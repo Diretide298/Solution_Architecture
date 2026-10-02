@@ -35,4 +35,60 @@
 #     producer-tickets: [SVC-ORDERS-CHECKOUT-1]
 #     consumer-tickets: [APP-POS-SCN-020, APP-WEB-GST-031]
 
-changes: []
+# BC-001 to BC-005 are one decision (CHG-CSP-002): `Session.saleBoardId` is no longer required, so every
+# operation that returns a Session reports it. Chinmay, 2 October 2026, door follow-ups: "Make it optional;
+# log the breaking change." Only a till session carries a board; a browser or handheld session has none.
+changes:
+  - id: BC-001
+    contract: identity
+    operation: login
+    change: "`session.saleBoardId` is no longer guaranteed"
+    reason: >-
+      A browser door (ADM-001, SUP-001, PTR-001) and the staff handheld (EMP-001) sign in with no workstation
+      since CHG-DOOR-001, and the board is derived from the workstation, so a required saleBoardId forced the
+      server to invent one. Only a till session carries it (CHG-CSP-002).
+    approved-by: Chinmay Parab, 2 October 2026 (door follow-ups)
+    tag: r2
+    producer-tickets: [SVC-IDENTITY-IDENTITY-2]
+    consumer-tickets: [APP-POS-POS-000, APP-STAFF-EMP-001, APP-SCANNER-SCN-001, APP-CONSOLE-ADM-001,
+                       APP-PARTNER-PTR-001, APP-SUPPORT-SUP-001]
+  - id: BC-002
+    contract: identity
+    operation: selectRole
+    change: "`saleBoardId` is no longer guaranteed"
+    reason: As BC-001; the role prompt returns the same Session (CHG-CSP-002).
+    approved-by: Chinmay Parab, 2 October 2026 (door follow-ups)
+    tag: r2
+    producer-tickets: [SVC-IDENTITY-IDENTITY-3]
+    consumer-tickets: [APP-POS-POS-000, APP-POS-POS-001, APP-STAFF-EMP-002, APP-SCANNER-SCN-001,
+                       APP-CONSOLE-ADM-001, APP-PARTNER-PTR-001, APP-SUPPORT-SUP-001]
+  - id: BC-003
+    contract: identity
+    operation: getCurrentSession
+    change: "`saleBoardId` is no longer guaranteed"
+    reason: As BC-001; a session read back from a browser or a handheld has no board (CHG-CSP-002).
+    approved-by: Chinmay Parab, 2 October 2026 (door follow-ups)
+    tag: r2
+    producer-tickets: [SVC-IDENTITY-IDENTITY-1]
+    consumer-tickets: [APP-POS-POS-000, APP-STAFF-EMP-001, APP-STAFF-EMP-002, APP-STAFF-EMP-042,
+                       APP-SCANNER-SCN-001, APP-CONSOLE-ADM-001, APP-PARTNER-PTR-001, APP-SUPPORT-SUP-001]
+  - id: BC-004
+    contract: identity
+    operation: completeSsoAuthorization
+    change: "`session.saleBoardId` is no longer guaranteed"
+    reason: As BC-001; SSO is offered only on browser doors and the staff handheld, none of which has a till
+      (CHG-DOOR-002, CHG-CSP-002).
+    approved-by: Chinmay Parab, 2 October 2026 (door follow-ups)
+    tag: r2
+    producer-tickets: [SVC-IDENTITY-IDENTITY]
+    consumer-tickets: [APP-STAFF-EMP-001, APP-CONSOLE-ADM-001, APP-PARTNER-PTR-001, APP-SUPPORT-SUP-001]
+  - id: BC-005
+    contract: identity
+    operation: verifyMfaChallenge
+    change: "`session.saleBoardId` is no longer guaranteed"
+    reason: As BC-001; the second factor completes the same sign-in and returns the same Session (CHG-CSP-002).
+    approved-by: Chinmay Parab, 2 October 2026 (door follow-ups)
+    tag: r2
+    producer-tickets: [SVC-IDENTITY-MFA-2]
+    consumer-tickets: [APP-POS-POS-000, APP-STAFF-EMP-001, APP-SCANNER-SCN-001, APP-CONSOLE-ADM-001,
+                       APP-PARTNER-PTR-001, APP-SUPPORT-SUP-001, APP-SETUP-BO-053]

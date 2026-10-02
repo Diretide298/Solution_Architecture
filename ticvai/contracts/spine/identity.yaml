@@ -486,6 +486,18 @@ paths:
         widens access somebody already holds, which is what makes a role hierarchy frightening to
         change and is why most of them are never changed.
 
+
+        **The presets a role starts from** (decided 2 October 2026, Chinmay, batch 1 ADM-554 and the
+        pre-apply round; DEC-007; CHG-CSP-003). The platform seeds, per module, three presets with
+        `isPreset` true: **All** (every capability of the module), **Viewer** (its read capabilities) and
+        **Mid-level** (reads plus the day-to-day writes, without the approve, publish and configure
+        capabilities), and the five starting configurations Cashier, Supervisor, Venue Manager, Finance
+        and Tenant Admin across modules. `createRole.presetCodes` copies them into a role. Each module''s
+        checklist carries that module''s own "Publish AI model" capability where it has AI models, so AI
+        release promotion goes to whoever holds it (the per-module permissions are
+        `contracts/shared/permissions.yaml`''s, outside this contract). `module` filters to one module''s
+        presets.
+
         '
       tags:
       - administration
@@ -494,6 +506,12 @@ paths:
       - staff
       x-ticvai-scope-level: tenant
       x-ticvai-read-routing: replica
+      parameters:
+      - name: module
+        in: query
+        description: A module (contract name, as `listModuleCapabilities`). Omitted returns every template.
+        schema:
+          type: string
       responses:
         '200':
           description: Templates
@@ -934,6 +952,7 @@ paths:
       x-ticvai-self-service: true
       x-ticvai-audience:
       - staff
+      - partner
       tags:
       - identity
       x-ticvai-permission: null
@@ -945,6 +964,18 @@ paths:
       summary: Choose a role for a multi-role session
       description: 'Per 12 Aug 2026 §4 — a user with one role logs in directly; a user with several is
         prompted to choose. Resolves the effective permission set.
+
+
+        **A partner chooses a role the same way** (decided 2 October 2026, Chinmay, door follow-ups;
+        CHG-CSP-001). PTR-001 Partner Login / MFA already called this operation while its audience named
+        staff only, so a partner user with two partner roles was refused at the door. `partner` joins
+        the audience; the operation, its request and its response are unchanged, and `login` already
+        admits partners.
+
+
+        **`Session.saleBoardId` is present only on a till session** (decided 2 October 2026, Chinmay;
+        CHG-CSP-002, breaking change BC-001 to BC-005): a session opened from a browser or a handheld
+        has no workstation and no board, and the field is absent rather than invented.
 
         '
       requestBody:
@@ -1483,12 +1514,25 @@ paths:
       x-ticvai-read-routing: replica
       summary: List roles
       description: 'A role is a grouping for permission management — code, name, description and the
-        permissions it carries (`Role.permissions`). **Seeded system roles ship with the tenant**
-        (`Role.isSystem`: editable, not deletable); every other role is created with `createRole`.
-        The seeded set is Cashier, Supervisor, Venue Manager, Finance and Tenant Admin, with the
-        permissions `docs/active/seed-data-proposal.md` section 2 drafts (proposed, client to correct;
-        audit R229).
-        Grants (`createDelegatedAccess`) attach a role or a single permission to a principal at a scope.
+        permissions it carries (`Role.permissions`). Grants (`createDelegatedAccess`) attach a role or a
+        single permission to a principal at a scope.
+
+
+        **No fixed default roles: the seeded sets are presets** (decided 2 October 2026, Chinmay, batch 1
+        ADM-554 and the pre-apply round; DEC-007; CHG-CSP-003). Chinmay: *"Default permission configs, so
+        to speak. We still have checklists: if they select Viewer, for example, they can still give that
+        viewer more permissions and rename it."* A new tenant starts with no roles. Creating one shows the
+        per-module permission checklist (`listModuleCapabilities`) and the presets
+        (`listCapabilityTemplates`: All, Viewer and Mid-level for each module, and the five starting
+        configurations Cashier, Supervisor, Venue Manager, Finance and Tenant Admin that
+        `docs/active/seed-data-proposal.md` section 2 drafted as roles, audit R229). **Picking a preset
+        fills the checklist and binds nothing**: every tick stays editable (`setRolePermissions`), the role
+        is renamed with `updateRole`, and `Role.presetCode` only records where it started. Who may promote
+        or publish an AI model is whichever role holds that module''s permission (ADR-0051, AI-D16).
+
+
+        `Role.isSystem` stays on the wire for clients built at r1 and is false on every role a tenant
+        creates from 2 October.
 
         '
       tags:
@@ -1530,6 +1574,15 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Create a role
+      description: '**Start from a preset, then edit the checklist** (decided 2 October 2026, Chinmay; DEC-007;
+        CHG-CSP-003). `presetCodes` names one or more presets (`listCapabilityTemplates`); their permissions
+        are copied into the new role, unioned with any `permissions` sent, and the copy binds to nothing:
+        changing a preset later never widens a role made from it. With neither, the role starts empty and
+        the checklist is ticked by hand. The initial set is checked as `setRolePermissions` checks it: a set
+        that breaches a `SegregationRule` is refused `422 segregation-breach`, naming the rule. An unknown
+        preset code is `422 unknown-preset`.
+
+        '
       tags:
       - administration
       x-ticvai-permission: ROLE_MANAGE
@@ -1560,6 +1613,18 @@ paths:
                 description:
                   type: string
                   maxLength: 500
+                presetCodes:
+                  type: array
+                  description: Presets (`CapabilityTemplate.code`) whose permissions fill the new role's
+                    checklist; copied, never bound (CHG-CSP-003).
+                  items:
+                    type: string
+                    maxLength: 64
+                permissions:
+                  type: array
+                  description: Permissions ticked on the checklist beyond the presets. Unioned with them.
+                  items:
+                    $ref: ../shared/permissions.yaml#/components/schemas/Permission
       responses:
         '201':
           headers:
@@ -1572,6 +1637,72 @@ paths:
                 $ref: '#/components/schemas/Role'
         '409':
           $ref: ../shared/common.yaml#/components/responses/DuplicateCode
+        '422':
+          description: A preset code that does not exist (`unknown-preset`), or an initial permission set that
+            breaches a segregation rule (`segregation-breach`, naming the rule and both permissions).
+          x-ticvai-problem-types:
+          - unknown-preset
+          - segregation-breach
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /roles/{roleId}:
+    parameters:
+    - name: roleId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    patch:
+      operationId: updateRole
+      x-ticvai-audience:
+      - staff
+      summary: Rename a role or change its description
+      description: '**A role made from a preset is renamed here** (decided 2 October 2026, Chinmay, pre-apply
+        round: *"they can still give that viewer more permissions and rename it"*; DEC-007; CHG-CSP-003).
+        Until this operation a role''s name was fixed at `createRole`. `code` does not change: a grant and
+        the audit log name the role by it. The permissions are `setRolePermissions`.
+
+        '
+      tags:
+      - administration
+      x-ticvai-permission: ROLE_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                name:
+                  type: string
+                  maxLength: 200
+                description:
+                  type: string
+                  maxLength: 500
+                  nullable: true
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The role, renamed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /delegated-access:
@@ -2176,6 +2307,14 @@ paths:
         this way needs no further verification.
 
         Government onboarding has lead time and should be started before it becomes the critical path.
+
+
+        **UAE Pass is integrated in release 1, and so is the ICP identity check** (decided 2 October 2026,
+        Chinmay, critical set 2, BO-627; DEC-457; CHG-CSP-034). Both need the client''s access to the
+        providers (UAE Pass onboarding and an ICP service agreement), which is an external dependency the
+        client owns. A UAE Pass identity counts as ID-verified (`IdentityGuestVerificationPolicy.uaePassSatisfiesIdDocument`);
+        the ICP check is a document verification, not a sign-in (`IdentityGuestVerificationPolicy.verificationProvider`
+        `icp`). Each venue''s own redirect URI is part of its domain setup (white-label `CustomDomain`; DEC-547).
 
         '
       tags:
@@ -4802,14 +4941,21 @@ paths:
         - "P09 ADM-342 Authentication & MFA Policy Manager"
       x-ticvai-agreed: '29 September: our build plan (5.3.21 "configurable identity workflows"); shape follows
         setPasswordPolicy'
-      x-ticvai-make-or-break: 'Which identity-verification provider, if any, does the client contract for
-        reviewMode provider or providerThenManual? — why: a name and an account only the client has. Manual
-        review works without one and is the default.'
+      x-ticvai-make-or-break: 'The provider is decided (ICP, release 1; Chinmay 2 October, DEC-457); the client''s
+        ICP service agreement and credentials for reviewMode provider or providerThenManual are still outstanding
+        — why: an account only the client has. Manual review works without one and is the default.'
       summary: Set which verifications a guest must pass, and when
       description: '5.3.21 (decided 29 September, build pass). **The configurable identity workflow**: which
         verifications registration requires, which moments require a verified ID document, which documents are
         accepted, who reviews them, and how long the scan is kept. One policy per tenant (identity is tenant-level
         under ADR-0018); PUT replaces it whole.
+
+
+        **UAE Pass and ICP are both in release 1** (decided 2 October 2026, Chinmay, critical set 2, BO-627;
+        DEC-457; CHG-CSP-034): `verificationProvider` `icp` is the government check behind `reviewMode`
+        `provider` and `providerThenManual`, and a UAE Pass sign-in satisfies the document requirement. Both
+        need the client''s access to the providers; until it exists a policy naming `icp` is refused `422
+        provider-not-connected` and manual review is what runs.
 
         '
       tags:
@@ -4839,6 +4985,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IdentityGuestVerificationPolicy'
+        '422':
+          description: '`verificationProvider` names a provider the tenant has no connection to yet
+            (`provider-not-connected`; CHG-CSP-034).'
+          x-ticvai-problem-types:
+          - provider-not-connected
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /role-suggestions:
@@ -5846,6 +6001,17 @@ components:
           default: manual
           description: Who checks a document. `provider` and `providerThenManual` need the client's verification
             provider (make-or-break on `setGuestVerificationPolicy`).
+        verificationProvider:
+          type: string
+          nullable: true
+          enum:
+          - icp
+          description: '**The government verification service behind `reviewMode` `provider`** (decided 2 October
+            2026, Chinmay; DEC-457; CHG-CSP-034): the UAE Federal Authority for Identity, Citizenship, Customs and
+            Port Security (ICP), integrated in release 1 once the client provides access. Null runs manual review
+            only. A verification it decides records `method` `provider`.
+
+            '
         documentImageRetention:
           type: string
           enum:
@@ -7186,6 +7352,35 @@ components:
           type: array
           items:
             type: string
+        module:
+          type: string
+          nullable: true
+          description: '**The module a per-module preset belongs to** (a contract name, as
+            `listModuleCapabilities`; CHG-CSP-003). Null for a template that spans modules, such as the
+            Cashier starting configuration.
+
+            '
+        presetLevel:
+          type: string
+          nullable: true
+          enum:
+          - all
+          - viewer
+          - midLevel
+          description: '**Which of the three per-module presets this is** (decided 2 October 2026, Chinmay;
+            DEC-007; CHG-CSP-003): All, Viewer or Mid-level. Null on a template a tenant saved itself and on
+            a cross-module starting configuration.
+
+            '
+        isPreset:
+          type: boolean
+          default: false
+          readOnly: true
+          description: '**Seeded by the platform, not saved by the tenant** (CHG-CSP-003). A preset is offered
+            when a role is created and cannot be deleted; a tenant saves its own tick-sets beside them with
+            `setCapabilityTemplate`.
+
+            '
         scopePath:
           type: string
           readOnly: true
@@ -7710,6 +7905,21 @@ components:
             **The seeded system roles are Cashier, Supervisor, Venue Manager, Finance and Tenant Admin**
             (proposed in `docs/active/seed-data-proposal.md` section 2, client to correct; audit R229).
 
+
+            **Superseded 2 October 2026: no fixed default roles** (Chinmay; DEC-007; CHG-CSP-003). The five
+            are presets (`CapabilityTemplate`, `isPreset`) a role starts from, not roles a tenant is given.
+            The field stays for clients built at r1 and is false on every role created from 2 October.
+
+            '
+        presetCode:
+          type: string
+          nullable: true
+          readOnly: true
+          maxLength: 64
+          description: '**The preset this role was started from, for the record only** (decided 2 October 2026,
+            Chinmay; DEC-007; CHG-CSP-003): the first of `createRole.presetCodes`, or null for a role ticked
+            by hand. It binds nothing; a later edit of the preset never changes this role.
+
             '
         principalCount:
           type: integer
@@ -8060,7 +8270,6 @@ components:
       - roleId
       - scope
       - effectivePermissions
-      - saleBoardId
       properties:
         sessionId:
           type: string
@@ -8102,6 +8311,15 @@ components:
           format: uuid
           description: 'Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3).
             Ticketing, F&B or Retail board.
+
+
+            **Optional since 2 October 2026: only a till session carries it** (Chinmay, door follow-ups;
+            CHG-CSP-002; breaking change against r1 approved as BC-001 to BC-005 in
+            `docs/active/breaking-changes.yaml`). A browser door (ADM-001, SUP-001, PTR-001) and a staff
+            handheld (EMP-001) sign in with no workstation since CHG-DOOR-001, so they have no board to
+            land on and the field is absent. On a till it is the workstation''s effective board: the
+            outlet''s board unless the till overrides it (`tenancy.Workstation.saleBoardSource`; CHG-CSP-006).
+            A client reads its landing from this field when present and from its own platform otherwise.
 
             '
         workstation:
