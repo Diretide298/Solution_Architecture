@@ -4643,6 +4643,7 @@ paths:
         format: uuid
     post:
       operationId: simulateRefund
+      x-ticvai-idempotency-exempt: A simulation writes nothing and calls no provider; repeating it is harmless (CHG-CSP-046).
       x-ticvai-audience:
       - staff
       summary: What a refund would do, without doing it
