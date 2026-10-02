@@ -29,7 +29,8 @@ decision_owner: Chinmay
 prevention:
   type: template-field
   ref: contracts/satellite/accreditation.yaml::faceMatching
-status: open
+status: closed
+closed_by_commit: 9bc4ce04
 notes: 'Dependencies: access BiometricPolicy and the ICP adaptor, identity guestUaePassLogin (spine); the external-dependency
   register entry for client access to UAE Pass and ICP (apply-docs). Batch CSA (apply-contracts-satellite), 2 October
-  2026; tickets: none started (Block A starts Monday 5 October). Closes on the commit that carries the change.'
+  2026; tickets: none started (Block A starts Monday 5 October).'
