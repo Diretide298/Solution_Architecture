@@ -39,8 +39,9 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: c481490c
 notes: 'Named bulkUpdateCatalogueProducts, not bulkUpdateProducts: operationIds are unique across the package
   (check-package refuses a second declaration) and the inventory operation keeps its id until it is retired. BO-007
   (P08, screens-p08-p09 or screens-move-adm049) rebinds from inventory.bulkUpdateProducts to this operation and adds
-  its consumed-by line. Batch FUP (apply-followup), 2 October 2026.'
+  its consumed-by line. Batch FUP (apply-followup), 2 October 2026. Closed on its commit; the prevention exists and run-checks runs it.'

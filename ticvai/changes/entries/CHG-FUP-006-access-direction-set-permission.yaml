@@ -29,6 +29,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: a7895ea6
 notes: 'No preset but a module''s all ticks it, so a venue grants it deliberately. CHG-CSP-032 stays open for its own
-  planned check. Batch FUP (apply-followup), 2 October 2026.'
+  planned check. Batch FUP (apply-followup), 2 October 2026. Closed on its commit; the prevention exists and run-checks runs it.'

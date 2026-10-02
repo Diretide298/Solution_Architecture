@@ -48,10 +48,11 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: a7895ea6
 notes: 'The permission switch on two r1 operations is breaking under SD-050; BC-006 and BC-007 carry Chinmay''s decision
   as the approval and move the producer and consumer tickets to r2 (none started). The lead confirms that reading of
   the decision (report question). x-ticvai-permission-by-module is a semantic key of check-contract-compat, so a later
   change to it is breaking too, and vocabulary_problems() fails one that names no map or field. Screens: ADM-508 and
   ADM-554 gate their publish and promote actions on the module permission (screens-p08-p09). Batch FUP
-  (apply-followup), 2 October 2026.'
+  (apply-followup), 2 October 2026. Closed on its commit; the prevention exists and run-checks runs it.'

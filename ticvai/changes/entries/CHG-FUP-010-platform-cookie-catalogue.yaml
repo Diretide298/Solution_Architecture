@@ -44,4 +44,4 @@ notes: 'check-contract-shapes caught two defects in the first draft (a search pa
   matches, a PUT with no address) and passes now. Open question for the lead: which permission curates the catalogue;
   PLATFORM_PLAN_MANAGE (the platform''s own catalogues) is used meanwhile, the alternative being a new
   PLATFORM_PRIVACY_MANAGE. No screen binds the catalogue yet: CMS-025 reads it (screens-guest), and the curation screen
-  is a new console screen if wanted (screens-p08-p09). Batch FUP (apply-followup), 2 October 2026.'
+  is a new console screen if wanted (screens-p08-p09). Batch FUP (apply-followup), 2 October 2026. Open until the lead names the curation permission; the contract change itself is in commit c481490c and check-contract-shapes passes it.'

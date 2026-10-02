@@ -40,8 +40,9 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: c481490c
 notes: 'roles.yaml keeps its shape (check-screens, check-step-up and derive-app-roles read it); only its description
   and a comment change. Verified: vocabulary_problems() reports a seed code that is not a Permission value. With this
   entry the planned prevention of CHG-CSP-003 (every preset lists only vocabulary permissions, every permission in one
-  module group) exists in check-contract-compat. Batch FUP (apply-followup), 2 October 2026.'
+  module group) exists in check-contract-compat. Batch FUP (apply-followup), 2 October 2026. Closed on its commit; the prevention exists and run-checks runs it.'

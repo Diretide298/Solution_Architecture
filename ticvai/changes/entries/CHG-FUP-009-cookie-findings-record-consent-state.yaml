@@ -40,7 +40,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: c481490c
 notes: 'Additive: every new request field is optional. listCookieScanFindings has no consumer yet; CMS-025 (P13,
   screens-guest) binds it and shows the violations list. The new table is derived at the refresh (derive-schema).
-  Batch FUP (apply-followup), 2 October 2026.'
+  Batch FUP (apply-followup), 2 October 2026. Closed on its commit; the prevention exists and run-checks runs it.'

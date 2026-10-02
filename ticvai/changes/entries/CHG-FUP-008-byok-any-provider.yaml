@@ -46,8 +46,9 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: c481490c
 notes: 'All additive against r1: no AiProviderKind value was added (a new native adapter later is a breaking change
   with an approval). The new optional testAiProvider body relies on CHG-FUP-002. ADM-037 (P09, screens-p08-p09) shows
   vendor, the compatibility result and the key hint, and offers activation only after a pass. Batch FUP
-  (apply-followup), 2 October 2026; tickets: none started.'
+  (apply-followup), 2 October 2026; tickets: none started. Closed on its commit; the prevention exists and run-checks runs it.'

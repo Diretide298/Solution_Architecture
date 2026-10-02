@@ -42,7 +42,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: a7895ea6
 notes: 'check-contract-compat now fails a Permission value outside the module groups or a preset ticking another
   module''s value (vocabulary_problems, CHG-FUP-001), and check-package already fails an operation permission outside
-  the enum. With CHG-FUP-004 to CHG-FUP-007 it completes CHG-CSA-007. Batch FUP (apply-followup), 2 October 2026.'
+  the enum. With CHG-FUP-004 to CHG-FUP-007 it completes CHG-CSA-007. Batch FUP (apply-followup), 2 October 2026. Closed on its commit; the prevention exists and run-checks runs it.'

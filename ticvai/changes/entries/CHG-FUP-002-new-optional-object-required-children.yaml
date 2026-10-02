@@ -27,7 +27,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: a7895ea6
 notes: 'Verified with a synthetic baseline: a new optional object `opt` with required `opt.inner` and `opt.list[].z`
   is additive, while a new top-level required field still fails. The new optional request objects of CHG-FUP-008 and
-  CHG-FUP-009 rely on it. Batch FUP (apply-followup), 2 October 2026.'
+  CHG-FUP-009 rely on it. Batch FUP (apply-followup), 2 October 2026. Closed on its commit; the prevention exists and run-checks runs it.'
