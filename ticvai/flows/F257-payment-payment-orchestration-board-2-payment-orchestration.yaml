@@ -1,11 +1,11 @@
 id: F257
 name: 'Payment Payment Orchestration board 2: Payment Orchestration Command Center\t27'
-actor: platformAdmin
+actor: venueManager
 wave: 3
 frequency: routine
 criticality: operational
 platforms:
-- P09 TICVAI Web
+- P08 Venue Management
 provenance: derived-from-board
 offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
   not guess.

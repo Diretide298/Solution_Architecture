@@ -492,7 +492,7 @@ paths:
         - "P08 BO-577 Maintenance Work Order"
         - "P08 BO-910 Maintenance & Resource Blocking"
         - "P08 BO-990 Maintenance & Out of Service"
-        - "P09 ADM-587 Terminal Health, Maintenance & Incident Center\t57"
+        - "P08 ADM-587 Terminal Health, Maintenance & Incident Center"
       x-ticvai-audience: [staff]
       summary: Raise a work order
       description: >

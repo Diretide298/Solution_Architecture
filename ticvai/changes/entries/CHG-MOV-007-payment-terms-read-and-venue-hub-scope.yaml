@@ -1,0 +1,41 @@
+id: CHG-MOV-007
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: ADM-603 reads the account's payment terms (getB2bPaymentTerms, now in the contract) and ADM-048 stops calling a platform-permission
+  read from a venue screen.
+decision:
+  what: ADM-603 binds getB2bPaymentTerms on load, shown in a Current payment terms panel, closing its deferred workshop-pack
+    gap. ADM-048 drops listMembershipCommercialPricing (PLATFORM_TENANT_VIEW at tenant scope); BO-291 keeps reading it for
+    membership pricing.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'The deferred workshop-pack gaps (CHG-WIR-027, deferred to this move by CHG-CSP-053 and CHG-CSA-044) are bound where
+  the operation exists: ADM-603''s gap was "a read of a B2B account''s payment terms (setB2bPaymentTerms has no get)", and
+  getB2bPaymentTerms now exists in contracts/satellite/payments.yaml. Design-notes correction ticketing-backoffice ADM-048:
+  "listMembershipCommercialPricing needs PLATFORM_TENANT_VIEW at tenant scope while the rest of the hub is venue-scoped PRODUCT_VIEW";
+  in Venue Management nobody holds a platform permission.'
+keys_touched:
+  screens:
+  - ADM-603
+  - ADM-048
+  operations:
+  - getB2bPaymentTerms
+  - listMembershipCommercialPricing
+  files:
+  - contracts/satellite/subscription.yaml (x-ticvai-consumed-by)
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ADM-603 (#20691)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: 56035b56
+notes: 'check-screen-wiring S-OP-UNREACHED (the new read is reached by its panel) and S-CONSUMED-MIRROR (the consumed-by lists
+  agree with the screens). No other workshop-pack gap has its operation yet: CHG-MOV-008.'

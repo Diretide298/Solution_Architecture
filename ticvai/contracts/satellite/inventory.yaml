@@ -3380,7 +3380,7 @@ paths:
       operationId: getInventoryKitDefinition
       x-ticvai-consumed-by:
         - "P08 BO-081 Inventory Items"
-        - "P09 ADM-189 Component Inventory & Availability Matrix"
+        - "P08 ADM-189 Component Inventory & Availability Matrix"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (retrace 4.4.20); shape follows getInventoryItem'

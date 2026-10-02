@@ -1823,7 +1823,7 @@ paths:
         - "P08 BO-124 Layout & Journey Builder"
         - "P08 BO-405 Reader Directory"
         - "P08 BO-732 POS & Device Assignment"
-        - "P09 ADM-580 Payment Terminal & Device Inventory\t49"
+        - "P08 ADM-580 Payment Terminal & Device Inventory\t49"
         - "P16 ANL-003 Operational Performance"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
@@ -2048,7 +2048,7 @@ paths:
     post:
       operationId: enrolDevice
       x-ticvai-consumed-by:
-        - "P09 ADM-581 Terminal Provisioning & Device Configuration\t51"
+        - "P08 ADM-581 Terminal Provisioning & Device Configuration"
       x-ticvai-conflict-policy: serverWins
       summary: Take a registered device through enrolment to activation
       description: '16.1.2, 16.1.3, 16.1.6. **`registerDevice` created a row; nothing turned it into a
@@ -2212,7 +2212,7 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-016 Till Configuration"
         - "P08 BO-732 POS & Device Assignment"
-        - "P09 ADM-582 POS, Kiosk & Terminal Assignment Manager\t52"
+        - "P08 ADM-582 POS, Kiosk & Terminal Assignment Manager"
       x-ticvai-conflict-policy: serverWins
       summary: Who owns it, who holds it, and where it is
       description: '16.2.9, 16.2.10 and 16.2.11. **Ownership, custody and location are three facts and
@@ -2271,8 +2271,8 @@ paths:
       operationId: getDeviceTelemetry
       x-ticvai-consumed-by:
         - "P08 BO-466 Reader & Device Health Monitor"
-        - "P09 ADM-584 Payment Server & Terminal Connectivity Manager\t54"
-        - "P09 ADM-587 Terminal Health, Maintenance & Incident Center\t57"
+        - "P08 ADM-584 Payment Server & Terminal Connectivity Manager"
+        - "P08 ADM-587 Terminal Health, Maintenance & Incident Center"
       summary: Battery, performance and consumables over time
       description: '16.4.21 and 16.4.22. **The heartbeat already carries consumables and nothing kept
         them.** A point-in-time reading answers *is it alive*; the matrix asks *is it degrading*, and
@@ -2323,7 +2323,7 @@ paths:
       operationId: listDeviceFirmware
       x-ticvai-consumed-by:
         - "P08 BO-129 Software, Configuration & Version Management"
-        - "P09 ADM-587 Terminal Health, Maintenance & Incident Center\t57"
+        - "P08 ADM-587 Terminal Health, Maintenance & Incident Center"
       summary: Firmware and software versions, and what is running where
       description: '16.6.30 and 16.6.32. **The fleet view, which is the only useful one.** *Which version
         is this scanner on* is rarely asked; *how many scanners are still on the version with the scan
@@ -2361,7 +2361,7 @@ paths:
       operationId: createDeviceFirmware
       x-ticvai-consumed-by:
         - "P08 BO-129 Software, Configuration & Version Management"
-        - "P09 ADM-587 Terminal Health, Maintenance & Incident Center\t57"
+        - "P08 ADM-587 Terminal Health, Maintenance & Incident Center"
       x-ticvai-agreed: '29 September: re-trace 16.6.30 and 16.6.33 (nothing wrote the table the rollout
         references); our build plan; shape follows startDeviceFirmwareRollout'
       summary: Register a firmware or software release before it is deployed
@@ -2429,7 +2429,7 @@ paths:
       operationId: getDeviceFirmware
       x-ticvai-consumed-by:
         - "P08 BO-129 Software, Configuration & Version Management"
-        - "P09 ADM-587 Terminal Health, Maintenance & Incident Center\t57"
+        - "P08 ADM-587 Terminal Health, Maintenance & Incident Center"
       x-ticvai-agreed: '29 September: re-trace 16.6.30 (release read beside the new write); our build
         plan; shape follows getDevice'
       summary: Read one firmware release, and how much of the fleet is on it
