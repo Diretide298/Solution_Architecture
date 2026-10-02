@@ -3342,6 +3342,103 @@ paths:
                         $ref: '#/components/schemas/ActiveSession'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /auth/sessions/mine:
+    get:
+      operationId: listOwnSessions
+      x-ticvai-self-service: true
+      x-ticvai-audience:
+      - staff
+      - partner
+      x-ticvai-read-routing: primary
+      summary: The caller's own signed-in sessions
+      description: '**A person''s own sessions, for "My account & security"** (decided 2 October 2026, Chinmay, door
+        follow-ups: "Operator''s own MFA and sessions: add ''My account & security''"; CHG-CSP-052). The new console screen
+        shows a platform operator, and any staff or partner user, where they are signed in, from which device and since
+        when, beside their own MFA methods (`listMfaMethods`, `enrolMfaMethod`, `removeMfaMethod`, already self-service).
+        `listActiveSessions` answers the same question about everybody and needs SESSION_FORCE_LOGOUT; this answers it
+        about the caller only and needs no permission. The current session is marked. **Ordered by `startedAt`, most
+        recent first, `sessionId` as the tiebreak.**
+
+        '
+      tags:
+      - session
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The caller's sessions
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ActiveSession'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /auth/sessions/mine/{sessionId}/end:
+    parameters:
+    - name: sessionId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: endOwnSession
+      x-ticvai-self-service: true
+      x-ticvai-audience:
+      - staff
+      - partner
+      summary: Sign one of the caller's own sessions out
+      description: '**Sign out a device you left signed in** (door follow-ups, 2 October 2026; CHG-CSP-052). Ends one of
+        the caller''s own sessions, revoking its tokens; a session that is not the caller''s is `404`, never `403`, so the
+        call reveals nothing about anybody else''s. Ending the session in use is `logout`. A session holding an open shift
+        is ended and the shift is reported, as `revokeAllSessions` reports it, not closed.
+
+        '
+      tags:
+      - session
+      x-ticvai-permission: null
+      x-ticvai-step-up: mfa
+      x-ticvai-step-up-reason: Ending a session elsewhere is an account-security act; the second factor proves it is the owner at the keyboard.
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Ended
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActiveSession'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The session is the one in use (`use-logout`) or has already ended (`session-ended`).
+          x-ticvai-problem-types:
+          - use-logout
+          - session-ended
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/sessions/revoke-all:
     post:
       operationId: revokeAllSessions
