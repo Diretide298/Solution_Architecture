@@ -1976,7 +1976,7 @@ screens:
 - id: CMS-010
   name: Media Library
   module: White Label
-  requiresModule: ticketing
+  requiresModule: core
   wave: 2
   capability: C00
   implementation:
@@ -2032,26 +2032,26 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: textField
+      - kind: selectField
         label: Kind
         operation: searchMedia
-        notes: Sends `?kind=` to `searchMedia`.
-        provenance: contract assets.yaml GET /media
-      - kind: textField
+        notes: The media kinds (image, video, document, audio) as a choice; sends `kind`.
+        provenance: corrected 2 October 2026 (CHG-SGU-019, design-notes correction)
+      - kind: multiSelect
         label: Tag
         operation: searchMedia
-        notes: Sends `?tag=` to `searchMedia`.
-        provenance: contract assets.yaml GET /media
-      - kind: textField
-        label: Collection id
+        notes: Tags picked from the taxonomy; sends `tag`.
+        provenance: corrected 2 October 2026 (CHG-SGU-019, design-notes correction)
+      - kind: selectField
+        label: Collection
         operation: searchMedia
-        notes: Sends `?collectionId=` to `searchMedia`.
-        provenance: contract assets.yaml GET /media
-      - kind: textField
-        label: Venue id
+        notes: Collections by name; sends `collectionId`.
+        provenance: corrected 2 October 2026 (CHG-SGU-019, design-notes correction)
+      - kind: selectField
+        label: Venue
         operation: searchMedia
-        notes: Sends `?venueId=` to `searchMedia`.
-        provenance: contract assets.yaml GET /media
+        notes: Venues by name; sends `venueId`.
+        provenance: corrected 2 October 2026 (CHG-SGU-019, design-notes correction)
       - kind: searchField
         label: Search
         operation: searchMedia
@@ -2071,7 +2071,6 @@ screens:
         label: Every media asset
         bindsTo: MediaAsset
         columns:
-        - MediaAsset.id
         - MediaAsset.kind
         - MediaAsset.status
         - MediaAsset.filename
@@ -2082,22 +2081,17 @@ screens:
         - MediaAsset.width
         - MediaAsset.height
         - MediaAsset.durationSeconds
-        - MediaAsset.customMetadata
         operation: searchMedia
-        provenance: contract assets.yaml GET /media
+        provenance: corrected 2 October 2026 (CHG-SGU-019, design-notes correction)
       - kind: dataTable
         label: Every collection
         bindsTo: Collection
         columns:
-        - Collection.id
         - Collection.name
         - Collection.description
-        - Collection.venueId
-        - Collection.parentCollectionId
         - Collection.assetCount
-        - Collection.coverAssetId
         operation: listCollections
-        provenance: contract assets.yaml GET /media/collections
+        provenance: corrected 2 October 2026 (CHG-SGU-019, design-notes correction)
       - kind: confirmDialog
         derived: true
         label: Confirm
@@ -2478,66 +2472,46 @@ screens:
     - name: contentBody
       slot: fields
       components:
-      - kind: textField
-        label: id
-        bindsTo: SeoMetadata.id
-        provenance: contract marketing-crm.yaml PUT /seo-metadata
-      - kind: textField
-        label: entityKind
-        bindsTo: SeoMetadata.entityKind
-        provenance: contract marketing-crm.yaml PUT /seo-metadata
-      - kind: textField
-        label: entityId
+      - kind: searchField
+        label: Page
         bindsTo: SeoMetadata.entityId
-        provenance: contract marketing-crm.yaml PUT /seo-metadata
+        operation: setSeoMetadata
+        notes: Pick the page (content page, product, event, performance, membership, promotion, venue)
+          from a search, never by id; the kind follows from the pick.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+      - kind: selectField
+        label: Language
+        notes: One tab per enabled locale; hreflang pairs are generated from the tabs.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
       - kind: textField
-        label: locale
-        bindsTo: SeoMetadata.locale
-        provenance: contract marketing-crm.yaml PUT /seo-metadata
-      - kind: textField
-        label: title
+        label: Title
         bindsTo: SeoMetadata.title
-        provenance: contract marketing-crm.yaml PUT /seo-metadata
+        operation: setSeoMetadata
+        notes: Counter at about 60 characters; "Generated" badge until edited, with Revert to generated.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
       - kind: textField
-        label: metaDescription
+        label: Description
         bindsTo: SeoMetadata.metaDescription
-        provenance: contract marketing-crm.yaml PUT /seo-metadata
+        operation: setSeoMetadata
+        notes: Counter at about 160 characters.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
       - kind: textField
-        label: keywords
-        bindsTo: SeoMetadata.keywords
-        provenance: contract marketing-crm.yaml PUT /seo-metadata
-      - kind: textField
-        label: canonicalUrl
-        bindsTo: SeoMetadata.canonicalUrl
-        provenance: contract marketing-crm.yaml PUT /seo-metadata
-      - kind: textField
-        label: slug
+        label: Address (slug)
         bindsTo: SeoMetadata.slug
-        provenance: contract marketing-crm.yaml PUT /seo-metadata
-      - kind: textField
-        label: hreflang
-        bindsTo: SeoMetadata.hreflang
-        provenance: contract marketing-crm.yaml PUT /seo-metadata
-      - kind: textField
-        label: schemaOrgType
-        bindsTo: SeoMetadata.schemaOrgType
-        provenance: contract marketing-crm.yaml PUT /seo-metadata
-      - kind: textField
-        label: openGraph
-        bindsTo: SeoMetadata.openGraph
-        provenance: contract marketing-crm.yaml PUT /seo-metadata
-      - kind: textField
-        label: isAutoGenerated
-        bindsTo: SeoMetadata.isAutoGenerated
-        provenance: contract marketing-crm.yaml PUT /seo-metadata
-      - kind: textField
-        label: noIndex
+        operation: setSeoMetadata
+        notes: Editing a live slug warns that a 301 redirect from the old address is created (`createUrlRedirect`).
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+      - kind: toggle
+        label: Hide from search
         bindsTo: SeoMetadata.noIndex
-        provenance: contract marketing-crm.yaml PUT /seo-metadata
+        operation: setSeoMetadata
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
       - kind: textField
-        label: scopePath
-        bindsTo: SeoMetadata.scopePath
-        provenance: contract marketing-crm.yaml PUT /seo-metadata
+        label: Social share card
+        bindsTo: SeoMetadata.openGraph
+        operation: setSeoMetadata
+        notes: Title, description and image; previewed beside the search snippet.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
       - kind: detailPanel
         label: Metadata in force
         bindsTo: SeoMetadata
@@ -2557,7 +2531,8 @@ screens:
   states:
     loading: Detail loads
     error: Could not load
-    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyFirstRun: 'No metadata saved for this page yet: the generated title and description are shown
+      with the "Generated" badge.'
     emptyNoAccess: Shown when the caller lacks `MARKETING_MANAGE`, which `setSeoMetadata` requires, and
       names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
@@ -3654,7 +3629,12 @@ screens:
 
 
     **Rewired 23 September (L7).** The screen called the maintenance equipment register, guest CRM or
-    subscription billing where its purpose names White Labelling. Its operations now match its purpose.'
+    subscription billing where its purpose names White Labelling. Its operations now match its purpose.
+
+
+    **Two permission families on one screen (DI-387; CHG-SGU-017).** Policies need `TENANT_CONFIGURE`; consent
+    purposes and questions need `GUEST_MANAGE` (reads `GUEST_VIEW`). A role holding one and not the other
+    sees the other section read-only, or hidden with the permission named, never a broken page.'
   density: compact
   pattern: listDetail
   patternReason: '`listPolicies` reads a population and nothing reads one of them; the detail is the row
@@ -3665,8 +3645,8 @@ screens:
   states:
     loading: The consent legal list.
     error: Could not load. Names which read failed and leaves the consent legal untouched.
-    emptyFirstRun: No consent legal yet. **Offers no create action** — this screen declares no operation
-      that makes one — and says so rather than showing an empty table.
+    emptyFirstRun: No policy, purpose or consent question yet. Offers Save policy (`setPolicy`), Save
+      consent purposes (`setConsentPurposes`) and New consent question (`createConsentQuestion`).
     emptyNoResults: '`listPolicies` takes no filter. The consent questions (kind, status) and the consent
       records (order, guest, question) do: an empty result names the active filter and offers to clear
       it.'
@@ -3741,6 +3721,7 @@ screens:
         - Policy.scopePath
         operation: listPolicies
         provenance: contract white-label.yaml GET /tenant-config/policies
+        permission: TENANT_CONFIGURE
       - kind: dataTable
         label: Every consent purpose config
         bindsTo: ConsentPurposeConfig
@@ -3754,6 +3735,7 @@ screens:
         - ConsentPurposeConfig.expiresAfterMonths
         operation: listConsentPurposes
         provenance: contract marketing-crm.yaml GET /consent-purposes
+        permission: GUEST_VIEW
       - kind: dataTable
         label: Every booking consent question
         bindsTo: ConsentQuestion
@@ -3773,6 +3755,7 @@ screens:
           flow on CMS-016 (`BookingFlowConfig.consentQuestionIds`, per venue), to a product on BO-008
           (`Product.consentQuestionIds`).'
         provenance: contract marketing-crm.yaml GET /consent-questions
+        permission: GUEST_VIEW
       - kind: dataTable
         label: Consent records
         bindsTo: BookingConsentRecord
@@ -3794,6 +3777,7 @@ screens:
           3 REV3-26). Filter by order, guest or question. Read-only: an answer is never edited here, and
           a superseded answer stays listed with `supersededAt`.'
         provenance: contract marketing-crm.yaml GET /consent-answers
+        permission: GUEST_VIEW
     - name: contextPanel
       slot: selection
       components:
@@ -3811,6 +3795,7 @@ screens:
         - Policy.scopePath
         operation: listPolicies
         provenance: contract white-label.yaml GET /tenant-config/policies
+        permission: TENANT_CONFIGURE
       - kind: detailPanel
         label: The selected consent question
         bindsTo: ConsentQuestion
@@ -3825,6 +3810,7 @@ screens:
         - ConsentQuestion.status
         operation: listConsentQuestions
         provenance: contract marketing-crm.yaml GET /consent-questions
+        permission: GUEST_VIEW
     - name: actionBar
       slot: rowActions
       components:
@@ -3832,14 +3818,17 @@ screens:
         label: Save policy
         operation: setPolicy
         provenance: contract white-label.yaml PUT /tenant-config/policies/{policyKind}
+        permission: TENANT_CONFIGURE
       - kind: secondaryButton
         label: Save consent purposes
         operation: setConsentPurposes
         provenance: contract marketing-crm.yaml PUT /consent-purposes
+        permission: GUEST_MANAGE
       - kind: secondaryButton
         label: New consent question
         operation: createConsentQuestion
         provenance: contract marketing-crm.yaml POST /consent-questions
+        permission: GUEST_MANAGE
       - kind: secondaryButton
         label: Save as new version
         operation: updateConsentQuestion
@@ -3847,12 +3836,14 @@ screens:
           changing the text, scope, required or blocking answer raises `version` by one, and every answer
           already given keeps the version it was given against.'
         provenance: contract marketing-crm.yaml PATCH /consent-questions/{questionId}
+        permission: GUEST_MANAGE
       - kind: destructiveButton
         label: Retire question
         operation: updateConsentQuestion
         notes: Sets `status` to `retired`. It stops being asked on every flow and product it is attached
           to and changes no version; the answers already given stay on record.
         provenance: contract marketing-crm.yaml PATCH /consent-questions/{questionId}
+        permission: GUEST_MANAGE
   entryState:
     params:
     - name: policyKind
@@ -4001,32 +3992,32 @@ screens:
         label: Every principal
         bindsTo: Principal
         columns:
-        - Principal.id
         - Principal.username
         - Principal.displayName
         - Principal.isActive
         - Principal.validFrom
         - Principal.validTo
-        - Principal.primaryRoleId
         - Principal.roles
         - Principal.lastLoginAt
         operation: listPrincipals
-        provenance: contract identity.yaml GET /principals
+        provenance: corrected 2 October 2026 (CHG-SGU-019, design-notes correction)
+        notes: The role a principal holds and the role another inherits from are shown by name; raw ids
+          only in the detail panel's copy action.
       - kind: dataTable
         label: Every role
         bindsTo: Role
         columns:
-        - Role.id
         - Role.code
         - Role.name
         - Role.description
         - Role.permissions
-        - Role.inheritsFromRoleId
         - Role.isSystem
         - Role.principalCount
         - Role.grantCount
         operation: listRoles
-        provenance: contract identity.yaml GET /roles
+        provenance: corrected 2 October 2026 (CHG-SGU-019, design-notes correction)
+        notes: The role a principal holds and the role another inherits from are shown by name; raw ids
+          only in the detail panel's copy action.
     - name: contextPanel
       slot: selection
       components:
@@ -4054,8 +4045,9 @@ screens:
   states:
     loading: The user access list.
     error: Could not load. Names which read failed and leaves the user access untouched.
-    emptyFirstRun: No user access yet. **Offers no create action** — this screen declares no operation
-      that makes one — and says so rather than showing an empty table.
+    emptyFirstRun: "Nobody but the tenant owner has access yet: an empty list here is normal on a new
+      tenant. Change access is offered on each person once they exist; people are invited from the platform's
+      user management, not here."
     emptyNoResults: Nothing matches the filter on scopePath, isActive and the user access are still there.
       Names the active filter and offers to clear it.
     emptyNoAccess: Shown when the caller lacks `USER_MANAGE`, which `listPrincipals` requires, and names
@@ -9536,40 +9528,40 @@ screens:
     template: split
     regions:
     - name: contentBody
-      slot: collection
+      slot: metrics
       components:
-      - kind: dataTable
-        label: Every digital asset
-        columns:
-        - Total Digital Assets
-        - Images
-        - Videos
-        - Uploads
-        - Updates
-        - Downloads
-        - Shares
-        - Recently Used
-        bindsTo: null
-        operation: null
-        provenance: pack Digital Asset Management DAM.pdf, page 3 §Display
-    - name: contextPanel
-      slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected digital asset
-        bindsTo: null
-        columns:
-        - Total Digital Assets
-        - Images
-        - Videos
-        - Uploads
-        - Updates
-        - Downloads
-        - Shares
-        - Recently Used
-        notes: 'The pack groups this record''s detail under its own headings: “Digital Asset Management”,
-          “Unclassified 128”, “Charts by”.'
-        provenance: pack Digital Asset Management DAM.pdf, page 3 §Display
+      - kind: metricTile
+        label: Total Digital Assets
+        operation: getMediaUsageAnalytics
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
+      - kind: metricTile
+        label: Images
+        operation: getMediaUsageAnalytics
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
+      - kind: metricTile
+        label: Videos
+        operation: getMediaUsageAnalytics
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
+      - kind: metricTile
+        label: Uploads
+        operation: getMediaUsageAnalytics
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
+      - kind: metricTile
+        label: Updates
+        operation: getMediaUsageAnalytics
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
+      - kind: metricTile
+        label: Downloads
+        operation: getMediaUsageAnalytics
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
+      - kind: metricTile
+        label: Shares
+        operation: getMediaUsageAnalytics
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
+      - kind: metricTile
+        label: Recently Used
+        operation: getMediaUsageAnalytics
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
     - name: actionBar
       slot: rowActions
       components:
@@ -9585,8 +9577,8 @@ screens:
   states:
     loading: The digital asset list.
     error: Could not load. Names which read failed and leaves the digital asset untouched.
-    emptyFirstRun: No digital asset yet. Carries the create action; distinct from a filter that matched
-      nothing.
+    emptyFirstRun: Nothing here yet for Digital Asset Management Command Center. This screen only reads,
+      so it offers no create action and says where the records come from.
     emptyNoResults: The filter narrowed it and the digital asset are still there. Names the active filter
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -9685,6 +9677,11 @@ screens:
         notes: The pack filters this screen by tenant, venue, asset type, category, collection, tags and
           5 more — which are present is a decision the pack already made.
         provenance: pack Digital Asset Management DAM.pdf, page 5 §Allow filtering by
+      - kind: selectField
+        label: Sort by
+        notes: 'Name, updated date or file size. "Ticket Media" is not a filter here: wristband and ticket
+          media are not library assets.'
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
     - name: contentBody
       slot: collection
       components:
@@ -9725,12 +9722,6 @@ screens:
     - name: actionBar
       slot: rowActions
       components:
-      - kind: primaryButton
-        label: File Size
-        provenance: pack Digital Asset Management DAM.pdf, page 5 §Support
-      - kind: secondaryButton
-        label: Ticket Media
-        provenance: pack Digital Asset Management DAM.pdf, page 5 §Support at minimum
       - kind: secondaryButton
         label: Preview
         provenance: pack Digital Asset Management DAM.pdf, page 5 §Actions
@@ -9749,8 +9740,8 @@ screens:
   states:
     loading: The central digital asset list.
     error: Could not load. Names which read failed and leaves the central digital asset untouched.
-    emptyFirstRun: No central digital asset yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: Nothing here yet for Central Digital Asset Library. This screen only reads, so it offers
+      no create action and says where the records come from.
     emptyNoResults: The filter narrowed it and the central digital asset are still there. The pack's own
       statuses are 🟢 Active — the state names which is selected.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -9882,7 +9873,7 @@ screens:
     purpose: Auto-tag on ingest
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id001
+    invalidates:
     - getMediaAsset
   wireframe:
     status: notStarted
@@ -10058,35 +10049,19 @@ screens:
   layout:
     template: split
     regions:
-    - name: actionBar
-      slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Asset Name
-        provenance: pack Digital Asset Management DAM.pdf, page 9 §Support
-      - kind: secondaryButton
-        label: Asset Type
-        provenance: pack Digital Asset Management DAM.pdf, page 9 §Support
-      - kind: secondaryButton
-        label: Venue
-        provenance: pack Digital Asset Management DAM.pdf, page 9 §Support
-      - kind: secondaryButton
-        label: Campaign
-        provenance: pack Digital Asset Management DAM.pdf, page 9 §Support
-      - kind: secondaryButton
-        label: Event
-        provenance: pack Digital Asset Management DAM.pdf, page 9 §Support
-      - kind: secondaryButton
-        label: Attraction
-        provenance: pack Digital Asset Management DAM.pdf, page 9 §Support
-      - kind: secondaryButton
-        label: Owner
-        provenance: pack Digital Asset Management DAM.pdf, page 9 §Support
-      - kind: secondaryButton
-        label: Source
-        provenance: pack Digital Asset Management DAM.pdf, page 9 §Support
     - name: contentBody
-      components: []
+      slot: collection
+      components:
+      - kind: dataTable
+        label: Metadata fields
+        operation: getMediaTaxonomy
+        notes: One row per field of the taxonomy (Asset Name, Asset Type, Venue, Campaign, Event, Attraction,
+          Owner, Source), with its type and whether it is required; edited with `setMediaTaxonomy`.
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
+      - kind: primaryButton
+        label: Save taxonomy
+        operation: setMediaTaxonomy
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
   states:
     loading: The metadata taxonomy list.
     error: Could not load. Names which read failed and leaves the metadata taxonomy untouched.
@@ -10116,6 +10091,18 @@ screens:
   apisNote: Regenerated 9 September 2026 from Digital Asset Management DAM.pdf page 9. 0 of 0 labels bound
     to a contract property; 9 of 51 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  overlays:
+  - id: formSetMediaTaxonomy
+    component: modal
+    trigger: Save taxonomy
+    body: 'The fields of the taxonomy as edited in the table: name, type, whether required, and the allowed
+      values for a choice field. Dismissing sends nothing.'
+    confirm:
+      label: Save taxonomy
+      operation: setMediaTaxonomy
+    dismiss:
+      label: Cancel
+    provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
 - id: CMS-066
   name: Tags, Keywords & Classification
   module: Media Library
@@ -10153,17 +10140,21 @@ screens:
       slot: fields
       components:
       - kind: selectField
-        label: 'Venue: Dubai Park'
-        provenance: pack Digital Asset Management DAM.pdf, page 11 §Select 100 assets and apply
+        label: 'Venue'
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
+        notes: e.g. Dubai Park
       - kind: selectField
-        label: 'Category: Marketing'
-        provenance: pack Digital Asset Management DAM.pdf, page 11 §Select 100 assets and apply
+        label: 'Category'
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
+        notes: e.g. Marketing
       - kind: selectField
-        label: 'Campaign: Summer 2026'
-        provenance: pack Digital Asset Management DAM.pdf, page 11 §Select 100 assets and apply
+        label: 'Campaign'
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
+        notes: e.g. Summer 2026
       - kind: selectField
-        label: 'Tags: Family, Outdoor'
-        provenance: pack Digital Asset Management DAM.pdf, page 11 §Select 100 assets and apply
+        label: 'Tags'
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
+        notes: e.g. Family, Outdoor
   states:
     loading: The tags keywords classification configuration as saved.
     error: Could not load. Names which read failed and leaves the tags keywords classification untouched.
@@ -10179,7 +10170,7 @@ screens:
     purpose: Tags and keywords, with their origin
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id002
+    invalidates:
     - searchMedia
     - getMediaAsset
   - operationId: getMediaTaxonomy
@@ -10274,8 +10265,8 @@ screens:
   states:
     loading: The advanced search discovery list.
     error: Could not load. Names which read failed and leaves the advanced search discovery untouched.
-    emptyFirstRun: No advanced search discovery yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: Nothing here yet for Advanced Search & Discovery. This screen only reads, so it offers
+      no create action and says where the records come from.
     emptyNoResults: The filter narrowed it and the advanced search discovery are still there. Names the
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -10390,8 +10381,8 @@ screens:
   states:
     loading: The digital asset 360° list.
     error: Could not load. Names which read failed and leaves the digital asset 360° untouched.
-    emptyFirstRun: No digital asset 360° yet. Carries the create action; distinct from a filter that matched
-      nothing.
+    emptyFirstRun: Nothing here yet for Digital Asset 360° Profile. This screen only reads, so it offers
+      no create action and says where the records come from.
     emptyNoResults: The filter narrowed it and the digital asset 360° are still there. The pack's own
       statuses are 🟢 Active — the state names which is selected.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -10501,7 +10492,8 @@ screens:
   states:
     loading: The bulk asset list.
     error: Could not load. Names which read failed and leaves the bulk asset untouched.
-    emptyFirstRun: No bulk asset yet. Carries the create action; distinct from a filter that matched nothing.
+    emptyFirstRun: Nothing here yet for Bulk Asset Management Workspace. This screen only reads, so it
+      offers no create action and says where the records come from.
     emptyNoResults: The filter narrowed it and the bulk asset are still there. Names the active filter
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -10633,8 +10625,8 @@ screens:
   states:
     loading: The asset activity recent list.
     error: Could not load. Names which read failed and leaves the asset activity recent untouched.
-    emptyFirstRun: No asset activity recent yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: Nothing here yet for Asset Activity, Recent Assets & Library Health. This screen only
+      reads, so it offers no create action and says where the records come from.
     emptyNoResults: The filter narrowed it and the asset activity recent are still there. Names the active
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -10749,57 +10741,86 @@ screens:
     template: split
     regions:
     - name: contentBody
-      slot: collection
+      slot: metrics
       components:
-      - kind: dataTable
-        label: Every asset intelligence
-        columns:
-        - AI-Processed Assets
-        - Pending AI Processing
-        - AI Tags Generated
-        - Duplicate Candidates
-        - Version Updates
-        - Renditions Generated
-        - Processing Failures
-        - Assets Requiring Review
-        - Processed
-        - Queued
-        - Processing
-        - Review Required
-        - Failed
-        - 95–100%
-        - 80–94%
-        - 60–79%
-        - Below Threshold
-        bindsTo: null
-        operation: null
-        provenance: pack Digital Asset Management DAM.pdf, page 25 §Display
-    - name: contextPanel
-      slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected asset intelligence
-        bindsTo: null
-        columns:
-        - AI-Processed Assets
-        - Pending AI Processing
-        - AI Tags Generated
-        - Duplicate Candidates
-        - Version Updates
-        - Renditions Generated
-        - Processing Failures
-        - Assets Requiring Review
-        - Processed
-        - Queued
-        - Processing
-        - Review Required
-        - Failed
-        - 95–100%
-        - 80–94%
-        - 60–79%
-        - Below Threshold
-        notes: null
-        provenance: pack Digital Asset Management DAM.pdf, page 25 §Display
+      - kind: metricTile
+        label: AI-Processed Assets
+        operation: getMediaUsageAnalytics
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
+      - kind: metricTile
+        label: Pending AI Processing
+        operation: getMediaUsageAnalytics
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
+      - kind: metricTile
+        label: AI Tags Generated
+        operation: getMediaUsageAnalytics
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
+      - kind: metricTile
+        label: Duplicate Candidates
+        operation: getMediaUsageAnalytics
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
+      - kind: metricTile
+        label: Version Updates
+        operation: getMediaUsageAnalytics
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
+      - kind: metricTile
+        label: Renditions Generated
+        operation: getMediaUsageAnalytics
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
+      - kind: metricTile
+        label: Processing Failures
+        operation: getMediaUsageAnalytics
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
+      - kind: metricTile
+        label: Assets Requiring Review
+        operation: getMediaUsageAnalytics
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
+      - kind: metricTile
+        label: Processed
+        operation: getMediaUsageAnalytics
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
+      - kind: metricTile
+        label: Queued
+        operation: getMediaUsageAnalytics
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
+      - kind: metricTile
+        label: Processing
+        operation: getMediaUsageAnalytics
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
+      - kind: metricTile
+        label: Review Required
+        operation: getMediaUsageAnalytics
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
+      - kind: metricTile
+        label: Failed
+        operation: getMediaUsageAnalytics
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
+      - kind: metricTile
+        label: 95–100%
+        operation: getMediaUsageAnalytics
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
+      - kind: metricTile
+        label: 80–94%
+        operation: getMediaUsageAnalytics
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
+      - kind: metricTile
+        label: 60–79%
+        operation: getMediaUsageAnalytics
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
+      - kind: metricTile
+        label: Below Threshold
+        operation: getMediaUsageAnalytics
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
+      - kind: chart
+        label: AI processing over time
+        operation: getMediaUsageAnalytics
+        notes: 'Per VO-R02: processing volume by day.'
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
+      - kind: chart
+        label: Confidence bands
+        operation: getMediaUsageAnalytics
+        notes: 'Per VO-R02: high, medium and low confidence counts; drawn pending the fields (CHG-SGU-024).'
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
     - name: actionBar
       slot: rowActions
       components:
@@ -10940,13 +10961,16 @@ screens:
     purpose: Auto-tag and describe
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id001
+    invalidates:
+    - getMediaAsset
   - operationId: setMediaAssetTags
     contract: assets
     purpose: Promote the proposals
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id002
+    invalidates:
+    - searchMedia
+    - getMediaAsset
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-072
@@ -11035,8 +11059,8 @@ screens:
   states:
     loading: The semantic natural-language asset list.
     error: Could not load. Names which read failed and leaves the semantic natural-language asset untouched.
-    emptyFirstRun: No semantic natural-language asset yet. Carries the create action; distinct from a
-      filter that matched nothing.
+    emptyFirstRun: Nothing here yet for Semantic & Natural-Language Asset Search. This screen only reads,
+      so it offers no create action and says where the records come from.
     emptyNoResults: The filter narrowed it and the semantic natural-language asset are still there. Names
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -11150,8 +11174,8 @@ screens:
   states:
     loading: The visual similarity related list.
     error: Could not load. Names which read failed and leaves the visual similarity related untouched.
-    emptyFirstRun: No visual similarity related yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: Nothing here yet for Visual Similarity & Related Asset Discovery. This screen only
+      reads, so it offers no create action and says where the records come from.
     emptyNoResults: The filter narrowed it and the visual similarity related are still there. Names the
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -11294,8 +11318,8 @@ screens:
   states:
     loading: The duplicate near-duplicate list.
     error: Could not load. Names which read failed and leaves the duplicate near-duplicate untouched.
-    emptyFirstRun: No duplicate near-duplicate yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: Nothing here yet for Duplicate & Near-Duplicate Management. This screen only reads,
+      so it offers no create action and says where the records come from.
     emptyNoResults: The filter narrowed it and the duplicate near-duplicate are still there. Names the
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -11396,8 +11420,8 @@ screens:
   states:
     loading: The asset version revision list.
     error: Could not load. Names which read failed and leaves the asset version revision untouched.
-    emptyFirstRun: No asset version revision yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: Nothing here yet for Asset Version Control & Revision History. This screen only reads,
+      so it offers no create action and says where the records come from.
     emptyNoResults: The filter narrowed it and the asset version revision are still there. Names the active
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -11413,7 +11437,7 @@ screens:
     purpose: Replace the current version
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id006
+    invalidates:
     - listMediaAssetVersions
     - getMediaDistribution
   wireframe:
@@ -11485,8 +11509,8 @@ screens:
   states:
     loading: The version comparison replacement list.
     error: Could not load. Names which read failed and leaves the version comparison replacement untouched.
-    emptyFirstRun: No version comparison replacement yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: Nothing here yet for Version Comparison & Replacement Impact. This screen only reads,
+      so it offers no create action and says where the records come from.
     emptyNoResults: The filter narrowed it and the version comparison replacement are still there. Names
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -11566,8 +11590,8 @@ screens:
   states:
     loading: The transformation rendition configuration as saved.
     error: Could not load. Names which read failed and leaves the transformation rendition untouched.
-    emptyFirstRun: No transformation rendition configured yet. Carries the create action and says what
-      the platform does in the meantime.
+    emptyFirstRun: Nothing here yet for Transformation & Rendition Management. Offers `requestMediaRendition`,
+      the action this screen has; distinct from a filter that matched nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
@@ -11675,8 +11699,8 @@ screens:
   states:
     loading: The rendition processing delivery list.
     error: Could not load. Names which read failed and leaves the rendition processing delivery untouched.
-    emptyFirstRun: No rendition processing delivery yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: Nothing here yet for Rendition Processing & Delivery Readiness. This screen only reads,
+      so it offers no create action and says where the records come from.
     emptyNoResults: The filter narrowed it and the rendition processing delivery are still there. Names
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -11820,8 +11844,8 @@ screens:
   states:
     loading: The quality intelligence review list.
     error: Could not load. Names which read failed and leaves the quality intelligence review untouched.
-    emptyFirstRun: No quality intelligence review yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: Nothing here yet for AI Quality, Intelligence Review & Recommendations. This screen
+      only reads, so it offers no create action and says where the records come from.
     emptyNoResults: The filter narrowed it and the quality intelligence review are still there. Names
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -11994,8 +12018,8 @@ screens:
   states:
     loading: The dam governance rights list.
     error: Could not load. Names which read failed and leaves the dam governance rights untouched.
-    emptyFirstRun: No dam governance rights yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: Nothing here yet for DAM Governance & Rights Command Center. This screen only reads,
+      so it offers no create action and says where the records come from.
     emptyNoResults: The filter narrowed it and the dam governance rights are still there. Names the active
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -12098,8 +12122,8 @@ screens:
   states:
     loading: The asset ownership responsibility list.
     error: Could not load. Names which read failed and leaves the asset ownership responsibility untouched.
-    emptyFirstRun: No asset ownership responsibility yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: Nothing here yet for Asset Ownership & Responsibility Management. This screen only
+      reads, so it offers no create action and says where the records come from.
     emptyNoResults: The filter narrowed it and the asset ownership responsibility are still there. Names
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -12203,7 +12227,7 @@ screens:
     purpose: Licence, territory, channel and expiry
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id004
+    invalidates:
     - getMediaAsset
     - getExpiringRights
   wireframe:
@@ -12278,16 +12302,11 @@ screens:
         label: Request Changes
         provenance: pack Digital Asset Management DAM.pdf, page 47 §Actions
       - kind: secondaryButton
-        label: Delegate
-        provenance: pack Digital Asset Management DAM.pdf, page 47 §Actions
-      - kind: secondaryButton
         label: Add Comment
         provenance: pack Digital Asset Management DAM.pdf, page 47 §Actions
       - kind: secondaryButton
         label: Rejection
         provenance: pack Digital Asset Management DAM.pdf, page 47 §Actions
-    - name: contentBody
-      components: []
   overlays:
   - id: confirmReject
     component: confirmDialog
@@ -12312,7 +12331,7 @@ screens:
     purpose: Submit, approve or reject
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id003
+    invalidates:
     - getMediaAsset
     - searchMedia
   wireframe:
@@ -12327,6 +12346,8 @@ screens:
     params:
     - name: assetId
       from: navigation
+  notes: '**No Delegate button (CHG-SGU-023).** Delegation is configured ahead of time (`createApprovalDelegation`
+    on the approvals screens), not chosen per decision.'
 - id: CMS-085
   name: Publication Eligibility & Governance Validation
   module: Media Library
@@ -12408,7 +12429,9 @@ screens:
     purpose: Publication eligibility, computed
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id003
+    invalidates:
+    - getMediaAsset
+    - searchMedia
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-085
@@ -12467,22 +12490,18 @@ screens:
     template: split
     regions:
     - name: contentBody
+      slot: collection
       components:
       - kind: dataTable
-        derived: true
-        impliedBy: listAuthorisationPolicies
-        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
-          a venue''s busiest hour is a list that skips rows.'
+        label: Roles and asset actions
+        operation: listAuthorisationPolicies
+        notes: One row per role, one column per asset action (discover, view, edit, download, share, approve,
+          manage), each allowed or not, with the scope it applies at.
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
       - kind: primaryButton
-        derived: true
-        impliedBy: createAuthorisationPolicy
-        label: Create access policy
-        notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createAuthorisationPolicy
+        label: Grant an asset action to a role
+        operation: createAuthorisationPolicy
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
   states:
     loading: The role-based asset access list.
     error: Could not load. Names which read failed and leaves the role-based asset access untouched.
@@ -12511,6 +12530,18 @@ screens:
     bound to a contract property; 0 of 20 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formCreateAuthorisationPolicy
+    component: modal
+    trigger: Grant an asset action to a role
+    body: The role, the asset actions it may take (discover, view, edit, download, share, approve, manage)
+      and the scope it applies at. Dismissing sends nothing.
+    confirm:
+      label: Grant an asset action to a role
+      operation: createAuthorisationPolicy
+    dismiss:
+      label: Cancel
+    provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
 - id: CMS-087
   name: Secure Internal & External Sharing
   module: Media Library
@@ -12676,8 +12707,6 @@ screens:
         - Expires in 30 Days
         - Expires in 60 Days
         - Expired
-        - Example
-        - DAM-IMG-008421
         bindsTo: null
         operation: null
         provenance: pack Digital Asset Management DAM.pdf, page 52 §Show
@@ -12692,8 +12721,6 @@ screens:
         - Expires in 30 Days
         - Expires in 60 Days
         - Expired
-        - Example
-        - DAM-IMG-008421
         notes: 'The pack groups this record''s detail under its own headings: “Rights expire”, “Impact”,
           “Owner notification”, “Digital Asset Management”, “Escalation”, “Expired”.'
         provenance: pack Digital Asset Management DAM.pdf, page 52 §Show
@@ -12738,7 +12765,9 @@ screens:
     purpose: Renew
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id004
+    invalidates:
+    - getMediaAsset
+    - getExpiringRights
   entryState:
     preloaded:
     - Expires in 7 Days
@@ -12812,8 +12841,8 @@ screens:
   states:
     loading: The governance audit trail configuration as saved.
     error: Could not load. Names which read failed and leaves the governance audit trail untouched.
-    emptyFirstRun: No governance audit trail configured yet. Carries the create action and says what the
-      platform does in the meantime.
+    emptyFirstRun: Nothing here yet for Governance Audit Trail & Compliance Evidence. This screen only
+      reads, so it offers no create action and says where the records come from.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
@@ -12925,8 +12954,8 @@ screens:
   states:
     loading: The governance risk compliance list.
     error: Could not load. Names which read failed and leaves the governance risk compliance untouched.
-    emptyFirstRun: No governance risk compliance yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: Nothing here yet for Governance Risk, Compliance & AI Recommendations. This screen
+      only reads, so it offers no create action and says where the records come from.
     emptyNoResults: The filter narrowed it and the governance risk compliance are still there. The pack's
       own statuses are 🟢 Valid — the state names which is selected.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -13127,8 +13156,8 @@ screens:
   states:
     loading: The asset distribution delivery list.
     error: Could not load. Names which read failed and leaves the asset distribution delivery untouched.
-    emptyFirstRun: No asset distribution delivery yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: Nothing here yet for Asset Distribution & Delivery Command Center. This screen only
+      reads, so it offers no create action and says where the records come from.
     emptyNoResults: The filter narrowed it and the asset distribution delivery are still there. Names
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -13232,8 +13261,8 @@ screens:
   states:
     loading: The asset usage distribution list.
     error: Could not load. Names which read failed and leaves the asset usage distribution untouched.
-    emptyFirstRun: No asset usage distribution yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: Nothing here yet for Asset Usage & Distribution Map. This screen only reads, so it
+      offers no create action and says where the records come from.
     emptyNoResults: The filter narrowed it and the asset usage distribution are still there. Names the
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -13350,7 +13379,7 @@ screens:
     purpose: CDN, signing and defaults
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id005
+    invalidates:
     - getMediaDistribution
   wireframe:
     status: notStarted
@@ -13448,7 +13477,8 @@ screens:
     purpose: Signed URLs and rendition delivery
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id005
+    invalidates:
+    - getMediaDistribution
   - operationId: listMediaRenditions
     contract: assets
     purpose: What can be delivered
@@ -13541,8 +13571,8 @@ screens:
   states:
     loading: The asset replacement propagation list.
     error: Could not load. Names which read failed and leaves the asset replacement propagation untouched.
-    emptyFirstRun: No asset replacement propagation yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: Nothing here yet for Asset Replacement & Propagation Management. This screen only reads,
+      so it offers no create action and says where the records come from.
     emptyNoResults: The filter narrowed it and the asset replacement propagation are still there. Names
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -13553,7 +13583,9 @@ screens:
     purpose: Replace and propagate
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id006
+    invalidates:
+    - listMediaAssetVersions
+    - getMediaDistribution
   - operationId: getMediaDistribution
     contract: assets
     purpose: Everywhere it would propagate to
@@ -13617,8 +13649,9 @@ screens:
       slot: fields
       components:
       - kind: textField
-        label: DAM-IMG-009211 — Default Dubai Park Hero
-        provenance: pack Digital Asset Management DAM.pdf, page 68 §Configured Fallback
+        label: Default fallback asset
+        provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
+        notes: Picked from the library (e.g. DAM-IMG-009211, "Default Dubai Park Hero").
     - name: actionBar
       slot: publish
       components:
@@ -13661,7 +13694,8 @@ screens:
     purpose: Fallback and expiry behaviour
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id005
+    invalidates:
+    - getMediaDistribution
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-096
@@ -13735,8 +13769,8 @@ screens:
   states:
     loading: The dam api integration list.
     error: Could not load. Names which read failed and leaves the dam api integration untouched.
-    emptyFirstRun: No dam api integration yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: Nothing here yet for DAM API & Integration Hub. This screen only reads, so it offers
+      no create action and says where the records come from.
     emptyNoResults: The filter narrowed it and the dam api integration are still there. Names the active
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -13844,8 +13878,8 @@ screens:
   states:
     loading: The delivery monitoring integration list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the delivery monitoring integration untouched.
-    emptyFirstRun: No delivery monitoring integration yet. Carries the create action; distinct from a
-      filter that matched nothing.
+    emptyFirstRun: Nothing here yet for Delivery Monitoring & Integration Health. This screen only reads,
+      so it offers no create action and says where the records come from.
     emptyNoResults: The filter narrowed it and the delivery monitoring integration are still there. Names
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -13949,8 +13983,8 @@ screens:
   states:
     loading: The asset usage performance list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the asset usage performance untouched.
-    emptyFirstRun: No asset usage performance yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: Nothing here yet for Asset Usage & Performance Analytics. This screen only reads, so
+      it offers no create action and says where the records come from.
     emptyNoResults: The filter narrowed it and the asset usage performance are still there. Names the
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -13990,7 +14024,8 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/distribution-intelligence-ai-insights-optimization-cms-100
-    component: apps/venue-management-web/src/routes/media-library/DistributionIntelligenceAiInsightsOptimization.tsx
+    component: 
+      apps/venue-management-web/src/routes/media-library/DistributionIntelligenceAiInsightsOptimization.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14020,8 +14055,8 @@ screens:
   states:
     loading: The distribution intelligence insights configuration as saved.
     error: Could not load. Names which read failed and leaves the distribution intelligence insights untouched.
-    emptyFirstRun: No distribution intelligence insights configured yet. Carries the create action and
-      says what the platform does in the meantime.
+    emptyFirstRun: Nothing here yet for Distribution Intelligence, AI Insights & Optimization. This screen
+      only reads, so it offers no create action and says where the records come from.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops

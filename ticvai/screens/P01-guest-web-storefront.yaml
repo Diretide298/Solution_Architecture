@@ -1063,7 +1063,8 @@ screens:
       differences: 'No standing attraction-detail page in the default flow: details are a banner above
         the booking step (behind a Config toggle), a pop-up per product, or the listing preview. Eligibility
         rule display (getProductEligibilityRule) appears only as tags. Prototype labels it WEB-003b, not
-        WEB-004.'
+        WEB-004. **Handoff: the screen id is WEB-004**; the prototype''s "WEB-003b" label is not an id
+        (CHG-SGU-020).'
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -1291,7 +1292,9 @@ screens:
         from the ticket chosen (2 park ticket, three adults: one line, AED 1,425), and Group / school
         booking starts from four group tickets with a typed headcount. The same flow''s Read more panel
         still prices guests at single-park rates (Adult AED 325, Infant AED 475): a prototype defect;
-        the counters on the page are the reference.'
+        the counters on the page are the reference. **Do not copy the Read more panel''s prices on the
+        multi-park flow** (Adult AED 325, Infant AED 475 are single-park rates): a prototype defect; the
+        counters on the page are the reference (CHG-SGU-020).'
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -1777,8 +1780,9 @@ screens:
         operation: getSeatAvailability
         provenance: contract seating.yaml GET /performances/{performanceId}/seat-availability
       - kind: banner
-        notes: Hold countdown, always visible. A selection that expires silently while a guest enters
-          card details is the worst outcome in this flow
+        notes: '**One countdown: `Cart.expiresAt`** (the earliest lease in the cart), always visible.
+          The 8-minute seat hold and the 15-minute cart lease are never shown as two clocks; a selection
+          that expires silently while a guest enters card details is the worst outcome in this flow (CHG-SGU-020).'
         provenance: carried from the previous definition
       - kind: seatMap
         label: Choose seats
@@ -2026,21 +2030,21 @@ screens:
     - name: contentBody
       slot: record
       components:
-      - kind: detailPanel
-        label: The upsell suggestion
-        bindsTo: UpsellSuggestion
+      - kind: cardList
+        label: Suggested for you
+        bindsTo: AiRecommendationItem
         columns:
-        - UpsellSuggestion.variantId
-        - UpsellSuggestion.bundleId
-        - UpsellSuggestion.name
-        - UpsellSuggestion.price
-        - UpsellSuggestion.discountedPrice
-        - UpsellSuggestion.source
-        - UpsellSuggestion.ruleId
-        - UpsellSuggestion.rank
-        - UpsellSuggestion.rationale
-        operation: getUpsellSuggestions
-        provenance: contract promotions.yaml POST /upsell-suggestions
+        - AiRecommendationItem.productId
+        - AiRecommendationItem.kind
+        - AiRecommendationItem.priceRef
+        - AiRecommendationItem.reasonText
+        - AiRecommendationItem.rank
+        operation: decideRecommendations
+        provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
+        notes: "The engine's slot (`decideRecommendations`, placement cart, maxItems 3: the client set
+          at most three, DI-959), answered in Block A from the Promotions relationship map (ADR-0052).
+          Each card shows the price from Pricing and the template reason; impressions and clicks go to
+          `recordRecommendationEvents`."
       - kind: detailPanel
         label: The bundle
         bindsTo: Bundle
@@ -2063,21 +2067,8 @@ screens:
         - Bundle.isActive
         operation: getBundle
         provenance: contract promotions.yaml GET /bundles/{bundleId}
-      - kind: dataTable
-        label: Every bundle
-        bindsTo: BundleSummary
-        columns:
-        - BundleSummary.venueId
-        - BundleSummary.publishedAt
-        - BundleSummary.publishedBy
-        - BundleSummary.contentHash
-        - BundleSummary.signatureKeyId
-        - BundleSummary.staleAfter
-        - BundleSummary.sizeBytes
-        - BundleSummary.note
-        - BundleSummary.appliedByWorkstations
-        operation: listCatalogueBundles
-        provenance: contract catalogue.yaml GET /catalogue/bundles
+        notes: A bundle the recommendation slot names (`kind` bundle), opened from its card; signed catalogue
+          snapshots (`listCatalogueBundles`) are the tills', not the guest's (R269).
       - kind: progressIndicator
         label: Booking steps
         bindsTo: BookingFlow
@@ -2095,11 +2086,9 @@ screens:
         operation: addCartLine
         provenance: contract orders.yaml POST /carts/{cartId}/lines
   states:
-    loading: The add-ons upsell, read by `getUpsellSuggestions`.
+    loading: The add-ons, read by `decideRecommendations`.
     error: Could not load. Names which read failed and leaves the add-ons upsell untouched.
-    emptyFirstRun: No add-ons upsell yet. Offers Add cart line (`addCartLine`).
-    emptyNoResults: 'Never shown: `listCatalogueBundles` takes no filter, so an empty list is always the
-      first-run state above.'
+    emptyFirstRun: 'No add-ons for this booking: the step is skipped and Continue goes on to sign-in.'
     emptyNoAccess: '**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission`
       is what a staff caller must hold; a guest call resolves to the guest''s own data). No access here
       means one of two things, told apart by the response: not signed in, where the guest is offered sign-in
@@ -2118,13 +2107,9 @@ screens:
     contract: promotions
     purpose: A bundle offered as an upsell
     trigger: onAction
-  - operationId: listCatalogueBundles
-    contract: catalogue
-    purpose: Which bundles apply here
-    trigger: onLoad
   - operationId: decideRecommendations
     contract: ai
-    purpose: Fill a recommendation slot
+    purpose: Fill the cart slot, maxItems 3 (DI-959)
     trigger: onLoad
     provenance: build, 29 September 2026
   - operationId: recordRecommendationEvents
@@ -2254,38 +2239,29 @@ screens:
           **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry
           reads *always requires confirmation*.'
         provenance: carried from the previous definition
+      - kind: secondaryButton
+        label: Browse
+        notes: 'Shown when the list is empty: saving is done with the heart on the product and date cards
+          (WEB-005, WEB-006, GST-004), never by typing an id here.'
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
     - name: actionBar
       slot: rowActions
       components:
-      - kind: primaryButton
-        label: Add to wishlist
-        operation: addToWishlist
-        provenance: contract marketing-crm.yaml POST /guests/{subjectId}/wishlist
       - kind: destructiveButton
         label: Remove from wishlist
         operation: removeFromWishlist
         provenance: contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}
+      - kind: toast
+        label: Removed. Undo
+        operation: addToWishlist
+        notes: The 5-second Undo after Remove; re-saves the same entry.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
   overlays:
   - id: confirmRemoveFromWishlist
     component: confirmDialog
     trigger: Remove from wishlist
     body: '**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather
       than the verb. A wishlist this affects should be identified in the dialog, not just counted.'
-    provenance: client-verified
-  - id: formAddToWishlist
-    component: modal
-    trigger: Add to wishlist
-    body: '**Collects what `addToWishlist` sends before it is called.** Required: `variantId`. Optional:
-      `performanceId`, `note`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Add to wishlist
-      operation: addToWishlist
-    dismiss:
-      label: Cancel
-      discards:
-      - variantId
-      - performanceId
-      - note
     provenance: client-verified
   states:
     loading: Saved items load
@@ -2307,7 +2283,8 @@ screens:
     trigger: onLoad
   - operationId: addToWishlist
     contract: marketing-crm
-    purpose: Save an item
+    purpose: Undo after a remove re-saves the same variant and date (idempotent); saving itself happens
+      on the product and date cards
     trigger: onAction
   - operationId: removeFromWishlist
     contract: marketing-crm
@@ -2643,7 +2620,9 @@ screens:
         changes it to slide-in, bottom sheet, floating icon or single column)
       differences: 'Not a separate screen: a persistent sidebar/drawer through the stepper, with a Rev
         3 option to mirror it in Arabic. No ''extend hold'' action (extendCart) — only hold timers on
-        the seat step. Exit-intent dialog (exit.open) is a prototype addition.'
+        the seat step. Exit-intent dialog (exit.open) is a prototype addition. **Draw the countdown with
+        More time (`extendCart`) on the basket**, although the prototype has no extend action and times
+        only the seat step (CHG-SGU-020).'
   apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -2753,56 +2732,34 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: dataTable
-        label: Every guest device
-        bindsTo: GuestDevice
-        columns:
-        - GuestDevice.id
-        - GuestDevice.subjectId
-        - GuestDevice.platform
-        - GuestDevice.tokenFingerprint
-        - GuestDevice.appVersion
-        - GuestDevice.osVersion
-        - GuestDevice.deviceModel
-        - GuestDevice.locale
-        - GuestDevice.status
-        - GuestDevice.failureCount
-        - GuestDevice.registeredAt
-        - GuestDevice.lastSeenAt
-        operation: listGuestDevices
-        provenance: contract marketing-crm.yaml GET /guests/{subjectId}/devices
-      - kind: dataTable
-        label: Every consent purpose config
-        bindsTo: ConsentPurposeConfig
-        columns:
-        - ConsentPurposeConfig.purpose
-        - ConsentPurposeConfig.displayName
-        - ConsentPurposeConfig.description
-        - ConsentPurposeConfig.channels
-        - ConsentPurposeConfig.noticeVersion
-        - ConsentPurposeConfig.isRequiredForService
-        - ConsentPurposeConfig.expiresAfterMonths
-        operation: listConsentPurposes
-        provenance: contract marketing-crm.yaml GET /consent-purposes
       - kind: textField
         label: Full name
         provenance: carried from the previous definition
+        operation: getMyProfile
       - kind: textField
         label: Email
         provenance: carried from the previous definition
+        operation: getMyProfile
       - kind: textField
         label: Mobile
         provenance: carried from the previous definition
+        operation: getMyProfile
       - kind: detailPanel
-        bindsTo: EntitlementTemplate.isNameBound
-        notes: Per-attendee fields appear only where the entitlement is name-bound. Most are not — identity
-          and entitlement are separate concerns
-        provenance: carried from the previous definition
+        bindsTo: Cart.lines
+        notes: One block per holder, titled "Ticket 2 of 4 - Child", only for lines whose ticket is name-bound;
+          the buyer is separate from the holders.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+        operation: getCart
+        label: Ticket holder details
       - kind: consentBlock
         bindsTo: ConsentPurposeConfig[]
-        notes: Marketing consent is opt-in and unticked. Transactional is required for service and is
-          presented differently, not as a choice dressed as one
-        provenance: carried from the previous definition
+        notes: One unticked checkbox per configured marketing channel and purpose, beside the terms, never
+          pre-ticked. The ticks travel with checkout as `marketingConsents[]` and are recorded by `recordCheckoutConsents`
+          with source checkout, bound to the order and the verified contact (M18-15); nothing is recorded
+          from this step, so an unpaid order records no consent.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+        label: Send me offers and news
+        operation: listConsentPurposes
       - kind: consentBlock
         label: Booking consent questions
         bindsTo: Cart.consentQuestions
@@ -2820,185 +2777,17 @@ screens:
         notes: The steps of the published flow in their `sortOrder`, this one (details) highlighted. A
           step the flow has turned off is not shown and is skipped by Continue and Back.
         provenance: decided 29 September 2026, W12; CMS-103 Booking Flows
-    - name: contextPanel
-      slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected guest device
-        bindsTo: GuestDevice
-        columns:
-        - GuestDevice.id
-        - GuestDevice.subjectId
-        - GuestDevice.platform
-        - GuestDevice.tokenFingerprint
-        - GuestDevice.tokenRef
-        - GuestDevice.appVersion
-        - GuestDevice.osVersion
-        - GuestDevice.deviceModel
-        - GuestDevice.locale
-        - GuestDevice.status
-        - GuestDevice.failureCount
-        - GuestDevice.registeredAt
-        - GuestDevice.lastSeenAt
-        - GuestDevice.revokedAt
-        operation: listGuestDevices
-        provenance: contract marketing-crm.yaml GET /guests/{subjectId}/devices
-      - kind: detailPanel
-        label: The guest profile
-        bindsTo: GuestProfileDetail
-        columns:
-        - GuestProfileDetail.id
-        - GuestProfileDetail.subjectId
-        - GuestProfileDetail.displayName
-        - GuestProfileDetail.email
-        - GuestProfileDetail.phone
-        - GuestProfileDetail.preferredLanguage
-        - GuestProfileDetail.preferredChannel
-        - GuestProfileDetail.guestLinkId
-        - GuestProfileDetail.tags
-        - GuestProfileDetail.engagementScore
-        - GuestProfileDetail.engagementTier
-        - GuestProfileDetail.lifetimeValue
-        - GuestProfileDetail.visitCount
-        - GuestProfileDetail.lastVisitAt
-        - GuestProfileDetail.isActive
-        - GuestProfileDetail.mergedIntoSubjectId
-        operation: getGuestProfile
-        provenance: contract marketing-crm.yaml GET /guests/{subjectId}
-      - kind: detailPanel
-        label: The wishlist
-        bindsTo: Wishlist
-        columns:
-        - Wishlist.subjectId
-        - Wishlist.items
-        operation: getWishlist
-        provenance: contract marketing-crm.yaml GET /guests/{subjectId}/wishlist
     - name: actionBar
       slot: rowActions
       components:
-      - kind: primaryButton
-        label: Add to wishlist
-        operation: addToWishlist
-        provenance: contract marketing-crm.yaml POST /guests/{subjectId}/wishlist
-      - kind: secondaryButton
-        label: Record consent
-        operation: recordConsent
-        provenance: contract marketing-crm.yaml POST /guests/{subjectId}/consents
-      - kind: secondaryButton
-        label: Register guest device
-        operation: registerGuestDevice
-        provenance: contract marketing-crm.yaml POST /guests/{subjectId}/devices
-      - kind: destructiveButton
-        label: Remove from wishlist
-        operation: removeFromWishlist
-        provenance: contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}
-      - kind: destructiveButton
-        label: Revoke guest device
-        operation: revokeGuestDevice
-        provenance: contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}
       - kind: secondaryButton
         label: Save my profile
         operation: updateMyProfile
         provenance: contract marketing-crm.yaml PATCH /guests/me/profile
-      - kind: secondaryButton
-        label: Upload guest document
-        operation: uploadGuestDocument
-        provenance: contract marketing-crm.yaml POST /guest-documents
       - kind: primaryButton
         label: Continue to payment
         provenance: carried from the previous definition
   overlays:
-  - id: confirmRemoveFromWishlist
-    component: confirmDialog
-    trigger: Remove from wishlist
-    body: '**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather
-      than the verb. A guest attendee forms this affects should be identified in the dialog, not just
-      counted.'
-    provenance: client-verified
-  - id: confirmRevokeGuestDevice
-    component: confirmDialog
-    trigger: Revoke guest device
-    body: '**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather
-      than the verb. A guest attendee forms this affects should be identified in the dialog, not just
-      counted.'
-    provenance: client-verified
-  - id: formUploadGuestDocument
-    component: modal
-    trigger: Upload guest document
-    body: '**Collects what `uploadGuestDocument` sends before it is called.** Required: `id`, `subjectId`,
-      `kind`, `storageRef`, `retainUntil`. Optional: `contentType`, `consentPurposeId`, `uploadedAt`,
-      `uploadedByPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: GuestDocument
-    confirm:
-      label: Upload guest document
-      operation: uploadGuestDocument
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - subjectId
-      - kind
-      - storageRef
-      - retainUntil
-      - contentType
-      - consentPurposeId
-      - uploadedAt
-      - uploadedByPrincipalId
-    provenance: client-verified
-  - id: formAddToWishlist
-    component: modal
-    trigger: Add to wishlist
-    body: '**Collects what `addToWishlist` sends before it is called.** Required: `variantId`. Optional:
-      `performanceId`, `note`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Add to wishlist
-      operation: addToWishlist
-    dismiss:
-      label: Cancel
-      discards:
-      - variantId
-      - performanceId
-      - note
-    provenance: client-verified
-  - id: formRecordConsent
-    component: modal
-    trigger: Record consent
-    body: '**Collects what `recordConsent` sends before it is called.** Required: `purpose`, `decision`,
-      `noticeVersion`, `source`, `recordedAt`. Optional: `channels`. Dismissing sends nothing; the screen
-      behind is unchanged.'
-    bindsTo: RecordConsentRequest
-    confirm:
-      label: Record consent
-      operation: recordConsent
-    dismiss:
-      label: Cancel
-      discards:
-      - purpose
-      - decision
-      - noticeVersion
-      - source
-      - recordedAt
-      - channels
-    provenance: client-verified
-  - id: formRegisterGuestDevice
-    component: modal
-    trigger: Register guest device
-    body: '**Collects what `registerGuestDevice` sends before it is called.** Required: `platform`, `token`.
-      Optional: `appVersion`, `osVersion`, `deviceModel`, `locale`. Dismissing sends nothing; the screen
-      behind is unchanged.'
-    confirm:
-      label: Register guest device
-      operation: registerGuestDevice
-    dismiss:
-      label: Cancel
-      discards:
-      - platform
-      - token
-      - appVersion
-      - osVersion
-      - deviceModel
-      - locale
-    provenance: client-verified
   - id: formUpdateMyProfile
     component: modal
     trigger: Save my profile
@@ -3022,7 +2811,8 @@ screens:
   states:
     loading: The guest attendee forms list.
     error: Could not load. Names which read failed and leaves the guest attendee forms untouched.
-    emptyFirstRun: No guest attendee forms yet. Offers Add to wishlist (`addToWishlist`).
+    emptyFirstRun: 'Nothing to fill in: continue to payment. The step is normally skipped when the cart
+      needs no details, holders or consent answers (F01 step 6).'
     emptyNoResults: 'Never shown: `listGuestDevices` takes no filter, so an empty list is always the first-run
       state above.'
     emptyNoAccess: '**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission`
@@ -3034,48 +2824,6 @@ screens:
     offline: '**Not available, and the offline banner says why.** A payment needs the gateway, and pretending
       otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice.'
   apis:
-  - operationId: addToWishlist
-    contract: marketing-crm
-    purpose: Save an item
-    trigger: onAction
-    invalidates:
-    - listGuestDevices
-  - operationId: getWishlist
-    contract: marketing-crm
-    purpose: Read a guest's saved items
-    trigger: onLoad
-  - operationId: listGuestDevices
-    contract: marketing-crm
-    purpose: A guest's registered devices
-    trigger: onLoad
-  - operationId: recordConsent
-    contract: marketing-crm
-    purpose: Record a consent decision
-    trigger: onAction
-    invalidates:
-    - listGuestDevices
-  - operationId: registerGuestDevice
-    contract: marketing-crm
-    purpose: Register a device for push
-    trigger: onAction
-    invalidates:
-    - listGuestDevices
-  - operationId: removeFromWishlist
-    contract: marketing-crm
-    purpose: Remove a saved item
-    trigger: onAction
-    invalidates:
-    - listGuestDevices
-  - operationId: revokeGuestDevice
-    contract: marketing-crm
-    purpose: Revoke a device registration
-    trigger: onAction
-    invalidates:
-    - listGuestDevices
-  - operationId: getGuestProfile
-    contract: marketing-crm
-    purpose: Read a guest profile
-    trigger: onLoad
   - operationId: listConsentPurposes
     contract: marketing-crm
     purpose: Configured consent purposes
@@ -3083,12 +2831,6 @@ screens:
   - operationId: updateMyProfile
     contract: marketing-crm
     purpose: A guest correcting their own details
-    trigger: onAction
-    invalidates:
-    - listGuestDevices
-  - operationId: uploadGuestDocument
-    contract: marketing-crm
-    purpose: Provide a document a booking requires
     trigger: onAction
   - operationId: getCart
     contract: orders
@@ -3105,12 +2847,12 @@ screens:
     purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
     trigger: onLoad
     provenance: decided 29 September 2026, W12
+  - operationId: getMyProfile
+    contract: marketing-crm
+    purpose: Prefill the buyer's contact from their own profile
+    trigger: onLoad
   entryState:
     params:
-    - name: deviceId
-      from: deepLink
-    - name: itemId
-      from: deepLink
     - name: subjectId
       from: session
     - name: cartId
@@ -3144,6 +2886,12 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop
     pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
     them to the ones that matter is work a person still owes this screen.
+  gaps:
+  - operation: uploadGuestDocument
+    why: 'An identity document a ticket requires cannot be uploaded end to end: uploadGuestDocument needs
+      a storageRef that no operation issues, so the upload control is hidden until the document-store
+      upload operation exists (CHG-SGU-024).'
+    source: contracts/satellite/marketing-crm.yaml#uploadGuestDocument
 - id: WEB-012
   name: Checkout — Payment
   module: Cart & Checkout
@@ -3387,7 +3135,8 @@ screens:
         Apple Pay, Tabby split-in-4, pay on arrival and invoice/PO; YAML removed the ''is this you?''
         match at checkout (R120 b) — prototype still asks the guest to link or keep separate. The unknown-outcome
         inquiry state matches the YAML (''We couldn''t confirm this payment yet… you won''t be charged
-        twice'').'
+        twice''). **Draw card, Apple Pay, Google Pay and wallet only** (R080, 28 September); Tabby split-in-4,
+        pay on arrival and invoice/PO are not in the first release (CHG-SGU-020).'
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -3498,6 +3247,11 @@ screens:
         label: Transfer tickets
         notes: Opens Ticket Transfer (WEB-030 on the web, GST-014 in the app), after the tickets.
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
+      - kind: secondaryButton
+        label: Set a password
+        operation: linkGuestCheckout
+        notes: 'Offered after a guest checkout: keeps these tickets in an account.'
+        provenance: corrected 2 October 2026 (CHG-SGU-020, design-notes correction)
   states:
     loading: The booking confirmation, read by `getOrder`.
     error: Could not load. Names which read failed and leaves the booking confirmation untouched.
@@ -3523,6 +3277,10 @@ screens:
     contract: orders
     purpose: Reprint or resend tickets
     trigger: onAction
+  - operationId: linkGuestCheckout
+    contract: identity
+    purpose: 'Set a password: turn the guest-checkout order into an account (parity with GST-010)'
+    trigger: onAction
   entryState:
     params:
     - name: orderId
@@ -3538,8 +3296,9 @@ screens:
       verified: 2026-09-28
       match: exact
       view: Book → final step 'Confirmed' after paying
-      differences: Prototype adds editing attendee details after purchase ('Change your details', signed-in
-        only) and Reissue QR. No 'unpaid — pay now' route to WEB-014.
+      differences: "Prototype adds editing attendee details after purchase ('Change your details', signed-in
+        only) and Reissue QR. No 'unpaid — pay now' route to WEB-014. **Leave out** editing attendee details
+        after purchase and Reissue QR: no operation on this screen declares them (CHG-SGU-020)."
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -3561,6 +3320,16 @@ screens:
       - lineIds
       - reason
     provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
+  - id: formLinkGuestCheckout
+    component: modal
+    trigger: Set a password
+    body: A password for the account; the order and the verified contact come from the checkout just made.
+    confirm:
+      label: Set a password
+      operation: linkGuestCheckout
+    dismiss:
+      label: Cancel
+    provenance: corrected 2 October 2026 (CHG-SGU-020, design-notes correction)
   gaps:
   - operation: transferOrderTickets
     removed: true
@@ -3793,16 +3562,18 @@ screens:
       match: partial
       view: Only when the host tweak 'waitingRoom' is on; it is not in the Config drawer lists, so a reviewer
         cannot switch it on from the page
-      differences: Drawn but unreachable from the Config drawer. The prototype holds the place by keeping
+      differences: "Drawn but unreachable from the Config drawer. The prototype holds the place by keeping
         the page open ('refreshing puts you at the back'); the room keeps it across a refresh, because
-        `enterWaitingRoom` returns the same entry for the same `Idempotency-Key` (ADR-0066).
+        `enterWaitingRoom` returns the same entry for the same `Idempotency-Key` (ADR-0066). **The copy
+        must not say \"refreshing puts you at the back\"**: the room keeps the place across a refresh
+        (same entry for the same Idempotency-Key, ADR-0066) (CHG-SGU-020)."
   apisNote: Rebuilt 1 October 2026 on the two waiting-room operations (ADR-0066). Columns are the entry's
     guest-facing fields; `pollAfterSeconds` and `admission` are plumbing the page acts on rather than
     shows.
 - id: WEB-016
   name: Login / Register
   module: Account & Self-Service
-  requiresModule: ticketing
+  requiresModule: core
   wave: 1
   capability: C36
   implementation:
@@ -4062,8 +3833,9 @@ screens:
   - id: formRequestGuestOtp
     component: modal
     trigger: Send me a code
-    body: '**Collects what `requestGuestOtp` sends before it is called.** Required: `identifier`, `channel`.
-      Optional: `purpose`. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects only the email or mobile number.** The channel follows from the identifier and the
+      tenant''s configured delivery (WhatsApp, SMS or email, DI-209); the guest is never asked to pick
+      one. Dismissing sends nothing.'
     confirm:
       label: Request guest OTP
       operation: requestGuestOtp
@@ -4073,7 +3845,7 @@ screens:
       - identifier
       - channel
       - purpose
-    provenance: client-verified
+    provenance: corrected 2 October 2026 (CHG-SGU-019, design-notes correction)
   - id: formVerifyGuestOtp
     component: modal
     trigger: Sign in with the code
@@ -4259,54 +4031,38 @@ screens:
   pattern: listDetail
   patternReason: '`listGuestDevices` reads the population and `getWishlist` reads one of them — list,
     select, act'
-  purpose: The screen this app sits on. Everything else is entered from here and returns to it.
+  purpose: 'Everything I have with this venue at a glance: bookings, wallet, loyalty, challenges and invitations,
+    each opening its own pane.'
   layout:
     template: split
     regions:
     - name: contentBody
       slot: collection
       components:
-      - kind: dataTable
-        label: Every guest device
-        bindsTo: GuestDevice
-        columns:
-        - GuestDevice.id
-        - GuestDevice.subjectId
-        - GuestDevice.platform
-        - GuestDevice.tokenFingerprint
-        - GuestDevice.appVersion
-        - GuestDevice.osVersion
-        - GuestDevice.deviceModel
-        - GuestDevice.locale
-        - GuestDevice.status
-        - GuestDevice.failureCount
-        - GuestDevice.registeredAt
-        - GuestDevice.lastSeenAt
-        operation: listGuestDevices
-        provenance: contract marketing-crm.yaml GET /guests/{subjectId}/devices
+      - kind: metricTile
+        label: Upcoming bookings
+        operation: listMyEntitlements
+        notes: Next visits; opens WEB-018.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+      - kind: metricTile
+        label: Orders
+        operation: listMyOrders
+        notes: Recent orders; opens WEB-019.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+      - kind: metricTile
+        label: Wallet
+        bindsTo: Wallet
+        operation: getWallet
+        notes: Balance; opens WEB-021.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+      - kind: metricTile
+        label: Loyalty
+        operation: getLoyaltyPosition
+        notes: Tier, points and points to the next tier; expiring points within 30 days; opens WEB-043.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
     - name: contextPanel
       slot: selection
       components:
-      - kind: detailPanel
-        label: The selected guest device
-        bindsTo: GuestDevice
-        columns:
-        - GuestDevice.id
-        - GuestDevice.subjectId
-        - GuestDevice.platform
-        - GuestDevice.tokenFingerprint
-        - GuestDevice.tokenRef
-        - GuestDevice.appVersion
-        - GuestDevice.osVersion
-        - GuestDevice.deviceModel
-        - GuestDevice.locale
-        - GuestDevice.status
-        - GuestDevice.failureCount
-        - GuestDevice.registeredAt
-        - GuestDevice.lastSeenAt
-        - GuestDevice.revokedAt
-        operation: listGuestDevices
-        provenance: contract marketing-crm.yaml GET /guests/{subjectId}/devices
       - kind: detailPanel
         label: The challenge
         bindsTo: Challenge
@@ -4335,46 +4091,15 @@ screens:
         - Wishlist.items
         operation: getWishlist
         provenance: contract marketing-crm.yaml GET /guests/{subjectId}/wishlist
+        notes: A shortcut tile with the count; opens WEB-009.
     - name: actionBar
       slot: rowActions
       components:
-      - kind: primaryButton
-        label: Add to wishlist
-        operation: addToWishlist
-        provenance: contract marketing-crm.yaml POST /guests/{subjectId}/wishlist
-      - kind: secondaryButton
-        label: Record consent
-        operation: recordConsent
-        provenance: contract marketing-crm.yaml POST /guests/{subjectId}/consents
-      - kind: secondaryButton
-        label: Register guest device
-        operation: registerGuestDevice
-        provenance: contract marketing-crm.yaml POST /guests/{subjectId}/devices
-      - kind: destructiveButton
-        label: Remove from wishlist
-        operation: removeFromWishlist
-        provenance: contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}
-      - kind: destructiveButton
-        label: Revoke guest device
-        operation: revokeGuestDevice
-        provenance: contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}
       - kind: secondaryButton
         label: Respond to invitation
         operation: respondToInvitation
         provenance: contract marketing-crm.yaml POST /invitations/{token}/respond
   overlays:
-  - id: confirmRemoveFromWishlist
-    component: confirmDialog
-    trigger: Remove from wishlist
-    body: '**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather
-      than the verb. A account this affects should be identified in the dialog, not just counted.'
-    provenance: client-verified
-  - id: confirmRevokeGuestDevice
-    component: confirmDialog
-    trigger: Revoke guest device
-    body: '**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather
-      than the verb. A account this affects should be identified in the dialog, not just counted.'
-    provenance: client-verified
   - id: formRespondToInvitation
     component: modal
     trigger: Respond to invitation
@@ -4388,60 +4113,6 @@ screens:
       discards:
       - response
       - plusOnes
-    provenance: client-verified
-  - id: formAddToWishlist
-    component: modal
-    trigger: Add to wishlist
-    body: '**Collects what `addToWishlist` sends before it is called.** Required: `variantId`. Optional:
-      `performanceId`, `note`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Add to wishlist
-      operation: addToWishlist
-    dismiss:
-      label: Cancel
-      discards:
-      - variantId
-      - performanceId
-      - note
-    provenance: client-verified
-  - id: formRecordConsent
-    component: modal
-    trigger: Record consent
-    body: '**Collects what `recordConsent` sends before it is called.** Required: `purpose`, `decision`,
-      `noticeVersion`, `source`, `recordedAt`. Optional: `channels`. Dismissing sends nothing; the screen
-      behind is unchanged.'
-    bindsTo: RecordConsentRequest
-    confirm:
-      label: Record consent
-      operation: recordConsent
-    dismiss:
-      label: Cancel
-      discards:
-      - purpose
-      - decision
-      - noticeVersion
-      - source
-      - recordedAt
-      - channels
-    provenance: client-verified
-  - id: formRegisterGuestDevice
-    component: modal
-    trigger: Register guest device
-    body: '**Collects what `registerGuestDevice` sends before it is called.** Required: `platform`, `token`.
-      Optional: `appVersion`, `osVersion`, `deviceModel`, `locale`. Dismissing sends nothing; the screen
-      behind is unchanged.'
-    confirm:
-      label: Register guest device
-      operation: registerGuestDevice
-    dismiss:
-      label: Cancel
-      discards:
-      - platform
-      - token
-      - appVersion
-      - osVersion
-      - deviceModel
-      - locale
     provenance: client-verified
   states:
     loading: Tiles skeleton
@@ -4459,44 +4130,10 @@ screens:
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
   apis:
-  - operationId: addToWishlist
-    contract: marketing-crm
-    purpose: Save an item
-    trigger: onAction
-    invalidates:
-    - listGuestDevices
   - operationId: getWishlist
     contract: marketing-crm
     purpose: Read a guest's saved items
     trigger: onLoad
-  - operationId: listGuestDevices
-    contract: marketing-crm
-    purpose: A guest's registered devices
-    trigger: onLoad
-  - operationId: recordConsent
-    contract: marketing-crm
-    purpose: Record a consent decision
-    trigger: onAction
-    invalidates:
-    - listGuestDevices
-  - operationId: registerGuestDevice
-    contract: marketing-crm
-    purpose: Register a device for push
-    trigger: onAction
-    invalidates:
-    - listGuestDevices
-  - operationId: removeFromWishlist
-    contract: marketing-crm
-    purpose: Remove a saved item
-    trigger: onAction
-    invalidates:
-    - listGuestDevices
-  - operationId: revokeGuestDevice
-    contract: marketing-crm
-    purpose: Revoke a device registration
-    trigger: onAction
-    invalidates:
-    - listGuestDevices
   - operationId: getMyChallenges
     contract: marketing-crm
     purpose: Outstanding security challenges
@@ -4505,12 +4142,24 @@ screens:
     contract: marketing-crm
     purpose: Accept or decline an invitation
     trigger: onAction
+  - operationId: listMyEntitlements
+    contract: access
+    purpose: Upcoming bookings tile
+    trigger: onLoad
+  - operationId: listMyOrders
+    contract: orders
+    purpose: Orders tile
+    trigger: onLoad
+  - operationId: getWallet
+    contract: wallet
+    purpose: Wallet tile
+    trigger: onLoad
+  - operationId: getLoyaltyPosition
+    contract: marketing-crm
+    purpose: Loyalty tile
+    trigger: onLoad
   entryState:
     params:
-    - name: deviceId
-      from: deepLink
-    - name: itemId
-      from: deepLink
     - name: subjectId
       from: session
     - name: token
@@ -4624,24 +4273,21 @@ screens:
         operation: listMyEntitlements
         notes: Sends `?includeShared=` to `listMyEntitlements`.
         provenance: contract access.yaml GET /guests/me/entitlements
-      - kind: dataTable
-        label: Every entitlement
+      - kind: cardList
+        label: My tickets
         bindsTo: Entitlement
         columns:
-        - Entitlement.id
-        - Entitlement.templateId
         - Entitlement.productId
-        - Entitlement.orderId
-        - Entitlement.orderLineId
-        - Entitlement.subjectId
-        - Entitlement.venueId
-        - Entitlement.scopePath
-        - Entitlement.mediaCode
-        - Entitlement.status
-        - Entitlement.statusNote
         - Entitlement.validFrom
+        - Entitlement.validTo
+        - Entitlement.lifecycleLabel
+        - Entitlement.entriesUsed
+        - Entitlement.entriesAllowed
+        - Entitlement.holderName
         operation: listMyEntitlements
-        provenance: contract access.yaml GET /guests/me/entitlements
+        provenance: corrected 2 October 2026 (CHG-SGU-021, design-notes correction)
+        notes: 'One list with tabs, Upcoming and Past: the product, the date, the status in plain words,
+          entries left and the code on opening. No ids, scope, template or order line.'
       - kind: dataTable
         label: Entitlement history
         operation: getEntitlementHistory
@@ -4649,24 +4295,20 @@ screens:
           inline response. **The response has no named schema**, so this cannot bind until the contract
           names one.
         provenance: contract access.yaml GET /entitlements/{entitlementId}/history
-      - kind: dataTable
-        label: Every entitlement
+      - kind: cardList
+        label: Past
         bindsTo: Entitlement
         columns:
-        - Entitlement.id
-        - Entitlement.templateId
         - Entitlement.productId
-        - Entitlement.orderId
-        - Entitlement.orderLineId
-        - Entitlement.subjectId
-        - Entitlement.venueId
-        - Entitlement.scopePath
-        - Entitlement.mediaCode
-        - Entitlement.status
-        - Entitlement.statusNote
         - Entitlement.validFrom
+        - Entitlement.validTo
+        - Entitlement.lifecycleLabel
+        - Entitlement.entriesUsed
+        - Entitlement.entriesAllowed
+        - Entitlement.holderName
         operation: listEntitlements
-        provenance: contract access.yaml GET /my/entitlements/all
+        provenance: corrected 2 October 2026 (CHG-SGU-021, design-notes correction)
+        notes: The Past tab of the same list.
     - name: contextPanel
       slot: selection
       components:
@@ -4996,11 +4638,6 @@ screens:
     purpose: List tax invoices
     trigger: onLoad
     provenance: build, 29 September 2026
-  - operationId: issueTaxInvoice
-    contract: finance
-    purpose: Issue a tax invoice
-    trigger: onAction
-    provenance: build, 29 September 2026
   - operationId: getTaxInvoice
     contract: finance
     purpose: Show a tax invoice
@@ -5123,70 +4760,49 @@ screens:
   pattern: listDetail
   patternReason: '`listConsentPurposes` reads the population and `getGuestProfile` reads one of them —
     list, select, act'
-  purpose: Change how profile behaves here, and see which level the current value came from.
+  purpose: Correct your details, choose what we may send you, and record your needs.
   layout:
     template: split
     regions:
     - name: contentBody
       slot: collection
       components:
-      - kind: dataTable
-        label: Every consent purpose config
-        bindsTo: ConsentPurposeConfig
-        columns:
-        - ConsentPurposeConfig.purpose
-        - ConsentPurposeConfig.displayName
-        - ConsentPurposeConfig.description
-        - ConsentPurposeConfig.channels
-        - ConsentPurposeConfig.noticeVersion
-        - ConsentPurposeConfig.isRequiredForService
-        - ConsentPurposeConfig.expiresAfterMonths
-        operation: listConsentPurposes
-        provenance: contract marketing-crm.yaml GET /consent-purposes
       - kind: banner
         label: Complete your details
         operation: updateMyProfile
         notes: 'For a profile created by guest checkout (W1): asks for what the pop-up did not; never
           blocks.'
         provenance: decided 29 September 2026, W1
+      - kind: consentBlock
+        label: What we may send you
+        bindsTo: ConsentState
+        operation: getGuestConsents
+        notes: One row per configured purpose (`listConsentPurposes`), its channels as toggles, its plain-language
+          description and the notice version in force; the current position from `getGuestConsents` (Given
+          with date, Withdrawn with date, Not asked, Needs renewing). A change is recorded at once with
+          `recordConsent` (source and notice version set by the app; the guest never types a purpose,
+          decision, source or time). Withdrawing is as easy as giving.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+      - kind: cardList
+        label: Purposes and notices
+        operation: listConsentPurposes
+        notes: The configured purposes with their plain-language description, channels and the notice
+          version in force.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+      - kind: toggle
+        label: Consent toggle
+        operation: recordConsent
+        notes: Per purpose and channel; recorded at once on change, append-only.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
     - name: contextPanel
       slot: selection
       components:
       - kind: detailPanel
-        label: The selected consent purpose config
-        bindsTo: ConsentPurposeConfig
-        columns:
-        - ConsentPurposeConfig.purpose
-        - ConsentPurposeConfig.displayName
-        - ConsentPurposeConfig.description
-        - ConsentPurposeConfig.channels
-        - ConsentPurposeConfig.noticeVersion
-        - ConsentPurposeConfig.isRequiredForService
-        - ConsentPurposeConfig.expiresAfterMonths
-        operation: listConsentPurposes
-        provenance: contract marketing-crm.yaml GET /consent-purposes
-      - kind: detailPanel
-        label: The guest profile
-        bindsTo: GuestProfileDetail
-        columns:
-        - GuestProfileDetail.id
-        - GuestProfileDetail.subjectId
-        - GuestProfileDetail.displayName
-        - GuestProfileDetail.email
-        - GuestProfileDetail.phone
-        - GuestProfileDetail.preferredLanguage
-        - GuestProfileDetail.preferredChannel
-        - GuestProfileDetail.guestLinkId
-        - GuestProfileDetail.tags
-        - GuestProfileDetail.engagementScore
-        - GuestProfileDetail.engagementTier
-        - GuestProfileDetail.lifetimeValue
-        - GuestProfileDetail.visitCount
-        - GuestProfileDetail.lastVisitAt
-        - GuestProfileDetail.isActive
-        - GuestProfileDetail.mergedIntoSubjectId
-        operation: getGuestProfile
-        provenance: contract marketing-crm.yaml GET /guests/{subjectId}
+        label: My details
+        operation: getMyProfile
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+        notes: Read by session (`getMyProfile`), matching `updateMyProfile`; it cannot be pointed at another
+          guest.
     - name: actionBar
       slot: rowActions
       components:
@@ -5194,10 +4810,6 @@ screens:
         label: Save my profile
         operation: updateMyProfile
         provenance: contract marketing-crm.yaml PATCH /guests/me/profile
-      - kind: secondaryButton
-        label: Record consent
-        operation: recordConsent
-        provenance: contract marketing-crm.yaml POST /guests/{subjectId}/consents
       - kind: secondaryButton
         label: Verify guest email
         operation: verifyGuestEmail
@@ -5225,10 +4837,6 @@ screens:
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
   apis:
-  - operationId: getGuestProfile
-    contract: marketing-crm
-    purpose: Read a guest profile
-    trigger: onLoad
   - operationId: updateMyProfile
     contract: marketing-crm
     purpose: A guest correcting their own details
@@ -5243,7 +4851,7 @@ screens:
     - listConsentPurposes
   - operationId: listConsentPurposes
     contract: marketing-crm
-    purpose: Configured consent purposes
+    purpose: The purposes the consent rows show
     trigger: onLoad
   - operationId: verifyGuestEmail
     contract: identity
@@ -5265,6 +4873,14 @@ screens:
     purpose: Upload an ID document for verification
     trigger: onAction
     provenance: build, 29 September 2026
+  - operationId: getMyProfile
+    contract: marketing-crm
+    purpose: The guest's own details, read by session
+    trigger: onLoad
+  - operationId: getGuestConsents
+    contract: marketing-crm
+    purpose: The current consent position the toggles change
+    trigger: onLoad
   entryState:
     params:
     - name: subjectId
@@ -5333,26 +4949,6 @@ screens:
       - preferredChannel
       - dietary
       - accessibility
-    provenance: client-verified
-  - id: formRecordConsent
-    component: modal
-    trigger: Record consent
-    body: '**Collects what `recordConsent` sends before it is called.** Required: `purpose`, `decision`,
-      `noticeVersion`, `source`, `recordedAt`. Optional: `channels`. Dismissing sends nothing; the screen
-      behind is unchanged.'
-    bindsTo: RecordConsentRequest
-    confirm:
-      label: Record consent
-      operation: recordConsent
-    dismiss:
-      label: Cancel
-      discards:
-      - purpose
-      - decision
-      - noticeVersion
-      - source
-      - recordedAt
-      - channels
     provenance: client-verified
   - id: formVerifyGuestEmail
     component: modal
@@ -6088,7 +5684,7 @@ screens:
   pattern: listDetail
   patternReason: '`listGuestDevices` reads the population and `getWishlist` reads one of them — list,
     select, act'
-  purpose: See loyalty & rewards for this venue.
+  purpose: Your devices, security, cookie choices and data rights.
   layout:
     template: split
     regions:
@@ -6143,6 +5739,27 @@ screens:
           **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry
           reads *always requires confirmation*.'
         provenance: carried from the previous definition
+      - kind: consentBlock
+        label: What we may send you
+        bindsTo: ConsentState
+        operation: getGuestConsents
+        notes: One row per configured purpose (`listConsentPurposes`), its channels as toggles, its plain-language
+          description and the notice version in force; the current position from `getGuestConsents` (Given
+          with date, Withdrawn with date, Not asked, Needs renewing). A change is recorded at once with
+          `recordConsent` (source and notice version set by the app; the guest never types a purpose,
+          decision, source or time). Withdrawing is as easy as giving.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+      - kind: cardList
+        label: Purposes and notices
+        operation: listConsentPurposes
+        notes: The configured purposes with their plain-language description, channels and the notice
+          version in force.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+      - kind: toggle
+        label: Consent toggle
+        operation: recordConsent
+        notes: Per purpose and channel; recorded at once on change, append-only.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
     - name: contextPanel
       slot: selection
       components:
@@ -6230,90 +5847,45 @@ screens:
         operation: listMfaMethods
         provenance: decided 29 September, rev 3 GAP-B1 (per venue)
       - kind: cardList
-        label: Signed-in devices
-        notes: The devices signed in to this account, with **Sign out this device** for a lost one (`revokeGuestDevice`).
+        label: Notifications on my devices
+        notes: Push registrations (`listGuestDevices`). "Stop notifications on this device" (`revokeGuestDevice`)
+          stops notifications; it does not sign a lost device out. No guest operation lists or ends other
+          sessions yet (CHG-SGU-024).
         operation: listGuestDevices
-        provenance: decided 29 September, rev 3 GAP-D1
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
     - name: actionBar
       slot: rowActions
       components:
-      - kind: primaryButton
-        label: Add to wishlist
-        operation: addToWishlist
-        provenance: contract marketing-crm.yaml POST /guests/{subjectId}/wishlist
-      - kind: secondaryButton
-        label: Record consent
-        operation: recordConsent
-        provenance: contract marketing-crm.yaml POST /guests/{subjectId}/consents
-      - kind: secondaryButton
-        label: Register guest device
-        operation: registerGuestDevice
-        provenance: contract marketing-crm.yaml POST /guests/{subjectId}/devices
       - kind: destructiveButton
-        label: Remove from wishlist
-        operation: removeFromWishlist
-        provenance: contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}
-      - kind: destructiveButton
-        label: Revoke guest device
+        label: Stop notifications on this device
         operation: revokeGuestDevice
-        provenance: contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
       - kind: destructiveButton
-        label: Delete guest account
+        label: Delete my account
         operation: deleteGuestAccount
         provenance: contract identity.yaml DELETE /auth/guest/account
       - kind: secondaryButton
-        label: Export subject data
+        label: Get a copy of my data
         operation: exportSubjectData
         provenance: contract identity.yaml POST /guests/{subjectId}/data-export
-      - kind: secondaryButton
-        label: Grant delegation
-        operation: grantDelegation
-        provenance: contract identity.yaml POST /guests/{subjectId}/delegations
       - kind: destructiveButton
         label: Revoke face pass
         operation: revokeFacePass
         provenance: contract access.yaml DELETE /face-pass/enrolments/{enrolmentId}
   overlays:
-  - id: confirmRemoveFromWishlist
-    component: confirmDialog
-    trigger: Remove from wishlist
-    body: '**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather
-      than the verb. A devices wishlist consent this affects should be identified in the dialog, not just
-      counted.'
-    provenance: client-verified
   - id: confirmRevokeGuestDevice
     component: confirmDialog
-    trigger: Revoke guest device
+    trigger: Stop notifications on this device
     body: '**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather
       than the verb. A devices wishlist consent this affects should be identified in the dialog, not just
       counted.'
     provenance: client-verified
   - id: confirmDeleteGuestAccount
     component: confirmDialog
-    trigger: Delete guest account
+    trigger: Delete my account
     body: '**Names what `deleteGuestAccount` changes and what it leaves alone**, in the consequence rather
       than the verb. A devices wishlist consent this affects should be identified in the dialog, not just
       counted.'
-    provenance: client-verified
-  - id: formGrantDelegation
-    component: modal
-    trigger: Grant delegation
-    body: '**Collects what `grantDelegation` sends before it is called.** Required: `overSubjectId`, `delegationKind`,
-      `permission`. Optional: `overObjectRef`, `quota`, `validTo`, `isRevocableBySubject`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Grant delegation
-      operation: grantDelegation
-    dismiss:
-      label: Cancel
-      discards:
-      - overSubjectId
-      - delegationKind
-      - permission
-      - overObjectRef
-      - quota
-      - validTo
-      - isRevocableBySubject
     provenance: client-verified
   - id: confirmRevokeFacePass
     component: confirmDialog
@@ -6321,60 +5893,6 @@ screens:
     body: '**Names what `revokeFacePass` changes and what it leaves alone**, in the consequence rather
       than the verb. A devices wishlist consent this affects should be identified in the dialog, not just
       counted.'
-    provenance: client-verified
-  - id: formAddToWishlist
-    component: modal
-    trigger: Add to wishlist
-    body: '**Collects what `addToWishlist` sends before it is called.** Required: `variantId`. Optional:
-      `performanceId`, `note`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Add to wishlist
-      operation: addToWishlist
-    dismiss:
-      label: Cancel
-      discards:
-      - variantId
-      - performanceId
-      - note
-    provenance: client-verified
-  - id: formRecordConsent
-    component: modal
-    trigger: Record consent
-    body: '**Collects what `recordConsent` sends before it is called.** Required: `purpose`, `decision`,
-      `noticeVersion`, `source`, `recordedAt`. Optional: `channels`. Dismissing sends nothing; the screen
-      behind is unchanged.'
-    bindsTo: RecordConsentRequest
-    confirm:
-      label: Record consent
-      operation: recordConsent
-    dismiss:
-      label: Cancel
-      discards:
-      - purpose
-      - decision
-      - noticeVersion
-      - source
-      - recordedAt
-      - channels
-    provenance: client-verified
-  - id: formRegisterGuestDevice
-    component: modal
-    trigger: Register guest device
-    body: '**Collects what `registerGuestDevice` sends before it is called.** Required: `platform`, `token`.
-      Optional: `appVersion`, `osVersion`, `deviceModel`, `locale`. Dismissing sends nothing; the screen
-      behind is unchanged.'
-    confirm:
-      label: Register guest device
-      operation: registerGuestDevice
-    dismiss:
-      label: Cancel
-      discards:
-      - platform
-      - token
-      - appVersion
-      - osVersion
-      - deviceModel
-      - locale
     provenance: client-verified
   states:
     loading: Points and rewards
@@ -6394,12 +5912,6 @@ screens:
       change queued and never sent is worse than one that could not be made — the legal clock starts when
       the platform receives it, and a device signed out offline is still signed in.'
   apis:
-  - operationId: addToWishlist
-    contract: marketing-crm
-    purpose: Save an item
-    trigger: onAction
-    invalidates:
-    - listGuestDevices
   - operationId: getWishlist
     contract: marketing-crm
     purpose: Read a guest's saved items
@@ -6411,18 +5923,6 @@ screens:
   - operationId: recordConsent
     contract: marketing-crm
     purpose: Record a consent decision
-    trigger: onAction
-    invalidates:
-    - listGuestDevices
-  - operationId: registerGuestDevice
-    contract: marketing-crm
-    purpose: Register a device for push
-    trigger: onAction
-    invalidates:
-    - listGuestDevices
-  - operationId: removeFromWishlist
-    contract: marketing-crm
-    purpose: Remove a saved item
     trigger: onAction
     invalidates:
     - listGuestDevices
@@ -6452,10 +5952,6 @@ screens:
     contract: marketing-crm
     purpose: Which waivers are signed and which are due
     trigger: onLoad
-  - operationId: grantDelegation
-    contract: identity
-    purpose: Let somebody else manage a booking
-    trigger: onAction
   - operationId: listDelegations
     contract: identity
     purpose: Who may act for this guest
@@ -6506,6 +6002,10 @@ screens:
     purpose: Change or withdraw cookie preferences
     trigger: onAction
     provenance: build, 29 September 2026
+  - operationId: listConsentPurposes
+    contract: marketing-crm
+    purpose: The purposes the consent rows show
+    trigger: onLoad
   entryState:
     params:
     - name: deviceId
@@ -6595,18 +6095,25 @@ screens:
     - name: contentBody
       slot: record
       components:
-      - kind: dataTable
-        label: Every case
+      - kind: cardList
+        label: Questions people ask
+        bindsTo: PublishedFaqCategory
+        operation: listPublishedFaqs
+        notes: The published FAQs, readable without signing in; WEB-045 and this screen are one implementation
+          (GAP-D3).
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+      - kind: cardList
+        label: My cases
         bindsTo: Case
         columns:
         - Case.caseNumber
-        - Case.guestName
         - Case.subject
-        - Case.kind
-        - Case.recordedAt
         - Case.status
-        operation: listCases
-        provenance: contract marketing-crm.yaml GET /cases
+        - Case.createdAt
+        - Case.resolvedAt
+        operation: listMyCases
+        notes: The guest's own cases (R148); no staff filters, assignee or SLA.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
       - kind: cardList
         label: What's new
         notes: 'Newest first, at most 10: version, date and the localised release notes, from `getTenantAppStatus`
@@ -6617,9 +6124,13 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Create case
-        operation: createCase
-        provenance: contract marketing-crm.yaml POST /cases
+        label: Ask for help
+        operation: raiseMyCase
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+      - kind: secondaryButton
+        label: Reply
+        operation: replyToMyCase
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
   states:
     loading: Articles load
     error: Could not load
@@ -6639,14 +6150,21 @@ screens:
     contract: white-label
     purpose: App status and recent changes
     trigger: onLoad
-  - operationId: createCase
+  - operationId: listMyCases
     contract: marketing-crm
-    purpose: Raise a case
+    purpose: The cases this guest raised
+    trigger: onLoad
+  - operationId: raiseMyCase
+    contract: marketing-crm
+    purpose: Raise a case as the guest
     trigger: onAction
-  - operationId: listCases
+  - operationId: replyToMyCase
     contract: marketing-crm
-    purpose: Cases this guest has open Only when signed in (decided 2 October 2026 by Chinmay, fix before
-      Block A starts (GFIX-6)).
+    purpose: Reply on a case the guest raised
+    trigger: onAction
+  - operationId: listPublishedFaqs
+    contract: white-label
+    purpose: 'The published FAQs (GAP-D3: one implementation with WEB-045)'
     trigger: onLoad
   wireframe:
     status: review
@@ -6664,32 +6182,27 @@ screens:
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
   overlays:
-  - id: formCreateCase
+  - id: formRaiseMyCase
     component: modal
-    trigger: Create case
-    body: '**Collects what `createCase` sends before it is called.** Required: `id`, `subject`, `description`,
-      `channel`, `recordedAt`. Optional: `subjectId`, `categoryId`, `priority`, `kind`, `venueId`, `relatedOrderId`,
-      `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: CreateCaseRequest
+    trigger: Ask for help
+    body: What it is about (lost property, a complaint, a question), a short summary and the detail; optionally
+      the visit or order it concerns, chosen from the guest's own. Nothing else is asked.
     confirm:
-      label: Create case
-      operation: createCase
+      label: Ask for help
+      operation: raiseMyCase
     dismiss:
       label: Cancel
-      discards:
-      - id
-      - subject
-      - description
-      - channel
-      - recordedAt
-      - subjectId
-      - categoryId
-      - priority
-      - kind
-      - venueId
-      - relatedOrderId
-      - attachmentRefs
-    provenance: client-verified
+    provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+  - id: formReplyToMyCase
+    component: modal
+    trigger: Reply
+    body: The reply text, added to the case thread the guest raised.
+    confirm:
+      label: Reply
+      operation: replyToMyCase
+    dismiss:
+      label: Cancel
+    provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
 - id: WEB-026
   name: Survey & Feedback
   module: Engagement & Support
@@ -6721,45 +6234,44 @@ screens:
   pattern: configEditor
   patternReason: the screen declares only writes (`submitReview`) and no read of a population — it is
     settings, not a list
-  purpose: Work with survey & feedback for this venue.
+  purpose: Tell the venue how the visit went, answer a survey it sent, or report a problem.
   layout:
     template: form
     regions:
     - name: contentBody
-      slot: fields
+      slot: form
       components:
-      - kind: textField
-        label: id
-        bindsTo: SubmitReviewRequest.id
-        provenance: contract marketing-crm.yaml POST /reviews
-      - kind: textField
-        label: subjectId
-        bindsTo: SubmitReviewRequest.subjectId
-        provenance: contract marketing-crm.yaml POST /reviews
-      - kind: textField
-        label: venueId
-        bindsTo: SubmitReviewRequest.venueId
-        provenance: contract marketing-crm.yaml POST /reviews
-      - kind: textField
-        label: relatedOrderId
+      - kind: selectField
+        label: Which visit
         bindsTo: SubmitReviewRequest.relatedOrderId
-        provenance: contract marketing-crm.yaml POST /reviews
-      - kind: textField
-        label: rating
+        operation: listMyOrders
+        notes: Chosen from the guest's recent orders ("Coastal Aqua - Sat 26 Sep 2026"); never typed.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+      - kind: selectField
+        label: Your rating
         bindsTo: SubmitReviewRequest.rating
-        provenance: contract marketing-crm.yaml POST /reviews
-      - kind: textField
-        label: body
-        bindsTo: SubmitReviewRequest.body
-        provenance: contract marketing-crm.yaml POST /reviews
-      - kind: textField
-        label: aspects
+        operation: submitReview
+        notes: 1 to 5 stars; required.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+      - kind: multiSelect
+        label: What stood out
         bindsTo: SubmitReviewRequest.aspects
-        provenance: contract marketing-crm.yaml POST /reviews
+        operation: submitReview
+        notes: The venue's closed aspect set (Cleanliness, Staff, Food, Queues); multi-select, optional.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
       - kind: textField
-        label: recordedAt
-        bindsTo: SubmitReviewRequest.recordedAt
-        provenance: contract marketing-crm.yaml POST /reviews
+        label: Your comments
+        bindsTo: SubmitReviewRequest.body
+        operation: submitReview
+        notes: Optional, any language. Id, subject, venue and time are set by the platform.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+      - kind: detailPanel
+        label: Survey
+        bindsTo: FormDefinition
+        operation: getForm
+        notes: A triggered survey link (post-visit, post-scan, case closure) opens here with its formId;
+          answered with `submitForm` (DI-391).
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
     - name: actionBar
       slot: publish
       components:
@@ -6767,6 +6279,14 @@ screens:
         label: Submit review
         operation: submitReview
         provenance: contract marketing-crm.yaml POST /reviews
+      - kind: secondaryButton
+        label: Send survey
+        operation: submitForm
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+      - kind: secondaryButton
+        label: Report a problem
+        operation: raiseMyCase
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
   states:
     loading: Survey loads
     error: '**Could not submit. The answers are kept on the form, and the guest retries by pressing Submit
@@ -6789,6 +6309,22 @@ screens:
     contract: marketing-crm
     purpose: from page inventory
     trigger: onAction
+  - operationId: getForm
+    contract: marketing-crm
+    purpose: A triggered survey opened from its link
+    trigger: onLoad
+  - operationId: submitForm
+    contract: marketing-crm
+    purpose: Answer the survey
+    trigger: onAction
+  - operationId: raiseMyCase
+    contract: marketing-crm
+    purpose: Report a problem as a case
+    trigger: onAction
+  - operationId: listMyOrders
+    contract: orders
+    purpose: The recent visits a review can be about
+    trigger: onLoad
   wireframe:
     status: review
     provenance: client-verified
@@ -6803,6 +6339,22 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: formRaiseMyCase
+    component: modal
+    trigger: Report a problem
+    body: A short summary and the detail of the problem; the visit is the one chosen above.
+    confirm:
+      label: Report a problem
+      operation: raiseMyCase
+    dismiss:
+      label: Cancel
+    provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+  entryState:
+    params:
+    - name: formId
+      from: deepLink
+      optional: true
 - id: WEB-027
   name: Newsletter Subscription
   module: Engagement & Support
@@ -6828,204 +6380,53 @@ screens:
   pattern: listDetail
   patternReason: '`listGuestDevices` reads the population and `getWishlist` reads one of them — list,
     select, act'
-  purpose: Record newsletter subscription for this venue.
+  purpose: Choose which newsletters you receive and on which channel, or leave one from its email link.
   layout:
     template: split
     regions:
     - name: contentBody
       slot: collection
       components:
-      - kind: dataTable
-        label: Every guest device
-        bindsTo: GuestDevice
-        columns:
-        - GuestDevice.id
-        - GuestDevice.subjectId
-        - GuestDevice.platform
-        - GuestDevice.tokenFingerprint
-        - GuestDevice.appVersion
-        - GuestDevice.osVersion
-        - GuestDevice.deviceModel
-        - GuestDevice.locale
-        - GuestDevice.status
-        - GuestDevice.failureCount
-        - GuestDevice.registeredAt
-        - GuestDevice.lastSeenAt
-        operation: listGuestDevices
-        provenance: contract marketing-crm.yaml GET /guests/{subjectId}/devices
-      - kind: confirmDialog
-        derived: true
-        label: Confirm
-        notes: '**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is
-          a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a
-          dialog somebody dismisses.
-
-
-          **Added 31 August.** `confirmDialog` and `modal` were both in the component library and used
-          **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry
-          reads *always requires confirmation*.'
-        provenance: carried from the previous definition
-    - name: contextPanel
-      slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected guest device
-        bindsTo: GuestDevice
-        columns:
-        - GuestDevice.id
-        - GuestDevice.subjectId
-        - GuestDevice.platform
-        - GuestDevice.tokenFingerprint
-        - GuestDevice.tokenRef
-        - GuestDevice.appVersion
-        - GuestDevice.osVersion
-        - GuestDevice.deviceModel
-        - GuestDevice.locale
-        - GuestDevice.status
-        - GuestDevice.failureCount
-        - GuestDevice.registeredAt
-        - GuestDevice.lastSeenAt
-        - GuestDevice.revokedAt
-        operation: listGuestDevices
-        provenance: contract marketing-crm.yaml GET /guests/{subjectId}/devices
-      - kind: detailPanel
-        label: The marketing subscription
+      - kind: consentBlock
+        label: What we may send you
+        bindsTo: ConsentState
+        operation: getGuestConsents
+        notes: One row per configured purpose (`listConsentPurposes`), its channels as toggles, its plain-language
+          description and the notice version in force; the current position from `getGuestConsents` (Given
+          with date, Withdrawn with date, Not asked, Needs renewing). A change is recorded at once with
+          `recordConsent` (source and notice version set by the app; the guest never types a purpose,
+          decision, source or time). Withdrawing is as easy as giving.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+      - kind: cardList
+        label: Purposes and notices
+        operation: listConsentPurposes
+        notes: The configured purposes with their plain-language description, channels and the notice
+          version in force.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+      - kind: toggle
+        label: Consent toggle
+        operation: recordConsent
+        notes: Per purpose and channel; recorded at once on change, append-only.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+      - kind: cardList
+        label: Lists I receive
         bindsTo: MarketingSubscription
         columns:
-        - MarketingSubscription.id
-        - MarketingSubscription.subjectId
-        - MarketingSubscription.channel
         - MarketingSubscription.listName
+        - MarketingSubscription.channel
         - MarketingSubscription.isSubscribed
-        - MarketingSubscription.source
-        - MarketingSubscription.unsubscribeToken
         operation: getMarketingSubscription
-        provenance: contract marketing-crm.yaml GET /marketing-subscriptions
-      - kind: detailPanel
-        label: The wishlist
-        bindsTo: Wishlist
-        columns:
-        - Wishlist.subjectId
-        - Wishlist.items
-        operation: getWishlist
-        provenance: contract marketing-crm.yaml GET /guests/{subjectId}/wishlist
-    - name: actionBar
-      slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Record consent
-        operation: recordConsent
-        provenance: contract marketing-crm.yaml POST /guests/{subjectId}/consents
-      - kind: secondaryButton
-        label: Add to wishlist
-        operation: addToWishlist
-        provenance: contract marketing-crm.yaml POST /guests/{subjectId}/wishlist
-      - kind: secondaryButton
-        label: Register guest device
-        operation: registerGuestDevice
-        provenance: contract marketing-crm.yaml POST /guests/{subjectId}/devices
-      - kind: destructiveButton
-        label: Remove from wishlist
-        operation: removeFromWishlist
-        provenance: contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}
-      - kind: destructiveButton
-        label: Revoke guest device
-        operation: revokeGuestDevice
-        provenance: contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}
-      - kind: secondaryButton
-        label: Save marketing subscription
+        notes: One row per list with a toggle per channel; a channel can be switched on only where marketing
+          consent for it is given, otherwise the toggle asks "Allow offers by email?" first and records
+          the consent in the same act. The guest never types an id, a subject, a token or a list name.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+      - kind: textField
+        label: Channel toggle
         operation: setMarketingSubscription
-        provenance: contract marketing-crm.yaml PUT /marketing-subscriptions
-  overlays:
-  - id: confirmRemoveFromWishlist
-    component: confirmDialog
-    trigger: Remove from wishlist
-    body: '**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather
-      than the verb. A newsletter subscription this affects should be identified in the dialog, not just
-      counted.'
-    provenance: client-verified
-  - id: confirmRevokeGuestDevice
-    component: confirmDialog
-    trigger: Revoke guest device
-    body: '**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather
-      than the verb. A newsletter subscription this affects should be identified in the dialog, not just
-      counted.'
-    provenance: client-verified
-  - id: formRecordConsent
-    component: modal
-    trigger: Record consent
-    body: '**Collects what `recordConsent` sends before it is called.** Required: `purpose`, `decision`,
-      `noticeVersion`, `source`, `recordedAt`. Optional: `channels`. Dismissing sends nothing; the screen
-      behind is unchanged.'
-    bindsTo: RecordConsentRequest
-    confirm:
-      label: Record consent
-      operation: recordConsent
-    dismiss:
-      label: Cancel
-      discards:
-      - purpose
-      - decision
-      - noticeVersion
-      - source
-      - recordedAt
-      - channels
-    provenance: client-verified
-  - id: formAddToWishlist
-    component: modal
-    trigger: Add to wishlist
-    body: '**Collects what `addToWishlist` sends before it is called.** Required: `variantId`. Optional:
-      `performanceId`, `note`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Add to wishlist
-      operation: addToWishlist
-    dismiss:
-      label: Cancel
-      discards:
-      - variantId
-      - performanceId
-      - note
-    provenance: client-verified
-  - id: formRegisterGuestDevice
-    component: modal
-    trigger: Register guest device
-    body: '**Collects what `registerGuestDevice` sends before it is called.** Required: `platform`, `token`.
-      Optional: `appVersion`, `osVersion`, `deviceModel`, `locale`. Dismissing sends nothing; the screen
-      behind is unchanged.'
-    confirm:
-      label: Register guest device
-      operation: registerGuestDevice
-    dismiss:
-      label: Cancel
-      discards:
-      - platform
-      - token
-      - appVersion
-      - osVersion
-      - deviceModel
-      - locale
-    provenance: client-verified
-  - id: formSetMarketingSubscription
-    component: modal
-    trigger: Save marketing subscription
-    body: '**Collects what `setMarketingSubscription` sends before it is called.** Required: `id`, `subjectId`,
-      `channel`, `listName`, `isSubscribed`. Optional: `source`, `unsubscribeToken`. Dismissing sends
-      nothing; the screen behind is unchanged.'
-    bindsTo: MarketingSubscription
-    confirm:
-      label: Save marketing subscription
-      operation: setMarketingSubscription
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - subjectId
-      - channel
-      - listName
-      - isSubscribed
-      - source
-      - unsubscribeToken
-    provenance: client-verified
+        notes: 'Arriving from an email link with its unsubscribe token: that list on that channel is unsubscribed
+          at once ("You will no longer receive Coastal Aqua news by email"), with no sign-in and no confirmation.
+          Resubscribing needs sign-in.'
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
   states:
     loading: —
     error: Could not subscribe. **Consent is not recorded on a failed request**, because a subscription
@@ -7048,38 +6449,6 @@ screens:
     contract: marketing-crm
     purpose: from page inventory
     trigger: onAction
-  - operationId: addToWishlist
-    contract: marketing-crm
-    purpose: Save an item
-    trigger: onAction
-    invalidates:
-    - listGuestDevices
-  - operationId: getWishlist
-    contract: marketing-crm
-    purpose: Read a guest's saved items
-    trigger: onLoad
-  - operationId: listGuestDevices
-    contract: marketing-crm
-    purpose: A guest's registered devices
-    trigger: onLoad
-  - operationId: registerGuestDevice
-    contract: marketing-crm
-    purpose: Register a device for push
-    trigger: onAction
-    invalidates:
-    - listGuestDevices
-  - operationId: removeFromWishlist
-    contract: marketing-crm
-    purpose: Remove a saved item
-    trigger: onAction
-    invalidates:
-    - listGuestDevices
-  - operationId: revokeGuestDevice
-    contract: marketing-crm
-    purpose: Revoke a device registration
-    trigger: onAction
-    invalidates:
-    - listGuestDevices
   - operationId: getMarketingSubscription
     contract: marketing-crm
     purpose: What this guest has opted into
@@ -7088,16 +6457,21 @@ screens:
     contract: marketing-crm
     purpose: Subscribe or unsubscribe
     trigger: onAction
-    invalidates:
-    - listGuestDevices
+  - operationId: getGuestConsents
+    contract: marketing-crm
+    purpose: The current consent per channel (signed in)
+    trigger: onLoad
+  - operationId: listConsentPurposes
+    contract: marketing-crm
+    purpose: The purposes the consent rows show
+    trigger: onLoad
   entryState:
     params:
-    - name: deviceId
-      from: deepLink
-    - name: itemId
-      from: deepLink
     - name: subjectId
       from: session
+    - name: unsubscribeToken
+      from: deepLink
+      optional: true
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
       three weeks late all land here, and the person holding the link did nothing wrong. **The screen
@@ -7525,7 +6899,12 @@ screens:
     the venue''s), superseding audit R077 (a). A reservation holding a deposit shows its amount, when
     it stops being refundable (`refundableUntil`) and the late-cancel and no-show terms. Group booking
     on the web is this screen (`requestGroupBooking`; GAP-D3, already); school and party requests are
-    unchanged (DG-4).'
+    unchanged (DG-4).
+
+
+    **Two jobs, one id (GAP-D3, DI-1078; CHG-SGU-020).** This is My Reservations and the web''s group-booking
+    view. The group request form is a flow opened from here and from the booking listing, not a separate
+    screen; the prototype labels that dialog WEB-031.'
   density: compact
   pattern: listDetail
   patternReason: '`listReservations` reads the population and `getReservation` reads one of them — list,
@@ -8137,6 +7516,26 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: selectField
+        label: What did you lose?
+        bindsTo: LostItem.kind
+        operation: recordLostItem
+        notes: Kind (bag, phone, wallet, keys, clothing, jewellery, documents, toy, buggy, other), colour,
+          brand, description, where and when it was last seen, and photos. Sent as `recordLostItem` with
+          foundOrLost lost and the caseId of the case raised with it, so the register (BO-073) can match
+          it to a found item.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+      - kind: textField
+        label: Colour, brand and description
+        bindsTo: LostItem.description
+        operation: recordLostItem
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+      - kind: fileUpload
+        label: Photos
+        bindsTo: LostItem.photoAssetIds
+        operation: recordLostItem
+        notes: Optional photos of the item.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
       - kind: dataTable
         label: Every case
         bindsTo: Case
@@ -8224,6 +7623,10 @@ screens:
     trigger: onAction
     invalidates:
     - listMyCases
+  - operationId: recordLostItem
+    contract: marketing-crm
+    purpose: The lost-item record BO-073 matches, linked to the guest's case
+    trigger: onAction
   entryState:
     params:
     - name: subjectId
@@ -8249,8 +7652,9 @@ screens:
       verified: 2026-09-28
       match: partial
       view: Account → 'Lost & found, reports'; Help → 'Your cases' → Raise a case → topic 'Lost property'
-      differences: No lost-item report form (item, where, when, photo); reported via the generic case
-        form.
+      differences: 'No lost-item report form (item, where, when, photo); reported via the generic case
+        form. The prototype has no lost-item form; it uses the generic case form. A prototype gap: the
+        build follows this screen (kind, colour, brand, where last seen, photos), not the prototype (CHG-SGU-017).'
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -8258,9 +7662,8 @@ screens:
   - id: formRaiseMyCase
     component: modal
     trigger: Raise my case
-    body: '**Collects what `raiseMyCase` sends before it is called.** Required: `id`, `kind`, `summary`,
-      `recordedAt`. Optional: `detail`, `venueId`, `orderRef`. Dismissing sends nothing; the screen behind
-      is unchanged.'
+    body: 'Raises the case (`raiseMyCase`, kind lost property) and records the lost item (`recordLostItem`,
+      foundOrLost lost, caseId) in the same act; the guest fills one form.'
     confirm:
       label: Raise my case
       operation: raiseMyCase
@@ -8274,7 +7677,7 @@ screens:
       - detail
       - venueId
       - orderRef
-    provenance: client-verified
+    provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
   - id: formReplyToMyCase
     component: modal
     trigger: Reply to my case
@@ -8491,11 +7894,20 @@ screens:
     and `tableReservationId`), pays it through checkout, and shows `refundableUntil` and the late-cancel
     and no-show terms. Off by default; amount and basis are venue configuration, never a fixed AED 100.
     **Modifiers (REV3-9):** Add opens the modifier side panel of WEB-037 when the item has groups attached.
-    Delivery fee, minimum order, area and full slots are unchanged (DG-5).'
+    Delivery fee, minimum order, area and full slots are unchanged (DG-5).
+
+
+    **Where the outlet is (decided by Chinmay, 2 October 2026; DEC-070, DEC-206).** An outlet is *Inside
+    the venue (needs an admission ticket)* or *Standalone (no ticket)* (`Outlet.admissionContext`). Ordering
+    from an inside-the-venue outlet needs admission: a ticket, or a location claimed inside the venue;
+    `createGuestFnbOrder` refuses 403 `entry-ticket-required` otherwise, and the screen says so and offers
+    the tickets. A standalone restaurant sells takeaway and delivery without a ticket. **F&B keeps its
+    own payment step and its own receipt** (DEC-071, DEC-052): DI-293''s one cart and one receipt does
+    not apply to F&B, so the food order is paid on its own pay step and its receipt does not join the
+    guest''s ticket receipt (CHG-SGU-001).'
   density: compact
   pattern: listDetail
-  patternReason: '`listDiningOutlets` reads the population and `getGuestMenu` reads one of them — list,
-    select, act'
+  patternReason: 'Location, menu, basket, pay: the guest picks an outlet, then orders from its menu (CHG-SGU-018)'
   purpose: Order food from a table, a lounger or a seat.
   layout:
     template: split
@@ -8503,157 +7915,104 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: dataTable
-        label: Every browse order
+      - kind: cardList
+        label: Where you can eat now
         bindsTo: DiningOutlet
         columns:
-        - DiningOutlet.outletId
         - DiningOutlet.name
-        - DiningOutlet.kind
         - DiningOutlet.zone
         - DiningOutlet.cuisine
-        - DiningOutlet.isOpenNow
-        - DiningOutlet.opensAt
-        - DiningOutlet.closesAt
         - DiningOutlet.orderingMethod
+        - DiningOutlet.closesAt
         - DiningOutlet.estimatedWaitMinutes
         - DiningOutlet.imageAssetRef
-        - DiningOutlet.menuId
         operation: listDiningOutlets
-        provenance: contract fnb.yaml GET /venues/{venueId}/dining
+        notes: 'Outlets open now: photo, name, zone, cuisine, how to order ("Order to your seat", "Collect",
+          "Counter only") and closing time; a wait only when the outlet reports one. No ids.'
+        provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
+      - kind: textField
+        label: Lounger, table or seat number
+        operation: claimLocationSession
+        notes: A scanned code arrives with the link and is claimed at once; this short box is the fallback
+          when the QR is damaged ("Lounger B-14", "Table 12"). Party size is asked only at a table.
+        provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
       - kind: selectField
-        label: Mode
+        label: How you get it
         operation: listFulfilmentSlots
-        notes: Sends `?mode=` to `listFulfilmentSlots`.
-        provenance: contract fnb.yaml GET /outlets/{outletId}/fulfilment-slots
-      - kind: datePicker
-        label: Date
+        notes: 'Only what the outlet supports: to my table, seat or lounger; collect from the counter;
+          delivery to an address. Sends `mode`.'
+        provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
+      - kind: selectField
+        label: When
+        bindsTo: FulfilmentSlots.slots
         operation: listFulfilmentSlots
-        notes: Sends `?date=` to `listFulfilmentSlots`.
-        provenance: contract fnb.yaml GET /outlets/{outletId}/fulfilment-slots
-      - kind: dataTable
-        label: Every fulfilment slots
-        bindsTo: FulfilmentSlots
-        columns:
-        - FulfilmentSlots.slots
-        operation: listFulfilmentSlots
-        provenance: contract fnb.yaml GET /outlets/{outletId}/fulfilment-slots
-      - kind: dataTable
-        label: Every modifier group
-        bindsTo: ModifierGroup
-        columns:
-        - ModifierGroup.id
-        - ModifierGroup.code
-        - ModifierGroup.name
-        - ModifierGroup.minSelections
-        - ModifierGroup.maxSelections
-        - ModifierGroup.options
-        - ModifierGroup.scopePath
-        operation: listModifierGroups
-        provenance: contract fnb.yaml GET /modifier-groups
-      - kind: dataTable
-        label: Every delivery location
-        bindsTo: DeliveryLocation
-        columns:
-        - DeliveryLocation.id
-        - DeliveryLocation.venueId
-        - DeliveryLocation.kind
-        - DeliveryLocation.label
-        - DeliveryLocation.zone
-        - DeliveryLocation.tableId
-        - DeliveryLocation.seatId
-        - DeliveryLocation.servingOutletIds
-        - DeliveryLocation.isServiceable
-        - DeliveryLocation.unserviceableReason
-        - DeliveryLocation.walkTimeMinutes
+        notes: ASAP first ("About 25 min"), then the open slots; a date only for advance takeaway or delivery.
+        provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
+      - kind: selectField
+        label: Deliver to
         operation: listDeliveryLocations
-        provenance: contract fnb.yaml GET /venues/{venueId}/delivery-locations
-      - kind: cardList
-        label: F&B — Browse & Order
-        provenance: carried from the previous definition
+        notes: The delivery area check before the menu; an address outside it never reaches a basket.
+          Building, unit, emirate (from the outlet's emirates) and directions.
+        provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
       - kind: detailPanel
-        label: Detail
-        provenance: carried from the previous definition
-    - name: contextPanel
-      slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected fulfilment slots
-        bindsTo: FulfilmentSlots
-        columns:
-        - FulfilmentSlots.slots
-        operation: listFulfilmentSlots
-        provenance: contract fnb.yaml GET /outlets/{outletId}/fulfilment-slots
-      - kind: detailPanel
-        label: The F&B delivery policy
-        bindsTo: FnbDeliveryPolicy
-        columns:
-        - FnbDeliveryPolicy.id
-        - FnbDeliveryPolicy.outletId
-        - FnbDeliveryPolicy.collectionEnabled
-        - FnbDeliveryPolicy.deliveryEnabled
-        - FnbDeliveryPolicy.collectionPoint
-        - FnbDeliveryPolicy.collectionHoldMinutes
-        - FnbDeliveryPolicy.asapCollectionMinutes
-        - FnbDeliveryPolicy.asapDeliveryMinutes
-        - FnbDeliveryPolicy.slotMinutes
-        - FnbDeliveryPolicy.minimumOrder
-        - FnbDeliveryPolicy.deliveryFee
-        - FnbDeliveryPolicy.freeDeliveryAbove
-        - FnbDeliveryPolicy.radiusKm
-        - FnbDeliveryPolicy.emiratesServed
-        - FnbDeliveryPolicy.cutleryOptIn
-        - FnbDeliveryPolicy.scopePath
-        operation: getFnbDeliveryPolicy
-        provenance: contract fnb.yaml GET /fnb-delivery-policy
-      - kind: detailPanel
-        label: The guest order status
-        bindsTo: GuestOrderStatus
-        columns:
-        - GuestOrderStatus.orderId
-        - GuestOrderStatus.orderNumber
-        - GuestOrderStatus.status
-        - GuestOrderStatus.estimatedReadyAt
-        - GuestOrderStatus.isReadyForCollection
-        - GuestOrderStatus.lines
-        operation: getGuestOrderStatus
-        provenance: contract fnb.yaml GET /guest-orders/{orderId}
-      - kind: detailPanel
-        label: The guest menu
+        label: Menu
         bindsTo: GuestMenu
         columns:
-        - GuestMenu.outletId
-        - GuestMenu.menuId
         - GuestMenu.name
         - GuestMenu.inForceUntil
-        - GuestMenu.currency
-        - GuestMenu.currencyScale
         - GuestMenu.sections
         operation: getGuestMenu
-        provenance: contract fnb.yaml GET /outlets/{outletId}/guest-menu
+        notes: Sections in the outlet's order, "Lunch menu until 16:00" from `inForceUntil`; each dish
+          with photo, price and allergens; a dish's modifier groups come inside the menu (no venue-wide
+          modifier list). Sold out stays in place, greyed.
+        provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
+      - kind: cartPanel
+        label: Your order
+        operation: getFnbDeliveryPolicy
+        notes: Lines with choices and a 1-20 stepper, the kitchen note per dish; for delivery the fee,
+          the free-delivery threshold and the minimum order.
+        provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
+      - kind: banner
+        label: Order placed
+        bindsTo: GuestOrderStatus
+        operation: getGuestOrderStatus
+        notes: The order number large, where it is going, the ready time as a clock time; then tracking
+          (WEB-038 / GST-025).
+        provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
+      - kind: banner
+        label: Needs an admission ticket
+        operation: createGuestFnbOrder
+        notes: "**Where the outlet is (decided by Chinmay, 2 October 2026; DEC-070, DEC-206).** An outlet
+          is *Inside the venue (needs an admission ticket)* or *Standalone (no ticket)* (`Outlet.admissionContext`).
+          Ordering from an inside-the-venue outlet needs admission: a ticket, or a location claimed inside
+          the venue; `createGuestFnbOrder` refuses 403 `entry-ticket-required` otherwise, and the screen
+          says so and offers the tickets. A standalone restaurant sells takeaway and delivery without
+          a ticket. **F&B keeps its own payment step and its own receipt** (DEC-071, DEC-052): DI-293's
+          one cart and one receipt does not apply to F&B, so the food order is paid on its own pay step
+          and its receipt does not join the guest's ticket receipt (CHG-SGU-001)."
+        provenance: corrected 2 October 2026 (CHG-SGU-001, decided by Chinmay 2 October 2026, DEC-070/071/052/206)
     - name: actionBar
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Claim location session
-        operation: claimLocationSession
-        provenance: contract fnb.yaml POST /location-sessions
-      - kind: secondaryButton
-        label: Claim table session
-        operation: claimTableSession
-        provenance: contract fnb.yaml POST /table-sessions
-      - kind: secondaryButton
-        label: Create guest F&B order
+        label: Pay
         operation: createGuestFnbOrder
-        provenance: contract fnb.yaml POST /guest-orders
+        notes: Reads "Pay AED 86.00", never "Send to the kitchen". The order and the total the guest saw
+          go to the server, then card or wallet on the F&B order's own pay step; the kitchen sees it only
+          once payment succeeds, unless it goes on an open table tab. Its own receipt (DEC-071).
+        provenance: corrected 2 October 2026 (CHG-SGU-001, decided by Chinmay 2 October 2026, DEC-070/071/052/206)
       - kind: secondaryButton
-        label: Create table reservation
+        label: Book a table
         operation: createTableReservation
-        provenance: contract fnb.yaml POST /table-reservations
+        provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
       - kind: secondaryButton
-        label: Join restaurant waitlist
+        label: Change or cancel booking
+        operation: updateTableReservation
+        provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
+      - kind: secondaryButton
+        label: Join the waitlist
         operation: joinRestaurantWaitlist
-        provenance: contract fnb.yaml POST /waitlist
+        provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
       - kind: destructiveButton
         label: Leave restaurant waitlist
         operation: leaveRestaurantWaitlist
@@ -8663,9 +8022,9 @@ screens:
   states:
     loading: Content resolves in place.
     error: Could not load. **The rest of the site is unaffected.**
-    emptyFirstRun: '**Nothing here yet for this venue.** Names what turns it on rather than showing an
-      empty panel.'
-    emptyNoResults: Nothing matches.
+    emptyFirstRun: 'No outlet takes orders here now. Names when the next one opens; a counter-only outlet''s
+      menu can still be read.'
+    emptyNoResults: 'No outlet open now matches: says so, with the next opening time.'
     emptyNoAccess: '**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission`
       is what a staff caller must hold; a guest call resolves to the guest''s own data; decided by Chinmay,
       fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told
@@ -8691,25 +8050,16 @@ screens:
     contract: fnb
     purpose: Where a guest can eat, right now
     trigger: onLoad
-  - operationId: listModifierGroups
-    contract: fnb
-    purpose: List modifier groups
-    trigger: onLoad
   - operationId: claimLocationSession
     contract: fnb
     purpose: Tell the platform where the guest is
     trigger: onAction
     invalidates:
     - listDiningOutlets
-  - operationId: claimTableSession
-    contract: fnb
-    purpose: Identify which table a guest is sitting at
-    trigger: onAction
-    invalidates:
-    - listDiningOutlets
   - operationId: createGuestFnbOrder
     contract: fnb
-    purpose: A guest orders food
+    purpose: A guest orders food; refused 403 entry-ticket-required at an inside-the-venue outlet without
+      admission; paid on its own pay step with its own receipt (DEC-070, DEC-071)
     trigger: onAction
     invalidates:
     - listDiningOutlets
@@ -8738,6 +8088,10 @@ screens:
   - operationId: addCartLine
     contract: orders
     purpose: Add a table deposit to the cart when the venue requires one
+    trigger: onAction
+  - operationId: updateTableReservation
+    contract: fnb
+    purpose: Change or cancel the guest's own table booking (web and app parity with GST-070)
     trigger: onAction
   entryState:
     params:
@@ -8770,119 +8124,55 @@ screens:
       verified: '2026-10-01'
       match: exact
       view: Summit Peaks → header 'At the venue' → Order food (table ordering)
-      differences: Prototype splits in-venue table ordering (At the venue) from takeaway/delivery ordering
+      differences: 'Prototype splits in-venue table ordering (At the venue) from takeaway/delivery ordering
         (a booking flow with a delivery-area and slot check). Table reservation and waitlist (in YAML
-        apis) are booking flows at Saffron Table.
+        apis) are booking flows at Saffron Table. **The prototype sends the order with "Send to the kitchen"
+        and no payment step: wrong here.** The contract takes payment before the kitchen sees a guest
+        order unless the outlet runs a tab, and F11 puts the pay step (4) before the kitchen (5); the
+        design shows the pay step (CHG-SGU-018).'
   apisNote: Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
   overlays:
   - id: formCreateTableReservation
     component: modal
-    trigger: Create table reservation
-    body: '**Collects what `createTableReservation` sends before it is called.** Required: `outletId`,
-      `partySize`, `startsAt`. Optional: `id`, `subjectId`, `guestName`, `contactPoint`, `durationMinutes`,
-      `tables`, `status`, `groupId`, `notes`, `actualPartySize`, `tableVisitId`. Dismissing sends nothing;
-      the screen behind is unchanged.'
+    trigger: Book a table
+    body: 'Restaurant, date, time and party size on one screen, an optional note for allergies or requests,
+      and optional seating preference (`seatingPreference`) and occasion (`occasion`: birthday, anniversary,
+      business, celebration, other; DEC-204). Name and contact are prefilled from the profile. No table
+      picking, no duration, and nothing the server sets (id, status, tables, group, visit). Confirmed
+      at once with "No card needed", unless the venue enabled a deposit (`awaitingDeposit`).'
     bindsTo: TableReservation
     confirm:
-      label: Create table reservation
+      label: Book a table
       operation: createTableReservation
     dismiss:
       label: Cancel
-      discards:
-      - outletId
-      - partySize
-      - startsAt
-      - id
-      - subjectId
-      - guestName
-      - contactPoint
-      - durationMinutes
-      - tables
-      - status
-      - groupId
-      - notes
-      - actualPartySize
-      - tableVisitId
-    provenance: client-verified
+    provenance: corrected 2 October 2026 (CHG-SGU-002, decided by Chinmay 2 October 2026, DEC-204)
+  - id: formUpdateTableReservation
+    component: modal
+    trigger: Change or cancel booking
+    body: 'Party size and time only; the restaurant is fixed. Cancelling says the consequence first: free,
+      deposit released, or deposit kept.'
+    bindsTo: TableReservation
+    confirm:
+      label: Change or cancel booking
+      operation: updateTableReservation
+    dismiss:
+      label: Cancel
+    provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
   - id: formJoinRestaurantWaitlist
     component: modal
-    trigger: Join restaurant waitlist
-    body: '**Collects what `joinRestaurantWaitlist` sends before it is called.** Required: `id`, `outletId`,
-      `partySize`, `status`, `recordedAt`. Optional: `subjectId`, `quotedWaitMinutes`, `seatingPreference`,
-      `notifiedAt`, `syncedAt`, `holdExpiresAt`. Dismissing sends nothing; the screen behind is unchanged.'
+    trigger: Join the waitlist
+    body: Party size and seating (Any, Indoor, Outdoor, Bar, Booth, High chair needed). Name and contact
+      come from the profile; nothing the server sets is asked.
     bindsTo: RestaurantWaitlist
     confirm:
-      label: Join restaurant waitlist
+      label: Join the waitlist
       operation: joinRestaurantWaitlist
     dismiss:
       label: Cancel
-      discards:
-      - id
-      - outletId
-      - partySize
-      - status
-      - recordedAt
-      - subjectId
-      - quotedWaitMinutes
-      - seatingPreference
-      - notifiedAt
-      - syncedAt
-      - holdExpiresAt
-    provenance: client-verified
-  - id: formClaimLocationSession
-    component: modal
-    trigger: Claim location session
-    body: '**Collects what `claimLocationSession` sends before it is called.** Nothing in the body is
-      required. Optional: `locationCode`, `seatReference`, `partySize`. Dismissing sends nothing; the
-      screen behind is unchanged.'
-    confirm:
-      label: Claim location session
-      operation: claimLocationSession
-    dismiss:
-      label: Cancel
-      discards:
-      - locationCode
-      - seatReference
-      - partySize
-    provenance: client-verified
-  - id: formClaimTableSession
-    component: modal
-    trigger: Claim table session
-    body: '**Collects what `claimTableSession` sends before it is called.** Required: `tableCode`. Optional:
-      `partySize`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Claim table session
-      operation: claimTableSession
-    dismiss:
-      label: Cancel
-      discards:
-      - tableCode
-      - partySize
-    provenance: client-verified
-  - id: formCreateGuestFnbOrder
-    component: modal
-    trigger: Create guest F&B order
-    body: '**Collects what `createGuestFnbOrder` sends before it is called.** Required: `id`, `lines`,
-      `quotedTotal`, `recordedAt`. Optional: `locationSessionId`, `outletId`, `fulfilment`, `paymentMethod`.
-      Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: CreateGuestOrderRequest
-    confirm:
-      label: Create guest F&B order
-      operation: createGuestFnbOrder
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - lines
-      - quotedTotal
-      - recordedAt
-      - locationSessionId
-      - outletId
-      - fulfilment
-      - paymentMethod
-    provenance: client-verified
+    provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
 - id: WEB-037
   name: Menu Item Detail
   module: In-venue Services
@@ -8907,52 +8197,16 @@ screens:
     groups.'
   density: compact
   pattern: listDetail
-  patternReason: '`listModifierGroups` reads the population and `getGuestMenu` reads one of them — list,
-    select, act'
+  patternReason: 'One dish from the outlet''s guest menu, with its modifiers and allergens (CHG-SGU-018)'
   purpose: What is in it, and what may be changed.
   layout:
     template: split
     regions:
-    - name: contentBody
-      slot: collection
-      components:
-      - kind: dataTable
-        label: Every modifier group
-        bindsTo: ModifierGroup
-        columns:
-        - ModifierGroup.id
-        - ModifierGroup.code
-        - ModifierGroup.name
-        - ModifierGroup.minSelections
-        - ModifierGroup.maxSelections
-        - ModifierGroup.options
-        - ModifierGroup.scopePath
-        operation: listModifierGroups
-        provenance: contract fnb.yaml GET /modifier-groups
-      - kind: cardList
-        label: Menu Item Detail
-        provenance: carried from the previous definition
-      - kind: detailPanel
-        label: Detail
-        provenance: carried from the previous definition
     - name: contextPanel
       slot: selection
       components:
       - kind: detailPanel
-        label: The selected modifier group
-        bindsTo: ModifierGroup
-        columns:
-        - ModifierGroup.id
-        - ModifierGroup.code
-        - ModifierGroup.name
-        - ModifierGroup.minSelections
-        - ModifierGroup.maxSelections
-        - ModifierGroup.options
-        - ModifierGroup.scopePath
-        operation: listModifierGroups
-        provenance: contract fnb.yaml GET /modifier-groups
-      - kind: detailPanel
-        label: The guest menu
+        label: The dish
         bindsTo: GuestMenu
         columns:
         - GuestMenu.outletId
@@ -8963,19 +8217,17 @@ screens:
         - GuestMenu.currencyScale
         - GuestMenu.sections
         operation: getGuestMenu
-        provenance: contract fnb.yaml GET /outlets/{outletId}/guest-menu
+        provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
+        notes: "The dish `menuItemId` resolved inside the outlet's `getGuestMenu`: photo, name, description,
+          price, its modifier groups (min and max per group) and allergens. Until the guest menu carries
+          the Allergen object, \"Contains\" is drawn from the current list and \"May contain\" and the
+          diet badges (vegetarian, vegan, halal) are drawn as pending (CHG-SGU-024)."
   states:
     loading: Content resolves in place.
     error: Could not load. **The rest of the site is unaffected.**
     emptyFirstRun: '**Nothing here yet for this venue.** Names what turns it on rather than showing an
       empty panel.'
-    emptyNoResults: Nothing matches.
-    emptyNoAccess: '**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission`
-      is what a staff caller must hold; a guest call resolves to the guest''s own data; decided by Chinmay,
-      fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told
-      apart by the response: not signed in, where the guest is offered sign-in and brought back to this
-      screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty
-      table** — that reads as *there is no data* and sends somebody to support with the wrong question.'
+    emptyNoAccess: 'Never shown: a menu is public and browsing a dish needs no sign-in.'
     offline: '**The offline banner shows.** The dish already loaded stays, with a note that it may be
       out of date and its allergens in full. Ordering is refused — availability changes by the minute.'
   apis:
@@ -8983,13 +8235,11 @@ screens:
     contract: fnb
     purpose: The menu a guest sees
     trigger: onLoad
-  - operationId: listModifierGroups
-    contract: fnb
-    purpose: List modifier groups
-    trigger: onLoad
   entryState:
     params:
     - name: outletId
+      from: deepLink
+    - name: menuItemId
       from: deepLink
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land
@@ -9055,7 +8305,7 @@ screens:
   pattern: statusTracker
   patternReason: '`getGuestOrderStatus` reads one record and nothing reads a population — the screen is
     about that one thing'
-  purpose: Watch it being made, and settle the bill.
+  purpose: Watch it being made, and see the table bill; it is paid at the table.
   layout:
     template: detail
     regions:
@@ -9088,33 +8338,22 @@ screens:
         - Bill.total
         operation: getGuestBill
         provenance: contract fnb.yaml GET /table-sessions/{sessionId}/bill
-      - kind: cardList
-        label: F&B — Order Tracking
-        provenance: carried from the previous definition
-      - kind: detailPanel
-        label: Detail
-        provenance: carried from the previous definition
-    - name: actionBar
-      slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Claim table session
-        operation: claimTableSession
-        provenance: contract fnb.yaml POST /table-sessions
+        notes: The table bill, read through the table session the guest holds. A guest who claimed with
+          `claimLocationSession` holds a visit, not a table session, and cannot read it yet (CHG-SGU-024);
+          "Pay at the table" until a guest payment of the visit's bill exists.
   states:
-    loading: Content resolves in place.
+    loading: Loading the order.
     error: Could not load. **The rest of the site is unaffected.**
-    emptyFirstRun: '**Nothing here yet for this venue.** Names what turns it on rather than showing an
-      empty panel.'
-    emptyNoResults: Nothing matches.
+    emptyFirstRun: 'The order is not found or was refunded (a cold link): says which, with the way back
+      to ordering.'
     emptyNoAccess: '**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission`
       is what a staff caller must hold; a guest call resolves to the guest''s own data; decided by Chinmay,
       fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told
       apart by the response: not signed in, where the guest is offered sign-in and brought back to this
       screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty
       table** — that reads as *there is no data* and sends somebody to support with the wrong question.'
-    offline: '**The offline banner shows.** The last status stays on screen with its age and is never
-      presented as current. Settling the bill waits for the connection.'
+    offline: '**The offline banner shows.** The last status stays with its age ("Preparing, 2 min ago");
+      nothing refreshes until the connection returns.'
   apis:
   - operationId: getGuestOrderStatus
     contract: fnb
@@ -9127,10 +8366,6 @@ screens:
     contract: fnb
     purpose: The bill for the guest's table
     trigger: onLoad
-  - operationId: claimTableSession
-    contract: fnb
-    purpose: Identify which table a guest is sitting at
-    trigger: onAction
   entryState:
     params:
     - name: subjectId
@@ -9161,21 +8396,6 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
-  overlays:
-  - id: formClaimTableSession
-    component: modal
-    trigger: Claim table session
-    body: '**Collects what `claimTableSession` sends before it is called.** Required: `tableCode`. Optional:
-      `partySize`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Claim table session
-      operation: claimTableSession
-    dismiss:
-      label: Cancel
-      discards:
-      - tableCode
-      - partySize
-    provenance: client-verified
 - id: WEB-039
   name: Venue Map & Wait Times
   module: In-venue Services
@@ -9423,14 +8643,6 @@ screens:
         label: Leave queue
         operation: leaveQueue
         provenance: contract queue.yaml DELETE /waiting-guests/{entryId}
-      - kind: secondaryButton
-        label: Join waitlist
-        operation: joinWaitlist
-        provenance: contract catalogue.yaml POST /waitlist-entries
-      - kind: secondaryButton
-        label: Leave waitlist
-        operation: leaveWaitlist
-        provenance: contract catalogue.yaml DELETE /waitlist-entries/{entryId}
   states:
     loading: Content resolves in place.
     error: Could not load. **The rest of the site is unaffected.**
@@ -9465,14 +8677,6 @@ screens:
     contract: queue
     purpose: Wait times across a venue
     trigger: onLoad
-  - operationId: joinWaitlist
-    contract: catalogue
-    purpose: Join a virtual queue
-    trigger: onAction
-  - operationId: leaveWaitlist
-    contract: catalogue
-    purpose: Leave it
-    trigger: onAction
   entryState:
     params:
     - name: subjectId
@@ -9496,31 +8700,6 @@ screens:
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
   overlays:
-  - id: formJoinWaitlist
-    component: modal
-    trigger: Join waitlist
-    body: '**Collects what `joinWaitlist` sends before it is called.** Required: `performanceId`, `partySize`.
-      Optional: `id`, `variantId`, `subjectId`, `contactPoint`, `status`, `position`, `offeredAt`, `offerExpiresAt`,
-      `joinedAt`. Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: WaitlistEntry
-    confirm:
-      label: Join waitlist
-      operation: joinWaitlist
-    dismiss:
-      label: Cancel
-      discards:
-      - performanceId
-      - partySize
-      - id
-      - variantId
-      - subjectId
-      - contactPoint
-      - status
-      - position
-      - offeredAt
-      - offerExpiresAt
-      - joinedAt
-    provenance: client-verified
   - id: formJoinQueue
     component: modal
     trigger: Join queue
@@ -9685,9 +8864,11 @@ screens:
       verified: '2026-10-01'
       match: partial
       view: Summit Peaks → header 'At the venue' → Parking
-      differences: Shows live free-bay counts, which the YAML says it does not have (no live availability;
+      differences: "Shows live free-bay counts, which the YAML says it does not have (no live availability;
         full = soldOutForDay). Pays directly with 'Reserve and pay' rather than through cart and checkout
-        (R166). Also a plate field in the cabana/party flows.
+        (R166). Also a plate field in the cabana/party flows. **Do not draw live free-bay counts or \"\
+        Reserve and pay\"**: no live count in the first release, and parking goes through the basket (R166)
+        (CHG-SGU-020)."
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -9747,11 +8928,21 @@ screens:
     - WEB-001
     exitTo:
     - WEB-001
+    - WEB-010
+    transitions:
+    - to: WEB-010
+      trigger: 'Go to basket: one cart and one checkout for tickets, F&B add-ons and retail (DI-293, R236)'
+      provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
   notes: '**The web could sell merchandise and could not arrange collection.** `lookupShopAndDrop` was
     app-only, which made the service half-available on the surface most guests use. **Paid online at checkout**
     (decided 28 September, audit R236): the guest adds the item to the cart for collection, checks out
     and pays (`addCartLine`, `checkoutCart`, `createPayment`), and payment creates the shop-and-drop that
-    `lookupShopAndDrop` then finds; `reserveMerchandise` ("reserved at purchase") is no longer wired here.'
+    `lookupShopAndDrop` then finds; `reserveMerchandise` ("reserved at purchase") is no longer wired here.
+
+
+    **Paid only on the web (R236; DEC-075 of 2 October).** The app keeps an unpaid "hold to pay at the
+    shop" drawn as secondary until decided, a sanctioned difference between the twins. The barcode price
+    check (`lookupMerchandise`) is not drawn on the web (DEC-076) (CHG-SGU-018).'
   density: compact
   pattern: listDetail
   patternReason: '`listMerchandise` reads a population and nothing reads one of them; the detail is the
@@ -9763,16 +8954,29 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: textField
-        label: Outlet id
+      - kind: selectField
+        label: Shop
         operation: listMerchandise
-        notes: Sends `?outletId=` to `listMerchandise`.
-        provenance: contract retail.yaml GET /merchandise
-      - kind: textField
-        label: Category id
+        notes: Shops by name; sends `outletId`.
+        provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
+      - kind: selectField
+        label: Category
         operation: listMerchandise
-        notes: Sends `?categoryId=` to `listMerchandise`.
-        provenance: contract retail.yaml GET /merchandise
+        notes: Categories by name; sends `categoryId`.
+        provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
+      - kind: cardList
+        label: Merchandise
+        bindsTo: GuestMerchandiseItem
+        columns:
+        - GuestMerchandiseItem.name
+        - GuestMerchandiseItem.description
+        - GuestMerchandiseItem.price
+        - GuestMerchandiseItem.isAvailable
+        - GuestMerchandiseItem.imageAssetRef
+        operation: listMerchandise
+        notes: 'The guest projection: name, photo, price and whether it can be bought; sold-out items
+          stay visible. No sku, barcode, variant, stock or inventory ids.'
+        provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
       - kind: toggle
         label: In stock only
         operation: listMerchandise
@@ -9783,82 +8987,15 @@ screens:
         operation: listMerchandise
         notes: Sends `?search=` to `listMerchandise`.
         provenance: contract retail.yaml GET /merchandise
-      - kind: dataTable
-        label: Every merchandise
-        bindsTo: MerchandiseItem
-        columns:
-        - MerchandiseItem.id
-        - MerchandiseItem.sku
-        - MerchandiseItem.barcode
-        - MerchandiseItem.name
-        - MerchandiseItem.outletId
-        - MerchandiseItem.categoryId
-        - MerchandiseItem.variantId
-        - MerchandiseItem.inventoryItemId
-        - MerchandiseItem.price
-        - MerchandiseItem.onHand
-        - MerchandiseItem.isReturnable
-        - MerchandiseItem.returnWindowDays
-        operation: listMerchandise
-        provenance: contract retail.yaml GET /merchandise
-      - kind: cardList
-        label: Retail & Shop and Drop
-        provenance: carried from the previous definition
-      - kind: detailPanel
-        label: Detail
-        provenance: carried from the previous definition
-    - name: contextPanel
-      slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected merchandise
-        bindsTo: MerchandiseItem
-        columns:
-        - MerchandiseItem.id
-        - MerchandiseItem.sku
-        - MerchandiseItem.barcode
-        - MerchandiseItem.name
-        - MerchandiseItem.outletId
-        - MerchandiseItem.categoryId
-        - MerchandiseItem.variantId
-        - MerchandiseItem.inventoryItemId
-        - MerchandiseItem.price
-        - MerchandiseItem.onHand
-        - MerchandiseItem.isReturnable
-        - MerchandiseItem.returnWindowDays
-        - MerchandiseItem.requiresSerialNumber
-        - MerchandiseItem.imageAssetRef
-        - MerchandiseItem.isActive
-        operation: listMerchandise
-        provenance: contract retail.yaml GET /merchandise
     - name: actionBar
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Lookup merchandise
-        operation: lookupMerchandise
-        notes: Sends `?outletId=` — the outlet the guest is browsing — because a web caller has no workstation;
-          price and stock are that outlet's, and an inactive item is not found (decided 28 September,
-          audit R215 (1)).
-        provenance: contract retail.yaml GET /merchandise/lookup
-      - kind: secondaryButton
-        label: Add to cart for collection
+        label: Add to basket
         operation: addCartLine
         provenance: contract orders.yaml POST /carts/{cartId}/lines
       - kind: secondaryButton
-        label: Check out to collect on the way out
-        operation: checkoutCart
-        notes: '**Paid online at checkout** (decided 28 September, audit R236): merchandise marked for
-          collection goes in the cart with `addCartLine`, the cart is checked out and paid here, and **payment
-          creates the shop-and-drop** for collection on the way out. Nothing is reserved unpaid on the
-          web; `reserveMerchandise` is not the web path.'
-        provenance: contract orders.yaml POST /carts/{cartId}/checkout
-      - kind: primaryButton
-        label: Pay
-        operation: createPayment
-        provenance: contract orders.yaml POST /payments
-      - kind: secondaryButton
-        label: Lookup shop and drop
+        label: What is waiting for me
         operation: lookupShopAndDrop
         provenance: contract retail.yaml GET /shop-and-drop/lookup
   states:
@@ -9867,12 +9004,8 @@ screens:
     emptyFirstRun: '**Nothing here yet for this venue.** Names what turns it on rather than showing an
       empty panel.'
     emptyNoResults: Nothing matches.
-    emptyNoAccess: '**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission`
-      is what a staff caller must hold; a guest call resolves to the guest''s own data; decided by Chinmay,
-      fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told
-      apart by the response: not signed in, where the guest is offered sign-in and brought back to this
-      screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty
-      table** — that reads as *there is no data* and sends somebody to support with the wrong question.'
+    emptyNoAccess: '**There is no permission to name: a guest holds none** (ADR-0025). The shop is public;
+      buying needs the guest''s cart.'
     offline: '**The offline banner shows, and lookup cannot run.** A drop reference already on screen
       stays visible so the guest can quote it at the collection point. Reserving merchandise needs the
       connection.'
@@ -9881,25 +9014,12 @@ screens:
     contract: retail
     purpose: List merchandise
     trigger: onLoad
-  - operationId: lookupMerchandise
-    contract: retail
-    purpose: Price and stock check by barcode, at the outlet named by `outletId` (audit R215 (1))
-    trigger: onAction
   - operationId: addCartLine
     contract: orders
     purpose: Put the item in the cart, marked for collection on the way out (audit R236)
     trigger: onAction
     invalidates:
     - listMerchandise
-  - operationId: checkoutCart
-    contract: orders
-    purpose: Turn the cart into an order; merchandise for collection is paid online (audit R236)
-    trigger: onAction
-  - operationId: createPayment
-    contract: orders
-    purpose: Pay for it; payment creates the shop-and-drop for collection (decided 28 September, audit
-      R236)
-    trigger: onAction
   - operationId: lookupShopAndDrop
     contract: retail
     purpose: Find a guest's dropped goods
@@ -9939,9 +9059,8 @@ screens:
   - id: formAddCartLine
     component: modal
     trigger: Add to cart for collection
-    body: '**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`.
-      Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the
-      screen behind is unchanged.'
+    body: 'The item and quantity (a size switches between sibling items); collection point or home delivery
+      is chosen at checkout. No variant, performance or seat ids are asked.'
     bindsTo: AddCartLineRequest
     confirm:
       label: Add cart line
@@ -9955,7 +9074,7 @@ screens:
       - seatIds
       - parentLineId
       - attributes
-    provenance: client-verified
+    provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
 - id: WEB-043
   name: Loyalty & Rewards
   module: Membership, Loyalty & Value
@@ -10033,6 +9152,22 @@ screens:
       - kind: detailPanel
         label: Detail
         provenance: carried from the previous definition
+      - kind: cardList
+        label: Rewards
+        operation: listRewards
+        notes: What points can be turned into, with the points each needs; Redeem on a reward the guest
+          can afford.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+      - kind: cardList
+        label: My badges
+        operation: listCustomerBadges
+        notes: Status badges the guest holds (DI-392).
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+      - kind: cardList
+        label: Leaderboard
+        operation: listLeaderboard
+        notes: Standings by nickname; the guest sets theirs with Choose my name.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
     - name: contextPanel
       slot: reads
       components:
@@ -10047,13 +9182,17 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Create referral
+        label: Invite a friend
         operation: createReferral
         provenance: contract marketing-crm.yaml POST /referrals
       - kind: secondaryButton
-        label: Redeem loyalty points
+        label: Redeem
         operation: redeemLoyaltyPoints
         provenance: contract marketing-crm.yaml POST /loyalty/redemptions
+      - kind: secondaryButton
+        label: Choose my name
+        operation: setLeaderboardNickname
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
   states:
     loading: Content resolves in place.
     error: Could not load. **The rest of the site is unaffected.**
@@ -10099,6 +9238,22 @@ screens:
     purpose: Report impressions, clicks and declines of recommended items
     trigger: onAction
     provenance: build, 29 September 2026
+  - operationId: listRewards
+    contract: marketing-crm
+    purpose: What points can be turned into
+    trigger: onLoad
+  - operationId: listCustomerBadges
+    contract: marketing-crm
+    purpose: Badges the guest holds
+    trigger: onLoad
+  - operationId: listLeaderboard
+    contract: marketing-crm
+    purpose: Standings, by nickname
+    trigger: onLoad
+  - operationId: setLeaderboardNickname
+    contract: marketing-crm
+    purpose: Choose the name shown on the board
+    trigger: onAction
   entryState:
     params:
     - name: subjectId
@@ -10123,47 +9278,38 @@ screens:
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
   overlays:
-  - id: formCreateReferral
-    component: modal
-    trigger: Create referral
-    body: '**Collects what `createReferral` sends before it is called.** Required: `id`, `referrerSubjectId`,
-      `code`, `status`. Optional: `refereeSubjectId`, `qualifyingAction`, `referrerRewardId`, `refereeRewardId`,
-      `expiresAt`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: Referral
+  - id: confirmCreateReferral
+    component: confirmDialog
+    trigger: Invite a friend
+    body: 'One tap: the code that comes back is shown with Share. Code, status, qualifying action, rewards
+      and expiry are set by the platform; the guest types nothing.'
     confirm:
-      label: Create referral
+      label: Invite a friend
       operation: createReferral
     dismiss:
       label: Cancel
-      discards:
-      - id
-      - referrerSubjectId
-      - code
-      - status
-      - refereeSubjectId
-      - qualifyingAction
-      - referrerRewardId
-      - refereeRewardId
-      - expiresAt
-      - scopePath
-    provenance: client-verified
+    provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
   - id: formRedeemLoyaltyPoints
     component: modal
-    trigger: Redeem loyalty points
-    body: '**Collects what `redeemLoyaltyPoints` sends before it is called.** Required: `subjectId`, `programmeId`,
-      `points`. Optional: `rewardId`, `orderId`. Dismissing sends nothing; the screen behind is unchanged.'
+    trigger: Redeem
+    body: The reward chosen from the list and its points; the guest is the caller, so no subject or programme
+      is asked.
     confirm:
-      label: Redeem loyalty points
+      label: Redeem
       operation: redeemLoyaltyPoints
     dismiss:
       label: Cancel
-      discards:
-      - subjectId
-      - programmeId
-      - points
-      - rewardId
-      - orderId
-    provenance: client-verified
+    provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+  - id: formSetLeaderboardNickname
+    component: modal
+    trigger: Choose my name
+    body: The nickname shown on the leaderboard.
+    confirm:
+      label: Choose my name
+      operation: setLeaderboardNickname
+    dismiss:
+      label: Cancel
+    provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
 - id: WEB-044
   name: AI Concierge – Home
   module: Engagement & Support
@@ -10191,71 +9337,67 @@ screens:
     is on (default on), otherwise as a plain button.'
   density: compact
   pattern: statusTracker
-  patternReason: '`getGuestMenu` reads one record and nothing reads a population — the screen is about
-    that one thing'
+  patternReason: 'The conversation and its state (thinking, answered, handed to a person) are the content;
+    the menu is only a shortcut (design-notes correction ai, CHG-SGU-016)'
   purpose: Ask, and be answered or handed to a person.
   layout:
     template: detail
     regions:
     - name: contentBody
-      slot: record
+      slot: collection
       components:
-      - kind: detailPanel
-        label: The guest menu
-        bindsTo: GuestMenu
-        columns:
-        - GuestMenu.outletId
-        - GuestMenu.menuId
-        - GuestMenu.name
-        - GuestMenu.inForceUntil
-        - GuestMenu.currency
-        - GuestMenu.currencyScale
-        - GuestMenu.sections
-        operation: getGuestMenu
-        provenance: contract fnb.yaml GET /outlets/{outletId}/guest-menu
-      - kind: dataTable
-        label: Every AI conversation
+      - kind: assistantPanel
+        label: Ask Sahli
+        operation: sendAiMessage
+        notes: "**The conversation is the content.** The question shows at once and the answer streams
+          with its sources; on 503 (every provider failed) \"Sahli can't answer right now\" with Hand
+          over to a person and Try again. The conversation is opened silently (`createAiConversation`)
+          on the first message, its scope taken from the session; the guest never picks a module."
+        provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
+      - kind: textField
+        label: Your question
+        operation: sendAiMessage
+        notes: The ask box under the conversation (typed, or a starter chip). Sending opens the conversation
+          on the first message.
+        provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
+      - kind: textField
+        label: Message to the agent
+        operation: sendConversationMessage
+        notes: Replaces the ask box once a person has taken the conversation; the transcript stays above.
+        provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
+      - kind: cardList
+        label: Earlier conversations
         bindsTo: AiConversation
         columns:
-        - AiConversation.id
-        - AiConversation.principalId
-        - AiConversation.scopePath
-        - AiConversation.module
-        - AiConversation.locale
-        - AiConversation.messageCount
         - AiConversation.startedAt
         - AiConversation.lastMessageAt
+        - AiConversation.messageCount
         operation: listAiConversations
-        provenance: contract ai.yaml GET /conversations
-      - kind: cardList
-        label: AI Concierge
-        provenance: carried from the previous definition
-      - kind: detailPanel
-        label: Detail
-        provenance: carried from the previous definition
+        notes: The signed-in guest's own conversations, newest first, the first question as the title;
+          no principal, scope or module columns.
+        provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
     - name: actionBar
       slot: rowActions
       components:
-      - kind: primaryButton
-        label: Create AI conversation
-        operation: createAiConversation
-        provenance: contract ai.yaml POST /conversations
       - kind: secondaryButton
-        label: Send AI message
-        operation: sendAiMessage
-        provenance: contract ai.yaml POST /conversations/{conversationId}/messages
-      - kind: secondaryButton
-        label: Handover to agent
+        label: Hand over to a person
         operation: handoverToAgent
-        provenance: contract marketing-crm.yaml POST /conversations/{conversationId}/handover
+        notes: One tap, always visible in the panel header. Sends reason `guestRequested` with Sahli's
+          own summary; the platform sets `assistantFailed`, `outOfScope` or `negativeSentiment` itself.
+          The panel becomes the agent chat (`sendConversationMessage`) with queue position and wait; 409
+          offers to raise a case.
+        provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
       - kind: secondaryButton
-        label: Request suggestion
-        operation: requestSuggestion
-        provenance: contract ai.yaml POST /ai/suggestions
+        label: Helpful / Not helpful
+        operation: recordAnswerFeedback
+        notes: Recorded silently with a small "Thanks"; nothing in the answer changes.
+        provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
       - kind: secondaryButton
-        label: Send conversation message
-        operation: sendConversationMessage
-        provenance: contract marketing-crm.yaml POST /conversations/{conversationId}/messages
+        label: Order food
+        operation: getGuestMenu
+        notes: An optional shortcut to the outlet's menu in force ("Menu until 11:00" from `inForceUntil`);
+          the concierge is not an F&B screen.
+        provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
   states:
     loading: Content resolves in place.
     error: Could not load. **The rest of the site is unaffected.**
@@ -10273,24 +9415,26 @@ screens:
   apis:
   - operationId: createAiConversation
     contract: ai
-    purpose: Open a conversation
-    trigger: onAction
+    purpose: Opened silently on the first message; the scope comes from the session, never a module the
+      guest picks
+    trigger: background
   - operationId: sendAiMessage
     contract: ai
     purpose: Ask
     trigger: onAction
   - operationId: handoverToAgent
     contract: marketing-crm
-    purpose: Pass an assistant conversation to a person
+    purpose: One tap; reason guestRequested and Sahli's summary are set for the guest
     trigger: onAction
   - operationId: requestSuggestion
     contract: ai
-    purpose: requestSuggestion
-    trigger: onAction
+    purpose: From the conversation only, kinds waitTime and upsell (prepPlan is the kitchen's production
+      plan; an itinerary is asked on the Plan tab); never a kind picker
+    trigger: background
   - operationId: getGuestMenu
     contract: fnb
-    purpose: The menu a guest sees
-    trigger: onLoad
+    purpose: Optional "Order food" shortcut to the menu in force
+    trigger: onAction
   - operationId: listAiConversations
     contract: ai
     purpose: Earlier conversations Only when signed in (decided 2 October 2026 by Chinmay, fix before
@@ -10330,80 +9474,6 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
-  overlays:
-  - id: formSendConversationMessage
-    component: modal
-    trigger: Send conversation message
-    body: '**Collects what `sendConversationMessage` sends before it is called.** Required: `body`. Optional:
-      `attachments`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Send conversation message
-      operation: sendConversationMessage
-    dismiss:
-      label: Cancel
-      discards:
-      - body
-      - attachments
-    provenance: client-verified
-  - id: formCreateAiConversation
-    component: modal
-    trigger: Create AI conversation
-    body: '**Collects what `createAiConversation` sends before it is called.** Required: `module`. Optional:
-      `locale`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Create AI conversation
-      operation: createAiConversation
-    dismiss:
-      label: Cancel
-      discards:
-      - module
-      - locale
-    provenance: client-verified
-  - id: formSendAiMessage
-    component: modal
-    trigger: Send AI message
-    body: '**Collects what `sendAiMessage` sends before it is called.** Required: `content`. Optional:
-      `collectionIds`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Send AI message
-      operation: sendAiMessage
-    dismiss:
-      label: Cancel
-      discards:
-      - content
-      - collectionIds
-    provenance: client-verified
-  - id: formHandoverToAgent
-    component: modal
-    trigger: Handover to agent
-    body: '**Collects what `handoverToAgent` sends before it is called.** Required: `reason`. Optional:
-      `summary`, `preferredQueueId`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Handover to agent
-      operation: handoverToAgent
-    dismiss:
-      label: Cancel
-      discards:
-      - reason
-      - summary
-      - preferredQueueId
-    provenance: client-verified
-  - id: formRequestSuggestion
-    component: modal
-    trigger: Request suggestion
-    body: '**Collects what `requestSuggestion` sends before it is called.** Required: `kind`. Optional:
-      `subjectRef`, `horizon`, `context`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Request suggestion
-      operation: requestSuggestion
-    dismiss:
-      label: Cancel
-      discards:
-      - kind
-      - subjectRef
-      - horizon
-      - context
-    provenance: client-verified
 - id: WEB-045
   name: Help Centre & Accessibility
   module: Support
@@ -10570,7 +9640,10 @@ screens:
     September, rev 3 GAP-C1): the notifications feed is needed in the first release, which reverses audit
     R242''s deferral of this screen. The `deferred` block is removed and the screen returns to `wave:
     2`, where it sat before R242. Queue calls and order status still also show on the queue and order
-    screens, which poll.'
+    screens, which poll.
+
+
+    **In the first release (rev 3 GAP-C1, 29 September; DI-1075)**, superseding the R242 deferral (CHG-SGU-017).'
   density: compact
   pattern: configEditor
   patternReason: '`listMyNotifications` reads the feed (decided 29 September, rev 3 GAP-C1); the location-session
@@ -10583,10 +9656,6 @@ screens:
       slot: publish
       components:
       - kind: primaryButton
-        label: Claim location session
-        operation: claimLocationSession
-        provenance: contract fnb.yaml POST /location-sessions
-      - kind: secondaryButton
         label: Mark all as read
         operation: markMyNotificationsRead
         notes: 'Sends `{all: true}`. Only the guest''s own notifications are marked.'
@@ -10605,18 +9674,6 @@ screens:
       - kind: detailPanel
         label: Detail
         provenance: carried from the previous definition
-      - kind: textField
-        label: Location code
-        operation: claimLocationSession
-        provenance: contract fnb.yaml POST /location-sessions
-      - kind: textField
-        label: Seat reference
-        operation: claimLocationSession
-        provenance: contract fnb.yaml POST /location-sessions
-      - kind: numberField
-        label: Party size
-        operation: claimLocationSession
-        provenance: contract fnb.yaml POST /location-sessions
       - kind: toggle
         label: Unread only
         operation: listMyNotifications
@@ -10639,10 +9696,6 @@ screens:
     emptyNoResults: '**No unread notifications.** Names the Unread only filter and offers to show all;
       the read ones are still there.'
   apis:
-  - operationId: claimLocationSession
-    contract: fnb
-    purpose: Tell the platform where the guest is
-    trigger: onAction
   - operationId: listMyNotifications
     contract: marketing-crm
     purpose: 'The guest''s notification feed, newest first: queue calls, order ready, booking changes,
@@ -10671,7 +9724,8 @@ screens:
       match: exact
       view: Summit Peaks → header 'At the venue' → Alerts
       differences: 'Deferred in the YAML (release later, R242: no in-app feed in the first release), but
-        the prototype draws it as a live section, so the client will expect it.'
+        the prototype draws it as a live section, so the client will expect it. **Superseded 29 September
+        (rev 3 GAP-C1, DI-1075): the screen is in the first release** (CHG-SGU-017).'
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -11180,13 +10234,6 @@ screens:
         label: Travel date
         notes: Timetables are released 30 days ahead.
         provenance: decided 29 September, rev 3 REV3-21
-      - kind: numberField
-        label: Passengers
-        bindsTo: PassengerType
-        notes: Adult, child 5-11 and student at half fare, person of determination free (one companion
-          at the adult fare); proof is checked at boarding.
-        operation: getTransportFareTable
-        provenance: decided 29 September, rev 3 REV3-21
       - kind: selectField
         label: Time period
         notes: Morning, Afternoon, Evening, Night, each with its count of departures.
@@ -11204,6 +10251,7 @@ screens:
         - DepartureOffer.fare
         operation: searchTransportDepartures
         provenance: decided 29 September, rev 3 REV3-21
+        notes: Departures list as soon as From, To and the date are set; there is no Search button (DI-1109).
       - kind: cardList
         label: Multi-trip cards
         bindsTo: PassOffer
@@ -11226,6 +10274,13 @@ screens:
         notes: The Favourites tab; *Book this route* prefills the one-way tab. Signed-in guests only.
         operation: listMyFavouriteRoutes
         provenance: decided 29 September, rev 3 REV3-21
+      - kind: numberField
+        label: Passengers
+        bindsTo: PassengerType
+        notes: 'Asked after a departure is chosen (DI-1110): Adult, child 5-11 and student at half fare,
+          person of determination free (one companion at the adult fare); proof is checked at boarding.'
+        operation: getTransportFareTable
+        provenance: corrected 2 October 2026 (CHG-SGU-020, design-notes correction)
     - name: contextPanel
       slot: selection
       components:
@@ -11252,10 +10307,6 @@ screens:
     - name: actionBar
       slot: rowActions
       components:
-      - kind: primaryButton
-        label: Search Trips
-        operation: searchTransportDepartures
-        provenance: decided 29 September, rev 3 REV3-21
       - kind: secondaryButton
         label: Next Available Trip
         operation: getNextTransportDeparture
@@ -11450,7 +10501,8 @@ screens:
       components:
       - kind: progressIndicator
         label: Plan your visit · n of 6
-        notes: Who, heights (skipped with no children), days (up to 3), pace, interests, lunch.
+        notes: Who, heights (skipped with no children), days (up to 3), pace (packed, balanced or relaxed;
+          DI-1098), interests, lunch.
         provenance: decided 29 September 2026, MOB-6; Visit Planner prototype
     - name: fields
       slot: fields

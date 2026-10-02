@@ -1393,7 +1393,7 @@ screens:
 - id: KSK-015
   name: Assistant
   module: AI
-  requiresModule: ticketing
+  requiresModule: ai
   wave: 2
   capability: C00
   implementation:
@@ -1431,9 +1431,8 @@ screens:
   density: touchLarge
   boardFrames:
   - Kiosk Board 2.dc.html#KSK-015
-  pattern: listDetail
-  patternReason: '`listProducts` reads the population and `getAvailability` reads one of them — list,
-    select, act'
+  pattern: statusTracker
+  patternReason: 'A conversation: the question, the answer and its product cards are the content (CHG-SGU-016)'
   purpose: Help a guest choose and pay, and nothing else.
   gaps:
   - operation: getAvailability
@@ -1446,64 +1445,40 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: textField
-        label: Venue id
-        operation: listProducts
-        notes: Sends `?venueId=` to `listProducts`.
-        provenance: contract catalogue.yaml GET /products
-      - kind: textField
-        label: Kind
-        operation: listProducts
-        notes: Sends `?kind=` to `listProducts`.
-        provenance: contract catalogue.yaml GET /products
-      - kind: toggle
-        label: Is sellable
-        operation: listProducts
-        notes: Sends `?isSellable=` to `listProducts`.
-        provenance: contract catalogue.yaml GET /products
-      - kind: dataTable
-        label: Every product
+      - kind: assistantPanel
+        label: Ask for help
+        operation: sendAiMessage
+        notes: 'Voice or a constrained touch interface, no keyboard. Products appear as cards inside the
+          conversation (from `listProducts`, guest projection: name, price, what it includes), never as
+          a table or a venue-id filter; tapping one returns the guest to the ticket step.'
+        provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
+      - kind: cardList
+        label: Products Sahli suggests
         bindsTo: Product
         columns:
-        - Product.id
-        - Product.code
         - Product.name
         - Product.description
-        - Product.kind
-        - Product.venueId
-        - Product.scopePath
-        - Product.createdByPrincipalId
-        - Product.approvedByPrincipalId
-        - Product.responsibleDepartmentId
-        - Product.onSaleFrom
-        - Product.onSaleTo
         operation: listProducts
-        provenance: contract catalogue.yaml GET /products
-      - kind: dataTable
-        label: Availability
+        notes: Cards inside the conversation with the price for today; tapping one returns the guest to
+          the ticket step (KSK-004).
+        provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
+      - kind: banner
+        label: Available today
         operation: getAvailability
-        notes: Shows `channelCapacityId`, `performanceId`, `capacity`, `sold`, `leased`, `remaining`,
-          `byChannel` from `getAvailability`'s inline response. **The response has no named schema**,
-          so this cannot bind until the contract names one.
-        provenance: contract catalogue.yaml GET /availability
+        notes: 'On a suggested card: whether it can still be bought today.'
+        provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
     - name: actionBar
       slot: rowActions
       components:
-      - kind: primaryButton
-        label: Send AI message
-        operation: sendAiMessage
-        provenance: contract ai.yaml POST /conversations/{conversationId}/messages
       - kind: secondaryButton
-        label: Handover to agent
+        label: Talk to a person
         operation: handoverToAgent
-        provenance: contract marketing-crm.yaml POST /conversations/{conversationId}/handover
+        notes: One tap; reason guestRequested.
+        provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
   states:
     loading: The assistant list.
     error: Could not load. Names which read failed and leaves the assistant untouched.
-    emptyFirstRun: No assistant yet. **Offers no create action** — this screen declares no operation that
-      makes one — and says so rather than showing an empty table.
-    emptyNoResults: Nothing matches the filter on venueId, kind, isSellable and the assistant are still
-      there. Names the active filter and offers to clear it.
+    emptyFirstRun: The ask prompt with three starter questions (tickets, timings, what is included).
     emptyNoAccess: '**A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block
       A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant
       has published like any visitor. A kiosk whose device registration is revoked goes out of service
@@ -1517,12 +1492,12 @@ screens:
     - listProducts
   - operationId: listProducts
     contract: catalogue
-    purpose: List products
-    trigger: onLoad
+    purpose: Products shown as cards inside the conversation
+    trigger: onAction
   - operationId: getAvailability
     contract: catalogue
-    purpose: Live remaining capacity
-    trigger: onLoad
+    purpose: Whether a product suggested in the conversation can still be bought today
+    trigger: onAction
   - operationId: handoverToAgent
     contract: marketing-crm
     purpose: Pass an assistant conversation to a person
@@ -1534,14 +1509,18 @@ screens:
     purpose: Say whether an answer helped
     trigger: onAction
     provenance: build, 29 September 2026
+  - operationId: createAiConversation
+    contract: ai
+    purpose: Opened silently on the first tap; the kiosk session is the scope
+    trigger: background
   entryState:
     params:
     - name: conversationId
       from: deepLink
     - name: messageId
       from: navigation
-    coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
-      and by whom.
+    coldEntry: 'None: a kiosk has no notification cold entry. The assistant opens from KSK-004 at the
+      point of confusion and closes when the guest returns or the session times out.'
     preloaded: []
   wireframe:
     status: notStarted
@@ -1555,35 +1534,17 @@ screens:
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
   overlays:
-  - id: formSendAiMessage
-    component: modal
-    trigger: Send AI message
-    body: '**Collects what `sendAiMessage` sends before it is called.** Required: `content`. Optional:
-      `collectionIds`. Dismissing sends nothing; the screen behind is unchanged.'
+  - id: confirmHandover
+    component: confirmDialog
+    trigger: Talk to a person
+    body: Ask a person to help? The conversation so far goes with it (reason guestRequested, Sahli's own
+      summary); the guest types nothing.
     confirm:
-      label: Send AI message
-      operation: sendAiMessage
-    dismiss:
-      label: Cancel
-      discards:
-      - content
-      - collectionIds
-    provenance: contract ai.yaml POST /conversations/{conversationId}/messages
-  - id: formHandoverToAgent
-    component: modal
-    trigger: Handover to agent
-    body: '**Collects what `handoverToAgent` sends before it is called.** Required: `reason`. Optional:
-      `summary`, `preferredQueueId`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Handover to agent
+      label: Ask a person
       operation: handoverToAgent
     dismiss:
-      label: Cancel
-      discards:
-      - reason
-      - summary
-      - preferredQueueId
-    provenance: contract marketing-crm.yaml POST /conversations/{conversationId}/handover
+      label: Keep asking
+    provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
 - id: KSK-016
   name: Order Food
   module: Sell
@@ -1606,8 +1567,18 @@ screens:
       - outletId
       provenance: derived — KSK-017 declares entryState.params outletId and KSK-016 holds outletId, so
         an edge into it carries them
-  notes: BL-066. **Every operation existed and no screen called them** — `getGuestMenu` and `createGuestFnbOrder`
-    are contracted and guest-callable, and P05 had fifteen screens selling neither food nor merchandise.
+  notes: "BL-066. **Every operation existed and no screen called them** — `getGuestMenu` and `createGuestFnbOrder`
+    are contracted and guest-callable, and P05 had fifteen screens selling neither food nor merchandise.\n
+    \n**Where the outlet is (decided by Chinmay, 2 October 2026; DEC-070, DEC-206).** An outlet is *Inside
+    the venue (needs an admission ticket)* or *Standalone (no ticket)* (`Outlet.admissionContext`). Ordering
+    from an inside-the-venue outlet needs admission: a ticket, or a location claimed inside the venue;
+    `createGuestFnbOrder` refuses 403 `entry-ticket-required` otherwise, and the screen says so and offers
+    the tickets. A standalone restaurant sells takeaway and delivery without a ticket. **F&B keeps its
+    own payment step and its own receipt** (DEC-071, DEC-052): DI-293's one cart and one receipt does
+    not apply to F&B, so the food order is paid on its own pay step and its receipt does not join the
+    guest's ticket receipt (CHG-SGU-001). **At a kiosk (DEC-206):** a kiosk inside the venue sells food
+    to admitted guests; food and tickets bought together at a kiosk are two payments and two receipts,
+    not one."
   density: touchLarge
   boardFrames:
   - Kiosk Board 2.dc.html#KSK-016
@@ -1635,9 +1606,11 @@ screens:
         operation: getGuestMenu
         provenance: contract fnb.yaml GET /outlets/{outletId}/guest-menu
       - kind: cardList
-        bindsTo: Menu
+        bindsTo: GuestMenu.sections
         notes: Photographs, because **a guest at a kiosk with a queue behind them is not reading descriptions**
-        provenance: carried from the previous definition
+        provenance: corrected 2 October 2026 (CHG-SGU-001, decided by Chinmay 2 October 2026, DEC-070/071/052/206)
+        operation: getGuestMenu
+        label: Menu
       - kind: banner
         notes: Allergens shown on the card, not behind a tap. **contains and mayContain are different
           claims** and a fryer shared with breaded fish makes chips a fish risk
@@ -1649,7 +1622,7 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Create guest F&B order
+        label: Pay
         operation: createGuestFnbOrder
         provenance: contract fnb.yaml POST /guest-orders
   states:
@@ -1668,7 +1641,8 @@ screens:
     trigger: onLoad
   - operationId: createGuestFnbOrder
     contract: fnb
-    purpose: Place the order
+    purpose: Order food at the kiosk; its own payment and receipt; refused without admission at an inside-the-venue
+      outlet (DEC-206)
     trigger: onAction
   entryState:
     params:
@@ -1728,6 +1702,8 @@ screens:
     - KSK-016
     exitTo:
     - KSK-016
+    - KSK-006
+    - KSK-007
     inferred: false
     notes: '**Returns to KSK-016.** Stated on 4 September: this screen declared where it is reached from
       and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
@@ -1739,33 +1715,58 @@ screens:
       - outletId
       provenance: derived — KSK-016 declares entryState.params outletId and KSK-017 holds outletId, so
         an edge into it carries them
+    - to: KSK-006
+      trigger: Review the basket
+      provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
+    - to: KSK-007
+      trigger: Pay
+      provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
   notes: 'BL-066, BL-019. **A guest can browse and reserve and not buy**, which is where retail stops
     for a guest surface — `createRetailSale` is a till operation. **Cross-surface parity, 31 August**:
     added addCartLine, lookupMerchandise. **A guest does not know which surface they are on** — the same
-    named screen on web and app now calls the same guest-callable operations.'
+    named screen on web and app now calls the same guest-callable operations.
+
+
+    **Buying goes through the kiosk basket and its payment steps (KSK-006, KSK-007)**; the hold is the
+    only unpaid path. Corrected 2 October 2026 (CHG-SGU-018): the notes'' "browse and reserve and not buy"
+    contradicted the purpose.'
   density: touchLarge
   boardFrames:
   - Kiosk Board 2.dc.html#KSK-017
   pattern: listDetail
   patternReason: '`listMerchandise` reads a population and nothing reads one of them; the detail is the
     row until a `get` exists'
-  purpose: Buy merchandise at the kiosk, or reserve it for collection.
+  purpose: Buy merchandise at the kiosk in the same basket as tickets and food, or hold an item to pay
+    for at the shop until the end of the visit day.
   layout:
     template: split
     regions:
     - name: contentBody
       slot: collection
       components:
-      - kind: textField
-        label: Outlet id
+      - kind: selectField
+        label: Shop
         operation: listMerchandise
-        notes: Sends `?outletId=` to `listMerchandise`.
-        provenance: contract retail.yaml GET /merchandise
-      - kind: textField
-        label: Category id
+        notes: Shops by name; sends `outletId`.
+        provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
+      - kind: selectField
+        label: Category
         operation: listMerchandise
-        notes: Sends `?categoryId=` to `listMerchandise`.
-        provenance: contract retail.yaml GET /merchandise
+        notes: Categories by name; sends `categoryId`.
+        provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
+      - kind: cardList
+        label: Merchandise
+        bindsTo: GuestMerchandiseItem
+        columns:
+        - GuestMerchandiseItem.name
+        - GuestMerchandiseItem.description
+        - GuestMerchandiseItem.price
+        - GuestMerchandiseItem.isAvailable
+        - GuestMerchandiseItem.imageAssetRef
+        operation: listMerchandise
+        notes: 'The guest projection: name, photo, price and whether it can be bought; sold-out items
+          stay visible. No sku, barcode, variant, stock or inventory ids.'
+        provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
       - kind: toggle
         label: In stock only
         operation: listMerchandise
@@ -1776,68 +1777,19 @@ screens:
         operation: listMerchandise
         notes: Sends `?search=` to `listMerchandise`.
         provenance: contract retail.yaml GET /merchandise
-      - kind: dataTable
-        label: Every merchandise
-        bindsTo: MerchandiseItem
-        columns:
-        - MerchandiseItem.id
-        - MerchandiseItem.sku
-        - MerchandiseItem.barcode
-        - MerchandiseItem.name
-        - MerchandiseItem.outletId
-        - MerchandiseItem.categoryId
-        - MerchandiseItem.variantId
-        - MerchandiseItem.inventoryItemId
-        - MerchandiseItem.price
-        - MerchandiseItem.onHand
-        - MerchandiseItem.isReturnable
-        - MerchandiseItem.returnWindowDays
-        operation: listMerchandise
-        provenance: contract retail.yaml GET /merchandise
       - kind: multiSelect
         label: Size
         provenance: carried from the previous definition
-      - kind: primaryButton
-        label: Add
-        provenance: carried from the previous definition
-      - kind: secondaryButton
-        label: Reserve for collection
-        notes: BL-019. **Reserve is not buy** — the guest pays at a till or on the app, and this screen
-          is honest about which
-        provenance: carried from the previous definition
-    - name: contextPanel
-      slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected merchandise
-        bindsTo: MerchandiseItem
-        columns:
-        - MerchandiseItem.id
-        - MerchandiseItem.sku
-        - MerchandiseItem.barcode
-        - MerchandiseItem.name
-        - MerchandiseItem.outletId
-        - MerchandiseItem.categoryId
-        - MerchandiseItem.variantId
-        - MerchandiseItem.inventoryItemId
-        - MerchandiseItem.price
-        - MerchandiseItem.onHand
-        - MerchandiseItem.isReturnable
-        - MerchandiseItem.returnWindowDays
-        - MerchandiseItem.requiresSerialNumber
-        - MerchandiseItem.imageAssetRef
-        - MerchandiseItem.isActive
-        operation: listMerchandise
-        provenance: contract retail.yaml GET /merchandise
+        notes: Size buttons switch between sibling items (DEC-057).
     - name: actionBar
       slot: rowActions
       components:
-      - kind: primaryButton
-        label: Reserve merchandise
+      - kind: secondaryButton
+        label: Hold to pay at the shop
         operation: reserveMerchandise
         provenance: contract retail.yaml POST /outlets/{outletId}/reserve
-      - kind: secondaryButton
-        label: Add cart line
+      - kind: primaryButton
+        label: Add to my kiosk basket
         operation: addCartLine
         provenance: contract orders.yaml POST /carts/{cartId}/lines
       - kind: secondaryButton
@@ -1854,7 +1806,8 @@ screens:
       — a guest looking at a blank grid assumes it is broken.
     emptyNoResults: Nothing in stock in that size or category. **Reserve-for-collection is offered here**,
       because out of stock at this kiosk is not out of stock at the venue.
-    emptyNoAccess: Not applicable.
+    emptyNoAccess: "**There is no permission to name: a guest holds none** (ADR-0025). The shop is public;
+      buying needs the guest's cart."
   apis:
   - operationId: listMerchandise
     contract: retail
@@ -1904,11 +1857,8 @@ screens:
   - id: formReserveMerchandise
     component: modal
     trigger: Reserve merchandise
-    body: '**Collects what `reserveMerchandise` sends before it is called.** Required: `id`, `lines`,
-      `expiresAt`. Optional: `subjectId`, `collectionNote`. **Expiry** (`expiresAt`) is picked from 15
-      minutes ahead up to the close of the venue''s operating day, and the picker offers nothing outside
-      that window (decided 28 September, audit R215 (2)). Dismissing sends nothing; the screen behind
-      is unchanged.'
+    body: 'The item and quantity, held to pay for at the shop until the end of the visit day (R169). No
+      ids are asked.'
     confirm:
       label: Reserve merchandise
       operation: reserveMerchandise
@@ -1920,13 +1870,12 @@ screens:
       - expiresAt
       - subjectId
       - collectionNote
-    provenance: contract retail.yaml POST /outlets/{outletId}/reserve
+    provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
   - id: formAddCartLine
     component: modal
     trigger: Add cart line
-    body: '**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`.
-      Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the
-      screen behind is unchanged.'
+    body: 'The item and quantity (a size switches between sibling items); collection point or home delivery
+      is chosen at checkout. No variant, performance or seat ids are asked.'
     bindsTo: AddCartLineRequest
     confirm:
       label: Add cart line
@@ -1940,4 +1889,4 @@ screens:
       - seatIds
       - parentLineId
       - attributes
-    provenance: contract orders.yaml POST /carts/{cartId}/lines
+    provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)

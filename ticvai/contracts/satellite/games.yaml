@@ -152,7 +152,6 @@ paths:
       operationId: getGameCard
       x-ticvai-consumed-by:
         - "P01 WEB-021 Wallet & Gift Cards"
-        - "P02 GST-026 Retail / Merchandise"
         - "P08 BO-454 Card Lifecycle Command Center"
         - "P08 BO-455 Card / Credential Profile"
         - "P08 BO-457 Last Recharge & Last Activity Tracking"

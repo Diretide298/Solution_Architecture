@@ -1297,8 +1297,6 @@ paths:
     post:
       operationId: joinWaitlist
       x-ticvai-consumed-by:
-        - "P01 WEB-040 Virtual Queue"
-        - "P02 GST-070 Reserve a Table"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1364,8 +1362,6 @@ paths:
     delete:
       operationId: leaveWaitlist
       x-ticvai-consumed-by:
-        - "P01 WEB-040 Virtual Queue"
-        - "P02 GST-070 Reserve a Table"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -3047,7 +3043,6 @@ paths:
     get:
       operationId: listCatalogueBundles
       x-ticvai-consumed-by:
-        - "P01 WEB-008 Add-ons & Upsell"
         - "P02 GST-052 Suggested Itineraries"
         - "P06 EMP-018 Offline package"
         - "P08 BO-011 Packages & Bundles"

@@ -836,7 +836,6 @@ paths:
     post:
       operationId: grantDelegation
       x-ticvai-consumed-by:
-        - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-015 Memberships"
       security:
       - guestAuth: []
@@ -2439,6 +2438,8 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
+        - "P02 GST-010 Booking Confirmation"
+        - "P01 WEB-013 Booking Confirmation"
       x-ticvai-audience:
       - guest
       summary: Attach a guest checkout to an account
@@ -4764,7 +4765,6 @@ paths:
       operationId: submitGuestIdentityDocument
       x-ticvai-consumed-by:
         - "P01 WEB-020 Profile & Preferences"
-        - "P02 GST-073 Security & Sign-in"
       x-ticvai-agreed: '29 September: our build plan (5.3.21 "ID verification, and configurable identity
         workflows"; BL-096); document storage follows pii.subject_document'
       summary: Submit an identity document for verification
@@ -4835,7 +4835,6 @@ paths:
       operationId: getMyIdentityVerification
       x-ticvai-consumed-by:
         - "P01 WEB-020 Profile & Preferences"
-        - "P02 GST-073 Security & Sign-in"
       x-ticvai-agreed: '29 September: our build plan (5.3.21); shape follows getGuestSession'
       summary: The guest's own latest identity verification
       description: 'Status, outcome and, where it was refused or needs resubmission, the reason the guest is shown.

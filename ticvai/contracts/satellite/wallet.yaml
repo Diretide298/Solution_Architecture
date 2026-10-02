@@ -1966,6 +1966,7 @@ paths:
         - "P08 BO-448 Redemption Wallet & Balance View"
         - "P08 BO-487 Customer Wallet & Balance Summary"
         - "P08 BO-488 Self-Service Wallet Top-Up"
+        - "P01 WEB-017 My Account Dashboard"
       parameters:
       - $ref: '../shared/common.yaml#/components/parameters/ConsistencyToken'
       security:

@@ -3909,6 +3909,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-031 My Reservations"
         - "P02 GST-070 Reserve a Table"
+        - "P01 WEB-036 F&B – Browse & Order"
       security:
       - guestAuth: []
       x-ticvai-self-scoped: subject
@@ -4263,9 +4264,7 @@ paths:
       operationId: claimLocationSession
       x-ticvai-consumed-by:
         - "P01 WEB-036 F&B – Browse & Order"
-        - "P01 WEB-046 In-Venue Notifications"
         - "P02 GST-024 F&B – Browse & Order"
-        - "P02 GST-030 In-Venue Notifications"
       x-ticvai-audience:
       - guest
       summary: Tell the platform where the guest is
@@ -4478,10 +4477,6 @@ paths:
     post:
       operationId: claimTableSession
       x-ticvai-consumed-by:
-        - "P01 WEB-036 F&B – Browse & Order"
-        - "P01 WEB-038 F&B – Order Tracking"
-        - "P02 GST-024 F&B – Browse & Order"
-        - "P02 GST-025 F&B – Order Tracking"
       x-ticvai-audience:
       - guest
       summary: Identify which table a guest is sitting at
@@ -5327,10 +5322,6 @@ paths:
     get:
       operationId: listModifierGroups
       x-ticvai-consumed-by:
-        - "P01 WEB-036 F&B – Browse & Order"
-        - "P01 WEB-037 Menu Item Detail"
-        - "P02 GST-024 F&B – Browse & Order"
-        - "P02 GST-061 Menu Item Detail"
         - "P08 BO-045 Menu Management"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
