@@ -351,7 +351,7 @@ paths:
       operationId: evaluateApprovalRequirement
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
-        - "P09 ADM-337 Routing Simulator & Conflict Detection"
+        - "P08 ADM-337 Routing Simulator & Conflict Detection"
         - "P09 ADM-530 AI Approval Requirement & Routing Configuration"
         - "P09 ADM-532 Conditional Approval & Approval Conditions"
       x-ticvai-audience:
@@ -917,8 +917,8 @@ paths:
         - "P08 ADM-083 Pricing Approval Workflow & Authority Matrix"
         - "P08 ADM-129 Approval Workflow Designer"
         - "P08 ADM-223 Campaign Approval Workflow Designer"
-        - "P09 ADM-329 Approval Matrix Command Center"
-        - "P09 ADM-338 AI Routing Advisor & Matrix Optimization"
+        - "P08 ADM-329 Approval Matrix Command Center"
+        - "P08 ADM-338 AI Routing Advisor & Matrix Optimization"
         - "P09 ADM-530 AI Approval Requirement & Routing Configuration"
         - "P09 ADM-532 Conditional Approval & Approval Conditions"
       x-ticvai-audience:
@@ -969,12 +969,12 @@ paths:
         - "P08 BO-639 Reviewer Assignment & Delegation"
         - "P08 BO-863 Resource Lifecycle, Governance & Audit"
         - "P08 ADM-243 Roles, Authority, Delegation & Approval Limits"
-        - "P09 ADM-330 Approval Authority Matrix"
-        - "P09 ADM-331 Organizational Hierarchy Routing"
-        - "P09 ADM-332 Department-Based Approval Matrix"
-        - "P09 ADM-333 Venue & Tenant Approval Matrix"
-        - "P09 ADM-334 Value & Threshold Routing"
-        - "P09 ADM-335 Risk-Based & Conditional Routing"
+        - "P08 ADM-330 Approval Authority Matrix"
+        - "P08 ADM-331 Organizational Hierarchy Routing"
+        - "P08 ADM-332 Department-Based Approval Matrix"
+        - "P08 ADM-333 Venue & Tenant Approval Matrix"
+        - "P08 ADM-334 Value & Threshold Routing"
+        - "P08 ADM-335 Risk-Based & Conditional Routing"
         - "P09 ADM-530 AI Approval Requirement & Routing Configuration"
       x-ticvai-audience:
       - staff
@@ -1216,15 +1216,15 @@ paths:
         - "P08 BO-372 Approval SLA & Workload Monitor"
         - "P08 BO-392 SLA & Escalation Performance Analytics"
         - "P08 BO-393 AI SLA & Escalation Advisor"
-        - "P09 ADM-339 Governance & Compliance Command Center"
-        - "P09 ADM-348 Governance Risk & AI Compliance Advisor"
-        - "P09 ADM-359 Approval Executive KPI Dashboard"
-        - "P09 ADM-360 Approval Volume & Outcome Analytics"
-        - "P09 ADM-361 Approval Processing Time Analytics"
-        - "P09 ADM-363 Approval Trend & Comparative Analytics"
-        - "P09 ADM-364 Approver & Team Performance Analytics"
-        - "P09 ADM-366 AI Approval Intelligence Center"
-        - "P09 ADM-368 AI Governance Executive Advisor"
+        - "P08 ADM-339 Governance & Compliance Command Center"
+        - "P08 ADM-348 Governance Risk & AI Compliance Advisor"
+        - "P08 ADM-359 Approval Executive KPI Dashboard"
+        - "P08 ADM-360 Approval Volume & Outcome Analytics"
+        - "P08 ADM-361 Approval Processing Time Analytics"
+        - "P08 ADM-363 Approval Trend & Comparative Analytics"
+        - "P08 ADM-364 Approver & Team Performance Analytics"
+        - "P08 ADM-366 AI Approval Intelligence Center"
+        - "P08 ADM-368 AI Governance Executive Advisor"
       x-ticvai-audience:
       - staff
       summary: Volumes, times, rejections and bottlenecks
@@ -1346,9 +1346,9 @@ paths:
       operationId: listRuleWorkflow
       x-ticvai-consumed-by:
         - "P08 ADM-238 Rules & Workflow Command Center"
-        - "P09 ADM-319 Approval Workflow Library"
-        - "P09 ADM-327 Workflow Publication & Lifecycle"
-        - "P09 ADM-328 Workflow Versioning & Change History"
+        - "P08 ADM-319 Approval Workflow Library"
+        - "P08 ADM-327 Workflow Publication & Lifecycle"
+        - "P08 ADM-328 Workflow Versioning & Change History"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Rules, Workflow, Approval & Automation Engine'' 13.1.1 p.5; MoM
@@ -1422,7 +1422,7 @@ paths:
       operationId: setVisualBusinessRule
       x-ticvai-consumed-by:
         - "P08 ADM-239 Visual Business Rule Builder"
-        - "P09 ADM-323 Condition & Decision Rule Builder"
+        - "P08 ADM-323 Condition & Decision Rule Builder"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack 13.1.2 p.6-7; MoM 10 Aug §5.5 (builder configures who approves
@@ -1477,7 +1477,7 @@ paths:
       operationId: listConditionDecisionLogic
       x-ticvai-consumed-by:
         - "P08 ADM-240 Conditions, Decision Logic & Decision Tables"
-        - "P09 ADM-323 Condition & Decision Rule Builder"
+        - "P08 ADM-323 Condition & Decision Rule Builder"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack 13.1.3 p.8-9; our build plan'
@@ -1525,10 +1525,10 @@ paths:
         - "P08 BO-638 Approval Rules & Conditions"
         - "P08 BO-643 Approval Policy Validation & Publication"
         - "P08 ADM-241 Visual Workflow Designer"
-        - "P09 ADM-320 Create Approval Workflow"
-        - "P09 ADM-322 Approval Stage Configuration"
-        - "P09 ADM-324 Approval Sequence & Parallel Routing"
-        - "P09 ADM-327 Workflow Publication & Lifecycle"
+        - "P08 ADM-320 Create Approval Workflow"
+        - "P08 ADM-322 Approval Stage Configuration"
+        - "P08 ADM-324 Approval Sequence & Parallel Routing"
+        - "P08 ADM-327 Workflow Publication & Lifecycle"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack 13.1.4 p.10; MoM 10 Aug §5.5 (multi-step chain initiator to publish);
@@ -1749,9 +1749,9 @@ paths:
       operationId: setTriggerActionCross
       x-ticvai-consumed-by:
         - "P08 ADM-245 Trigger, Action & Cross-Module Orchestration Configuration"
-        - "P09 ADM-325 Workflow Outcome & Action Configuration"
-        - "P09 ADM-352 Workflow Event Framework"
-        - "P09 ADM-355 Data & Workflow Mapping Studio"
+        - "P08 ADM-325 Workflow Outcome & Action Configuration"
+        - "P08 ADM-352 Workflow Event Framework"
+        - "P08 ADM-355 Data & Workflow Mapping Studio"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack 13.1.8 p.16-17; MoM 8 Sep (API/webhook/external workflow integration
@@ -1808,9 +1808,9 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-643 Approval Policy Validation & Publication"
         - "P08 ADM-246 Workflow Testing, Simulation & Impact Analysis"
-        - "P09 ADM-326 Workflow Validation & Simulation"
-        - "P09 ADM-337 Routing Simulator & Conflict Detection"
-        - "P09 ADM-367 AI Optimization & What-If Simulator"
+        - "P08 ADM-326 Workflow Validation & Simulation"
+        - "P08 ADM-337 Routing Simulator & Conflict Detection"
+        - "P08 ADM-367 AI Optimization & What-If Simulator"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack 13.1.9 p.18; MoM 8 Sep (builder); our build plan'
@@ -2143,7 +2143,7 @@ paths:
       operationId: listWorkflowExceptionFailure
       x-ticvai-consumed-by:
         - "P08 ADM-251 Workflow Exception, Failure & Recovery Center"
-        - "P09 ADM-357 Integration Monitoring, Error & Retry Center"
+        - "P08 ADM-357 Integration Monitoring, Error & Retry Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack 13.2.4 p.28-29; MoM 8 Sep (integration with retry); our build plan'
@@ -2221,7 +2221,7 @@ paths:
         - "P08 BO-370 Escalated Approval Center"
         - "P08 BO-384 Delegation & Escalation Command Center"
         - "P08 BO-391 Live Escalation Operations Center"
-        - "P09 ADM-362 Bottleneck Analysis & Heatmap"
+        - "P08 ADM-362 Bottleneck Analysis & Heatmap"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack 13.2.5 p.30; MoM 8 Sep (overdue escalates, workload view per approver,
@@ -2360,8 +2360,8 @@ paths:
       operationId: listCrossModuleOrchestration
       x-ticvai-consumed-by:
         - "P08 ADM-254 Cross-Module Orchestration Monitor"
-        - "P09 ADM-349 Approval Integration Command Center"
-        - "P09 ADM-350 Module Integration Registry"
+        - "P08 ADM-349 Approval Integration Command Center"
+        - "P08 ADM-350 Module Integration Registry"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack 13.2.7 p.33; our build plan'
@@ -2425,7 +2425,7 @@ paths:
       operationId: listWorkflowProcessPerformance
       x-ticvai-consumed-by:
         - "P08 ADM-255 Workflow Analytics & Process Performance"
-        - "P09 ADM-358 Integration Analytics & AI Health Advisor"
+        - "P08 ADM-358 Integration Analytics & AI Health Advisor"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack 13.2.8 p.34-35; MoM 8 Sep (reporting is one permission-based module;
@@ -2661,8 +2661,8 @@ paths:
       operationId: listStepUpPolicies
       x-ticvai-consumed-by:
         - "P08 BO-377 Approve & Sensitive Action Confirmation"
-        - "P09 ADM-342 Authentication & MFA Policy Manager"
-        - "P09 ADM-343 Sensitive Action Confirmation"
+        - "P08 ADM-342 Authentication & MFA Policy Manager"
+        - "P08 ADM-343 Sensitive Action Confirmation"
       x-ticvai-audience:
       - staff
       summary: What needs a second factor here
@@ -2700,8 +2700,8 @@ paths:
     put:
       operationId: setStepUpPolicy
       x-ticvai-consumed-by:
-        - "P09 ADM-342 Authentication & MFA Policy Manager"
-        - "P09 ADM-343 Sensitive Action Confirmation"
+        - "P08 ADM-342 Authentication & MFA Policy Manager"
+        - "P08 ADM-343 Sensitive Action Confirmation"
       x-ticvai-audience:
       - staff
       summary: Raise what needs a second factor
@@ -2781,8 +2781,8 @@ paths:
       operationId: listApprovalControlPolicies
       x-ticvai-consumed-by:
         - "P08 BO-381 Segregation of Duties & Four-Eyes Control"
-        - "P09 ADM-339 Governance & Compliance Command Center"
-        - "P09 ADM-341 Four-Eyes & Dual-Control Policy"
+        - "P08 ADM-339 Governance & Compliance Command Center"
+        - "P08 ADM-341 Four-Eyes & Dual-Control Policy"
       summary: Segregation of duties, four-eyes and dual control
       description: 'Approvals boards 4.8, 6.2 and 6.3. **`identity.setSegregationRules` says which
         permissions one person may not hold at once. This says which *decisions* one person may not take
@@ -2824,8 +2824,8 @@ paths:
       operationId: setApprovalControlPolicy
       x-ticvai-consumed-by:
         - "P08 BO-863 Resource Lifecycle, Governance & Audit"
-        - "P09 ADM-336 Approver Group & Decision Policy"
-        - "P09 ADM-341 Four-Eyes & Dual-Control Policy"
+        - "P08 ADM-336 Approver Group & Decision Policy"
+        - "P08 ADM-341 Four-Eyes & Dual-Control Policy"
       summary: Require a second, independent pair of eyes
       description: '**PUT semantics — an upsert keyed on `code`.** There is no id in the path, and
         `code` is the policy''s required, stable name, so the body names its target by it at the tenant
@@ -2950,7 +2950,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-376 Approval Timeline & Decision Chain"
         - "P08 BO-383 Decision Record & Immutable Audit View"
-        - "P09 ADM-345 Immutable Approval Record & Tamper Detection"
+        - "P08 ADM-345 Immutable Approval Record & Tamper Detection"
       summary: The immutable decision record, and whether it is intact
       description: 'Approvals boards 4.10 and 6.6. **Tamper evidence, not tamper prevention.** Nothing
         stops a sufficiently privileged person editing a row; what this does is make the edit visible,
@@ -3092,7 +3092,7 @@ paths:
     put:
       operationId: setApprovalRetentionPolicy
       x-ticvai-consumed-by:
-        - "P09 ADM-346 Approval Record Retention Policy"
+        - "P08 ADM-346 Approval Record Retention Policy"
       summary: How long decision records are kept, and what survives
       description: 'Approvals board 6.7. **Approval records outlive the things they approved**, and
         deliberately: the refund is history in ninety days and the evidence that it was authorised is
@@ -3149,7 +3149,7 @@ paths:
       operationId: createApprovalEvidencePackage
       x-ticvai-consumed-by:
         - "P08 BO-375 Business Context & Evidence Viewer"
-        - "P09 ADM-347 Regulatory Audit & Evidence Center"
+        - "P08 ADM-347 Regulatory Audit & Evidence Center"
       summary: Assemble what an auditor asked for
       description: 'Approvals board 6.9. **The request is never *show me an approval*; it is *show me
         every approval of this kind in this period, with the policy in force at the time*.** Assembling
@@ -3520,8 +3520,8 @@ paths:
     get:
       operationId: listApprovalExternalProviders
       x-ticvai-consumed-by:
-        - "P09 ADM-349 Approval Integration Command Center"
-        - "P09 ADM-354 External Workflow System Integration"
+        - "P08 ADM-349 Approval Integration Command Center"
+        - "P08 ADM-354 External Workflow System Integration"
       x-ticvai-agreed: '29 September: re-trace 11.1.65 (no registration of a third-party workflow system
         as a step or approver); MoM 8 Sep (API/webhook/external workflow integration with data mapping and
         retry); our build plan; shape follows listApprovalDelegations, paged as tenancy listDevices'
@@ -3570,7 +3570,7 @@ paths:
     put:
       operationId: setApprovalExternalProvider
       x-ticvai-consumed-by:
-        - "P09 ADM-354 External Workflow System Integration"
+        - "P08 ADM-354 External Workflow System Integration"
       x-ticvai-agreed: '29 September: re-trace 11.1.65 (external workflow connector: endpoint, mapping,
         callback into the decision); MoM 8 Sep (external workflow integration with data mapping and retry);
         our build plan; shape follows setApprovalSlaPolicy'
@@ -3646,9 +3646,9 @@ paths:
     get:
       operationId: listApprovalExternalDispatches
       x-ticvai-consumed-by:
-        - "P09 ADM-349 Approval Integration Command Center"
-        - "P09 ADM-354 External Workflow System Integration"
-        - "P09 ADM-357 Integration Monitoring, Error & Retry Center"
+        - "P08 ADM-349 Approval Integration Command Center"
+        - "P08 ADM-354 External Workflow System Integration"
+        - "P08 ADM-357 Integration Monitoring, Error & Retry Center"
       x-ticvai-agreed: '29 September: re-trace 11.1.65 (retry and failure handling of the external
         connector); our build plan; shape follows listApprovedActionExecutions'
       x-ticvai-audience:

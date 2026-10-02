@@ -18,10 +18,12 @@ Rules (P09 only):
 
 The 408 workshop-pack screens moved to Venue Management on 2 October (Chinmay: "they are venue screens", DEC-100,
 CHG-MOV-001) are P08 screens and this check no longer reads them; ADM-068 and ADM-619 stayed on the Console and
-carry the grant. **Prospect twins:** a Console screen another platform copies (`source.sameAs`, the P17
-sign-up journey) is the operator-led view of a prospect who has no tenant yet, so there is no tenant to open a grant
-into; C-GRANT skips it until the design-note correction on ADM-379/ADM-399 (keep the Console copies as TICVAI's
-assisted-sale view, or remove them) is decided. C-CORE still applies.
+carry the grant. So did the approvals and communication screens (ADM-319..ADM-368, ADM-038..ADM-047) the same day
+(CHG-CLN-003): inside the tenant's own app they need no tenant picker. **Prospect twins (decided):** the Console's
+sign-up journey ADM-379..ADM-417 is TICVAI's assisted-sale view of a prospect who has no tenant yet, so there is no
+tenant to open a grant into. Chinmay accepted, 2 October 2026, keeping them on the Console and exempt from C-GRANT
+(CHG-CLN-003); any screen another platform copies (`source.sameAs`, the P17 sign-up journey) is exempt the same way.
+C-CORE still applies to them.
 
 Read-only. Exit 1 on any finding.
 
@@ -42,6 +44,13 @@ ROOT = Path(__file__).resolve().parents[1]
 CONSOLE = ROOT / "screens" / "P09-platform-admin-console.yaml"
 CONTRACTS = ROOT / "contracts"
 FRAME = {"listTenants", "openPlatformStaffGrant", "listOwnPlatformStaffGrants"}
+# The prospect twins: the Console's sign-up journey, exempt from C-GRANT (Chinmay, 2 October 2026; CHG-CLN-003).
+PROSPECT_TWINS = range(379, 418)
+
+
+def prospect_twin(sid: str) -> bool:
+    m = re.fullmatch(r"ADM-(\d+)", sid or "")
+    return bool(m) and int(m.group(1)) in PROSPECT_TWINS
 
 
 def load(path: Path):
@@ -91,7 +100,7 @@ def main() -> int:
         apis = {a.get("operationId") for a in s.get("apis") or [] if isinstance(a, dict)}
         tenant = sorted(o for o in apis - FRAME
                         if perms.get(o) and not str(perms.get(o)).startswith("PLATFORM_"))
-        if not tenant or sid in copied:
+        if not tenant or sid in copied or prospect_twin(sid):
             continue
         missing = sorted({"listTenants", "openPlatformStaffGrant"} - apis)
         if missing:

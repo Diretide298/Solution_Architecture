@@ -1,0 +1,69 @@
+id: CHG-CLN-004
+date: '2026-10-02'
+source: cr
+kind: spec
+summary: The partner-portal screens that call staff-only writers (PTR-026, 029, 035, 036, 037, 039, 047, 048) move to Venue
+  Management as staff screens; their list reads gain the staff audience.
+decision:
+  what: 'Move the eight screens from P10 to the end of P08 (ids kept; venue-management-web; audience staff; requiresModule
+    partner), reached from Venue Home BO-100 since their board hubs PTR-022, PTR-032 and PTR-042 stay on the partner portal
+    and lose the edges. The partner they edit comes from the row picked (entry parameter partnerId from navigation, optional),
+    not the session; PTR-029, PTR-035 and PTR-036 draw the list as the table it is picked from. staff joins the audience
+    of listTerritoryMarketDistribution, listPartnerAccessRole, listCommissionMarginIncentive, listCreditLimitExposure,
+    listDepositGuaranteeFinancial, listCommercialAllocationQuota, listPartnerReconciliationException and listCommissionCalculationSettlement
+    (additive). Flows: F131 and F132 drop the moved spokes; F110 drops the PTR-029 round trip and says where the profile
+    is chosen now.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'The lead''s call of 2 October 2026 (recommended, logged; audit TODO "the PTR staff-only screens move to Venue Management
+  as staff screens"): each declares a writer whose audience is staff only (setPartnerDistributionRights, setPartnerCapabilityGrants,
+  setPartnerCommissionRules, setPartnerCreditProfile, setPartnerSecurity, setPartnerAllocations, actOnPartnerReconciliationException,
+  actOnPartnerCommissionLine, actOnPartnerSettlementBatch), so a partner could never save them (R254, check-audience-match).'
+keys_touched:
+  screens:
+  - PTR-026
+  - PTR-029
+  - PTR-035
+  - PTR-036
+  - PTR-037
+  - PTR-039
+  - PTR-047
+  - PTR-048
+  - PTR-022
+  - PTR-032
+  - PTR-042
+  - BO-100
+  operations:
+  - listTerritoryMarketDistribution
+  - listPartnerAccessRole
+  - listCommissionMarginIncentive
+  - listCreditLimitExposure
+  - listDepositGuaranteeFinancial
+  - listCommercialAllocationQuota
+  - listPartnerReconciliationException
+  - listCommissionCalculationSettlement
+  flows:
+  - F110
+  - F131
+  - F132
+  files:
+  - screens/P10-partner-reseller-portal.yaml
+  - screens/P08-venue-back-office.yaml
+  - contracts/satellite/subscription.yaml
+root_class: 'new: audience-mismatch'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'check-screen-wiring S-STAFF-AUDIENCE fails a staff screen calling a partner-only read, which is why staff joined the
+  eight list audiences. **Left as a contract gap (open, for the contract owner):** those eight reads still carry x-ticvai-permission
+  PLATFORM_TENANT_VIEW, a platform permission no venue role holds; changing an operation''s permission is breaking against
+  r1. Recommended default: in r3, give each a staff permission (PARTNER_VIEW) through an approved breaking change, or add
+  staff reads beside them. No P10 ticket is pushed for these screens (the partner portal is outside Block A and the Venue
+  Management waves).'

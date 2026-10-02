@@ -4036,13 +4036,13 @@ screens:
     actions:
       - action: Test connection / Send test message / Test webhook
         result: Each shows pass or fail with the provider's response.
-        source: screens/P09-platform-admin-console.yaml#ADM-039
+        source: screens/P08-venue-back-office.yaml#ADM-039
     sampleData:
       providers: ["Email - SendGrid - primary", "SMS - Etisalat gateway - primary", "WhatsApp - Meta Cloud API - primary"]
     corrections:
       - what: '"Legal Entity" is the primary button and the channel fields are selects.'
         why: The act is Save provider; legal entity is a field.
-        source: screens/P09-platform-admin-console.yaml#ADM-039
+        source: screens/P08-venue-back-office.yaml#ADM-039
 
   ADM-040:
     summary: >-
@@ -4058,7 +4058,7 @@ screens:
     corrections:
       - what: Every field (From name, From address, Reply-To, Phone number) is a select.
         why: Names and addresses are typed; only brand, provider and country are selects.
-        source: screens/P09-platform-admin-console.yaml#ADM-040
+        source: screens/P08-venue-back-office.yaml#ADM-040
 
   ADM-041:
     summary: >-
@@ -4089,7 +4089,7 @@ screens:
     corrections:
       - what: The action bar is buttons named Product, Event, Venue, Customer, Channel, Transaction Status, Membership, Booking Type.
         why: These are condition dimensions (filters or condition fields), not actions; and no write operation is declared.
-        source: screens/P09-platform-admin-console.yaml#ADM-042
+        source: screens/P08-venue-back-office.yaml#ADM-042
 
   ADM-043:
     summary: >-

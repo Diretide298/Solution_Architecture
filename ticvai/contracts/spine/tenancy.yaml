@@ -2889,7 +2889,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-192 Biometric Lifecycle, Retention & Deletion"
         - "P08 BO-751 Retention & Anonymization"
-        - "P09 ADM-346 Approval Record Retention Policy"
+        - "P08 ADM-346 Approval Record Retention Policy"
         - "P09 ADM-524 AI Data Access & Usage Policy"
         - "P16 ANL-050 Retention, Archive & Governance Policy"
       x-ticvai-agreed: '29 September: decided by Chinmay (all data retention is tenant configuration, one
@@ -2950,7 +2950,7 @@ paths:
       operationId: setDataRetentionSetting
       x-ticvai-consumed-by:
         - "P08 BO-751 Retention & Anonymization"
-        - "P09 ADM-346 Approval Record Retention Policy"
+        - "P08 ADM-346 Approval Record Retention Policy"
         - "P09 ADM-524 AI Data Access & Usage Policy"
         - "P16 ANL-050 Retention, Archive & Governance Policy"
       x-ticvai-agreed: '29 September: decided by Chinmay (all data retention moves to tenant

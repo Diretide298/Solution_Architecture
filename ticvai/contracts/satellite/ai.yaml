@@ -507,7 +507,7 @@ paths:
         - "P08 BO-772 A/B & AI Optimization"
         - "P08 BO-782 AI Journey Optimization"
         - "P08 BO-925 AI Staff Recommendation & Workforce Matching"
-        - "P09 ADM-047 AI Delivery Optimization & Communication Platform Diagnostics"
+        - "P08 ADM-047 AI Delivery Optimization & Communication Platform Diagnostics"
         - "P09 ADM-511 Attraction Utilization & Queue Forecast"
         - "P16 ANL-001 Executive Command Center"
         - "P16 ANL-006 Inventory & Waste Intelligence"
@@ -7414,7 +7414,7 @@ paths:
         - "P08 BO-367 Approval Request Detail"
         - "P08 BO-368 AI Decision Support"
         - "P08 BO-369 High Priority & Risk Queue"
-        - "P09 ADM-366 AI Approval Intelligence Center"
+        - "P08 ADM-366 AI Approval Intelligence Center"
       x-ticvai-agreed: '29 September: minutes of 8 September (context only); our build plan, shape follows getEntityRisk'
       summary: The latest context score of an approval request
       description: 'What the reviewer sees beside the request: risk band and score, priority, the suggested escalation

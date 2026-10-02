@@ -6018,7 +6018,7 @@ paths:
       operationId: listGovernanceRiskLaunch
       x-ticvai-consumed-by:
         - "P08 ADM-227 Governance Audit, AI Risk & Launch Readiness"
-        - "P09 ADM-365 Risk & Governance Analytics"
+        - "P08 ADM-365 Risk & Governance Analytics"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.136; MoM 14 Aug (AI advisory in phase one); shape fixed (19 non-field properties removed)'

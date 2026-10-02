@@ -853,65 +853,7 @@ paths:
         - "P09 ADM-026 End-of-Support Notice Management"
         - "P09 ADM-031 Security & Compliance Dashboard"
         - "P09 ADM-037 AI Provider & Credentials"
-        - "P09 ADM-038 Communication Service Command Center"
-        - "P09 ADM-039 Channel & Provider Configuration"
-        - "P09 ADM-040 Sender Identity, Domain & Brand Configuration"
-        - "P09 ADM-041 System Transactional Template Registry"
-        - "P09 ADM-042 Business Event & Notification Trigger Mapping"
-        - "P09 ADM-043 Routing, Priority, Throttling & Fallback Rules"
-        - "P09 ADM-044 Consent, Preference & Communication Policy Enforcement"
-        - "P09 ADM-045 Delivery Queue, Failure & Retry Management"
-        - "P09 ADM-046 Provider Health, Usage & Cost Monitoring"
-        - "P09 ADM-047 AI Delivery Optimization & Communication Platform Diagnostics"
         - "P09 ADM-068 Tax, Fee & Calculation Command Center"
-        - "P09 ADM-319 Approval Workflow Library"
-        - "P09 ADM-320 Create Approval Workflow"
-        - "P09 ADM-322 Approval Stage Configuration"
-        - "P09 ADM-323 Condition & Decision Rule Builder"
-        - "P09 ADM-324 Approval Sequence & Parallel Routing"
-        - "P09 ADM-325 Workflow Outcome & Action Configuration"
-        - "P09 ADM-326 Workflow Validation & Simulation"
-        - "P09 ADM-327 Workflow Publication & Lifecycle"
-        - "P09 ADM-328 Workflow Versioning & Change History"
-        - "P09 ADM-329 Approval Matrix Command Center"
-        - "P09 ADM-330 Approval Authority Matrix"
-        - "P09 ADM-331 Organizational Hierarchy Routing"
-        - "P09 ADM-332 Department-Based Approval Matrix"
-        - "P09 ADM-333 Venue & Tenant Approval Matrix"
-        - "P09 ADM-334 Value & Threshold Routing"
-        - "P09 ADM-335 Risk-Based & Conditional Routing"
-        - "P09 ADM-336 Approver Group & Decision Policy"
-        - "P09 ADM-337 Routing Simulator & Conflict Detection"
-        - "P09 ADM-338 AI Routing Advisor & Matrix Optimization"
-        - "P09 ADM-339 Governance & Compliance Command Center"
-        - "P09 ADM-340 Segregation of Duties Policy Manager"
-        - "P09 ADM-341 Four-Eyes & Dual-Control Policy"
-        - "P09 ADM-342 Authentication & MFA Policy Manager"
-        - "P09 ADM-343 Sensitive Action Confirmation"
-        - "P09 ADM-345 Immutable Approval Record & Tamper Detection"
-        - "P09 ADM-346 Approval Record Retention Policy"
-        - "P09 ADM-347 Regulatory Audit & Evidence Center"
-        - "P09 ADM-348 Governance Risk & AI Compliance Advisor"
-        - "P09 ADM-349 Approval Integration Command Center"
-        - "P09 ADM-350 Module Integration Registry"
-        - "P09 ADM-351 Approval API Management"
-        - "P09 ADM-352 Workflow Event Framework"
-        - "P09 ADM-353 Webhook Configuration & Subscription Manager"
-        - "P09 ADM-354 External Workflow System Integration"
-        - "P09 ADM-355 Data & Workflow Mapping Studio"
-        - "P09 ADM-356 Integration Security & Access Control"
-        - "P09 ADM-357 Integration Monitoring, Error & Retry Center"
-        - "P09 ADM-358 Integration Analytics & AI Health Advisor"
-        - "P09 ADM-359 Approval Executive KPI Dashboard"
-        - "P09 ADM-360 Approval Volume & Outcome Analytics"
-        - "P09 ADM-361 Approval Processing Time Analytics"
-        - "P09 ADM-362 Bottleneck Analysis & Heatmap"
-        - "P09 ADM-363 Approval Trend & Comparative Analytics"
-        - "P09 ADM-364 Approver & Team Performance Analytics"
-        - "P09 ADM-365 Risk & Governance Analytics"
-        - "P09 ADM-366 AI Approval Intelligence Center"
-        - "P09 ADM-367 AI Optimization & What-If Simulator"
-        - "P09 ADM-368 AI Governance Executive Advisor"
         - "P09 ADM-369 Commercial Command Center"
         - "P09 ADM-370 Customer Subscription & Commercial Portfolio"
         - "P09 ADM-374 Trial & Conversion Monitor"
@@ -5440,10 +5382,11 @@ paths:
     get:
       operationId: listTerritoryMarketDistribution
       x-ticvai-consumed-by:
-        - "P10 PTR-026 Territory, Market & Distribution Rights"
+        - "P08 PTR-026 Territory, Market & Distribution Rights"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
+      - staff
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.12-14
         (Territory Configuration, Distribution Rights, Example, Exclusivity, Sub-Agent Rights, Effective Dates,
         Conflict Detection); MoM 31 Aug 2026 §4.3 (territory/market and distribution rights define which regions
@@ -5667,10 +5610,11 @@ paths:
     get:
       operationId: listPartnerAccessRole
       x-ticvai-consumed-by:
-        - "P10 PTR-029 Partner Access, Roles & Permission Profile"
+        - "P08 PTR-029 Partner Access, Roles & Permission Profile"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
+      - staff
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.16-18
         (Organization-Level Capabilities, Partner-Level vs User-Level, Sensitive Functions, Effective Dates);
         MoM 31 Aug 2026 §4.3 (partner access controls define which actions a partner may perform, e.g. refund,
@@ -6135,10 +6079,11 @@ paths:
     get:
       operationId: listCommissionMarginIncentive
       x-ticvai-consumed-by:
-        - "P10 PTR-035 Commission, Margin & Incentive Management"
+        - "P08 PTR-035 Commission, Margin & Incentive Management"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
+      - staff
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.29-30
         (Commission Models, Example Tier, Configuration Dimensions, Incentives, Margin Visibility, Conflict
         Detection, AI Capability); MoM 31 Aug 2026 §4.4 (commission rate a partner earns per ticket sold); shape
@@ -6212,10 +6157,11 @@ paths:
     get:
       operationId: listCreditLimitExposure
       x-ticvai-consumed-by:
-        - "P10 PTR-036 Credit Limit & Exposure Management"
+        - "P08 PTR-036 Credit Limit & Exposure Management"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
+      - staff
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.30-32
         (Credit Profile, Real-Time Exposure, Credit Utilization, Thresholds, Credit Actions, Temporary Credit,
         Booking Validation, AI Capability); MoM 31 Aug 2026 §4.4 (payment model 1: sells up to an approved credit
@@ -6294,10 +6240,11 @@ paths:
     get:
       operationId: listDepositGuaranteeFinancial
       x-ticvai-consumed-by:
-        - "P10 PTR-037 Deposit, Guarantee & Financial Security Management"
+        - "P08 PTR-037 Deposit, Guarantee & Financial Security Management"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
+      - staff
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.32-33
         (Security Types, Security Record, Coverage Analysis, Alerts, Rules); MoM 31 Aug 2026 §4.4 (payment model
         2: prepayment/advance wallet balance)'
@@ -6440,10 +6387,11 @@ paths:
     get:
       operationId: listCommercialAllocationQuota
       x-ticvai-consumed-by:
-        - "P10 PTR-039 Commercial Allocation, Quota & Commitment Management"
+        - "P08 PTR-039 Commercial Allocation, Quota & Commitment Management"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
+      - staff
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.35-36
         and p.41 (Allocation Models, Configuration, Example, Commitment Rules, Performance, Integration, AI
         Capability; Critical architecture distinction); MoM 31 Aug 2026 §4.4 (a defined quantity of inventory
@@ -7191,10 +7139,11 @@ paths:
     get:
       operationId: listPartnerReconciliationException
       x-ticvai-consumed-by:
-        - "P10 PTR-047 Partner Reconciliation & Exception Management"
+        - "P08 PTR-047 Partner Reconciliation & Exception Management"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
+      - staff
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.52-54
         (Reconciliation Sources, Reconciliation Dashboard, Example, Exception Types, Resolution Workflow, AI
         Capability); MoM 31 Aug 2026 §4.5 (reconciliation/exception management, e.g. manual postings or unsettled
@@ -7281,10 +7230,11 @@ paths:
     get:
       operationId: listCommissionCalculationSettlement
       x-ticvai-consumed-by:
-        - "P10 PTR-048 Commission Calculation & Settlement Management"
+        - "P08 PTR-048 Commission Calculation & Settlement Management"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
+      - staff
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.54-55
         (Settlement Dashboard, Calculation Record, Settlement Period, Adjustments, Settlement Workflow, Settlement
         Batch, Important Boundary); MoM 31 Aug 2026 §4.4 (commission per ticket) and §4.5; shape follows CommissionStatement
@@ -8656,7 +8606,7 @@ paths:
     put:
       operationId: setPartnerDistributionRights
       x-ticvai-consumed-by:
-        - "P10 PTR-026 Territory, Market & Distribution Rights"
+        - "P08 PTR-026 Territory, Market & Distribution Rights"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 (control.partner_distribution_right had no writer; listTerritoryMarketDistribution
@@ -8738,7 +8688,7 @@ paths:
     put:
       operationId: setPartnerCapabilityGrants
       x-ticvai-consumed-by:
-        - "P10 PTR-029 Partner Access, Roles & Permission Profile"
+        - "P08 PTR-029 Partner Access, Roles & Permission Profile"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 (control.partner_capability_grant had no writer; listPartnerAccessRole
@@ -8824,7 +8774,7 @@ paths:
     put:
       operationId: setPartnerCommissionRules
       x-ticvai-consumed-by:
-        - "P10 PTR-035 Commission, Margin & Incentive Management"
+        - "P08 PTR-035 Commission, Margin & Incentive Management"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 (control.partner_commission_rule and its tiers had no
@@ -8909,7 +8859,7 @@ paths:
     put:
       operationId: setPartnerCreditProfile
       x-ticvai-consumed-by:
-        - "P10 PTR-036 Credit Limit & Exposure Management"
+        - "P08 PTR-036 Credit Limit & Exposure Management"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 (control.partner_credit_profile had no writer; listCreditLimitExposure
@@ -8977,7 +8927,7 @@ paths:
     put:
       operationId: setPartnerSecurity
       x-ticvai-consumed-by:
-        - "P10 PTR-037 Deposit, Guarantee & Financial Security Management"
+        - "P08 PTR-037 Deposit, Guarantee & Financial Security Management"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 (control.partner_security had no writer; listDepositGuaranteeFinancial
@@ -9046,7 +8996,7 @@ paths:
     put:
       operationId: setPartnerAllocations
       x-ticvai-consumed-by:
-        - "P10 PTR-039 Commercial Allocation, Quota & Commitment Management"
+        - "P08 PTR-039 Commercial Allocation, Quota & Commitment Management"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 (control.partner_allocation had no writer; listCommercialAllocationQuota
@@ -9203,7 +9153,7 @@ paths:
     post:
       operationId: actOnPartnerReconciliationException
       x-ticvai-consumed-by:
-        - "P10 PTR-047 Partner Reconciliation & Exception Management"
+        - "P08 PTR-047 Partner Reconciliation & Exception Management"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 (control.partner_reconciliation_exception had no owner
@@ -9310,7 +9260,7 @@ paths:
     post:
       operationId: actOnPartnerCommissionLine
       x-ticvai-consumed-by:
-        - "P10 PTR-048 Commission Calculation & Settlement Management"
+        - "P08 PTR-048 Commission Calculation & Settlement Management"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 (control.partner_commission_line is written by the commission
@@ -9400,7 +9350,7 @@ paths:
     post:
       operationId: actOnPartnerSettlementBatch
       x-ticvai-consumed-by:
-        - "P10 PTR-048 Commission Calculation & Settlement Management"
+        - "P08 PTR-048 Commission Calculation & Settlement Management"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 (control.partner_settlement_batch is created by the settlement

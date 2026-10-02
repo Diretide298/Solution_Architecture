@@ -5827,7 +5827,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-637 Approval Workflow Builder"
         - "P08 ADM-129 Approval Workflow Designer"
-        - "P09 ADM-319 Approval Workflow Library"
+        - "P08 ADM-319 Approval Workflow Library"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Product_Lifecycle___Catalogue_Governance_Reference.pdf'' pp.17-18
@@ -6432,7 +6432,7 @@ paths:
       operationId: listGovernanceRiskMonitoring
       x-ticvai-consumed-by:
         - "P08 ADM-137 Governance Risk, AI Monitoring & Control Center"
-        - "P09 ADM-365 Risk & Governance Analytics"
+        - "P08 ADM-365 Risk & Governance Analytics"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Product_Lifecycle___Catalogue_Governance_Reference.pdf'' pp.26-27

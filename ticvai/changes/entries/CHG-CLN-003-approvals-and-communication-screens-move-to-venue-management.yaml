@@ -1,0 +1,122 @@
+id: CHG-CLN-003
+date: '2026-10-02'
+source: cr
+kind: spec
+summary: The approvals workflow and matrix screens (ADM-319..ADM-368) and the communication service screens (ADM-038..ADM-047)
+  move from the TICVAI Console to Venue Management (P08); the console tenant picker and grant come off them; ADM-353 merges
+  into BO-1074; the prospect twins ADM-379..ADM-417 stay on the Console, exempt from the R098 check.
+decision:
+  what: 'Move the 59 screens (ADM-321 does not exist) to the end of P08 as the ADM-049 move did: ids kept as anchors (their
+    tickets keep their keys), venue-management-web as the app, the six board hubs (ADM-038, 319, 329, 339, 349, 359) reached
+    from Venue Home BO-100 instead of the console dashboard ADM-002, flows F124, F125, F128, F129, F130 and F133 renamed
+    to P08 with a venue manager as actor, x-ticvai-consumed-by renamed to P08. TICVAI staff reach them only under a platform-staff
+    grant into the tenant (R098), so the console frame CHG-SBO-001 added (tenant picker, grant banner, Open access grant,
+    its form, grantRequired, the tenantId entry parameter) is removed. ADM-353 declared exactly BO-1074 Webhook Configuration''s
+    three operations (check-screen-wiring S-DUP-SCREEN) and becomes its anchor. ADM-379..ADM-417 stay on the Console and
+    check-console-grant exempts them from C-GRANT by id (PROSPECT_TWINS).'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026: move the approvals workflow and matrix screens and the communication service screens to Venue
+  Management, as with ADM-049 (DEC-100, CHG-MOV-001); the prospect twins stay on P09, exempt from the R098 check (accepted).
+  Audit R098: the Console runs outside every cell, so a venue''s own configuration belongs in its own app; the pre-apply
+  round "Duplicate screens: merge as proposed".'
+keys_touched:
+  screens:
+  - ADM-038
+  - ADM-039
+  - ADM-040
+  - ADM-041
+  - ADM-042
+  - ADM-043
+  - ADM-044
+  - ADM-045
+  - ADM-046
+  - ADM-047
+  - ADM-319
+  - ADM-320
+  - ADM-322
+  - ADM-323
+  - ADM-324
+  - ADM-325
+  - ADM-326
+  - ADM-327
+  - ADM-328
+  - ADM-329
+  - ADM-330
+  - ADM-331
+  - ADM-332
+  - ADM-333
+  - ADM-334
+  - ADM-335
+  - ADM-336
+  - ADM-337
+  - ADM-338
+  - ADM-339
+  - ADM-340
+  - ADM-341
+  - ADM-342
+  - ADM-343
+  - ADM-344
+  - ADM-345
+  - ADM-346
+  - ADM-347
+  - ADM-348
+  - ADM-349
+  - ADM-350
+  - ADM-351
+  - ADM-352
+  - ADM-353
+  - ADM-354
+  - ADM-355
+  - ADM-356
+  - ADM-357
+  - ADM-358
+  - ADM-359
+  - ADM-360
+  - ADM-361
+  - ADM-362
+  - ADM-363
+  - ADM-364
+  - ADM-365
+  - ADM-366
+  - ADM-367
+  - ADM-368
+  - ADM-002
+  - BO-100
+  - BO-1074
+  operations:
+  - listTenants
+  - openPlatformStaffGrant
+  - listOwnPlatformStaffGrants
+  flows:
+  - F124
+  - F125
+  - F128
+  - F129
+  - F130
+  - F133
+  files:
+  - screens/P08-venue-back-office.yaml
+  - screens/P09-platform-admin-console.yaml
+  - tools/check-console-grant.py
+  - tools/applied/move-approvals-comms-partner-2-october.py
+  - handoff/design-notes/platform-foundation.yaml
+  - handoff/design-notes/customer-marketing.yaml
+  other:
+  - x-ticvai-consumed-by in ai, marketing-crm, promotions, public-api, subscription, approvals, catalogue, identity, tenancy
+root_class: A23 AUTH-SCOPE
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ADM-342
+  - APP-SETUP-ADM-354
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-console-grant.py
+status: open
+notes: 'check-console-grant reads only the Console, so a moved screen no longer needs the frame and a twin is exempt by id;
+  check-screen-wiring S-DUP-SCREEN found the ADM-353 duplicate and S-CONSUMED-MIRROR holds the renamed consumed-by. Applied
+  by tools/applied/move-approvals-comms-partner-2-october.py; batch CLN, worktree D:/wt/cleanup-pass.'

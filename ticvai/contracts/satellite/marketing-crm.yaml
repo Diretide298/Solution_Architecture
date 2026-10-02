@@ -6340,7 +6340,7 @@ paths:
       operationId: listCommunicationService
       x-ticvai-consumed-by:
         - "P08 BO-784 Communications Center"
-        - "P09 ADM-038 Communication Service Command Center"
+        - "P08 ADM-038 Communication Service Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.6; pack ''Communication & Notification Platform Services'' pp.4-5'
@@ -6398,7 +6398,7 @@ paths:
     put:
       operationId: setChannelProvider
       x-ticvai-consumed-by:
-        - "P09 ADM-039 Channel & Provider Configuration"
+        - "P08 ADM-039 Channel & Provider Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.6; pack ''Communication & Notification Platform Services'' pp.6-7'
@@ -6457,7 +6457,7 @@ paths:
     put:
       operationId: setSenderIdentityDomain
       x-ticvai-consumed-by:
-        - "P09 ADM-040 Sender Identity, Domain & Brand Configuration"
+        - "P08 ADM-040 Sender Identity, Domain & Brand Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.6; pack ''Communication & Notification Platform Services'' pp.7-9'
@@ -6517,7 +6517,7 @@ paths:
       operationId: listSystemTransactionalTemplate
       x-ticvai-consumed-by:
         - "P08 BO-789 Transactional Notification Rules"
-        - "P09 ADM-041 System Transactional Template Registry"
+        - "P08 ADM-041 System Transactional Template Registry"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.6; pack ''Communication & Notification Platform Services'' pp.9-10'
@@ -6618,7 +6618,7 @@ paths:
     get:
       operationId: listBusinessEventNotification
       x-ticvai-consumed-by:
-        - "P09 ADM-042 Business Event & Notification Trigger Mapping"
+        - "P08 ADM-042 Business Event & Notification Trigger Mapping"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.6; pack ''Communication & Notification Platform Services'' pp.11-13'
@@ -6749,7 +6749,7 @@ paths:
       operationId: listRoutingPriorityThrottling
       x-ticvai-consumed-by:
         - "P08 BO-790 Scheduling, Priority & Approval"
-        - "P09 ADM-043 Routing, Priority, Throttling & Fallback Rules"
+        - "P08 ADM-043 Routing, Priority, Throttling & Fallback Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.6; pack ''Communication & Notification Platform Services'' pp.13-14'
@@ -6874,7 +6874,7 @@ paths:
     get:
       operationId: listConsentPreferenceCommunication
       x-ticvai-consumed-by:
-        - "P09 ADM-044 Consent, Preference & Communication Policy Enforcement"
+        - "P08 ADM-044 Consent, Preference & Communication Policy Enforcement"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.6; MoM 20 Aug §4.3; pack ''Communication & Notification Platform Services'' pp.14-16'
@@ -6965,7 +6965,7 @@ paths:
       operationId: listDeliveryQueueFailure
       x-ticvai-consumed-by:
         - "P08 BO-791 Delivery, Retry & Failover"
-        - "P09 ADM-045 Delivery Queue, Failure & Retry Management"
+        - "P08 ADM-045 Delivery Queue, Failure & Retry Management"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.6; pack ''Communication & Notification Platform Services'' pp.16-18'
@@ -7124,7 +7124,7 @@ paths:
       operationId: listProviderHealthUsage
       x-ticvai-consumed-by:
         - "P08 BO-792 Deliverability & Analytics"
-        - "P09 ADM-046 Provider Health, Usage & Cost Monitoring"
+        - "P08 ADM-046 Provider Health, Usage & Cost Monitoring"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.6; pack ''Communication & Notification Platform Services'' pp.18-19'
@@ -7246,7 +7246,7 @@ paths:
     get:
       operationId: listDeliveryCommunicationPlatform
       x-ticvai-consumed-by:
-        - "P09 ADM-047 AI Delivery Optimization & Communication Platform Diagnostics"
+        - "P08 ADM-047 AI Delivery Optimization & Communication Platform Diagnostics"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.6; pack ''Communication & Notification Platform Services'' pp.19-21'

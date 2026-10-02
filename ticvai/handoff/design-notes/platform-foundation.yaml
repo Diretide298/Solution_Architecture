@@ -2501,7 +2501,7 @@ screens:
     corrections:
     - what: The gaps entry says nothing reads the password policy.
       why: getPasswordPolicy now exists; the screen should declare it and drop the stale gap.
-      source: contracts/spine/identity.yaml#getPasswordPolicy; screens/P09-platform-admin-console.yaml#ADM-342
+      source: contracts/spine/identity.yaml#getPasswordPolicy; screens/P08-venue-back-office.yaml#ADM-342
       status: fixed
       by: CHG-WIR-021
     - what: Tenant-config operations with no tenant picker or platform-staff grant.
@@ -2594,7 +2594,7 @@ screens:
         Eight selectFields with no binding (system name, direction, authentication, mappings, error handling, sync
         mode).
       why: The provider schema defines these; without binding nobody knows the options.
-      source: screens/P09-platform-admin-console.yaml#ADM-354
+      source: screens/P08-venue-back-office.yaml#ADM-354
       status: fixed
       by: CHG-SBO-011
     - what: listApprovalExternalDispatches and recordExternalApprovalDecision exist and are not declared.
@@ -12863,7 +12863,7 @@ screens:
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-319; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-319; screens/_components.yaml#contentSpec.emptyStates
       status: fixed
       by: CHG-SBO-002
   ADM-320:
@@ -12890,7 +12890,7 @@ screens:
     corrections:
     - what: Step headings ("Step 2 — Applicability") are rendered as fields.
       why: Wizard steps.
-      source: screens/P09-platform-admin-console.yaml#ADM-320
+      source: screens/P08-venue-back-office.yaml#ADM-320
       status: fixed
       by: CHG-SBO-015
     - what: >-
@@ -12909,7 +12909,7 @@ screens:
       why: >-
         Every board field was generated as a selectField. The request schema says these are free text, dates, numbers
         or yes/no; a drop-down for a name, a code or a date has no options to offer.
-      source: screens/P09-platform-admin-console.yaml#ADM-320; contracts/spine/approvals.yaml#setVisualWorkflow
+      source: screens/P08-venue-back-office.yaml#ADM-320; contracts/spine/approvals.yaml#setVisualWorkflow
       status: fixed
       by: CHG-SBO-015
   ADM-322:
@@ -12924,7 +12924,7 @@ screens:
     corrections:
     - what: The only field is "Stage Name - Finance Manager Approval".
       why: Sample value in a label; the stage fields are missing.
-      source: screens/P09-platform-admin-console.yaml#ADM-322
+      source: screens/P08-venue-back-office.yaml#ADM-322
       status: fixed
       by: CHG-SBO-015
     - what: >-
@@ -13042,7 +13042,7 @@ screens:
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-326; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-326; screens/_components.yaml#contentSpec.emptyStates
       status: fixed
       by: CHG-SBO-002
   ADM-327:
@@ -13108,7 +13108,7 @@ screens:
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-329; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-329; screens/_components.yaml#contentSpec.emptyStates
       status: fixed
       by: CHG-SBO-002
   ADM-330:
@@ -13228,7 +13228,7 @@ screens:
     corrections:
     - what: The only field is "→ IT Director".
       why: Sample text as a label.
-      source: screens/P09-platform-admin-console.yaml#ADM-332
+      source: screens/P08-venue-back-office.yaml#ADM-332
       status: fixed
       by: CHG-SBO-015
     - what: >-
@@ -13434,7 +13434,7 @@ screens:
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-337; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-337; screens/_components.yaml#contentSpec.emptyStates
       status: fixed
       by: CHG-SBO-002
   ADM-338:
@@ -13468,7 +13468,7 @@ screens:
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-338; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-338; screens/_components.yaml#contentSpec.emptyStates
       status: fixed
       by: CHG-SBO-002
   ADM-339:
@@ -13504,7 +13504,7 @@ screens:
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-339; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-339; screens/_components.yaml#contentSpec.emptyStates
       status: fixed
       by: CHG-SBO-002
   ADM-340:
@@ -13532,7 +13532,7 @@ screens:
     corrections:
     - what: The only field is labelled "=R".
       why: Broken label.
-      source: screens/P09-platform-admin-console.yaml#ADM-340
+      source: screens/P08-venue-back-office.yaml#ADM-340
       status: fixed
       by: CHG-SBO-015
     - what: >-
@@ -13654,7 +13654,7 @@ screens:
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-344; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-344; screens/_components.yaml#contentSpec.emptyStates
       status: fixed
       by: CHG-SBO-002
   ADM-345:
@@ -13684,7 +13684,7 @@ screens:
     corrections:
     - what: Column labels contain status text and emoji ("Record Integrity - VERIFIED ✓").
       why: Values in labels.
-      source: screens/P09-platform-admin-console.yaml#ADM-345
+      source: screens/P08-venue-back-office.yaml#ADM-345
       status: fixed
       by: CHG-SBO-015
     - what: >-
@@ -13704,7 +13704,7 @@ screens:
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-345; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-345; screens/_components.yaml#contentSpec.emptyStates
       status: fixed
       by: CHG-SBO-002
     - what: >-
@@ -13712,7 +13712,7 @@ screens:
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
-      source: screens/P09-platform-admin-console.yaml#ADM-345
+      source: screens/P08-venue-back-office.yaml#ADM-345
       status: logged
       by: CHG-SBO-005
   ADM-346:
@@ -13817,7 +13817,7 @@ screens:
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-348; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-348; screens/_components.yaml#contentSpec.emptyStates
       status: fixed
       by: CHG-SBO-002
   ADM-349:
@@ -13851,7 +13851,7 @@ screens:
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-349; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-349; screens/_components.yaml#contentSpec.emptyStates
       status: fixed
       by: CHG-SBO-002
   ADM-350:
@@ -13887,7 +13887,7 @@ screens:
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-350; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-350; screens/_components.yaml#contentSpec.emptyStates
       status: fixed
       by: CHG-SBO-002
   ADM-351:
@@ -13906,7 +13906,7 @@ screens:
     corrections:
     - what: Only listApprovalRequests.
       why: API configuration is not an approval list.
-      source: screens/P09-platform-admin-console.yaml#ADM-351
+      source: screens/P08-venue-back-office.yaml#ADM-351
       status: fixed
       by: CHG-WIR-021
     - what: >-
@@ -13914,7 +13914,7 @@ screens:
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-351; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-351; screens/_components.yaml#contentSpec.emptyStates
       status: fixed
       by: CHG-SBO-002
   ADM-352:
@@ -14027,7 +14027,7 @@ screens:
     corrections:
     - what: Only listAuthorisationPolicies and an empty table.
       why: No columns, no write.
-      source: screens/P09-platform-admin-console.yaml#ADM-356
+      source: screens/P08-venue-back-office.yaml#ADM-356
       status: logged
       by: CHG-SBO-005
     - what: >-
@@ -14035,7 +14035,7 @@ screens:
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-356; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-356; screens/_components.yaml#contentSpec.emptyStates
       status: fixed
       by: CHG-SBO-002
   ADM-357:
@@ -14073,7 +14073,7 @@ screens:
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-357; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-357; screens/_components.yaml#contentSpec.emptyStates
       status: fixed
       by: CHG-SBO-002
   ADM-358:
@@ -14115,7 +14115,7 @@ screens:
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-358; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-358; screens/_components.yaml#contentSpec.emptyStates
       status: fixed
       by: CHG-SBO-002
   ADM-359:
@@ -14147,7 +14147,7 @@ screens:
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-359; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-359; screens/_components.yaml#contentSpec.emptyStates
       status: fixed
       by: CHG-SBO-002
   ADM-360:
@@ -14179,7 +14179,7 @@ screens:
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-360; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-360; screens/_components.yaml#contentSpec.emptyStates
       status: fixed
       by: CHG-SBO-002
   ADM-361:
@@ -14211,7 +14211,7 @@ screens:
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-361; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-361; screens/_components.yaml#contentSpec.emptyStates
       status: fixed
       by: CHG-SBO-002
   ADM-362:
@@ -14240,7 +14240,7 @@ screens:
     corrections:
     - what: Approval kinds (Refund, Discount) are drawn as table columns.
       why: A heatmap's axes.
-      source: screens/P09-platform-admin-console.yaml#ADM-362
+      source: screens/P08-venue-back-office.yaml#ADM-362
       status: fixed
       by: CHG-SBO-015
     - what: >-
@@ -14260,7 +14260,7 @@ screens:
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-362; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-362; screens/_components.yaml#contentSpec.emptyStates
       status: fixed
       by: CHG-SBO-002
     - what: >-
@@ -14268,7 +14268,7 @@ screens:
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
-      source: screens/P09-platform-admin-console.yaml#ADM-362
+      source: screens/P08-venue-back-office.yaml#ADM-362
       status: logged
       by: CHG-SBO-005
   ADM-363:
@@ -14300,7 +14300,7 @@ screens:
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-363; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-363; screens/_components.yaml#contentSpec.emptyStates
       status: fixed
       by: CHG-SBO-002
   ADM-364:
@@ -14337,7 +14337,7 @@ screens:
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-364; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-364; screens/_components.yaml#contentSpec.emptyStates
       status: fixed
       by: CHG-SBO-002
   ADM-366:
@@ -14369,7 +14369,7 @@ screens:
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-366; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-366; screens/_components.yaml#contentSpec.emptyStates
       status: fixed
       by: CHG-SBO-002
   ADM-367:
@@ -14397,7 +14397,7 @@ screens:
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-367; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-367; screens/_components.yaml#contentSpec.emptyStates
       status: fixed
       by: CHG-SBO-002
   ADM-368:
@@ -14429,7 +14429,7 @@ screens:
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-368; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-368; screens/_components.yaml#contentSpec.emptyStates
       status: fixed
       by: CHG-SBO-002
   ADM-369:
@@ -17924,7 +17924,7 @@ screens:
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
-      source: screens/P10-partner-reseller-portal.yaml#PTR-036
+      source: screens/P08-venue-back-office.yaml#PTR-036
       status: fixed
       by: CHG-SOT-015
     - what: 'Partner portal screen calls staff-only operations: setPartnerCreditProfile (staff).'
@@ -17981,7 +17981,7 @@ screens:
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
-      source: screens/P10-partner-reseller-portal.yaml#PTR-037
+      source: screens/P08-venue-back-office.yaml#PTR-037
       status: fixed
       by: CHG-SOT-015
     - what: 'Partner portal screen calls staff-only operations: setPartnerSecurity (staff).'
@@ -18055,7 +18055,7 @@ screens:
     corrections:
     - what: Allocation types drawn as buttons.
       why: Choices.
-      source: screens/P10-partner-reseller-portal.yaml#PTR-039
+      source: screens/P08-venue-back-office.yaml#PTR-039
       status: fixed
       by: CHG-SOT-015
     - what: 'Partner portal screen calls staff-only operations: setPartnerAllocations (staff).'
@@ -18334,7 +18334,7 @@ screens:
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P10-partner-reseller-portal.yaml#PTR-047; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#PTR-047; screens/_components.yaml#contentSpec.emptyStates
       status: fixed
       by: CHG-SOT-015
   PTR-048:
@@ -18409,7 +18409,7 @@ screens:
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P10-partner-reseller-portal.yaml#PTR-048; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#PTR-048; screens/_components.yaml#contentSpec.emptyStates
       status: fixed
       by: CHG-SOT-015
   PTR-049:

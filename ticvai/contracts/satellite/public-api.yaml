@@ -169,8 +169,8 @@ paths:
         - "P08 BO-1179 Integration Monitoring & Exception Workbench"
         - "P08 BO-691 Accreditation API Management"
         - "P09 ADM-015 API Rate Limit & Quota Management"
-        - "P09 ADM-351 Approval API Management"
-        - "P09 ADM-356 Integration Security & Access Control"
+        - "P08 ADM-351 Approval API Management"
+        - "P08 ADM-356 Integration Security & Access Control"
         - "P10 PTR-019 API Credentials & Integration"
         - "P14 DEV-003 Clients & Credentials"
       summary: Registered clients for this developer
@@ -530,7 +530,6 @@ paths:
         - "P08 BO-1176 Wallet Events, Webhooks & Notification Orchestration"
         - "P08 BO-1179 Integration Monitoring & Exception Workbench"
         - "P08 BO-692 Accreditation Webhook Management"
-        - "P09 ADM-353 Webhook Configuration & Subscription Manager"
         - "P14 DEV-005 Webhooks"
       summary: The tenant's webhook subscriptions, filterable by API client
       description: >
@@ -567,7 +566,6 @@ paths:
         - "P08 BO-1074 Webhook Configuration"
         - "P08 BO-1176 Wallet Events, Webhooks & Notification Orchestration"
         - "P08 BO-692 Accreditation Webhook Management"
-        - "P09 ADM-353 Webhook Configuration & Subscription Manager"
         - "P14 DEV-005 Webhooks"
       summary: Subscribe to business events
       description: >
@@ -622,8 +620,7 @@ paths:
         - "P08 BO-1074 Webhook Configuration"
         - "P08 BO-1075 Seat Event Catalog"
         - "P08 BO-692 Accreditation Webhook Management"
-        - "P09 ADM-352 Workflow Event Framework"
-        - "P09 ADM-353 Webhook Configuration & Subscription Manager"
+        - "P08 ADM-352 Workflow Event Framework"
         - "P14 DEV-005 Webhooks"
       x-ticvai-agreed: >-
         29 September: re-trace 16.9.56, 12.1.53, 11.1.64, 11.1.66 and 21.13.4 (events existed or were
@@ -809,7 +806,7 @@ paths:
       operationId: getApiUsage
       x-ticvai-consumed-by:
         - "P09 ADM-015 API Rate Limit & Quota Management"
-        - "P09 ADM-351 Approval API Management"
+        - "P08 ADM-351 Approval API Management"
         - "P14 DEV-006 Usage & Limits"
       summary: Calls, errors, latency and success rate
       description: >
@@ -1116,7 +1113,7 @@ paths:
       operationId: setApiClientStatus
       x-ticvai-consumed-by:
         - "P08 BO-1179 Integration Monitoring & Exception Workbench"
-        - "P09 ADM-356 Integration Security & Access Control"
+        - "P08 ADM-356 Integration Security & Access Control"
       x-ticvai-agreed: >-
         29 September: VM close-out; pack 'Wallet_Configuration_Backend_Structure_v1.0.pdf' board 10
         pp.115 and 122 (Suspend Integration); shape follows revokeApiCredential and states/api-client.yaml
@@ -1236,7 +1233,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1073 API Access & OAuth"
         - "P08 BO-1177 API Security, Access & Integration Permissions"
-        - "P09 ADM-351 Approval API Management"
+        - "P08 ADM-351 Approval API Management"
         - "P10 PTR-019 API Credentials & Integration"
         - "P14 DEV-001 API Reference"
         - "P14 DEV-003 Clients & Credentials"
