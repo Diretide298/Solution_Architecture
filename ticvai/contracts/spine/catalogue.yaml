@@ -5638,6 +5638,47 @@ paths:
                           $ref: '#/components/schemas/ProductGovernanceCommandCenterView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /product-approval-workflows:
+    get:
+      operationId: listProductApprovalWorkflows
+      x-ticvai-audience:
+        - staff
+      x-ticvai-read-routing: replica
+      summary: The product approval workflows `approveWorkflow` saved
+      description: '**The read the workflow builder opens on** (design-notes correction on BO-637, Block B: "No read operation:
+        the screen declares only approveWorkflow and nothing that returns the current configuration. It opens as an empty
+        form even where a configuration exists"; PR-9; CHG-CSP-048). Returns the product approval workflows of the venue:
+        each workflow''s product types and change types, its stages in order, and its rejection and resubmission rules, as
+        `approveWorkflow` wrote them. Despite its name `approveWorkflow` designs a workflow; it keeps its r1 name. **Ordered
+        by workflow name, `workflowId` as the tiebreak.** These are product and catalogue workflows; accreditation approval
+        workflows are not here.
+
+        '
+      tags:
+        - drafted
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
+        - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Workflows
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../shared/common.yaml#/components/schemas/Page
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ApprovalWorkflowDesignerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /workflow:
     put:
       operationId: approveWorkflow
@@ -11202,6 +11243,130 @@ paths:
                           $ref: '#/components/schemas/PricingHistoryAuditComplianceExplorerView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /seat-pricing-rules:
+    get:
+      operationId: listSeatPricingRules
+      x-ticvai-audience:
+        - staff
+      x-ticvai-read-routing: replica
+      summary: Seat-level dynamic pricing rules
+      description: '**The rules Dynamic Seat Pricing edits, read back** (design-notes correction on BO-1044, Block B: "The
+        screen only lists strategies; nothing writes a seat pricing rule"; CHG-CSP-049). Filter by strategy, seat map or
+        performance. **Ordered by priority, highest first, then `id`.**
+
+        '
+      tags:
+        - drafted
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: strategyId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: seatMapId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: performanceId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
+        - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Rules
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../shared/common.yaml#/components/schemas/Page
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/SeatPricingRule'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /seat-pricing-rules/{ruleId}:
+    parameters:
+    - name: ruleId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: setSeatPricingRule
+      x-ticvai-audience:
+        - staff
+      x-ticvai-config-scope: venue
+      summary: Create or replace a seat-level dynamic pricing rule
+      description: '**Rules that move assigned-seat prices within bounds** (design-notes correction on BO-1044, Block B;
+        CHG-CSP-049): which seats (a section, rows, single seats or a seat category on a seat map, optionally one
+        performance), the dynamic pricing strategy that drives them (`setDynamicPricingStrategy`), the floor and ceiling
+        the price may move between and the step it moves by. The strategy decides when to move (pace, demand, time to
+        event); the rule bounds where. A move never goes below the floor or above the ceiling, and a seat already sold
+        keeps its price.
+
+
+        **PUT to the rule''s key: an idempotent upsert.** `ruleId` is a client-generated UUIDv7; a key with no rule creates
+        it (`201`), a key with one replaces it whole (`200`). Two rules of equal priority covering the same seat are refused `422
+        overlapping-rule-same-priority`; a floor above the ceiling is `422`.
+
+        '
+      tags:
+        - drafted
+      x-ticvai-permission: PRICE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeatPricingRule'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: An existing rule, replaced
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeatPricingRule'
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: A new rule, created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeatPricingRule'
+        '422':
+          description: The floor is above the ceiling, or another rule of the same priority covers a seat this one covers
+            (`overlapping-rule-same-priority`).
+          x-ticvai-problem-types:
+            - overlapping-rule-same-priority
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /dynamic-pricing-strategy:
     get:
       operationId: listDynamicPricingStrategy
@@ -14084,6 +14249,146 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EventSchedule'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /venues/{venueId}/event-change-treatment-policy:
+    parameters:
+    - name: venueId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getEventChangeTreatmentPolicy
+      x-ticvai-audience:
+        - staff
+      x-ticvai-read-routing: replica
+      summary: What happens to tickets, reservations and guests when an event changes, by default
+      description: '**The venue''s default treatment per kind of event change, read back** (design-notes correction on BO-720,
+        Block B; CHG-CSP-050); a venue with none saved reads the defaults below.
+
+        '
+      tags:
+        - events
+      x-ticvai-permission: PERFORMANCE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The policy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventChangeTreatmentPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    put:
+      operationId: setEventChangeTreatmentPolicy
+      x-ticvai-audience:
+        - staff
+      x-ticvai-config-scope: venue
+      summary: Set the default treatment per kind of event change
+      description: '**Made once and applied consistently, rather than per guest at a desk** (design-notes correction on BO-720,
+        Block B: "rescheduleEvent performs a change; there is no operation storing default treatments per change kind";
+        CHG-CSP-050). For each kind of change (`moveTime`, `moveDate`, `moveVenue`, `cancel`), the ticket treatment, whether
+        reservations follow, whether fees are refunded and whether guests are told. `rescheduleEvent` starts from these
+        defaults: a request that names no `ticketTreatment` takes the policy''s for its kind, and one that names a different
+        one is recorded as an override. PUT replaces the policy whole; one per venue.
+
+        '
+      tags:
+        - events
+      x-ticvai-permission: PERFORMANCE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventChangeTreatmentPolicy'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventChangeTreatmentPolicy'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /entitlement-templates/{templateId}/blackout-dates:
+    parameters:
+    - name: templateId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: setEntitlementTemplateBlackoutDates
+      x-ticvai-audience:
+        - staff
+      x-ticvai-config-scope: venue
+      summary: Set the dates a product's entitlement does not admit
+      description: '**Blackouts from the closures screen** (design-notes correction on BO-019, Block B: "No operation sets
+        product blackout dates or a venue closure day; the screen only cancels performances and closes paths. Blackouts
+        live on entitlement templates (blackoutDates) and are edited on BO-012; a closures screen needs a write for them";
+        DI-452; CHG-CSP-051). Replaces `EntitlementTemplate.blackoutDates` of one template, which until now could be set
+        only when the template was created. An annual pass that excludes public holidays is the usual case. Applies to
+        entitlements issued from the template from now on and to existing ones at their next validation; a date already
+        admitted on is not undone. A whole-venue closure day is the access operating calendar''s
+        (`setOperatingCalendarEntry` with `venueClosed`).
+
+        '
+      tags:
+        - entitlement
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - blackoutDates
+              properties:
+                blackoutDates:
+                  type: array
+                  description: The whole list; an empty list clears it.
+                  items:
+                    type: string
+                    format: date
+                reason:
+                  type: string
+                  maxLength: 300
+                  nullable: true
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The template, with its blackout dates replaced
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntitlementTemplate'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /events/{eventId}/reschedule:
@@ -17895,6 +18200,135 @@ components:
             '
         scopePath:
           type: string
+    EventChangeTreatmentPolicy:
+      type: object
+      x-ticvai-persistence: catalogue.event_change_treatment_policy
+      description: '**The venue''s default treatment per kind of event change** (CHG-CSP-050; BO-720). One per venue.'
+      required:
+      - treatments
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        scopePath:
+          type: string
+          readOnly: true
+        treatments:
+          type: array
+          description: One row per change kind; a kind left out takes the defaults shown on each field.
+          items:
+            type: object
+            required:
+            - changeKind
+            - ticketTreatment
+            properties:
+              changeKind:
+                type: string
+                enum:
+                - moveTime
+                - moveDate
+                - moveVenue
+                - cancel
+              ticketTreatment:
+                type: string
+                enum:
+                - moveAutomatically
+                - offerChoice
+                - refund
+                - creditToWallet
+                - honourAtAnyPerformance
+                description: As `EventReschedule.ticketTreatment`. Proposed defaults, client to correct - moveTime
+                  moveAutomatically, moveDate offerChoice, moveVenue offerChoice, cancel refund.
+              reservationsFollow:
+                type: boolean
+                default: true
+                description: Table, rental and add-on reservations tied to the performance move with it, or are released.
+              refundFees:
+                type: boolean
+                default: true
+              notifyGuests:
+                type: boolean
+                default: true
+              notificationTemplateId:
+                type: string
+                format: uuid
+                nullable: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+    SeatPricingRule:
+      type: object
+      x-ticvai-persistence: catalogue.seat_pricing_rule
+      description: '**One seat-level dynamic pricing rule: which seats, which strategy, and the bounds** (CHG-CSP-049; BO-1044).'
+      required:
+      - name
+      - strategyId
+      - seatMapId
+      - floorPrice
+      - ceilingPrice
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: The `ruleId` of the path.
+        name:
+          type: string
+          maxLength: 200
+        strategyId:
+          type: string
+          format: uuid
+          description: The dynamic pricing strategy that decides when to move (`setDynamicPricingStrategy`).
+        seatMapId:
+          type: string
+          format: uuid
+        performanceId:
+          type: string
+          format: uuid
+          nullable: true
+          description: One performance only; null for every performance on the seat map.
+        sectionIds:
+          type: array
+          items:
+            type: string
+        rows:
+          type: array
+          items:
+            type: string
+        seatIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        seatCategory:
+          type: string
+          nullable: true
+          maxLength: 64
+        floorPrice:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        ceilingPrice:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        stepPrice:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          description: How far one move changes the price; null lets the strategy choose within the bounds.
+        priority:
+          type: integer
+          minimum: 0
+          default: 0
+        isActive:
+          type: boolean
+          default: true
+        scopePath:
+          type: string
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
     EventReschedule:
       type: object
       x-ticvai-persistence: catalogue.event_reschedule

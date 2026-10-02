@@ -19635,6 +19635,14 @@ components:
           type: boolean
           nullable: true
           description: 'Special windows: operator enters attendance count'
+        venueClosed:
+          type: boolean
+          default: false
+          description: '**A day the whole venue is closed** (design-notes correction on BO-019, Block B: "No operation sets
+            product blackout dates or a venue closure day"; CHG-CSP-051). Every gate refuses admission for the entry''s
+            dates, as `temporaryClosure` does for one attraction, and the closures screen shows it beside the product
+            blackouts (catalogue `setEntitlementTemplateBlackoutDates`). Stopping sales for those dates is the
+            performances'' own (`cancelPerformance`, catalogue).'
         priority:
           type: integer
           minimum: 0
