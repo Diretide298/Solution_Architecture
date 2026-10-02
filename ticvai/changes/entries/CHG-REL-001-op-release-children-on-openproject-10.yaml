@@ -27,6 +27,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/op-release.py
-status: open
+status: closed
+closed_by_commit: 8bfcbcb7
 notes: Closes on its commit. The server-side dry run is the only place the Rails schema is real; this guard catches the
   known incompatibility before a bundle is built.
