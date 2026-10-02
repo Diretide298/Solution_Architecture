@@ -31,6 +31,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-wireframe-coverage.py
-status: open
+status: closed
+closed_by_commit: 0b04ecaa
 notes: For the lead to confirm. The alternative is a design run for the two screens before r2; the baseline entry goes when
   either gets a frame (the check then reports it gone).

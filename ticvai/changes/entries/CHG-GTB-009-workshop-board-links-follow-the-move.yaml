@@ -36,6 +36,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-wireframes.py
-status: open
+status: closed
+closed_by_commit: 734befda
 notes: check-wireframes caught it and gates; the applied script is the repair for the next move between platforms
   (tools/applied/README.md).

@@ -28,6 +28,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-package.py
-status: open
+status: closed
+closed_by_commit: d4e7e139
 notes: Prevention is check-package rule 19, which caught it. The lead's quoted words are kept; the bracket is an editorial
   insertion, not a rewording.

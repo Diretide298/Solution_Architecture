@@ -38,6 +38,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-glossary-terms.py
-status: open
+status: closed
+closed_by_commit: 28596da6
 notes: Additive against r1 - neither field nor the path existed in r1, so the rename breaks no released contract
   (check-contract-compat). No screen bound sectionIds.

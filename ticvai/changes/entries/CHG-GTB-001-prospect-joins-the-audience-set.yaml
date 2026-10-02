@@ -43,6 +43,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-package.py
-status: open
+status: closed
+closed_by_commit: d4e7e139
 notes: The prevention is the closed-set rule that caught it (check-package rule 13); a contract cannot use an audience value
   the check does not know. The gap was that a new value reached the contracts in a branch whose checks ran scoped, not full.

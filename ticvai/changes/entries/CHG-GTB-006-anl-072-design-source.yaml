@@ -26,5 +26,6 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-wireframe-coverage.py
-status: open
+status: closed
+closed_by_commit: 28596da6
 notes: Prevention is W-NO-DESIGN, which caught it.

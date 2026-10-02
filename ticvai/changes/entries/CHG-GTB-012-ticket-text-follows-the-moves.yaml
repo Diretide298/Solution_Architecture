@@ -49,6 +49,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-ticket-text.py
-status: open
+status: closed
+closed_by_commit: 1b475955
 notes: The text reaches OpenProject only through op-descriptions.rb at the release, and only for unstarted tickets (rule 6).
   If any of the seven was started, it keeps its text and takes a comment instead.

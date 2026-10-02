@@ -27,5 +27,6 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-backlog.py
-status: open
+status: closed
+closed_by_commit: 28596da6
 notes: Prevention is check-backlog's closed-blocker rule, which caught it.

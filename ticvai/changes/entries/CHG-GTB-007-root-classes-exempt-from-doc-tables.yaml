@@ -24,6 +24,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-doc-tables.py
-status: open
+status: closed
+closed_by_commit: 28596da6
 notes: The rest of root-classes.md is still read by nothing that checks table names; the file is a cited copy rebuilt only by
   a logged change (CHG-SEED-012).

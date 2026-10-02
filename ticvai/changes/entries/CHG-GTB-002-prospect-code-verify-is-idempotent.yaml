@@ -28,5 +28,6 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-package.py
-status: open
+status: closed
+closed_by_commit: d4e7e139
 notes: Additive against r1 (the operation is new in r2). Prevention is check-package rule 48, which caught it.

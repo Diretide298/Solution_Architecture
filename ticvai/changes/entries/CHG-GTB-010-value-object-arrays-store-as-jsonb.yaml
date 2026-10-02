@@ -56,6 +56,7 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/derive-schema.py::x-ticvai-persistence-column
-status: open
+status: closed
+closed_by_commit: 1a9325a4
 notes: Additive against r1 (check-contract-compat; the annotations are extensions, the columns new and nullable). ST-FIELD-NO-COLUMN
   still gates the next undeclared array; the rule makes a declared one land.

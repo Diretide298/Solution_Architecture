@@ -28,5 +28,6 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-frontend.py
-status: open
+status: closed
+closed_by_commit: 28596da6
 notes: Prevention is check-frontend's component-path rule, which caught it.

@@ -29,7 +29,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-binding-ratchet.py
-status: open
+status: closed
+closed_by_commit: 1b475955
 notes: 'The recorded commit field says 267b6cf2 because the tool writes the worktree HEAD; the counts are of the refreshed tree
   with this branch applied. Record the baseline from a refreshed tree (refresh-safe --keep-worktree), never from an
   unrefreshed main: on main without plan-tasks.csv the blocks read differently.'
