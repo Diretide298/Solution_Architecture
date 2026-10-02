@@ -1,0 +1,47 @@
+id: CHG-CSP-007
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: A late-night opening window is one window past midnight, marked endsNextDay.
+decision:
+  what: OpeningHoursWindow.endsNextDay (default false); a window ending before it starts is refused 422 window-ends-before-start
+    unless it ends the next day.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 6 set 6a, BO-731 (Q197): "One window past midnight, marked ''ends next day''" (DI-320).
+  Decision ledger: DEC-197 (workbook Q197).'
+keys_touched:
+  screens:
+  - BO-731
+  - BO-063
+  operations:
+  - createOutlet
+  - updateOutlet
+  schemas:
+  - OpeningHoursWindow
+  files:
+  - contracts/spine/tenancy.yaml
+  tickets:
+  - SVC-TENANCY-WORKSTATION-1
+  - SVC-TENANCY-WORKSTATION-3
+  - VM-BO-063
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - SVC-TENANCY-WORKSTATION-1 (#17812)
+  - SVC-TENANCY-WORKSTATION-3 (#17814)
+  - VM-BO-063 (#18260)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: none
+  reason: 'Planned, not yet written: check-applied-decisions (see notes). The entry stays open until the tools owner writes
+    it and registers it in run-checks; then the prevention becomes that check.'
+status: open
+notes: 'Open: Planned check check-applied-decisions (not yet written; the tools owner writes it): for every decision the
+  decisions register marks applied, each contract key the decision names exists in the named contract and its decided default
+  or enum is unchanged, so a decided behaviour cannot be dropped or reverted silently. Until it exists this entry stays
+  open. Applied in worktree apply-contracts-spine (batch CSP, 2 October 2026). Tickets: none started (Block A starts Monday
+  5 October 2026); unstarted keys are the tasks.csv keys naming a touched operation or screen.'

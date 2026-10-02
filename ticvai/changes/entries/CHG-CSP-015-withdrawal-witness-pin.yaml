@@ -1,0 +1,45 @@
+id: CHG-CSP-015
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: The cashier countersigns a mid-shift withdrawal with their own PIN on the same device.
+decision:
+  what: withdrawFromDepositBox gains x-ticvai-step-up pin answered by the witness; the PIN must be witnessPrincipalId's
+    (403 witness-not-verified) and the supervisor may not witness their own withdrawal.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 6 #178, BO-042 (Q178): "PIN on the same device" (R144). Decision ledger: DEC-178 (workbook
+  Q178).'
+keys_touched:
+  screens:
+  - BO-042
+  - POS-018
+  operations:
+  - withdrawFromDepositBox
+  files:
+  - contracts/spine/shift.yaml
+  tickets:
+  - SVC-ORDER-SHIFT-5
+  - APP-POS-POS-018
+  - VM-BO-042
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - SVC-ORDER-SHIFT-5 (#17856)
+  - APP-POS-POS-018 (#17889)
+  - VM-BO-042 (#18387)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: none
+  reason: 'Planned, not yet written: check-applied-decisions (see notes). The entry stays open until the tools owner writes
+    it and registers it in run-checks; then the prevention becomes that check.'
+status: open
+notes: 'Open: Planned check check-applied-decisions (not yet written; the tools owner writes it): for every decision the
+  decisions register marks applied, each contract key the decision names exists in the named contract and its decided default
+  or enum is unchanged, so a decided behaviour cannot be dropped or reverted silently. Until it exists this entry stays
+  open. check-step-up already refuses the step-up losing its reason. Applied in worktree apply-contracts-spine (batch CSP,
+  2 October 2026). Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming
+  a touched operation or screen.'

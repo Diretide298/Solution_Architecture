@@ -1,0 +1,40 @@
+id: CHG-CSP-054
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: 'bulkUpdateProducts stays in inventory for now: moving it to catalogue is a breaking change that needs approval.'
+decision:
+  what: No change. The BO-007 correction asks to move bulkUpdateProducts from inventory to catalogue; removing it from inventory
+    is breaking against r1 and only Session.saleBoardId is approved.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Design-notes correction on BO-007 (Block A, ticketing-backoffice): "bulkUpdateProducts, a catalogue act on products,
+  is declared in the inventory contract", logged open in CHG-WIR-027.'
+keys_touched:
+  screens:
+  - BO-007
+  operations:
+  - bulkUpdateProducts
+  files:
+  - contracts/satellite/inventory.yaml
+  - contracts/spine/catalogue.yaml
+  tickets:
+  - SVC-INVENTORY-INVENTORY-1
+  - APP-SETUP-BO-007
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - SVC-INVENTORY-INVENTORY-1 (#17935)
+  - APP-SETUP-BO-007 (#18007)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'Open: question for the lead. Recommended: add catalogue bulkUpdateProductAttributes (additive) and deprecate the
+  inventory operation at r2, rather than approve a breaking move. Applied in worktree apply-contracts-spine (batch CSP,
+  2 October 2026). Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming
+  a touched operation or screen.'

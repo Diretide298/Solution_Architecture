@@ -1,0 +1,55 @@
+id: CHG-CSP-011
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: A new device gets a one-time enrolment code and waits for approval; a second person, not the tester, approves it
+  before it goes live.
+decision:
+  what: 'RegisteredDevice.approvalStatus (DeviceApprovalStatus: pendingApproval, approved, rejected), enrolmentCode and
+    expiry (returned once by registerDevice), testedByPrincipalId, approvedByPrincipalId, approvedAt; DeviceEnrolment.enrolmentCode
+    and testResult; enrolDevice refuses active before approval (409 device-approval-required) and a bad code (422); new
+    approveDevice (403 approver-is-tester); new state model states/registered-device-approval.yaml.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, critical set 1: BO-196 (Q241) "Secure enrolment code + pending approval" and BO-203 (Q245)
+  "Approver must differ from the tester"; MoM 15 September (DI-892, DI-906); ADR-0067 one device register. Decision ledger:
+  DEC-241, DEC-245 (workbook Q241, Q245).'
+keys_touched:
+  screens:
+  - BO-196
+  - BO-203
+  - BO-036
+  - ADM-581
+  operations:
+  - registerDevice
+  - enrolDevice
+  - approveDevice
+  schemas:
+  - RegisteredDevice
+  - DeviceEnrolment
+  - DeviceApprovalStatus
+  files:
+  - contracts/spine/tenancy.yaml
+  - states/registered-device-approval.yaml
+  tickets:
+  - VM-TENANCY-WORKSTATION-1
+  - VM-BO-036
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - VM-TENANCY-WORKSTATION-1 (#18326)
+  - VM-BO-036 (#18459)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-states.py
+status: closed
+closed_by_commit: 94fdc6cb
+notes: 'check-states holds DeviceApprovalStatus to its model (every value modelled, approveDevice exists for both moves);
+  on the parent commit the model and enum did not exist. The approval axis is new rather than a value on enrolmentState,
+  which would be a breaking change against r1. Applied in worktree apply-contracts-spine (batch CSP, 2 October 2026). Tickets:
+  none started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched operation
+  or screen.'

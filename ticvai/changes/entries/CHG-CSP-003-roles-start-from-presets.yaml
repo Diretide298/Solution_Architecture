@@ -1,0 +1,59 @@
+id: CHG-CSP-003
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: 'No fixed default roles: the seeded role sets become editable presets (per-module All, Viewer, Mid-level and five
+  starting configurations); a role is created from presets, keeps an editable checklist and can be renamed.'
+decision:
+  what: createRole takes presetCodes and permissions (copied, never bound); Role.presetCode records the start; new updateRole
+    renames a role; CapabilityTemplate gains module, presetLevel and isPreset; listCapabilityTemplates filters by module;
+    listRoles, Role.isSystem and setRolePermissions describe roles as preset configurations. AI release promotion goes to
+    the holder of the module permission.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 1 (ADM-554, workbook Q7): "There are no default roles. When a role is created, the
+  permissions are a checklist, with presets (all permissions, viewer, mid-level) but fully selectable", and the pre-apply
+  round: "Default permission configs, so to speak ... they can still give that viewer more permissions and rename it." ADR-0051
+  (AI-D16) for promotion; audit R229 for the five seeded sets. Decision ledger: DEC-007 (workbook Q7).'
+keys_touched:
+  screens:
+  - ADM-554
+  - ADM-021
+  - BO-054
+  - BO-1066
+  operations:
+  - createRole
+  - updateRole
+  - listRoles
+  - listCapabilityTemplates
+  - setRolePermissions
+  schemas:
+  - Role
+  - CapabilityTemplate
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/spine/tenancy.yaml
+  tickets:
+  - SVC-IDENTITY-ADMINISTRATION-1
+  - APP-SETUP-BO-054
+  - APP-SETUP-ADM-554
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - SVC-IDENTITY-ADMINISTRATION-1 (#17782)
+  - APP-SETUP-BO-054 (#17799)
+  - APP-SETUP-ADM-554 (#20755)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: none
+  reason: 'Planned, not yet written: check-presets (see notes). The entry stays open until the tools owner writes it and
+    registers it in run-checks; then the prevention becomes that check.'
+status: open
+notes: 'Open: the prevention is a check that every preset lists only permissions in contracts/shared/permissions.yaml and
+  every permission sits in exactly one module group (DEC-007 hint), not yet written. Depends on the permissions owner for
+  the per-module "Publish AI model" permissions (<module>.AI_PUBLISH) and on roles.yaml becoming presets; this contract
+  names neither. Applied in worktree apply-contracts-spine (batch CSP, 2 October 2026). Tickets: none started (Block A starts
+  Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched operation or screen.'

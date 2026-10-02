@@ -3042,6 +3042,13 @@ paths:
 
         Moves an `open` period to `closing`, and records the step (who, when) in the period''s `events`.
 
+
+        **Wallet movements are frozen with the rest** (decided 2 October 2026, Chinmay, batch 6 #220, BO-1170: "Add
+        a wallet movement summary operation and wallet pre-close checks"; DEC-220; CHG-CSP-040). From `closing` the
+        period''s wallet movements are summarised (wallet `getWalletMovementSummary`, owned by the wallet contract) and
+        the close checks include the wallet checks (`PeriodCloseResult.walletChecks`): the close cannot pass while the
+        wallet roll-forward does not tie.
+
         '
       tags:
       - ledger
@@ -7426,6 +7433,59 @@ components:
                 type: string
               blockingCount:
                 type: integer
+        walletChecks:
+          type: array
+          description: '**The wallet pre-close checks** (decided 2 October 2026, Chinmay, batch 6 #220, BO-1170; DEC-220;
+            CHG-CSP-040). Beside `checks`, whose values clients built at r1 already switch on, so no value is added there.
+            `passed` is false while any of these fails. Empty where the tenant has no wallet module.'
+          items:
+            type: object
+            required:
+            - check
+            - passed
+            properties:
+              check:
+                type: string
+                enum:
+                - walletRollForwardTies
+                - walletLiabilityMatchesLedger
+                - noPendingWalletAuthorisations
+                - expiredBalancesReleased
+                - walletDisputesReviewed
+                description: '`walletRollForwardTies`: opening liability plus top-ups, minus spend, refunds and expiry,
+                  equals closing liability. `walletLiabilityMatchesLedger`: that closing liability equals the wallet
+                  liability account. `noPendingWalletAuthorisations`: no authorisation is still held open in the
+                  period. `expiredBalancesReleased`: balances past expiry were released to breakage. `walletDisputesReviewed`:
+                  no wallet dispute raised in the period is unreviewed.'
+              passed:
+                type: boolean
+              detail:
+                type: string
+              blockingCount:
+                type: integer
+        walletRollForward:
+          type: object
+          nullable: true
+          description: '**The period''s wallet movement summary, as the close checked it** (DEC-220; CHG-CSP-040): read
+            from wallet `getWalletMovementSummary` so BO-1170 shows the roll-forward beside the ledger checks. Null where
+            the tenant has no wallet module.'
+          properties:
+            openingLiability:
+              $ref: ../shared/common.yaml#/components/schemas/Money
+            toppedUp:
+              $ref: ../shared/common.yaml#/components/schemas/Money
+            spent:
+              $ref: ../shared/common.yaml#/components/schemas/Money
+            refunded:
+              $ref: ../shared/common.yaml#/components/schemas/Money
+            expired:
+              $ref: ../shared/common.yaml#/components/schemas/Money
+            closingLiability:
+              $ref: ../shared/common.yaml#/components/schemas/Money
+            ledgerLiability:
+              allOf:
+              - $ref: ../shared/common.yaml#/components/schemas/Money
+              description: The wallet liability account's balance, to compare with `closingLiability`.
     FinancialReport:
       x-ticvai-persistence: none — computed from replica
       type: object

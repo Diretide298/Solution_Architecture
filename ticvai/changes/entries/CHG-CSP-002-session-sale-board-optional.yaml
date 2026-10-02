@@ -1,0 +1,70 @@
+id: CHG-CSP-002
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: 'Session.saleBoardId is no longer required: only a till session carries it. Logged as breaking changes BC-001 to
+  BC-005.'
+decision:
+  what: Remove saleBoardId from Session.required; document that only a till session carries it; approve the five resulting
+    breaking changes (login, selectRole, getCurrentSession, completeSsoAuthorization, verifyMfaChallenge) in docs/active/breaking-changes.yaml,
+    moving producer and consumer tickets to r2.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Door follow-ups of 2 October 2026 (Chinmay: "Make it optional; log the breaking change"). CHG-DOOR-001 let browser
+  and handheld doors sign in with no workstation, and its notes left this for the lead: the board is derived from the workstation,
+  so a required field forced the server to invent one.'
+keys_touched:
+  screens:
+  - POS-000
+  - POS-001
+  - EMP-001
+  - EMP-002
+  - EMP-042
+  - SCN-001
+  - ADM-001
+  - PTR-001
+  - SUP-001
+  - BO-053
+  operations:
+  - login
+  - selectRole
+  - getCurrentSession
+  - completeSsoAuthorization
+  - verifyMfaChallenge
+  schemas:
+  - Session
+  files:
+  - contracts/spine/identity.yaml
+  - docs/active/breaking-changes.yaml
+  tickets:
+  - APP-SETUP-BO-053
+  - SVC-IDENTITY-MFA-2
+  - SVC-IDENTITY-IDENTITY-1
+  - SVC-IDENTITY-IDENTITY-2
+  - SVC-IDENTITY-IDENTITY-3
+  - APP-POS-POS-000
+  - APP-POS-POS-001
+root_class: 'new: door-cannot-open'
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-BO-053 (#17798)
+  - SVC-IDENTITY-MFA-2 (#17786)
+  - SVC-IDENTITY-IDENTITY-1 (#17932)
+  - SVC-IDENTITY-IDENTITY-2 (#17933)
+  - SVC-IDENTITY-IDENTITY-3 (#17934)
+  - APP-POS-POS-000 (#17977)
+  - APP-POS-POS-001 (#17978)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: closed
+closed_by_commit: '22490530'
+notes: 'check-contract-compat reported the five operations as unapproved breaking changes on the parent commit (55559080
+  plus the identity edit) and passes once BC-001 to BC-005 are listed. Producer ticket for completeSsoAuthorization is the
+  identity feature (no task names it yet). Applied in worktree apply-contracts-spine (batch CSP, 2 October 2026). Tickets:
+  none started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched operation
+  or screen.'

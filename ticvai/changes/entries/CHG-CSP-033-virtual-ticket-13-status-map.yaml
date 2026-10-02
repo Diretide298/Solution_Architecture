@@ -1,0 +1,44 @@
+id: CHG-CSP-033
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: The pack's 13 Virtual Ticket status names map onto the entitlement model; no state is missing, so none is added.
+decision:
+  what: states/entitlement-status.yaml pack_status_map; orders EntitlementStatus and access AccessTicketStatusTransition
+    describe the map; access Entitlement.lifecycleLabel (13 names, computed) and cancellationKind (voided, refunded, performanceCancelled,
+    superseded).
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, critical set 2, BO-336 (Q266): "Map the pack''s 13 names onto the model; add any missing
+  states", and Q267 "Reserved maps to Pending fulfilment" (DI-670). Decision ledger: DEC-266 (workbook Q266).'
+keys_touched:
+  screens:
+  - BO-336
+  - BO-334
+  - WEB-018
+  schemas:
+  - EntitlementStatus
+  - Entitlement
+  - AccessTicketStatusTransition
+  files:
+  - contracts/spine/orders.yaml
+  - contracts/spine/access.yaml
+  - states/entitlement-status.yaml
+  tickets:
+  - APP-WEB-WEB-018
+root_class: A21 STATE-MODELS
+tickets:
+  started: []
+  unstarted:
+  - APP-WEB-WEB-018 (#17992)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-states.py
+status: open
+notes: 'Open: check-states does not yet read pack_status_map; the prevention is a rule there that every name in AccessTicketStatusTransition.fromStatus
+  maps to a model state (DEC-266 hint), tools owner. Applied in worktree apply-contracts-spine (batch CSP, 2 October 2026).
+  Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched operation
+  or screen.'

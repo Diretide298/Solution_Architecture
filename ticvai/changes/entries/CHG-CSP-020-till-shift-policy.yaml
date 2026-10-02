@@ -1,0 +1,48 @@
+id: CHG-CSP-020
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: New getTillShiftPolicy and setTillShiftPolicy hold the venue's till opening, closing and exception rules that POS-019
+  promises.
+decision:
+  what: GET/PUT /venues/{venueId}/till-shift-policy with TillShiftPolicy (requireOpenApproval, openingFloatTolerance, depositBoxRequired,
+    bagNumberRequired, requireCloseApproval, autoCloseAfterHours, noSaleAlertCount), venue config scope; openShift and states/shift.yaml
+    point at it.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Design-notes correction on POS-019 (Block A, platform-foundation): "nothing reads or writes a shift template or close
+  policy ... Either add the shift-policy operations or rename the screen" (DI-309), logged open as CHG-WIR-024. The contract
+  already said "where the venue is configured to require approval on open" with no setting.'
+keys_touched:
+  screens:
+  - POS-019
+  operations:
+  - getTillShiftPolicy
+  - setTillShiftPolicy
+  - openShift
+  schemas:
+  - TillShiftPolicy
+  files:
+  - contracts/spine/shift.yaml
+  - states/shift.yaml
+  tickets:
+  - SVC-ORDER-SHIFT-3
+  - APP-POS-POS-019
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - SVC-ORDER-SHIFT-3 (#17854)
+  - APP-POS-POS-019 (#17915)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: ce2e32da
+notes: 'S-NO-READ (a screen that edits and reads nothing) and check-config-scope (setTillShiftPolicy must declare venue)
+  hold it. Closes the POS-019 gap in CHG-WIR-024. POS-019 must bind the two operations (screens owner). Applied in worktree
+  apply-contracts-spine (batch CSP, 2 October 2026). Tickets: none started (Block A starts Monday 5 October 2026); unstarted
+  keys are the tasks.csv keys naming a touched operation or screen.'

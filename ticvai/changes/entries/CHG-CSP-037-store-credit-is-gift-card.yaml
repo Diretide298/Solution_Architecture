@@ -1,0 +1,39 @@
+id: CHG-CSP-037
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: Store credit on a refund is a gift card issued for the refund amount.
+decision:
+  what: createRefund and Refund.settleTo storeCredit describe issuing a gift card (wallet issueGiftCard), not a voucher
+    or wallet top-up.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 1, POS-011 (Q61): "Gift card" (DI-796). Decision ledger: DEC-061 (workbook Q61).'
+keys_touched:
+  screens:
+  - POS-011
+  operations:
+  - createRefund
+  schemas:
+  - Refund
+  files:
+  - contracts/spine/orders.yaml
+  tickets:
+  - SVC-ORDER-REFUND-1
+  - APP-POS-POS-011
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - SVC-ORDER-REFUND-1 (#17851)
+  - APP-POS-POS-011 (#18002)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-design-notes.py
+status: open
+notes: 'Open: the prevention is a design-notes rule that POS-011''s tender list says Gift card (DEC-061 hint), design-notes
+  owner. Applied in worktree apply-contracts-spine (batch CSP, 2 October 2026). Tickets: none started (Block A starts Monday
+  5 October 2026); unstarted keys are the tasks.csv keys naming a touched operation or screen.'

@@ -1,0 +1,57 @@
+id: CHG-CSP-034
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: UAE Pass and the ICP identity check are in release 1, needing the client's access; the guest verification policy
+  names ICP as its provider.
+decision:
+  what: guestUaePassLogin describes release 1 and the client dependency; IdentityGuestVerificationPolicy.verificationProvider
+    (icp); setGuestVerificationPolicy make-or-break narrowed and 422 provider-not-connected.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, critical set 2, BO-627 (Q457): "UAE Pass + ICP integrated in release 1 (needs client access)".
+  Decision ledger: DEC-457 (workbook Q457).'
+keys_touched:
+  screens:
+  - BO-627
+  - WEB-016
+  - GST-042
+  - ADM-342
+  operations:
+  - guestUaePassLogin
+  - setGuestVerificationPolicy
+  schemas:
+  - IdentityGuestVerificationPolicy
+  files:
+  - contracts/spine/identity.yaml
+  tickets:
+  - SVC-IDENTITY-GUESTAUTH-2
+  - SVC-IDENTITY-IDENTITY-3
+  - APP-SETUP-ADM-342
+  - APP-MOB-GST-042
+  - APP-WEB-WEB-016
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - SVC-IDENTITY-GUESTAUTH-2 (#17843)
+  - SVC-IDENTITY-IDENTITY-3 (#17934)
+  - APP-SETUP-ADM-342 (#20614)
+  - APP-MOB-GST-042 (#17975)
+  - APP-WEB-WEB-016 (#17990)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: none
+  reason: 'Planned, not yet written: check-applied-decisions (see notes). The entry stays open until the tools owner writes
+    it and registers it in run-checks; then the prevention becomes that check.'
+status: open
+notes: 'Open: Planned check check-applied-decisions (not yet written; the tools owner writes it): for every decision the
+  decisions register marks applied, each contract key the decision names exists in the named contract and its decided default
+  or enum is unchanged, so a decided behaviour cannot be dropped or reverted silently. Until it exists this entry stays
+  open. The decision named access setVerificationMethodPolicy, which is the per-product credential method (QR, card, Face
+  Pass), not identity verification; ICP lives in identity''s guest verification policy here, and the accreditation identity
+  check (BO-627) is the accreditation owner''s. External dependency (client access to UAE Pass and ICP) is the registers
+  owner''s. Applied in worktree apply-contracts-spine (batch CSP, 2 October 2026). Tickets: none started (Block A starts
+  Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched operation or screen.'

@@ -4582,6 +4582,13 @@ paths:
         change it makes, with the previous and new state, the actor and the correlation id (decided 29
         September, writers pass).
 
+
+        **Store credit is a gift card** (decided 2 October 2026, Chinmay, batch 1, POS-011: "Gift card";
+        DEC-061; CHG-CSP-037; DI-796). A refund settled as store credit (`Refund.settleTo` `storeCredit`, or
+        `alternateTender` `giftCard`) issues a new gift card for the refund amount (wallet `issueGiftCard`) and
+        hands it to the guest; it is not a voucher and not a top-up of the guest''s wallet. POS-011 offers it as
+        "Gift card".
+
         '
       tags:
       - refund
@@ -4624,6 +4631,140 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/RefundPolicyProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /orders/{orderId}/refund-simulation:
+    parameters:
+    - name: orderId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: simulateRefund
+      x-ticvai-idempotency-exempt: A simulation writes nothing and calls no provider; repeating it is harmless (CHG-CSP-046).
+      x-ticvai-audience:
+      - staff
+      summary: What a refund would do, without doing it
+      description: '**Simulate a refund before making it** (design-notes correction on ADM-618, Block B: "Refund Simulator
+        declares no operation; a simulator needs a simulate operation"; CHG-CSP-046). For an order, the lines or an
+        amount, a reason and the channel, returns what `createRefund` would do: the refundable balance, whether a second
+        authoriser or an approval would be needed and at which threshold, the tender and provider route (original tender,
+        gift card for store credit, wire), the currency and FX the guest would be refunded in (CHG-FIN-001) and the cash
+        impact on a till. **Nothing is refunded, written or posted**; the answer is computed from the order, the venue''s
+        refund policy and the payments as they stand, and can differ from a later `createRefund` if any of them changes.
+        A POST because the question is a body, not because anything changes.
+
+        '
+      tags:
+      - refund
+      x-ticvai-permission: ORDER_REFUND
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lineIds:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                  description: Omit to simulate refunding the whole order.
+                amount:
+                  allOf:
+                  - $ref: ../shared/common.yaml#/components/schemas/Money
+                  nullable: true
+                  description: Omit to simulate the full refundable amount of the lines.
+                reason:
+                  type: string
+                  maxLength: 500
+                channel:
+                  $ref: ../shared/common.yaml#/components/schemas/SalesChannel
+                settleTo:
+                  type: string
+                  enum:
+                  - originalTender
+                  - advanceBalance
+                  - wireTransfer
+                  - storeCredit
+                  default: originalTender
+      responses:
+        '200':
+          description: What the refund would do
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefundSimulation'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: 'The order cannot be refunded at all: nothing is refundable (`exceedsRefundable`) or the refund
+            window has closed (`refundWindowClosed`). The problem names the policy, as `createRefund` would.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RefundPolicyProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /products/{productId}/ticket-previews:
+    parameters:
+    - name: productId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: previewProductTickets
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-bounded: one proof per output format the product issues, at most the seven `TicketProof.mediaType` values times the two wallet platforms
+      summary: Preview a product's PDF ticket and wallet passes
+      description: '**Every output format of a product, previewed before it is published** (decided 2 October 2026,
+        Chinmay, batch 4, CMS-006: "the preview of the PDF ticket and the Apple/Google Wallet pass must be in Block A";
+        DEC-151; and the design-notes correction on BO-008, Block A: "No operation renders the PDF ticket or Wallet pass
+        preview for a product; printTicketProof works on a template, not on a product"; DI-444; CHG-CSP-038). For a
+        product, renders a proof of each ticket template it issues through (`TicketTemplate`): the PDF ticket, and the
+        Apple Wallet and Google Wallet passes (`WalletPass`) where the product issues one, each filled with the product''s
+        own data and **marked as a proof on the artefact**, so a preview left on a counter cannot be presented at a gate.
+        Nothing is stored, sold or pushed to a wallet. A product with no template for a format returns no proof for it.
+        Read with `PRODUCT_VIEW`, so the product editor (BO-008) and the white-label preview (CMS-006) can call it;
+        `printTicketProof` stays the till''s sample print.
+
+        '
+      tags:
+      - orders
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: locale
+        in: query
+        schema:
+          type: string
+        description: The language to render in; the venue's default when omitted.
+      responses:
+        '200':
+          description: One proof per output format
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TicketProof'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /refunds/{refundId}/approve:
@@ -5039,6 +5180,14 @@ paths:
         values from the client. `amount` stays the base-currency amount, and that is what the ledger posts.
         Foreign cash handed over at a till is unchanged: recorded at its base equivalent, change in base.
 
+
+        **No cash on a handheld; cash goes to a till** (decided 2 October 2026, Chinmay, batch 6 #200, EMP-009:
+        "No cash on handhelds; cash goes to a till"; DEC-200; CHG-CSP-039; DI-805). A server taking payment at the
+        table on a staff handheld (EMP-059) offers card, wallet, gift card and voucher only; a `cash` tender from a
+        session with no till (the staff app, a handheld, a browser) is refused `409 cashNotOnHandheld`, and the guest
+        pays cash at a till, where a drawer and a person reconcile it. So a server''s End shift (EMP-009) has no cash
+        count; the till holder''s shift does.
+
         '
       tags:
       - payment
@@ -5075,7 +5224,8 @@ paths:
         '409':
           description: Tender unavailable offline (`tenderUnavailableOffline`), amount exceeds the
             balance due (`exceedsBalanceDue`), or a guest channel sent a tender other than card or wallet
-            (`tenderNotAllowedOnChannel`, audit R080).
+            (`tenderNotAllowedOnChannel`, audit R080), or cash from a session with no till
+            (`cashNotOnHandheld`, DEC-200; CHG-CSP-039).
           content:
             application/problem+json:
               schema:
@@ -20296,6 +20446,16 @@ components:
         Added 17 August. `states/entitlement.yaml` had modelled these six since 14 August and the contract
         had no enum behind it, which the state checker reported correctly for three days.
 
+
+        **The client''s 13 Virtual Ticket statuses map onto these six** (decided 2 October 2026, Chinmay, critical
+        set 2, BO-336: "Map the pack''s 13 names onto the model; add any missing states"; DEC-266; CHG-CSP-033).
+        Every name maps, so no value is added (one would be a breaking change against r1): Active is `issued`,
+        Partially used `partiallyConsumed`, Used `fullyConsumed`, Expired `expired`, Transferred `surrendered`,
+        Suspended and Blocked are `issued` with the suspended flag or an identity lock, and Cancelled, Voided,
+        Refunded and Reissued / superseded are `cancelled` told apart by access `Entitlement.cancellationKind`.
+        Created and Pending fulfilment (DI-670''s Reserved) are the order before an entitlement exists. The table
+        is `states/entitlement-status.yaml` (`pack_status_map`); access `Entitlement.lifecycleLabel` carries the name.
+
         '
       enum:
       - issued
@@ -22000,6 +22160,10 @@ components:
             **`originalTender` stays the default** because refunding elsewhere is how money laundering
             works, and anything else needs a reason.
 
+
+            **`storeCredit` is a gift card issued for the refund amount** (decided 2 October 2026, Chinmay,
+            batch 1, POS-011; DEC-061; CHG-CSP-037; DI-796), never a voucher or a wallet top-up.
+
             '
         fxVariance:
           allOf:
@@ -22821,6 +22985,90 @@ components:
           type: string
           format: uri
           description: Where the rendered proof can be fetched or sent to the printer from.
+        walletPlatform:
+          type: string
+          nullable: true
+          enum:
+          - appleWallet
+          - googleWallet
+          description: Which wallet the pass preview is for, where `mediaType` is `walletPass` (DEC-151; CHG-CSP-038).
+    RefundSimulation:
+      type: object
+      x-ticvai-persistence: none — computed, nothing is written
+      description: '**What `createRefund` would do, computed and not done** (CHG-CSP-046; ADM-618).'
+      required:
+      - orderId
+      - refundableAmount
+      - amount
+      properties:
+        orderId:
+          type: string
+          format: uuid
+        refundableAmount:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          description: What remains refundable on the order or lines, before this refund.
+        amount:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          description: What this refund would return, in the base currency.
+        secondAuthorisationRequired:
+          type: boolean
+          description: Above the venue's `requiresSecondUserAbove`, a second person must sign.
+        approvalRequired:
+          type: boolean
+          description: The refund would wait for `approveRefund` under the venue's refund policy.
+        thresholdAmount:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          description: The policy threshold that decides either of the two above.
+        settleTo:
+          type: string
+          enum:
+          - originalTender
+          - advanceBalance
+          - wireTransfer
+          - storeCredit
+        tenderRoutes:
+          type: array
+          description: Where the money would go, one row per payment it would refund against.
+          items:
+            type: object
+            required:
+            - tender
+            - amount
+            properties:
+              paymentId:
+                type: string
+                format: uuid
+                nullable: true
+              tender:
+                $ref: '#/components/schemas/TenderKind'
+              provider:
+                type: string
+                nullable: true
+              amount:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+              tenderCurrency:
+                type: string
+                pattern: ^[A-Z]{3}$
+                nullable: true
+                description: The currency the guest paid, which a card or wallet refund goes back in (CHG-FIN-001).
+              tenderAmount:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Money
+                nullable: true
+        cashImpact:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          description: Cash a till would pay out, in the base currency; null where nothing is paid in cash.
+        notes:
+          type: array
+          description: Why each figure is what it is, in order, for the simulator's explanation panel.
+          items:
+            type: string
     PaymentProblem:
       x-ticvai-persistence: none — error shape
       allOf:
@@ -22847,6 +23095,7 @@ components:
             - consentNotGiven              # storePaymentToken
             - chargebackClosed             # respondToChargeback
             - paymentNotCleanable          # cleanupFailedPayment: captured, refunded, or the action does not fit the status
+            - cashNotOnHandheld            # createPayment: cash from a session with no till (DEC-200; CHG-CSP-039)
           balanceDue:
             allOf:
             - $ref: ../shared/common.yaml#/components/schemas/Money

@@ -1,0 +1,61 @@
+id: CHG-CSP-005
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: An outlet has its name in the local language where the country requires it, an outlet type and a department, and
+  may produce for other outlets.
+decision:
+  what: Outlet.nameTranslations (OutletNameTranslations) with RegionSettings.localLanguageNameLocales; Outlet.outletType
+    (OutletType) and departmentId; Outlet.producesForOutletIds; 422 local-name-required and outlet-not-in-venue on createOutlet
+    and updateOutlet.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026: batch 2 #26, BO-044 (Q31) "English plus the local language where the country needs it" (DI-210);
+  batch 6 set 6a, BO-729 (Q196) "Add both fields: outlet type and department (DI-319)"; batch 6 set 5, BO-134 (Q188) "Yes:
+  via a producing outlet (one kitchen outlet produces for several)" (DI-330). Decision ledger: DEC-031, DEC-196, DEC-188
+  (workbook Q31, Q196, Q188).'
+keys_touched:
+  screens:
+  - BO-044
+  - BO-729
+  - BO-134
+  - BO-113
+  operations:
+  - createOutlet
+  - updateOutlet
+  schemas:
+  - Outlet
+  - OutletType
+  - OutletNameTranslations
+  - RegionSettings
+  files:
+  - contracts/spine/tenancy.yaml
+  tickets:
+  - SVC-TENANCY-WORKSTATION-1
+  - SVC-TENANCY-WORKSTATION-3
+  - APP-SETUP-BO-044
+  - VM-BO-134
+  - VM-BO-113
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - SVC-TENANCY-WORKSTATION-1 (#17812)
+  - SVC-TENANCY-WORKSTATION-3 (#17814)
+  - APP-SETUP-BO-044 (#18010)
+  - VM-BO-134 (#18427)
+  - VM-BO-113 (#18452)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: none
+  reason: 'Planned, not yet written: check-applied-decisions (see notes). The entry stays open until the tools owner writes
+    it and registers it in run-checks; then the prevention becomes that check.'
+status: open
+notes: 'Open: Planned check check-applied-decisions (not yet written; the tools owner writes it): for every decision the
+  decisions register marks applied, each contract key the decision names exists in the named contract and its decided default
+  or enum is unchanged, so a decided behaviour cannot be dropped or reverted silently. Until it exists this entry stays
+  open. Depends on fnb KitchenStation routing to a producing outlet. Applied in worktree apply-contracts-spine (batch CSP,
+  2 October 2026). Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming
+  a touched operation or screen.'

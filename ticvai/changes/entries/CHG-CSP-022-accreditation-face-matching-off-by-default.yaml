@@ -1,0 +1,46 @@
+id: CHG-CSP-022
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: Face matching for accreditation duplicates is a venue switch, off by default, needing applicant consent and the
+  venue's legal sign-off.
+decision:
+  what: VenueSettings.biometrics.accreditationFaceMatching (isEnabled, legalSignOffReference, who and when); setVenueSettings
+    refuses 422 legal-sign-off-required; BiometricPolicy describes it.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, critical set 3, BO-631 (Q461): "Only where the venue enables it, with applicant consent and
+  the venue''s legal sign-off; off by default". ADR-0063. Decision ledger: DEC-461 (workbook Q461).'
+keys_touched:
+  screens:
+  - BO-631
+  - BO-630
+  operations:
+  - setVenueSettings
+  schemas:
+  - VenueSettings
+  - BiometricPolicy
+  files:
+  - contracts/spine/tenancy.yaml
+  - contracts/spine/access.yaml
+  tickets:
+  - SVC-TENANCY-TENANCY-1
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - SVC-TENANCY-TENANCY-1 (#17884)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: none
+  reason: 'Planned, not yet written: check-applied-decisions (see notes). The entry stays open until the tools owner writes
+    it and registers it in run-checks; then the prevention becomes that check.'
+status: open
+notes: 'Open: Planned check check-applied-decisions (not yet written; the tools owner writes it): for every decision the
+  decisions register marks applied, each contract key the decision names exists in the named contract and its decided default
+  or enum is unchanged, so a decided behaviour cannot be dropped or reverted silently. Until it exists this entry stays
+  open. Applicant consent on the application is the accreditation owner''s (AccreditationDocument). Applied in worktree
+  apply-contracts-spine (batch CSP, 2 October 2026). Tickets: none started (Block A starts Monday 5 October 2026); unstarted
+  keys are the tasks.csv keys naming a touched operation or screen.'

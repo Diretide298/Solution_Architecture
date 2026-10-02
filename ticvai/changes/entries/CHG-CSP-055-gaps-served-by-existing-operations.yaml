@@ -1,0 +1,42 @@
+id: CHG-CSP-055
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'Two Block B gaps need a binding, not a contract change: BO-037 reads each device''s package versions from tenancy
+  listDevices, and BO-1049 reads saved scenarios from catalogue listScenarioModelingWhat.'
+decision:
+  what: No contract change. RegisteredDevice already carries configurationVersion, localRuleVersion and credentialSecurityPackageVersion
+    per device (ADR-0067), and listScenarioModelingWhat lists the saved what-if scenarios.
+  by: Chinmay
+  date: '2026-10-02'
+why: Design-notes corrections on BO-037 ("The screen needs a venue-scoped read of each device's package version") and BO-1049
+  ("No read operation ... saved what-if scenarios"), logged open in CHG-WIR-027.
+keys_touched:
+  screens:
+  - BO-037
+  - BO-1049
+  operations:
+  - listDevices
+  - listScenarioModelingWhat
+  files:
+  - contracts/spine/tenancy.yaml
+  - contracts/spine/catalogue.yaml
+  tickets:
+  - SVC-TENANCY-WORKSTATION-1
+  - VM-BO-037
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - SVC-TENANCY-WORKSTATION-1 (#17812)
+  - VM-BO-037 (#18280)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Open until the screens branch binds the two reads. Applied in worktree apply-contracts-spine (batch CSP, 2 October
+  2026). Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched
+  operation or screen.'

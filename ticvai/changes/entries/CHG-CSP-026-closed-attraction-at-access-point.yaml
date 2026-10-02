@@ -1,0 +1,46 @@
+id: CHG-CSP-026
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: An access point whose attraction is temporarily closed denies with the reopening time and offers a virtual-queue
+  return window where enabled.
+decision:
+  what: AccessPoint.temporaryClosure (isClosed, reason, reopensAt, offerVirtualQueueReturn, queueId), set by updateAccessPoint;
+    ValidationResult.denyCause attractionTemporarilyClosed with reopensAt and queueReturnOffer; travels offline.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 6 set 9, BO-147 (Q228): "Deny + reopening time + a virtual-queue return window where
+  enabled". Decision ledger: DEC-228 (workbook Q228).'
+keys_touched:
+  screens:
+  - BO-147
+  operations:
+  - updateAccessPoint
+  - validateAccess
+  schemas:
+  - AccessPoint
+  - ValidationResult
+  flows:
+  - F06
+  files:
+  - contracts/spine/access.yaml
+  tickets:
+  - SVC-ACCESS-ACCESSPOINT-2
+  - VM-ACCESS-VALIDATION-1
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - SVC-ACCESS-ACCESSPOINT-2 (#17876)
+  - VM-ACCESS-VALIDATION-1 (#18384)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-flows.py
+status: open
+notes: 'Open: the prevention is F06''s closed-attraction branch (DEC-228 hint), flows owner. denyCause is a new response
+  field because a new DenyReason value is a breaking change against r1. Applied in worktree apply-contracts-spine (batch
+  CSP, 2 October 2026). Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys
+  naming a touched operation or screen.'

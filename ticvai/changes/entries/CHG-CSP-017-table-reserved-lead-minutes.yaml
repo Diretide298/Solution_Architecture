@@ -1,0 +1,40 @@
+id: CHG-CSP-017
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: A venue sets how many minutes before a pre-allocated booking its table shows Reserved.
+decision:
+  what: VenueSettings.fnb.tableReservedLeadMinutes (default 30, client to correct).
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 6 set 6b, EMP-052 (Q202): "Reserved when a booking names the table, or N minutes (venue-set)
+  before a pre-allocated booking" (DI-689, DI-336). Decision ledger: DEC-202 (workbook Q202).'
+keys_touched:
+  screens:
+  - EMP-052
+  - POS-028
+  operations:
+  - setVenueSettings
+  schemas:
+  - VenueSettings
+  files:
+  - contracts/spine/tenancy.yaml
+  tickets:
+  - SVC-TENANCY-TENANCY-1
+  - APP-POS-POS-028
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - SVC-TENANCY-TENANCY-1 (#17884)
+  - APP-POS-POS-028 (#17981)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-config-scope.py
+status: open
+notes: 'Open: states/table.yaml (reserved by lead time) and fnb TableReservation belong to the fnb owner; the decision is
+  whole when they read this setting. Applied in worktree apply-contracts-spine (batch CSP, 2 October 2026). Tickets: none
+  started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched operation or screen.'

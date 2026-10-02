@@ -1,0 +1,52 @@
+id: CHG-CSP-031
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: A permanent lock, a whitelist entry and releasing a full-identity or permanent lock wait for a second approver;
+  an until-end-of-day lock does not.
+decision:
+  what: lockIdentity (permanent), releaseIdentityLock (fullIdentity or permanent) and addBlacklistEntry (new listType whitelist)
+    answer 202 with AccessPendingSecondApproval and act when approved (approvals kind accessPermissionChange); addBlacklistEntry
+    gains listType and disableScope; states/access-identity-lock.yaml open question closed.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, critical set 1, BO-229 (Q254): "Second approver for permanent locks, whitelist, and releasing
+  identity/permanent locks; none for ''until end of day''"; BO-247 (Q260): "As BO-229". Decision ledger: DEC-254, DEC-260
+  (workbook Q254, Q260).'
+keys_touched:
+  screens:
+  - BO-229
+  - BO-247
+  - BO-033
+  operations:
+  - lockIdentity
+  - releaseIdentityLock
+  - addBlacklistEntry
+  schemas:
+  - AccessPendingSecondApproval
+  - ApprovalKind
+  files:
+  - contracts/spine/access.yaml
+  - contracts/spine/approvals.yaml
+  - states/access-identity-lock.yaml
+  tickets:
+  - SVC-ACCESS-ACCESSPOINT-1
+  - APP-SETUP-BO-033
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - SVC-ACCESS-ACCESSPOINT-1 (#17875)
+  - APP-SETUP-BO-033 (#17918)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: none
+  reason: 'Planned, not yet written: check-four-eyes (see notes). The entry stays open until the tools owner writes it and
+    registers it in run-checks; then the prevention becomes that check.'
+status: open
+notes: 'Open: the prevention is a four-eyes check that every act a decision names as needing a second approver declares
+  the 202 hold and an approvals kind, and the approver differs from the requester (DEC-254 hint), not yet written. Applied
+  in worktree apply-contracts-spine (batch CSP, 2 October 2026). Tickets: none started (Block A starts Monday 5 October
+  2026); unstarted keys are the tasks.csv keys naming a touched operation or screen.'

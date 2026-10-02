@@ -1,0 +1,44 @@
+id: CHG-CSP-008
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: 'Region settings say which billing-entity documents are mandatory: a trade licence always, a VAT certificate when
+  a TRN is entered, configurable per country.'
+decision:
+  what: RegionSettings.requiredBillingDocuments (documentType, requiredWhen always or trnEntered), defaulting to the two
+    rows.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 6 set 7, ADM-411 (Q210): "Trade licence always; VAT certificate when a TRN is entered;
+  configurable per country". Decision ledger: DEC-210 (workbook Q210).'
+keys_touched:
+  screens:
+  - ADM-411
+  operations:
+  - updateRegionSettings
+  - getRegionSettings
+  schemas:
+  - RegionSettings
+  files:
+  - contracts/spine/tenancy.yaml
+  tickets:
+  - SVC-TENANCY-REGION-1
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - SVC-TENANCY-REGION-1 (#17808)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: none
+  reason: 'Planned, not yet written: check-applied-decisions (see notes). The entry stays open until the tools owner writes
+    it and registers it in run-checks; then the prevention becomes that check.'
+status: open
+notes: 'Open: Planned check check-applied-decisions (not yet written; the tools owner writes it): for every decision the
+  decisions register marks applied, each contract key the decision names exists in the named contract and its decided default
+  or enum is unchanged, so a decided behaviour cannot be dropped or reverted silently. Until it exists this entry stays
+  open. Depends on the subscription contract (PartnerDocument, billing entity) reading the list. Applied in worktree apply-contracts-spine
+  (batch CSP, 2 October 2026). Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv
+  keys naming a touched operation or screen.'

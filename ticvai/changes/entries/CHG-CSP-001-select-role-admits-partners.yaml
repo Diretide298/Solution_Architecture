@@ -1,0 +1,38 @@
+id: CHG-CSP-001
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: identity.selectRole admits the partner audience, so a partner user with several roles can pick one at PTR-001.
+decision:
+  what: Add partner to x-ticvai-audience of selectRole (additive); the request and response are unchanged.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Door follow-ups of 2 October 2026 (Chinmay: "Yes, add partner"), after the door fixes (CHG-DOOR-003) left PTR-001
+  Partner Login / MFA calling selectRole while its audience named staff only: a partner with two partner roles was refused
+  at the door. Same class as CHG-SEED-006 (council of 2 October: typed audience property).'
+keys_touched:
+  screens:
+  - PTR-001
+  operations:
+  - selectRole
+  files:
+  - contracts/spine/identity.yaml
+  tickets:
+  - SVC-IDENTITY-IDENTITY-3
+root_class: 'new: audience-mismatch'
+tickets:
+  started: []
+  unstarted:
+  - SVC-IDENTITY-IDENTITY-3 (#17934)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-audience-match.py
+status: closed
+closed_by_commit: '22490530'
+notes: 'check-audience-match is report-only until the lead records its baseline (run-checks REPORT_ONLY); it reports a partner
+  screen calling an operation whose audience excludes partner. Tickets from tasks.csv. Applied in worktree apply-contracts-spine
+  (batch CSP, 2 October 2026). Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv
+  keys naming a touched operation or screen.'
