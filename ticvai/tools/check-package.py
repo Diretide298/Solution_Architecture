@@ -746,6 +746,20 @@ def main() -> int:
                 "tools", "handoff", "sources")
     repos = ROOT / "repos"
     if repos.is_dir():
+        # **A file git ignores at the root is not mirrored, so it cannot be out of sync.**
+        # tools/derive-mirrors.py has skipped them since 1 October (the 24 MB guest build and the
+        # design videos under sources/designs/ would otherwise land, untracked, in six repos), and
+        # this rule did not: a refresh-safe worktree hydrates those ten files as inputs, the mirror
+        # step correctly left them out, and this reported every mirror "out of sync (10 file(s))".
+        # The same `git ls-files --ignored` question, asked the same way, so the two cannot drift.
+        import subprocess as _sp
+        try:
+            _out = _sp.run(["git", "-C", str(ROOT), "ls-files", "--others", "--ignored",
+                            "--exclude-standard", "-z", "--", *mirrored],
+                           capture_output=True, check=True).stdout
+            not_mirrored = {Path(p) for p in _out.decode("utf-8", "replace").split("\0") if p}
+        except (OSError, _sp.CalledProcessError):
+            not_mirrored = set()
         bibles = [d for d in ((repos / "ticvai-docs"),) if d.is_dir()]
         bibles += [r / "project-bible" for r in sorted(repos.iterdir())
                    if (r / "project-bible").is_dir()]
@@ -757,6 +771,8 @@ def main() -> int:
                     continue
                 for f in s_dir.rglob("*"):
                     if not f.is_file() or "__pycache__" in f.parts:
+                        continue
+                    if f.relative_to(ROOT) in not_mirrored:
                         continue
                     t = b / f.relative_to(ROOT)
                     if not t.exists() or t.read_bytes() != f.read_bytes():
@@ -1483,6 +1499,15 @@ def main() -> int:
     import re as _re
     real_codes = {yaml.safe_load(f.read_text(encoding="utf-8"))["platform"]["code"]
                   for f in (ROOT / "screens").glob("P*.yaml")}
+    # **A platform code is a number in the platform series, not any `P` and two digits.** The
+    # series is P01 to the highest code a screens file declares (P17 today); a gap inside it is a
+    # retired code (P03, the kiosk before it became P05) and is exactly what this rule is for.
+    # A number past the series was never a platform: on 1 October the design-handoff exporter
+    # (tools/design_spec.py) wrote latency percentiles -- "P50 latency ms", "P95 latency ms",
+    # "P99 latency ms", "P95 minutes" -- into the batch BUNDLE.md files and this rule failed the
+    # package nine times on them. Reading the series from screens/ keeps the bound honest: a
+    # P18 added tomorrow widens it by itself.
+    top_code = max(int(c[1:]) for c in real_codes)
     for f in list(ROOT.rglob("*.md")) + list((ROOT / "contracts").rglob("*.yaml")):
         # **`sources/` is what the client sent and is never edited.** It also contains the
         # only document that explains the gap this rule is about: the 7 September design note
@@ -1495,7 +1520,8 @@ def main() -> int:
             text = f.read_text(encoding="utf-8")
         except Exception:  # noqa: BLE001
             continue
-        for code in sorted(set(_re.findall(r"\bP\d\d\b", text)) - real_codes):
+        named = {c for c in _re.findall(r"\bP\d\d\b", text) if 1 <= int(c[1:]) <= top_code}
+        for code in sorted(named - real_codes):
             ERRORS.append(f"{f.name}: names platform code {code}, which no screen file defines")
 
     # 9. every operation declares how it is authenticated

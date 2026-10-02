@@ -192,6 +192,16 @@ python3 tools/build-service-docs.py
 # calendar, app-modules and scheduler shared with build-service-docs.py (tools/sprint_plan.py). The deck and
 # "TICVAI - Sprint Plan.xlsx" (tools/build-plan-deck.py) are still run by hand after a refresh.
 python3 tools/derive-block-a-schedule.py
+# **The ticket text, from the tasks and the schedule just written** (2 October). check-ticket-text and
+# check-ddl-conventions (D-MIG-TABLES) read handoff/service-docs/op-descriptions.json against the screens,
+# the contracts and backend/MIGRATIONS.md -- all of them rebuilt above -- and nothing in this script rebuilt
+# it: the tool passed the coverage block below only because its name is inside fix-audit-op-descriptions.
+# So every screen or slice change failed the gate on text nobody had regenerated: on 1 October the POS v2
+# screens (POS-028/030/031) left 15 ticket-text findings, and the slice's new tables (orders' group and
+# reservation tables, workforce.attendance) left MIG-ORDERS and MIG-WORKFORCE listing fewer tables than
+# MIGRATIONS.md. The r1 run earlier that day had failed the same way and was fixed by running this by hand.
+# Writes the local file only; tools/op-descriptions.rb applies it on the OpenProject server, per release.
+python3 tools/op-descriptions.py --schedule handoff/service-docs/block-a-schedule.json
 # How the tickets are linked: layers, services, module builds, reports (handoff/service-docs/TICKET-LINKS.md).
 python3 tools/build-ticket-links.py
 # **The client questions, flagged by what the first release needs** (23 September). Reads the
