@@ -427,25 +427,26 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: textField
+      - kind: selectField
         label: Status
         operation: listCases
-        notes: Sends `?status=` to `listCases`.
+        notes: 'Sends `?status=`: a choice of the case statuses, never typed.'
         provenance: contract marketing-crm.yaml GET /cases
-      - kind: textField
-        label: Assigned to principal id
+      - kind: selectField
+        label: Assigned to
         operation: listCases
-        notes: Sends `?assignedToPrincipalId=` to `listCases`.
+        notes: 'Sends `?assignedToPrincipalId=`: "Me" first, then the agents by name; nobody types a principal
+          id.'
         provenance: contract marketing-crm.yaml GET /cases
       - kind: toggle
-        label: Breached sla
+        label: Breached SLA only
         operation: listCases
         notes: Sends `?breachedSla=` to `listCases`.
         provenance: contract marketing-crm.yaml GET /cases
-      - kind: textField
+      - kind: selectField
         label: Priority
         operation: listCases
-        notes: Sends `?priority=` to `listCases`.
+        notes: 'Sends `?priority=`: a choice of the case priorities.'
         provenance: contract marketing-crm.yaml GET /cases
       - kind: dataTable
         label: Every case
@@ -558,12 +559,12 @@ screens:
         operation: setAgentAvailability
         provenance: contract marketing-crm.yaml PUT /agent-availability
   states:
-    loading: The agent list.
-    error: Could not load. Names which read failed and leaves the agent untouched.
-    emptyFirstRun: No agent yet. Offers Add case message (`addCaseMessage`); distinct from a filter that
-      matched nothing.
-    emptyNoResults: Nothing matches the filter on status, assignedToPrincipalId, breachedSla, priority
-      and the agent are still there. Names the active filter and offers to clear it.
+    loading: The cases assigned to you, SLA breaches first.
+    error: Could not load. Names which read failed (cases or conversations) and leaves the other on screen.
+    emptyFirstRun: 'No cases assigned to you: you are available for new work. Offers Create case (`createCase`)
+      for a contact that arrives outside the queue; distinct from a filter that matched nothing.'
+    emptyNoResults: Nothing matches the status, assignee, priority or SLA filter, and the cases are still
+      there. Names the active filter and offers to clear it.
     emptyNoAccess: Shown when the caller lacks `CASE_VIEW`, which `listCases` requires, and names that
       permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support
       with the wrong question.

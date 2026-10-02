@@ -1,0 +1,44 @@
+id: CHG-SOT-017
+date: '2026-10-02'
+source: client-review
+kind: spec
+summary: SGN-020 saves the billing entity on the onboarding application instead of calling a staff ledger operation, and stops
+  being a copy of ADM-411.
+decision:
+  what: 'SGN-020: billing entity fields (legal name, country, trade licence, TRN, address, invoice email, documents) sent
+    with submitOnboardingApplication; createLegalEntity removed with its consumed-by line; source.sameAs ADM-411 removed,
+    because the staff twin calls setBillingEntity and the two can no longer be one copy.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 6 set 7 (ADM-411, workbook Q209): "A new billing-entity record in the subscription contract";
+  set 9 (SGN-020, Q223): "Yes: saved on the application; nothing provisioned until verified"; Q210 default (trade licence
+  always, VAT certificate with a TRN). Decision ledger DEC-209, DEC-210, DEC-223; contract CHG-CSA-030; design-note correction
+  finance-insights SGN-020.'
+keys_touched:
+  screens:
+  - SGN-020
+  - ADM-411
+  operations:
+  - submitOnboardingApplication
+  - createLegalEntity
+  schemas:
+  - BillingEntity
+  - OnboardingApplication
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-design-notes.py
+notes: 'getBillingEntity and setBillingEntity are staff operations for ADM-411 (screens-p08-p09). check-screens holds P17
+  copies to their P09 twins (source.sameAs); tools/applied/apply-subscription-placement.py must not re-copy board 5.3 onto
+  SGN-020 (tools owner). The other P17 Block B corrections (empty states on SGN-001/003/004/006-015/022, the SGN-003 venue-type
+  choice) are NOT applied here: those screens are copies of ADM-379..414 on P09, so the fix belongs on the ADM twins (screens-p08-p09),
+  then the placement tool re-copies it. The prospect-audience, document-upload and amend-application gaps are in CHG-SOT-016.
+  Batch SOT (screens-other, phase B), 2 October 2026; worktree D:/wt/screens-other, branch screens-other. Tickets: none started
+  (Block A starts Monday 5 October 2026). Closed by the next commit once this one has a hash.'
+status: open

@@ -1918,7 +1918,6 @@ screens:
   requiresModule: core
   wave: 3
   source:
-    sameAs: ADM-411
     book: Subscription_Licensing_AI_Self_Service.pdf
     board: '5'
     number: '3'
@@ -1935,59 +1934,105 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P17 TICVAI Sign-up.dc.html#sgn-020
-  purpose: Capture the legally correct customer and billing information.
-  pattern: listDetail
-  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
-    display directory, no configuration directory. It falls to the default, and the fallback is recorded
-    rather than passed off as a decision'
+  purpose: Capture the company TICVAI will invoice and its trade licence and tax registration, in plain
+    language, saved on the application.
+  pattern: configEditor
+  patternReason: One record (the billing entity) entered and saved on the application; no population to
+    list (CHG-SOT-017).
   layout:
-    template: split
+    template: form
     regions:
+    - name: contentBody
+      slot: fields
+      components:
+      - kind: textField
+        label: Company to be invoiced (legal name)
+        bindsTo: BillingEntity.legalName
+        operation: submitOnboardingApplication
+        notes: Prints on the tax invoice exactly as entered. **The commercial customer may differ from
+          the operating venue** (the pack's "Commercial Customer ≠ Operating Venue").
+        provenance: contract subscription.yaml BillingEntity (CHG-CSA-030)
+      - kind: selectField
+        label: Country
+        bindsTo: BillingEntity.countryCode
+        operation: submitOnboardingApplication
+        notes: Decides which documents are required (tenancy `RegionSettings`).
+        provenance: contract subscription.yaml BillingEntity (CHG-CSA-030)
+      - kind: textField
+        label: Trade licence number
+        bindsTo: BillingEntity.tradeLicenceNumber
+        operation: submitOnboardingApplication
+        provenance: contract subscription.yaml BillingEntity (CHG-CSA-030)
+      - kind: textField
+        label: Tax registration number (TRN)
+        bindsTo: BillingEntity.trn
+        operation: submitOnboardingApplication
+        notes: Optional. Entering one makes the VAT certificate required (decided 2 October 2026, workbook
+          Q210, DEC-210).
+        provenance: contract subscription.yaml BillingEntity (CHG-CSA-030)
+      - kind: textField
+        label: Billing address
+        bindsTo: BillingEntity.address
+        operation: submitOnboardingApplication
+        provenance: contract subscription.yaml BillingEntity (CHG-CSA-030)
+      - kind: textField
+        label: Invoice email
+        bindsTo: BillingEntity.invoiceEmail
+        operation: submitOnboardingApplication
+        provenance: contract subscription.yaml BillingEntity (CHG-CSA-030)
+      - kind: detailPanel
+        label: Documents required
+        bindsTo: BillingEntity.documents
+        columns:
+        - BillingEntity.documents
+        - BillingEntity.missingDocuments
+        operation: submitOnboardingApplication
+        notes: A trade licence always; a VAT certificate when a TRN is entered. Each shows missing, uploaded,
+          verified, rejected or expired. **Nothing is provisioned until verification passes** (DEC-223).
+        provenance: contract subscription.yaml BillingEntity.documents (CHG-CSA-030)
     - name: actionBar
-      slot: rowActions
+      slot: publish
       components:
       - kind: primaryButton
-        label: Commercial Customer ≠ Operating Venue
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 60 §Allow
+        label: Save and continue
+        operation: submitOnboardingApplication
+        notes: 'Sends the application with `billingEntity` (decided 2 October 2026, Chinmay, workbook
+          Q209 and Q223: "Yes: saved on the application; nothing provisioned until verified"; DEC-209,
+          DEC-223, CHG-CSA-030).'
+        provenance: contract subscription.yaml POST /onboarding-applications
       - kind: secondaryButton
-        label: Validate Entity / Save / Continue
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 60 §Actions
-    - name: contentBody
-      components: []
+        label: Back
+        notes: Leaves without sending; what was typed stays on the sign-up session.
+        provenance: derived
   states:
-    loading: The billing legal entity list.
-    error: Could not load. Names which read failed and leaves the billing legal entity untouched.
-    emptyFirstRun: No billing legal entity yet. Carries the create action; distinct from a filter that
-      matched nothing.
-    emptyNoResults: The filter narrowed it and the billing legal entity are still there. Names the active
-      filter and offers to clear it.
-    emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
-      wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on
-      2.1, which is where somebody without access to a saved setup would be sent; no minute has decided
-      it.
+    loading: The application as saved so far.
+    error: Could not save. Names what failed; nothing typed is lost.
+    emptyFirstRun: Nothing entered yet. Says why each item is asked (it prints on the tax invoice) and
+      that nothing is provisioned until it is verified. The prospect's answers are kept on their sign-up
+      session and they can come back with a one-time code to "Continue saved setup" (decided 2 October
+      2026, DEC-167).
+    emptyNoAccess: 'Not applicable: a prospect holds no permission. A signed-out prospect without a saved
+      setup is sent to SGN-001 to start or continue one.'
   gaps:
+  - operation: createLegalEntity
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-SOT-017, design-notes correction SGN-020): `createLegalEntity` is
+      a tenant-scoped, staff-only ledger operation needing ACCOUNT_CONFIGURE, and a prospect on P17 has
+      no tenant and no cell. The billing entity rides on the onboarding application instead (CHG-CSA-030);
+      TICVAI staff maintain it on ADM-411 with `setBillingEntity`.'
+    source: contracts/spine/finance.yaml#createLegalEntity | contracts/satellite/subscription.yaml#submitOnboardingApplication
   - operation: null
-    why: '**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved:
-      Commercial Customer ≠ Operating Venue, Validate Entity / Save / Continue. Each needs an operation,
-      or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
-      rather than the contract side.'
-    source: pack Subscription_Licensing_AI_Self_Service.pdf, page 60 §Allow
-  - operation: null
-    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
-      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
-      in them. The screen has no content region rather than an empty one, and it needs a person before
-      it is built.'
-    source: pack Subscription_Licensing_AI_Self_Service.pdf, page 60
-  - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
-    source: pack Subscription_Licensing_AI_Self_Service.pdf, page 60
+    why: '**No public upload for the trade licence and VAT certificate, and no operation amends a submitted
+      application.** `createUpload` is staff-only, and the application is created once (SGN-002), so the
+      billing entity and its documents cannot be added from here after it is submitted. Logged as contract
+      gaps 2 October 2026 (CHG-SOT-016).'
+    source: contracts/satellite/assets.yaml#createUpload | contracts/satellite/subscription.yaml#submitOnboardingApplication
   apis:
-  - operationId: createLegalEntity
-    contract: finance
-    purpose: Billing and legal entity
+  - operationId: submitOnboardingApplication
+    contract: subscription
+    purpose: The billing entity rides on the onboarding application, saved before verification (DEC-223)
     trigger: onAction
-    provenance: board reading, 19 September 2026
+    provenance: decided 2 October 2026 (DEC-209, DEC-223, CHG-CSA-030); bound by CHG-SOT-017
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 60. 0 of
     0 labels bound to a contract property; 2 of 21 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
@@ -2007,6 +2052,10 @@ screens:
     - to: SGN-021
       trigger: Payment Method & Settlement Setup
       provenance: structural — the book's own journey, 2.1 "Journey Preview", 11 September 2026
+  sourceNote: '**No longer a copy of ADM-411** (2 October 2026, CHG-SOT-017). Chinmay decided the billing
+    entity rides on the onboarding application for a prospect (workbook Q223, DEC-223) while TICVAI staff
+    maintain it on ADM-411 with setBillingEntity (Q209, DEC-209), so the two screens call different operations
+    and `source.sameAs` would force them back together. The pack anchor (board 5.3) is kept.'
 - id: SGN-021
   name: Payment Method & Settlement Setup
   module: Purchase & Activation

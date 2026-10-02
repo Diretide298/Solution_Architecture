@@ -1,0 +1,40 @@
+id: CHG-SOT-002
+date: '2026-10-02'
+source: client-review
+kind: spec
+summary: 'F108 carries the pay-first branch: at an outlet whose payment timing is Pay first, the guest pays before anything
+  reaches the kitchen.'
+decision:
+  what: Step 3 says send-then-charge is the default; a branch at step 3 walks Outlet.paymentTiming payFirst (createFnbOrder
+    creates no kitchen tickets until the payment is captured).
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 1 (POS-021, workbook Q64): "Two configurations: one takes the bill (payment) first, the
+  other sends first and charges after"; refines audit R261 per outlet. Decision ledger DEC-064; contract CHG-CSA-010, CHG-CSP-004;
+  registers CHG-DOC-013.'
+keys_touched:
+  flows:
+  - F108
+  screens:
+  - POS-021
+  - POS-022
+  - BO-044
+  operations:
+  - createFnbOrder
+  schemas:
+  - OutletPaymentTiming
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-021 (#18004)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-flows.py
+notes: 'Closes the F108 dependency named in CHG-CSA-010, CHG-CSP-004 and CHG-DOC-013. Batch SOT (screens-other, phase B),
+  2 October 2026; worktree D:/wt/screens-other, branch screens-other. Tickets: none started (Block A starts Monday 5 October
+  2026). Closed by the next commit once this one has a hash.'
+status: open

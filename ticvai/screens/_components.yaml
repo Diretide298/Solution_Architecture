@@ -463,3 +463,23 @@ patterns:
     notes: >
       Lives in `statusStrip` on every offline-capable surface. A cashier needs to know at a
       glance whether their last twenty sales have reached the server.
+  - id: accreditationReview
+    description: >
+      **One reviewer queue and one reviewer workspace for accreditation, used in both apps** (decided 2
+      October 2026, Chinmay, workbook Q368: "One queue and workspace component used in both P11 and P08";
+      DEC-368, CHG-SOT-018). The queue lists the applications waiting on a decision for the reviewer's
+      programmes, due first, with the requirement and document states as row signals; the workspace shows
+      one application with the photo against the ID document, each document and its verification, the
+      venue's history with the person and the decision due date, and decides it (approve, refuse, return for
+      information, escalate).
+    components: [dataTable, detailPanel, banner, primaryButton, destructiveButton, textField]
+    usedBy:
+      queue: [ACC-006, BO-635]
+      workspace: [ACC-007, BO-636]
+    notes: >
+      **Built once.** The P11 reviewer screens and the P08 accreditation board render the same component
+      against the same operations (`listAccreditationApplications`, `getAccreditationApplication`,
+      `listAccreditationDocuments`, `verifyAccreditationDocument`, `decideAccreditationApplication`), so a
+      fix to one is a fix to both. Approval is offered only when nothing that blocks it is unresolved, and
+      every refusal carries a reason the applicant will read. Two copies drift, and a reviewer who works
+      in both apps notices first.

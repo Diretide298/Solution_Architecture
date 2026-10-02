@@ -5241,9 +5241,13 @@ screens:
       why: The client's dashboard specification describes the canvas in detail (grid, gallery, data pane, field
         wells, formatting).
       source: screens/P16-venue-analytics.yaml#ANL-023 | MATRIX 8.7.12
+      status: fixed
+      by: CHG-SOT-010
     - what: No undo or redo, and no draft or version of a dashboard.
       why: Every save overwrites the live dashboard; the client spec asks for draft, preview, publish and rollback.
       source: MATRIX 7.1.46 | contracts/satellite/reporting.yaml#updateDashboard
+      status: logged
+      by: CHG-SOT-016
     decisions:
     - question: Which visuals ship bindable in the first release?
       decision: Build all chart types, including the nine complex ones.
@@ -5401,18 +5405,26 @@ screens:
         ↓", "Gate Rejection Rate ↓", "Queue Time ↓" are drawn as fields.'
       why: Direction is one yes/no; the arrows are the pack's examples, not inputs.
       source: screens/P16-venue-analytics.yaml#ANL-025 | contracts/satellite/reporting.yaml#/components/schemas/KpiDefinition
+      status: fixed
+      by: CHG-SOT-012
     - what: Currency, decimal precision, measure, aggregation, data source, effective date and status are drawn
         as KPI fields.
       why: None is on the KPI definition; currency and decimals follow the region, the rest live in the formula
         and the active flag.
       source: contracts/satellite/reporting.yaml#/components/schemas/KpiDefinition
+      status: fixed
+      by: CHG-SOT-012
     - what: The gap says the screen declares no write operation.
       why: It declares the create operation; the gap is stale. There is no update or retire operation for a KPI,
         so a mistake cannot be corrected.
       source: screens/P16-venue-analytics.yaml#ANL-025 | contracts/satellite/reporting.yaml#createKpi
+      status: logged
+      by: CHG-SOT-016
     - what: The catalogue has no finance measures (gross sales, net revenue, refunds, tax).
       why: The KPIs every finance and executive board needs cannot be expressed until those measures exist.
       source: contracts/satellite/reporting.yaml#/components/schemas/MetricSource
+      status: fixed
+      by: CHG-FIN-007
   ANL-026:
     summary: 'Where a KPI''s target and its Warning and Critical bands are set, so every dashboard shows the same
       status for the same number. A target is per scope (tenant, region, venue) and per period. The thing to get
@@ -7998,10 +8010,14 @@ screens:
       why: The semantic model is fully described (domains, datasets, grain, fields, relationships); the columns
         can be bound.
       source: screens/P16-venue-analytics.yaml#ANL-066 | contracts/satellite/reporting.yaml#/components/schemas/SemanticModel
+      status: fixed
+      by: CHG-SOT-012
     - what: There is no certification, owner or lineage on a dataset or field.
       why: The client spec asks for certified badges with owner, glossary and lineage; the model has none of these
         fields.
       source: contracts/satellite/reporting.yaml#/components/schemas/SemanticModel
+      status: logged
+      by: CHG-SOT-016
   ANL-067:
     summary: 'Watches data moving from operations into analytics so stale or failed data is caught before anyone
       decides on it. The thing to get right: name what is affected ("Ticketing dataset delayed - affects Revenue
@@ -8197,6 +8213,8 @@ screens:
         billing record.
       source: contracts/spine/finance.yaml#createLegalEntity | screens/P09-platform-admin-console.yaml#ADM-411 |
         contracts/satellite/subscription.yaml#submitOnboardingApplication
+      status: fixed
+      by: CHG-SOT-017
     decisions:
     - question: Is the billing entity saved on the onboarding application (public) before verification?
       decision: 'Drawn default stands (answer: "Yes: saved on the application; nothing provisioned until verified"): Yes;

@@ -456,6 +456,7 @@ paths:
         - "P08 BO-262 Access Reports, Scheduled Reporting & Data Export"
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
+        - "P16 ANL-023 Drag-and-Drop Dashboard Canvas"
         - "P16 ANL-031 Report Catalogue & Library"
       x-ticvai-api-scope: analytics.read
       x-ticvai-audience:
@@ -582,6 +583,7 @@ paths:
         - "P08 BO-060 Attendance & Footfall"
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
+        - "P16 ANL-023 Drag-and-Drop Dashboard Canvas"
       x-ticvai-api-scope: analytics.read
       x-ticvai-audience:
       - staff
@@ -2085,6 +2087,7 @@ paths:
         - "P16 ANL-017 Customer, Membership & Loyalty Pulse"
         - "P16 ANL-057 Forecasting & Predictive Analytics Studio"
         - "P16 ANL-063 KPI Targets, Thresholds & Scorecards"
+        - "P16 ANL-072 Finance Dashboard"
       summary: Current values, against target, with movement
       description: 'BI boards 1 and 10.3. **The scorecard read.** Value, target, variance, direction and
         freshness in one call — a dashboard assembling those from four places will render three of them

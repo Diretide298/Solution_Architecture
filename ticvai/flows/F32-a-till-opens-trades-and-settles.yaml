@@ -120,11 +120,15 @@ branches:
     behaviour: >
       The blind count is submitted (`submitShiftCount`, which shows the cashier no figure; CHG-FIN-003)
       and the shift waits in `pendingVariance` while the supervisor is alerted. **A supervisor accepts the
-      variance on the till with `acceptShiftVariance`** (OVERSHORT_ACCEPT, PIN step-up). That is the
-      only path: no approval request is raised and nothing holds the close for a Duty Manager PIN
-      beforehand (decided 28 September, audit R080 (e)).
+      variance with `acceptShiftVariance`** (OVERSHORT_ACCEPT, PIN step-up): no approval request is
+      raised and nothing holds the close for a Duty Manager PIN beforehand (decided 28 September, audit
+      R080 (e)). **Since 2 October the supervisor may do it at any till of the venue or in the daily
+      cash reconciliation (BO-043)**, or reject it so the cashier recounts (`rejectShiftVariance`); the
+      cashier may sign out meanwhile, the shift shows "Under review", and **it never blocks the next
+      cashier opening a shift on that till** (decided 2 October 2026, Chinmay, DEC-059, DEC-173,
+      DEC-175; CHG-CSP-012, CHG-CSP-013). F74 walks the day this feeds.
     severity: high
-    resolvedBy: acceptShiftVariance
+    resolvedBy: acceptShiftVariance, or rejectShiftVariance and a recount
 
   - at: 6
     condition: The cashier's shift ends and the till stays open for the next one.

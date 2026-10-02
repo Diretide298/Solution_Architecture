@@ -1,0 +1,35 @@
+id: CHG-SOT-018
+date: '2026-10-02'
+source: client-review
+kind: spec
+summary: One accreditation review queue and one reviewer workspace component, shared by P11 (ACC-006, ACC-007) and P08 (BO-635,
+  BO-636), is recorded in the component library.
+decision:
+  what: Add the accreditationReview pattern to screens/_components.yaml (queue and workspace, usedBy ACC-006/BO-635 and ACC-007/BO-636);
+    ACC-006 and ACC-007 name it.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, critical set 3 (ACC-006, workbook Q368): "One queue and workspace component used in both P11
+  and P08". Decision ledger DEC-368; DI-671; TRACKER Actions row 247.'
+keys_touched:
+  screens:
+  - ACC-006
+  - ACC-007
+  - BO-635
+  - BO-636
+  files:
+  - screens/_components.yaml
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: template-field
+  ref: screens/_components.yaml::accreditationReview
+notes: 'Cross-file (screens-p08-p09): BO-635 and BO-636 name the same pattern. The ACC-006/007 corrections are Block D and
+  stay open. Batch SOT (screens-other, phase B), 2 October 2026; worktree D:/wt/screens-other, branch screens-other. Tickets:
+  none started (Block A starts Monday 5 October 2026). Closed by the next commit once this one has a hash.'
+status: open

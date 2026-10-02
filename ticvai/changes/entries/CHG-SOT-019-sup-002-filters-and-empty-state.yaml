@@ -1,0 +1,33 @@
+id: CHG-SOT-019
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: The agent dashboard (SUP-002) filters by status, assignee and priority as choices, and its empty state says the agent
+  is available for new work.
+decision:
+  what: Status, Assigned to (Me first, agents by name) and Priority become select fields; emptyFirstRun "No cases assigned
+    to you - you are available for new work", with Create case.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Design-notes corrections customer-marketing SUP-002 (0: "An agent cannot type a principal id; these are choices"; 1:
+  the empty state was pattern text): each a process-agent finding of 1-2 October 2026, recorded as a design-note correction.
+  Chinmay, 2 October: apply the open corrections on Block A screens (phase B).'
+keys_touched:
+  screens:
+  - SUP-002
+  operations:
+  - listCases
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-SUP-002 (#18187)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-design-notes.py
+notes: 'Block A. Batch SOT (screens-other, phase B), 2 October 2026; worktree D:/wt/screens-other, branch screens-other. Tickets:
+  none started (Block A starts Monday 5 October 2026). Closed by the next commit once this one has a hash.'
+status: open
