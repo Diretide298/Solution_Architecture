@@ -550,8 +550,8 @@ screens:
     - what: The offline state text speaks of "an erasure request", copied from a privacy screen.
       why: This screen has no erasure action; the text should speak of device sign-out and two-step changes.
       source: screens/P02-guest-mobile-app.yaml#GST-073
-      status: fixed
-      by: CHG-SGU-019
+      status: logged
+      by: CHG-SGU-025
     - what: getMyIdentityVerification and submitGuestIdentityDocument are declared but no component uses them.
       why: Either an ID-verification card belongs here (with its upload) or the declarations are residue.
       source: screens/P02-guest-mobile-app.yaml#GST-073

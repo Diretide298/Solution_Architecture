@@ -1,0 +1,90 @@
+id: CHG-SGU-022
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: The CMS workspace, brand, typography, theme, page, banner, translation, preview, publishing, version and settings
+  screens stop dumping TenantConfig and sending read-only fields, and the guest maintenance, contact and language screens
+  read the published configuration.
+decision:
+  what: 'Apply the open white-label corrections on CMS-001 to CMS-016, CMS-101, WEB-028, WEB-029, GST-043 and GST-047:
+    status header and grouped tiles, Live now controls, one upload control, the brand fields split between CMS-002 and
+    CMS-004, read-only fields off forms, content blocks authored on CMS-007, banner delete, a language select, the Arabic
+    preview, the restore permission, analytics platforms, the step-indicator style on the booking steps, the maintenance
+    state, getTranslationProposals bound (CHG-CSA-045).'
+  by: Chinmay
+  date: '2026-10-02'
+why: Process-agent findings of 1 October in handoff/design-notes/white-label.yaml, cited there to R073, DI-215, DI-988,
+  DI-285, DI-1093, F22 step 4, MATRIX 22.10.4 and the contract schemas.
+keys_touched:
+  screens:
+  - CMS-001
+  - CMS-002
+  - CMS-003
+  - CMS-004
+  - CMS-005
+  - CMS-007
+  - CMS-008
+  - CMS-011
+  - CMS-012
+  - CMS-014
+  - CMS-015
+  - CMS-016
+  - CMS-101
+  - GST-043
+  - GST-047
+  - WEB-028
+  - WEB-029
+  operations:
+  - completeUpload
+  - createContentBlock
+  - createPreview
+  - createUpload
+  - deleteBanner
+  - getPublishedTenantConfig
+  - getSiteSetupProgress
+  - getTenantAppStatus
+  - getTenantConfig
+  - getTranslationProposals
+  - listAnalyticsProviders
+  - publishContentBlock
+  - restoreConfigVersion
+  - setAnalyticsProvider
+  - setBrandIdentity
+  - setFonts
+  - setLanguages
+  - setMaintenanceMode
+  files:
+  - handoff/design-notes/white-label.yaml
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - screens/P13-white-label-cms.yaml
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-MOB-GST-043
+  - APP-MOB-GST-047
+  - APP-WEB-WEB-028
+  - APP-WEB-WEB-029
+  - APP-WL-CMS-001
+  - APP-WL-CMS-002
+  - APP-WL-CMS-003
+  - APP-WL-CMS-004
+  - APP-WL-CMS-005
+  - APP-WL-CMS-007
+  - APP-WL-CMS-008
+  - APP-WL-CMS-011
+  - APP-WL-CMS-012
+  - APP-WL-CMS-014
+  - APP-WL-CMS-015
+  - APP-WL-CMS-016
+  - APP-WL-CMS-101
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: d967f400
+notes: 'Batch SGU (screens-guest), 2 October 2026. Tickets: none started (Block A starts Monday 5 October 2026); unstarted
+  keys are the tasks.csv keys of the touched screens.'

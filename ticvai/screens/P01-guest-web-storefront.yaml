@@ -4832,7 +4832,7 @@ screens:
         provenance: decided 29 September 2026, W1
       - kind: consentBlock
         label: What we may send you
-        bindsTo: ConsentState
+        bindsTo: ConsentState.purposes
         operation: getGuestConsents
         notes: One row per configured purpose (`listConsentPurposes`), its channels as toggles, its plain-language
           description and the notice version in force; the current position from `getGuestConsents` (Given
@@ -4851,6 +4851,7 @@ screens:
         operation: recordConsent
         notes: Per purpose and channel; recorded at once on change, append-only.
         provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+        bindsTo: ConsentState.purposes
     - name: contextPanel
       slot: selection
       components:
@@ -5798,7 +5799,7 @@ screens:
         provenance: carried from the previous definition
       - kind: consentBlock
         label: What we may send you
-        bindsTo: ConsentState
+        bindsTo: ConsentState.purposes
         operation: getGuestConsents
         notes: One row per configured purpose (`listConsentPurposes`), its channels as toggles, its plain-language
           description and the notice version in force; the current position from `getGuestConsents` (Given
@@ -5817,6 +5818,7 @@ screens:
         operation: recordConsent
         notes: Per purpose and channel; recorded at once on change, append-only.
         provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+        bindsTo: ConsentState.purposes
     - name: contextPanel
       slot: selection
       components:
@@ -6446,7 +6448,7 @@ screens:
       components:
       - kind: consentBlock
         label: What we may send you
-        bindsTo: ConsentState
+        bindsTo: ConsentState.purposes
         operation: getGuestConsents
         notes: One row per configured purpose (`listConsentPurposes`), its channels as toggles, its plain-language
           description and the notice version in force; the current position from `getGuestConsents` (Given
@@ -6465,6 +6467,7 @@ screens:
         operation: recordConsent
         notes: Per purpose and channel; recorded at once on change, append-only.
         provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+        bindsTo: ConsentState.purposes
       - kind: cardList
         label: Lists I receive
         bindsTo: MarketingSubscription
@@ -6484,6 +6487,7 @@ screens:
           at once ("You will no longer receive Coastal Aqua news by email"), with no sign-in and no confirmation.
           Resubscribing needs sign-in.'
         provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+        bindsTo: MarketingSubscription.isSubscribed
   states:
     loading: —
     error: Could not subscribe. **Consent is not recorded on a failed request**, because a subscription
@@ -7989,12 +7993,14 @@ screens:
         notes: A scanned code arrives with the link and is claimed at once; this short box is the fallback
           when the QR is damaged ("Lounger B-14", "Table 12"). Party size is asked only at a table.
         provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
+        bindsTo: LocationSession.label
       - kind: selectField
         label: How you get it
         operation: listFulfilmentSlots
         notes: 'Only what the outlet supports: to my table, seat or lounger; collect from the counter;
           delivery to an address. Sends `mode`.'
         provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
+        bindsTo: DiningOutlet.orderingMethod
       - kind: selectField
         label: When
         bindsTo: FulfilmentSlots.slots
@@ -8007,6 +8013,7 @@ screens:
         notes: The delivery area check before the menu; an address outside it never reaches a basket.
           Building, unit, emirate (from the outlet's emirates) and directions.
         provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
+        bindsTo: DeliveryLocation.label
       - kind: detailPanel
         label: Menu
         bindsTo: GuestMenu
@@ -9012,11 +9019,13 @@ screens:
         operation: listMerchandise
         notes: Shops by name; sends `outletId`.
         provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
+        bindsTo: GuestMerchandiseItem.outletId
       - kind: selectField
         label: Category
         operation: listMerchandise
         notes: Categories by name; sends `categoryId`.
         provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
+        bindsTo: GuestMerchandiseItem.categoryId
       - kind: cardList
         label: Merchandise
         bindsTo: GuestMerchandiseItem
@@ -9111,12 +9120,12 @@ screens:
   overlays:
   - id: formAddCartLine
     component: modal
-    trigger: Add to cart for collection
+    trigger: Add to basket
     body: 'The item and quantity (a size switches between sibling items); collection point or home delivery
       is chosen at checkout. No variant, performance or seat ids are asked.'
     bindsTo: AddCartLineRequest
     confirm:
-      label: Add cart line
+      label: Add to basket
       operation: addCartLine
     dismiss:
       label: Cancel
@@ -9311,6 +9320,8 @@ screens:
     params:
     - name: subjectId
       from: session
+    - name: customerId
+      from: session
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land
       here, and the person holding it did nothing wrong. Arrives with no parameter — the venue comes from
@@ -9413,11 +9424,13 @@ screens:
         notes: The ask box under the conversation (typed, or a starter chip). Sending opens the conversation
           on the first message.
         provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
+        bindsTo: AiMessage.content
       - kind: textField
         label: Message to the agent
         operation: sendConversationMessage
         notes: Replaces the ask box once a person has taken the conversation; the transcript stays above.
         provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
+        bindsTo: ConversationMessage.body
       - kind: cardList
         label: Earlier conversations
         bindsTo: AiConversation

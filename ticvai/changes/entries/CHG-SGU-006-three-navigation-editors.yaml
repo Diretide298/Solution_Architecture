@@ -1,0 +1,45 @@
+id: CHG-SGU-006
+date: '2026-10-02'
+source: cr
+kind: spec
+summary: 'Navigation is three editors on CMS-009, each saved on its own: the header, the footer and the mobile tab bar;
+  the header and footer leave the page builder.'
+decision:
+  what: CMS-009 gains the header (setHeader) and footer (setFooter) editors beside the tab bar (setNavigation), each
+    with its own Save; CMS-007 no longer declares setHeader or setFooter.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October (batch 2 #41): "Three editors" (DEC-049 in handoff/decisions-2-october.json); DI-285; the design-notes
+  correction on CMS-007 (setHeader in apis with no control); contract side CHG-CSA-037.'
+keys_touched:
+  screens:
+  - CMS-007
+  - CMS-009
+  operations:
+  - getNavigation
+  - setFooter
+  - setHeader
+  - setNavigation
+  schemas:
+  - FooterConfig
+  - HeaderConfig
+  - NavigationConfig
+  files:
+  - handoff/design-notes/fnb-retail.yaml
+  - handoff/design-notes/white-label.yaml
+  - screens/P13-white-label-cms.yaml
+root_class: 'new: open-question-decided'
+tickets:
+  started: []
+  unstarted:
+  - APP-WL-CMS-007
+  - APP-WL-CMS-009
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: d967f400
+notes: 'Batch SGU (screens-guest), 2 October 2026. Tickets: none started (Block A starts Monday 5 October 2026); unstarted
+  keys are the tasks.csv keys of the touched screens.'

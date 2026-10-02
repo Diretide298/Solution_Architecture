@@ -1,0 +1,200 @@
+id: CHG-SGU-024
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: 'Contract gaps the guest and CMS screen corrections need: logged in the design notes, not built, because the
+  screens agent does not invent operations.'
+decision:
+  what: Log each correction that needs an operation, a field or a named schema the contracts lack as status logged with
+    this entry; the contract owners build them before the screen's block is tasked.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Process-agent corrections of 1 October in handoff/design-notes/*.yaml on the P01, P02, P05 and P13 screens (PHASE-B
+  rule 2: "If a correction needs an operation that doesn''t exist, mark it logged and add it to an open CHG entry (kind
+  contract) listing the gap. Don''t invent operations.").'
+keys_touched:
+  screens:
+  - CMS-005
+  - CMS-007
+  - CMS-016
+  - CMS-061
+  - CMS-062
+  - CMS-068
+  - CMS-070
+  - CMS-071
+  - CMS-073
+  - CMS-080
+  - CMS-081
+  - CMS-088
+  - CMS-090
+  - CMS-091
+  - CMS-092
+  - CMS-099
+  - CMS-103
+  - GST-001
+  - GST-007
+  - GST-008
+  - GST-024
+  - GST-025
+  - GST-033
+  - GST-036
+  - GST-042
+  - GST-045
+  - GST-052
+  - GST-053
+  - GST-054
+  - GST-061
+  - GST-065
+  - GST-066
+  - GST-070
+  - GST-071
+  - KSK-002
+  - KSK-004
+  - KSK-016
+  - WEB-001
+  - WEB-005
+  - WEB-006
+  - WEB-016
+  - WEB-017
+  - WEB-018
+  - WEB-024
+  - WEB-028
+  - WEB-031
+  - WEB-036
+  - WEB-037
+  - WEB-038
+  - WEB-042
+  - WEB-043
+  files:
+  - handoff/design-notes/ai.yaml
+  - handoff/design-notes/customer-marketing.yaml
+  - handoff/design-notes/fnb-retail.yaml
+  - handoff/design-notes/platform-foundation.yaml
+  - handoff/design-notes/ticketing-guest.yaml
+  - handoff/design-notes/venue-operations.yaml
+  - handoff/design-notes/white-label.yaml
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - screens/P05-guest-kiosk.yaml
+  - screens/P13-white-label-cms.yaml
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - APP-MOB-GST-001
+  - APP-MOB-GST-007
+  - APP-MOB-GST-008
+  - APP-MOB-GST-024
+  - APP-MOB-GST-025
+  - APP-MOB-GST-033
+  - APP-MOB-GST-036
+  - APP-MOB-GST-042
+  - APP-MOB-GST-045
+  - APP-MOB-GST-052
+  - APP-MOB-GST-053
+  - APP-MOB-GST-054
+  - APP-MOB-GST-061
+  - APP-MOB-GST-065
+  - APP-MOB-GST-066
+  - APP-MOB-GST-070
+  - APP-MOB-GST-071
+  - APP-WEB-WEB-001
+  - APP-WEB-WEB-005
+  - APP-WEB-WEB-006
+  - APP-WEB-WEB-016
+  - APP-WEB-WEB-017
+  - APP-WEB-WEB-018
+  - APP-WEB-WEB-024
+  - APP-WEB-WEB-028
+  - APP-WEB-WEB-031
+  - APP-WEB-WEB-036
+  - APP-WEB-WEB-037
+  - APP-WEB-WEB-038
+  - APP-WEB-WEB-042
+  - APP-WEB-WEB-043
+  - APP-WL-CMS-005
+  - APP-WL-CMS-007
+  - APP-WL-CMS-016
+  - APP-WL-CMS-103
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-design-notes.py
+status: open
+notes: 'Open until the contract owners build or decline each gap. The gaps: CMS-005: Theme.cornerRadius has no default;
+  the prototype default is 10 px | CMS-007: FooterConfig is declared with required [id, scopePath] (both server-owned)
+  and used as the setFooter request body, so a client cannot send a valid footer; the page form no longer asks for id,
+  status, isReferenced or scopePath | CMS-007: One HomepageLayout and one HeaderConfig serve web and app; the client
+  asked for header and layout configurable independently for web and mobile (DI-285, DI-1097) | CMS-016: stepIndicator
+  values (bar, numbered, dots, segmented, breadcrumb, pills, ticks, none) match neither the client''s words (bars, dots,
+  counters, step names) nor the prototypes (DI-1093) | CMS-016: The mobile prototype offers controls the contract lacks:
+  Continue button style, date picker style and step order (DI-1093) | CMS-061: CMS-061: the table columns are workshop-pack
+  labels; the operation returns no schema with those properties (0 of 8 labels bound) | CMS-062: CMS-062: the table columns
+  are workshop-pack labels; the operation returns no schema with those properties (0 of 20 labels bound) | CMS-068: CMS-068:
+  the table columns are workshop-pack labels; the operation returns no schema with those properties (0 of 18 labels bound)
+  | CMS-070: CMS-070: the table columns are workshop-pack labels; the operation returns no schema with those properties
+  (0 of 7 labels bound) | CMS-071: No operation returns AI processing counts, confidence bands or duplicate-candidate
+  counts for the DAM (getMediaUsageAnalytics returns storage, downloads, views, shares, never-used and unclassified only);
+  the five pack actions have no operations | CMS-073: CMS-073: the table columns are workshop-pack labels; the operation
+  returns no schema with those properties (0 of 7 labels bound) | CMS-080: CMS-080: the table columns are workshop-pack
+  labels; the operation returns no schema with those properties (0 of 9 labels bound) | CMS-081: CMS-081: the table columns
+  are workshop-pack labels; the operation returns no schema with those properties (0 of 8 labels bound) | CMS-088: CMS-088:
+  the table columns are workshop-pack labels; the operation returns no schema with those properties (0 of 6 labels bound)
+  | CMS-090: CMS-090: the table columns are workshop-pack labels; the operation returns no schema with those properties
+  (0 of 10 labels bound) | CMS-091: CMS-091: the table columns are workshop-pack labels; the operation returns no schema
+  with those properties (0 of 24 labels bound) | CMS-092: CMS-092: the table columns are workshop-pack labels; the operation
+  returns no schema with those properties (0 of 8 labels bound) | CMS-099: CMS-099: the table columns are workshop-pack
+  labels; the operation returns no schema with those properties (0 of 3 labels bound) | CMS-103: The surfSession BookingFlowType
+  level step has a broken stepSettings note in white-label.yaml (a stray key "from the products'' segmentTags" with a
+  null value, a YAML colon splitting the note) | GST-001: The venue overview''s description and before-you-go text have
+  no source; TenantAppStatus.venues carries name, city and today''s hours only | GST-007: BookingFlowSettings.timesPerPage
+  defaults to 24; the v4 build defaults to 12: one default for one setting | GST-007: Step-indicator styles: the contract
+  enum (bar, numbered, dots, segmented, breadcrumb, pills, ticks, none) does not match the client''s words or the prototypes;
+  the date-picker style and Continue-button style settings drawn in v4 have no field (DI-1093) | GST-008: As WEB-005:
+  supervisors and a water-park group''s session are not in requestGroupBooking (DI-1114, DI-1117) | GST-025: As WEB-038:
+  claimTableSession removed and "settle" reworded, but the bill is still read by a TableSession id and no guest payment
+  of a visit bill exists | GST-033: createAiConversation has no context reference (subjectRef or route) for the screen
+  the help is opened on | GST-036: getLoyaltyPosition returns an inline shape (tier, nextTier, pointsPending, expiringPoints)
+  different from the LoyaltyPosition schema the staff reads return; one concept, two shapes | GST-042: As WEB-016: verifyGuestOtp
+  code length | GST-045: "Keep ownership and rename the holder" (DI-200) has no operation; transferOrderTickets moves
+  ownership | GST-052: No operation returns the venue''s preset visit plans; listProducts returns products, not presets
+  | GST-053: Group sharing of a plan (in-app QR, DI-241) is not drawn and no operation backs it; whether it is in the
+  Block A planner is not stated | GST-054: The venue-map plan operations must return shops and kiosks as plan points
+  (TRACKER row 13, MoM 30 Sep 4.7); no point kind for them is confirmed in venue-map.yaml | GST-061: As WEB-037: the
+  guest menu lacks "may contain" and the dietary flags | GST-065: setMarketingSubscription channel enum is email, sms,
+  push: WhatsApp (a MessageChannel and the client''s main channel, MoM 31 Aug 4.6) cannot be subscribed to | GST-065:
+  getMarketingSubscription returns one MarketingSubscription, not one row per list and channel; setMarketingSubscription
+  is still marked a proposal to confirm | GST-066: No guest-callable read of a guest''s own data requests (getDsarRequest
+  is service-only); the page cannot show where a copy or erasure has got to | GST-070: No guest-callable read of the
+  guest''s own table bookings or waitlist place (listTableReservations is staff-only); the screen cannot show the booking
+  it changes or "your table is ready" | GST-071: No operation removes a saved card (only listPaymentTokens and storePaymentToken
+  in orders.yaml), yet the screen promises a guest can remove one | KSK-002: AccessibilitySettings (TenantConfig.accessibility)
+  has no operation that sets it; notificationBranding and enabledPaymentMethods have the same gap (MATRIX 2.1.27) | KSK-004:
+  getAvailability returns an inline response with no named schema (REV3-1 names the page response) | WEB-001: TenantConfig.venues
+  (LocalisedText name, active venues) and TenantAppStatus.venues (string name, published venues only) describe the same
+  venue picker with two shapes and two inclusion rules | WEB-005: Supervisors (free, one per N guests) and a water-park
+  group choosing a session are drawn in the 30 September build, but requestGroupBooking has only packageProductId and
+  expectedSize (DI-1114, DI-1117) | WEB-006: Two models for the swim question: the 30 September answer (All of us, Some
+  of us, None of us, changing products and prices; DI-1108) and REV3-26 (Yes/No consent per person or booking); guidedAnswerIds
+  filters only requiresSwimmer true/false and there is no "some of us" vest counter. One model must be chosen before
+  the build (question for Chinmay) | WEB-016: verifyGuestOtp accepts a 4 to 10 character code; the agreed rule is exactly
+  six digits (DI-1034): minLength/maxLength 6, digits | WEB-017: getMyChallenges returns an inline array with no named
+  schema (ChallengeProgress); the challenges tile binds to nothing | WEB-018: getEntitlementCredential and getEntitlementHistory
+  return inline responses with no named schema; the code and history panels cannot bind | WEB-024: getWaiverStatus returns
+  an inline response with no named schema; the waiver panel cannot bind | WEB-028: VenueContact is one per tenant while
+  a tenant has several venues (Kids Club Al Barsha and Mirdif); contact must be per venue (R267) | WEB-031: GroupBookingRequest.kind
+  is general, school, corporate or party; the 30 September build shows Tour operator and Community as their own types
+  (DI-1115): add them to the enum or map the cards to general | WEB-036: updateTableReservation is now on WEB-036, but
+  no guest-callable read of the guest''s own table bookings or waitlist entries exists (listTableReservations is staff-only)
+  | WEB-037: GuestMenu items carry a flat allergen list; the Allergen object (contains, mayContain, vegetarian, vegan,
+  halal) and nutrition are not on the guest menu | WEB-038: getGuestBill reads /table-sessions/{sessionId}/bill; a guest
+  who claimed with claimLocationSession holds a LocationSession with a visitId and no TableSession id | WEB-042: No cart-line
+  attribute marks a retail line for collection (or home delivery) or carries the chosen collection point; no guest read
+  lists the collection points and their hours (createShopAndDrop needs collectionPointId) | WEB-042: Merchandise data
+  does not say whether an item can be dropped (chilled, fragile, oversized); createShopAndDrop refuses only after payment
+  | WEB-043: As GST-036: getLoyaltyPosition shape, and listLoyaltyProgrammes needs MARKETING_VIEW on a guest screen;
+  rewards and badges are now wired here | WEB-036, GST-024, KSK-016: the guest DiningOutlet projection does not carry
+  the outlet''s admissionContext (insideVenue or standalone), so the list cannot say "needs an admission ticket" before
+  createGuestFnbOrder refuses (DEC-070) Batch SGU (screens-guest), 2 October 2026. Tickets: none started (Block A starts
+  Monday 5 October 2026); unstarted keys are the tasks.csv keys of the touched screens.'

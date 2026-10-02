@@ -1,0 +1,35 @@
+id: CHG-SGU-015
+date: '2026-10-02'
+source: cr
+kind: spec
+summary: The kiosk keeps tickets first, then date and time, unlike the web and the app; REV3-2 is superseded for the
+  kiosk only.
+decision:
+  what: KSK-004 states the kiosk order KSK-003, KSK-004 (tickets), KSK-005 (session), which F07 already walks.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October (batch 5): "Tickets first (kiosk differs from web and app)" (DEC-170 in handoff/decisions-2-october.json);
+  REV3-2, DI-116; the register side is CHG-DOC-017.'
+keys_touched:
+  screens:
+  - KSK-004
+  operations:
+  - listProductVariants
+  flows:
+  - F07
+  files:
+  - handoff/design-notes/ticketing-guest.yaml
+  - screens/P05-guest-kiosk.yaml
+root_class: 'new: open-question-decided'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-flows.py
+status: closed
+closed_by_commit: d967f400
+notes: 'Batch SGU (screens-guest), 2 October 2026. Tickets: none started (Block A starts Monday 5 October 2026); unstarted
+  keys are the tasks.csv keys of the touched screens.'

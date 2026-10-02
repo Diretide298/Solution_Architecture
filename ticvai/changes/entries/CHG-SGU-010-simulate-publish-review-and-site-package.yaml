@@ -1,0 +1,46 @@
+id: CHG-SGU-010
+date: '2026-10-02'
+source: cr
+kind: spec
+summary: Publishing is simulate then a single publish by the permission holder, with an optional review step the venue
+  switches on; a self-hosted tenant generates a site package.
+decision:
+  what: CMS-014 binds getPublishReviewPolicy and setPublishReviewPolicy (off by default; 202 Awaiting review when on),
+    labels the preview Simulate, and binds exportSitePackage and getSitePackage for self-hosted tenants; platform staff
+    publishing under a grant is ADM-016's (P09).
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October (batch 1): "Simulate, then a single publish by permission holders; optional review step if the
+  venue sets it up" and "Hosted with us: platform staff may publish; self-hosted: the venue generates a site package"
+  (DEC-156, DEC-144 in handoff/decisions-2-october.json); MATRIX 22.10.9; contract side CHG-CSA-038, CHG-CSA-042, CHG-CSP-036.'
+keys_touched:
+  screens:
+  - CMS-014
+  operations:
+  - createPreview
+  - exportSitePackage
+  - getPublishReviewPolicy
+  - getSitePackage
+  - publishTenantConfig
+  - setPublishReviewPolicy
+  schemas:
+  - ConfigVersion
+  - PublishReviewPolicy
+  - SitePackage
+  files:
+  - handoff/design-notes/white-label.yaml
+  - screens/P13-white-label-cms.yaml
+root_class: 'new: open-question-decided'
+tickets:
+  started: []
+  unstarted:
+  - APP-WL-CMS-014
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: d967f400
+notes: 'Batch SGU (screens-guest), 2 October 2026. Tickets: none started (Block A starts Monday 5 October 2026); unstarted
+  keys are the tasks.csv keys of the touched screens.'

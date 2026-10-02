@@ -434,6 +434,7 @@ screens:
           and completes it (`completeUpload`) behind the one action; nobody types a file name, content
           type or size.'
         provenance: corrected 2 October 2026 (CHG-SGU-022, design-notes correction)
+        bindsTo: BrandIdentity.logoAssetRef
     - name: actionBar
       slot: rowActions
       components:
@@ -1046,6 +1047,7 @@ screens:
         operation: previewProductTickets
         notes: The product whose ticket and passes are previewed.
         provenance: corrected 2 October 2026 (CHG-SGU-008, decided by Chinmay 2 October 2026, DEC-151)
+        bindsTo: Product.id
       - kind: livePreview
         label: PDF ticket and wallet passes
         bindsTo: TicketProof
@@ -1310,6 +1312,11 @@ screens:
         operation: publishContentBlock
         notes: Now or scheduled; where the venue switched the review step on, the block waits for a reviewer
           (MATRIX 22.10.8).
+        provenance: corrected 2 October 2026 (CHG-SGU-022, design-notes correction)
+      - kind: publishGate
+        label: What publishing a block changes
+        notes: Names the page and section the block shows in, from when, and for whom; says whether the
+          venue's review step applies. Blocks go live on their own schedule, not with the site Publish.
         provenance: corrected 2 October 2026 (CHG-SGU-022, design-notes correction)
   states:
     loading: The record, read by `getHomepageLayout`.
@@ -1980,13 +1987,13 @@ screens:
   overlays:
   - id: formSetNavigation
     component: modal
-    trigger: Save navigation and tabs
+    trigger: Save tab bar
     body: '**Collects what `setNavigation` sends.** Required: `kind`, `items` (label, icon, target, visible,
       order; a mobile tab targets an `appSection`). Optional: `buyButton` (`style`, `label`). Refused
       `400` when a tab targets a disabled module or more than five are visible. Dismissing sends nothing.'
     bindsTo: NavigationConfig
     confirm:
-      label: Save navigation
+      label: Save tab bar
       operation: setNavigation
     dismiss:
       label: Cancel
@@ -2126,21 +2133,25 @@ screens:
         operation: searchMedia
         notes: The media kinds (image, video, document, audio) as a choice; sends `kind`.
         provenance: corrected 2 October 2026 (CHG-SGU-019, design-notes correction)
+        bindsTo: MediaAsset.kind
       - kind: multiSelect
         label: Tag
         operation: searchMedia
         notes: Tags picked from the taxonomy; sends `tag`.
         provenance: corrected 2 October 2026 (CHG-SGU-019, design-notes correction)
+        bindsTo: MediaAsset.tags
       - kind: selectField
         label: Collection
         operation: searchMedia
         notes: Collections by name; sends `collectionId`.
         provenance: corrected 2 October 2026 (CHG-SGU-019, design-notes correction)
+        bindsTo: Collection.name
       - kind: selectField
         label: Venue
         operation: searchMedia
         notes: Venues by name; sends `venueId`.
         provenance: corrected 2 October 2026 (CHG-SGU-019, design-notes correction)
+        bindsTo: MediaAsset.venueId
       - kind: searchField
         label: Search
         operation: searchMedia
@@ -2572,6 +2583,7 @@ screens:
         label: Language
         notes: One tab per enabled locale; hreflang pairs are generated from the tabs.
         provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+        bindsTo: SeoMetadata.locale
       - kind: textField
         label: Title
         bindsTo: SeoMetadata.title
@@ -3083,11 +3095,11 @@ screens:
   overlays:
   - id: formPublishTenantConfig
     component: modal
-    trigger: Publish tenant config
+    trigger: Publish
     body: '**Collects what `publishTenantConfig` sends before it is called.** Required: `note`. Optional:
       `scheduledFor`. Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
-      label: Publish tenant config
+      label: Publish
       operation: publishTenantConfig
     dismiss:
       label: Cancel
@@ -3097,11 +3109,11 @@ screens:
     provenance: contract white-label.yaml POST /tenant-config/publish
   - id: formCreatePreview
     component: modal
-    trigger: Preview
+    trigger: Simulate
     body: '**Collects what `createPreview` sends before it is called.** Dismissing sends nothing; the
       screen behind is unchanged.'
     confirm:
-      label: Preview
+      label: Simulate
       operation: createPreview
     dismiss:
       label: Cancel
@@ -4930,6 +4942,7 @@ screens:
         notes: A filter over the registry (first-party cookie, third-party cookie, mobile SDK, analytics
           tracker, advertising pixel, embedded service, local storage, other); not an action.
         provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+        bindsTo: CookieTrackingDigitalTechnologyRegistryView.technologyType
       - kind: dataTable
         label: Tracking technologies
         bindsTo: CookieTrackingDigitalTechnologyRegistryView
@@ -10064,6 +10077,7 @@ screens:
         notes: 'Name, updated date or file size. "Ticket Media" is not a filter here: wristband and ticket
           media are not library assets.'
         provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
+        bindsTo: MediaAsset.sizeBytes
     - name: contentBody
       slot: collection
       components:
@@ -10525,18 +10539,22 @@ screens:
         label: 'Venue'
         provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
         notes: e.g. Dubai Park
+        bindsTo: MediaAsset.venueId
       - kind: selectField
         label: 'Category'
         provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
         notes: e.g. Marketing
+        bindsTo: MediaAsset.categoryId
       - kind: selectField
         label: 'Campaign'
         provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
         notes: e.g. Summer 2026
+        bindsTo: MediaAsset.tags
       - kind: selectField
         label: 'Tags'
         provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
         notes: e.g. Family, Outdoor
+        bindsTo: MediaAsset.tags
   states:
     loading: The tags keywords classification configuration as saved.
     error: Could not load. Names which read failed and leaves the tags keywords classification untouched.
@@ -14034,6 +14052,7 @@ screens:
         label: Default fallback asset
         provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
         notes: Picked from the library (e.g. DAM-IMG-009211, "Default Dubai Park Hero").
+        bindsTo: MediaAsset.id
     - name: actionBar
       slot: publish
       components:

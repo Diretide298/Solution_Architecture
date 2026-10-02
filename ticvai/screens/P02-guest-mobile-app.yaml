@@ -5213,12 +5213,14 @@ screens:
         notes: A scanned code arrives with the link and is claimed at once; this short box is the fallback
           when the QR is damaged ("Lounger B-14", "Table 12"). Party size is asked only at a table.
         provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
+        bindsTo: LocationSession.label
       - kind: selectField
         label: How you get it
         operation: listFulfilmentSlots
         notes: 'Only what the outlet supports: to my table, seat or lounger; collect from the counter;
           delivery to an address. Sends `mode`.'
         provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
+        bindsTo: DiningOutlet.orderingMethod
       - kind: selectField
         label: When
         bindsTo: FulfilmentSlots.slots
@@ -5231,6 +5233,7 @@ screens:
         notes: The delivery area check before the menu; an address outside it never reaches a basket.
           Building, unit, emirate (from the outlet's emirates) and directions.
         provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
+        bindsTo: DeliveryLocation.label
       - kind: detailPanel
         label: Menu
         bindsTo: GuestMenu
@@ -5512,12 +5515,6 @@ screens:
       provenance: 'derived — GST-001 declares entryState.params  and GST-026 holds none of them. The edge
         carries nothing: GST-026 is opened from GST-001, so this edge is the way back and GST-001 keeps
         its own state'
-    - to: BO-069
-      trigger: Machine records the play
-      provenance: flow F18 step 2→3
-      operation: getGameCard
-      crossesDevice: true
-      back: false
     - to: BO-048
       trigger: Collected on the way out
       provenance: flow F17 step 4→5
@@ -5554,11 +5551,13 @@ screens:
         operation: listMerchandise
         notes: Shops by name; sends `outletId`.
         provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
+        bindsTo: GuestMerchandiseItem.outletId
       - kind: selectField
         label: Category
         operation: listMerchandise
         notes: Categories by name; sends `categoryId`.
         provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
+        bindsTo: GuestMerchandiseItem.categoryId
       - kind: cardList
         label: Merchandise
         bindsTo: GuestMerchandiseItem
@@ -5686,12 +5685,12 @@ screens:
     provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
   - id: formAddCartLine
     component: modal
-    trigger: Add to cart for collection
+    trigger: Add to basket
     body: 'The item and quantity (a size switches between sibling items); collection point or home delivery
       is chosen at checkout. No variant, performance or seat ids are asked.'
     bindsTo: AddCartLineRequest
     confirm:
-      label: Add cart line
+      label: Add to basket
       operation: addCartLine
     dismiss:
       label: Cancel
@@ -6085,6 +6084,7 @@ screens:
         operation: listDiningOutlets
         notes: 'Chips: order to your seat, collect, counter only. Sends `orderingMethod`.'
         provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
+        bindsTo: DiningOutlet.orderingMethod
       - kind: cardList
         label: Dining
         bindsTo: DiningOutlet
@@ -6332,11 +6332,13 @@ screens:
         notes: The ask box under the conversation (typed, or a starter chip). Sending opens the conversation
           on the first message.
         provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
+        bindsTo: AiMessage.content
       - kind: textField
         label: Message to the agent
         operation: sendConversationMessage
         notes: Replaces the ask box once a person has taken the conversation; the transcript stays above.
         provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
+        bindsTo: ConversationMessage.body
       - kind: cardList
         label: Earlier conversations
         bindsTo: AiConversation
@@ -6424,6 +6426,9 @@ screens:
       from: deepLink
     - name: outletId
       from: deepLink
+    - name: messageId
+      from: navigation
+      optional: true
     coldEntry: 'A guest opening a notification about their own conversation (an agent replied, a handover
       was picked up): it opens that conversation, or says it was closed.'
   wireframe:
@@ -6780,6 +6785,7 @@ screens:
         notes: The ask box under the conversation (typed, or a starter chip). Sending opens the conversation
           on the first message.
         provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
+        bindsTo: AiMessage.content
     - name: actionBar
       slot: rowActions
       components:
@@ -6804,7 +6810,7 @@ screens:
       screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty
       table** — that reads as *there is no data* and sends somebody to support with the wrong question.'
     offline: '**Not available, and the offline banner says why.** The assistant needs the connection;
-      the screen behind is unchanged.'
+      conversations already loaded stay readable.'
   apis:
   - operationId: sendAiMessage
     contract: ai
@@ -6826,6 +6832,9 @@ screens:
     params:
     - name: conversationId
       from: deepLink
+    - name: messageId
+      from: navigation
+      optional: true
     coldEntry: 'A guest opening a notification about their own conversation: it opens the conversation,
       or says it was closed.'
   wireframe:
@@ -6838,8 +6847,8 @@ screens:
       verified: 2026-09-28
       match: exact
       view: Account → All screens → Wave 2 → AI concierge – contextual help
-    note: 'Corrected 2 October 2026 (CHG-SGU-016): the prototype view is a catalogue entry ("Account → All
-      screens → Wave 2"), not a client-drawn layout, so the frame is treated as designed, not client-verified.'
+    note: 'Corrected 2 October 2026 (CHG-SGU-016): the prototype view is a catalogue entry ("Account →
+      All screens → Wave 2"), not a client-drawn layout, so the frame is treated as designed, not client-verified.'
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -7430,6 +7439,8 @@ screens:
     params:
     - name: subjectId
       from: session
+    - name: customerId
+      from: session
   overlays:
   - id: confirmCreateReferral
     component: confirmDialog
@@ -7867,7 +7878,7 @@ screens:
         provenance: decided 29 September 2026, W1
       - kind: consentBlock
         label: What we may send you
-        bindsTo: ConsentState
+        bindsTo: ConsentState.purposes
         operation: getGuestConsents
         notes: One row per configured purpose (`listConsentPurposes`), its channels as toggles, its plain-language
           description and the notice version in force; the current position from `getGuestConsents` (Given
@@ -7886,6 +7897,7 @@ screens:
         operation: recordConsent
         notes: Per purpose and channel; recorded at once on change, append-only.
         provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+        bindsTo: ConsentState.purposes
     - name: actionBar
       slot: publish
       components:
@@ -11308,6 +11320,7 @@ screens:
         operation: getAvailability
         notes: 'The list is for a date: today by default.'
         provenance: corrected 2 October 2026 (CHG-SGU-020, design-notes correction)
+        bindsTo: PerformanceAvailability.performanceId
       - kind: cardList
         label: Cabanas
         bindsTo: Product
@@ -11907,7 +11920,7 @@ screens:
       components:
       - kind: consentBlock
         label: What we may send you
-        bindsTo: ConsentState
+        bindsTo: ConsentState.purposes
         operation: getGuestConsents
         notes: One row per configured purpose (`listConsentPurposes`), its channels as toggles, its plain-language
           description and the notice version in force; the current position from `getGuestConsents` (Given
@@ -11926,6 +11939,7 @@ screens:
         operation: recordConsent
         notes: Per purpose and channel; recorded at once on change, append-only.
         provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+        bindsTo: ConsentState.purposes
       - kind: cardList
         label: Lists I receive
         bindsTo: MarketingSubscription
@@ -11943,6 +11957,7 @@ screens:
         operation: setMarketingSubscription
         notes: The per-list, per-channel toggle; saved on change.
         provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+        bindsTo: MarketingSubscription.isSubscribed
     - name: actionBar
       slot: rowActions
       components:
@@ -12070,7 +12085,7 @@ screens:
         provenance: contract marketing-crm.yaml GET /guests/{subjectId}/consents
       - kind: consentBlock
         label: What we may send you
-        bindsTo: ConsentState
+        bindsTo: ConsentState.purposes
         operation: getGuestConsents
         notes: One row per configured purpose (`listConsentPurposes`), its channels as toggles, its plain-language
           description and the notice version in force; the current position from `getGuestConsents` (Given
@@ -12089,6 +12104,7 @@ screens:
         operation: recordConsent
         notes: Per purpose and channel; recorded at once on change, append-only.
         provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+        bindsTo: ConsentState.purposes
     - name: actionBar
       slot: rowActions
       components:
@@ -12827,14 +12843,14 @@ screens:
   overlays:
   - id: formCreateTableReservation
     component: modal
-    trigger: Create table reservation
+    trigger: Reserve
     body: 'Restaurant, date, time and party size on one screen; an optional note for allergies or requests;
       optional seating preference (`seatingPreference`) and occasion (`occasion`), fields on the booking
       since 2 October (DEC-204). Name and contact come from the profile. Nothing the server or staff set
       is asked (id, status, tables, group, actual party size, table visit).'
     bindsTo: TableReservation
     confirm:
-      label: Create table reservation
+      label: Reserve
       operation: createTableReservation
     dismiss:
       label: Cancel
@@ -12856,12 +12872,12 @@ screens:
     provenance: corrected 2 October 2026 (CHG-SGU-002, decided by Chinmay 2 October 2026, DEC-204)
   - id: formUpdateTableReservation
     component: modal
-    trigger: Save table reservation
+    trigger: Change or cancel
     body: 'Party size and time only; the restaurant is fixed. With a per-guest deposit, the difference
       or the release is stated before saving.'
     bindsTo: TableReservation
     confirm:
-      label: Save table reservation
+      label: Change or cancel
       operation: updateTableReservation
     dismiss:
       label: Cancel
@@ -12883,12 +12899,12 @@ screens:
     provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
   - id: formJoinRestaurantWaitlist
     component: modal
-    trigger: Join restaurant waitlist
+    trigger: Join the waitlist
     body: 'Party size and seating (Any, Indoor, Outdoor, Bar, Booth, High chair needed). Name and contact
       come from the profile; id, status and times are the server''s.'
     bindsTo: RestaurantWaitlist
     confirm:
-      label: Join restaurant waitlist
+      label: Join the waitlist
       operation: joinRestaurantWaitlist
     dismiss:
       label: Cancel
@@ -12907,7 +12923,7 @@ screens:
     provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
   - id: confirmLeaveRestaurantWaitlist
     component: confirmDialog
-    trigger: Leave restaurant waitlist
+    trigger: Leave the waitlist
     body: '**Says the place is given up and the next party moves up**, naming the restaurant and the party
       size. Leaving cannot be undone; joining again goes to the back (audit R073 (d)).'
     provenance: client-verified
@@ -13470,8 +13486,9 @@ screens:
       apart by the response: not signed in, where the guest is offered sign-in and brought back to this
       screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty
       table** — that reads as *there is no data* and sends somebody to support with the wrong question.'
-    offline: '**Not available, and the offline banner says why.** Signing a device out, changing the recovery
-      email and setting up two-step verification need the connection; nothing is queued.'
+    offline: '**Nothing here is offered offline, and the banner says so.** An erasure request or a device
+      change queued and never sent is worse than one that could not be made — the legal clock starts when
+      the platform receives it, and a device signed out offline is still signed in.'
   apis:
   - operationId: getGuestSession
     contract: identity
@@ -13565,7 +13582,7 @@ screens:
   overlays:
   - id: confirmRevokeGuestDevice
     component: confirmDialog
-    trigger: Revoke guest device
+    trigger: Stop notifications on this device
     body: '**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather
       than the verb. A security sign-in this affects should be identified in the dialog, not just counted.'
     provenance: client-verified

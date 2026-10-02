@@ -1671,13 +1671,13 @@ screens:
   overlays:
   - id: formCreateGuestFnbOrder
     component: modal
-    trigger: Create guest F&B order
+    trigger: Pay
     body: '**Collects what `createGuestFnbOrder` sends before it is called.** Required: `id`, `lines`,
       `quotedTotal`, `recordedAt`. Optional: `locationSessionId`, `outletId`, `fulfilment`, `paymentMethod`.
       Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: CreateGuestOrderRequest
     confirm:
-      label: Create guest F&B order
+      label: Pay
       operation: createGuestFnbOrder
     dismiss:
       label: Cancel
@@ -1732,8 +1732,8 @@ screens:
 
 
     **Buying goes through the kiosk basket and its payment steps (KSK-006, KSK-007)**; the hold is the
-    only unpaid path. Corrected 2 October 2026 (CHG-SGU-018): the notes'' "browse and reserve and not buy"
-    contradicted the purpose.'
+    only unpaid path. Corrected 2 October 2026 (CHG-SGU-018): the notes'' "browse and reserve and not
+    buy" contradicted the purpose.'
   density: touchLarge
   boardFrames:
   - Kiosk Board 2.dc.html#KSK-017
@@ -1753,11 +1753,13 @@ screens:
         operation: listMerchandise
         notes: Shops by name; sends `outletId`.
         provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
+        bindsTo: GuestMerchandiseItem.outletId
       - kind: selectField
         label: Category
         operation: listMerchandise
         notes: Categories by name; sends `categoryId`.
         provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
+        bindsTo: GuestMerchandiseItem.categoryId
       - kind: cardList
         label: Merchandise
         bindsTo: GuestMerchandiseItem
@@ -1860,11 +1862,11 @@ screens:
   overlays:
   - id: formReserveMerchandise
     component: modal
-    trigger: Reserve merchandise
+    trigger: Hold to pay at the shop
     body: 'The item and quantity, held to pay for at the shop until the end of the visit day (R169). No
       ids are asked.'
     confirm:
-      label: Reserve merchandise
+      label: Hold to pay at the shop
       operation: reserveMerchandise
     dismiss:
       label: Cancel
@@ -1877,12 +1879,12 @@ screens:
     provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
   - id: formAddCartLine
     component: modal
-    trigger: Add cart line
+    trigger: Add to my kiosk basket
     body: 'The item and quantity (a size switches between sibling items); collection point or home delivery
       is chosen at checkout. No variant, performance or seat ids are asked.'
     bindsTo: AddCartLineRequest
     confirm:
-      label: Add cart line
+      label: Add to my kiosk basket
       operation: addCartLine
     dismiss:
       label: Cancel

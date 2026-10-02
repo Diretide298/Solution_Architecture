@@ -1,0 +1,49 @@
+id: CHG-SGU-013
+date: '2026-10-02'
+source: cr
+kind: spec
+summary: The cookie registry runs on a bought scanner API (hybrid) with the manual upload kept, and shows each scan's
+  findings by consent state with the loaded-before-consent count first.
+decision:
+  what: 'CMS-025 is rebuilt: registry table with a type filter, scan runs with their source, the preConsentViolationCount
+    tile, listCookieScanFindings (consent state, page, script, attributes, suggested category), listTrackingTechnologyCatalogue
+    (read-only) and the scan policy with scanSource and scannerVendorRef.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October (batch 5 set 2): "Buy a scanner API (hybrid)" (DEC-019 in handoff/decisions-2-october.json);
+  contract follow-ups: "Cookie scan consent state: add now" (CHG-FUP-009, CHG-FUP-010); CHG-CSA-023; the lead''s follow-up
+  of 2 October; the customer-marketing correction on CMS-025.'
+keys_touched:
+  screens:
+  - CMS-025
+  operations:
+  - listCookieScanFindings
+  - listCookieScanPolicies
+  - listCookieScans
+  - listCookieTrackingDigital
+  - listTrackingTechnologyCatalogue
+  - recordCookieScan
+  - setCookieScanPolicy
+  - setTrackingTechnology
+  schemas:
+  - CookieScanPolicy
+  - CookieScanRun
+  - CookieTrackingDigitalTechnologyRegistryView
+  files:
+  - handoff/design-notes/customer-marketing.yaml
+  - screens/P13-white-label-cms.yaml
+root_class: 'new: open-question-decided'
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-CMS-025
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: d967f400
+notes: 'CMS-025 is Block A in the plan; the HLD/LLD scanner integration is apply-docs''. Batch SGU (screens-guest), 2
+  October 2026. Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys of
+  the touched screens.'

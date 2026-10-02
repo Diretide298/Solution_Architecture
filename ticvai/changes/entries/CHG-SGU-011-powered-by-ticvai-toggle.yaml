@@ -1,0 +1,40 @@
+id: CHG-SGU-011
+date: '2026-10-02'
+source: cr
+kind: spec
+summary: '"Powered by TICVAI" is a toggle on CMS-104, on by default, switchable off only where the licence allows; the
+  credit shows on the launch screen and at the foot of Account.'
+decision:
+  what: CMS-104 binds getBrandIdentity and setBrandIdentity for BrandIdentity.showPoweredBy, with the 403 powered-by-locked
+    refusal named.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October (batch 4): "''Powered by'' as a configuration toggle (default on)"; pre-apply round: "A toggle,
+  default on" (DEC-160 in handoff/decisions-2-october.json); DI-250, DI-297; CHG-CSA-036; the lead''s follow-up of 2
+  October (CMS-104 calls setBrandIdentity).'
+keys_touched:
+  screens:
+  - CMS-104
+  operations:
+  - getBrandIdentity
+  - setBrandIdentity
+  schemas:
+  - BrandIdentity
+  - LicencePosition
+  files:
+  - handoff/design-notes/white-label.yaml
+  - screens/P13-white-label-cms.yaml
+root_class: 'new: open-question-decided'
+tickets:
+  started: []
+  unstarted:
+  - APP-WL-CMS-104
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: d967f400
+notes: 'Batch SGU (screens-guest), 2 October 2026. Tickets: none started (Block A starts Monday 5 October 2026); unstarted
+  keys are the tasks.csv keys of the touched screens.'
