@@ -1,0 +1,38 @@
+id: CHG-AUD-001
+date: '2026-10-03'
+source: audit
+kind: spec
+summary: Patterns the r2 Block A and Block D audit samples found beyond the done-when gap, logged for the r3 fix pass
+  after the zero-AI checks count them across all 940 Block A tickets.
+decision:
+  what: 'Log, do not fix yet (Chinmay, 3 October: log these, see what the other batches show, then fix). Patterns, each
+    with an example from the 75 tickets judged by Opus 5.5: (1) generated forms ask for readOnly fields (BO-094 id and
+    mapId) and detail lists dump every schema field (EMP-026, 12 columns on a phone); (2) no-access states name the
+    wrong permission (BO-094 VIEW vs MANAGE); (3) guest screens bind staff-only operations or need an id no entry gives
+    (GST-061 listModifierGroups needs PRODUCT_VIEW; GST-032 and WEB-044 conversationId and module; CMS-104);
+    (4) contract rules that disagree with their screens (closeTableVisit payments and subBillId vs POS-028 / EMP-059
+    splits; updateVisitPlan change kinds vs GST-053 add-on; updateDashboard vs ANL-023 Save; streaming answers);
+    (5) table specs that cannot be migrated as written (return_policy.id PK not required; tenant_isolation RLS on tables
+    with no tenant_id; games.reader with no keys; tables with no migration; two migration file names for MIG-RETAIL);
+    (6) ticket scope out of step with its screen after the 2 October moves (APP-SETUP-BO-009 title 5 operations,
+    screen 11; VM-BO-030 route still the old screen); (7) wireframes not started or pointing at archived boards (Claude
+    Design); (8) stale notes (Wave 2 text on GST-054).'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Block A audit on live r2, 3 October: 75 tickets (25 Block A early, 25 Block A mid-build, 25 Block D mid-build),
+  each judged in one tool-free call from its developer pull (audit finding batches judge-log, judge-a-mid, judge-d-mid; council item C7 pointers). Logs in audit/ticvai/runs/r2-block-a/direct (judge-*.jsonl).'
+keys_touched:
+  screens: [BO-094, EMP-026, GST-061, GST-032, WEB-044, CMS-104, POS-028, EMP-059, GST-053, ANL-023, BO-009, BO-030, GST-054]
+  operations: [closeTableVisit, updateVisitPlan, updateDashboard, listModifierGroups, createAiConversation]
+root_class: A00 AUDIT
+tickets:
+  started: []
+  unstarted: []
+release_tag: r3
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: none
+  reason: 'this entry holds the r3 fix pass; each fix it splits into names its own check or generator rule'
+  approved_by: Chinmay
+status: open

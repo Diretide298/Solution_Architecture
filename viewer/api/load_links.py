@@ -36,6 +36,9 @@ def main() -> int:
     ap.add_argument("--db", default=os.environ.get("TICVAI_DB", str(Path(__file__).parent / "ticvai.db")))
     ap.add_argument("--apply", action="store_true")
     ap.add_argument("--remove", help="JSON file with a 'tickets' object keyed by OpenProject ids whose links go")
+    ap.add_argument("--prune", action="store_true",
+                    help="for every ticket in the file, remove the bulk-loaded links (made by --email) the file no "
+                         "longer has: a release's links replace the last release's instead of piling up")
     a = ap.parse_args()
 
     data = json.loads(Path(a.file).read_text(encoding="utf-8"))
@@ -62,6 +65,13 @@ def main() -> int:
     drop = conn.execute(
         f"SELECT COUNT(*) FROM artefact_link WHERE project_id = ? AND external_system = 'openproject' "
         f"AND external_key IN ({','.join('?' * len(gone))})", (project[0], *gone)).fetchone()[0] if gone else 0
+    want = {(l["kind"], l["id"], l["key"]) for l in data["links"]}
+    in_file = {l["key"] for l in data["links"]}
+    stale = [r for r in conn.execute(
+        "SELECT id, target_kind, target_id, external_key FROM artefact_link WHERE project_id = ? "
+        "AND external_system = 'openproject' AND created_by = ?", (project[0], account[0]))
+        if r[3] in in_file and (r[1], r[2], r[3]) not in want] if a.prune else []
+    print(f"prune: {len(stale)} links the file no longer has, on tickets it lists (made by this account)" if a.prune else "")
     print(f"ADAM project {project[0]} ({project[1]}), as {account[1] or a.email}: {len(data['links'])} links in the "
           f"file, {len(data['links']) - len(new)} already there, {len(new)} to add ({before} links in the project now)"
           f"; cached ticket columns refreshed on {len(old)}; {drop} links to {len(gone)} deleted tickets to remove"
@@ -85,11 +95,13 @@ def main() -> int:
             "AND external_system = 'openproject' AND external_key = ?",
             [(l.get("subject", ""), l.get("status", ""), l.get("type", ""), l.get("assignee", ""), now,
               project[0], l["kind"], l["id"], l["key"]) for l in old])
+        if stale:
+            conn.executemany("DELETE FROM artefact_link WHERE id = ?", [(r[0],) for r in stale])
         if gone:
             conn.execute(f"DELETE FROM artefact_link WHERE project_id = ? AND external_system = 'openproject' "
                          f"AND external_key IN ({','.join('?' * len(gone))})", (project[0], *gone))
     after = conn.execute("SELECT COUNT(*) FROM artefact_link WHERE project_id = ?", (project[0],)).fetchone()[0]
-    print(f"done: {len(new)} links added, {len(old)} refreshed, {drop} removed; {after} in the project")
+    print(f"done: {len(new)} links added, {len(old)} refreshed, {drop + len(stale)} removed; {after} in the project")
     return 0
 
 

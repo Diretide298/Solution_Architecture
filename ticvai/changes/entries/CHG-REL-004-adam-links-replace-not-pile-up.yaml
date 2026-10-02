@@ -1,0 +1,31 @@
+id: CHG-REL-004
+date: '2026-10-03'
+source: audit
+kind: process
+summary: load_links.py --prune replaces a ticket's bulk-loaded ADAM links with the release's, so links a release dropped
+  stop reaching developers.
+decision:
+  what: 'viewer/api/load_links.py gains --prune: for every ticket in the file, the links the same account bulk-loaded
+    that the file no longer has are removed. Links made by other accounts and tickets absent from the file are left
+    alone. The release push loads links with --prune from r2 on.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'The Block A audit on live r2 (3 October) found pulled tickets still linked to operations the 2 October screen
+  changes removed, e.g. VM-BO-030 with six operations its screen no longer calls (finding in judge-log, ticket 18xxx
+  VM-BO-030); spot checks the same night showed old tickets with more links than adam-links.json gives them. The
+  loader only inserted (INSERT OR IGNORE), so r1 links survived r2.'
+keys_touched:
+  files:
+  - ../viewer/api/load_links.py
+root_class: A00 TOOLING
+tickets:
+  started: []
+  unstarted: []
+release_tag: r2
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/adam-links.py
+status: open
+notes: Tested on a throwaway database (stale link removed, another account's link and an unlisted ticket kept).

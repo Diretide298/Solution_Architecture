@@ -117,18 +117,64 @@ def builds_of(r, part, lineage):
     return []
 
 
-def pointer(key, summary, builds, release):
-    """The description a ticket carries from this release on. %ID% is its OpenProject id, filled in on the server."""
+DONE_WHEN = re.compile(r"Done when[:,]?\s*(.+)", re.S | re.I)
+
+
+def done_when(r, part, builds):
+    """What finishes this ticket, as one line every pointer carries (CHG-REL-003). The plan's own "Done when" when the
+    task has one; otherwise the test strategy's (docs/active/block-test-strategy.md) for its kind, naming what it
+    builds. Before 3 October the pointer said the done-when lived in ADAM, which serves contracts, screens and
+    tables but no task's done-when, so most tickets reached developers with none."""
+    m = DONE_WHEN.search(r.get("description") or "")
+    if m and not part:
+        return "Done when " + " ".join(m.group(1).split())[:700]
+    names = [b.split(" ", 1)[1] for b in builds]
+    named = ", ".join(f"`{n}`" for n in names[:8]) + (f" and {len(names) - 8} more" if len(names) > 8 else "")
+    kind, typ = r.get("track"), r.get("type")
+    if typ == "Epic":
+        return ("Done when every app-module in the block is done, every flow the block claims passes end to end on the "
+                "integration environment, and the client has run its acceptance session (block-test-strategy).")
+    if typ == "Feature":
+        return ("Done when every ticket under it is done and its module test passes on the integration environment with "
+                "no open severity 1 or 2 defect (block-test-strategy).")
+    if kind == "Backend" and names:
+        return (f"Done when {named} pass their contract tests against the contract in ADAM, including every documented "
+                "error response; each reads and writes only the tables its spec lists, under row-level security; unit "
+                "tests cover its rules; and a peer in the same stack has reviewed and tested it.")
+    if kind == "Database" and names:
+        return (f"Done when the migration for {named} runs forward on an empty database and on the previous release's "
+                "schema, every table matches its spec in ADAM (columns, keys, indexes, row-level security), and a peer "
+                "has reviewed it.")
+    if kind == "Frontend" and names:
+        step = {"build": "the layout is built from the screen spec (and its wireframe once client-verified)",
+                "wire": "every bound operation is called as the screen spec says, with its loading, empty and error states",
+                "test": "a component or interaction test covers every state, navigation link and permission"}.get(part)
+        if step:
+            return f"Done when, for {named}: {step}."
+        return (f"Done when {named} reaches every state its spec lists, every navigation link works, an allowed and a "
+                "refused user see what its permissions say, and it calls only its bound operations (block-test-strategy).")
+    return ("Done when the work in the description above is built, tested and reviewed by a peer in the same stack "
+            "(block-test-strategy).")
+
+
+def pointer(key, summary, builds, release, what="", done=""):
+    """The description a ticket carries from this release on. %ID% is its OpenProject id, filled in on the server.
+    A ticket that builds nothing ADAM indexes keeps its plan text (`what`): ADAM has nothing else to give it."""
     shown = builds[:MAX_BUILDS]
     more = f" and {len(builds) - MAX_BUILDS} more (all listed in ADAM)" if len(builds) > MAX_BUILDS else ""
     lines = [f"**{summary}**", "",
              f"- Key: `{key}`",
-             "- Builds: " + (", ".join(f"`{b}`" for b in shown) + more if shown else "see the key; nothing indexed by id"),
+             "- Builds: " + (", ".join(f"`{b}`" for b in shown) + more if shown else "see the description below"),
              f"- {POINTER_PREFIX} `/ticket %ID%`",
              f"{RELEASE_PREFIX}`{release}`",
-             "",
-             "The spec (contract, tables, screens, done-when) lives in ADAM at the release tag, not in this ticket. "
-             "OpenProject holds who, when, state and order."]
+             ""]
+    if what:
+        what = DONE_WHEN.sub("", what).strip() if done else what   # the done-when gets its own line below
+        lines += ["**What:** " + " ".join(what.split()), ""]
+    if done:
+        lines += ["**Done when:** " + done[len("Done when"):].lstrip(" ,:"), ""]
+    lines.append("The rest of the spec (contract, tables, screens) lives in ADAM at the release tag. "
+                 "OpenProject holds who, when, state and order.")
     return "\n".join(lines) + "\n"
 
 
@@ -222,7 +268,9 @@ def build(rows, mp, sched, lineage, retire_plan, unexplained, release):
             "assignee": name(assignee), "responsible": name(accountable(r)),
             "sprint": n, "version_key": f"VERSION-S{n}" if n else None,
             "version": mp.get(f"VERSION-S{n}") if n else None, "set_version": task,
-            "summary": summ, "builds": builds, "pointer": pointer(key, summ, builds, release)})
+            "summary": summ, "builds": builds,
+            "pointer": pointer(key, summ, builds, release, what="" if builds else (r.get("description") or ""),
+                               done=done_when(r, part, builds) if typ != "Sub Task" or builds else "")})
 
     for r in rows:
         add(r["key"], r["type"], r["parent"], r["subject"], r, "")
@@ -385,6 +433,9 @@ def main() -> int:
 
     bundle, errors = build(rows, mp, sched, lineage, retire_plan, unexplained, release)
     errors += op10_problems()
+    # CHG-REL-003: every task a developer pulls says what finishes it
+    errors += [f"{t['key']}: its pointer has no done-when" for t in bundle["tickets"]
+               if t["type"] == "Task" and "**Done when:**" not in t["pointer"]]
     if not a.no_key_check:
         ks = _load("check_key_stability", "check-key-stability.py")
         if hasattr(ks, "retired_keys"):      # the 1C version (1 October): a rename of a pushed key blocks too

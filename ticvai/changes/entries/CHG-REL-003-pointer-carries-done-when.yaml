@@ -1,0 +1,37 @@
+id: CHG-REL-003
+date: '2026-10-03'
+source: audit
+kind: process
+summary: Every ticket's OpenProject pointer carries its done-when, and a ticket that builds nothing ADAM indexes keeps
+  its plan text; r2 pointers had removed both.
+decision:
+  what: 'op-release.py writes a "Done when" line into every pointer: the plan''s own when the task has one, otherwise the
+    test strategy''s for its kind (backend operations, database migrations, frontend screens and their build / wire /
+    test sub-tasks, features, epics), naming what it builds. A ticket with no indexed artefacts (module tests, AI engine,
+    DB-ROLES, setup, DevOps) also keeps its plan description as "What". op-release.py refuses a bundle in which any task
+    pointer has no done-when. The new pointers reach OpenProject through the descriptions phase (ONLY=descriptions).'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'The Block A audit on live r2 (25 tickets judged by Opus 5.5 from their developer pulls, 3 October) found 6 of 25
+  tickets not buildable. 5 had a pointer that said the spec (done-when) lives in ADAM, but ADAM serves contracts, screens
+  and tables and no task done-when, and nothing was linked: DB-ROLES, TEST-AM-FOUNDATION-PLATFORM,
+  TEST-AM-FOUNDATION-DATABASE, TEST-AM-FOOD-BEVERAGE-P08-BLOCK-A, AI-ENGINE-BASELINE. Backend and frontend tasks never
+  had an explicit done-when (894 of 919 and 887 of 887); this is the 26 Sep audit''s "no acceptance criteria" root,
+  and the C7 pointer of 1 October (council item C7) made it worse.'
+keys_touched:
+  files:
+  - tools/op-release.py
+  - handoff/service-docs/op-release.json
+root_class: A00 TOOLING
+tickets:
+  started: []
+  unstarted: []
+release_tag: r2
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/op-release.py
+status: open
+notes: The audit's harness capped the files it gave the model at 60,000 characters in the first batch, so SVC-AI-ASSIST-1's
+  "files not in the package" was the harness, not the package; the cap is 150,000 now and names what it left out.
