@@ -1,0 +1,32 @@
+id: CHG-DOC-001
+date: '2026-10-02'
+source: audit
+kind: process
+summary: The two research reports of 2 October, the AI/ML workbook, Chinmay's answers log and the list of defaults to review are copied
+  into git as the cited inputs of the 2 October decisions.
+decision:
+  what: Copy audit/ research and answers into docs/active/research/ and docs/active/decisions/, and cite those copies (DEC-556).
+  by: Chinmay
+  date: '2026-10-02'
+why: 'CHG-SEED-012 and the council of 2 October: nothing outside git may be cited (ticvai/CLAUDE.md rule 12). The answers file itself
+  said the research was ''to be copied into git when applied'' (DEC-556 in docs/registers/decisions-2-october.md).'
+keys_touched:
+  files:
+  - docs/active/research/ai-ml-model-selection-2-october.md
+  - docs/active/research/ai-ml-model-selection-2-october.xlsx
+  - docs/active/research/cookie-scanner-and-domains-2-october.md
+  - docs/active/decisions/answers-2-october.md
+  - docs/active/decisions/questions-defaults-to-review.md
+  - docs/active/README.md
+root_class: 'new: source-outside-git'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-cited-sources.py
+status: open
+notes: Each copy carries a header saying it is the cited copy and what was decided on it; the one citation of the audit folder in the
+  answers log is repointed to docs/active/research/. check-cited-sources (gating) fails any new citation of audit/. Closes on its commit.
