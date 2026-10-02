@@ -1,0 +1,34 @@
+id: CHG-CLN-015
+date: '2026-10-02'
+source: audit
+kind: process
+summary: build-service-docs' key reconciliation gives a migration task whose own pushed key went to other work the next
+  free number, instead of writing two tasks under one key and stopping the refresh.
+decision:
+  what: In reconcile_keys, a tables-identity task (MIG-, VM-MIG-) left unmatched whose key is already taken takes <stem>-<n>,
+    the first number nobody has pushed or taken, as an operations task does; screens keep the old rule.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Found on this branch and on main at e80beb7b alike, before any cleanup change: after a local derive, build-service-docs
+  stopped on "key reconciliation gave two tasks one key" because MIG-FNB-4 (allergen_verdict, ingredient_substitute, substitution_rule)
+  overlapped the pushed VM-MIG-FNB most and took it, and the planned VM-MIG-FNB (fnb.temperature_checkpoint) was then written
+  under the same key. The r2 refresh could not have run (council of 1 October, C4 key stability).'
+keys_touched:
+  files:
+  - tools/build-service-docs.py
+  tickets:
+  - VM-MIG-FNB
+root_class: A10 TICKET-DRIFT
+tickets:
+  started: []
+  unstarted:
+  - VM-MIG-FNB
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py::reconcile_keys
+status: open
+notes: The assertion in reconcile_keys is the guard; it fired on the parent commit and passes after. check-key-stability then
+  reports the new key's work on the pushed ticket as a split (it does not fail).

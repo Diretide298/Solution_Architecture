@@ -1059,8 +1059,9 @@ paths:
 
         **And, from 2 October 2026** (Chinmay; CHG-CSP-018, CHG-CSP-022): biometrics switched on
         without the venue's own `biometrics.consentFormId` (DEC-128), and accreditation face matching
-        switched on without `legalSignOffReference` (DEC-461). `cashDrawerLimit` (CHG-CSP-016) and
-        `fnb.tableReservedLeadMinutes` (CHG-CSP-017) are venue overrides like the other limits.
+        switched on without `legalSignOffReference` (DEC-461). `cashDrawerLimit` (CHG-CSP-016) is a venue
+        override like the other limits; `fnb.tableReservedLeadMinutes` (CHG-CSP-017) is deprecated in favour of
+        `fnb.FnbReservationPolicy.reservedLeadMinutes` (CHG-CLN-009).
       tags: [tenancy]
       x-ticvai-permission: TENANT_CONFIGURE
       x-ticvai-audience: [staff]
@@ -3935,6 +3936,9 @@ components:
         restaurant outside the gate, which may sell takeaway and delivery (DI-1039) with no ticket.
         DI-292 is amended for standalone outlets only. The admission check itself stays in Access
         (ADR-0068). F&B keeps its own payment and its own receipt either way.
+        **The canonical name** (2 October 2026, CHG-CLN-008): the field is `admissionContext` on the
+        outlet and on F&B's guest `DiningOutlet`; common `OutletSiting` and the word "siting" are
+        deprecated aliases of this.
       enum: [insideVenue, standalone]
 
     OutletNameTranslations:
@@ -5244,7 +5248,11 @@ components:
               minimum: 0
               maximum: 240
               default: 30
+              deprecated: true
               description: >
+                **Deprecated (2 October 2026, CHG-CLN-009): `fnb.FnbReservationPolicy.reservedLeadMinutes`
+                is canonical.** The table state model reads the reservation policy (`states/table.yaml`);
+                this venue setting is kept for compatibility, never read, and not drawn. Its former meaning:
                 **How long before a pre-allocated booking its table shows Reserved** (decided 2 October 2026,
                 Chinmay, batch 6 set 6b, EMP-052: "Reserved when a booking names the table, or N minutes
                 (venue-set) before a pre-allocated booking"; DEC-202; CHG-CSP-017; DI-689, DI-336). A booking

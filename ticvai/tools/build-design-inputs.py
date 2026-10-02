@@ -90,12 +90,22 @@ def screen_index() -> tuple[dict, dict, set]:
 
 
 def superseded_ids(inputs: list[dict]) -> dict:
-    """id -> the id of the entry that supersedes it."""
+    """id -> the id of the entry that supersedes it, or the decision that did (`superseded_by`)."""
     out = {}
     for e in inputs:
         for old in e.get("supersedes") or []:
             out[old] = e["id"]
+    # **A decision can supersede a meeting input with no later meeting to say so** (2 October 2026, CHG-CLN-012):
+    # the 19 September kitchen display decision superseded DI-077, ADR-0051 superseded DI-280. The entry then
+    # carries `superseded_by: {ref, note}`, where ref is an ADR, a decision (DEC-), a change entry (CHG-) or a DI.
+    for e in inputs:
+        sb = e.get("superseded_by")
+        if isinstance(sb, dict) and sb.get("ref") and e["id"] not in out:
+            out[e["id"]] = str(sb["ref"])
     return out
+
+
+SUPERSEDED_BY_REF = re.compile(r"^(DI-\d{3,4}|ADR-\d{4}|DEC-\d+|CHG-[A-Z]{2,6}-\d{3})$")
 
 
 def active(inputs: list[dict] | None = None) -> list[dict]:
@@ -159,6 +169,20 @@ def validate(inputs: list[dict]) -> list[str]:
                 errs.append(f"{i}: supersedes {old}, which does not exist")
             elif old == e.get("id"):
                 errs.append(f"{i}: supersedes itself")
+        sb = e.get("superseded_by")
+        if sb is not None:
+            if not isinstance(sb, dict) or not str(sb.get("note") or "").strip():
+                errs.append(f"{i}: superseded_by needs a ref and a note saying what replaced it")
+            elif not SUPERSEDED_BY_REF.match(str(sb.get("ref") or "")):
+                errs.append(f"{i}: superseded_by.ref {sb.get('ref')!r} is not a DI, ADR, DEC or CHG id")
+            else:
+                ref = str(sb["ref"])
+                if ref.startswith("DI-") and ref not in ids:
+                    errs.append(f"{i}: superseded_by {ref}, which does not exist")
+                if ref.startswith("ADR-") and not list((ROOT / "docs" / "adr").glob(f"{ref[4:]}-*.md")):
+                    errs.append(f"{i}: superseded_by {ref}, which has no file in docs/adr/")
+                if ref.startswith("CHG-") and not list((ROOT / "changes" / "entries").glob(f"{ref}-*.yaml")):
+                    errs.append(f"{i}: superseded_by {ref}, which is not a change entry")
     # **A chain must end.** A supersedes B supersedes A would drop both from every bundle.
     nxt = superseded_ids(inputs)
     for start in nxt:

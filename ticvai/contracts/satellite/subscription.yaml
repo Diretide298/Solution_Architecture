@@ -91,8 +91,12 @@ paths:
       tags:
       - subscription
       x-ticvai-permission: TENANT_CONFIGURE
+      security:
+      - bearerAuth: []
+      - prospectAuth: []
       x-ticvai-audience:
       - public
+      - prospect
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1331,8 +1335,12 @@ paths:
         - "P09 ADM-392 Subscription Tier Configuration"
         - "P09 ADM-400 Commercial Model & Tier Selection"
         - "P17 SGN-012 Commercial Model & Tier Selection"
+      security:
+      - bearerAuth: []
+      - prospectAuth: []
       x-ticvai-audience:
       - staff
+      - prospect
       x-ticvai-read-routing: replica
       summary: List subscription plans
       description: '**Packages, standard and custom (decided 29 September, Chinmay).** With `offeredToTenantId`,
@@ -1550,8 +1558,12 @@ paths:
         - "P09 ADM-463 Subscription & Commercial Change Management"
         - "P17 SGN-019 Contract & Billing Cycle Selection"
         - "P17 SGN-024 Subscription Confirmation & Commercial Activation"
+      security:
+      - bearerAuth: []
+      - prospectAuth: []
       x-ticvai-audience:
       - staff
+      - prospect
       summary: Assign or change a subscription
       description: 'Upgrades take effect immediately. **Downgrades are checked first**: if the target
         plan licenses fewer modules than the tenant currently has enabled, or lower limits than they are
@@ -1641,8 +1653,12 @@ paths:
         - "P09 ADM-414 Order & Commercial Pricing Review"
         - "P09 ADM-463 Subscription & Commercial Change Management"
         - "P17 SGN-022 Order & Commercial Pricing Review"
+      security:
+      - bearerAuth: []
+      - prospectAuth: []
       x-ticvai-audience:
       - staff
+      - prospect
       summary: Preview the effect of a plan change
       description: 'What would change, what would break, and the prorated amount. Run before committing
         — an account manager should never discover a conflict by causing it.
@@ -5977,8 +5993,12 @@ paths:
         - "P10 PTR-033 Agreement & Contract Terms Builder"
         - "P17 SGN-023 Commercial Agreement, Billable Definition & Customer Acceptance"
       x-ticvai-api-scope: partner.write
+      security:
+      - bearerAuth: []
+      - prospectAuth: []
       x-ticvai-audience:
       - partner
+      - prospect
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.25-27
         (Agreement Information, Agreement Types, Contract Terms, Renewal, Document Association, Versioning);
         MoM 31 Aug 2026 §4.4 (each agreement captures term/value; three payment models); shape follows createPartnerAgreement/updatePartnerAgreement
@@ -7697,6 +7717,7 @@ paths:
       security:
       - guestAuth: []
       - bearerAuth: []
+      - prospectAuth: []
       summary: Score a prospect's answers into a tier and a package
       description: 'Board 2, all ten screens of it — venue type, visitor scale, channels, ticketing
         needs, access and queue, additional modules, integrations.
@@ -7713,6 +7734,7 @@ paths:
       x-ticvai-audience:
       - staff
       - guest
+      - prospect
       x-ticvai-scope-level: platform
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -7824,6 +7846,7 @@ paths:
       - {}
       - guestAuth: []
       - bearerAuth: []
+      - prospectAuth: []
       summary: Modules, their dependencies and their commercial treatment
       description: 'Boards 4.3 and 4.6. **A module marketplace without a dependency graph sells
         combinations that cannot be provisioned.** F&B needs inventory; seating needs the venue map;
@@ -7838,6 +7861,7 @@ paths:
       x-ticvai-audience:
       - staff
       - guest
+      - prospect
       x-ticvai-scope-level: platform
       x-ticvai-read-routing: replica
       responses:
@@ -7898,6 +7922,7 @@ paths:
       security:
       - guestAuth: []
       - bearerAuth: []
+      - prospectAuth: []
       summary: What this package would cost, and what it would provision
       description: 'Boards 3.9, 4.8 and 10.8. **Four boards ask for a simulator, which is the pack
         saying the model is too complex to hold in a head.** Tier, allowances, billable unit, minimum
@@ -7915,6 +7940,7 @@ paths:
       x-ticvai-audience:
       - staff
       - guest
+      - prospect
       x-ticvai-scope-level: platform
       requestBody:
         required: true
@@ -8160,8 +8186,12 @@ paths:
       tags:
       - subscription
       x-ticvai-permission: PLATFORM_BILLING_MANAGE
+      security:
+      - bearerAuth: []
+      - prospectAuth: []
       x-ticvai-audience:
       - staff
+      - prospect
       x-ticvai-scope-level: platform
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -24935,6 +24965,11 @@ components:
           format: date-time
           description: Generated at
   securitySchemes:
+    prospectAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Prospect sign-up session token (common.yaml prospectAuth). Scoped to one onboarding application; DEC-167, CHG-CLN-010.
     serviceAuth:
       type: http
       scheme: bearer

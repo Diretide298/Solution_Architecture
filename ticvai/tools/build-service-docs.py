@@ -639,6 +639,17 @@ def reconcile_keys(plan: dict[str, set], fixed: set, mp: dict, closed: frozenset
                 n += 1
             final[t] = f"{stem}-{n}"
             notes.append(f"{t}: pushed for other work, so this work is new and takes {final[t]}")
+        elif ident and ident[0] == "tables" and t in taken:
+            # **Its own key already went to other work** (2 October 2026, CHG-CLN-015): the greedy pass gave the
+            # pushed VM-MIG-FNB to MIG-FNB-4, which overlapped it most, and VM-MIG-FNB itself was then written under
+            # the same key -- two tasks, one key, and the assertion below stopped every refresh. A migration task whose
+            # key is taken takes the next number nobody has pushed (MIG-X-n), as an operations task does.
+            stem = re.sub(r"-\d+$", "", t)
+            n = 1
+            while f"{stem}-{n}" in pitems or f"{stem}-{n}" in taken:
+                n += 1
+            final[t] = f"{stem}-{n}"
+            notes.append(f"{t}: its key went to other work, so this work is new and takes {final[t]}")
         else:
             final[t] = t
             notes.append(f"{t}: keeps its key, which was pushed for other work")

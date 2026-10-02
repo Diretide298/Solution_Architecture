@@ -1,0 +1,36 @@
+id: CHG-CLN-009
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: FnbReservationPolicy.reservedLeadMinutes is the one setting for when a pre-allocated table shows Reserved; VenueSettings.fnb.tableReservedLeadMinutes
+  is deprecated.
+decision:
+  what: tenancy VenueSettings.fnb.tableReservedLeadMinutes is marked deprecated (kept for compatibility, never read, not drawn);
+    fnb FnbReservationPolicy.reservedLeadMinutes, which the table state model already reads (states/table.yaml), says it is
+    canonical; setVenueSettings' description stops listing the deprecated field as a venue override.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'One decision (workbook Q202, DI-689; DEC-202) was modelled twice: CHG-CSA-012 put reservedLeadMinutes on the fnb reservation
+  policy (per outlet) and CHG-CSP-017 tableReservedLeadMinutes on the venue settings. The cleanup pass of 2 October named
+  the policy field the winner (audit TODO, from CHG-SPO-020).'
+keys_touched:
+  schemas:
+  - VenueSettings
+  - FnbReservationPolicy
+  operations:
+  - setVenueSettings
+  files:
+  - contracts/spine/tenancy.yaml
+  - contracts/satellite/fnb.yaml
+root_class: 'new: duplicated-definition'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: Deprecation is additive against r1 (the venue field was not in r1). No screen binds the deprecated field.

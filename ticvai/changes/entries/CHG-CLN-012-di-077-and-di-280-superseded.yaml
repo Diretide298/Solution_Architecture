@@ -1,0 +1,39 @@
+id: CHG-CLN-012
+date: '2026-10-02'
+source: design-input
+kind: design-input
+summary: DI-077 (KDS integration point only) and DI-280 (no forecasting in phase one) are marked superseded and leave every
+  design bundle; DI-474's scope names P08/Catalogue.
+decision:
+  what: 'A design input may carry superseded_by {ref, note} when a decision, not a later meeting, replaced it; build-design-inputs.py
+    treats it as superseded and validates the ref (a DI, an ADR file, a DEC or a change entry) and the note. DI-077 is superseded
+    by the 19 September decision that the kitchen display is TICVAI''s own (recorded here), DI-280 by ADR-0051 (baseline-first
+    forecasting). DI-474''s scope P09/Catalogue, which the ADM-049 move emptied, becomes P08/Catalogue.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Design-note corrections KIT-001 (CHG-SPO-020) and BO-919 (CHG-SBO-020) asked for both to be marked superseded; Chinmay''s
+  answer 317 (2 October) applies the 30 September baseline-first design over DI-280; the fnb contract records the 19 September
+  KDS decision (CF-19). build-design-inputs --check failed on DI-474 since the ADM-049 move (CHG-MOV-001).'
+keys_touched:
+  files:
+  - handoff/design-inputs/mom-design-inputs.yaml
+  - tools/build-design-inputs.py
+  - handoff/design-notes/ai.yaml
+  - handoff/design-notes/fnb-retail.yaml
+  other:
+  - DI-077
+  - DI-280
+  - DI-474
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/build-design-inputs.py::superseded_by
+status: open
+notes: build-design-inputs --check failed on the parent commit (DI-474) and passes after; the two design-note corrections
+  are fixed by this entry.

@@ -437,7 +437,12 @@ components:
       default: sendFirst
     OutletSiting:
       type: string
-      description: '**Whether an outlet is inside the venue''s gates or stands on its own** (Chinmay, 2 October,
+      deprecated: true
+      description: '**Deprecated alias** (2 October 2026, CHG-CLN-008): the canonical name is the outlet field
+        `admissionContext`, typed `tenancy.OutletAdmissionContext`, with the same two values; no operation uses
+        this schema and new references must not. Kept so an earlier reference resolves.
+
+        **Whether an outlet is inside the venue''s gates or stands on its own** (Chinmay, 2 October,
         workbook Q70; amends DI-292 for standalone outlets; CHG-CSA-011). `insideVenue`, the default: a guest
         ordering online or at a kiosk needs a valid admission ticket for the venue (DI-292; the admission check
         stays in Access, ADR-0068). `standalone`: a restaurant outside the venue sells takeaway and delivery with
@@ -860,6 +865,20 @@ components:
           schema:
             $ref: '#/components/schemas/Problem'
   securitySchemes:
+    prospectAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: '**Prospect sign-up session token** (decided 2 October 2026, Chinmay: DEC-167, "Email +
+        one-time code"; CHG-CLN-010). The audience `prospect`: somebody signing their venue up to TICVAI
+        through the public sign-up journey (P17) before any tenant exists. Issued once the prospect proves
+        their email with a one-time code, and "Continue saved setup" signs back in the same way. **Scoped to
+        one onboarding application**: it reads and writes only that application, its assessment, its package
+        and its subscription choice, carries no tenant and no permission, and an operation''s
+        `x-ticvai-permission` is what a staff caller must hold, never the prospect. Expires with the
+        application''s activation or abandonment.
+
+        '
     bearerAuth:
       type: http
       scheme: bearer

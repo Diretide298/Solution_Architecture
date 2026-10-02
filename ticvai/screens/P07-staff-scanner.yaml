@@ -2237,9 +2237,10 @@ screens:
       - kind: secondaryButton
         label: Switch direction
         operation: setAccessPointDirection
-        permission: ACCESS_POINT_CONFIGURE
+        permission: ACCESS_DIRECTION_SET
         notes: '**Live, with a specific permission, and logged** (decided 2 October 2026, Chinmay, critical
           set 1, BO-230: "Live direction switch with permission, logged; R221 amended"; DEC-255; CHG-CSP-032).
+          The permission is ACCESS_DIRECTION_SET, the operation''s own (CHG-FUP-006; CHG-CLN-013).
           Entry to Exit or back, with a reason and an optional time it takes effect; the gate mode change
           records the from and to direction. Hidden without the permission.'
         provenance: contract access.yaml PUT /access-points/{accessPointId}/direction

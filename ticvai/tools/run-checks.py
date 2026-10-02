@@ -105,9 +105,8 @@ REPORT_ONLY = {
         "gates once the public theme and policy reads land and the lead records its baseline",
     "check-subject":
         "gates once the POS loyalty swap lands and the lead records its baseline",
-    "check-candidate-decisions":
-        "gates once the five undecided POS v2 candidates (POS-000, -003, -004, -012, -023) are decided and "
-        "the lead records its baseline (CHG-SEED-005)",
+    # check-candidate-decisions gates since 2 October 2026 (CHG-CLN-011): the five POS v2 candidates are decided
+    # (POSV2-9..13, applied by CHG-SPO-001) and it passes with an empty baseline.
 }
 
 

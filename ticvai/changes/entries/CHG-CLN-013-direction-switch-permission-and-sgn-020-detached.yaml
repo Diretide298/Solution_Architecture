@@ -1,0 +1,40 @@
+id: CHG-CLN-013
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: SCN-016's Switch direction (and BO-201's) is permissioned ACCESS_DIRECTION_SET; apply-subscription-placement.py no
+  longer copies ADM-411 onto SGN-020.
+decision:
+  what: 'The Switch direction button on SCN-016 names ACCESS_DIRECTION_SET, the permission setAccessPointDirection requires
+    (it named ACCESS_POINT_CONFIGURE); BO-201''s button states the same permission. ADM-411 joins DETACHED in tools/applied/apply-subscription-placement.py
+    (SGN-020 is the prospect''s own billing-entity form), so a re-run neither re-adds source.sameAs nor copies ADM-411''s
+    console fields, including its R098 tenant picker, onto it.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'The contract follow-ups of 2 October added ACCESS_DIRECTION_SET for the live direction switch (DEC-255, CHG-FUP-006);
+  the screen kept the broader configure permission. SGN-020 was detached by hand when ADM-411 gained the console grant (CHG-SBO-001,
+  R098; workbook Q223) and the placement script would undo it on its next run (audit TODO, cleanup pass).'
+keys_touched:
+  screens:
+  - SCN-016
+  - BO-201
+  - SGN-020
+  - ADM-411
+  files:
+  - screens/P07-staff-scanner.yaml
+  - screens/P08-venue-back-office.yaml
+  - tools/applied/apply-subscription-placement.py
+root_class: A23 AUTH-SCOPE
+tickets:
+  started: []
+  unstarted:
+  - APP-SCANNER-SCN-016
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/applied/apply-subscription-placement.py::DETACHED
+status: open
+notes: 'No check compares a control''s permission with its operation''s x-ticvai-permission today; recommended later: a check-screen-wiring
+  rule that does.'

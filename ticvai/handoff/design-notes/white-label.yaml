@@ -951,8 +951,8 @@ screens:
     - what: F102 step 3 to step 4 jumps from CMS-006 to ADM-016 (cross-device, platform console).
       why: A tenant's preview never hands over to the platform console; the next step is CMS-012 or CMS-014.
       source: [F102 step 3, F22 step 4]
-      status: logged
-      by: CHG-SGU-025
+      status: fixed
+      by: CHG-CLN-005
     decisions:
     - question: Should the preview also render the PDF ticket and Apple / Google Wallet pass?
       decision: Previews of the PDF ticket and the Apple/Google Wallet pass are in Block A.
@@ -1886,8 +1886,8 @@ screens:
     - what: F102 hands over from the tenant's CMS-006 to this console screen as step 4.
       why: A tenant's journey never continues on the platform console.
       source: F102 step 3
-      status: logged
-      by: CHG-SBO-020
+      status: fixed
+      by: CHG-CLN-005
     decisions:
     - question: May platform staff publish a tenant's site, or only prepare the draft for the tenant to publish?
       decision: 'Hosted with TICVAI: platform staff may publish a tenant''s site under a grant. Self-hosted: the venue uses

@@ -1,0 +1,42 @@
+id: CHG-CLN-014
+date: '2026-10-02'
+source: audit
+kind: plan
+summary: The first-release slice takes the 20 operations the Block A AI setup screens need to read what they write (derive-delivery-slice
+  ALSO), closing CHG-SBO-006's generator half.
+decision:
+  what: 'ALSO gains listAiProviders, testAiProvider, listOwnPlatformStaffGrants, getRegionSettings, getAiByokEnablement, listForecastVersions,
+    getForecastAccuracy, listAiCapabilities, listAiGovernancePolicyVersions, getEffectiveAiPolicy, revokeAiPolicyException,
+    pauseAiCapability, overrideAiDecision, listAiGovernanceAlerts, listAiEvaluations, listAiTrainingRuns, openAiIncident, listAiIncidents,
+    getForecast and listOperationalRequirements, so the refresh plans their service work in Block A.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'CHG-SBO-006 (design-note corrections, ai, 1-2 October; ADR-0059): ADM-037, ADM-508, ADM-520, ADM-523, ADM-526..528,
+  ADM-536, ADM-554, ADM-556, BO-919 and BO-927 bind these reads and the slice did not contain them; the cleanup pass of 2
+  October asked for them in ALSO.'
+keys_touched:
+  files:
+  - tools/derive-delivery-slice.py
+  operations:
+  - listAiProviders
+  - getForecast
+  - listOperationalRequirements
+  - listAiGovernancePolicyVersions
+root_class: A10 TICKET-DRIFT
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ADM-037
+  - APP-SETUP-ADM-508
+  - APP-SETUP-ADM-520
+  - APP-SETUP-BO-919
+release_tag: r2
+decision_owner: Chinmay
+triage: fix-forward
+proposed: 2026-10-02T09:00
+prevention:
+  type: generator-rule
+  ref: tools/derive-delivery-slice.py::ALSO
+status: open
+notes: Cooling-off waived by Chinmay until Mon 5 Oct 2026 (CHG-DOC-023). New service sub-tasks appear at the r2 refresh; no
+  pushed key moves (check-key-stability).

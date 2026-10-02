@@ -2024,8 +2024,12 @@ paths:
       tags:
       - orders
       x-ticvai-permission: TENANT_CONFIGURE
+      security:
+      - bearerAuth: []
+      - prospectAuth: []
       x-ticvai-audience:
       - staff
+      - prospect
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
       x-ticvai-offline-capable: false
@@ -31058,6 +31062,11 @@ components:
             - transactions
           description: Marketplace navigation
   securitySchemes:
+    prospectAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Prospect sign-up session token (common.yaml prospectAuth). Scoped to one onboarding application; DEC-167, CHG-CLN-010.
     guestAuth:
       type: http
       scheme: bearer

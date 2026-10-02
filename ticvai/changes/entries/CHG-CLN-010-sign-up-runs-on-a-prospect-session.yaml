@@ -1,0 +1,50 @@
+id: CHG-CLN-010
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: The ten operations the P17 sign-up screens call accept a prospect session (audience prospect, security prospectAuth),
+  scoped to one onboarding application.
+decision:
+  what: 'A new security scheme prospectAuth (common, subscription and orders contracts): the sign-up session a prospect holds
+    after proving their email with a one-time code, scoped to one onboarding application, carrying no tenant and no permission.
+    addCapacityPack, listModuleCatalogue, listPlans, previewSubscriptionChange, scoreVsiAssessment, setAgreementContractTerm,
+    setSubscription, simulateCommercialPackage, submitOnboardingApplication (subscription) and setPaymentProvider (orders)
+    gain the audience prospect and prospectAuth as an alternative security requirement. Additive: an alternative added to
+    security and a new audience value.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'DEC-167 (Chinmay, 2 October, batch 5: "Email + one-time code"): the prospect has a sign-up session between Start new
+  setup and activation; the lead''s call of 2 October (audit TODO): "P17 sign-up runs on a public prospect audience scoped
+  to the sign-up session". Before this, every sign-up operation took only a staff token (bearerAuth) a prospect never holds
+  (F110 branch at step 3; R098).'
+keys_touched:
+  operations:
+  - addCapacityPack
+  - listModuleCatalogue
+  - listPlans
+  - previewSubscriptionChange
+  - scoreVsiAssessment
+  - setAgreementContractTerm
+  - setPaymentProvider
+  - setSubscription
+  - simulateCommercialPackage
+  - submitOnboardingApplication
+  files:
+  - contracts/shared/common.yaml
+  - contracts/satellite/subscription.yaml
+  - contracts/spine/orders.yaml
+root_class: A23 AUTH-SCOPE
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: '**Left open (contract gap, for the identity owner):** no operation issues the prospect session yet (the email and
+  one-time code DEC-167 decided). Recommended default: identity gains startProspectSignup (email, public, rate-limited) and
+  verifyProspectSignupCode (returns a prospectAuth token), both additive, bound on SGN-002 and on "Continue saved setup".
+  check-contract-compat confirms the security change is a widening (security_widened).'

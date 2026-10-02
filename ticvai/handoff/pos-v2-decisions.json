@@ -117,7 +117,7 @@
   "what": "Sign-in: v2 co-brands the sign-in with the venue (name and logo), shows recent cashiers, takes a cashier-ID entry and switches between PIN and password.",
   "kind": "accept-v2",
   "decision": "Accept all of v2: co-branding, recent cashiers, cashier-ID entry and the PIN/password switch become the spec. (Chinmay, 2 October, batch 5; DEC-550)",
-  "applied": "Pending: the POS-000 candidate block in screens/P04-point-of-sale.yaml cites POSV2-9 (decisions or applied) so check-candidate-decisions passes; recorded by CHG-DOC-018",
+  "applied": "Applied by CHG-SPO-001 (2 October 2026): POS-000 in screens/P04-point-of-sale.yaml is the accepted v2 design, and its candidate block cites POSV2-9; recorded by CHG-DOC-018",
   "screens": [
    "POS-000"
   ],
@@ -129,7 +129,7 @@
   "what": "Timed entry: v2's visit-date card with Change and its entry-slot picker inside the POS-002 drawer.",
   "kind": "accept-v2",
   "decision": "Accept v2 as drawn. (Chinmay, 2 October, batch 5; DEC-551)",
-  "applied": "Pending: the POS-003 candidate block in screens/P04-point-of-sale.yaml cites POSV2-10 (decisions or applied) so check-candidate-decisions passes; recorded by CHG-DOC-018",
+  "applied": "Applied by CHG-SPO-001 (2 October 2026): POS-003 in screens/P04-point-of-sale.yaml is the accepted v2 design, and its candidate block cites POSV2-10; recorded by CHG-DOC-018",
   "screens": [
    "POS-003"
   ],
@@ -141,7 +141,7 @@
   "what": "Seat map: v2's section-then-seat flow for a reserved event inside the POS-002 drawer.",
   "kind": "accept-v2",
   "decision": "Accept v2: section then seat; no hold extend, no recommendation, no booking-fee line. (Chinmay, 2 October, batch 5; DEC-552)",
-  "applied": "Pending: the POS-004 candidate block in screens/P04-point-of-sale.yaml cites POSV2-11 (decisions or applied) so check-candidate-decisions passes; recorded by CHG-DOC-018",
+  "applied": "Applied by CHG-SPO-001 (2 October 2026): POS-004 in screens/P04-point-of-sale.yaml is the accepted v2 design, and its candidate block cites POSV2-11; recorded by CHG-DOC-018; extendSeatHold left POS-004 once flow F59 step 3 was repointed (CHG-CLN-006)",
   "screens": [
    "POS-004"
   ],
@@ -153,7 +153,7 @@
   "what": "Order and fulfilment: four order types in the cart (Dine-in, Quick service, Takeaway, Delivery); delivery asks the fulfilment source.",
   "kind": "accept-v2",
   "decision": "Accept v2: four order types, dine-in, quick service, takeaway and delivery (own fleet or partner). (Chinmay, 2 October, batch 5; DEC-553)",
-  "applied": "Pending: the POS-012 candidate block in screens/P04-point-of-sale.yaml cites POSV2-12 (decisions or applied) so check-candidate-decisions passes; recorded by CHG-DOC-018",
+  "applied": "Applied by CHG-SPO-001 (2 October 2026): POS-012 in screens/P04-point-of-sale.yaml is the accepted v2 design, and its candidate block cites POSV2-12; recorded by CHG-DOC-018",
   "screens": [
    "POS-012"
   ],
@@ -165,7 +165,7 @@
   "what": "Merchandise: category tabs including Lockers, refine chips and Scan; the approved build's operational inventory ledger under Sync is gone.",
   "kind": "accept-v2",
   "decision": "Accept v2: Lockers tab, refine chips and Scan; no inventory ledger on the till. (Chinmay, 2 October, batch 5; DEC-554)",
-  "applied": "Pending: the POS-023 candidate block in screens/P04-point-of-sale.yaml cites POSV2-13 (decisions or applied) so check-candidate-decisions passes; recorded by CHG-DOC-018",
+  "applied": "Applied by CHG-SPO-001 (2 October 2026): POS-023 in screens/P04-point-of-sale.yaml is the accepted v2 design, and its candidate block cites POSV2-13; recorded by CHG-DOC-018",
   "screens": [
    "POS-023"
   ],

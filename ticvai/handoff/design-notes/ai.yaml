@@ -1207,8 +1207,8 @@ screens:
         Superseded by plan decision 10 and ADR-0051 (baseline first, from day one). Mark DI-280 superseded so it stops reaching
         the bundle.
       source: DI-280 | ADR-0051 | ADR-0051 (AI-D17)
-      status: logged
-      by: CHG-SBO-020
+      status: fixed
+      by: CHG-CLN-012
     decisions:
     - question: Which resource types does the event forecast cover in release 1 (staff, gates, F&B tills, rentable equipment)?
       decision: 'The event forecast covers every requirement kind (staff, pos, kiosk, gates, fnb, retail, stock, resource,

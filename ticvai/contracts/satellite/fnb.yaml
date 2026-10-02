@@ -4742,8 +4742,9 @@ paths:
         receipt. DI-293''s one cart, one receipt does not apply to F&B.
 
         **Inside the venue, a ticket is needed; a standalone outlet sells without one** (Chinmay, 2 October,
-        workbook Q70; DI-292 amended for standalone outlets; CHG-CSA-011). The outlet''s siting is
-        `tenancy.Outlet` `siting` (common `OutletSiting`). At an `insideVenue` outlet the guest must hold a valid
+        workbook Q70; DI-292 amended for standalone outlets; CHG-CSA-011). Where the outlet sits is
+        `tenancy.Outlet.admissionContext` (`OutletAdmissionContext`; "siting" and common `OutletSiting` are its
+        deprecated aliases, CHG-CLN-008), shown to the guest as `DiningOutlet.admissionContext`. At an `insideVenue` outlet the guest must hold a valid
         admission ticket for the venue for the day, checked through Access (ADR-0068); without one the order is
         refused `403 entry-ticket-required` and nothing is held. A `standalone` outlet takes takeaway and
         delivery orders with no ticket.
@@ -4830,7 +4831,7 @@ paths:
                       - paymentRequired
                       - paymentDeclined
         '403':
-          description: The outlet is inside the venue (`tenancy.Outlet.siting` `insideVenue`) and the guest holds
+          description: The outlet is inside the venue (`tenancy.Outlet.admissionContext` `insideVenue`) and the guest holds
             no valid admission ticket for the venue today (`entry-ticket-required`; DI-292, workbook Q70,
             CHG-CSA-011). A standalone outlet never refuses on this.
           x-ticvai-problem-types:
@@ -8287,7 +8288,9 @@ components:
           type: integer
           minimum: 0
           nullable: true
-          description: '**When a table shows Reserved** (Chinmay, 2 October, workbook Q202; DI-689; CHG-CSA-012). A
+          description: '**When a table shows Reserved** (Chinmay, 2 October, workbook Q202; DI-689; CHG-CSA-012). **The
+            canonical setting** (CHG-CLN-009): tenancy `VenueSettings.fnb.tableReservedLeadMinutes` is deprecated in
+            its favour. A
             table shows Reserved when a booking names it; with this set, it also shows Reserved this many minutes
             before a booking pre-allocated to it starts. Null, the default, means only a named table shows Reserved
             and other arrivals show in the next-arrivals strip. Set by the venue, per outlet where the outlet has
@@ -9641,6 +9644,14 @@ components:
           type: string
           format: uuid
           nullable: true
+        admissionContext:
+          allOf:
+          - $ref: '../spine/tenancy.yaml#/components/schemas/OutletAdmissionContext'
+          description: '**Inside the venue or standalone** (decided 2 October 2026, Chinmay: DEC-070, workbook
+            Q70; CHG-CLN-008): the outlet''s `tenancy.Outlet.admissionContext`, so the guest sees before ordering
+            whether an admission ticket for today is needed (`insideVenue`, refused `403 entry-ticket-required`
+            without one) or not (`standalone`, takeaway and delivery). The canonical name; "siting" is its
+            deprecated alias.'
     GuestMenu:
       type: object
       x-ticvai-persistence: none — projection over menu, item and availability

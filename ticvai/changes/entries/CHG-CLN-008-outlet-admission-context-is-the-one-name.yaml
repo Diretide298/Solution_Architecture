@@ -1,0 +1,43 @@
+id: CHG-CLN-008
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: The outlet's inside-or-standalone field has one name, admissionContext (tenancy OutletAdmissionContext); common
+  OutletSiting and the word "siting" are deprecated aliases; the guest DiningOutlet carries admissionContext.
+decision:
+  what: 'Canonical: Outlet.admissionContext typed tenancy OutletAdmissionContext (insideVenue default, standalone), the field
+    the outlet record, createOutlet and updateOutlet already carry. common OutletSiting is marked deprecated (kept so a reference
+    resolves; nothing uses it); fnb createGuestFnbOrder''s text names tenancy.Outlet.admissionContext instead of a siting
+    field that never existed; fnb DiningOutlet gains admissionContext (a new response field, additive) so the guest sees
+    before ordering whether a ticket for today is needed.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Two agents modelled the same decision (DEC-070, workbook Q70) under two names: CHG-CSA-011 added common OutletSiting
+  and described tenancy Outlet.siting, while CHG-CSP-004 added Outlet.admissionContext; CHG-SOT-003 logged the clash for
+  the cleanup pass. admissionContext wins because it is the field the record and its writers carry.'
+keys_touched:
+  schemas:
+  - OutletSiting
+  - OutletAdmissionContext
+  - DiningOutlet
+  operations:
+  - createGuestFnbOrder
+  - listDiningOutlets
+  files:
+  - contracts/shared/common.yaml
+  - contracts/spine/tenancy.yaml
+  - contracts/satellite/fnb.yaml
+root_class: 'new: duplicated-definition'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'Additive against r1: neither name was in r1, DiningOutlet gains an optional response field, and deprecation is a
+  description. check-contract-compat holds it additive. No new check: a second name for a field one agent added is what
+  CHG-SOT-003 caught by reading; the duplicated-definition class has S-DUP-SCREEN for screens only.'

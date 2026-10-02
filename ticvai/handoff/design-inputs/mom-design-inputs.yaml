@@ -772,6 +772,12 @@ inputs:
   note: >-
     P15 Kitchen Display screens exist in the current inventory; the merger should check whether a later
     source reinstated a built KDS.
+  superseded_by:
+    ref: CHG-CLN-012
+    note: >-
+      Superseded on 19 September 2026: the kitchen display is TICVAI's own, P15 on commodity screens (the fnb
+      contract's positions; conflict CF-19). Marked here on 2 October 2026 so bundles stop carrying the 31 July
+      "integration point only" (design-note correction KIT-001, CHG-SPO-020).
 - id: DI-078
   source: {file: sources/mom/TICVAI_MoM_31Jul2026__1_.docx, date: '2026-07-31', section: 12. Payments
       & Regional Preferences}
@@ -2651,6 +2657,12 @@ inputs:
   topic: [states, other]
   scope: [ANL-008, ANL-057, BO-919, BO-926]
   status: agreed
+  superseded_by:
+    ref: ADR-0051
+    note: >-
+      AI ships on a baseline and learns per tenant: the forecast is baseline-first with maturity stages from day
+      one (plan decision 10, 30 September; Chinmay's answer 317, 2 October). Marked 2 October 2026 (design-note
+      correction BO-919, CHG-SBO-020; CHG-CLN-012).
 - id: DI-281
   source: {file: sources/mom/TICVAI_MoM_2026-08-14.docx, date: '2026-08-14', section: 1. AI Configuration
       Assistant — Phase-One Scope}
@@ -4508,7 +4520,7 @@ inputs:
     to avoid a long, click-heavy admin flow; Allam agreed, citing the previous system's demo as a starting
     reference.
   topic: [density, layout, navigation]
-  scope: [P08/Sell, P09/Catalogue]
+  scope: [P08/Sell, P08/Catalogue]
   status: agreed
 - id: DI-475
   source: {file: sources/mom/TICVAI_MoM_2026-08-26_ResourceManagement.docx, date: '2026-08-26', section: 4.1

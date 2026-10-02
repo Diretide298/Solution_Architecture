@@ -1165,8 +1165,8 @@ screens:
     - what: Flow F17 step 4 ("Guest tracks it in the app") points at GST-026 with listMerchandise.
       why: Tracking a drop is lookupShopAndDrop on GST-062. The step should point there.
       source: F17 step 4 | contracts/satellite/retail.yaml#lookupShopAndDrop
-      status: logged
-      by: CHG-SGU-025
+      status: fixed
+      by: CHG-CLN-005
     - what: The app keeps the unpaid "Hold to pay at the shop" that the web dropped.
       why: Parity break; see WEB-042.
       source: DI-970 | R236
@@ -3303,8 +3303,8 @@ screens:
       why: Neither operation collects a drop, and a kiosk cannot hand goods over (collectShopAndDrop is staff-only). The
         step should be rewritten or removed.
       source: F51 step 4 | contracts/satellite/retail.yaml#collectShopAndDrop
-      status: logged
-      by: CHG-SGU-025
+      status: fixed
+      by: CHG-CLN-005
     - what: 'Plumbing: "Outlet id" and "Category id" boxes, a stock table (onHand, inventoryItemId, variantId), and modals
         collecting variantId and seatIds.'
       why: Guest kiosk; the guest projection carries none of these.
@@ -6674,8 +6674,8 @@ screens:
     - what: Navigation exits to POS-002 "Sell — Ticket Catalogue" carrying orderId (from F81).
       why: A back-office search does not open a till's sell screen on another device; follows from the wrong RET-3A mapping.
       source: F81 step 1 | R251
-      status: logged
-      by: CHG-SBO-020
+      status: fixed
+      by: CHG-CLN-006
     decisions:
     - question: Is Order Search F&B-only, or every order at the venue (tickets, retail, F&B — one cart, one receipt)?
       decision: 'Drawn default stands (answer: "Default / recommended accepted"): Draw it venue-wide with a module chip on
@@ -7969,8 +7969,8 @@ screens:
 
         '
       source: F17 step 3 | F17 step 5 | R251
-      status: logged
-      by: CHG-SBO-020
+      status: fixed
+      by: CHG-CLN-005
     decisions:
     - question: 'Should a merchandise item require a stock link? Sales are gated on system stock per venue, and an unlinked
         item cannot be gated.
@@ -9567,7 +9567,7 @@ screens:
         of written-off stock. It must not restock a second time.
 
         '
-      source: F34 step 8 | contracts/satellite/retail.yaml#createRetailReturn
+      source: F34 step 7 | contracts/satellite/retail.yaml#createRetailReturn
     - case: Kit sold
       expected: The ledger shows one Sale line per component, never a line for the kit itself.
       source: contracts/satellite/inventory.yaml#setInventoryKitDefinition
@@ -9620,9 +9620,9 @@ screens:
 
         '
       why: A manual movement after the return would count the same item twice.
-      source: F34 step 8 | contracts/satellite/retail.yaml#createRetailReturn
-      status: logged
-      by: CHG-SBO-020
+      source: F34 step 7 | contracts/satellite/retail.yaml#createRetailReturn
+      status: fixed
+      by: CHG-CLN-005
     - what: The item, location and kind filters are text fields ("Item id", "Location id", "Kind").
       why: These leak plumbing. Use pickers and a kind multi-select in words.
       source: screens/P08-venue-back-office.yaml#BO-082
@@ -13202,8 +13202,8 @@ screens:
       why: The fnb contract records it as superseded on 19 September (the kitchen display is TICVAI's own); mark DI-077
         superseded so bundles stop carrying it.
       source: DI-077 | contracts/satellite/fnb.yaml#listKitchenTickets
-      status: logged
-      by: CHG-SPO-020
+      status: fixed
+      by: CHG-CLN-012
   KIT-002:
     summary: 'The station display on the kitchen wall: the tickets this station must make, in the order the kitchen should
       make them, bumped with one touch or a bump bar by someone wearing gloves. The one thing to get right: each ticket
@@ -13311,8 +13311,8 @@ screens:
       why: The pass fires and holds courses (DI-407); a station cook working one section should not release a table's next
         course.
       source: DI-407 | contracts/satellite/fnb.yaml#fireCourse
-      status: logged
-      by: CHG-SPO-020
+      status: fixed
+      by: CHG-CLN-006
     - what: The cards say "ordered by promise time not arrival", the loading state "oldest ticket first".
       why: The rail order is the server's (priority weights); re-sorting on the device would disagree with every other display.
       source: contracts/satellite/fnb.yaml#listKitchenTickets

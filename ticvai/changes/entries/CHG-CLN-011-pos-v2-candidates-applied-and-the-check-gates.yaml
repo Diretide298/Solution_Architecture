@@ -1,0 +1,37 @@
+id: CHG-CLN-011
+date: '2026-10-02'
+source: client-review
+kind: process
+summary: POSV2-9 to POSV2-13 record CHG-SPO-001 as applied in the POS v2 register, and check-candidate-decisions gates.
+decision:
+  what: handoff/pos-v2-decisions.json's applied column for POSV2-9..13 names CHG-SPO-001 (and, for POSV2-11, the extendSeatHold
+    removal of CHG-CLN-006); docs/registers/pos-v2-decisions.md is regenerated from it; check-candidate-decisions leaves REPORT_ONLY
+    in run-checks.py, since it passes with an empty baseline.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'CHG-SEED-005 made the check report-only until the five undecided candidates were decided; POSV2-9..13 (DEC-550..554)
+  decided them and CHG-SPO-001 applied them, but the register still said "Pending".'
+keys_touched:
+  files:
+  - handoff/pos-v2-decisions.json
+  - docs/registers/pos-v2-decisions.md
+  - tools/run-checks.py
+  other:
+  - POSV2-9
+  - POSV2-10
+  - POSV2-11
+  - POSV2-12
+  - POSV2-13
+root_class: 'new: design-return'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-candidate-decisions.py
+status: open
+notes: check-candidate-decisions prints "PASS - 0 new, 0 known (baseline)" on this branch and on main, so gating it adds
+  no failure.

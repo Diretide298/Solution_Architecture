@@ -46855,6 +46855,7 @@ screens:
       - kind: secondaryButton
         label: Switch direction
         operation: setAccessPointDirection
+        permission: ACCESS_DIRECTION_SET
         notes: '**A gate''s direction can be switched live (Entry to Exit) by a holder of the right, and
           the switch is logged (decided 2 October 2026 by Chinmay, DEC-255; R221 amended; CHG-CSP-032).**
           Needs `ACCESS_DIRECTION_SET` (CHG-FUP-004); without it the button is disabled and names the
