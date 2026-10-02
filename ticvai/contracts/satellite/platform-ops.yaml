@@ -2787,6 +2787,8 @@ components:
           type: string
           format: date-time
         changes:
+          x-ticvai-persistence-kind: valueObject
+          x-ticvai-persistence-column: jsonb
           type: array
           items:
             type: object

@@ -1,0 +1,61 @@
+id: CHG-GTB-010
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: Twelve r2 array fields that hold a value object get a jsonb column - derive-schema honours a property-level
+  x-ticvai-persistence-column, and nine fields declare it beside the three that already did.
+decision:
+  what: 'tools/derive-schema.py: an array property carrying x-ticvai-persistence-column becomes that column (the three that
+    declared jsonb - AiModel.curatedRange, KitchenRoutingRules.categoryRules, WasteApprovalPolicy.bands - had been ignored).
+    Nine more declare x-ticvai-persistence-kind valueObject and x-ticvai-persistence-column jsonb:
+    AccessHardwareCertification.results, AiByokEnablement.taskModelMap, EventChangeTreatmentPolicy.treatments,
+    CreateSegmentRequest.ruleGroups (Segment, SegmentRuleGroup already "stored with the segment as jsonb"),
+    ConfigPackageDiff.changes, BillingEntity.documents, RegionSettings.requiredBillingDocuments,
+    WalletRefundPolicy.destinationsBySource, CustomDomain.dnsRecords. Each is a small list read and written whole with its
+    row, never queried on its own, so a jsonb value is the store and a child table is not. The columns reach the database
+    through the next forward migration derive-ddl writes after r1 (migration freeze; no baseline file changes).'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'check-contract-storage (ST-FIELD-NO-COLUMN, A15 STORAGE-GAP, R086) failed the r2 full refresh with 12 new fields
+  "persisted to a table and no column or child table holds it", all added on 2 October (CHG-CSA-001, CHG-CSA-034,
+  CHG-CSA-043, CHG-CSA-045, CHG-CSP-008 and the finance and door decisions). derive-schema skips an inline array of objects
+  as a child table''s rows unless told otherwise.'
+keys_touched:
+  schemas:
+  - AccessHardwareCertification
+  - AiByokEnablement
+  - AiModel
+  - EventChangeTreatmentPolicy
+  - KitchenRoutingRules
+  - WasteApprovalPolicy
+  - CreateSegmentRequest
+  - Segment
+  - ConfigPackageDiff
+  - BillingEntity
+  - RegionSettings
+  - WalletRefundPolicy
+  - CustomDomain
+  files:
+  - tools/derive-schema.py
+  - contracts/spine/access.yaml
+  - contracts/satellite/ai.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/platform-ops.yaml
+  - contracts/satellite/subscription.yaml
+  - contracts/spine/tenancy.yaml
+  - contracts/satellite/wallet.yaml
+  - contracts/satellite/white-label.yaml
+root_class: A15 STORAGE-GAP
+tickets:
+  started: []
+  unstarted: []
+release_tag: r2
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-schema.py::x-ticvai-persistence-column
+status: open
+notes: Additive against r1 (check-contract-compat; the annotations are extensions, the columns new and nullable). ST-FIELD-NO-COLUMN
+  still gates the next undeclared array; the rule makes a declared one land.

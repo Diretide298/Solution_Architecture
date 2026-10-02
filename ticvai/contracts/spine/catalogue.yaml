@@ -18256,6 +18256,8 @@ components:
           type: string
           readOnly: true
         treatments:
+          x-ticvai-persistence-kind: valueObject
+          x-ticvai-persistence-column: jsonb
           type: array
           description: One row per change kind; a kind left out takes the defaults shown on each field.
           items:

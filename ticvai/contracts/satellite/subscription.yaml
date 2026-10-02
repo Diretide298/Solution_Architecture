@@ -11389,6 +11389,8 @@ components:
           format: email
           nullable: true
         documents:
+          x-ticvai-persistence-kind: valueObject
+          x-ticvai-persistence-column: jsonb
           type: array
           description: The trade licence and, where a TRN is entered, the VAT certificate, each a stored file
             with its verification.

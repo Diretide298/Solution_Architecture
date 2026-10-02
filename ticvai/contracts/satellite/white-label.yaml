@@ -6461,6 +6461,8 @@ components:
             a subdomain to TICVAI''s name servers (NS). `apex`: the bare domain, only on request. There is no path
             proxy.'
         dnsRecords:
+          x-ticvai-persistence-kind: valueObject
+          x-ticvai-persistence-column: jsonb
           type: array
           readOnly: true
           description: '**Every record the tenant must publish, with what is observed now** (CHG-CSA-043): the TXT

@@ -5471,6 +5471,8 @@ components:
             (`422 local-name-required`).
           items: { type: string, pattern: '^[a-z]{2}$' }
         requiredBillingDocuments:
+          x-ticvai-persistence-kind: valueObject
+          x-ticvai-persistence-column: jsonb
           type: array
           description: >
             **Which documents a TICVAI customer's billing entity must upload, in this country** (decided

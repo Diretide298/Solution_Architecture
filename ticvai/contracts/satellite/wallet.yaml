@@ -4992,6 +4992,8 @@ components:
           nullable: true
           description: 'An incentive to take the refund as credit rather than to a card.'
         destinationsBySource:
+          x-ticvai-persistence-kind: valueObject
+          x-ticvai-persistence-column: jsonb
           type: array
           description: '**A destination per refund source** (contract gap CHG-WIR-027, BO-1146; CHG-CSA-045). A refund
             of a ticket, an event, F&B, retail, a rental, parking, a membership or a compensation goes to the

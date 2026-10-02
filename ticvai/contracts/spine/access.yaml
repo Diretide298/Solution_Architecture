@@ -19821,6 +19821,8 @@ components:
           - certified
           - failed
         results:
+          x-ticvai-persistence-kind: valueObject
+          x-ticvai-persistence-column: jsonb
           type: array
           minItems: 1
           items:

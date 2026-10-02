@@ -15137,6 +15137,8 @@ components:
             type: string
           description: 'Where `coverage` is `perTask`: the gateway tasks a tenant key may serve. Empty means any.'
         taskModelMap:
+          x-ticvai-persistence-kind: valueObject
+          x-ticvai-persistence-column: jsonb
           type: array
           readOnly: true
           description: '**The provider''s equivalent model for each task, chosen by TICVAI** (Chinmay, 2 October,

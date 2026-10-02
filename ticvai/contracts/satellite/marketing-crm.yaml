@@ -22631,6 +22631,8 @@ components:
             type: string
             format: uuid
         ruleGroups:
+          x-ticvai-persistence-kind: valueObject
+          x-ticvai-persistence-column: jsonb
           type: array
           description: '**Nested AND / OR / NOT groups** (contract gap CHG-WIR-007, BO-755; CHG-CSA-045). Where present,
             the segment matches `criteria` (combined by `match`) AND every group here. Absent keeps the flat list.'
