@@ -158696,11 +158696,16 @@ screens:
     - to: ADM-048
       trigger: Returns to the board's landing screen
       provenance: flow F143 step 2→3
-      operation: setPriceListMaster
     - to: BO-009
       trigger: Open Pricing Rules
       provenance: a section of BO-009 since 2 October 2026 (CHG-MOV-002)
-  notes: '**Merged into BO-009 Pricing Rules as a section of it** (decided 2 October 2026, Chinmay: DEC-100,
+  notes: '**Its own writer is retired in r2** (decided 2 October 2026, Chinmay: "13 dupes would be gone
+    in r2"; CHG-CLN-001). `setPriceListMaster` duplicated BO-009 Pricing Rules''s createPriceList and
+    updatePriceList, so it is removed from the contract (BC-008) and BO-009 saves this record. This id
+    stays the anchor of its section of BO-009: nothing on it writes separately.
+
+
+    **Merged into BO-009 Pricing Rules as a section of it** (decided 2 October 2026, Chinmay: DEC-100,
     "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round; CHG-MOV-002).
     It edits the same record as BO-009: it renders inside BO-009''s component, under its route, and keeps
     its own operations, because the first-release slice and its ticket name them. Whether those duplicate
@@ -158806,10 +158811,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: setPriceListMaster
-    contract: catalogue
-    purpose: Price List Master Configuration
-    trigger: onAction
   - operationId: listPriceLists
     contract: catalogue
     purpose: List price lists
@@ -158823,7 +158824,8 @@ screens:
   apisNote: Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 8. 0 of
     0 labels bound to a contract property; 21 of 37 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
-    than here.
+    than here. **2 October 2026 (CHG-CLN-001):** setPriceListMaster retired in r2 (BC-008); BO-009 Pricing
+    Rules writes the record with createPriceList and updatePriceList.
   entryState: {}
 - id: ADM-050
   name: Price Category & Rate Type Library
@@ -158984,11 +158986,16 @@ screens:
     - to: ADM-048
       trigger: Returns to the board's landing screen
       provenance: flow F143 step 6→7
-      operation: setRateStructure
     - to: BO-009
       trigger: Open Pricing Rules
       provenance: a section of BO-009 since 2 October 2026 (CHG-MOV-002)
-  notes: '**Merged into BO-009 Pricing Rules as a section of it** (decided 2 October 2026, Chinmay: DEC-100,
+  notes: '**Its own writer is retired in r2** (decided 2 October 2026, Chinmay: "13 dupes would be gone
+    in r2"; CHG-CLN-001). `setRateStructure` duplicated BO-009 Pricing Rules''s setPrices, so it is removed
+    from the contract (BC-009) and BO-009 saves this record. This id stays the anchor of its section of
+    BO-009: nothing on it writes separately.
+
+
+    **Merged into BO-009 Pricing Rules as a section of it** (decided 2 October 2026, Chinmay: DEC-100,
     "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round; CHG-MOV-002).
     It edits the same record as BO-009: it renders inside BO-009''s component, under its route, and keeps
     its own operations, because the first-release slice and its ticket name them. Whether those duplicate
@@ -159025,7 +159032,6 @@ screens:
         - Duplicate Rates
         - RateStructureBuilderView.validationIssues
         bindsTo: RateStructureBuilderView
-        operation: setRateStructure
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 11 §Detect
       - kind: dataTable
         label: List prices in a list
@@ -159069,10 +159075,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: setRateStructure
-    contract: catalogue
-    purpose: Rate Structure Builder
-    trigger: onAction
   - operationId: listPrices
     contract: catalogue
     purpose: List prices in a list
@@ -159093,7 +159095,8 @@ screens:
   apisNote: Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 11. 4 of
     5 labels bound to a contract property; 9 of 47 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
-    than here.
+    than here. **2 October 2026 (CHG-CLN-001):** setRateStructure retired in r2 (BC-009); BO-009 Pricing
+    Rules writes the record with setPrices.
 - id: ADM-052
   name: Product & Service Price Assignment
   module: Commercial
@@ -168730,12 +168733,18 @@ screens:
     - to: ADM-118
       trigger: Returns to the board's landing screen
       provenance: flow F152 step 6→7
-      operation: createBulkProductCatalogue
     - to: BO-117
       trigger: Open Product Import, Governance & AI Configuration Assistant
       provenance: a section of BO-117 since 2 October 2026 (CHG-MOV-002)
-  notes: '**Merged into BO-117 Product Import, Governance & AI Configuration Assistant as a section of
-    it** (decided 2 October 2026, Chinmay: DEC-100, "merge them with BO-008 to BO-011 so one surface edits
+  notes: '**Its own writer is retired in r2** (decided 2 October 2026, Chinmay: "13 dupes would be gone
+    in r2"; CHG-CLN-001). `createBulkProductCatalogue` duplicated BO-117 Product Import, Governance &
+    AI Configuration Assistant''s importProductCatalogue and commitCatalogueImport, so it is removed from
+    the contract (BC-010) and BO-117 saves this record. This id stays the anchor of its section of BO-117:
+    nothing on it writes separately.
+
+
+    **Merged into BO-117 Product Import, Governance & AI Configuration Assistant as a section of it**
+    (decided 2 October 2026, Chinmay: DEC-100, "merge them with BO-008 to BO-011 so one surface edits
     each record", and the pre-apply round; CHG-MOV-002). It edits the same record as BO-117: it renders
     inside BO-117''s component, under its route, and keeps its own operations, because the first-release
     slice and its ticket name them. Whether those duplicate writers retire in favour of the venue screen''s
@@ -168786,17 +168795,14 @@ screens:
   states:
     loading: The bulk product creation list.
     error: Could not load. Names which read failed and leaves the bulk product creation untouched.
-    emptyFirstRun: No bulk product creation yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: Nothing saved yet. The create action is BO-117's (importProductCatalogue and commitCatalogueImport);
+      this section offers none of its own.
     emptyNoResults: The filter narrowed it and the bulk product creation are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
-  apis:
-  - operationId: createBulkProductCatalogue
-    contract: catalogue
-    purpose: Bulk Product Creation & Catalogue Import
-    trigger: onAction
+    emptyNoAccess: Shown when the caller lacks the permission BO-117 Product Import, Governance & AI Configuration
+      Assistant requires; this section has no operation of its own since its writer was retired, so it
+      names that screen's.
+  apis: []
   wireframe:
     status: notStarted
     provenance: generated
@@ -168805,7 +168811,9 @@ screens:
   apisNote: Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page
     6. 0 of 0 labels bound to a contract property; 0 of 37 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    rather than here. **2 October 2026 (CHG-CLN-001):** createBulkProductCatalogue retired in r2 (BC-010);
+    BO-117 Product Import, Governance & AI Configuration Assistant writes the record with importProductCatalogue
+    and commitCatalogueImport.
 - id: ADM-122
   name: Product Import / Export & Environment Transfer
   module: Catalogue
@@ -172653,47 +172661,44 @@ screens:
     - to: ADM-149
       trigger: Works in Percentage & Fixed Discount Configurator
       provenance: flow F155 step 1→2
-      operation: setPromotionRule
     - to: ADM-150
       trigger: Works in Cart & Transaction Threshold Rules
       provenance: flow F155 step 3→4
-      operation: setPromotionRule
     - to: ADM-151
       trigger: Works in Volume, Bulk & Tier Discount Configurator
       provenance: flow F155 step 5→6
-      operation: setPromotionRule
     - to: ADM-152
       trigger: Works in Time-Based & Seasonal Discount Rules
       provenance: flow F155 step 7→8
-      operation: setPromotionRule
     - to: ADM-153
       trigger: Works in Customer, Membership & Segment Discount Rules
       provenance: flow F155 step 9→10
-      operation: setPromotionRule
     - to: ADM-154
       trigger: Works in Payment Method, Bank & Partner Discount Rules
       provenance: flow F155 step 11→12
-      operation: setPromotionRule
     - to: ADM-155
       trigger: Works in Special Price & Guest Offer Configurator
       provenance: flow F155 step 13→14
-      operation: setPromotionRule
     - to: ADM-156
       trigger: Works in Discount Limits, Guardrails & Commercial Controls
       provenance: flow F155 step 15→16
-      operation: setPromotionRule
     - to: ADM-157
       trigger: Works in Rule Test, Simulation & AI Recommendation Workspace
       provenance: flow F155 step 17→18
-      operation: setPromotionRule
     - to: BO-010
       trigger: Open Promotions & Coupons
       provenance: a section of BO-010 since 2 October 2026 (CHG-MOV-002)
-  notes: '**Merged into BO-010 Promotions & Coupons as a section of it** (decided 2 October 2026, Chinmay:
-    DEC-100, "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round;
-    CHG-MOV-002). It edits the same record as BO-010: it renders inside BO-010''s component, under its
-    route, and keeps its own operations, because the first-release slice and its ticket name them. Whether
-    those duplicate writers retire in favour of the venue screen''s is a contract and plan question (CHG-MOV-008).
+  notes: '**Its own writer is retired in r2** (decided 2 October 2026, Chinmay: "13 dupes would be gone
+    in r2"; CHG-CLN-001). `setPromotionRule` duplicated BO-010 Promotions & Coupons''s createPromotion
+    and updatePromotion, so it is removed from the contract (BC-011) and BO-010 saves this record. This
+    id stays the anchor of its section of BO-010: nothing on it writes separately.
+
+
+    **Merged into BO-010 Promotions & Coupons as a section of it** (decided 2 October 2026, Chinmay: DEC-100,
+    "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round; CHG-MOV-002).
+    It edits the same record as BO-010: it renders inside BO-010''s component, under its route, and keeps
+    its own operations, because the first-release slice and its ticket name them. Whether those duplicate
+    writers retire in favour of the venue screen''s is a contract and plan question (CHG-MOV-008).
 
 
     **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
@@ -172723,11 +172728,6 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Promotions___Bundles_Management_Reference.pdf, page 22
-  - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of a promotion rule written by setPromotionRule
-      (or the screen moves to getPromotion with createPromotion/updatePromotion; see the duplicate-writer
-      proposal).'
-    source: contracts/satellite/promotions.yaml#setPromotionRule | screens/P08-venue-back-office.yaml#ADM-148
   layout:
     template: split
     regions:
@@ -172752,10 +172752,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: setPromotionRule
-    contract: promotions
-    purpose: Promotion Rule Builder
-    trigger: onAction
   - operationId: setPromotionStackingRule
     contract: promotions
     purpose: Promotion Stacking Rule Builder
@@ -172768,7 +172764,8 @@ screens:
   apisNote: Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 22. 0
     of 0 labels bound to a contract property; 2 of 51 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    rather than here. **2 October 2026 (CHG-CLN-001):** setPromotionRule retired in r2 (BC-011); BO-010
+    Promotions & Coupons writes the record with createPromotion and updatePromotion.
 - id: ADM-149
   name: Percentage & Fixed Discount Configurator
   module: Commercial
@@ -174001,11 +173998,17 @@ screens:
     - to: BO-010
       trigger: Open Promotions & Coupons
       provenance: a section of BO-010 since 2 October 2026 (CHG-MOV-002)
-  notes: '**Merged into BO-010 Promotions & Coupons as a section of it** (decided 2 October 2026, Chinmay:
-    DEC-100, "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round;
-    CHG-MOV-002). It edits the same record as BO-010: it renders inside BO-010''s component, under its
-    route, and keeps its own operations, because the first-release slice and its ticket name them. Whether
-    those duplicate writers retire in favour of the venue screen''s is a contract and plan question (CHG-MOV-008).
+  notes: '**Its own writer is retired in r2** (decided 2 October 2026, Chinmay: "13 dupes would be gone
+    in r2"; CHG-CLN-001). `setCouponPromoCode` duplicated BO-010 Promotions & Coupons''s createCouponCampaign
+    and generateCouponCodes, so it is removed from the contract (BC-012) and BO-010 saves this record.
+    This id stays the anchor of its section of BO-010: nothing on it writes separately.
+
+
+    **Merged into BO-010 Promotions & Coupons as a section of it** (decided 2 October 2026, Chinmay: DEC-100,
+    "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round; CHG-MOV-002).
+    It edits the same record as BO-010: it renders inside BO-010''s component, under its route, and keeps
+    its own operations, because the first-release slice and its ticket name them. Whether those duplicate
+    writers retire in favour of the venue screen''s is a contract and plan question (CHG-MOV-008).
 
 
     **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
@@ -174069,10 +174072,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: setCouponPromoCode
-    contract: promotions
-    purpose: Coupon & Promo Code Builder
-    trigger: onAction
   - operationId: listCouponCampaigns
     contract: promotions
     purpose: The coupon campaigns, to open one in the builder
@@ -174086,7 +174085,8 @@ screens:
   apisNote: Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 37. 0
     of 0 labels bound to a contract property; 9 of 30 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    rather than here. **2 October 2026 (CHG-CLN-001):** setCouponPromoCode retired in r2 (BC-012); BO-010
+    Promotions & Coupons writes the record with createCouponCampaign and generateCouponCodes.
   entryState: {}
 - id: ADM-160
   name: Unique Code Generation & Batch Manager
@@ -175247,15 +175247,20 @@ screens:
     - to: ADM-168
       trigger: Returns to the board's landing screen
       provenance: flow F157 step 2→3
-      operation: setBuyGetBogo
     - to: BO-010
       trigger: Open Promotions & Coupons
       provenance: a section of BO-010 since 2 October 2026 (CHG-MOV-002)
-  notes: '**Merged into BO-010 Promotions & Coupons as a section of it** (decided 2 October 2026, Chinmay:
-    DEC-100, "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round;
-    CHG-MOV-002). It edits the same record as BO-010: it renders inside BO-010''s component, under its
-    route, and keeps its own operations, because the first-release slice and its ticket name them. Whether
-    those duplicate writers retire in favour of the venue screen''s is a contract and plan question (CHG-MOV-008).
+  notes: '**Its own writer is retired in r2** (decided 2 October 2026, Chinmay: "13 dupes would be gone
+    in r2"; CHG-CLN-001). `setBuyGetBogo` duplicated BO-010 Promotions & Coupons''s createPromotion, so
+    it is removed from the contract (BC-013) and BO-010 saves this record. This id stays the anchor of
+    its section of BO-010: nothing on it writes separately.
+
+
+    **Merged into BO-010 Promotions & Coupons as a section of it** (decided 2 October 2026, Chinmay: DEC-100,
+    "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round; CHG-MOV-002).
+    It edits the same record as BO-010: it renders inside BO-010''s component, under its route, and keeps
+    its own operations, because the first-release slice and its ticket name them. Whether those duplicate
+    writers retire in favour of the venue screen''s is a contract and plan question (CHG-MOV-008).
 
 
     **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
@@ -175328,15 +175333,11 @@ screens:
   states:
     loading: The buy get bogo configuration as saved.
     error: Could not load. Names which read failed and leaves the buy get bogo untouched.
-    emptyFirstRun: No buy get bogo configured yet. Carries the create action and says what the platform
-      does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
-  apis:
-  - operationId: setBuyGetBogo
-    contract: promotions
-    purpose: Buy X Get Y / BOGO Rule Builder
-    trigger: onAction
+    emptyFirstRun: Nothing saved yet. The create action is BO-010's (createPromotion); this section offers
+      none of its own.
+    emptyNoAccess: Shown when the caller lacks the permission BO-010 Promotions & Coupons requires; this
+      section has no operation of its own since its writer was retired, so it names that screen's.
+  apis: []
   wireframe:
     status: notStarted
     provenance: generated
@@ -175345,12 +175346,8 @@ screens:
   apisNote: Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 52. 0
     of 0 labels bound to a contract property; 15 of 27 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
-  gaps:
-  - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of the offer written by setBuyGetBogo
-      (or the offer is a typed Discount on createPromotion, read by getPromotion).'
-    source: contracts/satellite/promotions.yaml#setBuyGetBogo | screens/P08-venue-back-office.yaml#ADM-169
+    rather than here. **2 October 2026 (CHG-CLN-001):** setBuyGetBogo retired in r2 (BC-013); BO-010 Promotions
+    & Coupons writes the record with createPromotion.
 - id: ADM-170
   name: Multi-Buy & Quantity Offer Configurator
   module: Commercial
@@ -175560,15 +175557,20 @@ screens:
     - to: ADM-168
       trigger: Returns to the board's landing screen
       provenance: flow F157 step 8→9
-      operation: setFixedPriceOffer
     - to: BO-010
       trigger: Open Promotions & Coupons
       provenance: a section of BO-010 since 2 October 2026 (CHG-MOV-002)
-  notes: '**Merged into BO-010 Promotions & Coupons as a section of it** (decided 2 October 2026, Chinmay:
-    DEC-100, "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round;
-    CHG-MOV-002). It edits the same record as BO-010: it renders inside BO-010''s component, under its
-    route, and keeps its own operations, because the first-release slice and its ticket name them. Whether
-    those duplicate writers retire in favour of the venue screen''s is a contract and plan question (CHG-MOV-008).
+  notes: '**Its own writer is retired in r2** (decided 2 October 2026, Chinmay: "13 dupes would be gone
+    in r2"; CHG-CLN-001). `setFixedPriceOffer` duplicated BO-010 Promotions & Coupons''s createPromotion,
+    so it is removed from the contract (BC-014) and BO-010 saves this record. This id stays the anchor
+    of its section of BO-010: nothing on it writes separately.
+
+
+    **Merged into BO-010 Promotions & Coupons as a section of it** (decided 2 October 2026, Chinmay: DEC-100,
+    "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round; CHG-MOV-002).
+    It edits the same record as BO-010: it renders inside BO-010''s component, under its route, and keeps
+    its own operations, because the first-release slice and its ticket name them. Whether those duplicate
+    writers retire in favour of the venue screen''s is a contract and plan question (CHG-MOV-008).
 
 
     **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
@@ -175620,15 +175622,11 @@ screens:
   states:
     loading: The fixed-price for offer configuration as saved.
     error: Could not load. Names which read failed and leaves the fixed-price for offer untouched.
-    emptyFirstRun: No fixed-price for offer configured yet. Carries the create action and says what the
-      platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
-  apis:
-  - operationId: setFixedPriceOffer
-    contract: promotions
-    purpose: Fixed-Price & “N for X” Offer Builder
-    trigger: onAction
+    emptyFirstRun: Nothing saved yet. The create action is BO-010's (createPromotion); this section offers
+      none of its own.
+    emptyNoAccess: Shown when the caller lacks the permission BO-010 Promotions & Coupons requires; this
+      section has no operation of its own since its writer was retired, so it names that screen's.
+  apis: []
   wireframe:
     status: notStarted
     provenance: generated
@@ -175637,12 +175635,8 @@ screens:
   apisNote: Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 54. 0
     of 0 labels bound to a contract property; 8 of 21 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
-  gaps:
-  - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of the offer written by setFixedPriceOffer
-      (or the offer is a typed Discount on createPromotion, read by getPromotion).'
-    source: contracts/satellite/promotions.yaml#setFixedPriceOffer | screens/P08-venue-back-office.yaml#ADM-172
+    rather than here. **2 October 2026 (CHG-CLN-001):** setFixedPriceOffer retired in r2 (BC-014); BO-010
+    Promotions & Coupons writes the record with createPromotion.
 - id: ADM-173
   name: Gift, Free Product & Added-Value Offer Builder
   module: Commercial
@@ -175671,15 +175665,20 @@ screens:
     - to: ADM-168
       trigger: Returns to the board's landing screen
       provenance: flow F157 step 10→11
-      operation: setGiftFreeProduct
     - to: BO-010
       trigger: Open Promotions & Coupons
       provenance: a section of BO-010 since 2 October 2026 (CHG-MOV-002)
-  notes: '**Merged into BO-010 Promotions & Coupons as a section of it** (decided 2 October 2026, Chinmay:
-    DEC-100, "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round;
-    CHG-MOV-002). It edits the same record as BO-010: it renders inside BO-010''s component, under its
-    route, and keeps its own operations, because the first-release slice and its ticket name them. Whether
-    those duplicate writers retire in favour of the venue screen''s is a contract and plan question (CHG-MOV-008).
+  notes: '**Its own writer is retired in r2** (decided 2 October 2026, Chinmay: "13 dupes would be gone
+    in r2"; CHG-CLN-001). `setGiftFreeProduct` duplicated BO-010 Promotions & Coupons''s createPromotion,
+    so it is removed from the contract (BC-015) and BO-010 saves this record. This id stays the anchor
+    of its section of BO-010: nothing on it writes separately.
+
+
+    **Merged into BO-010 Promotions & Coupons as a section of it** (decided 2 October 2026, Chinmay: DEC-100,
+    "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round; CHG-MOV-002).
+    It edits the same record as BO-010: it renders inside BO-010''s component, under its route, and keeps
+    its own operations, because the first-release slice and its ticket name them. Whether those duplicate
+    writers retire in favour of the venue screen''s is a contract and plan question (CHG-MOV-008).
 
 
     **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
@@ -175723,17 +175722,11 @@ screens:
   states:
     loading: The gift free product configuration as saved.
     error: Could not load. Names which read failed and leaves the gift free product untouched.
-    emptyFirstRun: No gift free product configured yet. Carries the create action and says what the platform
-      does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
-  apis:
-  - operationId: setGiftFreeProduct
-    contract: promotions
-    purpose: Gift, Free Product & Added-Value Offer Builder
-    trigger: onAction
-    invalidates:
-    - setGiftFreeProduct
+    emptyFirstRun: Nothing saved yet. The create action is BO-010's (createPromotion); this section offers
+      none of its own.
+    emptyNoAccess: Shown when the caller lacks the permission BO-010 Promotions & Coupons requires; this
+      section has no operation of its own since its writer was retired, so it names that screen's.
+  apis: []
   wireframe:
     status: notStarted
     provenance: generated
@@ -175742,12 +175735,8 @@ screens:
   apisNote: Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 55. 0
     of 0 labels bound to a contract property; 5 of 32 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
-  gaps:
-  - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of the offer written by setGiftFreeProduct
-      (or the offer is a typed Discount on createPromotion, read by getPromotion).'
-    source: contracts/satellite/promotions.yaml#setGiftFreeProduct | screens/P08-venue-back-office.yaml#ADM-173
+    rather than here. **2 October 2026 (CHG-CLN-001):** setGiftFreeProduct retired in r2 (BC-015); BO-010
+    Promotions & Coupons writes the record with createPromotion.
 - id: ADM-174
   name: Cross-Category Promotion Builder
   module: Commercial
@@ -175776,15 +175765,20 @@ screens:
     - to: ADM-168
       trigger: Returns to the board's landing screen
       provenance: flow F157 step 12→13
-      operation: setCrossCategoryPromotion
     - to: BO-010
       trigger: Open Promotions & Coupons
       provenance: a section of BO-010 since 2 October 2026 (CHG-MOV-002)
-  notes: '**Merged into BO-010 Promotions & Coupons as a section of it** (decided 2 October 2026, Chinmay:
-    DEC-100, "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round;
-    CHG-MOV-002). It edits the same record as BO-010: it renders inside BO-010''s component, under its
-    route, and keeps its own operations, because the first-release slice and its ticket name them. Whether
-    those duplicate writers retire in favour of the venue screen''s is a contract and plan question (CHG-MOV-008).
+  notes: '**Its own writer is retired in r2** (decided 2 October 2026, Chinmay: "13 dupes would be gone
+    in r2"; CHG-CLN-001). `setCrossCategoryPromotion` duplicated BO-010 Promotions & Coupons''s createPromotion,
+    so it is removed from the contract (BC-016) and BO-010 saves this record. This id stays the anchor
+    of its section of BO-010: nothing on it writes separately.
+
+
+    **Merged into BO-010 Promotions & Coupons as a section of it** (decided 2 October 2026, Chinmay: DEC-100,
+    "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round; CHG-MOV-002).
+    It edits the same record as BO-010: it renders inside BO-010''s component, under its route, and keeps
+    its own operations, because the first-release slice and its ticket name them. Whether those duplicate
+    writers retire in favour of the venue screen''s is a contract and plan question (CHG-MOV-008).
 
 
     **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
@@ -175809,10 +175803,6 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Promotions___Bundles_Management_Reference.pdf, page 56
-  - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of the offer written by setCrossCategoryPromotion
-      (or the offer is a typed Discount on createPromotion, read by getPromotion).'
-    source: contracts/satellite/promotions.yaml#setCrossCategoryPromotion | screens/P08-venue-back-office.yaml#ADM-174
   layout:
     template: split
     regions:
@@ -175832,17 +175822,13 @@ screens:
   states:
     loading: The cross-category promotion list.
     error: Could not load. Names which read failed and leaves the cross-category promotion untouched.
-    emptyFirstRun: No cross-category promotion yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: Nothing saved yet. The create action is BO-010's (createPromotion); this section offers
+      none of its own.
     emptyNoResults: The filter narrowed it and the cross-category promotion are still there. Names the
       active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
-  apis:
-  - operationId: setCrossCategoryPromotion
-    contract: promotions
-    purpose: Cross-Category Promotion Builder
-    trigger: onAction
+    emptyNoAccess: Shown when the caller lacks the permission BO-010 Promotions & Coupons requires; this
+      section has no operation of its own since its writer was retired, so it names that screen's.
+  apis: []
   wireframe:
     status: notStarted
     provenance: generated
@@ -175851,7 +175837,8 @@ screens:
   apisNote: Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 56. 0
     of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    rather than here. **2 October 2026 (CHG-CLN-001):** setCrossCategoryPromotion retired in r2 (BC-016);
+    BO-010 Promotions & Coupons writes the record with createPromotion.
 - id: ADM-175
   name: Reward Selection, Substitution & Customer Choice
   module: Commercial
@@ -176416,15 +176403,20 @@ screens:
     - to: ADM-178
       trigger: Returns to the board's landing screen
       provenance: flow F158 step 2→3
-      operation: setBundleDefinition
     - to: BO-011
       trigger: Open Packages & Bundles
       provenance: a section of BO-011 since 2 October 2026 (CHG-MOV-002)
-  notes: '**Merged into BO-011 Packages & Bundles as a section of it** (decided 2 October 2026, Chinmay:
-    DEC-100, "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round;
-    CHG-MOV-002). It edits the same record as BO-011: it renders inside BO-011''s component, under its
-    route, and keeps its own operations, because the first-release slice and its ticket name them. Whether
-    those duplicate writers retire in favour of the venue screen''s is a contract and plan question (CHG-MOV-008).
+  notes: '**Its own writer is retired in r2** (decided 2 October 2026, Chinmay: "13 dupes would be gone
+    in r2"; CHG-CLN-001). `setBundleDefinition` duplicated BO-011 Packages & Bundles''s createBundle and
+    updateBundle, so it is removed from the contract (BC-018) and BO-011 saves this record. This id stays
+    the anchor of its section of BO-011: nothing on it writes separately.
+
+
+    **Merged into BO-011 Packages & Bundles as a section of it** (decided 2 October 2026, Chinmay: DEC-100,
+    "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round; CHG-MOV-002).
+    It edits the same record as BO-011: it renders inside BO-011''s component, under its route, and keeps
+    its own operations, because the first-release slice and its ticket name them. Whether those duplicate
+    writers retire in favour of the venue screen''s is a contract and plan question (CHG-MOV-008).
 
 
     **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
@@ -176526,10 +176518,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: setBundleDefinition
-    contract: promotions
-    purpose: Bundle Definition & Setup
-    trigger: onAction
   - operationId: listCommercialCampaigns
     contract: promotions
     purpose: List commercial campaigns
@@ -176542,7 +176530,8 @@ screens:
   apisNote: Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 65. 0
     of 0 labels bound to a contract property; 11 of 26 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    rather than here. **2 October 2026 (CHG-CLN-001):** setBundleDefinition retired in r2 (BC-018); BO-011
+    Packages & Bundles writes the record with createBundle and updateBundle.
 - id: ADM-180
   name: Bundle Component Builder
   module: Commercial
@@ -176571,15 +176560,20 @@ screens:
     - to: ADM-178
       trigger: Returns to the board's landing screen
       provenance: flow F158 step 4→5
-      operation: setBundleComponent
     - to: BO-011
       trigger: Open Packages & Bundles
       provenance: a section of BO-011 since 2 October 2026 (CHG-MOV-002)
-  notes: '**Merged into BO-011 Packages & Bundles as a section of it** (decided 2 October 2026, Chinmay:
-    DEC-100, "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round;
-    CHG-MOV-002). It edits the same record as BO-011: it renders inside BO-011''s component, under its
-    route, and keeps its own operations, because the first-release slice and its ticket name them. Whether
-    those duplicate writers retire in favour of the venue screen''s is a contract and plan question (CHG-MOV-008).
+  notes: '**Its own writer is retired in r2** (decided 2 October 2026, Chinmay: "13 dupes would be gone
+    in r2"; CHG-CLN-001). `setBundleComponent` duplicated BO-011 Packages & Bundles''s createBundle, so
+    it is removed from the contract (BC-019) and BO-011 saves this record. This id stays the anchor of
+    its section of BO-011: nothing on it writes separately.
+
+
+    **Merged into BO-011 Packages & Bundles as a section of it** (decided 2 October 2026, Chinmay: DEC-100,
+    "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round; CHG-MOV-002).
+    It edits the same record as BO-011: it renders inside BO-011''s component, under its route, and keeps
+    its own operations, because the first-release slice and its ticket name them. Whether those duplicate
+    writers retire in favour of the venue screen''s is a contract and plan question (CHG-MOV-008).
 
 
     **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
@@ -176632,10 +176626,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: setBundleComponent
-    contract: promotions
-    purpose: Bundle Component Builder
-    trigger: onAction
   - operationId: getBundle
     contract: promotions
     purpose: The bundle with its components and allocation
@@ -176649,7 +176639,8 @@ screens:
   apisNote: Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 66. 0
     of 0 labels bound to a contract property; 5 of 31 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    rather than here. **2 October 2026 (CHG-CLN-001):** setBundleComponent retired in r2 (BC-019); BO-011
+    Packages & Bundles writes the record with createBundle.
   entryState:
     params:
     - name: bundleId
@@ -176682,15 +176673,20 @@ screens:
     - to: ADM-178
       trigger: Returns to the board's landing screen
       provenance: flow F158 step 6→7
-      operation: setGuestChoiceBuild
     - to: BO-011
       trigger: Open Packages & Bundles
       provenance: a section of BO-011 since 2 October 2026 (CHG-MOV-002)
-  notes: '**Merged into BO-011 Packages & Bundles as a section of it** (decided 2 October 2026, Chinmay:
-    DEC-100, "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round;
-    CHG-MOV-002). It edits the same record as BO-011: it renders inside BO-011''s component, under its
-    route, and keeps its own operations, because the first-release slice and its ticket name them. Whether
-    those duplicate writers retire in favour of the venue screen''s is a contract and plan question (CHG-MOV-008).
+  notes: '**Its own writer is retired in r2** (decided 2 October 2026, Chinmay: "13 dupes would be gone
+    in r2"; CHG-CLN-001). `setGuestChoiceBuild` duplicated BO-011 Packages & Bundles''s createBundle,
+    so it is removed from the contract (BC-020) and BO-011 saves this record. This id stays the anchor
+    of its section of BO-011: nothing on it writes separately.
+
+
+    **Merged into BO-011 Packages & Bundles as a section of it** (decided 2 October 2026, Chinmay: DEC-100,
+    "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round; CHG-MOV-002).
+    It edits the same record as BO-011: it renders inside BO-011''s component, under its route, and keeps
+    its own operations, because the first-release slice and its ticket name them. Whether those duplicate
+    writers retire in favour of the venue screen''s is a contract and plan question (CHG-MOV-008).
 
 
     **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
@@ -176739,12 +176735,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: setGuestChoiceBuild
-    contract: promotions
-    purpose: Guest Choice & Build-Your-Own Bundle Designer
-    trigger: onAction
-    invalidates:
-    - setGuestChoiceBuild
   - operationId: getBundle
     contract: promotions
     purpose: The bundle with its choice groups
@@ -176758,7 +176748,8 @@ screens:
   apisNote: Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 67. 0
     of 0 labels bound to a contract property; 3 of 27 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    rather than here. **2 October 2026 (CHG-CLN-001):** setGuestChoiceBuild retired in r2 (BC-020); BO-011
+    Packages & Bundles writes the record with createBundle.
   entryState:
     params:
     - name: bundleId
@@ -178769,15 +178760,20 @@ screens:
     - to: ADM-198
       trigger: Returns to the board's landing screen
       provenance: flow F160 step 2→3
-      operation: setEligibilityRule
     - to: BO-010
       trigger: Open Promotions & Coupons
       provenance: a section of BO-010 since 2 October 2026 (CHG-MOV-002)
-  notes: '**Merged into BO-010 Promotions & Coupons as a section of it** (decided 2 October 2026, Chinmay:
-    DEC-100, "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round;
-    CHG-MOV-002). It edits the same record as BO-010: it renders inside BO-010''s component, under its
-    route, and keeps its own operations, because the first-release slice and its ticket name them. Whether
-    those duplicate writers retire in favour of the venue screen''s is a contract and plan question (CHG-MOV-008).
+  notes: '**Its own writer is retired in r2** (decided 2 October 2026, Chinmay: "13 dupes would be gone
+    in r2"; CHG-CLN-001). `setEligibilityRule` duplicated BO-010 Promotions & Coupons''s createPromotion,
+    so it is removed from the contract (BC-017) and BO-010 saves this record. This id stays the anchor
+    of its section of BO-010: nothing on it writes separately.
+
+
+    **Merged into BO-010 Promotions & Coupons as a section of it** (decided 2 October 2026, Chinmay: DEC-100,
+    "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round; CHG-MOV-002).
+    It edits the same record as BO-010: it renders inside BO-010''s component, under its route, and keeps
+    its own operations, because the first-release slice and its ticket name them. Whether those duplicate
+    writers retire in favour of the venue screen''s is a contract and plan question (CHG-MOV-008).
 
 
     **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
@@ -178814,10 +178810,6 @@ screens:
       written on its own screen, ADM-279 Resale Eligibility Rule Configuration (design-notes correction
       ticketing-backoffice ADM-199).'
     source: contracts/spine/orders.yaml#setResaleEligibilityRule | screens/P08-venue-back-office.yaml#ADM-199
-  - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of promotion eligibility rules (setEligibilityRule
-      has no get).'
-    source: contracts/satellite/promotions.yaml#setEligibilityRule | screens/P08-venue-back-office.yaml#ADM-199
   layout:
     template: split
     regions:
@@ -178841,13 +178833,9 @@ screens:
       that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the eligibility rule are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
-  apis:
-  - operationId: setEligibilityRule
-    contract: promotions
-    purpose: Eligibility Rule Builder
-    trigger: onAction
+    emptyNoAccess: Shown when the caller lacks the permission BO-010 Promotions & Coupons requires; this
+      section has no operation of its own since its writer was retired, so it names that screen's.
+  apis: []
   wireframe:
     status: notStarted
     provenance: generated
@@ -178856,7 +178844,8 @@ screens:
   apisNote: Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 95. 0
     of 0 labels bound to a contract property; 1 of 33 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    rather than here. **2 October 2026 (CHG-CLN-001):** setEligibilityRule retired in r2 (BC-017); BO-010
+    Promotions & Coupons writes the record with createPromotion.
 - id: ADM-200
   name: CRM & Customer Segment Manager
   module: Commercial
@@ -179945,11 +179934,15 @@ screens:
     - to: BO-010
       trigger: Open Promotions & Coupons
       provenance: a section of BO-010 since 2 October 2026 (CHG-MOV-002)
-  notes: '**Merged into BO-010 Promotions & Coupons as a section of it** (decided 2 October 2026, Chinmay:
-    DEC-100, "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round;
-    CHG-MOV-002). It edits the same record as BO-010: it renders inside BO-010''s component, under its
-    route, and keeps its own operations, because the first-release slice and its ticket name them. Whether
-    those duplicate writers retire in favour of the venue screen''s is a contract and plan question (CHG-MOV-008).
+  notes: '**setPromotionRule unbound in r2** (decided 2 October 2026; CHG-CLN-001): the duplicate writer
+    was removed from the contract; this screen keeps its own operation.
+
+
+    **Merged into BO-010 Promotions & Coupons as a section of it** (decided 2 October 2026, Chinmay: DEC-100,
+    "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round; CHG-MOV-002).
+    It edits the same record as BO-010: it renders inside BO-010''s component, under its route, and keeps
+    its own operations, because the first-release slice and its ticket name them. Whether those duplicate
+    writers retire in favour of the venue screen''s is a contract and plan question (CHG-MOV-008).
 
 
     **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
@@ -180007,10 +180000,6 @@ screens:
   - operationId: setPromotionStackingRule
     contract: promotions
     purpose: Promotion Stacking Rule Builder
-    trigger: onAction
-  - operationId: setPromotionRule
-    contract: promotions
-    purpose: Promotion Rule Builder
     trigger: onAction
   wireframe:
     status: notStarted

@@ -25,9 +25,8 @@ steps:
     strategies, and their performance.
 - step: 2
   screen: ADM-199
-  action: Works in Eligibility Rule Builder
-  operations:
-  - setEligibilityRule
+  action: Works in Eligibility Rule Builder, a section of BO-010, which saves the record with createPromotion (setEligibilityRule retired in r2, CHG-CLN-001)
+  operations: []
   outcome: Provide a no-code rule engine for determining promotion eligibility.
 - step: 3
   screen: ADM-198

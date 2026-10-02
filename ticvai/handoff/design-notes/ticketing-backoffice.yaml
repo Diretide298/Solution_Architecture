@@ -10504,23 +10504,23 @@ screens:
       rule: >-
         Scope (global, country, market, brand, venue, event, business unit) decides which of market, country, brand
         and venue are asked; the tenant and venue come from the console context (PR-1).
-      source: contracts/spine/catalogue.yaml#setPriceListMaster | R098
+      source: contracts/spine/catalogue.yaml#/components/schemas/PriceListMasterConfigurationInput | R098
     - field: defaults
       rule: >-
         Default rate category, rounding profile and price hierarchy are pickers of records from ADM-050, ADM-075
         and ADM-055, never free codes.
-      source: contracts/spine/catalogue.yaml#setPriceListMaster
+      source: contracts/spine/catalogue.yaml#/components/schemas/PriceListMasterConfigurationInput
     - field: status
       rule: >-
         Only Draft, Configured, Inactive and Archived are set here; Validated comes from structure validation (ADM-057),
         Active and Expired from governance. Show the others read-only.
-      source: contracts/spine/catalogue.yaml#setPriceListMaster
+      source: contracts/spine/catalogue.yaml#/components/schemas/PriceListMasterConfigurationInput
     outputs:
     - element: consuming modules
       rule: >-
         The modules that use this list (ticketing, B2C, POS, kiosk, B2B, group sales, membership, F&B, retail, rental)
         as chips, so a change's reach is visible.
-      source: contracts/spine/catalogue.yaml#setPriceListMaster
+      source: contracts/spine/catalogue.yaml#/components/schemas/PriceListMasterConfigurationInput
     - element: Where this screen lives
       rule: 'A venue screen: it moves to Venue Management (P08) and merges with BO-008 product, BO-009 price matrix, BO-010
         promotions and BO-011 bundles, so one surface edits each record. TICVAI staff reach it only under a platform-staff
@@ -10529,7 +10529,7 @@ screens:
     actions:
     - action: Duplicate
       result: New draft list with "copied from" set; the user is asked for the new code and validity.
-      source: contracts/spine/catalogue.yaml#setPriceListMaster | DI-592
+      source: contracts/spine/catalogue.yaml#/components/schemas/PriceListMasterConfigurationInput | DI-592
     consistency:
     - with: BO-009
       note: >-
@@ -10556,16 +10556,16 @@ screens:
         Currency resolves from the region and cannot be chosen (ADR-0018, updatePriceList); two writers with two
         status vocabularies (draft, configured, inactive, archived vs CatalogueConfigStatus) for one record.
       source: >-
-        contracts/spine/catalogue.yaml#setPriceListMaster | contracts/spine/catalogue.yaml#createPriceList | ADR-0018
-      status: logged
-      by: CHG-MOV-008
+        contracts/spine/catalogue.yaml#/components/schemas/PriceListMasterConfigurationInput | contracts/spine/catalogue.yaml#createPriceList | ADR-0018
+      status: fixed
+      by: CHG-CLN-001
     - what: >-
         No read operation: the screen declares only setPriceListMaster and nothing that returns the current configuration.
       why: >-
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/catalogue.yaml#setPriceListMaster | screens/P08-venue-back-office.yaml#ADM-049
+        contracts/spine/catalogue.yaml#/components/schemas/PriceListMasterConfigurationInput | screens/P08-venue-back-office.yaml#ADM-049
       status: fixed
       by: CHG-WIR-025
     decisions:
@@ -10579,7 +10579,7 @@ screens:
       decidedBy: Chinmay
       date: '2026-10-02'
       source: DEC-100 | CHG-NOTE-006
-      questionSource: R098 | screens/P08-venue-back-office.yaml#ADM-049 | contracts/spine/catalogue.yaml#setPriceListMaster
+      questionSource: R098 | screens/P08-venue-back-office.yaml#ADM-049 | contracts/spine/catalogue.yaml#/components/schemas/PriceListMasterConfigurationInput
     - question: Which way does price list priority run (does the higher or the lower number win)?
       decision: 'Drawn default stands (answer: "Default: higher number wins"): Label it "Higher number wins" and show the
         overlapping lists.'
@@ -10653,19 +10653,19 @@ screens:
       rule: >-
         A cell holds either an amount or a derivation (base rate and adjustment); a derived cell shows its computed
         amount greyed with the formula on hover; amount is ignored when derived.
-      source: contracts/spine/catalogue.yaml#setRateStructure
+      source: contracts/spine/catalogue.yaml#/components/schemas/RateStructureBuilderInput
     - field: precision
       rule: 0 to 3 decimals, the third kept where the currency needs it.
-      source: contracts/spine/catalogue.yaml#setRateStructure | DI-598
+      source: contracts/spine/catalogue.yaml#/components/schemas/RateStructureBuilderInput | DI-598
     actions:
     - action: Matrix actions
       result: >-
         Add rate, Duplicate, Edit, Disable, Sort, Copy across categories, Compare, as buttons on the matrix.
-      source: contracts/spine/catalogue.yaml#setRateStructure
+      source: contracts/spine/catalogue.yaml#/components/schemas/RateStructureBuilderInput
     edgeCases:
     - case: Circular derived rates (Adult from Child, Child from Adult)
       expected: Refused on save with the cycle drawn.
-      source: contracts/spine/catalogue.yaml#setRateStructure
+      source: contracts/spine/catalogue.yaml#/components/schemas/RateStructureBuilderInput
     sampleData:
       rates:
       - category: Adult
@@ -10683,9 +10683,9 @@ screens:
     - what: setRateStructure accepts a currency per rate.
       why: >-
         Currency resolves from the region (ADR-0018); a rate in another currency is exactly what setPrices refuses.
-      source: contracts/spine/catalogue.yaml#setRateStructure | ADR-0018
-      status: logged
-      by: CHG-MOV-008
+      source: contracts/spine/catalogue.yaml#/components/schemas/RateStructureBuilderInput | ADR-0018
+      status: withdrawn
+      by: CHG-CLN-001
     - what: >-
         Rates are written by setRateStructure here and by setPrices on BO-009, two writers for the price of one
         ticket type.
@@ -10699,7 +10699,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/catalogue.yaml#setRateStructure | screens/P08-venue-back-office.yaml#ADM-051
+        contracts/spine/catalogue.yaml#/components/schemas/RateStructureBuilderInput | screens/P08-venue-back-office.yaml#ADM-051
       status: fixed
       by: CHG-WIR-025
     - what: >-
@@ -12415,14 +12415,14 @@ screens:
       rule: >-
         Source columns on the left, TICVAI fields on the right, with required fields marked and auto-matched where
         names match.
-      source: contracts/spine/catalogue.yaml#createBulkProductCatalogue
+      source: contracts/spine/catalogue.yaml#/components/schemas/BulkProductCreationCatalogueImportInput
     - field: rowCorrections and excludedRows
       rule: Edit a failing row inline and re-validate, or exclude it; the counts update.
-      source: contracts/spine/catalogue.yaml#createBulkProductCatalogue
+      source: contracts/spine/catalogue.yaml#/components/schemas/BulkProductCreationCatalogueImportInput
     actions:
     - action: Download error report
       result: A file of failing rows with the reason per row.
-      source: contracts/spine/catalogue.yaml#createBulkProductCatalogue
+      source: contracts/spine/catalogue.yaml#/components/schemas/BulkProductCreationCatalogueImportInput
     consistency:
     - with: BO-117
       note: >-
@@ -12439,9 +12439,9 @@ screens:
         createBulkProductCatalogue is a second catalogue-import operation beside importProductCatalogue and commitCatalogueImport.
       why: One import job, two operations and two screens; the lead should name one.
       source: >-
-        contracts/spine/catalogue.yaml#createBulkProductCatalogue | contracts/spine/catalogue.yaml#importProductCatalogue
-      status: logged
-      by: CHG-MOV-008
+        contracts/spine/catalogue.yaml#/components/schemas/BulkProductCreationCatalogueImportInput | contracts/spine/catalogue.yaml#importProductCatalogue
+      status: fixed
+      by: CHG-CLN-001
     - what: >-
         No read operation: the screen declares only createBulkProductCatalogue and nothing that returns the current
         configuration.
@@ -12449,7 +12449,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/catalogue.yaml#createBulkProductCatalogue | screens/P08-venue-back-office.yaml#ADM-121
+        contracts/spine/catalogue.yaml#/components/schemas/BulkProductCreationCatalogueImportInput | screens/P08-venue-back-office.yaml#ADM-121
       status: fixed
       by: CHG-MOV-002
   ADM-122:
@@ -13092,7 +13092,7 @@ screens:
       rule: >-
         One outcome kind at a time with its own inputs; "multiple outcomes" adds a second outcome block rather than
         more fields.
-      source: contracts/satellite/promotions.yaml#setPromotionRule
+      source: contracts/satellite/promotions.yaml#/components/schemas/PromotionRuleBuilderInput
     - field: stacking rule
       rule: >-
         Scope (transaction, product, category, ticket, bundle component, customer, channel) and model (fully stackable,
@@ -13115,9 +13115,9 @@ screens:
         Two writers for one promotion; the typed one (Discount.kind, PromotionConditions, StackingMode) is the one
         checkout evaluates.
       source: >-
-        contracts/satellite/promotions.yaml#setPromotionRule | contracts/satellite/promotions.yaml#createPromotion
-      status: logged
-      by: CHG-MOV-008
+        contracts/satellite/promotions.yaml#/components/schemas/PromotionRuleBuilderInput | contracts/satellite/promotions.yaml#createPromotion
+      status: fixed
+      by: CHG-CLN-001
     - what: >-
         No read operation: the screen declares only setPromotionRule, setPromotionStackingRule and nothing that
         returns the current configuration.
@@ -13125,10 +13125,10 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#setPromotionRule | contracts/satellite/promotions.yaml#setPromotionStackingRule
+        contracts/satellite/promotions.yaml#/components/schemas/PromotionRuleBuilderInput | contracts/satellite/promotions.yaml#setPromotionStackingRule
         | screens/P08-venue-back-office.yaml#ADM-148
-      status: logged
-      by: CHG-WIR-027
+      status: withdrawn
+      by: CHG-CLN-001
     - what: 'Pack actions with no operation: Nested condition groups.'
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
@@ -13504,11 +13504,11 @@ screens:
       rule: >-
         Shown as cards with one line each; a common code asks for the code text, unique codes ask for a pattern
         (prefix and length).
-      source: contracts/satellite/promotions.yaml#setCouponPromoCode | DI-173
+      source: contracts/satellite/promotions.yaml#/components/schemas/CouponPromoCodeBuilderInput | DI-173
     - field: benefitValue
       rule: >-
         A percentage or an amount depending on the benefit type; amount in the region's currency (PR-2).
-      source: contracts/satellite/promotions.yaml#setCouponPromoCode
+      source: contracts/satellite/promotions.yaml#/components/schemas/CouponPromoCodeBuilderInput
     consistency:
     - with: BO-010
       note: Coupon campaigns on P08 are the same thing; same wording for shared vs unique codes.
@@ -13527,16 +13527,16 @@ screens:
         setCouponPromoCode duplicates createCouponCampaign and types campaign and eligibleProducts as plain strings.
       why: One coupon campaign, two writers; pickers need ids.
       source: >-
-        contracts/satellite/promotions.yaml#setCouponPromoCode | contracts/satellite/promotions.yaml#createCouponCampaign
-      status: logged
-      by: CHG-MOV-008
+        contracts/satellite/promotions.yaml#/components/schemas/CouponPromoCodeBuilderInput | contracts/satellite/promotions.yaml#createCouponCampaign
+      status: fixed
+      by: CHG-CLN-001
     - what: >-
         No read operation: the screen declares only setCouponPromoCode and nothing that returns the current configuration.
       why: >-
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#setCouponPromoCode | screens/P08-venue-back-office.yaml#ADM-159
+        contracts/satellite/promotions.yaml#/components/schemas/CouponPromoCodeBuilderInput | screens/P08-venue-back-office.yaml#ADM-159
       status: fixed
       by: CHG-WIR-025
   ADM-160:
@@ -13827,7 +13827,7 @@ screens:
       rule: >-
         A sentence builder ("Buy 2 Day Pass Adult, get 1 Day Pass Child at 100% off") rather than separate fields;
         same vs different product as a switch.
-      source: contracts/satellite/promotions.yaml#setBuyGetBogo | DI-174 | DI-600
+      source: contracts/satellite/promotions.yaml#/components/schemas/BuyXGetYBogoRuleBuilderInput | DI-174 | DI-600
     sampleData:
       offer:
         buy: 2 x Day Pass Adult
@@ -13843,18 +13843,18 @@ screens:
       why: >-
         Pickers and switches need ids and booleans; the typed equivalent is Discount kind buyXGetY on createPromotion.
       source: >-
-        contracts/satellite/promotions.yaml#setBuyGetBogo | contracts/satellite/promotions.yaml#/components/schemas/Discount
-      status: logged
-      by: CHG-MOV-008
+        contracts/satellite/promotions.yaml#/components/schemas/BuyXGetYBogoRuleBuilderInput | contracts/satellite/promotions.yaml#/components/schemas/Discount
+      status: withdrawn
+      by: CHG-CLN-001
     - what: >-
         No read operation: the screen declares only setBuyGetBogo and nothing that returns the current configuration.
       why: >-
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#setBuyGetBogo | screens/P08-venue-back-office.yaml#ADM-169
-      status: logged
-      by: CHG-WIR-027
+        contracts/satellite/promotions.yaml#/components/schemas/BuyXGetYBogoRuleBuilderInput | screens/P08-venue-back-office.yaml#ADM-169
+      status: withdrawn
+      by: CHG-CLN-001
   ADM-170:
     block: B
     summary: >-
@@ -13915,7 +13915,7 @@ screens:
     - field: fixedPromotionalPrice
       rule: >-
         In the region's currency (PR-2) with the saving shown against the cheapest and dearest qualifying combination.
-      source: contracts/satellite/promotions.yaml#setFixedPriceOffer
+      source: contracts/satellite/promotions.yaml#/components/schemas/FixedPriceNForXOfferBuilderInput
     sampleData:
       offer:
         name: Any 3 attractions
@@ -13927,18 +13927,18 @@ screens:
     - what: >-
         The offer carries its own currency field; maximum repetitions and min/max values are strings.
       why: Currency resolves from the region (ADR-0018); numbers need number types.
-      source: contracts/satellite/promotions.yaml#setFixedPriceOffer | ADR-0008
-      status: logged
-      by: CHG-MOV-008
+      source: contracts/satellite/promotions.yaml#/components/schemas/FixedPriceNForXOfferBuilderInput | ADR-0008
+      status: withdrawn
+      by: CHG-CLN-001
     - what: >-
         No read operation: the screen declares only setFixedPriceOffer and nothing that returns the current configuration.
       why: >-
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#setFixedPriceOffer | screens/P08-venue-back-office.yaml#ADM-172
-      status: logged
-      by: CHG-WIR-027
+        contracts/satellite/promotions.yaml#/components/schemas/FixedPriceNForXOfferBuilderInput | screens/P08-venue-back-office.yaml#ADM-172
+      status: withdrawn
+      by: CHG-CLN-001
   ADM-173:
     block: A
     summary: >-
@@ -13950,7 +13950,7 @@ screens:
       rule: >-
         One choice among substitute, do not offer the promotion, provide an alternative reward, allow later fulfilment,
         with the alternative picked when chosen.
-      source: contracts/satellite/promotions.yaml#setGiftFreeProduct
+      source: contracts/satellite/promotions.yaml#/components/schemas/GiftFreeProductAddedValueOfferBuilderInput
     sampleData:
       offer:
         trigger: basket over AED 200.00
@@ -13961,18 +13961,18 @@ screens:
     corrections:
     - what: basketValue is a string, and inventory, location and fulfilment point are free text.
       why: A money threshold must be Money; locations must be pickers.
-      source: contracts/satellite/promotions.yaml#setGiftFreeProduct
-      status: logged
-      by: CHG-MOV-008
+      source: contracts/satellite/promotions.yaml#/components/schemas/GiftFreeProductAddedValueOfferBuilderInput
+      status: withdrawn
+      by: CHG-CLN-001
     - what: >-
         No read operation: the screen declares only setGiftFreeProduct and nothing that returns the current configuration.
       why: >-
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#setGiftFreeProduct | screens/P08-venue-back-office.yaml#ADM-173
-      status: logged
-      by: CHG-WIR-027
+        contracts/satellite/promotions.yaml#/components/schemas/GiftFreeProductAddedValueOfferBuilderInput | screens/P08-venue-back-office.yaml#ADM-173
+      status: withdrawn
+      by: CHG-CLN-001
   ADM-174:
     block: A
     summary: >-
@@ -13983,7 +13983,7 @@ screens:
       rule: >-
         Draw as two columns, "Buy from" and "Get in", each a domain picker followed by a product picker of that
         domain.
-      source: contracts/satellite/promotions.yaml#setCrossCategoryPromotion
+      source: contracts/satellite/promotions.yaml#/components/schemas/CrossCategoryPromotionBuilderInput
     sampleData:
       offer:
         buyFrom: 'Ticketing: Day Pass Adult'
@@ -13995,9 +13995,9 @@ screens:
       why: >-
         It cannot express a cross-category rule; it needs the qualifier and reward structure of setBuyGetBogo or
         createPromotion with categoryIds.
-      source: contracts/satellite/promotions.yaml#setCrossCategoryPromotion
-      status: logged
-      by: CHG-MOV-008
+      source: contracts/satellite/promotions.yaml#/components/schemas/CrossCategoryPromotionBuilderInput
+      status: withdrawn
+      by: CHG-CLN-001
     - what: >-
         No read operation: the screen declares only setCrossCategoryPromotion and nothing that returns the current
         configuration.
@@ -14005,9 +14005,9 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#setCrossCategoryPromotion | screens/P08-venue-back-office.yaml#ADM-174
-      status: logged
-      by: CHG-WIR-027
+        contracts/satellite/promotions.yaml#/components/schemas/CrossCategoryPromotionBuilderInput | screens/P08-venue-back-office.yaml#ADM-174
+      status: withdrawn
+      by: CHG-CLN-001
   ADM-175:
     block: B
     summary: >-
@@ -14143,7 +14143,7 @@ screens:
     inputs:
     - field: bundleType
       rule: Cards with one line each; Build your own and Dynamic lead to ADM-181, others to ADM-180.
-      source: contracts/satellite/promotions.yaml#setBundleDefinition
+      source: contracts/satellite/promotions.yaml#/components/schemas/BundleDefinitionSetupInput
     - field: campaign
       rule: Picked from the commercial campaigns list.
       source: contracts/satellite/promotions.yaml#listCommercialCampaigns
@@ -14168,9 +14168,9 @@ screens:
       why: >-
         Two writers for one bundle record; the typed createBundle is what the ledger allocation hangs on.
       source: >-
-        contracts/satellite/promotions.yaml#setBundleDefinition | contracts/satellite/promotions.yaml#createBundle
-      status: logged
-      by: CHG-MOV-008
+        contracts/satellite/promotions.yaml#/components/schemas/BundleDefinitionSetupInput | contracts/satellite/promotions.yaml#createBundle
+      status: fixed
+      by: CHG-CLN-001
   ADM-180:
     block: A
     summary: >-
@@ -14181,7 +14181,7 @@ screens:
     - field: quantity
       rule: >-
         Fixed, or per guest, or per ticket, as one choice; minimum and maximum only for optional and choice components.
-      source: contracts/satellite/promotions.yaml#setBundleComponent
+      source: contracts/satellite/promotions.yaml#/components/schemas/BundleComponentBuilderInput
     edgeCases:
     - case: Components of a bundle that has sold
       expected: Read-only, as on BO-011.
@@ -14206,16 +14206,16 @@ screens:
       why: >-
         A component that names no product cannot be sold or allocated (BundleComponent requires variantId).
       source: >-
-        contracts/satellite/promotions.yaml#setBundleComponent | contracts/satellite/promotions.yaml#/components/schemas/BundleComponent
-      status: logged
-      by: CHG-MOV-008
+        contracts/satellite/promotions.yaml#/components/schemas/BundleComponentBuilderInput | contracts/satellite/promotions.yaml#/components/schemas/BundleComponent
+      status: withdrawn
+      by: CHG-CLN-001
     - what: >-
         No read operation: the screen declares only setBundleComponent and nothing that returns the current configuration.
       why: >-
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#setBundleComponent | screens/P08-venue-back-office.yaml#ADM-180
+        contracts/satellite/promotions.yaml#/components/schemas/BundleComponentBuilderInput | screens/P08-venue-back-office.yaml#ADM-180
       status: fixed
       by: CHG-WIR-025
   ADM-181:
@@ -14229,7 +14229,7 @@ screens:
       rule: >-
         Group name, category, minimum and maximum selections, required or optional, eligible products, an extra
         charge for premium choices, display order.
-      source: contracts/satellite/promotions.yaml#setGuestChoiceBuild | ADR-0019
+      source: contracts/satellite/promotions.yaml#/components/schemas/GuestChoiceBuildYourOwnBundleDesignerInput | ADR-0019
     outputs:
     - element: guest preview
       rule: >-
@@ -14261,16 +14261,16 @@ screens:
       why: >-
         Numbers and booleans need types; a group must belong to a bundle (BundleChoiceGroup exists on createBundle).
       source: >-
-        contracts/satellite/promotions.yaml#setGuestChoiceBuild | contracts/satellite/promotions.yaml#createBundle
-      status: logged
-      by: CHG-MOV-008
+        contracts/satellite/promotions.yaml#/components/schemas/GuestChoiceBuildYourOwnBundleDesignerInput | contracts/satellite/promotions.yaml#createBundle
+      status: withdrawn
+      by: CHG-CLN-001
     - what: >-
         No read operation: the screen declares only setGuestChoiceBuild and nothing that returns the current configuration.
       why: >-
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#setGuestChoiceBuild | screens/P08-venue-back-office.yaml#ADM-181
+        contracts/satellite/promotions.yaml#/components/schemas/GuestChoiceBuildYourOwnBundleDesignerInput | screens/P08-venue-back-office.yaml#ADM-181
       status: fixed
       by: CHG-WIR-025
   ADM-182:
@@ -14675,7 +14675,7 @@ screens:
       rule: >-
         A query builder (field, operator, value) with AND inside a group and the group's effect (include or exclude);
         all criteria must match by default.
-      source: contracts/satellite/promotions.yaml#setEligibilityRule | R096
+      source: contracts/satellite/promotions.yaml#/components/schemas/EligibilityRuleBuilderInput | R096
     sampleData:
       rule:
         groups:
@@ -14697,9 +14697,9 @@ screens:
       by: CHG-WIR-025
     - what: Every criterion is a free string and nested groups are a string.
       why: A rule engine needs field, operator and value; the typed analogue is PromotionConditions.
-      source: contracts/satellite/promotions.yaml#setEligibilityRule
-      status: logged
-      by: CHG-MOV-008
+      source: contracts/satellite/promotions.yaml#/components/schemas/EligibilityRuleBuilderInput
+      status: withdrawn
+      by: CHG-CLN-001
     - what: >-
         No read operation: the screen declares only setEligibilityRule, setResaleEligibilityRule and nothing that
         returns the current configuration.
@@ -14707,7 +14707,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#setEligibilityRule | contracts/spine/orders.yaml#setResaleEligibilityRule
+        contracts/satellite/promotions.yaml#/components/schemas/EligibilityRuleBuilderInput | contracts/spine/orders.yaml#setResaleEligibilityRule
         | screens/P08-venue-back-office.yaml#ADM-199
       status: fixed
       by: CHG-WIR-025
@@ -14965,7 +14965,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#setPromotionStackingRule | contracts/satellite/promotions.yaml#setPromotionRule
+        contracts/satellite/promotions.yaml#setPromotionStackingRule | contracts/satellite/promotions.yaml#/components/schemas/PromotionRuleBuilderInput
         | screens/P08-venue-back-office.yaml#ADM-210
       status: logged
       by: CHG-WIR-027
@@ -16074,7 +16074,7 @@ screens:
     corrections:
     - what: The screen also writes the promotion eligibility rule (setEligibilityRule).
       why: Promotion eligibility is a different concept.
-      source: contracts/satellite/promotions.yaml#setEligibilityRule
+      source: contracts/satellite/promotions.yaml#/components/schemas/EligibilityRuleBuilderInput
       status: fixed
       by: CHG-WIR-025
     - what: priceCategory is typed Money and ownership period a date-time.
@@ -16087,7 +16087,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/orders.yaml#setResaleEligibilityRule | contracts/satellite/promotions.yaml#setEligibilityRule
+        contracts/spine/orders.yaml#setResaleEligibilityRule | contracts/satellite/promotions.yaml#/components/schemas/EligibilityRuleBuilderInput
         | screens/P08-venue-back-office.yaml#ADM-279
       status: fixed
       by: CHG-WIR-025

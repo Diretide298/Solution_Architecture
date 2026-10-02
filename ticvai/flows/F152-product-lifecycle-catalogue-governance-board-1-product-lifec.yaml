@@ -49,9 +49,8 @@ steps:
   outcome: Ready for the next screen on this board
 - step: 6
   screen: ADM-121
-  action: Works in Bulk Product Creation & Catalogue Import
-  operations:
-  - createBulkProductCatalogue
+  action: Works in Bulk Product Creation & Catalogue Import, a section of BO-117, which saves the record with importProductCatalogue and commitCatalogueImport (createBulkProductCatalogue retired in r2, CHG-CLN-001)
+  operations: []
   outcome: Allow large catalogues to be created efficiently rather than configuring every product manually.
     This directly addresses the matrix requirement for catalogue creation through bulk-file upload.
 - step: 7

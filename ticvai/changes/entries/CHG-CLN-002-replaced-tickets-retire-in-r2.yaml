@@ -1,0 +1,62 @@
+id: CHG-CLN-002
+date: '2026-10-02'
+source: cr
+kind: plan
+summary: The 13 pushed APP-SETUP-ADM tickets of the retired duplicate writers, and their 13 service sub-tasks, leave the plan
+  at r2 and are closed with a "replaced by <key>" note naming the venue screen's ticket that builds the record.
+decision:
+  what: 'tools/op-retire.py gains REPLACED (APP-SETUP-ADM-049, 051 -> APP-SETUP-BO-009; ADM-121 -> APP-SETUP-BO-117; ADM-148,
+    159, 169, 172, 173, 174, 199 -> APP-SETUP-BO-010; ADM-179, 180, 181 -> APP-SETUP-BO-011) and REPLACED_OPS (each retired
+    operation''s SVC-CATALOGUE-DRAFTED-n sub-task -> the planned sub-task of its typed writer). Both are closed as merged (Rejected)
+    with the note "Replaced by <key> (#id) (decided 2 October 2026, release r2)". check-key-stability counts REPLACED keys
+    as retired, so retiring is never read as renaming.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026: "13 dupes would be gone in r2" (CHG-CLN-001). A pushed ticket whose work left the plan with
+  no reason in op-retire.py is listed as unexplained and never touched; a "replaced by" note tells the developer where the
+  work went (council of 1 October, C4: a pushed key is never renamed).'
+keys_touched:
+  tickets:
+  - APP-SETUP-ADM-049
+  - APP-SETUP-ADM-051
+  - APP-SETUP-ADM-121
+  - APP-SETUP-ADM-148
+  - APP-SETUP-ADM-159
+  - APP-SETUP-ADM-169
+  - APP-SETUP-ADM-172
+  - APP-SETUP-ADM-173
+  - APP-SETUP-ADM-174
+  - APP-SETUP-ADM-179
+  - APP-SETUP-ADM-180
+  - APP-SETUP-ADM-181
+  - APP-SETUP-ADM-199
+  files:
+  - tools/op-retire.py
+  - tools/check-key-stability.py
+root_class: A10 TICKET-DRIFT
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ADM-049 (#20641)
+  - APP-SETUP-ADM-051 (#20642)
+  - APP-SETUP-ADM-121 (#20646)
+  - APP-SETUP-ADM-148 (#20647)
+  - APP-SETUP-ADM-159 (#20648)
+  - APP-SETUP-ADM-169 (#20650)
+  - APP-SETUP-ADM-172 (#20651)
+  - APP-SETUP-ADM-173 (#20652)
+  - APP-SETUP-ADM-174 (#20653)
+  - APP-SETUP-ADM-179 (#20654)
+  - APP-SETUP-ADM-180 (#20655)
+  - APP-SETUP-ADM-181 (#20656)
+  - APP-SETUP-ADM-199 (#20657)
+release_tag: r2
+decision_owner: Chinmay
+triage: fix-forward
+proposed: 2026-10-02T09:00
+prevention:
+  type: generator-rule
+  ref: tools/op-retire.py::REPLACED
+status: open
+notes: Cooling-off waived by Chinmay until Mon 5 Oct 2026 (CHG-DOC-023). The op-release bundle (tools/op-release.py) reads
+  op-retire's plan, so the r2 push applies it; nothing is sent to OpenProject from this branch.

@@ -4318,6 +4318,68 @@ paths:
                   type: integer
                 isActive:
                   type: boolean
+                description:
+                  type: string
+                  nullable: true
+                  description: >-
+                    **The price list master fields** (data model DM3) are written here since setPriceListMaster was
+                    retired in r2 (BC-008, CHG-CLN-001); each is optional and means what it means on `PriceList`.
+                priceListType:
+                  type: string
+                  enum: [standardRetail, venue, attraction, event, membership, group, corporate, b2b, reseller, ota,
+                         internal, specialMarket]
+                ownerPrincipalId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                tags:
+                  type: array
+                  items:
+                    type: string
+                legalEntityId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                brand:
+                  type: string
+                  maxLength: 100
+                  nullable: true
+                businessUnit:
+                  type: string
+                  maxLength: 100
+                  nullable: true
+                countryCode:
+                  type: string
+                  maxLength: 2
+                  nullable: true
+                  pattern: ^[A-Z]{2}$
+                marketCode:
+                  type: string
+                  maxLength: 40
+                  nullable: true
+                scopeLevel:
+                  type: string
+                  enum: [global, country, market, brand, venue, event, businessUnit]
+                defaultPriceCategoryId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                roundingProfileId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                priceResolutionPolicyId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                allowOverrides:
+                  type: boolean
+                allowInheritance:
+                  type: boolean
+                allowMultipleCurrencies:
+                  type: boolean
+                allowProductSpecificRates:
+                  type: boolean
       responses:
         '200':
           headers:
@@ -5116,57 +5178,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LifecycleStatusWorkflowConfigurationView'
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /bulk-product-catalogue:
-    post:
-      operationId: createBulkProductCatalogue
-      x-ticvai-consumed-by:
-        - "P08 ADM-121 Bulk Product Creation & Catalogue Import"
-      x-ticvai-audience:
-        - staff
-      x-ticvai-agreed: '29 September: pack ''Product_Lifecycle___Catalogue_Governance_Reference.pdf'' pp.6-7
-        (Screen 4 Bulk Product Creation & Catalogue Import: Supported Sources, Backend Functions, AI Capability,
-        Acceptance Condition); MoM 31 Aug 2026 §4.10 (bulk product creation via template import/export)'
-      summary: Bulk Product Creation & Catalogue Import
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.** Product
-        Lifecycle   Catalogue Governance, page 6. The screen says: Allow large catalogues to be created efficiently
-        rather than configuring every product manually. This directly addresses the matrix requirement for catalogue
-        creation through bulk-file upload.
-
-
-        **Agreed (decided 29 September, readiness close-out).** the six supported sources became one sourceFormat
-        enum; preview, error correction and exclusion became typed lists; job id, counts, column mapping, target
-        venue, default template and validate/commit mode added (shape follows CatalogueImportJob). Two-phase
-        like CatalogueImportJob: mode validate parses and returns preview and validationIssues, mode commit
-        creates the non-excluded rows as draft products. Download template, download error report (errorReportUrl)
-        and roll back an import where permitted are actions on ADM-121. Nothing the AI proposes becomes live:
-        every created product is draft.'
-      tags:
-        - drafted
-      x-ticvai-permission: PRODUCT_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/BulkProductCreationCatalogueImportInput'
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      responses:
-        '200':
-          headers:
-            X-Consistency-Token:
-              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Bulk Product Creation & Catalogue Import
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BulkProductCreationCatalogueImportView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /product-import-export:
@@ -8143,7 +8154,7 @@ paths:
         **Agreed (decided 29 September, readiness close-out).** the 12 KPI cards moved to CommercialPricingCommandCenterSummary
         on a paged list, with the AI assistance lines beside them; the price-list type and status became enums/descriptions;
         Effective Period split into two dates; the ''Modify Pricing Structure'' permission removed from the
-        row; the pack''s filters became query parameters. Quick actions Create Price List (setPriceListMaster),
+        row; the pack''s filters became query parameters. Quick actions Create Price List (createPriceList on BO-009; setPriceListMaster retired in r2, BC-008),
         Duplicate (the clone on ADM-056, listPriceListTemplate), Open, Compare, Validate (listCommercialPricingStructure),
         View Dependencies, Export and Archive are buttons on ADM-048; approval and publication belong to Board
         4 governance.'
@@ -8257,54 +8268,6 @@ paths:
                           $ref: '#/components/schemas/CommercialPricingCommandCenterView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /price-list-master:
-    put:
-      operationId: setPriceListMaster
-      x-ticvai-consumed-by:
-        - "P08 ADM-049 Price List Master Configuration"
-      x-ticvai-audience:
-        - staff
-      x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.8-9 (10.1.2 General
-        Configuration, Scope, Commercial Types, Default Behaviors, Dependencies, Duplicate); MoM 1 Sep 2026
-        §4.1 (price lists per channel, segment or category; multiple lists coexist; cloning)'
-      summary: Price List Master Configuration
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.** Pricing   Revenue
-        Management, page 8. The screen says: Create the master container that holds commercial rates. A Price
-        List should be reusable across products and channels.
-
-
-        **Agreed (decided 29 September, readiness close-out).** the scope options (Global, Event, ...) became
-        one scope enum; a price list id and the clone source were added; name/code/type typed as strings (they
-        were Money); tags an array; the consuming modules of the Dependencies panel added to the response. Duplicate
-        on ADM-049 creates a new list with clonedFromPriceListId set; approval and publication of a list belong
-        to Board 4.'
-      tags:
-        - drafted
-      x-ticvai-permission: PRODUCT_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PriceListMasterConfigurationInput'
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      responses:
-        '200':
-          headers:
-            X-Consistency-Token:
-              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Price List Master Configuration
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PriceListMasterConfigurationView'
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /price-category-rate:
     get:
       operationId: listPriceCategoryRate
@@ -8379,55 +8342,6 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/PriceCategoryRateTypeLibraryView'
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /rate-structure:
-    put:
-      operationId: setRateStructure
-      x-ticvai-consumed-by:
-        - "P08 ADM-051 Rate Structure Builder"
-      x-ticvai-audience:
-        - staff
-      x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.11-13 (10.1.4 Rate
-        Matrix, Rate Configuration, Unit Basis, Derived Rates, Matrix Editing, Validation); MoM 1 Sep 2026 §4.1
-        (rate structure sets the amount against a category), §4.5 (up to three decimal places)'
-      summary: Rate Structure Builder
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.** Pricing   Revenue
-        Management, page 11. The screen says: Define the actual monetary rates contained within a price list.
-        This is the core commercial configuration screen.
-
-
-        **Agreed (decided 29 September, readiness close-out).** example rows (Adult 250, Child 180, ...) removed;
-        the nine unit bases became the unitBasis enum; the four validation checks became validationIssues; derived
-        rates carry their base rate and adjustment; types corrected (names/codes strings, precision an integer,
-        currency ISO code). Matrix editing actions Add Rate, Duplicate Rate, Edit, Disable, Sort, Copy Across
-        Categories and Compare are buttons on ADM-051; Duplicate Rates, Missing Amounts, Unsupported Currency,
-        Invalid Derived Rate and Circular Rate Relationship are detected on save.'
-      tags:
-        - drafted
-      x-ticvai-permission: PRODUCT_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RateStructureBuilderInput'
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      responses:
-        '200':
-          headers:
-            X-Consistency-Token:
-              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Rate Structure Builder
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RateStructureBuilderView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /product-service-price:
@@ -20966,7 +20880,7 @@ components:
           type: string
           nullable: true
           description: >-
-            Price list master fields (29 September, data model DM3), set with `setPriceListMaster` (ADM-058).
+            Price list master fields (29 September, data model DM3), set with `createPriceList` and `updatePriceList` since setPriceListMaster was retired in r2 (BC-008, CHG-CLN-001).
         priceListType:
           type: string
           enum:
@@ -21091,6 +21005,68 @@ components:
         priority:
           type: integer
           default: 0
+        description:
+          type: string
+          nullable: true
+          description: >-
+            **The price list master fields** (data model DM3) are written here since setPriceListMaster was
+            retired in r2 (BC-008, CHG-CLN-001); each is optional and means what it means on `PriceList`.
+        priceListType:
+          type: string
+          enum: [standardRetail, venue, attraction, event, membership, group, corporate, b2b, reseller, ota,
+                 internal, specialMarket]
+        ownerPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        tags:
+          type: array
+          items:
+            type: string
+        legalEntityId:
+          type: string
+          format: uuid
+          nullable: true
+        brand:
+          type: string
+          maxLength: 100
+          nullable: true
+        businessUnit:
+          type: string
+          maxLength: 100
+          nullable: true
+        countryCode:
+          type: string
+          maxLength: 2
+          nullable: true
+          pattern: ^[A-Z]{2}$
+        marketCode:
+          type: string
+          maxLength: 40
+          nullable: true
+        scopeLevel:
+          type: string
+          enum: [global, country, market, brand, venue, event, businessUnit]
+        defaultPriceCategoryId:
+          type: string
+          format: uuid
+          nullable: true
+        roundingProfileId:
+          type: string
+          format: uuid
+          nullable: true
+        priceResolutionPolicyId:
+          type: string
+          format: uuid
+          nullable: true
+        allowOverrides:
+          type: boolean
+        allowInheritance:
+          type: boolean
+        allowMultipleCurrencies:
+          type: boolean
+        allowProductSpecificRates:
+          type: boolean
     Price:
       x-ticvai-persistence: catalogue.price
       type: object
@@ -22294,6 +22270,7 @@ components:
           description: 'Status-specific edit permissions: who may edit a product in each state, and which sections
             are locked'
     BulkProductCreationCatalogueImportView:
+      x-ticvai-retired: 'createBulkProductCatalogue was removed in r2 (BC-010, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over catalogue state, assembled at read time from tables that
@@ -22379,6 +22356,7 @@ components:
           format: uri
           nullable: true
     BulkProductCreationCatalogueImportInput:
+      x-ticvai-retired: 'createBulkProductCatalogue was removed in r2 (BC-010, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
@@ -26726,6 +26704,7 @@ components:
             type: string
           description: AI observations for this screen; advisory only, never applied automatically
     PriceListMasterConfigurationView:
+      x-ticvai-retired: 'setPriceListMaster was removed in r2 (BC-008, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over catalogue state, assembled at read time from tables that
@@ -26850,6 +26829,7 @@ components:
               - rental
           description: 'Dependencies: the modules that consume this list (p.9); read-only'
     PriceListMasterConfigurationInput:
+      x-ticvai-retired: 'setPriceListMaster was removed in r2 (BC-008, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
@@ -27022,6 +27002,7 @@ components:
           description: 'AI Standardization: ids of categories that appear to mean the same thing (Kids / Child
             / Children Rate); advisory'
     RateStructureBuilderView:
+      x-ticvai-retired: 'setRateStructure was removed in r2 (BC-009, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over catalogue state, assembled at read time from tables that
@@ -27112,6 +27093,7 @@ components:
               message:
                 type: string
     RateStructureBuilderInput:
+      x-ticvai-retired: 'setRateStructure was removed in r2 (BC-009, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest

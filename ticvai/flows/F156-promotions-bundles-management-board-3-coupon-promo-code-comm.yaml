@@ -25,9 +25,8 @@ steps:
     activities.
 - step: 2
   screen: ADM-159
-  action: Works in Coupon & Promo Code Builder
-  operations:
-  - setCouponPromoCode
+  action: Works in Coupon & Promo Code Builder, a section of BO-010, which saves the record with createCouponCampaign and generateCouponCodes (setCouponPromoCode retired in r2, CHG-CLN-001)
+  operations: []
   outcome: Create the commercial definition of a coupon or promo-code campaign.
 - step: 3
   screen: ADM-158

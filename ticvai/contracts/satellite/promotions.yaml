@@ -2596,59 +2596,6 @@ paths:
                   $ref: '#/components/schemas/PromotionAuditActivityVersionHistoryView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /promotion-rule:
-    put:
-      operationId: setPromotionRule
-      x-ticvai-consumed-by:
-        - "P08 ADM-148 Promotion Rule Builder"
-        - "P08 ADM-210 Promotion Stacking Rule Builder"
-      x-ticvai-audience:
-        - staff
-      x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.22; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (1 non-field properties removed)'
-      summary: Promotion Rule Builder
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Promotions   Bundles Management, page 22. The screen says: Provide the main no-code workspace
-        for creating the commercial logic behind a promotion.
-
-
-        **Every property carries the sentence it came from.** 21 were read from the screen''s own bulleted
-        directory and 11 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
-
-
-        **Agreed 29 September (decided 29 September, readiness close-out).** Checked against the
-        pack page and the minutes: no promotions minutes on file (the 3 September walkthrough was
-        not minuted), so our build plan. Shape: 1 properties removed that were filters, actions,
-        behaviour, roles, examples or prose fragments rather than fields.'
-      tags:
-        - drafted
-      x-ticvai-permission: PRICE_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-config-scope: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PromotionRuleBuilderInput'
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      responses:
-        '200':
-          headers:
-            X-Consistency-Token:
-              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Promotion Rule Builder
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PromotionRuleBuilderView'
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /percentage-fixed-discount:
     get:
       operationId: listPercentageFixedDiscount
@@ -3050,59 +2997,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RuleTestSimulationAiRecommendationWorkspaceView'
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /coupon-promo-code:
-    put:
-      operationId: setCouponPromoCode
-      x-ticvai-consumed-by:
-        - "P08 ADM-159 Coupon & Promo Code Builder"
-      x-ticvai-audience:
-        - staff
-      x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.37; MoM 7 Aug 17 (shared codes and batches of unique single-use codes); shape fixed (1 non-field properties removed; enums codeType, benefitType; added benefitValue, campaign, code, maximumDiscount, eligibleProducts, channels, validFrom, validTo)'
-      summary: Coupon & Promo Code Builder
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Promotions   Bundles Management, page 37. The screen says: Create the commercial definition of
-        a coupon or promo-code campaign.
-
-
-        **Every property carries the sentence it came from.** 20 were read from the screen''s own bulleted
-        directory and 3 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
-
-
-        **Agreed 29 September (decided 29 September, readiness close-out).** Checked against the
-        pack page and the minutes: MoM 7 Aug 17 (shared codes and batches of unique single-use
-        codes). Shape: 1 properties removed that were filters, actions, behaviour, roles, examples
-        or prose fragments rather than fields; 19 one-value-per-field properties folded into enums
-        (codeType, benefitType); added benefitValue, campaign, code, maximumDiscount,
-        eligibleProducts, channels, validFrom, validTo.'
-      tags:
-        - drafted
-      x-ticvai-permission: PRICE_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CouponPromoCodeBuilderInput'
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      responses:
-        '200':
-          headers:
-            X-Consistency-Token:
-              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Coupon & Promo Code Builder
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CouponPromoCodeBuilderView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /unique-code-generation:
@@ -3695,56 +3589,6 @@ paths:
                   $ref: '#/components/schemas/AdvancedOfferCommandCenterView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /buy-get-bogo:
-    put:
-      operationId: setBuyGetBogo
-      x-ticvai-consumed-by:
-        - "P08 ADM-169 Buy X Get Y / BOGO Rule Builder"
-      x-ticvai-audience:
-        - staff
-      x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.52; MoM 1 Sep 4.7 (BOGO and ''buy 2, get the 3rd free''); shape agreed as drafted'
-      summary: Buy X Get Y / BOGO Rule Builder
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Promotions   Bundles Management, page 52. The screen says: Configure the fundamental qualifier
-        → reward relationship.
-
-
-        **Every property carries the sentence it came from.** 15 were read from the screen''s own bulleted
-        directory and 10 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
-
-
-        **Agreed 29 September (decided 29 September, readiness close-out).** Checked against the
-        pack page and the minutes: MoM 1 Sep 4.7 (BOGO and ''buy 2, get the 3rd free''). Shape:
-        agreed as drafted.'
-      tags:
-        - drafted
-      x-ticvai-permission: PRICE_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/BuyXGetYBogoRuleBuilderInput'
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      responses:
-        '200':
-          headers:
-            X-Consistency-Token:
-              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Buy X Get Y / BOGO Rule Builder
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BuyXGetYBogoRuleBuilderView'
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /multi-buy-quantity:
     get:
       operationId: listMultiBuyQuantity
@@ -3828,162 +3672,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CheapestLowestValueItemPromotionView'
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /fixed-price-offer:
-    put:
-      operationId: setFixedPriceOffer
-      x-ticvai-consumed-by:
-        - "P08 ADM-172 Fixed-Price & “N for X” Offer Builder"
-      x-ticvai-audience:
-        - staff
-      x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.54; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (6 non-field properties removed)'
-      summary: Fixed-Price & “N for X” Offer Builder
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Promotions   Bundles Management, page 54. The screen says: Configure promotions where a qualifying
-        collection of products is sold for a fixed promotional total.
-
-
-        **Every property carries the sentence it came from.** 14 were read from the screen''s own bulleted
-        directory and 7 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
-
-
-        **Agreed 29 September (decided 29 September, readiness close-out).** Checked against the
-        pack page and the minutes: no promotions minutes on file (the 3 September walkthrough was
-        not minuted), so our build plan. Shape: 6 properties removed that were filters, actions,
-        behaviour, roles, examples or prose fragments rather than fields.
-
-
-        The fixed promotional price is allocated back across the qualifying lines, and that
-        allocation is what refunds, tax, revenue recognition, partner settlement and reporting use.'
-      tags:
-        - drafted
-      x-ticvai-permission: PRICE_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/FixedPriceNForXOfferBuilderInput'
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      responses:
-        '200':
-          headers:
-            X-Consistency-Token:
-              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Fixed-Price & “N for X” Offer Builder
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FixedPriceNForXOfferBuilderView'
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /gift-free-product:
-    put:
-      operationId: setGiftFreeProduct
-      x-ticvai-consumed-by:
-        - "P08 ADM-173 Gift, Free Product & Added-Value Offer Builder"
-      x-ticvai-audience:
-        - staff
-      x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.55; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape agreed as drafted'
-      summary: Gift, Free Product & Added-Value Offer Builder
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Promotions   Bundles Management, page 55. The screen says: Configure promotions where a purchase
-        generates an additional entitlement rather than simply reducing price. The matrix explicitly provides
-        the example: “Buy for more than 200 AED and get a free pencil.”
-
-
-        **Every property carries the sentence it came from.** 15 were read from the screen''s own bulleted
-        directory and 7 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
-
-
-        **Agreed 29 September (decided 29 September, readiness close-out).** Checked against the
-        pack page and the minutes: no promotions minutes on file (the 3 September walkthrough was
-        not minuted), so our build plan. Shape: agreed as drafted.'
-      tags:
-        - drafted
-      x-ticvai-permission: PRICE_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GiftFreeProductAddedValueOfferBuilderInput'
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      responses:
-        '200':
-          headers:
-            X-Consistency-Token:
-              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Gift, Free Product & Added-Value Offer Builder
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GiftFreeProductAddedValueOfferBuilderView'
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /cross-category-promotion:
-    put:
-      operationId: setCrossCategoryPromotion
-      x-ticvai-consumed-by:
-        - "P08 ADM-174 Cross-Category Promotion Builder"
-      x-ticvai-audience:
-        - staff
-      x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.56; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape agreed as drafted'
-      summary: Cross-Category Promotion Builder
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Promotions   Bundles Management, page 56. The screen says: Create promotions spanning different
-        TICVAI commercial domains.
-
-
-        **Every property carries the sentence it came from.** 10 were read from the screen''s own bulleted
-        directory and 7 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
-
-
-        **Agreed 29 September (decided 29 September, readiness close-out).** Checked against the
-        pack page and the minutes: no promotions minutes on file (the 3 September walkthrough was
-        not minuted), so our build plan. Shape: agreed as drafted.'
-      tags:
-        - drafted
-      x-ticvai-permission: PRICE_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CrossCategoryPromotionBuilderInput'
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      responses:
-        '200':
-          headers:
-            X-Consistency-Token:
-              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Cross-Category Promotion Builder
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CrossCategoryPromotionBuilderView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /reward-selection-substitution:
@@ -4256,162 +3944,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BundleComboCommandCenterView'
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /bundle-definition:
-    put:
-      operationId: setBundleDefinition
-      x-ticvai-consumed-by:
-        - "P08 ADM-179 Bundle Definition & Setup"
-      x-ticvai-audience:
-        - staff
-      x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.65; MoM 10 Aug 4.10; shape fixed (5 non-field properties removed; added bundleType)'
-      summary: Bundle Definition & Setup
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Promotions   Bundles Management, page 65. The screen says: Create the commercial identity and
-        high-level behavior of a bundle.
-
-
-        **Every property carries the sentence it came from.** 19 were read from the screen''s own bulleted
-        directory and 8 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
-
-
-        **Agreed 29 September (decided 29 September, readiness close-out).** Checked against the
-        pack page and the minutes: MoM 10 Aug 4.10. Shape: 5 properties removed that were filters,
-        actions, behaviour, roles, examples or prose fragments rather than fields; added bundleType.'
-      tags:
-        - drafted
-      x-ticvai-permission: PRICE_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-config-scope: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/BundleDefinitionSetupInput'
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      responses:
-        '200':
-          headers:
-            X-Consistency-Token:
-              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Bundle Definition & Setup
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BundleDefinitionSetupView'
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /bundle-component:
-    put:
-      operationId: setBundleComponent
-      x-ticvai-consumed-by:
-        - "P08 ADM-180 Bundle Component Builder"
-      x-ticvai-audience:
-        - staff
-      x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.66; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (2 non-field properties removed; enums componentType)'
-      summary: Bundle Component Builder
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Promotions   Bundles Management, page 66. The screen says: Define exactly what products and services
-        make up the bundle.
-
-
-        **Every property carries the sentence it came from.** 26 were read from the screen''s own bulleted
-        directory and 2 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
-
-
-        **Agreed 29 September (decided 29 September, readiness close-out).** Checked against the
-        pack page and the minutes: no promotions minutes on file (the 3 September walkthrough was
-        not minuted), so our build plan. Shape: 2 properties removed that were filters, actions,
-        behaviour, roles, examples or prose fragments rather than fields; 18 one-value-per-field
-        properties folded into enums (componentType).'
-      tags:
-        - drafted
-      x-ticvai-permission: PRICE_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/BundleComponentBuilderInput'
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      responses:
-        '200':
-          headers:
-            X-Consistency-Token:
-              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Bundle Component Builder
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BundleComponentBuilderView'
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /guest-choice-build:
-    put:
-      operationId: setGuestChoiceBuild
-      x-ticvai-consumed-by:
-        - "P08 ADM-181 Guest Choice & Build-Your-Own Bundle Designer"
-      x-ticvai-audience:
-        - staff
-      x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.67; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (11 non-field properties removed)'
-      summary: Guest Choice & Build-Your-Own Bundle Designer
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Promotions   Bundles Management, page 67. The screen says: Configure bundles where the guest chooses
-        products from predefined groups. The matrix specifically requires the guest to be able to choose
-        attractions, experiences, F&B, retail products, or services from predefined categories while maintaining
-        bundle pricing rules.
-
-
-        **Every property carries the sentence it came from.** 19 were read from the screen''s own bulleted
-        directory and 5 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
-
-
-        **Agreed 29 September (decided 29 September, readiness close-out).** Checked against the
-        pack page and the minutes: no promotions minutes on file (the 3 September walkthrough was
-        not minuted), so our build plan. Shape: 11 properties removed that were filters, actions,
-        behaviour, roles, examples or prose fragments rather than fields.'
-      tags:
-        - drafted
-      x-ticvai-permission: PRICE_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GuestChoiceBuildYourOwnBundleDesignerInput'
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      responses:
-        '200':
-          headers:
-            X-Consistency-Token:
-              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Guest Choice & Build-Your-Own Bundle Designer
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GuestChoiceBuildYourOwnBundleDesignerView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /bundle-pricing-commercial:
@@ -5259,58 +4791,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/TargetingEligibilityCommandCenterView'
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /eligibility-rule:
-    put:
-      operationId: setEligibilityRule
-      x-ticvai-consumed-by:
-        - "P08 ADM-199 Eligibility Rule Builder"
-      x-ticvai-audience:
-        - staff
-      x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.95; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (enums ruleEffect)'
-      summary: Eligibility Rule Builder
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Promotions   Bundles Management, page 95. The screen says: Provide a no-code rule engine for determining
-        promotion eligibility.
-
-
-        **Every property carries the sentence it came from.** 21 were read from the screen''s own bulleted
-        directory and 12 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
-
-
-        **Agreed 29 September (decided 29 September, readiness close-out).** Checked against the
-        pack page and the minutes: no promotions minutes on file (the 3 September walkthrough was
-        not minuted), so our build plan. Shape: 2 one-value-per-field properties folded into enums
-        (ruleEffect).'
-      tags:
-        - drafted
-      x-ticvai-permission: PRICE_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-config-scope: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EligibilityRuleBuilderInput'
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      responses:
-        '200':
-          headers:
-            X-Consistency-Token:
-              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Eligibility Rule Builder
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EligibilityRuleBuilderView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /crm-customer-segment:
@@ -9075,14 +8555,14 @@ components:
             type: string
             format: uuid
           description: 'The reward products, where the reward is not the qualifying product: the free
-            gift of `freeItem`, the "different product" of a `buyXGetY` (setGiftFreeProduct, setBuyGetBogo).
+            gift of `freeItem`, the "different product" of a `buyXGetY` (createPromotion; the builders setGiftFreeProduct and setBuyGetBogo were retired in r2, CHG-CLN-001).
             Absent means the reward is taken from the qualifying lines. (DM5, 29 September: data model for the agreed operations)'
         maxApplicationsPerBasket:
           type: integer
           minimum: 1
           nullable: true
           description: 'How many times the offer repeats in one basket: the "maximum repetitions" of
-            an N-for-X offer (setFixedPriceOffer). Null repeats for every complete set. (DM5, 29 September: data model for the agreed operations)'
+            an N-for-X offer (createPromotion; setFixedPriceOffer was retired in r2, CHG-CLN-001). Null repeats for every complete set. (DM5, 29 September: data model for the agreed operations)'
     PromotionConditions:
       x-ticvai-persistence: none — embedded in promotion
       type: object
@@ -9198,7 +8678,7 @@ components:
             type: string
             format: uuid
           description: 'Reusable eligibility rules (`promotions.promotion_rule` rows of `ruleType: eligibility`
-            with no promotion of their own, saved by setEligibilityRule) that must also hold. Each is
+            with no promotion of their own) that must also hold. **Deprecated in r2** (CHG-CLN-001): setEligibilityRule, which saved library rules, was retired (BC-017), so no operation creates one; send the conditions inline. Rules already saved still apply. Each is
             evaluated with its own `effect`. (DM5, 29 September: data model for the agreed operations)'
     StackingMode:
       type: string
@@ -9521,8 +9001,10 @@ components:
     PromotionRule:
       x-ticvai-persistence: promotions.promotion_rule
       type: object
-      description: 'A rule made in the Promotion Rule Builder (setPromotionRule, `ruleType: benefit`) or
-        the Eligibility Rule Builder (setEligibilityRule, `ruleType: eligibility`). **One table for
+      description: 'A rule made in the Promotion Rule Builder (`ruleType: benefit`) or the Eligibility Rule
+        Builder (`ruleType: eligibility`). **No operation writes it since r2**: setPromotionRule and
+        setEligibilityRule were retired (BC-011, BC-017, CHG-CLN-001) and createPromotion carries
+        the conditions; the table stays until a forward migration drops it. **One table for
         both**: each is a named, prioritised set of nested condition groups; a benefit rule adds its
         outcomes, an eligibility rule its include/exclude effect. A rule with a `promotionId` belongs
         to that promotion; one without is a reusable library rule that promotions name in
@@ -11862,6 +11344,7 @@ components:
           type: string
           description: Promotion ID
     PromotionRuleBuilderView:
+      x-ticvai-retired: 'setPromotionRule was removed in r2 (BC-011, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over promotions state, assembled at read time from tables
@@ -11931,6 +11414,7 @@ components:
           type: string
           description: Rule ordering
     PromotionRuleBuilderInput:
+      x-ticvai-retired: 'setPromotionRule was removed in r2 (BC-011, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: 'none — request only; saved as a `promotions.promotion_rule` row (PromotionRule,
@@ -12499,6 +11983,7 @@ components:
           type: string
           description: Promo code
     CouponPromoCodeBuilderView:
+      x-ticvai-retired: 'setCouponPromoCode was removed in r2 (BC-012, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over promotions state, assembled at read time from tables
@@ -12567,6 +12052,7 @@ components:
           format: date-time
           description: Valid to
     CouponPromoCodeBuilderInput:
+      x-ticvai-retired: 'setCouponPromoCode was removed in r2 (BC-012, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
@@ -13216,6 +12702,7 @@ components:
           type: string
           description: Archived
     BuyXGetYBogoRuleBuilderView:
+      x-ticvai-retired: 'setBuyGetBogo was removed in r2 (BC-013, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over promotions state, assembled at read time from tables
@@ -13271,6 +12758,7 @@ components:
           $ref: ../shared/common.yaml#/components/schemas/Money
           description: Fixed reward price
     BuyXGetYBogoRuleBuilderInput:
+      x-ticvai-retired: 'setBuyGetBogo was removed in r2 (BC-013, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
@@ -13405,6 +12893,7 @@ components:
           type: string
           description: N cheapest items free
     FixedPriceNForXOfferBuilderView:
+      x-ticvai-retired: 'setFixedPriceOffer was removed in r2 (BC-014, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over promotions state, assembled at read time from tables
@@ -13438,6 +12927,7 @@ components:
           type: string
           description: Minimum/maximum product values
     FixedPriceNForXOfferBuilderInput:
+      x-ticvai-retired: 'setFixedPriceOffer was removed in r2 (BC-014, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
@@ -13471,6 +12961,7 @@ components:
           type: string
           description: Minimum/maximum product values
     GiftFreeProductAddedValueOfferBuilderView:
+      x-ticvai-retired: 'setGiftFreeProduct was removed in r2 (BC-015, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over promotions state, assembled at read time from tables
@@ -13536,6 +13027,7 @@ components:
           type: boolean
           description: Allow later fulfillment
     GiftFreeProductAddedValueOfferBuilderInput:
+      x-ticvai-retired: 'setGiftFreeProduct was removed in r2 (BC-015, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
@@ -13601,6 +13093,7 @@ components:
           type: boolean
           description: Allow later fulfillment
     CrossCategoryPromotionBuilderView:
+      x-ticvai-retired: 'setCrossCategoryPromotion was removed in r2 (BC-016, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over promotions state, assembled at read time from tables
@@ -13640,6 +13133,7 @@ components:
           type: string
           description: Services
     CrossCategoryPromotionBuilderInput:
+      x-ticvai-retired: 'setCrossCategoryPromotion was removed in r2 (BC-016, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
@@ -13884,6 +13378,7 @@ components:
           type: string
           description: Archived
     BundleDefinitionSetupView:
+      x-ticvai-retired: 'setBundleDefinition was removed in r2 (BC-018, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over promotions state, assembled at read time from tables
@@ -13946,6 +13441,7 @@ components:
             selects from permitted categories; changes with availability or rules; contains internal
             and external products'
     BundleDefinitionSetupInput:
+      x-ticvai-retired: 'setBundleDefinition was removed in r2 (BC-018, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
@@ -14007,6 +13503,7 @@ components:
             - partner
           description: Bundle type
     BundleComponentBuilderView:
+      x-ticvai-retired: 'setBundleComponent was removed in r2 (BC-019, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over promotions state, assembled at read time from tables
@@ -14062,6 +13559,7 @@ components:
             - externalProduct
           description: What the component is.
     BundleComponentBuilderInput:
+      x-ticvai-retired: 'setBundleComponent was removed in r2 (BC-019, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
@@ -14117,6 +13615,7 @@ components:
             - externalProduct
           description: What the component is.
     GuestChoiceBuildYourOwnBundleDesignerView:
+      x-ticvai-retired: 'setGuestChoiceBuild was removed in r2 (BC-020, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over promotions state, assembled at read time from tables
@@ -14151,6 +13650,7 @@ components:
           type: string
           description: Selection order
     GuestChoiceBuildYourOwnBundleDesignerInput:
+      x-ticvai-retired: 'setGuestChoiceBuild was removed in r2 (BC-020, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
@@ -15029,6 +14529,7 @@ components:
             - missingData
           description: Health of the targeting rule.
     EligibilityRuleBuilderView:
+      x-ticvai-retired: 'setEligibilityRule was removed in r2 (BC-017, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over promotions state, assembled at read time from tables
@@ -15102,6 +14603,7 @@ components:
             - exclude
           description: Whether matching guests are included or excluded.
     EligibilityRuleBuilderInput:
+      x-ticvai-retired: 'setEligibilityRule was removed in r2 (BC-017, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: 'none — request only; saved as a `promotions.promotion_rule` row (PromotionRule,

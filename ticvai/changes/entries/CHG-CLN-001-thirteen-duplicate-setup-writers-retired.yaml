@@ -1,0 +1,106 @@
+id: CHG-CLN-001
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: The 13 duplicate first-release setup operations the ADM-049 section merges kept are removed from the catalogue and
+  promotions contracts in r2 (BC-008 to BC-020), unbound from their screens and board flows; the venue screens' typed writers
+  carry the records.
+decision:
+  what: 'Retire setPriceListMaster, setRateStructure and createBulkProductCatalogue (catalogue) and setPromotionRule, setCouponPromoCode,
+    setBuyGetBogo, setFixedPriceOffer, setGiftFreeProduct, setCrossCategoryPromotion, setEligibilityRule, setBundleDefinition,
+    setBundleComponent and setGuestChoiceBuild (promotions) as approved breaking changes tagged r2. Each ADM section screen
+    (ADM-049, 051, 121, 148, 159, 169, 172, 173, 174, 179, 180, 181, 199; ADM-210 also declared setPromotionRule) stays the
+    anchor of its section and declares no writer; BO-009 (createPriceList, updatePriceList, setPrices), BO-010 (createPromotion,
+    updatePromotion, createCouponCampaign, generateCouponCodes), BO-011 (createBundle, updateBundle) and BO-117 (importProductCatalogue,
+    commitCatalogueImport) save the records. Additive with it: CreatePriceListRequest and updatePriceList take the price list
+    master fields (DM3) setPriceListMaster held; PromotionConditions.eligibilityRuleIds is described as deprecated (nothing
+    creates a library rule). The retired request and view schemas stay, marked x-ticvai-retired, because design notes cite
+    them; board flows F143, F152, F155..F158 and F160 drop the operations from their steps; the design-note corrections the
+    retirement made moot are fixed or withdrawn.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026: "13 dupes would be gone in r2", answering the plan question CHG-MOV-008 logged (the section
+  merges of CHG-MOV-002 kept duplicate writers beside the typed writers because the slice and 13 pushed tickets named them).
+  Two writers for one record with two status vocabularies (design-note corrections on ADM-049, ADM-148, ADM-159, ADM-179;
+  CHG-CSA-044).'
+keys_touched:
+  screens:
+  - ADM-049
+  - ADM-051
+  - ADM-121
+  - ADM-148
+  - ADM-159
+  - ADM-169
+  - ADM-172
+  - ADM-173
+  - ADM-174
+  - ADM-179
+  - ADM-180
+  - ADM-181
+  - ADM-199
+  - ADM-210
+  operations:
+  - setPriceListMaster
+  - setRateStructure
+  - createBulkProductCatalogue
+  - setPromotionRule
+  - setCouponPromoCode
+  - setBuyGetBogo
+  - setFixedPriceOffer
+  - setGiftFreeProduct
+  - setCrossCategoryPromotion
+  - setEligibilityRule
+  - setBundleDefinition
+  - setBundleComponent
+  - setGuestChoiceBuild
+  - createPriceList
+  - updatePriceList
+  schemas:
+  - CreatePriceListRequest
+  - PromotionConditions
+  - PromotionRule
+  flows:
+  - F143
+  - F152
+  - F155
+  - F156
+  - F157
+  - F158
+  - F160
+  files:
+  - contracts/spine/catalogue.yaml
+  - contracts/satellite/promotions.yaml
+  - docs/active/breaking-changes.yaml
+  - handoff/design-notes/ticketing-backoffice.yaml
+  - tools/applied/retire-duplicate-setup-ops-2-october.py
+root_class: 'new: duplicated-definition'
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ADM-049 (#20641)
+  - APP-SETUP-ADM-051 (#20642)
+  - APP-SETUP-ADM-121 (#20646)
+  - APP-SETUP-ADM-148 (#20647)
+  - APP-SETUP-ADM-159 (#20648)
+  - APP-SETUP-ADM-169 (#20650)
+  - APP-SETUP-ADM-172 (#20651)
+  - APP-SETUP-ADM-173 (#20652)
+  - APP-SETUP-ADM-174 (#20653)
+  - APP-SETUP-ADM-179 (#20654)
+  - APP-SETUP-ADM-180 (#20655)
+  - APP-SETUP-ADM-181 (#20656)
+  - APP-SETUP-ADM-199 (#20657)
+  - SVC-CATALOGUE-DRAFTED-1..5 (the 13 operation sub-tasks)
+release_tag: r2
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'check-contract-compat fails each removal unless docs/active/breaking-changes.yaml approves it (BC-008..BC-020, tag
+  r2); run on the parent commit with the operations removed and no entries it reported 13 unapproved breaking changes. check-screen-wiring
+  S-CONSUMED-MIRROR and check-flows hold the screens and flows to the contract. **Left for later (not a question):** catalogue.rate
+  and promotions.promotion_rule have no writer since r2; dropping them is a forward migration (check-migration-freeze),
+  for the migration owner after r2. Applied by tools/applied/retire-duplicate-setup-ops-2-october.py; batch CLN (cleanup
+  pass), worktree D:/wt/cleanup-pass. Closes the plan question of CHG-MOV-008 and the promotion-builder half of CHG-CSA-044.'

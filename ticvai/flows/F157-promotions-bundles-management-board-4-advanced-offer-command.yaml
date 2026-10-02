@@ -24,9 +24,8 @@ steps:
   outcome: Provide the centralized management workspace for all advanced promotional mechanics.
 - step: 2
   screen: ADM-169
-  action: Works in Buy X Get Y / BOGO Rule Builder
-  operations:
-  - setBuyGetBogo
+  action: Works in Buy X Get Y / BOGO Rule Builder, a section of BO-010, which saves the record with createPromotion (setBuyGetBogo retired in r2, CHG-CLN-001)
+  operations: []
   outcome: Configure the fundamental qualifier → reward relationship.
 - step: 3
   screen: ADM-168
@@ -62,9 +61,8 @@ steps:
   outcome: Ready for the next screen on this board
 - step: 8
   screen: ADM-172
-  action: Works in Fixed-Price & “N for X” Offer Builder
-  operations:
-  - setFixedPriceOffer
+  action: Works in Fixed-Price & “N for X” Offer Builder, a section of BO-010, which saves the record with createPromotion (setFixedPriceOffer retired in r2, CHG-CLN-001)
+  operations: []
   outcome: Configure promotions where a qualifying collection of products is sold for a fixed promotional
     total.
 - step: 9
@@ -75,9 +73,8 @@ steps:
   outcome: Ready for the next screen on this board
 - step: 10
   screen: ADM-173
-  action: Works in Gift, Free Product & Added-Value Offer Builder
-  operations:
-  - setGiftFreeProduct
+  action: Works in Gift, Free Product & Added-Value Offer Builder, a section of BO-010, which saves the record with createPromotion (setGiftFreeProduct retired in r2, CHG-CLN-001)
+  operations: []
   outcome: 'Configure promotions where a purchase generates an additional entitlement rather than simply
     reducing price. The matrix explicitly provides the example: “Buy for more than 200 AED and get a free
     pencil.”'
@@ -89,9 +86,8 @@ steps:
   outcome: Ready for the next screen on this board
 - step: 12
   screen: ADM-174
-  action: Works in Cross-Category Promotion Builder
-  operations:
-  - setCrossCategoryPromotion
+  action: Works in Cross-Category Promotion Builder, a section of BO-010, which saves the record with createPromotion (setCrossCategoryPromotion retired in r2, CHG-CLN-001)
+  operations: []
   outcome: Create promotions spanning different TICVAI commercial domains.
 - step: 13
   screen: ADM-168
