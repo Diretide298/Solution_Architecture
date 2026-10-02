@@ -1263,6 +1263,137 @@ paths:
                 $ref: '#/components/schemas/Challenge'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    get:
+      operationId: listChallenges
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '2 October: contract gap CHG-WIR-007 (BO-825: no list or read of challenges, so a builder cannot
+        reopen a draft); shape follows listCookieScans'
+      summary: The venue's challenges
+      description: 'Every challenge of the venue, drafts included (contract gap logged in CHG-WIR-007 for BO-825;
+        CHG-CSA-045). Ordered by `status`, then `name`, then `id`.
+
+        '
+      tags:
+      - marketing
+      x-ticvai-permission: MARKETING_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - draft
+          - active
+          - paused
+          - ended
+          - archived
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Challenges
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/Challenge'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /challenges/{challengeId}:
+    parameters:
+    - name: challengeId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getChallenge
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '2 October: contract gap CHG-WIR-007 (BO-825); shape follows createChallenge'
+      summary: One challenge
+      description: 'The challenge as stored, so the builder can reopen a draft (CHG-CSA-045).
+
+        '
+      tags:
+      - marketing
+      x-ticvai-permission: MARKETING_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The challenge
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Challenge'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /challenges/{challengeId}/activate:
+    parameters:
+    - name: challengeId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: activateChallenge
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: contract gap CHG-WIR-007 (BO-825: no activate step); shape follows createChallenge'
+      summary: Publish a draft challenge to guests
+      description: '**Draft to active** (contract gap logged in CHG-WIR-007 for BO-825; CHG-CSA-045;
+        states/challenge.yaml). Only a `draft` challenge is activated; any other status is refused 409
+        `challenge-not-draft`. Launching a challenge to guests is a send-like act, so it takes `MARKETING_SEND`.
+
+        '
+      tags:
+      - marketing
+      x-ticvai-permission: MARKETING_SEND
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Active
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Challenge'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The challenge is not a draft (`challenge-not-draft`).
+          x-ticvai-problem-types:
+          - challenge-not-draft
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/me/challenges:
     get:
       operationId: getMyChallenges
@@ -2048,6 +2179,66 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /message-dispatches:
+    get:
+      operationId: listMessageDispatches
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '2 October: contract gap CHG-WIR-004 (BO-023, F09 step 5: confirm the guests of a cancelled
+        performance were notified; no list of dispatches existed); shape follows listCookieScans'
+      summary: Messages sent, and whether they arrived
+      description: '**What was sent to whom, and what became of it** (contract gap logged in CHG-WIR-004 for BO-023;
+        CHG-CSA-045). F09 step 5 confirms that the guests of a cancelled performance were notified: filter by
+        `sourceRef` (the performance, order or other record whose business event triggered the message) and read
+        the delivered, failed and suppressed counts with each dispatch. Ordered by `queuedAt` descending, then `id`.
+        Guest contact details are not returned; `subjectId` is.
+
+        '
+      tags:
+      - marketing
+      x-ticvai-permission: MARKETING_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: sourceRef
+        in: query
+        description: The id of the record whose business event triggered the messages, e.g. a performance id.
+        schema:
+          type: string
+      - name: campaignId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        schema:
+          type: string
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Dispatches
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/MessageDispatch'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /message-dispatches/{dispatchId}/retry:
@@ -3554,6 +3745,7 @@ paths:
         - "P08 BO-748 Consent Capture & Versions"
       x-ticvai-audience:
       - guest
+      - staff
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -3567,7 +3759,9 @@ paths:
         **Two callers, two rules.** A guest recording their own consent uses a guest token and may only
         act on their own subject. An agent recording on a guest''s behalf uses a staff token, requires
         `GUEST_MANAGE`, and the resulting record names them in `recordedByPrincipalId` — consent captured
-        by proxy has to be attributable.
+        by proxy has to be attributable. **The staff audience is declared** (contract gap CHG-WIR-007, POS-027;
+        CHG-CSA-045): the till records the consent of a guest enrolled at the counter with source
+        `agentRecorded`. Creating the guest''s profile at the till is identity''s (`registerGuest`, spine).
 
         '
       tags:
@@ -3634,8 +3828,13 @@ paths:
 
 
         **Idempotent on order id + channel + purpose**: a redelivered `order.created` finds the records already
-        written and returns them. Invoked by the event relay, never by a screen. Whether a guest-checkout
-        opt-in is sufficient consent is the client''s to confirm (make-or-break on `checkoutCart`).
+        written and returns them. Invoked by the event relay, never by a screen.
+
+
+        **Decided: the ticked checkout opt-in is the marketing consent, and nothing is sent without it**
+        (Chinmay, 2 October, from WEB-011: workbook Q23, Q275, Q276 and Q282; CHG-CSA-025). A guest who checked out
+        without an account receives marketing only where this recorded a `granted` opt-in with source `checkout`;
+        segment eligibility and campaign sends exclude every guest-checkout buyer without one.
 
         '
       tags:
@@ -4417,6 +4616,46 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /segments/preview:
+    post:
+      operationId: previewSegmentDraft
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: contract gap CHG-WIR-007 (BO-755: previewSegment works only on a saved segment, the
+        builder needs a live count while editing); shape follows previewSegment'
+      summary: Estimate an unsaved segment's size and reachability
+      description: '**The live count while the segment is being built** (contract gap logged in CHG-WIR-007 for BO-755;
+        CHG-CSA-045). The same evaluation as `previewSegment`, on a definition that is not saved: the matching count
+        and the reachable count per channel after consent and suppression. Writes nothing.
+
+        '
+      tags:
+      - segment
+      x-ticvai-permission: MARKETING_VIEW
+      x-ticvai-idempotency-exempt: A computation that writes nothing; a replay returns the same counts and duplicates no row.
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSegmentRequest'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Preview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SegmentDraftPreview'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /segments/{segmentId}/preview:
@@ -11322,7 +11561,8 @@ paths:
         '409':
           $ref: ../shared/common.yaml#/components/responses/Conflict
         '422':
-          description: The form is not of kind `waiver`, or `sourceWaiverId` is missing for a duplicate.
+          description: The form is not of kind `waiver` or `consentForm` (CHG-CSA-026), or `sourceWaiverId` is
+            missing for a duplicate.
           content:
             application/problem+json:
               schema:
@@ -11340,9 +11580,15 @@ paths:
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.9 (drag-and-drop fields, builder fully configurable, conditional questions, mobile view); pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.9-11 (11.1.3)'
       summary: Save the layout of a draft waiver version
       description: >
-        **Saves the customer-facing layout of one draft waiver version: its sections and content
-        blocks.** An upsert keyed on `formId` + `formVersion`, which must be a `FormDefinition` of kind
-        `waiver` in `draft` (404 if absent; 409 once published, superseded or retired, because a
+        **Saves the customer-facing layout of one draft waiver or consent-form version: its sections and
+        content blocks.** **The consent-form builder is this builder** (Chinmay, 2 October, batch 4: "consent
+        form builder in Venue Management"; CHG-CSA-026): a venue authors its biometric (Face Pass, Face Tag),
+        marketing and other consent forms here as a `FormDefinition` of kind `consentForm`, with the same
+        fields, versioning, signature and acceptance record as a waiver, rather than in a second builder.
+        `FormDefinition.consentPurposes` says what the form consents to; Face Pass and Face Tag enrolment name
+        the venue's form by id (access `BiometricPolicy`). An upsert keyed on `formId` + `formVersion`, which
+        must be a `FormDefinition` of kind `waiver` or `consentForm` in `draft` (404 if absent; 409 once
+        published, superseded or retired, because a
         published version is immutable and a change is a new version through `createForm`). Input
         blocks (question, checkbox, acknowledgement, signature, initials, date, customer and guardian
         details) point at a field of the same version by `fieldKey`; the fields themselves are written
@@ -16476,6 +16722,15 @@ paths:
         policy names (`setCookieScanPolicy`); the scan run is kept with its counts. A technology
         missing from two consecutive scans of its channel is flagged for retirement, never retired
         automatically.
+
+
+        **Decided: buy a scanner API, hybrid** (Chinmay, 2 October, batch 5 set 2, answering CF-127 and
+        workbook Q19; CHG-CSA-023). Our banner, consent runtime, registry and consent logs stay ours; a bought
+        scanner API is called on each channel's schedule by a TICVAI adapter, which posts its results here with
+        a service credential and `source` `boughtScanner` (`scannerRef` naming the vendor and its scan id). The
+        manual "Upload scan report" path stays, as `manualUpload`. The vendor is a procurement choice and its
+        egress is in the HLD and LLD; nothing downstream of this operation depends on which vendor. Recording
+        the consent state a finding was seen in is an open gap (CHG-CSA-024).
       tags:
       - consent
       x-ticvai-permission: GUEST_MANAGE
@@ -17152,6 +17407,21 @@ components:
           items:
             type: string
             format: uuid
+        scanSource:
+          type: string
+          enum:
+          - boughtScanner
+          - manualUpload
+          default: boughtScanner
+          description: '**Who scans this channel** (Chinmay, 2 October: buy a scanner API, hybrid; CHG-CSA-023).
+            `boughtScanner`: the scheduled run calls the bought scanner API through TICVAI''s adapter, which feeds
+            `recordCookieScan`. `manualUpload`: no scheduled scan; an administrator uploads a scan report.'
+        scannerVendorRef:
+          type: string
+          maxLength: 200
+          nullable: true
+          description: The scanner vendor and the account or domain group the adapter uses; set by TICVAI when the
+            vendor is contracted.
         lastRunAt:
           type: string
           format: date-time
@@ -19455,6 +19725,20 @@ components:
           - consentForm
           - incidentReport
           - registration
+        consentPurposes:
+          type: array
+          description: '**What a `consentForm` consents to** (Chinmay, 2 October, batch 4; follows BO-188: biometric
+            capture needs consent on the venue''s own form; CHG-CSA-026). A guardian-signed form for a minor carries
+            the guardian fields of the waiver builder (workbook Q237: guardian consent, configurable per country).
+            Empty for any other kind.'
+          items:
+            type: string
+            enum:
+            - facePass
+            - faceTag
+            - marketing
+            - photography
+            - waiver
         version:
           readOnly: true
           type: integer
@@ -21928,6 +22212,67 @@ components:
           items:
             type: string
             format: uuid
+        ruleGroups:
+          type: array
+          description: '**Nested AND / OR / NOT groups** (contract gap CHG-WIR-007, BO-755; CHG-CSA-045). Where present,
+            the segment matches `criteria` (combined by `match`) AND every group here. Absent keeps the flat list.'
+          items:
+            $ref: '#/components/schemas/SegmentRuleGroup'
+        effectiveFrom:
+          type: string
+          format: date-time
+          nullable: true
+          description: The segment is evaluated for sends only from this time.
+        effectiveTo:
+          type: string
+          format: date-time
+          nullable: true
+        ownerPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Who answers for the segment; defaults to its creator.
+        requiresApproval:
+          type: boolean
+          default: false
+          description: Where true, a campaign may use the segment only after an `approvals` request on it is approved.
+    SegmentRuleGroup:
+      x-ticvai-persistence: none — stored with the segment as jsonb
+      type: object
+      description: One group of a segment's nested rules (CHG-CSA-045). `operator` combines the group's `criteria` and
+        its child `groups`; `not` negates the group (it takes one child, criteria or group).
+      properties:
+        operator:
+          type: string
+          enum:
+          - and
+          - or
+          - not
+        criteria:
+          type: array
+          description: Each entry has the shape of `SegmentCriterion` (`attribute`, `operator`, `value`). Typed loosely
+            here so the new optional field adds no required member to `createSegment`'s body for clients built at r1;
+            the server validates each entry as a `SegmentCriterion` (400 otherwise).
+          items:
+            type: object
+            additionalProperties: true
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/SegmentRuleGroup'
+    SegmentDraftPreview:
+      x-ticvai-persistence: none — evaluated live
+      type: object
+      description: The preview of an unsaved segment (`previewSegmentDraft`, CHG-CSA-045); `SegmentPreview` without a
+        segment id.
+      properties:
+        matchingCount:
+          type: integer
+        reachable:
+          $ref: '#/components/schemas/SegmentPreview/properties/reachable'
+        evaluatedAt:
+          type: string
+          format: date-time
     Segment:
       x-ticvai-persistence: marketing.segment + marketing.segment_criterion
       allOf:

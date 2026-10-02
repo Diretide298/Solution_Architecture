@@ -1,0 +1,97 @@
+id: CHG-CSA-045
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: 'The Block A and B contract gaps in the satellite contracts are built: fifteen screens get the read, audience
+  or field they lacked.'
+decision:
+  what: 'Built: listMessageDispatches (BO-023); recordConsent staff audience (POS-027); previewSegmentDraft, SegmentRuleGroup
+    and segment dates, owner, approval (BO-755); listChallenges, getChallenge, activateChallenge (BO-825; states/challenge.yaml);
+    createTableReservationForGuest (POS-028); listDeliveryLocations staff audience (BO-065); getCourseRules, getKitchenSla
+    (KIT-009); decideRecommendations previewOnly (BO-102); closeAiIncident impact, controlFailure, lessonsLearned
+    (ADM-556); getTenantAppStatus and getPublishedBookingFlow staff audience (CMS-014, CMS-103); getTranslationProposals
+    (CMS-011); getB2bPaymentTerms (ADM-603); WalletRefundPolicy.destinationsBySource (BO-1146); createPreview productId
+    (BO-008, CHG-CSA-041); takings by saleBoardId (BO-122, partly).'
+  by: Chinmay
+  date: '2026-10-02'
+why: Contract gaps logged open by the wiring fixes (CHG-WIR-004, CHG-WIR-007, CHG-WIR-011, CHG-WIR-014, CHG-WIR-017,
+  CHG-WIR-024, CHG-WIR-027) from the process design-note corrections; the apply brief of 2 October asks the satellite
+  contract owner to build those of Block A and B screens.
+keys_touched:
+  operations:
+  - listMessageDispatches
+  - recordConsent
+  - previewSegmentDraft
+  - createSegment
+  - listChallenges
+  - getChallenge
+  - activateChallenge
+  - createTableReservationForGuest
+  - listDeliveryLocations
+  - getCourseRules
+  - getKitchenSla
+  - decideRecommendations
+  - closeAiIncident
+  - getTenantAppStatus
+  - getPublishedBookingFlow
+  - getTranslationProposals
+  - getB2bPaymentTerms
+  - setWalletRefundPolicy
+  - createPreview
+  - getKpiValues
+  screens:
+  - BO-023
+  - POS-027
+  - BO-755
+  - BO-825
+  - POS-028
+  - BO-065
+  - KIT-009
+  - BO-102
+  - ADM-556
+  - CMS-014
+  - CMS-103
+  - CMS-011
+  - ADM-603
+  - BO-1146
+  - BO-008
+  - BO-122
+  files:
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/fnb.yaml
+  - contracts/satellite/ai.yaml
+  - contracts/satellite/white-label.yaml
+  - contracts/satellite/payments.yaml
+  - contracts/satellite/wallet.yaml
+  - contracts/satellite/reporting.yaml
+  - states/challenge.yaml
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-KIT-009
+  - APP-POS-POS-027
+  - APP-POS-POS-028
+  - APP-SETUP-ADM-556
+  - APP-SETUP-ADM-603
+  - APP-SETUP-BO-008
+  - APP-SETUP-BO-065
+  - APP-SETUP-BO-1146
+  - APP-SETUP-BO-755
+  - APP-SETUP-BO-825
+  - APP-WL-CMS-011
+  - APP-WL-CMS-014
+  - APP-WL-CMS-103
+  - VM-BO-023
+  - VM-BO-102
+  - VM-BO-122
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'The screens still declare the old bindings; the screens agent binds the new operations (list in the batch
+  report). x-ticvai-consumed-by is written back by link-screens-contracts at the refresh, so the new operations
+  carry none yet. Batch CSA (apply-contracts-satellite), 2 October 2026; tickets: none started (Block A starts Monday
+  5 October). Closes on the commit that carries the change.'

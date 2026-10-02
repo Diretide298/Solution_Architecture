@@ -1,0 +1,44 @@
+id: CHG-CSA-010
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: An outlet sets its payment timing, send first (the default, R261) or pay first; a pay-first order reaches
+  the kitchen only once paid.
+decision:
+  what: Add common OutletPaymentTiming (sendFirst default, payFirst); createFnbOrder, fireCourse and FnbOrder (paymentTiming
+    snapshot, sentToKitchenAt) honour it.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October, workbook Q64 (POS-021; DEC-064): "Two outlet configurations: pay first, or send to kitchen
+  then charge". Refines R261 per outlet; ADR-0029.'
+keys_touched:
+  operations:
+  - createFnbOrder
+  - fireCourse
+  schemas:
+  - OutletPaymentTiming
+  - FnbOrder
+  screens:
+  - POS-021
+  - BO-044
+  flows:
+  - F108
+  files:
+  - contracts/shared/common.yaml
+  - contracts/satellite/fnb.yaml
+root_class: 'new: open-question-decided'
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-021
+  - APP-SETUP-BO-044
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: template-field
+  ref: contracts/shared/common.yaml::OutletPaymentTiming
+status: open
+notes: 'Dependency on the spine agent: tenancy Outlet (and createOutlet/updateOutlet) gains paymentTiming, $ref
+  common OutletPaymentTiming, outlet-scoped. F108 pay-first branch and R261 register line are other agents''. Batch
+  CSA (apply-contracts-satellite), 2 October 2026; tickets: none started (Block A starts Monday 5 October). Closes
+  on the commit that carries the change.'

@@ -1,0 +1,49 @@
+id: CHG-CSA-044
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: 'The six promotion builder screens with no read (ADM-148, ADM-169, ADM-172, ADM-173, ADM-174, ADM-199)
+  get no new reads here: the console commercial screens move to Venue Management and merge with BO-010, which reads
+  getPromotion.'
+decision:
+  what: No contract change; logged open until the screen merge decides the binding.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Contract gaps CHG-WIR-027 (each correction offers "or the screen moves to getPromotion"); Chinmay, 2 October,
+  ADM-049 ("they are venue screens": move and merge) and the pre-apply round ("duplicate screens: merge as proposed").'
+keys_touched:
+  operations:
+  - setPromotionRule
+  - setBuyGetBogo
+  - setFixedPriceOffer
+  - setGiftFreeProduct
+  - setCrossCategoryPromotion
+  - setEligibilityRule
+  screens:
+  - ADM-148
+  - ADM-169
+  - ADM-172
+  - ADM-173
+  - ADM-174
+  - ADM-199
+  files:
+  - contracts/satellite/promotions.yaml
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ADM-148
+  - APP-SETUP-ADM-169
+  - APP-SETUP-ADM-172
+  - APP-SETUP-ADM-173
+  - APP-SETUP-ADM-174
+  - APP-SETUP-ADM-199
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/audit-screenless-operations.py
+status: open
+notes: 'Close when the screens agent merges the screens onto getPromotion/createPromotion; if any builder survives
+  the merge, add its get operation then. Batch CSA (apply-contracts-satellite), 2 October 2026; tickets: none started
+  (Block A starts Monday 5 October).'

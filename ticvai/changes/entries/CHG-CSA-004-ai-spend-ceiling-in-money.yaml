@@ -1,0 +1,38 @@
+id: CHG-CSA-004
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: The AI spend ceiling is shown and set in the tenant's selected currency (USD by default), with tokens alongside.
+decision:
+  what: 'Add getAiSpendCeiling and setAiSpendCeiling (AiSpendCeiling: spend as Money, token equivalent) beside AiPolicy.monthlyTokenCeiling,
+    and AiUsageReport.currency and ceiling. A separate operation because a Money field on AiPolicy would add required
+    members to setAiPolicy''s body for clients built at r1.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October, workbook Q8 (BO-091; DEC-008): "In the tenant''s selected currency (default USD), with
+  tokens". AI-D02 (re-billed per token).'
+keys_touched:
+  operations:
+  - getAiSpendCeiling
+  - setAiSpendCeiling
+  - getAiUsage
+  schemas:
+  - AiSpendCeiling
+  - AiUsageReport
+  screens:
+  - BO-091
+  files:
+  - contracts/satellite/ai.yaml
+root_class: 'new: open-question-decided'
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-BO-091
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: template-field
+  ref: contracts/satellite/ai.yaml::AiSpendCeiling
+status: open
+notes: 'Batch CSA (apply-contracts-satellite), 2 October 2026; tickets: none started (Block A starts Monday 5 October).
+  Closes on the commit that carries the change.'

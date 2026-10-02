@@ -1307,6 +1307,35 @@ paths:
       schema:
         type: string
         format: uuid
+    get:
+      operationId: getB2bPaymentTerms
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '2 October: contract gap CHG-WIR-027 (ADM-603: setB2bPaymentTerms has no read, so the screen
+        opens empty where terms exist); shape follows setB2bPaymentTerms'
+      summary: An account's limit, terms, billing cycle and limit behaviour
+      description: 'The terms `setB2bPaymentTerms` stored for one B2B credit account (contract gap logged in
+        CHG-WIR-027 for ADM-603; built in CHG-CSA-045). An account with none set reads 404.
+
+        '
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The terms
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/B2bPaymentTerms'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setB2bPaymentTerms
       x-ticvai-consumed-by:

@@ -1,0 +1,32 @@
+id: CHG-CSA-019
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: A discount or price-override limit is a percentage or an amount, chosen by the venue per limit.
+decision:
+  what: StoreRule gains limitKind (percent, amount) and thresholdPercent; thresholdAmount serves amount limits.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October, workbook Q195 (BO-142; DEC-195): "Both: the venue chooses percentage or amount per limit".'
+keys_touched:
+  operations:
+  - setStoreRules
+  schemas:
+  - StoreRule
+  screens:
+  - BO-142
+  files:
+  - contracts/satellite/retail.yaml
+root_class: 'new: open-question-decided'
+tickets:
+  started: []
+  unstarted:
+  - VM-BO-142
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: template-field
+  ref: contracts/satellite/retail.yaml::limitKind
+status: open
+notes: 'Batch CSA (apply-contracts-satellite), 2 October 2026; tickets: none started (Block A starts Monday 5 October).
+  Closes on the commit that carries the change.'

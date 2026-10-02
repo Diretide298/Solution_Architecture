@@ -2413,6 +2413,14 @@ components:
           items:
             type: string
             format: uuid
+        coversGamesAddedLater:
+          type: boolean
+          default: true
+          description: '**Whether a pass sold today covers a game added tomorrow** (Chinmay, 2 October, workbook Q397:
+            "venue configures; default yes"; CHG-CSA-028). True, the default: an `allGamesPass`, or a pass bound by
+            `attractionTypeIds`, covers games added after it was sold that match it; the coverage summary says so.
+            False: it covers only the games that existed at sale. A pass listing `gameIds` covers those games only,
+            whatever this says.'
         playCount:
           type: integer
           nullable: true
@@ -2663,6 +2671,15 @@ components:
         retryWindowSeconds:
           type: integer
           nullable: true
+          description: How long after the game ends the retry offer stays open.
+        retryOfferLeadSeconds:
+          type: integer
+          minimum: 0
+          nullable: true
+          description: '**When the retry offer appears** (Chinmay, 2 October, workbook Q410, default accepted; DI-877;
+            CHG-CSA-028): this many seconds before the game ends, and it stays open `retryWindowSeconds` after. A retry
+            is charged in money at `retryPrice`, never from an entitlement; a retry after a machine fault is the
+            reader''s `retryPricing`, not this.'
         priority:
           type: array
           items:
@@ -3002,6 +3019,19 @@ components:
         reportedAt:
           type: string
           format: date-time
+        offlineSince:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When the reader lost its connection; null while online.
+        refusingOfflineTaps:
+          type: boolean
+          readOnly: true
+          description: '**True once the reader has been offline longer than the venue''s maximum offline duration**
+            (Chinmay, 2 October, workbook Q426; BO-471; ADR-0068; CHG-CSA-028). The limit is the venue''s offline
+            policy (access `AccessOfflinePolicy`), carried in the reader''s edge package; past it the reader refuses
+            offline taps until it syncs.'
         scopePath:
           type: string
     GameEligibility:

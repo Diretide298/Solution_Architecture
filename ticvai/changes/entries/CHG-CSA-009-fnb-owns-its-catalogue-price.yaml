@@ -1,0 +1,38 @@
+id: CHG-CSA-009
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: MenuItem.price is F&B's own catalogue price, set per outlet; the stale text saying price and tax come from
+  the central catalogue variant is corrected.
+decision:
+  what: Rewrite MenuItem.productVariantId (link for reporting, stock and tax class only; F&B owns its prices; an
+    outlet may set its own) and say applyMenuActions reprice changes F&B's own price.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October, workbook Q34 (BO-045; DEC-034), corrected: "F&B has its own catalogue table (prices migrated
+  into F&B so ticketing scales in isolation); outlets may set their own price". ADR-0028.'
+keys_touched:
+  operations:
+  - applyMenuActions
+  schemas:
+  - MenuItem
+  screens:
+  - BO-045
+  - POS-021
+  files:
+  - contracts/satellite/fnb.yaml
+root_class: 'new: open-question-decided'
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-021
+  - APP-SETUP-BO-045
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: template-field
+  ref: contracts/satellite/fnb.yaml::is not where the price comes from
+status: open
+notes: 'The F&B notes'' correction to drop the menu''s own price is withdrawn (apply-notes). The ADR-0028 reason
+  line is apply-docs. Batch CSA (apply-contracts-satellite), 2 October 2026; tickets: none started (Block A starts
+  Monday 5 October). Closes on the commit that carries the change.'

@@ -2019,6 +2019,12 @@ paths:
         **Investigation notes are a history, not a field** (decided 28 September, audit R106 (5)).
         Each `investigationNote` sent appends one row to `IncidentDetail.investigationNotes`, with
         who wrote it and when; nothing overwrites or deletes an earlier note.
+
+        **A critical incident is closed by another supervisor** (Chinmay, 2 October, workbook Q530,
+        the default; segregation of duties; CHG-CSA-033). Closing an incident of severity `critical`
+        is refused `403 closer-completed-action` when the caller completed its corrective action (the
+        linked work order, or the corrective actions recorded on it); another holder of
+        `INCIDENT_MANAGE` closes it.
       tags: [incident]
       x-ticvai-permission: INCIDENT_MANAGE
       x-ticvai-scope-level: venue
@@ -2060,6 +2066,14 @@ paths:
               schema: { $ref: '#/components/schemas/Incident' }
         '400':
           description: Closure attempted without findings or a corrective action
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '403':
+          description: A critical incident closed by the person who completed its corrective action
+            (`closer-completed-action`; workbook Q530; CHG-CSA-033). Another supervisor must close it.
+          x-ticvai-problem-types:
+          - closer-completed-action
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }

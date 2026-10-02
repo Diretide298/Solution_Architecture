@@ -1,0 +1,35 @@
+id: CHG-CSA-003
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: Every LLM call is scrubbed offline (Presidio with UAE and Arabic recognisers, reversible placeholders)
+  and checked by a guard model, failing closed, whatever the residency class.
+decision:
+  what: AiPolicy gains a read-only scrubbing block (mandatory, recognisers, reversible tokens, guard model); sendAiMessage
+    documents the scrub and re-fill, declares 503 scrubber-unavailable (fail closed) and 422 guard-refused; maskedFields
+    stays in addition to the scrubber.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October: "we may need to scrub personal info no matter what: an offline NLP-based scrubber or censorship"
+  (DEC-542, DEC-543; Qwen3Guard). Reinforces ADR-0020 (the LLM never reads raw data) and ADR-0023.'
+keys_touched:
+  operations:
+  - sendAiMessage
+  schemas:
+  - AiPolicy
+  files:
+  - contracts/satellite/ai.yaml
+root_class: 'new: open-question-decided'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: template-field
+  ref: contracts/satellite/ai.yaml::scrubber-unavailable
+status: open
+notes: 'ADR-0020 amendment, ai-system-design 2.1/3.3/3.7, HLD/LLD Security and the gateway task are apply-docs.
+  A gateway test corpus is the runtime prevention the AI engineers build (AI-ENGINE-GATEWAY). Batch CSA (apply-contracts-satellite),
+  2 October 2026; tickets: none started (Block A starts Monday 5 October). Closes on the commit that carries the
+  change.'

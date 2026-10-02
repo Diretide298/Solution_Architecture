@@ -1,0 +1,50 @@
+id: CHG-CSA-043
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: Every tenant has a platform subdomain per cell; custom domains are a CNAME to Front Door with the full
+  DNS record list, revalidation and timeout, a takeover warning, a primary domain and per-domain readiness.
+decision:
+  what: getPlatformSubdomain (PlatformSubdomain); setPrimaryDomain and regenerateDomainToken; CustomDomain gains
+    routing, dnsRecords, revalidation (none, pendingRevalidation, timedOut), cnameLost, isPrimary and readiness;
+    claim and relinquish document the CNAME and the takeover warning.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October, batch 5 set 2: "Subdomain plus CNAME" (DEC-546, DEC-547), batch 2 #41 and batch 3 (CMS-017
+  covers the guest web app). DI-283; research B1-B6.'
+keys_touched:
+  operations:
+  - claimCustomDomain
+  - verifyCustomDomain
+  - relinquishCustomDomain
+  - listCustomDomains
+  - setPrimaryDomain
+  - regenerateDomainToken
+  - getPlatformSubdomain
+  schemas:
+  - CustomDomain
+  - PlatformSubdomain
+  screens:
+  - CMS-017
+  - ADM-017
+  flows:
+  - F103
+  files:
+  - contracts/satellite/white-label.yaml
+root_class: 'new: open-question-decided'
+tickets:
+  started: []
+  unstarted:
+  - APP-WL-ADM-017
+  - APP-WL-CMS-017
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'pendingRevalidation and timedOut are a separate revalidation field, not CustomDomain.status values: a new
+  status value is a response-enum change that breaks r1, so states/custom-domain.yaml is unchanged. Dependencies:
+  tenancy TenantDomain/setTenantDomainMapping (spine), F103 failure branches (flows), HLD/LLD (apply-docs). Batch
+  CSA (apply-contracts-satellite), 2 October 2026; tickets: none started (Block A starts Monday 5 October). Closes
+  on the commit that carries the change.'

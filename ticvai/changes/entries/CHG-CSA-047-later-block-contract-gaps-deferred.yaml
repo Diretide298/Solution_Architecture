@@ -1,0 +1,136 @@
+id: CHG-CSA-047
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: The contract gaps of Block C and D screens in the satellite contracts are deferred to their block, not
+  built now.
+decision:
+  what: No contract change; they stay open in the CHG-WIR contract-gap entries and are built when their block is
+    broken into tasks.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'The apply brief of 2 October: contract-gap corrections for later blocks are logged open, not built. Gaps from
+  CHG-WIR-004, CHG-WIR-007, CHG-WIR-011, CHG-WIR-014, CHG-WIR-017, CHG-WIR-024 and CHG-WIR-027 on screens outside
+  Blocks A and B.'
+keys_touched:
+  screens:
+  - ADM-093
+  - ADM-149
+  - ADM-150
+  - ADM-151
+  - ADM-152
+  - ADM-153
+  - ADM-154
+  - ADM-155
+  - ADM-156
+  - ADM-161
+  - ADM-162
+  - ADM-163
+  - ADM-170
+  - ADM-176
+  - ADM-184
+  - ADM-186
+  - ADM-206
+  - ADM-209
+  - ADM-210
+  - ADM-214
+  - ADM-220
+  - ADM-276
+  - ADM-310
+  - ADM-375
+  - ADM-408
+  - ADM-425
+  - ADM-575
+  - ADM-585
+  - ADM-594
+  - ADM-596
+  - ADM-597
+  - ADM-612
+  - ADM-621
+  - ADM-631
+  - ADM-632
+  - ADM-645
+  - ADM-677
+  - ADM-682
+  - ADM-685
+  - ADM-694
+  - BO-1024
+  - BO-1048
+  - BO-1051
+  - BO-1072
+  - BO-1105
+  - BO-1106
+  - BO-1114
+  - BO-1124
+  - BO-1133
+  - BO-1134
+  - BO-1135
+  - BO-1136
+  - BO-1137
+  - BO-1138
+  - BO-1139
+  - BO-1140
+  - BO-1144
+  - BO-1145
+  - BO-1148
+  - BO-1153
+  - BO-1154
+  - BO-1155
+  - BO-1156
+  - BO-1158
+  - BO-1159
+  - BO-1164
+  - BO-1169
+  - BO-1175
+  - BO-347
+  - BO-348
+  - BO-398
+  - BO-399
+  - BO-414
+  - BO-419
+  - BO-432
+  - BO-444
+  - BO-445
+  - BO-454
+  - BO-456
+  - BO-478
+  - BO-483
+  - BO-485
+  - BO-574
+  - BO-631
+  - BO-651
+  - BO-660
+  - BO-666
+  - BO-674
+  - BO-675
+  - BO-679
+  - BO-748
+  - BO-770
+  - BO-831
+  - BO-881
+  - BO-887
+  - BO-925
+  - BO-946
+  - BO-981
+  - BO-991
+  - CMS-044
+  - CMS-046
+  - CMS-047
+  - EMP-024
+  - EMP-047
+  - EMP-055
+  - EMP-100
+  - SGN-018
+  other:
+  - 107 screens, 107 gaps naming a satellite operation or schema
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/audit-screenless-operations.py
+status: open
+notes: 'Batch CSA (apply-contracts-satellite), 2 October 2026; tickets: none started (Block A starts Monday 5 October).'

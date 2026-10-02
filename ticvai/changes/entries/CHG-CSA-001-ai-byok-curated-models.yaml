@@ -1,0 +1,46 @@
+id: CHG-CSA-001
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: BYOK maps each AI task to the tenant provider's equivalent from TICVAI's curated range, and a model outside
+  that range is refused.
+decision:
+  what: AiModel gains curatedRange (task, tier, rank, byokEligible); setAiProvider and setAiModel refuse a model
+    outside the curated range for a task (422 model-not-curated), replacing AI-D18's warn-only fitness band; AiByokEnablement
+    gains taskModelMap (the provider's equivalent per task, chosen by TICVAI); usage on a tenant key is billed to
+    that key.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October, workbook Q1 and Q2 (ADM-037; decisions DEC-001, DEC-002) and the AI/ML model selection
+  (batch 2 #7, batch 3; DEC-544): "BYOK: the agent assigns the provider''s equivalent models from TICVAI''s curated
+  range per task"; "the client cannot change models; TICVAI curates them". Closes AI-D20, amends AI-D18 (DI-967,
+  MoM 21 Sep).'
+keys_touched:
+  operations:
+  - setAiProvider
+  - setAiModel
+  - setAiByokEnablement
+  - listAiModels
+  schemas:
+  - AiModel
+  - AiProvider
+  - AiByokEnablement
+  screens:
+  - ADM-037
+  files:
+  - contracts/satellite/ai.yaml
+root_class: 'new: open-question-decided'
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ADM-037
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: template-field
+  ref: contracts/satellite/ai.yaml::curatedRange
+status: open
+notes: 'Not changed here (other agents): handoff/ai-decisions.json AI-D18/AI-D20 and the new curated-range AI-D
+  entry, ai-system-design 3.3 and 5.9, and the seeded model catalogue rows. The research file is outside git until
+  DEC-556 copies it in. Batch CSA (apply-contracts-satellite), 2 October 2026; tickets: none started (Block A starts
+  Monday 5 October). Closes on the commit that carries the change.'

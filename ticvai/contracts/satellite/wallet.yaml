@@ -1517,6 +1517,108 @@ paths:
                   $ref: '#/components/schemas/WalletLiabilityRow'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /wallet-movement-summary:
+    get:
+      operationId: getWalletMovementSummary
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q220 (BO-1170: add a wallet movement summary operation and wallet
+        pre-close checks); shape follows getWalletLiability'
+      summary: How the stored-value balance moved over a period
+      description: '**The wallet roll-forward** (Chinmay, 2 October, workbook Q220; CHG-CSA-027). Opening balance,
+        what came in (top-ups, refunds to wallet, transfers in, positive adjustments), what went out (spend,
+        transfers out, negative adjustments, refunds out), expiries and breakage, and the closing balance, per
+        credit type where asked. `tiesOut` is false where opening plus movements does not equal closing, which is
+        the first of the pre-close checks (`getWalletPreCloseChecks`).
+
+        '
+      tags:
+      - wallet
+      x-ticvai-permission: WALLET_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: from
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: groupBy
+        in: query
+        schema:
+          type: string
+          enum:
+          - creditType
+          - walletType
+          - venue
+      responses:
+        '200':
+          description: The movement summary
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WalletMovementSummary'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /wallet-pre-close-checks:
+    get:
+      operationId: getWalletPreCloseChecks
+      x-ticvai-audience:
+      - staff
+      - service
+      x-ticvai-read-routing: primary
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q220 (BO-1170: the wallet-specific checks join the period-close
+        checks); shape follows getWalletReconciliation'
+      summary: The wallet's checks before a period closes
+      description: '**The wallet-specific checks that join the period-close checks** (Chinmay, 2 October, workbook
+        Q220; CHG-CSA-027). Each check passes, warns or fails with its figures: the roll-forward ties out
+        (`getWalletMovementSummary`); the wallet sub-ledger equals the stored-value liability in the ledger; no
+        hold is open past its expiry; no expiry run is pending for the period; no dispute is unresolved past its
+        deadline; the reconciliation sources are matched for every day of the period. Finance''s period close reads
+        it (`finance.beginPeriodClose` lists these with its own checks), and a failing check blocks the close as its
+        own checks do.
+
+        '
+      tags:
+      - wallet
+      x-ticvai-permission: WALLET_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - bearerAuth: []
+      - serviceAuth: []
+      parameters:
+      - name: periodEnd
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: The checks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WalletPreCloseCheck'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-reconciliation:
     get:
       operationId: getWalletReconciliation
@@ -2089,6 +2191,10 @@ paths:
 
         Physical cards are pre-printed and activated at sale; digital cards are issued with a
         generated code.
+
+        **Store credit is a gift card** (Chinmay, 2 October, workbook Q61, the default; DI-796; CHG-CSA-027): a
+        refund taken as store credit at the till issues a digital gift card here for the refund amount, never a
+        voucher and never a top-up of the guest's wallet.
       tags: [giftCard]
       x-ticvai-permission: WALLET_OPERATE
       x-ticvai-scope-level: workstation
@@ -3348,7 +3454,8 @@ paths:
         when the balance falls below `thresholdAmount`, `reloadAmount` is charged to the stored card
         (`paymentTokenId`, one of the caller's own) and loaded as cash credit. The venue's rules bound it
         (minimum and maximum top-up, velocity limits, `maximumPerDay`); this is refused where the venue has
-        auto-reload disabled. A declined charge suspends the setting until the holder updates it, rather
+        auto-reload disabled, or where the wallet's type does not allow it (`WalletType.autoReloadAllowed`,
+        CHG-CSA-027). A declined charge suspends the setting until the holder updates it, rather
         than retrying a card that has said no. The holder sets it for their own wallet; staff set it for
         a guest at a counter with the guest present.
       tags: [retail]
@@ -3983,6 +4090,12 @@ components:
       - code
       - name
       properties:
+        autoReloadAllowed:
+          type: boolean
+          default: true
+          description: '**Auto-reload is optional per wallet type** (Chinmay, 2 October, workbook Q105, default
+            accepted; CHG-CSA-027). Where false, a holder of this type cannot set an auto top-up
+            (`setWalletAutoReloadSetting` refuses it) whatever the venue''s `WalletFundingRules.autoReload` says.'
         id:
           type: string
           format: uuid
@@ -4877,6 +4990,31 @@ components:
           type: number
           nullable: true
           description: 'An incentive to take the refund as credit rather than to a card.'
+        destinationsBySource:
+          type: array
+          description: '**A destination per refund source** (contract gap CHG-WIR-027, BO-1146; CHG-CSA-045). A refund
+            of a ticket, an event, F&B, retail, a rental, parking, a membership or a compensation goes to the
+            destination listed for its source; a source not listed takes `defaultDestination`.'
+          items:
+            type: object
+            properties:
+              source:
+                type: string
+                enum:
+                - ticket
+                - event
+                - fnb
+                - retail
+                - rental
+                - parking
+                - membership
+                - compensation
+              destination:
+                type: string
+                enum:
+                - originalTender
+                - wallet
+                - guestChoice
         scopePath:
           type: string
     WalletRestriction:
@@ -5138,6 +5276,68 @@ components:
         oldestLotAt:
           type: string
           format: date
+          nullable: true
+    WalletMovementSummary:
+      type: object
+      x-ticvai-persistence: none — aggregated from wallet.transaction and wallet.credit_lot
+      description: One row of the wallet roll-forward (`getWalletMovementSummary`, CHG-CSA-027). Every amount is in the
+        base currency.
+      properties:
+        groupKey:
+          type: string
+          nullable: true
+        opening:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        topUps:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        refundsIn:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        transfersIn:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        adjustmentsIn:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        spend:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        transfersOut:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        adjustmentsOut:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        refundsOut:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        expired:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        breakageRecognised:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        closing:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        tiesOut:
+          type: boolean
+          description: Opening plus every movement equals closing.
+    WalletPreCloseCheck:
+      type: object
+      x-ticvai-persistence: none — computed at the call
+      description: One wallet check before a period closes (`getWalletPreCloseChecks`, CHG-CSA-027).
+      properties:
+        code:
+          type: string
+          enum:
+          - rollForwardTies
+          - subLedgerTiesToLedger
+          - noExpiredHoldsOpen
+          - noPendingExpiryRun
+          - noOverdueDisputes
+          - reconciliationSourcesMatched
+        outcome:
+          type: string
+          enum:
+          - pass
+          - warn
+          - fail
+        detail:
+          type: string
+        difference:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
           nullable: true
     WalletReconciliation:
       type: object

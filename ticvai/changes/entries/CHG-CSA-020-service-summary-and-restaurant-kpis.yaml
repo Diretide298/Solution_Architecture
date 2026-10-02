@@ -1,0 +1,42 @@
+id: CHG-CSA-020
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: A server without a till gets a service summary, the restaurant measures are seeded KPIs, and the F&B hub
+  reads F&B takings.
+decision:
+  what: 'getServiceSummary (ServiceSummary: covers, tables, sales, tips; self-scoped); ReportingSystemKpi adds tableTurnTime,
+    noShowRate, covers and waitQuoteAccuracy; getKpiValues gains the module filter (takings with module=fnb) and
+    takings by saleBoardId.'
+  by: Chinmay
+  date: '2026-10-02'
+why: Chinmay, 2 October, workbook Q199 (EMP-008; DEC-199), Q205 (EMP-060; DEC-205) and Q181 (BO-104; DEC-181). MATRIX
+  4.9.7, DI-492, DI-400; CHG-FIN-006 same numbers, CHG-FIN-010.
+keys_touched:
+  operations:
+  - getServiceSummary
+  - getKpiValues
+  schemas:
+  - ServiceSummary
+  - ReportingSystemKpi
+  screens:
+  - EMP-008
+  - EMP-060
+  - BO-104
+  - BO-122
+  files:
+  - contracts/satellite/reporting.yaml
+root_class: 'new: open-question-decided'
+tickets:
+  started: []
+  unstarted:
+  - VM-BO-104
+  - VM-BO-122
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-finance-rules.py
+status: open
+notes: 'Batch CSA (apply-contracts-satellite), 2 October 2026; tickets: none started (Block A starts Monday 5 October).
+  Closes on the commit that carries the change.'

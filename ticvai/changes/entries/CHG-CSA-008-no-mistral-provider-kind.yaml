@@ -1,0 +1,31 @@
+id: CHG-CSA-008
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: 'AiProviderKind gets no mistral value: the research names it a gap, nobody decided it, and a new value
+  would break r1.'
+decision:
+  what: Document that a Mistral key goes through openaiCompatible if compatible (unconfirmed); no enum value added.
+  by: Chinmay
+  date: '2026-10-02'
+why: Research of 2 October (AI/ML model selection, contract-fit row and item 8) lists "no mistral kind" as a gap;
+  the decisions of 2 October (DEC-539, DEC-544) do not decide it. A new AiProviderKind value is a response-enum
+  change refused by check-contract-compat. Provider choice is governed by ADR-0009 and ADR-0020.
+keys_touched:
+  schemas:
+  - AiProviderKind
+  files:
+  - contracts/satellite/ai.yaml
+root_class: 'new: open-question-undecided'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'Open until Chinmay decides whether Mistral is in the curated BYOK range; recommended default: no mistral
+  kind, Mistral only through openaiCompatible after a compatibility test. Batch CSA (apply-contracts-satellite),
+  2 October 2026; tickets: none started (Block A starts Monday 5 October).'

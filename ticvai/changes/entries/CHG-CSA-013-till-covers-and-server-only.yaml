@@ -1,0 +1,32 @@
+id: CHG-CSA-013
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: On the till in Block A a table visit can change its covers and its server; moving it to another table waits
+  until after r2.
+decision:
+  what: updateTableVisit and transferTableVisit say so.
+  by: Chinmay
+  date: '2026-10-02'
+why: Chinmay, 2 October, workbook Q68 (POS-028; DEC-068, default accepted); POSV2-8; CHG-SEED-007.
+keys_touched:
+  operations:
+  - updateTableVisit
+  - transferTableVisit
+  screens:
+  - POS-028
+  files:
+  - contracts/satellite/fnb.yaml
+root_class: 'new: open-question-decided'
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-028
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: template-field
+  ref: contracts/satellite/fnb.yaml::change covers and change server only
+status: open
+notes: 'Batch CSA (apply-contracts-satellite), 2 October 2026; tickets: none started (Block A starts Monday 5 October).
+  Closes on the commit that carries the change.'

@@ -941,6 +941,10 @@ paths:
         action somebody runs twice — and **the preview names how many items each action touches**, because
         *reprice all* and *reprice all in this category* differ by four hundred dirhams a day.
 
+        **`reprice` changes F&B''s own catalogue price** (`MenuItem.price`) on this outlet''s menu (Chinmay,
+        2 October, workbook Q34; CHG-CSA-009). F&B owns its prices; the central catalogue is not consulted and
+        is not changed.
+
         '
       tags:
       - fnb
@@ -1463,6 +1467,35 @@ paths:
       schema:
         type: string
         format: uuid
+    get:
+      operationId: getKitchenSla
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '2 October: contract gap CHG-WIR-011 (KIT-009: setKitchenSla has no read); shape follows setKitchenSla'
+      summary: How long a ticket may sit before it is late (read)
+      description: 'The outlet''s ticket targets and priority weights as `setKitchenSla` stored them (contract gap
+        logged in CHG-WIR-011 for KIT-009; built in CHG-CSA-045). The display reads it to colour the rail.
+
+        '
+      tags:
+      - fnb
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: outlet
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The targets
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KitchenSla'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setKitchenSla
       x-ticvai-consumed-by:
@@ -2409,6 +2442,10 @@ paths:
         **Offline-capable and it must be.** The pass is the one screen that cannot wait for a network,
         and a fire that queues is a fire that happened.
 
+        **Table service only.** Coursing belongs to a table visit, which pays at close whatever the outlet''s
+        payment timing; a `payFirst` outlet''s order (`tenancy.Outlet.paymentTiming`, CHG-CSA-010) reaches the
+        kitchen when it is paid, never by a fire.
+
         '
       tags:
       - fnb
@@ -2698,6 +2735,37 @@ paths:
       schema:
         type: string
         format: uuid
+    get:
+      operationId: getCourseRules
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '2 October: contract gap CHG-WIR-011 (KIT-009: setCourseRules has no read, so an editor cannot load
+        the current values); shape follows setCourseRules'
+      summary: How this outlet courses by default (read)
+      description: 'The outlet''s coursing default as `setCourseRules` stored it (contract gap logged in CHG-WIR-011
+        for KIT-009; built in CHG-CSA-045). An outlet that never set one reads the default of the template it was
+        created from, or `defaultCoursing` unset.
+
+        '
+      tags:
+      - fnb
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: outlet
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The rules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseRules'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setCourseRules
       x-ticvai-consumed-by:
@@ -3516,6 +3584,8 @@ paths:
       summary: Move a check to another server
       description: 'BL-125. **A shift change mid-service leaves a check with a server who has gone home.**
 
+        **"Change server" on the till (POS-028) in Block A** (Chinmay, 2 October, workbook Q68; CHG-CSA-013).
+
         **The transfer is recorded, not silent** — tips and sales attribution follow the server, and a
         check that changes hands without a record is a dispute at cash-up.
 
@@ -4132,6 +4202,7 @@ paths:
         - "P02 GST-029 Venue Info & Services"
       x-ticvai-audience:
       - guest
+      - staff
       summary: Where an order can be delivered
       description: '4.6.26 — tables, seats, cabanas or designated locations. A venue runs several kinds
         at once: a restaurant with tables, a poolside with cabanas and sunbeds, an auditorium where the
@@ -4139,6 +4210,10 @@ paths:
 
         They are one concept because a runner needs one instruction, and a guest needs one way to say
         where they are.
+
+        **Staff read it too** (contract gap logged in CHG-WIR-011 for BO-065; CHG-CSA-045): the venue
+        configuration screen lists the locations it creates and edits (`createDeliveryLocation`,
+        `updateDeliveryLocation`). A staff token was already accepted; the audience now says so.
 
         '
       tags:
@@ -4673,6 +4748,18 @@ paths:
         Payment is required before the kitchen sees it, unless the outlet runs a tab — a kitchen that
         cooks on an unpaid guest order is a kitchen giving food away.
 
+        **F&B keeps its own payment step and its own receipt** (Chinmay, 2 October, workbook Q52 and Q71;
+        CHG-CSA-011). A guest F&B order does not go through the shared cart (`orders.addCartLine`,
+        `checkoutCart`): it is paid in its own pay step after this call (F11 step 4) and gets its own F&B
+        receipt. DI-293''s one cart, one receipt does not apply to F&B.
+
+        **Inside the venue, a ticket is needed; a standalone outlet sells without one** (Chinmay, 2 October,
+        workbook Q70; DI-292 amended for standalone outlets; CHG-CSA-011). The outlet''s siting is
+        `tenancy.Outlet` `siting` (common `OutletSiting`). At an `insideVenue` outlet the guest must hold a valid
+        admission ticket for the venue for the day, checked through Access (ADR-0068); without one the order is
+        refused `403 entry-ticket-required` and nothing is held. A `standalone` outlet takes takeaway and
+        delivery orders with no ticket.
+
         '
       tags:
       - guestOrdering
@@ -4754,6 +4841,16 @@ paths:
                       enum:
                       - paymentRequired
                       - paymentDeclined
+        '403':
+          description: The outlet is inside the venue (`tenancy.Outlet.siting` `insideVenue`) and the guest holds
+            no valid admission ticket for the venue today (`entry-ticket-required`; DI-292, workbook Q70,
+            CHG-CSA-011). A standalone outlet never refuses on this.
+          x-ticvai-problem-types:
+          - entry-ticket-required
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /guest-orders/{orderId}:
     parameters:
     - name: orderId
@@ -5158,6 +5255,74 @@ paths:
                 $ref: '#/components/schemas/MenuItem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /menu-items/{itemId}/daily-count:
+    parameters:
+    - name: itemId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: setMenuItemDailyCount
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q194 (BO-140, FNB-2H "Count set"): daily counts with automatic
+        sold-out at zero; shape follows setItemAvailability'
+      summary: Set today's count for a dish
+      description: '**"6 left" on the till and the guest menu** (Chinmay, 2 October, workbook Q194; CHG-CSA-017).
+        The kitchen sets how many portions it has for today; each sale takes one from `MenuItem.remainingCount`,
+        and **at zero the item goes unavailable on every till and guest menu of the outlet immediately**, as
+        `setItemAvailability` does, recorded as an `EightySixEvent` with `source` `dailyCount`. Raising the
+        count above zero brings an item that was taken off by its count back on sale; an item taken off by
+        hand stays off until somebody puts it back.
+
+        **Not inventory `setDailyCount`**, which picks the items of a stock count. This is a service count for
+        one menu item, reset at the venue day start. `count` null stops counting the item.
+
+        '
+      tags:
+      - menu
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - count
+              properties:
+                count:
+                  type: integer
+                  minimum: 0
+                  nullable: true
+                  description: Portions for today. Null stops counting the item.
+      responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set; the item with its `dailyCount` and `remainingCount`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuItem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /modifier-groups:
     get:
       operationId: listModifierGroups
@@ -5331,6 +5496,13 @@ paths:
       - staff
       summary: Place an F&B order
       description: 'Quick service pays immediately; table service attaches to a visit and pays at close.
+
+        **When it is paid is the outlet''s choice** (Chinmay, 2 October, workbook Q64; refines audit R261 per
+        outlet; CHG-CSA-010). The outlet''s `tenancy.Outlet.paymentTiming` (common `OutletPaymentTiming`):
+        `sendFirst`, the default, creates the kitchen tickets with the order and the till charges after (R261);
+        `payFirst` creates the order with no kitchen tickets, and **they are created only when its payment is
+        captured** (`FnbOrder.sentToKitchenAt` stays null until then). An unpaid order at a `payFirst` outlet
+        never reaches the kitchen. The order carries the timing it was placed under (`FnbOrder.paymentTiming`).
 
         Offline behaviour depends on the items: an order containing only untracked items queues normally,
         while one containing a recipe-linked item is refused offline because stock depletes in real time.
@@ -5734,6 +5906,10 @@ paths:
         is matched on `TableDefinition.id`: an id already on the outlet updates that table, a new id adds
         one. A table whose capacity changes is refused while a visit is open on it, as `updateTable` is.
 
+        **Nothing is ever deleted** (Chinmay, 2 October, workbook Q67; CHG-CSA-012). "Remove table" on the
+        layout editor marks the table out of service (`TableStatus` `outOfService`), so its history, its visits
+        and its bookings keep their table; a table left out of the body is unchanged, not removed.
+
         '
       tags:
       - table
@@ -5867,6 +6043,11 @@ paths:
       summary: Amend covers, move table, or reassign server
       description: 'Moving a party to another table is routine and must not lose the visit. The visit
         is the unit that survives; the table is an attribute of it.
+
+        **On the till in Block A: change covers and change server only** (Chinmay, 2 October, workbook Q68,
+        default accepted; POSV2-8; CHG-CSA-013). POS-028 uses this for covers and `transferTableVisit` for the
+        server. Moving the party to another table (and `moveTableVisit`, `mergeTableVisits`) stays on the
+        staff app and comes to the till only after r2.
 
         '
       tags:
@@ -6685,6 +6866,12 @@ paths:
       description: 'Depletes stock without a sale. Also the ground truth for waste prediction, so the
         reason code matters more than it appears to.
 
+        **Approval is a venue policy, off by default** (Chinmay, 2 October, workbook Q192; CHG-CSA-016). With
+        the venue''s waste-approval policy off, waste is written off when recorded. With it on
+        (`setWasteApprovalPolicy`), the policy''s value bands decide: below the first band nothing changes,
+        in a band that needs approval the record is held `pending` and an approval request is raised (stock is
+        written off when it is approved), and at or above `photoRequiredAbove` a photo is required.
+
         '
       tags:
       - production
@@ -6741,6 +6928,13 @@ paths:
                 recordedAt:
                   type: string
                   format: date-time
+                photoAssetId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: '**Photo evidence** (an `assets` media id). Required where the venue''s waste-approval
+                    policy is on and the value is at or above its `photoRequiredAbove` (CHG-CSA-016); refused `422
+                    photo-required` otherwise.'
       responses:
         '201':
           headers:
@@ -6756,6 +6950,29 @@ paths:
                     type: string
                   totalCost:
                     $ref: ../shared/common.yaml#/components/schemas/Money
+                  approvalStatus:
+                    type: string
+                    enum:
+                    - notRequired
+                    - pending
+                    description: '`pending` where the venue''s waste-approval policy is on and the value falls in a
+                      band that needs approval (`getWasteApprovalPolicy`, CHG-CSA-016): stock is written off only
+                      when the approval request is approved. `notRequired` otherwise, and always while the policy
+                      is off (the default).'
+                  approvalRequestId:
+                    type: string
+                    format: uuid
+                    nullable: true
+                    description: The `approvals` request raised for it, where `approvalStatus` is `pending`.
+        '422':
+          description: The waste-approval policy is on and the value needs photo evidence that was not sent
+            (`photo-required`, CHG-CSA-016).
+          x-ticvai-problem-types:
+          - photo-required
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /food-safety/corrective-actions/{actionId}/action:
@@ -7212,6 +7429,388 @@ paths:
         '422':
           description: A `defaultMenuIds` entry that is not an active menu at this venue (`unknownMenu`), or a
             `deliveryPolicyId` that does not exist (`unknownDeliveryPolicy`).
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /waste-approval-policy:
+    get:
+      operationId: getWasteApprovalPolicy
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q192 (BO-139, FNB-5E): a waste-approval policy the venue switches
+        on or off; shape follows getFnbReservationPolicy'
+      summary: The venue's waste-approval policy
+      description: '**Off by default** (Chinmay, 2 October, workbook Q192; CHG-CSA-016). A venue that never set
+        one reads the default: `enabled` false and no bands.
+
+        '
+      tags:
+      - production
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The policy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WasteApprovalPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    put:
+      operationId: setWasteApprovalPolicy
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q192 (BO-139, FNB-5E bands AED 100 / 500 / 2,000, photo above
+        AED 500): a policy the venue switches on or off; shape follows setFnbReservationPolicy'
+      summary: Switch waste approval on or off, and set its bands
+      description: '**A waste-approval policy the venue can switch on or off** (Chinmay, 2 October, workbook Q192;
+        audit R144 widened to waste; CHG-CSA-016). When `enabled`, `recordWaste` checks the record''s value
+        against `bands`: each band from its `fromValue` says whether it needs approval and who approves
+        (`approverPermission`), raised as an approval request through the approvals matrix, and a photo is
+        required at or above `photoRequiredAbove`. When off, waste is written off when recorded. One policy per
+        venue; the whole policy is replaced.
+
+        '
+      tags:
+      - production
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: One policy per venue, the caller's venue; there is no key in the path.
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WasteApprovalPolicy'
+      responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WasteApprovalPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /outlets/{outletId}/kitchen-routing:
+    parameters:
+    - name: outletId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getKitchenRoutingRules
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q189 and Q190 (BO-135, DI-323): item routing + category rules + a
+        fallback station, and a default station named per outlet; shape follows getFnbReservationPolicy'
+      summary: An outlet's kitchen routing rules
+      description: 'The category rules, the default station and the fallback station of one outlet
+        (CHG-CSA-015). The item rules are on the stations themselves (`KitchenStation.menuItemIds`,
+        `listKitchenStations`).
+
+        '
+      tags:
+      - kitchen
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: outlet
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The rules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KitchenRoutingRules'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    put:
+      operationId: setKitchenRoutingRules
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q189 and Q190 (BO-135, DI-323); shape follows setCourseRules'
+      summary: Set an outlet's category rules, default station and fallback station
+      description: '**Item routing, then category rules, then the default station** (Chinmay, 2 October, workbook
+        Q189 and Q190; DI-323, client-requested; CHG-CSA-015). When an order is sent, each line goes to:
+
+        1. the station whose `menuItemIds` names the item (item routing, `setKitchenStations`);
+
+        2. otherwise the first `categoryRules` entry matching the item''s menu section or product category;
+
+        3. otherwise the outlet''s `defaultStationId`. **An item is never refused at Send to kitchen for want
+        of a station.**
+
+        If the station a line routes to is inactive or every display assigned to it is down, its ticket goes to
+        `fallbackStationId` instead (DI-323: the fallback display). Every station named must belong to this
+        outlet, or to the producing outlet that serves it (`KitchenStation.servesOutletIds`); otherwise `422`.
+
+        '
+      tags:
+      - kitchen
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: outlet
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KitchenRoutingRules'
+      responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '422':
+          description: A station named is not this outlet's and does not serve it (`unknown-station`).
+          x-ticvai-problem-types:
+          - unknown-station
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KitchenRoutingRules'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /prep-sheet-template:
+    get:
+      operationId: getPrepSheetTemplate
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q185 (BO-112): prep sheets print from a print template, to kitchen
+        printers and the browser; shape follows getFnbReservationPolicy'
+      summary: The venue's prep-sheet print template
+      description: 'How a production plan prints (CHG-CSA-014). A venue that never set one reads the default:
+        grouped by station, A4 for the browser and 80 mm for a kitchen printer.
+
+        '
+      tags:
+      - production
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The template
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrepSheetTemplate'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    put:
+      operationId: setPrepSheetTemplate
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q185 (BO-112); shape follows setCourseRules'
+      summary: Set the prep-sheet print template
+      description: '**A print template, not a browser print of the station view** (Chinmay, 2 October, workbook
+        Q185; CHG-CSA-014). One per venue, replaced whole. `printPrepSheet` renders a plan through it.
+
+        '
+      tags:
+      - production
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: One template per venue, the caller's venue; there is no key in the path.
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrepSheetTemplate'
+      responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrepSheetTemplate'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /production-plans/{planId}/prep-sheet:
+    parameters:
+    - name: planId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: printPrepSheet
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q185 and Q187 (BO-112, BO-134): prep sheets print from a template to
+        kitchen printers (release 1) and the browser; shape follows printOrderLabel'
+      summary: Print a production plan's prep sheet
+      description: '**To the kitchen printers or the browser** (Chinmay, 2 October, workbook Q185; kitchen printers
+        are in release 1, workbook Q187; CHG-CSA-014). Renders the plan through the venue''s prep-sheet template
+        (`getPrepSheetTemplate`) and returns the sheet. With `target` `stationPrinters`, each station''s part is
+        also sent to the printers assigned to that station (`KitchenStation.printerDeviceIds`); a station with no
+        printer is listed in `notPrinted`, never silently skipped. With `target` `browser`, nothing is sent and
+        the client prints what is returned.
+
+        '
+      tags:
+      - production
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - target
+              properties:
+                target:
+                  type: string
+                  enum:
+                  - browser
+                  - stationPrinters
+                stationIds:
+                  type: array
+                  description: Only these stations' parts. Empty means every station in the plan.
+                  items:
+                    type: string
+                    format: uuid
+      responses:
+        '200':
+          description: The rendered prep sheet
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrepSheet'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The plan is not released yet (`plan-not-released`); a draft plan prints only to the browser.
+          x-ticvai-problem-types:
+          - plan-not-released
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /outlets/{outletId}/table-reservations:
+    parameters:
+    - name: outletId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: createTableReservationForGuest
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: contract gap CHG-WIR-011 (POS-028: the v2 Reservations tab needs a staff booking
+        create; createTableReservation is guest-only); shape follows createTableReservation'
+      summary: Book a table for a guest (staff)
+      description: '**A host or cashier books a table on a guest''s behalf** (contract gap logged in CHG-WIR-011 for
+        POS-028; built in CHG-CSA-045). The same booking as `createTableReservation` (the same deposit rule,
+        `orders.DepositPolicy.dining`, the same states), taken by staff: the outlet is the one in the path, the
+        guest is named by `subjectId` where known or by `guestName` and `contactPoint`, and the booking records
+        who took it (`TableReservation.takenByPrincipalId`). Where a deposit applies, the booking is created
+        `awaitingDeposit` and the deposit is taken at the till like any other line.
+
+        Amending or cancelling a booking from the staff app (EMP-055) is a later-block gap (CHG-CSA-047).
+
+        '
+      tags:
+      - fnb
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TableReservation'
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Booked, or `awaitingDeposit` where a deposit applies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TableReservation'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '409':
+          description: No cover is free at that time for that party size (`no-availability`).
+          x-ticvai-problem-types:
+          - no-availability
           content:
             application/problem+json:
               schema:
@@ -7701,6 +8300,15 @@ components:
           nullable: true
           description: '**The ceiling on a single booking.** A reservation extended by hand past this
             needs the manager, because the table after it is somebody else''s booking.'
+        reservedLeadMinutes:
+          type: integer
+          minimum: 0
+          nullable: true
+          description: '**When a table shows Reserved** (Chinmay, 2 October, workbook Q202; DI-689; CHG-CSA-012). A
+            table shows Reserved when a booking names it; with this set, it also shows Reserved this many minutes
+            before a booking pre-allocated to it starts. Null, the default, means only a named table shows Reserved
+            and other arrivals show in the next-arrivals strip. Set by the venue, per outlet where the outlet has
+            its own policy.'
         isActive:
           type: boolean
         scopePath:
@@ -8347,6 +8955,19 @@ components:
         calledByPrincipalId:
           type: string
           format: uuid
+        source:
+          type: string
+          readOnly: true
+          enum:
+          - manual
+          - dailyCount
+          default: manual
+          description: '**Who took the item off** (CHG-CSA-017). `manual`: a person, through `setItemAvailability`.
+            `dailyCount`: the item''s `remainingCount` reached zero and the system marked it unavailable
+            (`setMenuItemDailyCount`; Chinmay, 2 October, workbook Q194). An automatic 86 carries no
+            `calledByPrincipalId`.
+
+            '
         refusedOrderCount:
           type: integer
           default: 0
@@ -8882,9 +9503,33 @@ components:
           description: 5.1.2. Several bookings managed as one party across adjacent tables.
         notes:
           type: string
-          description: Allergies
-          occasion: null
-          accessibility.: null
+          description: Allergies, accessibility needs and other requests, as the guest wrote them.
+        seatingPreference:
+          type: string
+          maxLength: 64
+          nullable: true
+          description: '**The seating area the guest asked for**, e.g. indoor, terrace, majlis (Chinmay, 2 October,
+            workbook Q204; DI-791; CHG-CSA-018). The outlet''s own area names, as the waitlist''s
+            `RestaurantWaitlist.seatingPreference` takes them. A preference, not a table: the host seats the
+            party on the night.'
+        occasion:
+          type: string
+          nullable: true
+          enum:
+          - birthday
+          - anniversary
+          - business
+          - celebration
+          - other
+          description: The occasion the guest named (workbook Q204, DI-337; CHG-CSA-018). Shown to the host and
+            the server; never a price.
+        takenByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The staff member who took the booking (`createTableReservationForGuest`); null for a guest's
+            own booking (CHG-CSA-045).
         actualPartySize:
           type: integer
           nullable: true
@@ -9742,8 +10387,15 @@ components:
         productVariantId:
           type: string
           format: uuid
-          description: 'The catalogue variant this item sells. Pricing and tax come from there — a menu
-            is a presentation of the catalogue, not a second catalogue.
+          description: '**The catalogue variant this item links to, for reporting, stock and tax class only. It
+            is not where the price comes from** (Chinmay, 2 October, workbook Q34; CHG-CSA-009). F&B owns its own
+            catalogue: F&B prices were migrated into the F&B service so ticketing scales as an isolated service
+            (ADR-0028), and the price an outlet sells at is `price` on this item. The central catalogue prices
+            tickets and single-price booths; it never reprices a dish. A menu belongs to one outlet, so `price` is
+            that outlet''s price, and an outlet may set its own; it changes through `updateMenu`, `setMenuSections`
+            or `applyMenuActions` (`reprice`). Tax is computed on the order line by the tax engine. (Replaces the
+            earlier text "pricing and tax come from there — a menu is a presentation of the catalogue", which was
+            stale.)
 
             '
         name:
@@ -9754,6 +10406,26 @@ components:
         price:
           x-ticvai-column: list_price
           $ref: ../shared/common.yaml#/components/schemas/Money
+        dailyCount:
+          type: integer
+          minimum: 0
+          nullable: true
+          readOnly: true
+          description: '**How many portions the kitchen set for today** (`setMenuItemDailyCount`; Chinmay,
+            2 October, workbook Q194; CHG-CSA-017). Null means the item is not counted. Reset at the venue day
+            start.
+
+            '
+        remainingCount:
+          type: integer
+          minimum: 0
+          nullable: true
+          readOnly: true
+          description: '**What is left of `dailyCount`** ("6 left" on the till and the guest menu). Each sale
+            takes from it; **at zero the item is marked unavailable automatically**, with an `EightySixEvent`
+            whose `source` is `dailyCount`. Null where the item is not counted.
+
+            '
         sortOrder:
           type: integer
         modifierGroupIds:
@@ -9996,6 +10668,18 @@ components:
         outletId:
           type: string
           format: uuid
+        paymentTiming:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/OutletPaymentTiming
+          readOnly: true
+          description: The outlet's payment timing when the order was placed (CHG-CSA-010), kept as a snapshot.
+        sentToKitchenAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When the order's kitchen tickets were created. Null on a `payFirst` order not yet paid
+            (CHG-CSA-010).
         serviceMode:
           $ref: '#/components/schemas/ServiceMode'
         tableVisitId:
@@ -10599,8 +11283,239 @@ components:
             is down — 18 Aug minute). Absent where the station has no display assigned.
 
             '
+        printerDeviceIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: '**The kitchen printers assigned to this station** (Chinmay, 2 October, workbook Q187:
+            kitchen printers are in release 1; CHG-CSA-014), as tenancy `RegisteredDevice` ids of kind
+            `receiptPrinter` or `labelPrinter`. A station may have printers, displays or both; a ticket for a
+            station with printers is printed there as well as shown, and `printPrepSheet` sends the station''s
+            part of a prep sheet to them.
+
+            '
+        servesOutletIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: '**A producing outlet''s station serving other outlets** (Chinmay, 2 October, workbook
+            Q186 and Q188; DI-330; CHG-CSA-015). `outletId` is the producing outlet (the commissary or main
+            kitchen); the outlets listed here route their orders to this station as if it were their own. Empty,
+            the default, means the station serves only its own outlet.
+
+            '
         isActive:
           type: boolean
+    KitchenRoutingRules:
+      type: object
+      x-ticvai-persistence: fnb.kitchen_routing_rule
+      description: '**Where a line goes when its item names no station** (Chinmay, 2 October, workbook Q189 and Q190;
+        DI-323; CHG-CSA-015). Item rules are `KitchenStation.menuItemIds`; these are the category rules, the
+        default station and the fallback station of one outlet. One row per outlet.
+
+        '
+      required:
+      - defaultStationId
+      properties:
+        outletId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: The outlet in the path.
+        categoryRules:
+          type: array
+          x-ticvai-persistence-kind: valueObject
+          x-ticvai-persistence-column: jsonb
+          description: Tried in order; the first match wins.
+          items:
+            type: object
+            required:
+            - matchKind
+            - matchValue
+            - stationId
+            properties:
+              matchKind:
+                type: string
+                enum:
+                - menuSection
+                - productCategory
+              matchValue:
+                type: string
+                description: A `MenuSection.code`, or a catalogue product category code.
+              stationId:
+                type: string
+                format: uuid
+        defaultStationId:
+          type: string
+          format: uuid
+          description: Where a line that matches no item rule and no category rule goes (workbook Q190). Never
+            refused for want of a station.
+        fallbackStationId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Where a ticket goes when the station it routed to is inactive or every display assigned to it
+            is down (DI-323).
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `outlet` scope.'
+    WasteApprovalPolicy:
+      type: object
+      x-ticvai-persistence: fnb.waste_approval_policy
+      description: '**Whether waste needs approval, and above what value** (Chinmay, 2 October, workbook Q192;
+        CHG-CSA-016). Off by default: a venue that never set one has `enabled` false. One row per venue.
+
+        '
+      required:
+      - enabled
+      properties:
+        enabled:
+          type: boolean
+          default: false
+        bands:
+          type: array
+          x-ticvai-persistence-kind: valueObject
+          x-ticvai-persistence-column: jsonb
+          description: Value bands in ascending `fromValue`; a record's value falls in the last band it reaches. A
+            value below the first band needs nothing.
+          items:
+            type: object
+            required:
+            - fromValue
+            - requiresApproval
+            properties:
+              fromValue:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+              requiresApproval:
+                type: boolean
+              approverPermission:
+                type: string
+                nullable: true
+                description: The permission an approver in this band holds (a value of the permission vocabulary,
+                  e.g. `APPROVAL_ACT`).
+        photoRequiredAbove:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          description: At or above this value a photo is required (`recordWaste.photoAssetId`). Null means never.
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+    PrepSheetTemplate:
+      type: object
+      x-ticvai-persistence: fnb.prep_sheet_template
+      description: '**How a production plan prints** (Chinmay, 2 October, workbook Q185; CHG-CSA-014). One per venue.
+
+        '
+      properties:
+        groupBy:
+          type: string
+          enum:
+          - station
+          - item
+          default: station
+        browserPaper:
+          type: string
+          enum:
+          - a4
+          - letter
+          default: a4
+        printerPaper:
+          type: string
+          enum:
+          - thermal80mm
+          - thermal58mm
+          default: thermal80mm
+        columns:
+          type: array
+          description: The columns printed, in order.
+          items:
+            type: string
+            enum:
+            - item
+            - plannedQuantity
+            - suggestedQuantity
+            - unit
+            - station
+            - allergens
+            - notes
+        headerText:
+          type: string
+          maxLength: 200
+          nullable: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
+    PrepSheet:
+      type: object
+      x-ticvai-persistence: none — rendered from the production plan and the template
+      description: A production plan rendered through the venue's prep-sheet template (`printPrepSheet`, CHG-CSA-014).
+      required:
+      - planId
+      - sections
+      properties:
+        planId:
+          type: string
+          format: uuid
+        renderedAt:
+          type: string
+          format: date-time
+        sections:
+          type: array
+          items:
+            type: object
+            properties:
+              stationId:
+                type: string
+                format: uuid
+                nullable: true
+              title:
+                type: string
+              lines:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    item:
+                      type: string
+                    plannedQuantity:
+                      type: number
+                    suggestedQuantity:
+                      type: number
+                      nullable: true
+                    unit:
+                      type: string
+                    allergens:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/AllergenCode'
+        printedTo:
+          type: array
+          description: The printers each station's part was sent to (`target` `stationPrinters`).
+          items:
+            type: object
+            properties:
+              stationId:
+                type: string
+                format: uuid
+              deviceId:
+                type: string
+                format: uuid
+        notPrinted:
+          type: array
+          description: Stations in the plan with no printer assigned; never silently skipped.
+          items:
+            type: string
+            format: uuid
     Recipe:
       x-ticvai-persistence: fnb.recipe + fnb.recipe_ingredient
       type: object
