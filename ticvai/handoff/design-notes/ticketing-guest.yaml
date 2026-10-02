@@ -3263,6 +3263,8 @@ screens:
       - what: The approved build shows a cart-hold countdown of 300 seconds with up to two extensions; the contract's cart window is 15 minutes with one 5-minute extension proposed, and seats are held 8 minutes.
         why: Three different hold clocks for one sale; the till should show the contract's.
         source: screens/P04-point-of-sale.yaml#POS-002 wireframe.prototype.differences; contracts/spine/orders.yaml#extendCart; contracts/spine/orders.yaml#addCartLine
+        status: fixed
+        by: CHG-SPO-015
       - what: Raw filters (Venue id, Kind, Is sellable) and twelve "Every …" tables, and some 25 operation buttons (game cards, retail returns, exchanges, sync orders) on the sell screen.
         why: The sell screen is tiles, cards and the cart; post-sale actions live on POS-011, POS-026 and POS-030, and the hot functions are Refund, Check transaction and Print last receipt.
         source: screens/P04-point-of-sale.yaml#POS-002 layout; DI-132
@@ -3276,6 +3278,8 @@ screens:
       - what: The approved build adds a waitlist for sold-out events, gift-voucher face-value sales and group bundles with no declared operations.
         why: Either declare them or leave them out of the design.
         source: screens/P04-point-of-sale.yaml#POS-002 wireframe.prototype.differences
+        status: fixed
+        by: CHG-SPO-015
     decisions:
     - question: Which hot functions sit always visible beside the search ("magic banner")?
       decision: 'Drawn default accepted: Refund, Check transaction, Print last receipt, plus search.'
@@ -3316,6 +3320,8 @@ screens:
       - what: The screen is modelled as a page, while the 3 August decision made it a drawer step.
         why: Recorded gap; the design should draw the drawer.
         source: screens/P04-point-of-sale.yaml#POS-003 gaps
+        status: fixed
+        by: CHG-SPO-015
 
   POS-004:
     summary: >-
@@ -3355,6 +3361,8 @@ screens:
       - what: The approved build has a zone-priced general-admission flow (zones, tiers, keep the party together) with no screen.
         why: Draw it in the drawer as the zone-only seat model.
         source: screens/P04-point-of-sale.yaml#POS-004 wireframe.prototype.differences; DI-410
+        status: fixed
+        by: CHG-SPO-001
 
   POS-005:
     summary: >-
@@ -3396,6 +3404,8 @@ screens:
       - what: Raw retail-sale filters (Outlet id, Shift id, Created from/to) on the payment screen.
         why: Payment completes one sale; no list.
         source: screens/P04-point-of-sale.yaml#POS-005 layout
+        status: fixed
+        by: CHG-SPO-015
 
   POS-006:
     summary: >-
@@ -3422,9 +3432,13 @@ screens:
       - what: Staff list filters typed as text (Venue id, Principal id, Shift id, Status).
         why: The list is this terminal's holds with a search; ids are not typed.
         source: screens/P04-point-of-sale.yaml#POS-006 layout
+        status: fixed
+        by: CHG-SPO-015
       - what: Parked cart tabs (max 4) and held orders are two hold mechanisms in the approved build.
         why: One concept for the cashier; decide whether tabs are held orders.
         source: screens/P04-point-of-sale.yaml#POS-006 wireframe.prototype.differences
+        status: fixed
+        by: CHG-SPO-015
 
   POS-010:
     summary: >-
@@ -3453,6 +3467,8 @@ screens:
       - what: No prototype frame (match none).
         why: Needs a frame.
         source: screens/P04-point-of-sale.yaml#POS-010 wireframe
+        status: logged
+        by: CHG-SPO-020
 
   POS-014:
     summary: >-
@@ -3475,9 +3491,13 @@ screens:
       - what: The no-sale form asks the cashier for "Id" and "Recorded at".
         why: Both are set by the till.
         source: screens/P04-point-of-sale.yaml#POS-014 layout
+        status: fixed
+        by: CHG-SPO-015
       - what: The approval modal's reject path is not modelled.
         why: The design draws it; the screen should declare it.
         source: screens/P04-point-of-sale.yaml#POS-014 wireframe.prototype.differences
+        status: fixed
+        by: CHG-SPO-015
 
   POS-030:
     summary: >-

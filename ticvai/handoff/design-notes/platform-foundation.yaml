@@ -757,6 +757,8 @@ screens:
         Allocation needs a cashier, the float (total or denominations) and the workstation; the rest is computed
         or closing data. Replace with the allocation form.
       source: screens/P04-point-of-sale.yaml#POS-016; contracts/spine/shift.yaml#allocateDepositBox
+      status: fixed
+      by: CHG-SPO-015
     - what: '"Record device heartbeat" is a button with a form (status, recordedAt).'
       why: >-
         recordDeviceHeartbeat's audience is device only; the peripheral reports it. Show the last heartbeat read-only.
@@ -775,6 +777,8 @@ screens:
         They were generated from a response schema; ids, statuses and computed totals are not typed by anybody.
         Replace with the real form the write operation needs (or a read-only summary).
       source: screens/P04-point-of-sale.yaml#POS-016
+      status: fixed
+      by: CHG-SPO-015
     - what: formRecordDeviceHeartbeat asks the person for status.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
@@ -790,6 +794,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P04-point-of-sale.yaml#POS-016
+      status: fixed
+      by: CHG-SPO-015
     decisions:
     - question: Which terminal toggles (printer, offline continuity, screen prompts, key sounds, training mode) are workstation
         settings, and which are venue policy that the till only reads?
@@ -881,6 +887,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P04-point-of-sale.yaml#POS-019
+      status: fixed
+      by: CHG-SPO-015
     decisions:
     - question: Should the cashier ever see expected sales during or at close?
       decision: The cashier never sees expected sales during or at close (blind close).
@@ -956,6 +964,8 @@ screens:
         A home dashboard has nothing to create; the empty case is a till with no boards assigned, which should say
         who configures it.
       source: screens/P04-point-of-sale.yaml#POS-025
+      status: fixed
+      by: CHG-SPO-002
     - what: >-
         getCurrentShift requires SHIFT_OPEN; a supervisor covering the till without a shift of their own cannot
         load the home.
@@ -2871,6 +2881,8 @@ screens:
     - what: selectRole is not declared though staff hold several roles.
       why: ADR-0003 multi-role prompt; F64 has the steward take a venue and a role.
       source: ADR-0003; F64 step 1
+      status: fixed
+      by: CHG-SPO-018
     - what: >-
         Tables show every schema field, plumbing included: 'Every MFA method' drop id; 'Every SSO provider' drop
         id, scopePath.
@@ -2925,6 +2937,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P06-staff-app.yaml#EMP-002; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SPO-018
   EMP-042:
     block: B
     summary: >-
@@ -2973,6 +2987,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P06-staff-app.yaml#EMP-042
+      status: fixed
+      by: CHG-SPO-018
   EMP-043:
     block: B
     summary: >-
@@ -3012,11 +3028,15 @@ screens:
     - what: requiresModule is 'marketing' on the handheld's device settings.
       why: Device settings are core.
       source: screens/P06-staff-app.yaml#EMP-043
+      status: fixed
+      by: CHG-SPO-018
     - what: formRegisterDevice asks the person for id.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P06-staff-app.yaml#EMP-043
+      status: fixed
+      by: CHG-SPO-018
     - what: >-
         Tables show every schema field, plumbing included: 'Every registered device' drop id, driver, workstationId,
         pushToken, pushPlatform, pushFailureCount.
@@ -3025,6 +3045,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P06-staff-app.yaml#EMP-043
+      status: fixed
+      by: CHG-SPO-018
   EMP-046:
     block: B
     summary: >-
@@ -3134,12 +3156,16 @@ screens:
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P07-staff-scanner.yaml#SCN-011
+      status: fixed
+      by: CHG-SPO-018
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P07-staff-scanner.yaml#SCN-011; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SPO-018
   SUP-001:
     block: B
     summary: >-

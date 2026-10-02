@@ -1,0 +1,43 @@
+id: CHG-SPO-003
+date: '2026-10-02'
+source: client-review
+kind: spec
+summary: POS-007 shows a counted shift as "Under review", lets the cashier sign out without blocking the next shift, and gives
+  the supervisor Ask for a recount and the count lines on any till.
+decision:
+  what: 'POS-007 binds rejectShiftVariance (supervisor PIN, reason) and getShiftCountLines (permissioned OVERSHORT_ACCEPT);
+    the pendingVariance state reads "Under review" with sign-out allowed and resolution at any till or in the daily cash reconciliation;
+    a recountRequested state and machine transition; POS-001 notes that a pending shift never blocks the next. closeShift
+    on POS-007 is NOT bound: see CHG-SPO-021.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026: batch 3 #1 (POS-007, "The cashier may sign out ... must not stop the next cashier starting
+  a shift ... On the cashier''s page it shows Under review"), batch 6 #173 to #175 (BO-040: any till with supervisor PIN;
+  Reject + recount, DI-804) and the pre-apply round. DEC-059, DEC-173, DEC-175; contract CHG-CSP-012, CHG-CSP-013, CHG-CSP-014;
+  blind close CHG-FIN-003.'
+keys_touched:
+  screens:
+  - POS-007
+  - POS-001
+  operations:
+  - rejectShiftVariance
+  - getShiftCountLines
+  - submitShiftCount
+  - acceptShiftVariance
+  files:
+  - screens/P04-point-of-sale.yaml
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-001
+  - APP-POS-POS-007
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-finance-rules.py
+status: open
+notes: 'check-finance-rules F-BLIND-CLOSE keeps the new supervisor components behind OVERSHORT_ACCEPT and refuses any expected
+  figure to the cashier. Applied in worktree screens-pos-staff (batch SPO, phase B, 2 October 2026). Tickets: none started
+  (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys of the touched screens.'

@@ -1166,6 +1166,8 @@ screens:
     - what: The screen sits in the venue-operations process (module Virtual Queue)
       why: It belongs to the F&B and retail process; refine there.
       source: screens/P04-point-of-sale.yaml#POS-029
+      status: fixed
+      by: CHG-SPO-015
   EMP-048:
     summary: >-
       On the Staff App, before the first guest arrives, a steward or technician works the opening checklist for
@@ -1436,6 +1438,8 @@ screens:
         Ids are never typed; status and priority are closed sets; the person's own queue is the default, not a filter
         (per VO-R12).
       source: screens/P06-staff-app.yaml#EMP-004 | contracts/satellite/maintenance.yaml#listWorkOrders
+      status: fixed
+      by: CHG-SPO-018
     - what: >-
         Fourteen lifecycle buttons (verify, close, cancel, complete, parts, time, save, start, pause...) on the
         list screen
@@ -1463,6 +1467,8 @@ screens:
         value and WorkOrder no acceptedAt, so the outlined/solid distinction cannot be drawn from the read.
       source: >-
         contracts/satellite/maintenance.yaml#/components/schemas/WorkOrderStatus | contracts/satellite/maintenance.yaml#acceptWorkOrder
+      status: logged
+      by: CHG-SPO-019
     - what: Navigation entry only from EMP-006 and inferred exits to Sign in and Select venue
       why: The task list is reached from the on-duty home (F08 step 5) and returns there.
       source: F08 step 5 | screens/P06-staff-app.yaml#EMP-004
@@ -1636,9 +1642,13 @@ screens:
         labour time, with one reason vocabulary.
       source: >-
         contracts/satellite/maintenance.yaml#pauseWorkOrder | contracts/satellite/maintenance.yaml#recordWorkOrderTime
+      status: logged
+      by: CHG-SPO-019
     - what: recordWorkOrderTime requires `id` in the body
       why: A time entry id is server-owned or a device idempotency key, never a field (per VO-R03).
       source: contracts/satellite/maintenance.yaml#recordWorkOrderTime
+      status: logged
+      by: CHG-SPO-019
     - what: >-
         Complete, Record parts and Record time need WORK_ORDER_MANAGE while Accept/Start/Pause need MAINTENANCE_EXECUTE
       why: >-
@@ -1646,6 +1656,8 @@ screens:
         their own job. Completing and recording parts and time are execution acts.
       source: >-
         contracts/satellite/maintenance.yaml#completeWorkOrder | contracts/satellite/maintenance.yaml#recordWorkOrderParts
+      status: logged
+      by: CHG-SPO-019
     - what: Verify, Close, Cancel and Save (reassign, reprioritise) on the technician's task screen
       why: Supervisor acts (verifier may not be the technician); they belong to BO-030 and BO-070.
       source: contracts/satellite/maintenance.yaml#verifyWorkOrder | F12 step 4
@@ -1658,6 +1670,8 @@ screens:
         job has nowhere to hold checklist answers.
       source: >-
         screens/P06-staff-app.yaml#EMP-005 | DI-911 | contracts/satellite/maintenance.yaml#/components/schemas/MaintenancePlan
+      status: logged
+      by: CHG-SPO-019
     decisions:
     - question: The pack's field actions include Acknowledge, Travelling and Arrived before Start. Are these needed, or is
         Accept then Start enough?
@@ -3172,23 +3186,31 @@ screens:
         Both writes need INCIDENT_MANAGE and are supervisor acts (EMP-027, BO-072); the reporter needs reportIncident
         only.
       source: contracts/satellite/maintenance.yaml#recordAuthorityNotification | F69 step 2
+      status: fixed
+      by: CHG-SPO-018
     - what: Near miss is both a kind and a severity
       why: >-
         IncidentKind and IncidentSeverity both contain nearMiss, so "Guest injured / Near miss" is possible and
         meaningless. The pack's severity scale is S1 Critical to S5 Observation with kind kept separate.
       source: >-
         screens/P06-staff-app.yaml#EMP-026 | contracts/satellite/maintenance.yaml#/components/schemas/IncidentSeverity
+      status: logged
+      by: CHG-SPO-019
     - what: No way to report a hazard (an unsafe condition before anything happened)
       why: >-
         The pack and the 17 September workshop keep hazards (exposed wiring by a queue) separate from near misses
         and incidents, with an initial risk level; IncidentKind has no hazard and the incident has no risk level.
       source: screens/P06-staff-app.yaml#EMP-026 | MoM 2026-09-17 4.5 | MATRIX 17.5.3
+      status: logged
+      by: CHG-SPO-019
     - what: Nothing sets isReportable or notificationDueAt
       why: >-
         The statutory clock BO-072 and EMP-027 count down is read from the incident, but neither reportIncident
         nor updateIncident writes it, and no rule derives it from kind and severity.
       source: >-
         contracts/satellite/maintenance.yaml#/components/schemas/Incident | contracts/satellite/maintenance.yaml#reportIncident
+      status: logged
+      by: CHG-SPO-019
     decisions:
     - question: Should the incident kinds follow the pack's categories (Guest, Employee, Contractor, Ride/attraction, Electrical,
         Slip/trip/fall, Mechanical...) rather than the contract's ten?
@@ -3791,6 +3813,8 @@ screens:
     - what: Customer photo on the result (DI-129) is still an open question
       why: The validation result has no photo; only accreditation verification returns one.
       source: DI-129 | contracts/spine/access.yaml#/components/schemas/ValidationResult
+      status: logged
+      by: CHG-SPO-019
     decisions:
     - question: Should the admitted state show the guest's photo for name-bound passes?
       decision: 'Drawn default accepted: Show name only; photo for accreditation credentials.'

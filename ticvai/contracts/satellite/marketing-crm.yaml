@@ -3743,6 +3743,7 @@ paths:
         - "P02 GST-039 Profile"
         - "P02 GST-065 Newsletter & Preferences"
         - "P08 BO-748 Consent Capture & Versions"
+        - "P04 POS-027 Guest Lookup"
       x-ticvai-audience:
       - guest
       - staff

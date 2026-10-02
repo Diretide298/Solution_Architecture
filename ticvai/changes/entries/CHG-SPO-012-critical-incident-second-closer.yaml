@@ -1,0 +1,30 @@
+id: CHG-SPO-012
+date: '2026-10-02'
+source: client-review
+kind: spec
+summary: On EMP-027 a critical incident is closed by another supervisor, never by the person who completed its corrective
+  action.
+decision:
+  what: 'EMP-027: Close is hidden for the person who completed the action, with a denied state for 403 closer-completed-action.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, workbook Q530 (EMP-027; DEC-530, the default): segregation of duties. Contract CHG-CSA-033.'
+keys_touched:
+  screens:
+  - EMP-027
+  operations:
+  - updateIncident
+  files:
+  - screens/P06-staff-app.yaml
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Block D screen. Applied in worktree screens-pos-staff (batch SPO, phase B, 2 October 2026). Tickets: none started
+  (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys of the touched screens.'

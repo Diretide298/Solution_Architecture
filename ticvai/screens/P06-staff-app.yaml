@@ -182,6 +182,13 @@ screens:
         notes: 'Only when the PIN was reset and is temporary: a new one twice before anything else; the
           last five cannot be reused (audit R132).'
         provenance: contract identity.yaml POST /auth/credential
+      - kind: secondaryButton
+        label: Choose venue and role
+        operation: selectRole
+        notes: 'Shown when `LoginResponse.requiresRoleSelection` is true: a steward takes a venue and
+          a role (ADR-0003; F64 step 1; design-notes correction platform-foundation EMP-001). EMP-002
+          is where the role is changed later.'
+        provenance: contract identity.yaml POST /auth/select-role
   states:
     loading: Checking the credential. The form stays visible and disabled.
     emptyFirstRun: '**Nobody signed in** - the normal state of a door. A shared handheld between shifts
@@ -240,6 +247,11 @@ screens:
   - operationId: getCurrentSession
     contract: identity
     purpose: Read the session the sign-in just opened, for the landing
+    trigger: onAction
+  - operationId: selectRole
+    contract: identity
+    purpose: Choose the venue and role to work as when login returns more than one (ADR-0003; F64 step
+      1)
     trigger: onAction
   entryState:
     params:
@@ -337,8 +349,8 @@ screens:
   states:
     loading: The select venue role list.
     error: Could not load. Names which read failed and leaves the select venue role untouched.
-    emptyFirstRun: No select venue role yet. **Offers no create action** — this screen declares no operation
-      that makes one — and says so rather than showing an empty table.
+    emptyFirstRun: '**One venue and one role**: nothing to choose, so the app goes straight on. Shown
+      only when the person holds no role at any venue, and says who at the tenant grants one.'
     emptyNoResults: 'Never shown: nothing on this screen filters its list, so an empty list is always
       the first-run state above.'
     emptyNoAccess: Shown when the caller lacks the permission the screen requires, and names it. **Never
@@ -1275,7 +1287,13 @@ screens:
     which answers only what happens next (closed, with your supervisor, or awaiting close approval); the
     variance alerts the supervisors on the venue''s alerting channel and appears on BO-040. The cashier
     may add a reason and a note with every count (DI-803). A recount the supervisor asks for is counted
-    blind again (DI-804). Retail practice: docs/active/research-uae-vat-and-blind-close-2-october.md.'
+    blind again (DI-804). Retail practice: docs/active/research-uae-vat-and-blind-close-2-october.md.
+
+
+    **No cash count for a server** (decided 2 October 2026, Chinmay; DEC-200; CHG-CSP-039; CHG-SPO-009).
+    A handheld takes no cash, so a server''s End shift has no drawer and no count: it closes the service
+    day (unsynced orders, open tables). The blind count and the variance acceptance on this screen are
+    for a cashier whose drawer is on a till.'
   density: comfortable
   pattern: approvalInbox
   patternReason: '`approveShiftOpen` decides items that `listCashMovements` queues — every row is waiting
@@ -2865,25 +2883,11 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: textField
-        label: Assigned to principal id
+      - kind: multiSelect
+        label: Status and priority
         operation: listWorkOrders
-        notes: Sends `?assignedToPrincipalId=` to `listWorkOrders`.
-        provenance: contract maintenance.yaml GET /work-orders
-      - kind: textField
-        label: Status
-        operation: listWorkOrders
-        notes: Sends `?status=` to `listWorkOrders`.
-        provenance: contract maintenance.yaml GET /work-orders
-      - kind: textField
-        label: Priority
-        operation: listWorkOrders
-        notes: Sends `?priority=` to `listWorkOrders`.
-        provenance: contract maintenance.yaml GET /work-orders
-      - kind: textField
-        label: Asset id
-        operation: listWorkOrders
-        notes: Sends `?assetId=` to `listWorkOrders`.
+        notes: Chips from the closed sets; my own queue is the default, not a filter (VO-R12; design-notes
+          correction venue-operations EMP-004). No ids are typed.
         provenance: contract maintenance.yaml GET /work-orders
       - kind: toggle
         label: Overdue only
@@ -2891,7 +2895,7 @@ screens:
         notes: Sends `?overdueOnly=` to `listWorkOrders`.
         provenance: contract maintenance.yaml GET /work-orders
       - kind: dataTable
-        label: Every work order
+        label: My work orders
         bindsTo: WorkOrder
         columns:
         - WorkOrder.downtimeMinutes
@@ -4323,6 +4327,14 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: metricTile
+        label: 'My service today: covers, tables, sales, tips'
+        bindsTo: ServiceSummary
+        operation: getServiceSummary
+        notes: 'For a server without a till (decided 2 October 2026, Chinmay, batch 6, EMP-008: "Yes:
+          a service summary (covers, tables, sales, tips)"; DEC-199; CHG-CSA-020). Self-scoped under REPORT_VIEW_OWN.
+          A cashier with a drawer sees the shift instead; neither ever sees expected cash (CHG-FIN-003).'
+        provenance: contract reporting.yaml GET /service-summary
       - kind: textField
         label: Workstation id
         operation: listShifts
@@ -4450,6 +4462,10 @@ screens:
   - operationId: listCashMovements
     contract: shift
     purpose: Lifts, adds and the opening float
+    trigger: onLoad
+  - operationId: getServiceSummary
+    contract: reporting
+    purpose: 'A server without a till: my covers, tables, sales and tips today (DEC-199; CHG-CSA-020)'
     trigger: onLoad
   entryState:
     params:
@@ -8384,19 +8400,10 @@ screens:
         label: Report incident
         operation: reportIncident
         provenance: contract maintenance.yaml POST /incidents
-      - kind: secondaryButton
-        label: Record authority notification
-        operation: recordAuthorityNotification
-        provenance: contract maintenance.yaml POST /incidents/{incidentId}/notify-authority
-      - kind: secondaryButton
-        label: Save incident
-        operation: updateIncident
-        provenance: contract maintenance.yaml PATCH /incidents/{incidentId}
   states:
     loading: The incident report list.
     error: Could not load. Names which read failed and leaves the incident report untouched.
-    emptyFirstRun: No incident report yet. Offers Record authority notification (`recordAuthorityNotification`);
-      distinct from a filter that matched nothing.
+    emptyFirstRun: Nothing reported yet by you today. Offers Report incident.
     emptyNoResults: Nothing matches the filter on severity, status, isReportable and the incident report
       are still there. Names the active filter and offers to clear it.
     emptyNoAccess: Shown when the caller lacks `INCIDENT_VIEW`, which `getIncident` requires, and names
@@ -8416,18 +8423,6 @@ screens:
     contract: maintenance
     purpose: List incidents
     trigger: onLoad
-  - operationId: recordAuthorityNotification
-    contract: maintenance
-    purpose: Record notification to an external authority
-    trigger: onAction
-    invalidates:
-    - listIncidents
-  - operationId: updateIncident
-    contract: maintenance
-    purpose: Investigate, escalate or close an incident
-    trigger: onAction
-    invalidates:
-    - listIncidents
   entryState:
     params:
     - name: incidentId
@@ -8481,45 +8476,17 @@ screens:
       - emergencyServicesCalled
       - attachmentRefs
     provenance: contract maintenance.yaml POST /incidents
-  - id: formRecordAuthorityNotification
-    component: modal
-    trigger: Record authority notification
-    body: '**Collects what `recordAuthorityNotification` sends before it is called.** Required: `authority`,
-      `notifiedAt`. Optional: `reference`, `notifiedByPrincipalId`, `attachmentRefs`. Dismissing sends
-      nothing; the screen behind is unchanged.'
-    confirm:
-      label: Record authority notification
-      operation: recordAuthorityNotification
-    dismiss:
-      label: Cancel
-      discards:
-      - authority
-      - notifiedAt
-      - reference
-      - notifiedByPrincipalId
-      - attachmentRefs
-    provenance: contract maintenance.yaml POST /incidents/{incidentId}/notify-authority
-  - id: formUpdateIncident
-    component: modal
-    trigger: Save incident
-    body: '**Collects what `updateIncident` sends before it is called.** Nothing in the body is required.
-      Optional: `status`, `severity`, `assignedToPrincipalId`, `investigationNote`, `rootCause`, `correctiveActions`,
-      `correctiveWorkOrderId`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Save incident
-      operation: updateIncident
-    dismiss:
-      label: Cancel
-      discards:
-      - status
-      - severity
-      - assignedToPrincipalId
-      - investigationNote
-      - rootCause
-      - correctiveActions
-      - correctiveWorkOrderId
-      - attachmentRefs
-    provenance: contract maintenance.yaml PATCH /incidents/{incidentId}
+  gaps:
+  - operation: recordAuthorityNotification
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-SPO-018): a supervisor act (INCIDENT_MANAGE) on EMP-027 and BO-072;
+      the reporter needs reportIncident only (F69 step 2; design-notes correction venue-operations EMP-026).'
+    source: F69 step 2 | contracts/satellite/maintenance.yaml#recordAuthorityNotification
+  - operation: updateIncident
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-SPO-018): a supervisor act (INCIDENT_MANAGE) on EMP-027 and BO-072;
+      the reporter needs reportIncident only (F69 step 2; design-notes correction venue-operations EMP-026).'
+    source: F69 step 2 | contracts/satellite/maintenance.yaml#recordAuthorityNotification
 - id: EMP-027
   name: Incident detail
   module: Operations
@@ -8669,6 +8636,10 @@ screens:
         label: Save incident
         operation: updateIncident
         provenance: contract maintenance.yaml PATCH /incidents/{incidentId}
+        notes: '**A critical incident is closed by another supervisor** (decided 2 October 2026, Chinmay,
+          batch 6, EMP-027; DEC-530; CHG-CSA-033): the person who completed the corrective action cannot
+          close it, and `updateIncident` refuses them 403 `closer-completed-action`. Close is hidden for
+          them, with "Another supervisor closes this incident".'
       - kind: secondaryButton
         label: Record authority notification
         operation: recordAuthorityNotification
@@ -8685,6 +8656,8 @@ screens:
       that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
     offline: Cached; updates queue
+    denied: 'Closing was refused: you completed the corrective action on this critical incident, so another
+      supervisor closes it (403 closer-completed-action; DEC-530).'
   apis:
   - operationId: getIncident
     contract: maintenance
@@ -10209,7 +10182,6 @@ screens:
         label: Every MFA method
         bindsTo: MfaMethod
         columns:
-        - MfaMethod.id
         - MfaMethod.kind
         - MfaMethod.label
         - MfaMethod.maskedTarget
@@ -10223,12 +10195,10 @@ screens:
         label: Every SSO provider
         bindsTo: SsoProvider
         columns:
-        - SsoProvider.id
         - SsoProvider.displayName
         - SsoProvider.protocol
         - SsoProvider.iconAssetRef
         - SsoProvider.isEnforced
-        - SsoProvider.scopePath
         operation: listSsoProviders
         provenance: contract identity.yaml GET /auth/sso/providers
     - name: contextPanel
@@ -10393,7 +10363,7 @@ screens:
 - id: EMP-043
   name: Device settings
   module: Operations
-  requiresModule: marketing
+  requiresModule: core
   wave: 1
   capability: C00
   implementation:
@@ -10454,29 +10424,13 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: textField
-        label: Workstation id
-        operation: listDevices
-        notes: Sends `?workstationId=` to `listDevices`.
-        provenance: contract tenancy.yaml GET /devices
-      - kind: textField
-        label: Kind
-        operation: listDevices
-        notes: Sends `?kind=` to `listDevices`.
-        provenance: contract tenancy.yaml GET /devices
       - kind: dataTable
         label: Every registered device
         bindsTo: RegisteredDevice
         columns:
-        - RegisteredDevice.id
         - RegisteredDevice.kind
-        - RegisteredDevice.driver
         - RegisteredDevice.identifier
-        - RegisteredDevice.workstationId
         - RegisteredDevice.model
-        - RegisteredDevice.pushToken
-        - RegisteredDevice.pushPlatform
-        - RegisteredDevice.pushFailureCount
         - RegisteredDevice.offlineScope
         - RegisteredDevice.firmwareVersion
         - RegisteredDevice.isRequired
@@ -10558,10 +10512,9 @@ screens:
   - id: formRegisterDevice
     component: modal
     trigger: Register device
-    body: '**Collects what `registerDevice` sends before it is called.** Required: `id`, `kind`, `driver`,
-      `workstationId`. Optional: `identifier`, `model`, `pushToken`, `pushPlatform`, `pushFailureCount`,
-      `offlineScope`, `firmwareVersion`, `isRequired`, `status`, `batteryPercent`, `lastCheckedAt`, `health`
-      and 5 more. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Registers this handheld.** The device id is a UUIDv7 the app generates silently; status and
+      timestamps are the server''s, so none of them is a field (design-notes correction platform-foundation
+      EMP-043).'
     bindsTo: RegisteredDevice
     confirm:
       label: Register device
@@ -10569,7 +10522,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - kind
       - driver
       - workstationId
@@ -11214,6 +11166,10 @@ screens:
         - TableMap.tables
         operation: getTableMap
         provenance: contract fnb.yaml GET /outlets/{outletId}/tables
+        notes: '**Table states** (DI-336; CHG-CSA-012): Available, Ordered, Table closed (a short state
+          after payment, ended by Make available; DEC-201, default) and Reserved, shown when a booking
+          names the table or from N minutes (the venue''s lead time) before a pre-allocated booking (decided
+          2 October 2026, Chinmay, batch 6; DEC-202).'
       - kind: searchField
         label: Search floor plan
         provenance: carried from the previous definition
@@ -11619,18 +11575,6 @@ screens:
       slot: fields
       components:
       - kind: textField
-        label: id
-        bindsTo: TableReservation.id
-        provenance: contract fnb.yaml POST /table-reservations
-      - kind: textField
-        label: outletId
-        bindsTo: TableReservation.outletId
-        provenance: contract fnb.yaml POST /table-reservations
-      - kind: textField
-        label: subjectId
-        bindsTo: TableReservation.subjectId
-        provenance: contract fnb.yaml POST /table-reservations
-      - kind: textField
         label: guestName
         bindsTo: TableReservation.guestName
         provenance: contract fnb.yaml POST /table-reservations
@@ -11655,24 +11599,8 @@ screens:
         bindsTo: TableReservation.tables[].tableId
         provenance: contract fnb.yaml POST /table-reservations
       - kind: textField
-        label: status
-        bindsTo: TableReservation.status
-        provenance: contract fnb.yaml POST /table-reservations
-      - kind: textField
-        label: groupId
-        bindsTo: TableReservation.groupId
-        provenance: contract fnb.yaml POST /table-reservations
-      - kind: textField
         label: notes
         bindsTo: TableReservation.notes
-        provenance: contract fnb.yaml POST /table-reservations
-      - kind: textField
-        label: actualPartySize
-        bindsTo: TableReservation.actualPartySize
-        provenance: contract fnb.yaml POST /table-reservations
-      - kind: textField
-        label: tableVisitId
-        bindsTo: TableReservation.tableVisitId
         provenance: contract fnb.yaml POST /table-reservations
       - kind: duplicateMatch
         label: Possible existing guest
@@ -11702,6 +11630,17 @@ screens:
         bindsTo: FnbReservationPolicy
         operation: getFnbReservationPolicy
         provenance: contract fnb.yaml GET /reservation-policy; wiring fix, 2 October 2026
+      - kind: selectField
+        label: Seating preference
+        bindsTo: TableReservation.seatingPreference
+        notes: 'Indoor, terrace, majlis: a preference, not a table (decided 2 October 2026, Chinmay, batch
+          6; DEC-204; CHG-CSA-018).'
+        provenance: contract fnb.yaml TableReservation.seatingPreference
+      - kind: selectField
+        label: Occasion
+        bindsTo: TableReservation.occasion
+        notes: Birthday, anniversary, business and so on; shown to the host and the server (DEC-204).
+        provenance: contract fnb.yaml TableReservation.occasion
     - name: actionBar
       slot: publish
       components:
@@ -11721,6 +11660,10 @@ screens:
         operation: sendBookingConfirmation
         provenance: contract fnb.yaml POST /table-reservations/{reservationId}/confirm; wiring fix, 2
           October 2026
+      - kind: primaryButton
+        label: Save booking
+        operation: createTableReservationForGuest
+        provenance: contract fnb.yaml POST /outlets/{outletId}/table-reservations
   states:
     loading: The saved create edit reservation.
     error: Could not load. Names which read failed and leaves the create edit reservation untouched.
@@ -11747,6 +11690,12 @@ screens:
     purpose: Send the confirmation and reminder
     trigger: onAction
     provenance: wiring fix, 2 October 2026 (CHG-WIR-008)
+  - operationId: createTableReservationForGuest
+    contract: fnb
+    purpose: The host books a table for a guest, with seating preference and occasion (DEC-204; CHG-CSA-018,
+      CHG-CSA-045)
+    trigger: onAction
+    invalidates: []
   entryState:
     params:
     - name: venueId
@@ -11797,6 +11746,10 @@ screens:
       of a table reservation.'
     source: contracts/satellite/fnb.yaml#createTableReservation | contracts/satellite/fnb.yaml#updateTableReservation
       | MATRIX 4.9.10
+  - why: '2 October 2026 (CHG-SPO-010): the staff create now exists (`createTableReservationForGuest`,
+      CHG-CSA-045), so a host books from here; amending or cancelling a booking from staff still has no
+      staff-audience operation (CHG-WIR-011 stays open for those).'
+    source: contracts/satellite/fnb.yaml#createTableReservationForGuest
 - id: EMP-056
   name: Walk-In & Waitlist Management
   module: Floor Service
@@ -12295,30 +12248,6 @@ screens:
     - name: contentBody
       slot: fields
       components:
-      - kind: textField
-        label: id
-        bindsTo: OpenTableVisitRequest.id
-        provenance: contract fnb.yaml POST /table-visits
-      - kind: textField
-        label: tableId
-        bindsTo: OpenTableVisitRequest.tableId
-        provenance: contract fnb.yaml POST /table-visits
-      - kind: textField
-        label: covers
-        bindsTo: OpenTableVisitRequest.covers
-        provenance: contract fnb.yaml POST /table-visits
-      - kind: textField
-        label: serverPrincipalId
-        bindsTo: OpenTableVisitRequest.serverPrincipalId
-        provenance: contract fnb.yaml POST /table-visits
-      - kind: textField
-        label: subjectId
-        bindsTo: OpenTableVisitRequest.subjectId
-        provenance: contract fnb.yaml POST /table-visits
-      - kind: textField
-        label: recordedAt
-        bindsTo: OpenTableVisitRequest.recordedAt
-        provenance: contract fnb.yaml POST /table-visits
       - kind: detailPanel
         label: The table visit
         bindsTo: TableVisit
@@ -12357,17 +12286,21 @@ screens:
         operation: openTableVisit
         provenance: contract fnb.yaml POST /table-visits
       - kind: secondaryButton
-        label: Save table visit
+        label: Change covers
         operation: updateTableVisit
         provenance: contract fnb.yaml PATCH /table-visits/{visitId}
+        notes: Covers only (`updateTableVisit`); the table and the server change through their own acts.
+          (Design-notes corrections fnb-retail EMP-058.)
       - kind: destructiveButton
         label: Merge table visits
         operation: mergeTableVisits
         provenance: contract fnb.yaml POST /table-visits/{visitId}/merge
       - kind: secondaryButton
-        label: Transfer table visit
+        label: Change server
         operation: transferTableVisit
         provenance: contract fnb.yaml POST /table-visits/{visitId}/transfer
+        notes: 'Hands the check to another server (`transferTableVisit`). Not "Transfer": the client''s
+          "Transfer table" is moving the party. (Design-notes corrections fnb-retail EMP-058.)'
       - kind: secondaryButton
         label: Seat table reservation
         operation: seatTableReservation
@@ -12377,17 +12310,15 @@ screens:
         operation: setServiceStage
         provenance: contract fnb.yaml PUT /table-visits/{visitId}/stage
       - kind: secondaryButton
-        label: Move table visit
+        label: Transfer table
         operation: moveTableVisit
         provenance: contract fnb.yaml POST /table-visits/{visitId}/move
+        notes: 'The client''s "Transfer table": move the party to another table (`moveTableVisit`; DI-338).
+          (Design-notes corrections fnb-retail EMP-058.)'
       - kind: secondaryButton
         label: Reassign server
         operation: reassignServer
         provenance: contract fnb.yaml PUT /table-visits/{visitId}/server
-      - kind: secondaryButton
-        label: Notify server
-        operation: notifyServer
-        provenance: contract fnb.yaml POST /table-visits/{visitId}/notify-server
       - kind: secondaryButton
         label: Create F&B order
         operation: createFnbOrder
@@ -12506,25 +12437,11 @@ screens:
       - serverPrincipalId
       - splitGratuity
     provenance: contract fnb.yaml PUT /table-visits/{visitId}/server
-  - id: formNotifyServer
-    component: modal
-    trigger: Notify server
-    body: '**Collects what `notifyServer` sends before it is called.** Nothing in the body is required.
-      Optional: `reason`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Notify server
-      operation: notifyServer
-    dismiss:
-      label: Cancel
-      discards:
-      - reason
-    provenance: contract fnb.yaml POST /table-visits/{visitId}/notify-server
   - id: formCreateFnbOrder
     component: modal
     trigger: Create F&B order
-    body: '**Collects what `createFnbOrder` sends before it is called.** Required: `id`, `outletId`, `serviceMode`,
-      `lines`, `recordedAt`. Optional: `tableVisitId`. Dismissing sends nothing; the screen behind is
-      unchanged.'
+    body: '**Ordering is a menu, like the till''s order pad**: dishes and options are tapped, not typed;
+      ids, outlet and device time are set by the app (design-notes correction fnb-retail EMP-058).'
     bindsTo: CreateFnbOrderRequest
     confirm:
       label: Create F&B order
@@ -12616,10 +12533,6 @@ screens:
     contract: fnb
     purpose: Hand a table to another server
     trigger: onAction
-  - operationId: notifyServer
-    contract: fnb
-    purpose: The kitchen calls the server to the pass
-    trigger: onAction
   - operationId: createFnbOrder
     contract: fnb
     purpose: Place an F&B order
@@ -12692,6 +12605,12 @@ screens:
       the waitlist actions belong to EMP-056; R254 re-derives operations from purpose (F94 step 1, F29
       step 1; design-notes correction fnb-retail EMP-058).'
     source: R254 | F94 step 1 | F29 step 1 | contracts/satellite/fnb.yaml#setTableCombinations
+  - operation: notifyServer
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-SPO-018): the kitchen calls the server to the pass; on the staff
+      app that is an incoming notification, not a button (F29 step 4; design-notes correction fnb-retail
+      EMP-058). Stays on KIT-002.'
+    source: F29 step 4 | contracts/satellite/fnb.yaml#notifyServer
 - id: EMP-059
   name: Table Order, Bill & Payment Management
   module: Floor Service
@@ -12774,6 +12693,8 @@ screens:
         label: Create payment
         operation: createPayment
         provenance: contract orders.yaml POST /payments
+        notes: No cash tender on a handheld; "Pay cash at the till" sends the guest's bill to a till instead
+          (DEC-200).
       - kind: secondaryButton
         label: Create F&B order
         operation: createFnbOrder
@@ -12818,9 +12739,11 @@ screens:
   - id: formCreatePayment
     component: modal
     trigger: Create payment
-    body: '**Collects what `createPayment` sends before it is called.** Required: `id`, `orderId`, `tender`,
-      `amount`, `recordedAt`. Optional: `tenderCurrency`, `tenderAmount`, `walletAuthorisationId`, `deviceId`.
-      Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Card, contactless, wallet or room charge; never cash.** A handheld takes no cash payment:
+      cash goes to a till (decided 2 October 2026, Chinmay, batch 6, EMP-009: "No cash on handhelds; cash
+      goes to a till"; DEC-200; CHG-CSP-039), and `createPayment` refuses cash from a session with no
+      till (409 `cashNotOnHandheld`). Required: `orderId`, `tender`, `amount`; `id` and `recordedAt` are
+      set by the app. Dismissing sends nothing.'
     bindsTo: CreatePaymentRequest
     confirm:
       label: Create payment
@@ -13011,6 +12934,14 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: metricTile
+        label: Turn time, no-shows, covers, wait accuracy
+        bindsTo: KpiValue
+        operation: getKpiValues
+        notes: 'All four from reporting, never computed on the device (decided 2 October 2026, Chinmay,
+          batch 6, EMP-060; DEC-205; CHG-CSA-020): `tableTurnTime`, `noShowRate`, `covers`, `waitQuoteAccuracy`,
+          for this outlet and today.'
+        provenance: contract reporting.yaml GET /kpi-values
       - kind: textField
         label: Outlet id
         operation: listTableReservations
@@ -13101,6 +13032,11 @@ screens:
   - operationId: getTableMap
     contract: fnb
     purpose: Table map with live state
+    trigger: onLoad
+  - operationId: getKpiValues
+    contract: reporting
+    purpose: Turn time, no-show rate, covers and wait-quote accuracy, computed by reporting (DEC-205;
+      CHG-CSA-020)
     trigger: onLoad
   entryState:
     params:
@@ -13867,7 +13803,7 @@ screens:
     provenance: contract inventory.yaml POST /stock-transfers/{transferId}/receive; wiring fix, 2 October
       2026
 - id: EMP-065
-  name: Receiving & Store Put-Away
+  name: Receiving
   module: Stock on the Floor
   requiresModule: inventory
   wave: 2
@@ -13895,7 +13831,11 @@ screens:
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at all
     — **twenty screens of floor work with nothing behind them** — and every operation these need already
     existed. **Food-safety operations wired 20 August** — boards 5G and 5J of the client F&B pack, and
-    **HACCP is a regulatory obligation nothing in the package touched.**'
+    **HACCP is a regulatory obligation nothing in the package touched.**
+
+
+    **Retitled "Receiving"** (DI-346, the simplicity principle: no put-away, picking, packing or dispatching
+    statuses; design-notes correction fnb-retail EMP-065; CHG-SPO-018). The screen id and route are unchanged.'
   density: comfortable
   boardFrames:
   - FnB Board 5.dc.html#fnb-5g
@@ -15771,9 +15711,16 @@ screens:
     component: apps/venue-staff-app/src/routes/rentals/DepositFinancialHandoverValidation.tsx
     status: notStarted
   density: comfortable
-  notes: The staff-app form of `BO-551`, for the attendant at the rental counter. Decided 11 September
+  notes: 'The staff-app form of `BO-551`, for the attendant at the rental counter. Decided 11 September
     2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps
     the two in step.
+
+
+    **The card hold is a pre-authorisation on the payment terminal** (decided 2 October 2026, Chinmay,
+    batch 6, EMP-078; DEC-304; CHG-CSA-029). The terminal returns the authorisation reference, the check-out
+    carries it (`RentalCheckOut.depositAuthorisationId`) and the booking stores it; **check-out is blocked
+    until the pre-authorisation succeeds** (`checkOutRental` answers 409 `deposit-not-authorised`), and
+    the screen says so rather than offering to continue.'
   purpose: Give the rental operator a clear commercial status without requiring them to enter the Finance
     module.
   pattern: listDetail
@@ -17758,9 +17705,15 @@ screens:
     component: apps/venue-staff-app/src/routes/rentals/LateFeesDamageFeesFinalSettlement.tsx
     status: notStarted
   density: comfortable
-  notes: The staff-app form of `BO-571`, for the attendant at the rental counter. Decided 11 September
+  notes: 'The staff-app form of `BO-571`, for the attendant at the rental counter. Decided 11 September
     2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps
     the two in step.
+
+
+    **Extra time is charged at the normal rate** (decided 2 October 2026, Chinmay, batch 6, EMP-098: "Normal
+    rate (DI-499)"; DEC-307; CHG-CSA-029): a wheelchair paid for one hour and used for three is charged
+    two more hours at its usual price, not a late-fee rate. `returnRental` prices it; the screen shows
+    the extra hours and their amount beside damage and the deposit.'
   purpose: Calculate the customer's final rental financial position. Board 8 should consume, not recreate,
     the commercial policies configured in Board 4.
   pattern: listDetail

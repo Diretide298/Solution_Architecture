@@ -1,0 +1,31 @@
+id: CHG-SPO-005
+date: '2026-10-02'
+source: client-review
+kind: spec
+summary: On POS-024, Remove table marks the table Out of service; nothing deletes a table.
+decision:
+  what: POS-024's layout save and floor cards say Remove marks the table Out of service (setTableLayout never deletes) with
+    Return to service.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 3 #2 (POS-024: "Yes: mark the table out of service"); DEC-067; contract CHG-CSA-012.'
+keys_touched:
+  screens:
+  - POS-024
+  operations:
+  - setTableLayout
+  files:
+  - screens/P04-point-of-sale.yaml
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-024
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Applied in worktree screens-pos-staff (batch SPO, phase B, 2 October 2026). Tickets: none started (Block A starts
+  Monday 5 October 2026); unstarted keys are the tasks.csv keys of the touched screens.'

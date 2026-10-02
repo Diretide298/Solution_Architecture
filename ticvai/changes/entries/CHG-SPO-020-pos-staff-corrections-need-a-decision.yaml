@@ -1,0 +1,60 @@
+id: CHG-SPO-020
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: Eight Block A design-note corrections on the till, kitchen display and staff app need a decision or another owner,
+  not a screen edit; they are logged here with a recommended default.
+decision:
+  what: 'Logged: POS-001 F32 (open with a failed device on approval) against openShift (refuses) - default, the contract wins;
+    POS-011 two approval models for refunds (supervisor PIN for a return, dual authorisation for a ticket refund, a routed
+    approval before the bank) - default, supervisor PIN for both at the till, routing in the back office; POS-023 offline
+    retail (DI-075 oversell against DI-294 stock gates) - default, refuse offline as the contract does; POS-023 which path
+    depletes merchandise stock in a mixed cart - default, the shared cart, createRetailSale for retail-only tills; EMP-058
+    whether a server may fire a course from the floor (F29 against DI-407) - default, the pass only; KIT-001 DI-077 marked
+    superseded in the design-input index (design-inputs owner); POS-010 needs a frame (designer); KIT-002 fire and hold leave
+    the station display, and POS-004 extendSeatHold leaves the till, only once flows F88 step 2 and F59 step 3 are repointed
+    (flows owner, screens-other) - check-flows fails otherwise.'
+  by: Chinmay
+  date: '2026-10-02'
+why: Design-notes corrections fnb-retail POS-001, POS-011, POS-023, EMP-058, KIT-001 and ticketing-guest POS-010 on Block
+  A screens; DI-075, DI-294, DI-407, DI-077, F32, F29.
+keys_touched:
+  screens:
+  - POS-001
+  - POS-004
+  - POS-010
+  - POS-011
+  - POS-023
+  - EMP-058
+  - KIT-001
+  - KIT-002
+  operations:
+  - extendSeatHold
+  - fireCourse
+  - holdCourse
+  flows:
+  - F59
+  - F88
+  files:
+  - handoff/design-notes/fnb-retail.yaml
+  - handoff/design-notes/ticketing-guest.yaml
+root_class: 'new: open-question-undecided'
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-KIT-001
+  - APP-POS-KIT-002
+  - APP-POS-POS-001
+  - APP-POS-POS-004
+  - APP-POS-POS-010
+  - APP-POS-POS-011
+  - APP-POS-POS-023
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-design-notes.py
+status: open
+notes: 'Open until Chinmay decides (or accepts the defaults above) and the design-inputs owner marks DI-077. Applied in worktree
+  screens-pos-staff (batch SPO, phase B, 2 October 2026). Tickets: none started (Block A starts Monday 5 October 2026); unstarted
+  keys are the tasks.csv keys of the touched screens.'

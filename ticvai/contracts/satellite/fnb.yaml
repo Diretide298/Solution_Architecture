@@ -1869,7 +1869,6 @@ paths:
     post:
       operationId: notifyServer
       x-ticvai-consumed-by:
-        - "P06 EMP-058 Live Table & Service Management"
         - "P15 KIT-002 Kitchen Display System (KDS)"
       summary: The kitchen calls the server to the pass
       description: 'Board 3 and Board 4. **Food ready and nobody collecting it is the commonest reason
@@ -3206,7 +3205,7 @@ paths:
     post:
       operationId: logColdChain
       x-ticvai-consumed-by:
-        - "P06 EMP-065 Receiving & Store Put-Away"
+        - "P06 EMP-065 Receiving"
       summary: The temperature a delivery arrived at, and what was decided
       description: 'Board 5G. **A delivery arriving warm is a rejection decision made at the door**, and
         `createGoodsReceipt` had nowhere to record the temperature.
@@ -3581,6 +3580,7 @@ paths:
       operationId: transferTableVisit
       x-ticvai-consumed-by:
         - "P06 EMP-058 Live Table & Service Management"
+        - "P04 POS-028 Table Service"
       summary: Move a check to another server
       description: 'BL-125. **A shift change mid-service leaves a check with a server who has gone home.**
 
@@ -6038,6 +6038,7 @@ paths:
       operationId: updateTableVisit
       x-ticvai-consumed-by:
         - "P06 EMP-058 Live Table & Service Management"
+        - "P04 POS-028 Table Service"
       x-ticvai-audience:
       - staff
       summary: Amend covers, move table, or reassign server

@@ -1810,7 +1810,6 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-007 Interactive Seat Selection"
         - "P02 GST-049 Interactive Seat Selection"
-        - "P04 POS-004 Sell — Seat Map"
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-1001 View Preview, Compare & Heat Map"

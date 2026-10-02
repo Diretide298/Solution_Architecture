@@ -1,0 +1,34 @@
+id: CHG-SPO-011
+date: '2026-10-02'
+source: client-review
+kind: spec
+summary: EMP-078 blocks rental check-out until the terminal pre-authorisation succeeds, and EMP-098 charges extra time at
+  the normal rate.
+decision:
+  what: EMP-078 notes that check-out is blocked until the pre-authorisation succeeds (409 deposit-not-authorised; no new state,
+    because EMP-078 mirrors BO-551); EMP-098 notes the normal-rate extra time priced by returnRental.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 6: EMP-078 (Q304; DEC-304) and EMP-098 (Q307: "Normal rate (DI-499)"; DEC-307). Contract
+  CHG-CSA-029.'
+keys_touched:
+  screens:
+  - EMP-078
+  - EMP-098
+  operations:
+  - checkOutRental
+  - returnRental
+  files:
+  - screens/P06-staff-app.yaml
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Block D screens. Applied in worktree screens-pos-staff (batch SPO, phase B, 2 October 2026). Tickets: none started
+  (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys of the touched screens.'

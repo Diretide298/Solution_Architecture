@@ -1,0 +1,53 @@
+id: CHG-SPO-001
+date: '2026-10-02'
+source: client-review
+kind: spec
+summary: The five POS v2 candidates left undecided (POS-000, -003, -004, -012, -023) are the specification now, and each candidate
+  block cites its POSV2 decision.
+decision:
+  what: 'Accept v2: POS-000 co-branding, recent cashiers, cashier-ID entry and the PIN/password switch; POS-003 as drawn;
+    POS-004 section then seat, recommendSeats taken off, extendSeatHold not drawn (it comes off once flow F59 step 3 is repointed,
+    CHG-SPO-020) and no booking-fee line; POS-012 the four order types (dine-in, quick service, takeaway, delivery by own
+    fleet or partner) and no hold timer on a food cart; POS-023 Lockers tab, refine chips and Scan, no inventory ledger, "Low
+    stock" wording and a variant picker. Each candidate''s differences cite POSV2-9 to POSV2-13.'
+  by: Chinmay
+  date: '2026-10-02'
+why: Chinmay, 2 October 2026, batch 5 sets 1 and 2 ("Accept all of v2", "Accept v2", "As drawn"); DEC-550 to DEC-554; POSV2-9
+  to POSV2-13 recorded by CHG-DOC-018; CHG-SEED-005 asked for a prevention against an undecided design import. Design-notes
+  corrections ticketing-guest POS-004 and fnb-retail POS-012, POS-023 applied with them.
+keys_touched:
+  screens:
+  - POS-000
+  - POS-003
+  - POS-004
+  - POS-012
+  - POS-023
+  operations:
+  - extendSeatHold
+  - recommendSeats
+  - login
+  - lookupMerchandise
+  files:
+  - screens/P04-point-of-sale.yaml
+  - contracts/satellite/seating.yaml (consumed-by lines only)
+  - handoff/design-notes/ticketing-guest.yaml
+  - handoff/design-notes/fnb-retail.yaml
+root_class: 'new: design-return'
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-000
+  - APP-POS-POS-003
+  - APP-POS-POS-004
+  - APP-POS-POS-012
+  - APP-POS-POS-023
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-candidate-decisions.py
+status: open
+notes: 'check-candidate-decisions: 5 CD-UNDECIDED on the parent commit, 0 after (run in the worktree). The registers docs/registers/pos-v2-decisions.md
+  and handoff/pos-v2-decisions.json still say "Pending" for POSV2-9..13; their owner updates the applied column to CHG-SPO-001,
+  and the lead can then make the check gate. Applied in worktree screens-pos-staff (batch SPO, phase B, 2 October 2026). Tickets:
+  none started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys of the touched screens.'

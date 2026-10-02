@@ -1,0 +1,53 @@
+id: CHG-SPO-017
+date: '2026-10-02'
+source: client-review
+kind: spec
+summary: 'The kitchen display screens stop repeating the station rail: the command centre, order journey, pass, guest board
+  and analysis each draw their own job, and course chips replace typed filters.'
+decision:
+  what: KIT-001, -004, -006, -007 lose the copied rail controls and states; KIT-002 uses course chips and its Fire and Hold
+    course controls are marked not drawn (they leave once flow F88 is repointed, CHG-SPO-020); KIT-007 is an unattended guest
+    board; KIT-009 reads getKitchenSla and getCourseRules; KIT-010 is the performance and AI analysis.
+  by: Chinmay
+  date: '2026-10-02'
+why: Design-notes corrections fnb-retail KIT-001, -002, -004, -006, -007, -009 and finance-insights KIT-010 (Block A); DI-407,
+  DI-332, POSV2-7; contract CHG-CSA-045 (getKitchenSla, getCourseRules).
+keys_touched:
+  screens:
+  - KIT-001
+  - KIT-002
+  - KIT-004
+  - KIT-006
+  - KIT-007
+  - KIT-009
+  - KIT-010
+  operations:
+  - fireCourse
+  - holdCourse
+  - getKitchenSla
+  - getCourseRules
+  - listKitchenTickets
+  files:
+  - screens/P15-kitchen-display.yaml
+  - contracts/satellite/fnb.yaml (consumed-by lines only)
+  - handoff/design-notes/fnb-retail.yaml
+  - handoff/design-notes/finance-insights.yaml
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-KIT-001
+  - APP-POS-KIT-002
+  - APP-POS-KIT-004
+  - APP-POS-KIT-006
+  - APP-POS-KIT-007
+  - APP-POS-KIT-009
+  - APP-POS-KIT-010
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-design-notes.py
+status: open
+notes: 'Applied in worktree screens-pos-staff (batch SPO, phase B, 2 October 2026). Tickets: none started (Block A starts
+  Monday 5 October 2026); unstarted keys are the tasks.csv keys of the touched screens.'

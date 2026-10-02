@@ -153,12 +153,27 @@ screens:
     - name: contentBody
       slot: form
       components:
+      - kind: banner
+        label: Venue co-branding
+        notes: The venue name and logo above the sign-in, as drawn in v2 (POSV2-9, DEC-550). Read from
+          the terminal's cached brand (the catalogue bundle the till already holds), never fetched before
+          sign-in, so the door still needs nothing to open.
+        provenance: POS v2 candidate, accepted 2 October 2026 (POSV2-9)
       - kind: numberField
-        label: Employee number
-        notes: Goes into `LoginRequest.username`.
+        label: Cashier ID
+        notes: Goes into `LoginRequest.username`. For anyone not on the recent-cashier tiles (v2 cashier-ID
+          entry, POSV2-9, DEC-550).
+      - kind: selectField
+        label: Sign in with PIN or password
+        notes: 'The v2 switch (POSV2-9, DEC-550): sets `LoginRequest.method` to `pin` or `password` and
+          swaps the keypad for a text field. A tenant whose password policy forbids PINs shows password
+          only.'
+        provenance: POS v2 candidate (sources/designs/TICVAI_POS_Terminal_v2.html), accepted 2 October
+          2026 (POSV2-9)
       - kind: numberField
-        label: PIN
-        notes: 'Goes into `LoginRequest.credential` with `method: pin`.'
+        label: PIN or password
+        notes: 'Goes into `LoginRequest.credential`, with `method: pin` (a 4-digit keypad) or `method:
+          password` (a text field), as the switch above it says.'
       - kind: primaryButton
         label: Sign in
         operation: login
@@ -180,10 +195,11 @@ screens:
         notes: The fallback -- issues the challenge against the principal's email (`emailOtp`) method
           (audit R126 (5)).
       - kind: cardList
-        label: Recent operators on this till
-        notes: '**Device-local and deliberately backed by no operation.** The terminal remembers who used
-          it so an operator taps a face rather than typing a number; the PIN is still required. Putting
-          this behind an endpoint would publish a staff list to an unauthenticated caller.'
+        label: Recent cashiers on this till
+        notes: '**Device-local and deliberately backed by no operation.** Four at a time, each with their
+          last shift on this till, as drawn in v2 (POSV2-9, DEC-550). The terminal remembers who used
+          it so an operator taps a face rather than typing a number; the PIN or password is still required.
+          Putting this behind an endpoint would publish a staff list to an unauthenticated caller.'
     - name: contextPanel
       slot: selection
       components:
@@ -286,7 +302,10 @@ screens:
         not on the tiles, and switches between a 4-digit PIN and a password (LoginRequest.method takes
         pin or password). Badge / RFID, Corporate SSO, the 90 s idle lock and the ''Shift not started
         · Float pending'' pill stay. As in the approved build: no MFA challenge, no active-session / force-logout,
-        no role selection, and no denied, offline or emptyNoAccess state.'
+        no role selection, and no denied, offline or emptyNoAccess state. Accepted as drawn (decided 2
+        October 2026, Chinmay, batch 5: "Accept all of v2"; POSV2-9, DEC-550; CHG-SPO-001): the venue
+        co-branding, the recent cashiers four at a time with their last shift, the cashier-ID entry and
+        the PIN/password switch are the specification now; the layout carries them.'
 - id: POS-001
   name: Begin Shift
   module: Shift
@@ -434,7 +453,12 @@ screens:
     may add a reason and a note with every count (DI-803). A recount the supervisor asks for is counted
     blind again (DI-804). Retail practice: docs/active/research-uae-vat-and-blind-close-2-october.md.
     On this screen: the edge to POS-007 no longer carries `expectedCash`, the shift panels no longer show
-    sales, refunds or lifts totals, and closing goes through POS-007''s blind count.'
+    sales, refunds or lifts totals, and closing goes through POS-007''s blind count.
+
+
+    **A shift "Under review" does not stop this one** (decided 2 October 2026, Chinmay; DEC-059; CHG-CSP-012;
+    CHG-SPO-003). `openShift` refuses only while a shift is open or suspended on this workstation; a counted
+    shift waiting for its supervisor has its own box and count, so the next cashier opens with a new float.'
   density: touchLarge
   boardFrames:
   - POS Board 3.dc.html#pos-3d
@@ -561,8 +585,8 @@ screens:
         label: Notes
         provenance: carried from the previous definition
       - kind: detailPanel
-        notes: Suggested float from the venue default. Advisory, not prefilled — a prefilled count is
-          not a count
+        notes: '**No expected float and no live variance while counting** (POSV2-3, audit R080; design-notes
+          correction fnb-retail POS-001): the cashier counts what is in the box, and the server compares.'
         provenance: carried from the previous definition
     - name: contextPanel
       slot: item
@@ -683,8 +707,9 @@ screens:
     emptyNoAccess: Shown when the caller lacks `SHIFT_OPEN`, which `getCurrentShift` requires, and names
       that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
-    offline: Opens locally and syncs. A gate that cannot open a till because the network is down is a
-      gate that does not sell
+    offline: '**Cannot open offline.** `openShift` is online only (F32; audit R257): an opening float
+      declared offline is one nobody can reconcile against the safe. Says so and keeps the count on screen
+      until the link returns (design-notes correction fnb-retail POS-001).'
     denied: Sign-in succeeds and the shift will not open — the operator's role does not hold `sale.create`
       on this terminal. The float count is kept, not discarded, and a supervisor can open the shift against
       the same count.
@@ -763,7 +788,9 @@ screens:
         No suspend, resume or reopen, cash movement, no-sale, deposit-box float or role selection, as
         before. Design corrections (decided 1 October): the expected float and the live variance are not
         shown while counting; the blind count stands (POSV2-3, audit R080). Report to facilities is dropped
-        from the design: no operation is behind it (POSV2-8).'
+        from the design: no operation is behind it (POSV2-8). Design correction confirmed 2 October (CHG-SPO-015):
+        no "Expected float" or "Matches expected float" line, and no "Report to facilities" button (POSV2-3,
+        POSV2-8).'
     derivedFrom: wireframes/reference/TICVAI Boards v2.dc.html
     source: Claude Design POS pack, 24 August
     note: '**Drawn by Claude Design on `TICVAI Boards v2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
@@ -930,7 +957,14 @@ screens:
     endPromotion, pausePromotion, publishPromotion, setAlternativeCodes, setProductAttributes, transitionProductLifecycle,
     unschedulePromotion, updateProduct, updatePromotion, createStockMovement. **A till sells the catalogue;
     it does not author it.** These arrived in the 18 August bulk attach — the same defect that put 21
-    of 39 review rows in one bucket — and a flow walking a ticket sale is what surfaced them.'
+    of 39 review rows in one bucket — and a flow walking a ticket sale is what surfaced them.
+
+
+    **One hold clock: the contract''s** (design-notes correction ticketing-guest POS-002; CHG-SPO-015).
+    The cart shows its own window (`extendCart`: 15 minutes with one 5-minute extension) and a seat hold
+    its 8 minutes; the approved build''s 300-second countdown with two extensions is not drawn. The approved
+    build''s waitlist for sold-out events, gift-voucher face-value sales and group bundles have no operation
+    on this screen and are left out of the design.'
   density: touchLarge
   boardFrames:
   - Retail Board 3.dc.html#ret-3b
@@ -2107,7 +2141,11 @@ screens:
     forceReleaseInventoryHold, setAlternativeCodes, setProductAttributes, transitionProductLifecycle,
     updateProduct. **A till sells the catalogue; it does not author it.** These arrived in the 18 August
     bulk attach — the same defect that put 21 of 39 review rows in one bucket — and a flow walking a ticket
-    sale is what surfaced them.'
+    sale is what surfaced them.
+
+
+    **Drawn as a step of the POS-002 drawer, not a page** (the 3 August decision, kept by v2; design-notes
+    correction ticketing-guest POS-003; CHG-SPO-015).'
   density: touchLarge
   pattern: listDetail
   patternReason: '`listProductVariants` reads the population and `getAvailability` reads one of them —
@@ -2212,24 +2250,30 @@ screens:
         operation: listProducts
         provenance: contract catalogue.yaml GET /products
       - kind: datePicker
-        notes: Seven-day strip, as designed. Region date format
-        provenance: carried from the previous definition
+        notes: The visit date as a business-date card with Change (v2, POSV2-10, DEC-551); Change opens
+          the seven-day strip. Region date format.
+        provenance: POS v2 candidate, accepted 2 October 2026 (POSV2-10)
       - kind: cardList
         bindsTo: PerformanceAvailabilityPage.items
-        notes: Slots with remaining counts and a demand indicator — the mockup shows High, Medium, Low,
-          Sold Out
+        notes: The entry slot as a card with what is left ("59 LEFT") and Change, which opens the slot
+          grid with the remaining count per slot (v2, POSV2-10, DEC-551). The demand indicator is a presentation
+          of remaining capacity.
         provenance: carried from the previous definition
       - kind: cardList
         bindsTo: ProductVariant[]
-        notes: Adult and child with steppers
+        notes: Guests by ticket type (adult, child, senior, infant) with steppers, then group and family
+          bundles at one price (v2, POSV2-10, DEC-551).
         provenance: carried from the previous definition
     - name: actionBar
       slot: rowActions
       components:
-      - kind: primaryButton
+      - kind: secondaryButton
         label: Acquire inventory hold
         operation: acquireInventoryHold
         provenance: contract catalogue.yaml POST /inventory-holds
+        notes: '**Not a cashier control** (v2, POSV2-10): the terminal takes its lease when the line is
+          added and the cashier sees only the cart''s countdown. Kept for the terminal''s own lease (ADR-0013),
+          never drawn as a button.'
       - kind: secondaryButton
         label: Resolve product by code
         operation: resolveProductByCode
@@ -2349,7 +2393,10 @@ screens:
         date is a business-date card with Change, the entry slot a card with what is left (''59 LEFT'')
         and Change, then guests by ticket type (adult, child, senior, infant) and group & family bundles
         at one price. The cart''s inventory hold (countdown, Extend +2 min) is the only hold the cashier
-        sees: there is no acquire, renew or relinquish of an inventory hold as such.'
+        sees: there is no acquire, renew or relinquish of an inventory hold as such. Accepted as drawn
+        (decided 2 October 2026, Chinmay, batch 5; POSV2-10, DEC-551; CHG-SPO-001): the business-date
+        card with Change, the entry-slot card with what is left and Change, guests by ticket type and
+        the group and family bundles are the specification; the hold the cashier sees is the cart''s countdown.'
   apisNote: Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop
     pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
     them to the ones that matter is work a person still owes this screen.
@@ -2455,6 +2502,12 @@ screens:
       when a discount needs it, not as a button on the seat map (design-notes correction ticketing-guest
       POS-004).'
     source: screens/P04-point-of-sale.yaml#POS-004
+  - operation: recommendSeats
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-SPO-001): POS v2 accepted as drawn, "section then seat; no hold
+      extend, no recommendation, no booking-fee line" (Chinmay, batch 5; POSV2-11, DEC-552). The operation
+      stays in the seating contract for the guest and back-office screens.'
+    source: docs/registers/pos-v2-decisions.md#POSV2-11
   layout:
     template: detail
     regions:
@@ -2511,6 +2564,16 @@ screens:
       - kind: banner
         notes: Hold countdown
         provenance: carried from the previous definition
+      - kind: seatMap
+        label: Section map, then the section's seats
+        bindsTo: SeatAvailability
+        operation: getSeatAvailability
+        notes: 'v2 (POSV2-11, DEC-552): pick the date and time, then a section on the section map, then
+          seats in that section with held and sold seats shown and the price tiers as a legend; Back and
+          All sections step back. A zone-priced general-admission event draws the same drawer with zones
+          and tiers only (no seats) and keeps a party together (DI-410; design-notes correction ticketing-guest
+          POS-004). No hold extend, no recommendation and no booking-fee line.'
+        provenance: POS v2 candidate, accepted 2 October 2026 (POSV2-11)
     - name: actionBar
       slot: rowActions
       components:
@@ -2522,10 +2585,9 @@ screens:
         label: Extend seat hold
         operation: extendSeatHold
         provenance: contract seating.yaml POST /seat-holds/{holdId}/extend
-      - kind: secondaryButton
-        label: Recommend seats
-        operation: recommendSeats
-        provenance: contract seating.yaml POST /performances/{performanceId}/seat-recommendations
+        notes: '**Not drawn** (v2 accepted: no hold extend; POSV2-11, DEC-552). The declaration stays
+          only until flow F59 step 3 stops calling it from this screen (open entry CHG-SPO-020); then
+          it comes off.'
       - kind: secondaryButton
         label: Release seat hold
         operation: relinquishSeatHold
@@ -2582,10 +2644,6 @@ screens:
     contract: seating
     purpose: Read a hold
     trigger: onLoad
-  - operationId: recommendSeats
-    contract: seating
-    purpose: Recommend seats for a party
-    trigger: onAction
   - operationId: relinquishSeatHold
     contract: seating
     purpose: Release a hold
@@ -2632,7 +2690,10 @@ screens:
       differences: 'Still inside the POS-002 drawer, not a full-screen map. v2 adds the section-then-seat
         flow for a reserved big-top event (Pluma Circus: date and time, a section map, then the section''s
         seats with held and sold seats and three price tiers; Back and All sections step back). No seat-hold
-        extend or recommend, and no booking-fee line.'
+        extend or recommend, and no booking-fee line. Accepted as drawn (decided 2 October 2026, Chinmay,
+        batch 5: "section then seat; no hold extend, no recommendation, no booking-fee line"; POSV2-11,
+        DEC-552; CHG-SPO-001): recommendSeats comes off, and extendSeatHold once flow F59 step 3 is repointed
+        (CHG-SPO-020); this screen; the drawer is section map, then the section''s seats.'
     derivedFrom: wireframes/reference/Seat Board 3.dc.html
     note: '**Drawn by Claude Design on `Seat Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
@@ -2658,26 +2719,6 @@ screens:
       - seatIds
       - ttlSeconds
       - subjectId
-    provenance: client-verified
-  - id: formRecommendSeats
-    component: modal
-    trigger: Recommend seats
-    body: '**Collects what `recommendSeats` sends before it is called.** Required: `partySize`, `strategy`.
-      Optional: `categoryIds`, `maxPrice`, `accessibleCount`, `maxOptions`. Dismissing sends nothing;
-      the screen behind is unchanged.'
-    bindsTo: SeatRecommendationRequest
-    confirm:
-      label: Recommend seats
-      operation: recommendSeats
-    dismiss:
-      label: Cancel
-      discards:
-      - partySize
-      - strategy
-      - categoryIds
-      - maxPrice
-      - accessibleCount
-      - maxOptions
     provenance: client-verified
   - id: formCreateOrder
     component: modal
@@ -2893,26 +2934,6 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: textField
-        label: Outlet id
-        operation: listRetailSales
-        notes: Sends `?outletId=` to `listRetailSales`.
-        provenance: contract retail.yaml GET /retail-sales
-      - kind: textField
-        label: Shift id
-        operation: listRetailSales
-        notes: Sends `?shiftId=` to `listRetailSales`.
-        provenance: contract retail.yaml GET /retail-sales
-      - kind: datePicker
-        label: Created from
-        operation: listRetailSales
-        notes: Sends `?createdFrom=` to `listRetailSales`.
-        provenance: contract retail.yaml GET /retail-sales
-      - kind: datePicker
-        label: Created to
-        operation: listRetailSales
-        notes: Sends `?createdTo=` to `listRetailSales`.
-        provenance: contract retail.yaml GET /retail-sales
       - kind: dataTable
         label: Every retail sale
         bindsTo: RetailSale
@@ -3079,8 +3100,7 @@ screens:
     error: Could not load. Names which read failed and leaves the payment untouched.
     emptyFirstRun: No payment yet. Offers Create payment (`createPayment`); distinct from a filter that
       matched nothing.
-    emptyNoResults: Nothing matches the filter on outletId, shiftId, createdFrom, createdTo and the payment
-      are still there. Names the active filter and offers to clear it.
+    emptyNoResults: 'Never shown: the payment screen completes one sale and has no list filter.'
     emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `getRetailSale` requires, and names
       that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
@@ -3386,7 +3406,12 @@ screens:
         performanceId, so an edge into it carries them
   notes: 'Implied by the Hold Order button in the design and absent from it. A hold with no way to find
     it again is a lost sale. **Improved 20 August against the client design board**, answering 1 board
-    screen(s): Transaction Search, Hold, Recall & Post-Sale Management.'
+    screen(s): Transaction Search, Hold, Recall & Post-Sale Management.
+
+
+    **Parked carts are held orders** (design-notes correction ticketing-guest POS-006; CHG-SPO-015): the
+    approved build''s parked cart tabs (up to four) are drawn as held orders on this screen, one concept
+    for the cashier.'
   density: touchLarge
   boardFrames:
   - Retail Board 3.dc.html#ret-3f
@@ -3399,35 +3424,12 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: textField
-        label: Venue id
+      - kind: searchField
+        label: Search this terminal's holds
         operation: listOrders
-        notes: Sends `?venueId=` to `listOrders`.
-        provenance: contract orders.yaml GET /orders
-      - kind: textField
-        label: Principal id
-        operation: listOrders
-        notes: Sends `?principalId=` to `listOrders`.
-        provenance: contract orders.yaml GET /orders
-      - kind: textField
-        label: Shift id
-        operation: listOrders
-        notes: Sends `?shiftId=` to `listOrders`.
-        provenance: contract orders.yaml GET /orders
-      - kind: textField
-        label: Status
-        operation: listOrders
-        notes: Sends `?status=` to `listOrders`.
-        provenance: contract orders.yaml GET /orders
-      - kind: datePicker
-        label: Created from
-        operation: listOrders
-        notes: Sends `?createdFrom=` to `listOrders`.
-        provenance: contract orders.yaml GET /orders
-      - kind: datePicker
-        label: Created to
-        operation: listOrders
-        notes: Sends `?createdTo=` to `listOrders`.
+        notes: This terminal's held orders, newest first, searched by name, phone or reference; venue,
+          principal, shift and status are fixed by the session, never typed (design-notes correction ticketing-guest
+          POS-006).
         provenance: contract orders.yaml GET /orders
       - kind: dataTable
         label: Every order
@@ -3749,8 +3751,8 @@ screens:
     error: Could not load. Names which read failed and leaves the held orders untouched.
     emptyFirstRun: No held orders yet. Offers Create order (`createOrder`); distinct from a filter that
       matched nothing.
-    emptyNoResults: Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom,
-      createdTo and the held orders are still there. Names the active filter and offers to clear it.
+    emptyNoResults: Nothing on this terminal matches the search; the holds are still there. Clear the
+      search.
     emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that
       permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support
       with the wrong question.
@@ -3952,7 +3954,17 @@ screens:
     which answers only what happens next (closed, with your supervisor, or awaiting close approval); the
     variance alerts the supervisors on the venue''s alerting channel and appears on BO-040. The cashier
     may add a reason and a note with every count (DI-803). A recount the supervisor asks for is counted
-    blind again (DI-804). Retail practice: docs/active/research-uae-vat-and-blind-close-2-october.md.'
+    blind again (DI-804). Retail practice: docs/active/research-uae-vat-and-blind-close-2-october.md.
+
+
+    **The cashier signs out; the supervisor resolves later** (decided 2 October 2026, Chinmay, batch 3
+    #1, batch 6 #173 to #175 and the pre-apply round; DEC-059, DEC-175; CHG-SPO-003). A shift over the
+    threshold is "Under review" on the cashier''s view, never blocks the next cashier''s shift on this
+    till, and is resolved by a supervisor with their PIN on any till (accept, or ask for a recount) or
+    in the daily cash reconciliation (BO-043). **Pending: `closeShift` on this screen** (the pre-apply
+    round declares it here, supervisor PIN, any till) is refused by check-finance-rules F-BLIND-CLOSE,
+    which forbids `closeShift` on every P04 and P06 screen; it is bound once that rule admits a supervisor-permissioned
+    close (open entry CHG-SPO-021).'
   density: touchLarge
   boardFrames:
   - POS Board 3.dc.html#pos-3f
@@ -3970,10 +3982,14 @@ screens:
           the shift closed or went to the supervisor (CHG-FIN-003).'
       pendingVariance:
         operation: acceptShiftVariance
-        note: '**Counted, and the supervisor has been alerted.** The cashier sees "Your count is with
-          your supervisor" and nothing about the amount. A supervisor holding OVERSHORT_ACCEPT, after
-          a PIN step-up, sees counted, expected and variance and accepts it here or on BO-040, or asks
-          for a recount (counted blind again). Not the cashier whose shift it is (audit R080 (e); CHG-FIN-003).'
+        note: '**Counted, and the supervisor has been alerted; the cashier sees "Under review" and may
+          sign out.** A supervisor holding OVERSHORT_ACCEPT, after a PIN step-up on any till, sees counted,
+          expected and variance and accepts it, asks for a recount (`rejectShiftVariance`); or does so
+          in the daily cash reconciliation (BO-043). Not the cashier whose shift it is (audit R080 (e);
+          CHG-FIN-003; DEC-059, DEC-175).'
+      recountRequested:
+        operation: rejectShiftVariance
+        note: The supervisor asked for a recount; the cashier recounts blind and resubmits (DEC-175; CHG-CSP-013).
     transitions:
     - from: count
       'on': Submit count
@@ -3986,6 +4002,13 @@ screens:
       to: pendingVariance
       note: Within the threshold the shift closes and the screen leaves for POS-001; beyond it the shift
         is `pendingVariance` (audit R080 (e)).
+    - from: pendingVariance
+      'on': rejectShiftVariance (supervisor PIN)
+      to: recountRequested
+      note: The shift stays pendingVariance in the contract; the till shows "Recount requested" (CHG-CSP-013).
+    - from: recountRequested
+      'on': Recount
+      to: count
   pattern: approvalInbox
   patternReason: '`approveShiftOpen` decides items that `listCashMovements` queues — every row is waiting
     for a person, so the empty state is success'
@@ -4083,6 +4106,15 @@ screens:
         - Shift.openingFloat
         operation: getCurrentShift
         provenance: contract shift.yaml GET /shifts/current
+      - kind: dataTable
+        label: What was counted, note by note
+        bindsTo: CashCountLine
+        operation: getShiftCountLines
+        permission: OVERSHORT_ACCEPT
+        notes: 'For the supervisor reviewing an "Under review" shift: each count (and each recount) by
+          denomination, counted quantity and value only. Never shown to the cashier on this screen, although
+          the read itself carries no expected figure (CHG-CSP-014).'
+        provenance: contract shift.yaml GET /shifts/{shiftId}/count-lines
     - name: actionBar
       slot: decision
       components:
@@ -4100,6 +4132,14 @@ screens:
       - kind: primaryButton
         label: Submit count
         provenance: carried from the previous definition
+      - kind: secondaryButton
+        label: Ask for a recount
+        operation: rejectShiftVariance
+        permission: OVERSHORT_ACCEPT
+        notes: 'Supervisor only, PIN step-up: rejects the variance with a reason the cashier reads (never
+          the amount). The shift stays pendingVariance with the recount requested; the cashier recounts
+          blind at any till and resubmits with `submitShiftCount` (DEC-175; DI-804; CHG-CSP-013).'
+        provenance: contract shift.yaml POST /shifts/{shiftId}/reject-variance
   overlays:
   - id: confirmCloseShift
     component: confirmDialog
@@ -4133,6 +4173,20 @@ screens:
       discards:
       - reason
     provenance: client-verified
+  - id: formRejectShiftVariance
+    component: modal
+    trigger: Ask for a recount
+    body: '**Collects what `rejectShiftVariance` sends.** Required: `reason` (at least 3 characters),
+      shown to the cashier; never the amount. The supervisor confirms with their PIN (step-up). Dismissing
+      sends nothing.'
+    confirm:
+      label: Ask for a recount
+      operation: rejectShiftVariance
+    dismiss:
+      label: Cancel
+      discards:
+      - reason
+    provenance: contract shift.yaml POST /shifts/{shiftId}/reject-variance
   states:
     loading: The close shift list.
     error: Could not load. Names which read failed and leaves the close shift untouched.
@@ -4148,9 +4202,18 @@ screens:
     denied: '`acceptShiftVariance` was refused: the caller lacks OVERSHORT_ACCEPT at this venue, or is
       the cashier whose shift it is. The shift stays `pendingVariance` against the same count, and a supervisor
       accepts it on this till (audit R080 (e)).'
-    pendingVariance: '**Counted; with the supervisor.** `submitShiftCount` answered `referredToSupervisor`.
-      The cashier sees "Your count is with your supervisor" and no amount; the supervisor, after a PIN
-      step-up, accepts the variance or asks for a recount (CHG-FIN-003; audit R080 (e)).'
+    pendingVariance: '**Counted; "Under review".** `submitShiftCount` answered `referredToSupervisor`.
+      The cashier sees "Under review" and no amount, **and may sign out**: the shift waits, and the next
+      cashier opens a shift on this till meanwhile (it never blocks the next one). A supervisor resolves
+      it with their PIN on this till or any till of the venue (accept the variance or ask for a recount),
+      or in the daily cash reconciliation, which lists every shift of the day and resolves them one by
+      one; the supervisor''s close on the till itself (`closeShift`) waits on CHG-SPO-021 (decided 2 October
+      2026, Chinmay, batch 3 #1 and pre-apply round; DEC-059, DEC-173; CHG-CSP-012; CHG-FIN-003; audit
+      R080 (e)).'
+    recountRequested: '**"Recount requested".** A supervisor rejected the variance (`rejectShiftVariance`)
+      with a reason the cashier reads; the shift is still pendingVariance with `recountRequestedAt` set.
+      The cashier counts the drawer blind again, at any till of the venue, and submits with `submitShiftCount`;
+      a recount within the threshold closes the shift (DEC-175; DI-804; CHG-CSP-013).'
   apis:
   - operationId: submitShiftCount
     contract: shift
@@ -4178,6 +4241,18 @@ screens:
     contract: shift
     purpose: listDenominations
     trigger: onLoad
+  - operationId: rejectShiftVariance
+    contract: shift
+    purpose: A supervisor sends a counted shift back for a recount, with a reason and their PIN; the shift
+      stays pendingVariance (DEC-175; CHG-CSP-013)
+    trigger: onAction
+    invalidates:
+    - listCashMovements
+  - operationId: getShiftCountLines
+    contract: shift
+    purpose: The denominations the cashier counted, line by line, for the supervisor reviewing the shift;
+      counted values only, never the expected figure (CHG-CSP-014)
+    trigger: onAction
   entryState:
     params:
     - name: shiftId
@@ -4340,7 +4415,14 @@ screens:
 
     **On the till** (CHG-FIN-003): the terminal day view withholds its cash-tender figures from the cashier
     of an open shift, since float plus cash takings is the expected drawer; what else a cashier sees is
-    the per-role switch of DI-802.'
+    the per-role switch of DI-802.
+
+
+    **This terminal''s day, not the venue''s** (design-notes corrections finance-insights POS-008; CHG-SPO-015).
+    No report authoring (Retire report, Save query), no statutory statements and no Export at the till
+    (CSV and Excel export were deferred by POSV2-1). Do not copy the approved prototype''s cross-venue
+    command dashboard. The per-cashier foreign-currency collections report has no cashier-tier read yet
+    (open entry CHG-SPO-019).'
   density: touchLarge
   pattern: listDetail
   patternReason: '`listReports` reads the population and `getFinancialReport` reads one of them — list,
@@ -4352,11 +4434,6 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: textField
-        label: Category
-        operation: listReports
-        notes: Sends `?category=` to `listReports`.
-        provenance: contract reporting.yaml GET /reports
       - kind: searchField
         label: Search
         operation: listReports
@@ -4417,19 +4494,6 @@ screens:
         - ReportDefinition.lastRunAt
         operation: getReport
         provenance: contract reporting.yaml GET /reports/{reportId}
-      - kind: detailPanel
-        label: The financial report
-        bindsTo: FinancialReport
-        columns:
-        - FinancialReport.report
-        - FinancialReport.fiscalPeriodId
-        - FinancialReport.legalEntityId
-        - FinancialReport.currency
-        - FinancialReport.currencyScale
-        - FinancialReport.generatedAt
-        - FinancialReport.sections
-        operation: getFinancialReport
-        provenance: contract finance.yaml GET /reports/financial
     - name: actionBar
       slot: rowActions
       components:
@@ -4444,32 +4508,7 @@ screens:
         label: Ask reporting question
         operation: askReportingQuestion
         provenance: contract reporting.yaml POST /reports/ask
-      - kind: destructiveButton
-        label: Delete report
-        operation: deleteReport
-        provenance: contract reporting.yaml DELETE /reports/{reportId}
-      - kind: secondaryButton
-        label: Save natural language query
-        operation: saveNaturalLanguageQuery
-        provenance: contract reporting.yaml POST /reports/ask/{conversationId}/save
-      - kind: secondaryButton
-        label: Export
-        provenance: carried from the previous definition
   overlays:
-  - id: confirmDeleteReport
-    component: confirmDialog
-    trigger: Delete report
-    body: '**Names what `deleteReport` changes and what it leaves alone**, in the consequence rather than
-      the verb. A reports this affects should be identified in the dialog, not just counted.'
-    provenance: client-verified
-    confirm:
-      label: Delete
-      operation: deleteReport
-      carries:
-      - reportId
-    dismiss:
-      label: Keep
-      discards: []
   - id: formRunReport
     component: modal
     trigger: Run report
@@ -4504,20 +4543,6 @@ screens:
       - conversationId
       - venueId
     provenance: client-verified
-  - id: formSaveNaturalLanguageQuery
-    component: modal
-    trigger: Save natural language query
-    body: '**Collects what `saveNaturalLanguageQuery` sends before it is called.** Required: `name`. Optional:
-      `category`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Save natural language query
-      operation: saveNaturalLanguageQuery
-    dismiss:
-      label: Cancel
-      discards:
-      - name
-      - category
-    provenance: client-verified
   states:
     loading: The reports list.
     error: Could not load. Names which read failed and leaves the reports untouched.
@@ -4525,9 +4550,9 @@ screens:
       makes one — and says so rather than showing an empty table.
     emptyNoResults: Nothing matches the filter on category, search and the reports are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getFinancialReport` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller holds neither REPORT_VIEW_OWN (a cashier''s own figures) nor
+      REPORT_VIEW_WORKSTATION (this terminal''s, for a supervisor), and names them. Never the venue-wide
+      report permission: a till shows the person''s or the terminal''s day.'
     offline: '**Not available.** Reporting reads the analytical replica (ADR-0016) and a terminal-local
       figure would disagree with the back office'
   apis:
@@ -4541,16 +4566,6 @@ screens:
     trigger: onAction
     invalidates:
     - listReports
-  - operationId: deleteReport
-    contract: reporting
-    purpose: Retire a report definition
-    trigger: onAction
-    invalidates:
-    - listReports
-  - operationId: getFinancialReport
-    contract: finance
-    purpose: P&L, balance sheet or cash flow
-    trigger: onLoad
   - operationId: getReport
     contract: reporting
     purpose: Read a report definition
@@ -4559,12 +4574,6 @@ screens:
     contract: reporting
     purpose: List available report definitions
     trigger: onLoad
-  - operationId: saveNaturalLanguageQuery
-    contract: reporting
-    purpose: Save a natural-language answer as a report definition
-    trigger: onAction
-    invalidates:
-    - listReports
   entryState:
     params:
     - name: conversationId
@@ -4595,6 +4604,25 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  gaps:
+  - operation: deleteReport
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-SPO-015): a till does not author or retire reports, and statutory
+      statements need ledger permissions a cashier does not hold (design-notes corrections finance-insights
+      POS-008; F74 step 2).'
+    source: screens/P04-point-of-sale.yaml#POS-008
+  - operation: saveNaturalLanguageQuery
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-SPO-015): a till does not author or retire reports, and statutory
+      statements need ledger permissions a cashier does not hold (design-notes corrections finance-insights
+      POS-008; F74 step 2).'
+    source: screens/P04-point-of-sale.yaml#POS-008
+  - operation: getFinancialReport
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-SPO-015): a till does not author or retire reports, and statutory
+      statements need ledger permissions a cashier does not hold (design-notes corrections finance-insights
+      POS-008; F74 step 2).'
+    source: screens/P04-point-of-sale.yaml#POS-008
 - id: POS-009
   name: Staff Roster
   module: Shift
@@ -4627,8 +4655,8 @@ screens:
       provenance: 'derived — POS-007 declares entryState.params saleId and POS-009 holds none of them.
         The edge carries nothing: saleId only pre-selects (deep link or optional), and POS-007 opens on
         its own'
-  notes: 'Close counts each foreign currency separately (`foreignHoldings`). **A variance collapsed into
-    a base-currency total cannot be attributed to the currency that caused it.** **createCashMovement
+  notes: 'Close (POS-007) counts each foreign currency separately (`foreignHoldings`). **A variance collapsed
+    into a base-currency total cannot be attributed to the currency that caused it.** **createCashMovement
     removed 18 August** — attached by module resemblance, not by what this screen does. A screen that
     does not handle money should not be able to move it (CF-87''s class). **Improved 20 August against
     the client design board**, answering 2 board screen(s): Shift & Operator Dashboard; Operator & Workstation
@@ -4640,7 +4668,11 @@ screens:
     **Blind close** (decided 2 October 2026, Chinmay; CHG-FIN-003): closing from here submits the cashier''s
     blind count with `submitShiftCount` (no expected cash, no variance shown; the supervisor is alerted
     beyond the threshold); `closeShift`, which returns the expected figure, is the supervisor''s path
-    on BO-039 and BO-040.'
+    on BO-039 and BO-040.
+
+
+    Foreign-currency counting belongs to the close (POS-007), not the roster (design-notes correction
+    fnb-retail POS-009; CHG-SPO-015).'
   density: touchLarge
   boardFrames:
   - POS Board 3.dc.html#pos-3a
@@ -4654,16 +4686,6 @@ screens:
     - name: contentBody
       slot: queue
       components:
-      - kind: textField
-        label: Workstation id
-        operation: listShifts
-        notes: Sends `?workstationId=` to `listShifts`.
-        provenance: contract shift.yaml GET /shifts
-      - kind: textField
-        label: Status
-        operation: listShifts
-        notes: Sends `?status=` to `listShifts`.
-        provenance: contract shift.yaml GET /shifts
       - kind: datePicker
         label: Opened from
         operation: listShifts
@@ -5280,6 +5302,10 @@ screens:
         label: Create refund
         operation: createRefund
         provenance: contract orders.yaml POST /orders/{orderId}/refunds
+        notes: '**Store credit is a gift card issued at the refund amount** (decided 2 October 2026, Chinmay,
+          batch 1, POS-011: "Gift card"; DEC-061; CHG-CSP-037, CHG-CSA-027). The tender list reads "Gift
+          card (store credit)"; `createRefund` with `settleTo: storeCredit` issues the card and the receipt
+          prints its number.'
       - kind: secondaryButton
         label: Exchange order lines
         operation: exchangeOrderLines
@@ -5319,7 +5345,9 @@ screens:
     emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `getReturnPolicy` requires, and names
       that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
-    offline: '**Working from the local journal.** The till keeps taking money; this reconciles on sync.'
+    offline: '**Refunds and returns are refused offline** (F58 step 8; design-notes correction fnb-retail
+      POS-011). The till keeps selling from the local journal; a refund needs the original sale and its
+      payment, which only the server holds. Says so and offers to try again when the link returns.'
   apis:
   - operationId: createRefund
     contract: orders
@@ -5516,7 +5544,13 @@ screens:
     them. **Named in the board contents and not written up in it.** **Owns POS board frame(s) POS-2C**
     (client pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three attempts
     at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table is worse
-    off than one who has none.'
+    off than one who has none.
+
+
+    **One screen, two jobs, now named** (POS v2 accepted 2 October 2026, POSV2-12, DEC-553; CHG-SPO-001).
+    The cart''s order-type choice (Dine-in, Quick service, Takeaway, Delivery with Own delivery or Delivery
+    partner) is drawn here, and the orders it produces are worked on the queue (POS-029) and collected
+    here (F60). The design draws the selector inside the cart; this screen keeps the collection counter.'
   density: touchLarge
   boardFrames:
   - POS Frontline Board 2.dc.html#pos-2c
@@ -5577,6 +5611,15 @@ screens:
       - kind: primaryButton
         label: Confirm
         provenance: carried from the previous definition
+      - kind: selectField
+        label: Order type
+        notes: 'The cart''s order type, as drawn in v2 (POSV2-12, DEC-553): Dine-in, Quick service, Takeaway,
+          Delivery. Delivery asks the fulfilment source, Own delivery or Delivery partner. Quick service
+          is a counter order with no guest details whose number prints on the receipt and shows on the
+          guest status board (KIT-007). **No hold timer on a food cart**: food lines hold no capacity
+          (design-notes correction fnb-retail POS-012). The delivery partner''s reference, driver and
+          fee have no contract field yet (open entry CHG-SPO-019).'
+        provenance: POS v2 candidate, accepted 2 October 2026 (POSV2-12)
     - name: contextPanel
       slot: selection
       components:
@@ -5703,7 +5746,11 @@ screens:
         asks the fulfilment source (Own delivery or Delivery partner), and the queue (POS-029) works the
         orders. Quick service is a counter order with no guest details, whose number prints on the receipt
         and shows on the guest status board. No click-and-collect of merchandise (reserveMerchandise)
-        and no handover record beyond the queue''s stage action.'
+        and no handover record beyond the queue''s stage action. Accepted as drawn (decided 2 October
+        2026, Chinmay, batch 5: "four order types: dine-in, quick service, takeaway and delivery (own
+        fleet or partner)"; POSV2-12, DEC-553; CHG-SPO-001). A food cart shows no hold timer: food lines
+        hold no capacity (CartLine hold is null), so the v2 "Inventory held · Extend" strip is not drawn
+        on an F&B cart.'
     derivedFrom: wireframes/reference/POS Frontline Board 2.dc.html
     source: Claude Design POS pack, 24 August
     note: '**Drawn by Claude Design on `POS Frontline Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
@@ -5857,10 +5904,12 @@ screens:
     - name: actionBar
       slot: rowActions
       components:
-      - kind: primaryButton
+      - kind: secondaryButton
         label: Sync orders
         operation: syncOrders
         provenance: contract orders.yaml POST /sync/orders
+        notes: '**Sync is automatic** (DI-798, DI-071; design-notes correction fnb-retail POS-013): this
+          is a retry shown only when a sync failed, never the primary action.'
       - kind: secondaryButton
         label: Create order
         operation: createOrder
@@ -6039,7 +6088,12 @@ screens:
       provenance: derived — POS-001 declares entryState.params shiftId and POS-014 holds shiftId, so an
         edge into it carries them
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
-    them.'
+    them.
+
+
+    `id` and `recordedAt` of a no-sale are set by the till (design-notes correction ticketing-guest POS-014;
+    CHG-SPO-015). The approval modal has a reject path: the supervisor declines with a reason, and the
+    drawer stays shut.'
   density: touchLarge
   pattern: configEditor
   patternReason: the screen declares only writes (`recordNoSale`, `voidOrder`, `applyManualDiscount`)
@@ -6069,18 +6123,8 @@ screens:
       - kind: primaryButton
         label: Confirm
         provenance: carried from the previous definition
-      - kind: textField
-        label: Id
-        operation: recordNoSale
-        notes: Required.
-        provenance: contract shift.yaml POST /shifts/{shiftId}/no-sale
       - kind: selectField
         label: Reason
-        operation: recordNoSale
-        notes: Required.
-        provenance: contract shift.yaml POST /shifts/{shiftId}/no-sale
-      - kind: datePicker
-        label: Recorded at
         operation: recordNoSale
         notes: Required.
         provenance: contract shift.yaml POST /shifts/{shiftId}/no-sale
@@ -6137,6 +6181,8 @@ screens:
       that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
     offline: '**Working from the local journal.** The till keeps taking money; this reconciles on sync.'
+    approvalRejected: The supervisor declined the no-sale or void; the drawer stays shut and the reason
+      is shown.
   apis:
   - operationId: recordNoSale
     contract: shift
@@ -6260,6 +6306,15 @@ screens:
         - DepositBox.foreignHoldings
         - DepositBox.expectedTotal
         operation: listDepositBoxes
+        provenance: contract shift.yaml GET /deposit-boxes
+      - kind: banner
+        label: Drawers over their limit
+        bindsTo: DepositBox.overDrawerLimit
+        operation: listDepositBoxes
+        permission: OVERSHORT_ACCEPT
+        notes: 'The supervisor''s view (DEC-179; CHG-CSP-016): boxes over the drawer limit, with a lift
+          to offer. **Expected cash per till is a supervisor figure**: shown only to a holder of OVERSHORT_ACCEPT
+          or SHIFT_CLOSE_OTHER, never on a cashier''s screen (DI-273, audit R080, POSV2-3).'
         provenance: contract shift.yaml GET /deposit-boxes
       - kind: primaryButton
         label: Confirm
@@ -6389,92 +6444,46 @@ screens:
     - name: contentBody
       slot: fields
       components:
-      - kind: textField
-        label: id
-        bindsTo: DepositBox.id
-        provenance: contract shift.yaml POST /deposit-boxes
-      - kind: textField
-        label: cashierPrincipalId
-        bindsTo: DepositBox.cashierPrincipalId
-        provenance: contract shift.yaml POST /deposit-boxes
-      - kind: textField
-        label: cashierName
-        bindsTo: DepositBox.cashierName
-        provenance: contract shift.yaml POST /deposit-boxes
-      - kind: textField
-        label: venueId
-        bindsTo: DepositBox.venueId
-        provenance: contract shift.yaml POST /deposit-boxes
-      - kind: textField
-        label: workstationId
-        bindsTo: DepositBox.workstationId
-        provenance: contract shift.yaml POST /deposit-boxes
-      - kind: textField
-        label: shiftId
-        bindsTo: DepositBox.shiftId
-        provenance: contract shift.yaml POST /deposit-boxes
-      - kind: textField
-        label: status
-        bindsTo: DepositBox.status
-        provenance: contract shift.yaml POST /deposit-boxes
-      - kind: textField
-        label: openingFloat
-        bindsTo: DepositBox.openingFloat
-        provenance: contract shift.yaml POST /deposit-boxes
-      - kind: textField
-        label: openingDenominations
-        bindsTo: DepositBox.openingDenominations
-        provenance: contract shift.yaml POST /deposit-boxes
-      - kind: textField
-        label: withdrawnTotal
-        bindsTo: DepositBox.withdrawnTotal
-        provenance: contract shift.yaml POST /deposit-boxes
-      - kind: textField
-        label: foreignHoldings
-        bindsTo: DepositBox.foreignHoldings
-        provenance: contract shift.yaml POST /deposit-boxes
-      - kind: textField
-        label: expectedTotal
-        bindsTo: DepositBox.expectedTotal
-        provenance: contract shift.yaml POST /deposit-boxes
-      - kind: textField
-        label: countedTotal
-        bindsTo: DepositBox.countedTotal
-        provenance: contract shift.yaml POST /deposit-boxes
-      - kind: textField
-        label: variance
-        bindsTo: DepositBox.variance
-        provenance: contract shift.yaml POST /deposit-boxes
-      - kind: textField
-        label: closedByPrincipalId
-        bindsTo: DepositBox.closedByPrincipalId
-        provenance: contract shift.yaml POST /deposit-boxes
-      - kind: textField
-        label: allocatedAt
-        bindsTo: DepositBox.allocatedAt
-        provenance: contract shift.yaml POST /deposit-boxes
-      - kind: textField
-        label: closedAt
-        bindsTo: DepositBox.closedAt
-        provenance: contract shift.yaml POST /deposit-boxes
+      - kind: selectField
+        label: Cashier
+        operation: allocateDepositBox
+        notes: Picked from the staff on shift; the deposit box is allocated to them on this workstation.
+        provenance: contract shift.yaml allocateDepositBox
+      - kind: numberField
+        label: Float by denomination
+        operation: allocateDepositBox
+        notes: The float, as a total or by denomination. Ids, statuses, expected and counted totals and
+          the variance are computed or closing data and are not fields (design-notes corrections platform-foundation
+          POS-016).
+        provenance: contract shift.yaml allocateDepositBox
       - kind: dataTable
         label: Every registered device
         bindsTo: RegisteredDevice
         columns:
-        - RegisteredDevice.id
         - RegisteredDevice.kind
-        - RegisteredDevice.driver
         - RegisteredDevice.identifier
-        - RegisteredDevice.workstationId
         - RegisteredDevice.model
-        - RegisteredDevice.pushToken
-        - RegisteredDevice.pushPlatform
-        - RegisteredDevice.pushFailureCount
         - RegisteredDevice.offlineScope
         - RegisteredDevice.firmwareVersion
         - RegisteredDevice.isRequired
         operation: listDevices
         provenance: contract tenancy.yaml GET /devices
+        notes: Names, not ids; the raw ids stay in the detail panel's copy action (design-notes correction
+          platform-foundation POS-016).
+      - kind: numberField
+        label: Drawer limit for this till (override)
+        bindsTo: ConfigureWorkstationRequest.cashDrawerLimit
+        operation: configureWorkstation
+        notes: Empty uses the venue default (`VenueSettings.cashDrawerLimit`); the till warns and offers
+          a lift above it (DEC-179; CHG-CSP-016).
+        provenance: contract tenancy.yaml PUT /workstations/{workstationId}
+      - kind: selectField
+        label: Sale board (till override)
+        bindsTo: ConfigureWorkstationRequest.saleBoardId
+        operation: configureWorkstation
+        notes: Empty inherits the outlet's board; set only to override it on this till (BO-109 "Per outlet,
+          with a till override"; DEC-183; CHG-CSP-006).
+        provenance: contract tenancy.yaml PUT /workstations/{workstationId}
       - kind: primaryButton
         label: Confirm
         provenance: carried from the previous definition
@@ -6650,37 +6659,32 @@ screens:
     - name: contentBody
       slot: fields
       components:
-      - kind: textField
-        label: id
-        bindsTo: CreateCashMovementRequest.id
-        provenance: contract shift.yaml POST /shifts/{shiftId}/cash-movements
-      - kind: textField
-        label: kind
+      - kind: selectField
+        label: Cash in or cash out
         bindsTo: CreateCashMovementRequest.kind
-        provenance: contract shift.yaml POST /shifts/{shiftId}/cash-movements
-      - kind: textField
-        label: amount
-        bindsTo: CreateCashMovementRequest.amount
-        provenance: contract shift.yaml POST /shifts/{shiftId}/cash-movements
-      - kind: textField
-        label: denominations
+        notes: A two-way choice (lift or add); never typed.
+        provenance: contract shift.yaml CreateCashMovementRequest
+      - kind: numberField
+        label: Counted by denomination
         bindsTo: CreateCashMovementRequest.denominations
-        provenance: contract shift.yaml POST /shifts/{shiftId}/cash-movements
-      - kind: textField
-        label: reference
-        bindsTo: CreateCashMovementRequest.reference
-        provenance: contract shift.yaml POST /shifts/{shiftId}/cash-movements
-      - kind: textField
-        label: reason
+        notes: The amount is the sum of the notes and coins counted, not typed separately.
+        provenance: contract shift.yaml CreateCashMovementRequest
+      - kind: selectField
+        label: Reason
         bindsTo: CreateCashMovementRequest.reason
-        provenance: contract shift.yaml POST /shifts/{shiftId}/cash-movements
-      - kind: textField
-        label: recordedAt
-        bindsTo: CreateCashMovementRequest.recordedAt
-        provenance: contract shift.yaml POST /shifts/{shiftId}/cash-movements
+        notes: From the venue's reasons, with a reference where one applies. `id` and `recordedAt` are
+          set by the till.
+        provenance: contract shift.yaml CreateCashMovementRequest
       - kind: primaryButton
         label: Confirm
         provenance: carried from the previous definition
+      - kind: banner
+        label: The drawer is over its limit
+        notes: '**Warn and offer a cash lift; never block, never a figure to the cashier** (decided 2
+          October 2026, Chinmay, batch 6, BO-042: "Add drawer limit setting (warn + offer cash lift)";
+          DEC-179; DI-274; CHG-CSP-016). The limit is `VenueSettings.cashDrawerLimit` with a till override
+          (`Workstation.cashDrawerLimit`).'
+        provenance: contract shift.yaml POST /shifts/{shiftId}/cash-movements
     - name: actionBar
       slot: publish
       components:
@@ -6798,6 +6802,10 @@ screens:
         label: Withdraw from deposit box
         operation: withdrawFromDepositBox
         provenance: contract shift.yaml POST /deposit-boxes/{boxId}/withdraw
+        notes: '**The cashier countersigns with their own PIN on the same device** (decided 2 October
+          2026, Chinmay, batch 6, BO-042: "PIN on the same device"; DEC-178; CHG-CSP-015): the supervisor
+          takes the cash, the cashier enters their PIN as witness, and a supervisor may not witness their
+          own withdrawal (403 witness-not-verified).'
   overlays:
   - id: confirmWithdrawFromDepositBox
     component: confirmDialog
@@ -6971,16 +6979,6 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: textField
-        label: Workstation id
-        operation: listShifts
-        notes: Sends `?workstationId=` to `listShifts`.
-        provenance: contract shift.yaml GET /shifts
-      - kind: textField
-        label: Status
-        operation: listShifts
-        notes: Sends `?status=` to `listShifts`.
-        provenance: contract shift.yaml GET /shifts
       - kind: datePicker
         label: Opened from
         operation: listShifts
@@ -6995,11 +6993,6 @@ screens:
         label: Every shift
         bindsTo: Shift
         columns:
-        - Shift.id
-        - Shift.workstationId
-        - Shift.venueId
-        - Shift.scopePath
-        - Shift.principalId
         - Shift.principalDisplayName
         - Shift.incidents
         - Shift.status
@@ -7009,6 +7002,8 @@ screens:
         - Shift.bagNumber
         operation: listShifts
         provenance: contract shift.yaml GET /shifts
+        notes: Who, when and the state; names rather than ids (design-notes correction platform-foundation
+          POS-019).
       - kind: primaryButton
         label: Confirm
         provenance: carried from the previous definition
@@ -7037,6 +7032,14 @@ screens:
         - Shift.liftsTotal
         operation: listShifts
         provenance: contract shift.yaml GET /shifts
+      - kind: detailPanel
+        label: The rules this till opens and closes to
+        bindsTo: TillShiftPolicy
+        operation: getTillShiftPolicy
+        notes: 'Read-only on the till: open approval, deposit box and bag number, the abandoned-shift
+          limit and the exception alerts, set for the venue in the back office (CHG-CSP-020). The variance
+          threshold and drawer limit are venue settings shown beside them.'
+        provenance: contract shift.yaml GET /venues/{venueId}/till-shift-policy
     - name: actionBar
       slot: rowActions
       components: []
@@ -7055,6 +7058,10 @@ screens:
   - operationId: listShifts
     contract: shift
     purpose: List shifts
+    trigger: onLoad
+  - operationId: getTillShiftPolicy
+    contract: shift
+    purpose: The venue's till opening, closing and exception rules that this till's shifts run under (CHG-CSP-020)
     trigger: onLoad
   entryState:
     params:
@@ -7106,6 +7113,10 @@ screens:
     why: 'Contract gap recorded 2 October 2026 (CHG-WIR-024): No operation reads or writes a till shift
       policy (opening and closing rules, exceptions and alerts) for F73 step 2.'
     source: DI-309 | screens/P04-point-of-sale.yaml#POS-019 | F73 step 2
+  - why: '2 October 2026 (CHG-SPO-014): the shift-policy read now exists (`getTillShiftPolicy`, CHG-CSP-020)
+      and is bound; the CHG-WIR-024 gap for this screen is closed on the read side. Writing the policy
+      stays in the back office.'
+    source: contracts/spine/shift.yaml#getTillShiftPolicy
   purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the pasted board placeholder
     "Shift Templates & Policies — from the client design board, 20 August" (DI-309).'
 - id: POS-020
@@ -7144,7 +7155,11 @@ screens:
     **Cash variances are for the supervisor, not the cashier** (decided 2 October 2026, Chinmay; CHG-FIN-003).
     A shift counted beyond the venue threshold raises an alert to the supervisors holding OVERSHORT_ACCEPT;
     the `shiftSummary` report (expected against counted, variance) runs only for them, and is never shown
-    to the cashier whose shift it is. The cashier''s own till shows no expected cash anywhere.'
+    to the cashier whose shift it is. The cashier''s own till shows no expected cash anywhere.
+
+
+    Workstation and shift are this till''s by default and are picked, never typed as ids (design-notes
+    correction finance-insights POS-020; CHG-SPO-015).'
   density: touchLarge
   boardFrames:
   - POS Board 3.dc.html#pos-3e
@@ -7173,21 +7188,6 @@ screens:
         label: Severity
         operation: listAlerts
         notes: Sends `?severity=` to `listAlerts`.
-        provenance: contract reporting.yaml GET /alerts
-      - kind: textField
-        label: Workstation id
-        operation: listAlerts
-        notes: Sends `?workstationId=` to `listAlerts`.
-        provenance: contract reporting.yaml GET /alerts
-      - kind: textField
-        label: Shift id
-        operation: listAlerts
-        notes: Sends `?shiftId=` to `listAlerts`.
-        provenance: contract reporting.yaml GET /alerts
-      - kind: textField
-        label: Item id
-        operation: listAlerts
-        notes: Sends `?itemId=` to `listAlerts`.
         provenance: contract reporting.yaml GET /alerts
       - kind: dataTable
         label: Waiting for a decision
@@ -7355,9 +7355,9 @@ screens:
   - id: formCreateApprovalRequest
     component: modal
     trigger: Create approval request
-    body: '**Collects what `createApprovalRequest` sends before it is called.** Required: `id`, `kind`,
-      `subjectContract`, `subjectType`, `subjectId`, `scopePath`, `summary`. Optional: `amount`, `attributes`,
-      `justification`, `isDraft`. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Raised from the transaction it is about**: the record, contract and subject type and the
+      scope come from the selected exception, never typed. The person adds the reason only (design-notes
+      correction finance-insights POS-020).'
     bindsTo: CreateApprovalRequest
     confirm:
       label: Create approval request
@@ -7462,7 +7462,13 @@ screens:
 
     **The client pack has the same gap.** Six F&B boards: board 3 is the kitchen, board 4 is table service,
     and none is a counter till — so the placement on 20 August was faithful to a pack that never drew
-    it.'
+    it.
+
+
+    **Outlet decisions of 2 October** (Chinmay; CHG-SPO-004): payment timing is an outlet setting, send
+    first or pay first (DEC-064, refining audit R261 per outlet); a dish can carry a daily count that
+    sells it out at zero (DEC-194); and F&B owns its prices in its own catalogue (DEC-034), so the till
+    prices a dish from the guest menu, never from the ticketing catalogue.'
   density: touchLarge
   pattern: listDetail
   patternReason: '`listMenus` reads the population and `getGuestMenu` reads one of them — list, select,
@@ -7478,7 +7484,10 @@ screens:
         bindsTo: MenuItem[]
         label: Menu
         notes: '**Sections in the order the outlet set them, not alphabetical.** A menu board that sorts
-          by name puts Desserts above Mains forever.'
+          by name puts Desserts above Mains forever. **Daily counts** (DEC-194; CHG-CSA-017): a dish with
+          a count shows what is left ("6 left", `MenuItem.remainingCount`) and goes sold out by itself
+          at zero. **Prices are F&B''s own**: `MenuItem.price`, set per outlet in the F&B catalogue, never
+          the central catalogue variant (DEC-034; CHG-CSA-009).'
         provenance: carried from the previous definition
       - kind: detailPanel
         label: Modifiers
@@ -7491,6 +7500,12 @@ screens:
       - kind: primaryButton
         label: Pay
         provenance: carried from the previous definition
+        notes: '**Payment timing is the outlet''s setting** (decided 2 October 2026, Chinmay, batch 1,
+          POS-021: "Two configurations: one takes the bill first, the other sends first and charges after";
+          DEC-064; CHG-CSP-004, CHG-CSA-010). Send first (the default, audit R261): Send to kitchen, then
+          Charge. Pay first: Charge, and the order reaches the kitchen only once paid. The button order
+          and labels follow `Outlet.paymentTiming`; the header never says "kitchen fires on payment" on
+          a send-first outlet.'
     - name: contextPanel
       slot: selection
       components:
@@ -7518,6 +7533,8 @@ screens:
         label: Evaluate promotions
         operation: evaluatePromotions
         provenance: contract promotions.yaml POST /promotions/evaluate
+        notes: Automatic on every cart change (DI-102); drawn as the basket's promotion line, never a
+          button.
       - kind: secondaryButton
         label: Save item availability
         operation: setItemAvailability
@@ -7535,6 +7552,8 @@ screens:
       it and the guest is refunded at the counter.'
     denied: Ordering is refused without `payment.take`. The kitchen is not fired, so nothing is cooked
       against a sale that cannot be paid for.
+    soldOutByCount: A dish whose daily count reached zero shows Sold out and cannot be added; the kitchen
+      or the back office sets tomorrow's count (DEC-194; CHG-CSA-017).
   apis:
   - operationId: getGuestMenu
     contract: fnb
@@ -7595,7 +7614,11 @@ screens:
         which the 28 September decision replaced (audit R261: send to kitchen, then charge, for every
         POS F&B order). No item-availability (86) toggle, although the definition attaches setItemAvailability.
         Design correction (decided 1 October, POSV2-4): ''kitchen fires on payment'' is wrong; audit R261
-        stands: send to kitchen, then charge.'
+        stands: send to kitchen, then charge. Decided 2 October 2026 (DEC-064; CHG-SPO-004): payment timing
+        is the outlet''s setting, so "kitchen fires on payment" is right only on a pay-first outlet; on
+        the default send-first outlet audit R261 stands. Design corrections (CHG-SPO-016): no "Open-dated
+        · any day" validity chip on food tiles, no "Today" or "Low capacity" REFINE chips and no "Reserve"
+        button in a food-only cart; those are ticket concepts.'
   apisNote: Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -7603,9 +7626,9 @@ screens:
   - id: formAddCartLine
     component: modal
     trigger: Add cart line
-    body: '**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`.
-      Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the
-      screen behind is unchanged.'
+    body: '**No form: a tap on a dish adds it.** Options open the modifier panel; seat and performance
+      fields are ticket fields and are not shown (design-notes correction fnb-retail POS-021). Kept as
+      the add of a dish with its options.'
     bindsTo: AddCartLineRequest
     confirm:
       label: Add cart line
@@ -7623,9 +7646,8 @@ screens:
   - id: formEvaluatePromotions
     component: modal
     trigger: Evaluate promotions
-    body: '**Collects what `evaluatePromotions` sends before it is called.** Required: `venueId`, `channel`,
-      `lines`. Optional: `subjectId`, `membershipTierId`, `couponCodes`, `evaluateAt`. Dismissing sends
-      nothing; the screen behind is unchanged.'
+    body: '**Not a button the cashier presses**: promotions are re-evaluated on every cart read, locally
+      on the terminal (DI-102). Shown only as the result line in the basket.'
     bindsTo: EvaluatePromotionsRequest
     confirm:
       label: Evaluate promotions
@@ -7721,7 +7743,11 @@ screens:
 
 
     `markOrderCollected` closes the fulfilment clock here — **order to ready is the kitchen’s number,
-    ready to collected is the counter’s**, and food under a lamp for nine minutes shows in neither alone.'
+    ready to collected is the counter’s**, and food under a lamp for nine minutes shows in neither alone.
+
+
+    **The counter sends before it charges on a send-first outlet** (POSV2-4, audit R261; DEC-064 makes
+    it the outlet''s choice; CHG-SPO-016): Send to kitchen is the step at the counter before Charge.'
   density: touchLarge
   pattern: listDetail
   patternReason: '`listKitchenTickets` reads a population and nothing reads one of them; the detail is
@@ -7733,16 +7759,6 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: textField
-        label: Station id
-        operation: listKitchenTickets
-        notes: Sends `?stationId=` to `listKitchenTickets`.
-        provenance: contract fnb.yaml GET /kitchen/tickets
-      - kind: textField
-        label: Status
-        operation: listKitchenTickets
-        notes: Sends `?status=` to `listKitchenTickets`.
-        provenance: contract fnb.yaml GET /kitchen/tickets
       - kind: dataTable
         label: Every kitchen ticket
         bindsTo: KitchenTicket
@@ -7910,9 +7926,9 @@ screens:
   - id: formCreateFnbOrder
     component: modal
     trigger: Create F&B order
-    body: '**Collects what `createFnbOrder` sends before it is called.** Required: `id`, `outletId`, `serviceMode`,
-      `lines`, `recordedAt`. Optional: `tableVisitId`. Dismissing sends nothing; the screen behind is
-      unchanged.'
+    body: '**No form: the order comes from the cart.** Send to kitchen sends the cart''s F&B lines with
+      the service mode; ids and device times are generated, never typed (design-notes correction fnb-retail
+      POS-022).'
     bindsTo: CreateFnbOrderRequest
     confirm:
       label: Create F&B order
@@ -7930,8 +7946,7 @@ screens:
   - id: formSetKitchenTicketStatus
     component: modal
     trigger: Save kitchen ticket status
-    body: '**Collects what `setKitchenTicketStatus` sends before it is called.** Required: `status`, `recordedAt`.
-      Optional: `lineIds`, `stationId`. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**A gesture on the ticket card, not a form**; the time is the device''s.'
     confirm:
       label: Save kitchen ticket status
       operation: setKitchenTicketStatus
@@ -8012,7 +8027,12 @@ screens:
     - posSaleToPayment
   notes: '**Built 24 August.** `RetailService` has 35 operations and F34 walks a retail sale from scan
     to return — **on `POS-002`, which is declared `ticketing`.** A venue licensing retail without ticketing
-    had a till it could not open.'
+    had a till it could not open.
+
+
+    **Offline: the design follows the contract until one rule is chosen** (design-notes correction fnb-retail
+    POS-023; CHG-SPO-016): `createRetailSale` is not offline-capable, so the offline state says a retail
+    sale needs the link. The question of offline overselling (DI-075 against DI-294) is logged in CHG-SPO-020.'
   density: touchLarge
   pattern: listDetail
   patternReason: '`listMerchandise` reads a population and nothing reads one of them; the detail is the
@@ -8033,6 +8053,15 @@ screens:
       - kind: primaryButton
         label: Pay
         provenance: carried from the previous definition
+      - kind: cardList
+        label: Category tabs (including Lockers), REFINE chips and Scan
+        operation: lookupMerchandise
+        notes: 'As drawn in v2 (POSV2-13, DEC-554): category tabs including Lockers, REFINE chips and
+          Scan (a barcode or SKU resolves through `lookupMerchandise`). No inventory ledger on the till.
+          **Merchandise words, not ticket words**: a chip reads "Low stock", never "Low capacity", and
+          no tile carries an "Open-dated · any day" validity. An item with variants (size, colour) opens
+          a variant picker, each variant with its own barcode and stock (DI-354).'
+        provenance: POS v2 candidate, accepted 2 October 2026 (POSV2-13)
     - name: contextPanel
       slot: selection
       components: []
@@ -8065,8 +8094,9 @@ screens:
     emptyNoResults: Nothing matches. **A scan that finds nothing is a barcode not in the catalogue** —
       said plainly, because the cashier will otherwise scan it four more times.
     emptyNoAccess: You do not have permission to sell at this store.
-    offline: '**Sells from the cached catalogue.** Stock goes negative rather than refusing — a level
-      that will not go negative is a level that hides what happened, and the count is where it is found.'
+    offline: '**A retail sale needs the link** (`createRetailSale` is not offline-capable). The tiles
+      stay browsable from the cached catalogue; Charge says to reconnect. (Design-notes correction fnb-retail
+      POS-023; the offline-overselling rule is an open question, CHG-SPO-020.)'
     denied: Merchandise scans and prices normally; charging needs `payment.take`. Stock reserved on add
       is released rather than held against a sale that cannot complete.
     stockConflict: The merchandise line went out of stock between scan and charge. The line is flagged
@@ -8127,7 +8157,10 @@ screens:
       view: Left rail 'Retail' (category tabs incl. Lockers, REFINE chips)
       differences: 'v2: category tabs including Lockers, REFINE chips and Scan; the operational inventory
         ledger that the approved build had under Sync is gone. Still no size or variant picker for apparel,
-        and stockConflict shows only through sync conflicts.'
+        and stockConflict shows only through sync conflicts. Accepted as drawn (decided 2 October 2026,
+        Chinmay, batch 5: "Lockers tab, refine chips and Scan; no inventory ledger on the till"; POSV2-13,
+        DEC-554; CHG-SPO-001). Chip wording: "Low stock", never "Low capacity", and no "Open-dated" validity
+        on merchandise (DI-354; design-notes correction fnb-retail POS-023).'
   apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -8248,6 +8281,7 @@ screens:
         bindsTo: TableDefinition[]
         label: Floor
         provenance: carried from the previous definition
+        notes: Each table has Remove (marks it Out of service, DEC-067) rather than Delete.
       - kind: detailPanel
         label: Combinations
         notes: '**Declared, not inferred.** Two adjacent tables do not always combine — a pillar, a step,
@@ -8274,6 +8308,10 @@ screens:
         label: Save table layout
         operation: setTableLayout
         provenance: contract fnb.yaml PUT /outlets/{outletId}/tables
+        notes: '**Remove table marks it Out of service; `setTableLayout` never deletes a table** (decided
+          2 October 2026, Chinmay, batch 3 #2: "Yes: mark the table out of service"; DEC-067; CHG-CSA-012).
+          An out-of-service table keeps its history and its visits, is greyed on the floor and cannot
+          be seated; Return to service brings it back.'
       - kind: secondaryButton
         label: Save table combinations
         operation: setTableCombinations
@@ -8507,7 +8545,10 @@ screens:
   states:
     loading: The saved till home.
     error: Could not load. Names which read failed and leaves the till home untouched.
-    emptyFirstRun: No till home yet. Carries the create action and says what the till does in the meantime.
+    emptyFirstRun: '**A till with no sale boards assigned.** Nothing to create here: says that the till
+      layout is set per outlet in the back office (with a till override on POS-016) and names who at the
+      venue configures it, and the launcher shows only what needs no board (design-notes correction platform-foundation
+      POS-025).'
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
     offline: '**Working from the local journal.** The tiles show what this workstation knows; the queue
@@ -8517,8 +8558,9 @@ screens:
   apis:
   - operationId: getWorkstationShift
     contract: shift
-    purpose: Whose shift this is and when it opened, read under a view permission so a supervisor covering
-      the till can load the home (CHG-DOOR-005)
+    purpose: Whose shift this is and when it opened, read on load under a view permission so a supervisor
+      covering the till can load the home (CHG-DOOR-005); the shift id the actions use comes from here,
+      not from navigation (CHG-SPO-002)
     trigger: onLoad
   - operationId: listSaleBoards
     contract: tenancy
@@ -8551,9 +8593,11 @@ screens:
     - name: workstationId
       from: session
     - name: shiftId
-      from: navigation
+      from: session
     coldEntry: '**Resolves from the session, which carries the workstation** — a till is signed into,
-      not navigated to.'
+      not navigated to. **The shift is read, never passed**: `getWorkstationShift` on load returns the
+      open or suspended shift on this workstation, and Suspend and Reopen act on its id (decided 2 October
+      2026, Chinmay, pre-apply round; CHG-SPO-002). A 404 `no-current-shift` is the no-shift state.'
   requiresModule: core
   wireframe:
     status: review
@@ -8657,7 +8701,14 @@ screens:
     till prints it on payment from the issued invoice (`getTaxInvoice`, `getTaxDocumentRendition`) with
     the words "Tax Invoice", the supplier''s name, address and TRN, the date, what was sold, the total
     and the VAT in AED. A reprint is marked "Copy" and keeps the invoice number. A VAT-registered buyer
-    may ask for a full tax invoice here (`issueTaxInvoice` `full`, name, address and TRN).'
+    may ask for a full tax invoice here (`issueTaxInvoice` `full`, name, address and TRN).
+
+
+    **Both receipt cases are drawn**: auto-issued (the receipt is the simplified tax invoice) and on request.
+    Whether a venue auto-issues is a template setting (`FinTaxInvoiceTemplate.autoIssueOnPayment`, off
+    by default), but the only read of it (`listTaxInvoiceTemplates`) is tenant-scoped under LEDGER_VIEW,
+    which a till does not hold; a till-scoped read is logged as a contract gap (open entry CHG-SPO-019;
+    design-notes correction finance-insights POS-026).'
   density: touchLarge
   pattern: detail
   patternReason: One order is named and acted on — detail, not a list
@@ -8792,6 +8843,8 @@ screens:
       - kind: detailPanel
         label: Wallet, passes and open reservations
         bindsTo: GuestProfile
+        notes: Open reservations are drawn on the guest card before the sale (design-notes correction
+          customer-marketing POS-027; the prototype omits them).
       - kind: primaryButton
         label: Attach to sale
       - kind: detailPanel
@@ -8800,6 +8853,12 @@ screens:
         operation: getGuestLoyalty
         provenance: contract marketing-crm.yaml GET /guests/{subjectId}/loyalty; wiring fix, 2 October
           2026
+      - kind: consentBlock
+        label: Consent given at the till
+        operation: recordConsent
+        notes: The guest says yes or no in person; the cashier records it on their behalf, with the notice
+          version shown (design-notes correction customer-marketing POS-027; CHG-CSA-045).
+        provenance: contract marketing-crm.yaml POST /guests/{subjectId}/consents
     - name: actionBar
       components:
       - kind: secondaryButton
@@ -8833,6 +8892,11 @@ screens:
     purpose: Top up the guest's wallet (AED 50 to 1
     trigger: onAction
     provenance: wiring fix, 2 October 2026 (CHG-WIR-005)
+  - operationId: recordConsent
+    contract: marketing-crm
+    purpose: Record the consent the guest gives in person at the till, recorded by the agent (GUEST_MANAGE;
+      CHG-CSA-045)
+    trigger: onAction
   entryState:
     params:
     - name: workstationId
@@ -8909,7 +8973,13 @@ screens:
     and no way to seat a party. **Moving and merging tables is deferred until after r2** (decided 1 October
     2026, POSV2-8; taken off this screen the same day): `moveTableVisit` and `mergeTableVisits` stay in
     the fnb contract and on the staff app''s EMP-058, and come back to the till in a later release. The
-    v2 build draws neither.'
+    v2 build draws neither.
+
+
+    **Change covers and change server in Block A; table transfer after r2** (decided 2 October 2026, Chinmay,
+    batch 3 #3; DEC-068; CHG-SPO-006). Covers use `updateTableVisit`, the server `transferTableVisit`;
+    moving the party stays on the staff app (EMP-058). Reserved, Table closed and Make available follow
+    the client''s table states (DEC-202, DI-336).'
   density: touchLarge
   pattern: board
   patternReason: '`getTableMap` reads a floor and the visits are worked on it — a board, not a table of
@@ -8924,6 +8994,11 @@ screens:
       - kind: cardList
         label: The floor
         bindsTo: TableMap.tables
+        notes: '**Table states in the client''s words** (DI-336; CHG-CSA-012): Available, Ordered, **Table
+          closed** (the contract''s `needsClearing`, after the visit is paid) and Reserved; never "Cleaning".
+          A closed table shows **Make available** (`clearTable`). A table shows **Reserved** when a booking
+          names it, or from N minutes (the venue''s lead time) before a pre-allocated booking (decided
+          2 October 2026, Chinmay, batch 6; DEC-202; CHG-CSA-012).'
       - kind: detailPanel
         label: The visit on the selected table
         bindsTo: TableVisit
@@ -8942,6 +9017,11 @@ screens:
         bindsTo: Bill
         operation: getBill
         provenance: contract fnb.yaml GET /table-visits/{visitId}/bill; wiring fix, 2 October 2026
+      - kind: secondaryButton
+        label: Make available
+        operation: clearTable
+        notes: Ends "Table closed" (the contract's needsClearing) and frees the table (DI-336; CHG-CSA-012).
+        provenance: contract fnb.yaml POST /tables/{tableId}/clear
     - name: actionBar
       components:
       - kind: secondaryButton
@@ -8953,14 +9033,33 @@ screens:
         label: Split bill
         operation: splitBill
         provenance: contract fnb.yaml POST /table-visits/{visitId}/bill/split; wiring fix, 2 October 2026
+      - kind: secondaryButton
+        label: Change covers
+        operation: updateTableVisit
+        notes: Covers only (DEC-068). Moving the party to another table waits until after r2 (POSV2-8).
+        provenance: contract fnb.yaml PATCH /table-visits/{visitId}
+      - kind: secondaryButton
+        label: Change server
+        operation: transferTableVisit
+        notes: Hands the check to another server; the transfer is recorded (DEC-068; CHG-CSA-013).
+        provenance: contract fnb.yaml POST /table-visits/{visitId}/transfer
+      - kind: secondaryButton
+        label: Book a table
+        operation: createTableReservationForGuest
+        notes: 'The v2 Reservations sitting: party size, date and time, the table held for, seating preference
+          and occasion; a holding deposit only where the venue switched dining deposits on (batch 3 #4,
+          default).'
+        provenance: contract fnb.yaml POST /outlets/{outletId}/table-reservations
   states:
     loading: The saved floor.
     error: Could not load. Names which read failed and leaves the floor untouched.
     emptyFirstRun: No floor yet. Carries the create action and says what the till does in the meantime.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    offline: '**The floor is held locally and reconciles on sync.** Two tills moving the same party while
-      offline is the conflict this screen must survive.'
+    offline: '**The floor is held locally and reconciles on sync.** Seating, covers and server changes
+      made offline queue; two tills changing the same visit while disconnected reconcile server-wins on
+      reconnect and the till says which change stood. (Moving and merging tables is not on this screen
+      until after r2, POSV2-8; design-notes correction fnb-retail POS-028.)'
   apis:
   - operationId: getTableMap
     contract: fnb
@@ -9006,6 +9105,27 @@ screens:
     purpose: Split by amount, covers, category, item or seat
     trigger: onAction
     provenance: wiring fix, 2 October 2026 (CHG-WIR-008)
+  - operationId: updateTableVisit
+    contract: fnb
+    purpose: 'Change covers on the visit (the till changes covers only in Block A; decided 2 October 2026,
+      Chinmay, batch 3 #3; DEC-068; CHG-CSA-013)'
+    trigger: onAction
+    invalidates:
+    - getTableMap
+  - operationId: transferTableVisit
+    contract: fnb
+    purpose: 'Change server: hand the check to another server, recorded so tips and sales follow (DEC-068;
+      CHG-CSA-013)'
+    trigger: onAction
+    invalidates:
+    - getTableMap
+  - operationId: createTableReservationForGuest
+    contract: fnb
+    purpose: 'Book a table for the guest at the till: a sitting, party size, the table held, seating preference
+      and occasion (CHG-CSA-045; CHG-CSA-018)'
+    trigger: onAction
+    invalidates:
+    - listTableReservations
   entryState:
     params:
     - name: workstationId
@@ -9088,6 +9208,55 @@ screens:
     dismiss:
       label: Cancel
     provenance: contract fnb.yaml POST /table-visits/{visitId}/bill/split; wiring fix, 2 October 2026
+  - id: formUpdateTableVisit
+    component: modal
+    trigger: Change covers
+    body: '**Collects the new number of covers only.** The table and the server are not changed here (DEC-068).'
+    confirm:
+      label: Change covers
+      operation: updateTableVisit
+    dismiss:
+      label: Cancel
+      discards:
+      - covers
+    provenance: contract fnb.yaml PATCH /table-visits/{visitId}
+  - id: formTransferTableVisit
+    component: modal
+    trigger: Change server
+    body: '**Picks the server who takes the check**, from the staff on shift; never a typed id (DEC-068).'
+    confirm:
+      label: Change server
+      operation: transferTableVisit
+    dismiss:
+      label: Cancel
+      discards: []
+    provenance: contract fnb.yaml POST /table-visits/{visitId}/transfer
+  - id: formCreateTableReservationForGuest
+    component: modal
+    trigger: Book a table
+    body: '**Collects the sitting**: guest name and contact, party size, date and time, the table held
+      (optional), seating preference (indoor, terrace, majlis) and occasion (DEC-204; CHG-CSA-018). Ids
+      and status are the server''s.'
+    bindsTo: TableReservation
+    confirm:
+      label: Book
+      operation: createTableReservationForGuest
+    dismiss:
+      label: Cancel
+      discards: []
+    provenance: contract fnb.yaml POST /outlets/{outletId}/table-reservations
+  - id: confirmClearTable
+    component: confirmDialog
+    trigger: Make available
+    body: '**Ends "Table closed" and frees the table** (DI-336; CHG-CSA-012). Names the table; `recordedAt`
+      is the device time, set by the till. Dismissing sends nothing.'
+    confirm:
+      label: Make available
+      operation: clearTable
+    dismiss:
+      label: Cancel
+      discards: []
+    provenance: contract fnb.yaml POST /tables/{tableId}/clear
 - id: POS-029
   name: Order Queue
   module: Sell
@@ -9120,7 +9289,11 @@ screens:
     completed → *reopen*. P04 had `listFnbOrders` and nineteen queue operations and no board to work them
     on. **The customer-facing order status board is owned by KIT-007** (P15, decided 1 October 2026, POSV2-7):
     this queue shows a mirror of it (order numbers only, Preparing and Ready for pickup), and **Cancel
-    is not on the cards**: no operation is behind it (POSV2-8).'
+    is not on the cards**: no operation is behind it (POSV2-8).
+
+
+    **Refined in the F&B and retail process** (design-notes correction venue-operations POS-029; CHG-SPO-015):
+    the order queue is the counter''s F&B queue (module Sell), not a ride queue.'
   density: touchLarge
   pattern: board
   patternReason: Orders move between named stages and are acted on in place — a board

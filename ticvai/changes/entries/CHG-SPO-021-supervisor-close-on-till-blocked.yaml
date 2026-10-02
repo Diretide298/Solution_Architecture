@@ -1,0 +1,36 @@
+id: CHG-SPO-021
+date: '2026-10-02'
+source: audit
+kind: process
+summary: 'closeShift is not yet bound on POS-007: check-finance-rules F-BLIND-CLOSE refuses closeShift on every P04 and P06
+  screen, while the pre-apply round declares it on POS-007 for the supervisor.'
+decision:
+  what: 'Hold the closeShift binding on POS-007 until the tools owner amends F-BLIND-CLOSE to admit closeShift on a cashier
+    platform when the component is permissioned SHIFT_CLOSE_OTHER or OVERSHORT_ACCEPT (the supervisor), then bind it: button
+    "Close shift for the cashier", supervisor PIN, any till.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, pre-apply round: "closeShift is declared on POS-007 (supervisor PIN, any till) and in the daily
+  cash reconciliation" (DEC-059; CHG-CSP-012). check-finance-rules (CHG-FIN-003) predates it and fails the binding; the apply
+  brief forbids new check failures.'
+keys_touched:
+  screens:
+  - POS-007
+  operations:
+  - closeShift
+  files:
+  - tools/check-finance-rules.py
+root_class: 'new: package-contradicts-decision'
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-007
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-finance-rules.py
+status: open
+notes: 'Open: needs the tools owner (check-finance-rules) first, then a one-line screen change. Applied in worktree screens-pos-staff
+  (batch SPO, phase B, 2 October 2026). Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are the
+  tasks.csv keys of the touched screens.'

@@ -1,0 +1,42 @@
+id: CHG-SPO-006
+date: '2026-10-02'
+source: client-review
+kind: spec
+summary: POS-028 changes covers and changes server in Block A, books a table for a guest, and shows the client's table states
+  (Reserved, Table closed, Make available).
+decision:
+  what: POS-028 binds updateTableVisit (covers only), transferTableVisit (change server) and createTableReservationForGuest;
+    clearTable is "Make available" with a confirmation; Reserved when a booking names the table or N minutes before a pre-allocated
+    booking; the offline state no longer talks about moving parties.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026: batch 3 #3 (POS-028: "Apply it now: change covers and change server. Hold table transfer until
+  r2"; DEC-068) and #4 (deposit default), batch 6 set 6b (DEC-202, DEC-201 default); POSV2-8. Contract: CHG-CSA-012, CHG-CSA-013,
+  CHG-CSA-045, CHG-CSP-017. Design-notes corrections fnb-retail POS-028 (Table closed wording, offline text).'
+keys_touched:
+  screens:
+  - POS-028
+  operations:
+  - updateTableVisit
+  - transferTableVisit
+  - createTableReservationForGuest
+  - clearTable
+  files:
+  - screens/P04-point-of-sale.yaml
+  - contracts/satellite/fnb.yaml (consumed-by lines only)
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-028
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'check-screen-wiring S-CONSUMED-MIRROR now holds POS-028 to updateTableVisit and transferTableVisit. The lead time
+  for Reserved lives in two places on main: VenueSettings.fnb.tableReservedLeadMinutes (CHG-CSP-017) and FnbReservationPolicy.reservedLeadMinutes
+  (CHG-CSA-012); the screen says "the venue''s lead time" until one is chosen (reported to the lead). Applied in worktree
+  screens-pos-staff (batch SPO, phase B, 2 October 2026). Tickets: none started (Block A starts Monday 5 October 2026); unstarted
+  keys are the tasks.csv keys of the touched screens.'
