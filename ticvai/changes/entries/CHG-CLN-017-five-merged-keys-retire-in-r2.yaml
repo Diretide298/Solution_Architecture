@@ -43,6 +43,7 @@ proposed: 2026-10-02T15:00
 prevention:
   type: check
   ref: tools/check-key-stability.py
-status: open
+status: closed
+closed_by_commit: f73c2b0c
 notes: 'check-key-stability on a fresh local derive (not committed) failed with these 5 renames before and passes after,
   with its 12 self-tests. Cooling-off waived by Chinmay until Mon 5 Oct 2026 (CHG-DOC-023).'

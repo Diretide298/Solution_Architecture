@@ -42,7 +42,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: f73c2b0c
 notes: Additive against r1 (new operations and schemas, a new security scheme). New-operation gates - permission null (public),
   no configuration noun, not a list. check-contract-shapes asked for the 409 on the verify action (C-ACTION-409). Closes the
   gap CHG-CLN-010 logged.

@@ -43,8 +43,9 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: f73c2b0c
 notes: '**Left open (contract gap, for the identity owner):** no operation issues the prospect session yet (the email and
   one-time code DEC-167 decided). Recommended default: identity gains startProspectSignup (email, public, rate-limited) and
   verifyProspectSignupCode (returns a prospectAuth token), both additive, bound on SGN-002 and on "Continue saved setup".
-  check-contract-compat confirms the security change is a widening (security_widened).'
+  Done by CHG-CLN-019. check-contract-compat confirms the security change is a widening (security_widened).'

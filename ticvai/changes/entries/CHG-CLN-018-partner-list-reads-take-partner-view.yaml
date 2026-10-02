@@ -39,6 +39,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: f73c2b0c
 notes: check-contract-compat reports each permission change as breaking and passes only with BC-021..BC-028. None of the
   eight operations is pushed; producer and consumer keys are the planned ones. Closes the gap CHG-CLN-004 logged.

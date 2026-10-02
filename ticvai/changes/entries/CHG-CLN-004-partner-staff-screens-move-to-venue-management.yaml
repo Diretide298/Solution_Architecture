@@ -60,10 +60,11 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-screen-wiring.py
-status: open
+status: closed
+closed_by_commit: f73c2b0c
 notes: 'check-screen-wiring S-STAFF-AUDIENCE fails a staff screen calling a partner-only read, which is why staff joined the
   eight list audiences. **Left as a contract gap (open, for the contract owner):** those eight reads still carry x-ticvai-permission
   PLATFORM_TENANT_VIEW, a platform permission no venue role holds; changing an operation''s permission is breaking against
   r1. Recommended default: in r3, give each a staff permission (PARTNER_VIEW) through an approved breaking change, or add
-  staff reads beside them. No P10 ticket is pushed for these screens (the partner portal is outside Block A and the Venue
+  staff reads beside them (done in r2 by CHG-CLN-018). No P10 ticket is pushed for these screens (the partner portal is outside Block A and the Venue
   Management waves).'
