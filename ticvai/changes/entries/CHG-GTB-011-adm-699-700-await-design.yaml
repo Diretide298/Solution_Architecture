@@ -1,0 +1,36 @@
+id: CHG-GTB-011
+date: '2026-10-02'
+source: cr
+kind: spec
+summary: ADM-699 and ADM-700, new console screens with no design source anywhere, are recorded in the W-NO-DESIGN baseline
+  and wait for Claude Design like ADM-022 and ADM-023.
+decision:
+  what: 'check-wireframe-coverage --update-baseline on the r2 gate branch adds exactly ADM-699 and ADM-700 to W-NO-DESIGN
+    (ANL-072 got its source instead, CHG-GTB-006; nothing else changed), with a note in handoff/audit-baseline.json saying why.
+    No reference frame was borrowed: no drawn frame, prototype view or workshop board shows an operator''s own MFA methods
+    and sessions, or a configuration-package promotion, and pointing at an unrelated frame would tell the designer the
+    screen had been drawn.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'check-wireframe-coverage (W-NO-DESIGN, R252, A33) failed the r2 full refresh. The two screens were added on 2 October by
+  the lead''s decisions (CHG-SBO-022: "Add My account & security"; CHG-SBO-024, DEC-168, ADR-0070) and genuinely have no
+  design yet - a finding that is real, predates this branch (it is on main at 267b6cf2) and is documented here.'
+keys_touched:
+  screens:
+  - ADM-699
+  - ADM-700
+  files:
+  - handoff/audit-baseline.json
+root_class: A33 WIREFRAMES
+tickets:
+  started: []
+  unstarted: []
+release_tag: r2
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-wireframe-coverage.py
+status: open
+notes: For the lead to confirm. The alternative is a design run for the two screens before r2; the baseline entry goes when
+  either gets a frame (the check then reports it gone).

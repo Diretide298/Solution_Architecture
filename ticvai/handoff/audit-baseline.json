@@ -12911,8 +12911,9 @@
   }
  },
  "check-wireframe-coverage": {
-  "updated": "2026-10-01",
-  "commit": "278cc437",
+  "updated": "2026-10-02",
+  "commit": "1a9325a4",
+  "note": "Re-recorded 2 October on the r2 gate branch (CHG-GTB-011): ADM-699 (My Account & Security, CHG-SBO-022) and ADM-700 (Configuration Promotion, CHG-SBO-024) are console screens the lead added that day; no frame, prototype or workshop board exists for either, so they join the Claude Design work list like ADM-022 and ADM-023. Nothing else changed.",
   "rules": {
    "W-INCOMING-UNLINKED": [
     "GST-001:wireframes/incoming/P02-mobile-v4/gst-001.html",
@@ -12978,6 +12979,8 @@
     "ADM-036",
     "ADM-037",
     "ADM-318",
+    "ADM-699",
+    "ADM-700",
     "ANL-071",
     "BO-001",
     "BO-003",
@@ -13231,7 +13234,6 @@
     "SUP-007",
     "SUP-008"
    ]
-  },
-  "note": "union of the working tree on 2026-10-01 (with other agents' uncommitted contract edits) and HEAD 278cc437, so neither state fails"
+  }
  }
 }
