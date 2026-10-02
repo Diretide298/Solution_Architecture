@@ -670,7 +670,28 @@ def closed_keys() -> frozenset:
         spec.loader.exec_module(mod)
     except Exception:
         return frozenset()
-    return frozenset(k for k, (kind, _, _) in mod.OTHER.items() if kind == "merge")
+    return frozenset([k for k, (kind, _, _) in mod.OTHER.items() if kind == "merge"]
+                     + list(getattr(mod, "REPLACED", {})))
+
+
+def replaced_screens() -> frozenset:
+    """**Screens whose pushed ticket op-retire.py closes as replaced** (r2, CHG-CLN-002): the 13 section screens whose
+    duplicate writer was removed from the contract. Each renders inside its venue screen's component, and that
+    screen's ticket builds it, so it gets no task of its own; planned, its pushed key would have carried on as a
+    later-block task and the "replaced by" note would never be sent."""
+    try:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("op_retire", ROOT / "tools" / "op-retire.py")
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+    except Exception:
+        return frozenset()
+    out = set()
+    for k in getattr(mod, "REPLACED", {}):
+        ident = key_identity(k)
+        if ident and ident[0] == "screen":
+            out.add(ident[1])
+    return frozenset(out)
 
 
 def main() -> int:
@@ -1641,10 +1662,13 @@ def main() -> int:
         need_screens |= doors_of_plat.get(plat_of(sid_)) or doors_of_app.get(app_) or set()
     for sid in need_screens:
         need_ops |= set(screen_ops(sid))
+    gone_screens = replaced_screens()
     for sid in sorted(screens):
         s_ = screens[sid]
         if str(s_.get("wave")) == "4" and sid not in need_screens:
             continue
+        if sid in gone_screens:
+            continue                     # built inside its venue screen; its ticket is replaced (CHG-CLN-002)
         have = built_screen.get(sid)
         if have and not have.startswith("APP-SETUP-"):
             if have.startswith("VM-"):           # Venue Management waves 1-2: ticketed, planned with the rest of P08

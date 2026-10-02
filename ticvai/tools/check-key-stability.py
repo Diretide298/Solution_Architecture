@@ -215,8 +215,9 @@ def self_test(rows, mp, closed=frozenset(), retired=frozenset()):
         while f"SVC-WALLET-RETAIL-{n}" in m or f"SVC-WALLET-RETAIL-{n}" in w or f"SVC-WALLET-RETAIL-{n}" in fixed:
             n += 1
         case("new group avoids a number pushed for other work", f["SVC-WALLET-RETAIL-3"], f"SVC-WALLET-RETAIL-{n}")
-    # 6. Today's plan against today's map moves nothing.
-    f = run(work, mp)
+    # 6. Today's plan against today's map moves nothing -- with the keys op-retire closes, as the generator runs it
+    # (a key closed as replaced, CHG-CLN-002, is never handed to other work).
+    f = run(work, mp, closed)
     case("today's plan keeps every key", sum(1 for k, v in f.items() if k != v), 0)
 
     # 8-12. **The block** (C4, 1 October): these run check() itself, on a plan and a map edited in memory.

@@ -9,7 +9,10 @@ decision:
     159, 169, 172, 173, 174, 199 -> APP-SETUP-BO-010; ADM-179, 180, 181 -> APP-SETUP-BO-011) and REPLACED_OPS (each retired
     operation''s SVC-CATALOGUE-DRAFTED-n sub-task -> the planned sub-task of its typed writer). Both are closed as merged (Rejected)
     with the note "Replaced by <key> (#id) (decided 2 October 2026, release r2)". check-key-stability counts REPLACED keys
-    as retired, so retiring is never read as renaming.'
+    as retired, so retiring is never read as renaming. build-service-docs.py plans no task for the 13 section screens
+    (replaced_screens: each renders inside its venue screen, whose ticket builds it) and counts REPLACED keys as closed,
+    so no other work takes them. SVC-CATALOGUE-DRAFTED-3, three of whose four operations were retired, closes as replaced
+    by SVC-CATALOGUE-DRAFTED-1, where its last operation (setDemandOccupancyAvailability) is now chunked.'
   by: Chinmay
   date: '2026-10-02'
 why: 'Chinmay, 2 October 2026: "13 dupes would be gone in r2" (CHG-CLN-001). A pushed ticket whose work left the plan with
@@ -30,9 +33,11 @@ keys_touched:
   - APP-SETUP-ADM-180
   - APP-SETUP-ADM-181
   - APP-SETUP-ADM-199
+  - SVC-CATALOGUE-DRAFTED-3
   files:
   - tools/op-retire.py
   - tools/check-key-stability.py
+  - tools/build-service-docs.py
 root_class: A10 TICKET-DRIFT
 tickets:
   started: []
@@ -58,5 +63,10 @@ prevention:
   type: generator-rule
   ref: tools/op-retire.py::REPLACED
 status: open
-notes: Cooling-off waived by Chinmay until Mon 5 Oct 2026 (CHG-DOC-023). The op-release bundle (tools/op-release.py) reads
-  op-retire's plan, so the r2 push applies it; nothing is sent to OpenProject from this branch.
+notes: 'Cooling-off waived by Chinmay until Mon 5 Oct 2026 (CHG-DOC-023). Verified on a local derive (derive-lineage, derive-delivery-slice,
+  derive-schema, build-service-docs; not committed): none of the 13 keys is planned, op-retire''s plan closes all 13 and
+  their build/wire/test sub-tasks, SVC-CATALOGUE-DRAFTED-3 and the 13 operation sub-tasks with "Replaced by <key>", and
+  check-key-stability reports no rename of its own (the 5 renames it reports, SVC-ACCESS-SYNC-1, SVC-LEDGER-REPORTING-1,
+  SVC-VENUEOPS-FEED-1, VM-MARKETING-MARKETING-2 and VM-ORDER-SYNC-1, are on main at e80beb7b too). Its "today''s plan keeps
+  every key" self-test now passes the closed keys, as the generator does. The op-release bundle (tools/op-release.py) reads
+  op-retire''s plan, so the r2 push applies it; nothing is sent to OpenProject from this branch.'

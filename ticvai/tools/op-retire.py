@@ -114,6 +114,11 @@ REPLACED = {
     "APP-SETUP-ADM-179": ("APP-SETUP-BO-011", "setBundleDefinition", "createBundle and updateBundle on BO-011"),
     "APP-SETUP-ADM-180": ("APP-SETUP-BO-011", "setBundleComponent", "createBundle (its components) on BO-011"),
     "APP-SETUP-ADM-181": ("APP-SETUP-BO-011", "setGuestChoiceBuild", "createBundle (its choice groups) on BO-011"),
+    # The service chunk three of the writers made up most of: with them gone, its last operation,
+    # setDemandOccupancyAvailability, is chunked into SVC-CATALOGUE-DRAFTED-1 (found by a local derive, 2 October).
+    "SVC-CATALOGUE-DRAFTED-3": ("SVC-CATALOGUE-DRAFTED-1",
+                                "setCrossCategoryPromotion, setEligibilityRule and setFixedPriceOffer",
+                                "createPromotion, and setDemandOccupancyAvailability on SVC-CATALOGUE-DRAFTED-1"),
 }
 # The same 13 writers as service sub-tasks (SVC-CATALOGUE-DRAFTED-n#op): each is closed as replaced by the planned
 # sub-task that builds its typed writer, not put on hold as work that merely left the plan.
