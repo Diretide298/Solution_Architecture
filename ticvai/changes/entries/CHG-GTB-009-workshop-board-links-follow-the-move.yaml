@@ -1,0 +1,41 @@
+id: CHG-GTB-009
+date: '2026-10-02'
+source: cr
+kind: spec
+summary: The static workshop boards WS31-WS41 link the 67 approvals, communication and partner screens on P08, where they
+  now live, instead of P09 and P10 (181 links).
+decision:
+  what: 'tools/applied/repoint-workshop-board-links-2-october.py --apply re-pointed every WS board href whose screen another
+    platform now holds to that platform''s wireframeBoard: 165 ADM links P09 -> P08 (ADM-038..047, ADM-319..368) and 16
+    PTR links P10 -> P08 (PTR-026, 029, 035..037, 039, 047, 048), on nine boards. The script stays in tools/applied/ for the
+    next move.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'check-wireframes (rule 4, hrefs across every board) failed the r2 full refresh with 181 "anchor missing in target"
+  errors: the move of 2 October (move-approvals-comms-partner-2-october.py) did not re-point the static workshop boards the
+  way the ADM-049 move (CHG-MOV-001, commit 56035b56) did.'
+keys_touched:
+  files:
+  - wireframes/WS31 Approval Workflows and Governance Board 2.dc.html
+  - wireframes/WS32 Approval Workflows and Governance Board 3.dc.html
+  - wireframes/WS35 Approval Workflows and Governance Board 6.dc.html
+  - wireframes/WS36 Approval Workflows and Governance Board 7.dc.html
+  - wireframes/WS37 Approval Workflows and Governance Board 8.dc.html
+  - wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html
+  - wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html
+  - wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html
+  - wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html
+  - tools/applied/repoint-workshop-board-links-2-october.py
+root_class: A33 WIREFRAMES
+tickets:
+  started: []
+  unstarted: []
+release_tag: r2
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-wireframes.py
+status: open
+notes: check-wireframes caught it and gates; the applied script is the repair for the next move between platforms
+  (tools/applied/README.md).
