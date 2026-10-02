@@ -37,7 +37,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: 3897bda2
 notes: 'Additive against r1: neither name was in r1, DiningOutlet gains an optional response field, and deprecation is a
   description. check-contract-compat holds it additive. No new check: a second name for a field one agent added is what
   CHG-SOT-003 caught by reading; the duplicated-definition class has S-DUP-SCREEN for screens only.'

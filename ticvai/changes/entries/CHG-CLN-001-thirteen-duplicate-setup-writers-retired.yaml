@@ -97,7 +97,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: c069846a
 notes: 'check-contract-compat fails each removal unless docs/active/breaking-changes.yaml approves it (BC-008..BC-020, tag
   r2); run on the parent commit with the operations removed and no entries it reported 13 unapproved breaking changes. check-screen-wiring
   S-CONSUMED-MIRROR and check-flows hold the screens and flows to the contract. **Left for later (not a question):** catalogue.rate

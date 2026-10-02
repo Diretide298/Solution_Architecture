@@ -35,6 +35,7 @@ triage: fix-forward
 prevention:
   type: generator-rule
   ref: tools/applied/apply-subscription-placement.py::DETACHED
-status: open
+status: closed
+closed_by_commit: 3897bda2
 notes: 'No check compares a control''s permission with its operation''s x-ticvai-permission today; recommended later: a check-screen-wiring
   rule that does.'

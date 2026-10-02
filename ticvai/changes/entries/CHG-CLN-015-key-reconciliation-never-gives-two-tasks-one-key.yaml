@@ -29,6 +29,7 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/build-service-docs.py::reconcile_keys
-status: open
+status: closed
+closed_by_commit: 6a7ec485
 notes: The assertion in reconcile_keys is the guard; it fired on the parent commit and passes after. check-key-stability then
   reports the new key's work on the pushed ticket as a split (it does not fail).

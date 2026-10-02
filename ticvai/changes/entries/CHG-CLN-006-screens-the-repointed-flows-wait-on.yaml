@@ -49,7 +49,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-screen-wiring.py
-status: open
+status: closed
+closed_by_commit: 00593f33
 notes: 'check-screen-wiring S-CONSUMED-MIRROR holds the consumed-by lists to the screens, and check-flows the flows to the
   screens. Plan effect at the refresh: createShopAndDrop and collectShopAndDrop enter the first-release slice through POS
   (new SVC sub-tasks), and extendSeatHold leaves it (op-retire puts its sub-task on hold). The edges removed were flow-derived

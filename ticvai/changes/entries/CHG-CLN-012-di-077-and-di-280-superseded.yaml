@@ -34,6 +34,7 @@ triage: fix-forward
 prevention:
   type: generator-rule
   ref: tools/build-design-inputs.py::superseded_by
-status: open
+status: closed
+closed_by_commit: 3897bda2
 notes: build-design-inputs --check failed on the parent commit (DI-474) and passes after; the two design-note corrections
   are fixed by this entry.

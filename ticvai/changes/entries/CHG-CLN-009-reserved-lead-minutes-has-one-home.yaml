@@ -32,5 +32,6 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: 3897bda2
 notes: Deprecation is additive against r1 (the venue field was not in r1). No screen binds the deprecated field.

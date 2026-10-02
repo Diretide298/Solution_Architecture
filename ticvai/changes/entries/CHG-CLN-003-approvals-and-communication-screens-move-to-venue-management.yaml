@@ -116,7 +116,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-console-grant.py
-status: open
+status: closed
+closed_by_commit: d04af310
 notes: 'check-console-grant reads only the Console, so a moved screen no longer needs the frame and a twin is exempt by id;
   check-screen-wiring S-DUP-SCREEN found the ADM-353 duplicate and S-CONSUMED-MIRROR holds the renamed consumed-by. Applied
   by tools/applied/move-approvals-comms-partner-2-october.py; batch CLN, worktree D:/wt/cleanup-pass.'

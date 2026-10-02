@@ -37,6 +37,7 @@ proposed: 2026-10-02T09:00
 prevention:
   type: generator-rule
   ref: tools/derive-delivery-slice.py::ALSO
-status: open
+status: closed
+closed_by_commit: 3897bda2
 notes: Cooling-off waived by Chinmay until Mon 5 Oct 2026 (CHG-DOC-023). New service sub-tasks appear at the r2 refresh; no
   pushed key moves (check-key-stability).

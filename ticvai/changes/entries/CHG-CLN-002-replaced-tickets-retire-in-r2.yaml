@@ -62,7 +62,8 @@ proposed: 2026-10-02T09:00
 prevention:
   type: generator-rule
   ref: tools/op-retire.py::REPLACED
-status: open
+status: closed
+closed_by_commit: 6a7ec485
 notes: 'Cooling-off waived by Chinmay until Mon 5 Oct 2026 (CHG-DOC-023). Verified on a local derive (derive-lineage, derive-delivery-slice,
   derive-schema, build-service-docs; not committed): none of the 13 keys is planned, op-retire''s plan closes all 13 and
   their build/wire/test sub-tasks, SVC-CATALOGUE-DRAFTED-3 and the 13 operation sub-tasks with "Replaced by <key>", and

@@ -46,6 +46,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-flows.py
-status: open
+status: closed
+closed_by_commit: 00593f33
 notes: check-flows failed on 9 of these steps on the parent commit (an operation the screen does not declare) and passes
   with 0 failures after. Applied by tools/applied/cleanup-flows-2-october.py; batch CLN.

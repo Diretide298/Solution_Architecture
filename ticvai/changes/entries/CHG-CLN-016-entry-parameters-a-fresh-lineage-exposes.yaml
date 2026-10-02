@@ -37,6 +37,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-screens.py
-status: open
+status: closed
+closed_by_commit: e86a6a7e
 notes: check-screens failed with 6 errors on the derived state before this and passes after (run with the local derive in place,
   not committed). POS-012's lookup also binds ShopAndDrop.dropReference so the binding ratchet does not rise.

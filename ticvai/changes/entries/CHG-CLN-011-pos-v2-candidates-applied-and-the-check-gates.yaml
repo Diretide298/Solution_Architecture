@@ -32,6 +32,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-candidate-decisions.py
-status: open
+status: closed
+closed_by_commit: 3897bda2
 notes: check-candidate-decisions prints "PASS - 0 new, 0 known (baseline)" on this branch and on main, so gating it adds
   no failure.
