@@ -258,25 +258,38 @@
   {
    "key": "POS-KDS-ROUTING",
    "epic": "OFFLINE",
-   "points": 5,
+   "points": 8,
    "pool": "backend",
    "depends": [
     "PLATFORM-OUTBOX"
    ],
    "subject": "A POS sale reaches the kitchen: routing online, and the LAN path decision",
-   "detail": "createFnbOrder from the POS creates the kitchen ticket as the guest order does, routed to the right station (SD-046). The offline LAN path to the Kitchen Display is an ADR decision; this task implements the online path and the stub the decision fills. Done when: a POS sale of a burger and a drink shows on the grill and bar stations."
+   "detail": "createFnbOrder from the POS creates the kitchen ticket as the guest order does, routed to the right station (SD-046). The offline LAN path to the Kitchen Display is an ADR decision; this task implements the online path and the stub the decision fills. Done when: a POS sale of a burger and a drink shows on the grill and bar stations. 2 October (Chinmay, DEC-187/189): kitchen printers are in release 1 (print template, printer routing) and routing takes category rules with a default/fallback station per outlet. 8 points (was 5)."
   },
   {
    "key": "AI-ENGINE-GATEWAY",
    "epic": "AI-ENGINE",
    "assignee": "Kalpita Mejari",
-   "days": 10,
+   "days": 12,
    "subject": "AI gateway, governance decision point and usage metering",
-   "detail": "One gateway every AI call goes through: provider (managed Azure by default; BYOK where TICVAI enables it), policy check (evaluateAiGovernance), usage and spend (getAiUsage), and the decision record for every answer. About 10 engineer-days.",
+   "detail": "One gateway every AI call goes through: provider (managed Azure by default; BYOK where TICVAI enables it), policy check (evaluateAiGovernance), usage and spend (getAiUsage), and the decision record for every answer. About 10 engineer-days. 2 October (Chinmay, DEC-539): routes each call by the tenant's AI residency class (UAE-only via Core42 Compass by default, Global opt-in under PDPL Art. 23, on-prem open models) and enforces TICVAI's curated model range per task tier (BYOK maps to the provider's equivalent; clients cannot pick models). About 12 engineer-days (was 10).",
    "depends": [
     "SETUP-CI",
     "SETUP-ENV"
    ]
+  },
+  {
+   "key": "AI-ENGINE-SCRUB-GUARD",
+   "epic": "AI-ENGINE",
+   "assignee": "Second AI engineer",
+   "days": 6,
+   "subject": "Offline PII scrubber and guard model in front of every LLM call",
+   "detail": "2 October (Chinmay, DEC-542/543, ADR-0020 amended): Microsoft Presidio in-cell with UAE recognisers (Emirates ID, UAE phone, passport, IBAN, Luhn-checked cards, email) and Arabic NER for names and places; reversible placeholders whose map stays in-cell and replies re-filled before the user sees them; Qwen3Guard on input and output; fails closed. Mandatory whatever the tenant's residency class. Done when: a prompt with an Emirates ID, an Arabic name and a card number reaches the provider as placeholders and the reply comes back filled. About 6 engineer-days.",
+   "depends": [
+    "SETUP-CI",
+    "SETUP-ENV"
+   ],
+   "appModule": "baseline"
   },
   {
    "key": "AI-ENGINE-BASELINE",
@@ -436,6 +449,32 @@
    "detail": "ADR-0068 (accepted 1 October; B1, with the scanner): the closed JSON rule format (AdmissionRule, AdmissionCondition; conditionRule on access.dynamic_policy versions) evaluated by validateAccess online in .NET and by the gate offline in TypeScript (packages/offline-core) against the same active policy version that getOfflinePackage carries; each scan_event records the policy version that decided it. Done when: one set of test vectors runs in CI against both evaluators and they agree on every vector, a rule the format cannot express is refused when the policy is saved, and an offline scan and an online scan of the same credential under the same policy version give the same decision.",
    "module": "Admission & Access Control",
    "platform": "P07"
+  },
+  {
+   "key": "ACC-UAEPASS-ICP",
+   "epic": "PLATFORM",
+   "points": 8,
+   "pool": "backend",
+   "block": "D",
+   "module": "Accreditation",
+   "platform": "API",
+   "depends": [
+    "PLATFORM-KERNEL"
+   ],
+   "subject": "Identity verification for accreditation: UAE Pass and ICP",
+   "detail": "2 October (Chinmay, DEC-457): UAE Pass sign-in/verification and ICP (Federal Authority for Identity, Citizenship, Customs and Port Security) document checks for accreditation applicants, alongside manual review. Needs client access to both (external dependencies register). Done when: an applicant verified through UAE Pass shows the verified identity on the reviewer workspace, and an ICP check result is recorded on the application."
+  },
+  {
+   "key": "TEST-SAME-NUMBERS",
+   "epic": "PLATFORM",
+   "points": 3,
+   "pool": "frontend",
+   "block": "B",
+   "module": "Reporting & Analytics",
+   "platform": "API",
+   "depends": [],
+   "subject": "Same numbers test: till, back-office and Analytics reports agree",
+   "detail": "2 October (Chinmay, DEC-559, prevention of CHG-FIN-006): an automated comparison of the same measure (takings, gross sales, net revenue, refunds) for the same period and scope on the till report (POS-008), the back-office report and the Analytics (P16) dashboard; fails when they differ. Done when: the test runs in CI against the seeded demo tenant."
   }
  ]
 }
