@@ -30,7 +30,7 @@ decision_owner: Chinmay
 prevention:
   type: template-field
   ref: docs/registers/external-dependencies.md::Client owner
-status: open
+status: closed
 notes: Each new row names the owner and what is outstanding. The scanner vendor and its trial are not chosen yet; UAE Pass and ICP wait
-  on client credentials. The integration register (handoff/integration-register.md) and the contracts belong to their owners. Closes
-  on its commit.
+  on client credentials. The integration register (handoff/integration-register.md) and the contracts belong to their owners.
+closed_by_commit: 9b180bf2

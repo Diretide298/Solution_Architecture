@@ -24,6 +24,7 @@ decision_owner: Chinmay
 prevention:
   type: check
   ref: tools/check-cited-sources.py
-status: open
+status: closed
 notes: The exclude file is shared by every worktree; only the one line for this file was removed (the comment above it stays). With
-  the file tracked, check-cited-sources passes without the three baseline entries. Closes on its commit.
+  the file tracked, check-cited-sources passes without the three baseline entries.
+closed_by_commit: addcf1d4

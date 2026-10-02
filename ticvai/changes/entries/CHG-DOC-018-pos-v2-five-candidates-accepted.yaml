@@ -31,6 +31,7 @@ decision_owner: Chinmay
 prevention:
   type: check
   ref: tools/check-candidate-decisions.py
-status: open
+status: closed
 notes: check-candidate-decisions stays report-only until the screens owner records POSV2-9..13 on the five candidate blocks in screens/P04-point-of-sale.yaml
-  (decisions or applied); then the lead baselines it and makes it gate. Closes on its commit.
+  (decisions or applied); then the lead baselines it and makes it gate.
+closed_by_commit: 9b180bf2

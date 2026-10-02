@@ -27,6 +27,7 @@ decision_owner: Chinmay
 prevention:
   type: generator-rule
   ref: tools/build-audit-decisions.py::citing_entries
-status: open
+status: closed
 notes: The register is regenerated from the JSON (authored) and the change entries, so a decision applied later shows its entry without
-  a hand edit. Later rounds (DOOR-1..3, PRE-1..9) are recorded beside the DEC rows they override. Closes on its commit.
+  a hand edit. Later rounds (DOOR-1..3, PRE-1..9) are recorded beside the DEC rows they override.
+closed_by_commit: 9b180bf2

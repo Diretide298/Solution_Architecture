@@ -32,7 +32,7 @@ decision_owner: Chinmay
 prevention:
   type: check
   ref: tools/check-config-scope.py
-status: open
+status: closed
 notes: check-config-scope fails an operation on /outlets/{outletId} whose scope is not outlet, so the new outlet settings cannot land
   venue-scoped. The fields and operations are the contracts owners' to add (contracts/spine/tenancy.yaml Outlet; contracts/satellite/fnb.yaml).
-  Closes on its commit.
+closed_by_commit: d1abad9c

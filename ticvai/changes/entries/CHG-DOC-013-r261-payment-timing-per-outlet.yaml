@@ -31,6 +31,7 @@ decision_owner: Chinmay
 prevention:
   type: generator-rule
   ref: tools/build-audit-decisions.py::amendments_marked
-status: open
+status: closed
 notes: The outlet field, createFnbOrder / fireCourse behaviour and F108's pay-first branch belong to the contracts, screens and flows
-  owners. Closes on its commit.
+  owners.
+closed_by_commit: 9b180bf2

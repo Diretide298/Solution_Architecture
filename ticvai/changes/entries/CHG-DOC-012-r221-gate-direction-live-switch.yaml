@@ -28,6 +28,7 @@ decision_owner: Chinmay
 prevention:
   type: generator-rule
   ref: tools/build-audit-decisions.py::amendments_marked
-status: open
+status: closed
 notes: The register shows the amendment on R221's row (superseded field rendered by the generator). The contract (setTurnstileMode,
-  AccessPoint, the new permission) and BO-230 / SCN-016 belong to their owners. Closes on its commit.
+  AccessPoint, the new permission) and BO-230 / SCN-016 belong to their owners.
+closed_by_commit: 9b180bf2

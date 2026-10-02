@@ -26,5 +26,5 @@ decision_owner: Chinmay
 prevention:
   type: generator-rule
   ref: tools/build-audit-decisions.py::amendments_marked
-status: open
-notes: Closes on its commit.
+status: closed
+closed_by_commit: 9b180bf2
