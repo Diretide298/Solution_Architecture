@@ -1,0 +1,44 @@
+id: CHG-TBF-006
+date: '2026-10-03'
+source: audit
+kind: plan
+proposed: '2026-10-03'
+summary: The ten Block A AI engine tasks say what to build and when it is done, from the AI system design and the 2
+  October AI decisions; days, owners and dependencies are unchanged.
+decision:
+  what: 'docs/active/block-a-extra-tasks.json: AI-ENGINE-GATEWAY, -SCRUB-GUARD, -BASELINE, -SUGGESTIONS, -CONCIERGE,
+    -QDRANT, -GUIDED, -TRANSLATE, -PLANNER and -EVAL get a detail written from docs/architecture/ai-system-design.md
+    (3.3 routing and the breaker, 3.5 evaluation and gates, 3.6 caching, 3.7 degradation, 3.8 governance, 3.9 decision
+    records, 3.11 Help me choose, 3.13 baseline then learn, 5.8 Qdrant) and the 2 October decisions: the per-tenant
+    residency class with Core42 Compass the UAE-only default (ADR-0009 amended), the mandatory offline Presidio scrubber
+    with UAE and Arabic recognisers and a Qwen3Guard guard (ADR-0020 amended), and BYOK of any provider enabled by
+    TICVAI for a globalAllowed tenant (CHG-FUP-008). Each ends with a checkable Done when. Written by
+    tools/applied/ai-engine-tasks-3-october.py.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Chinmay, 3 October, Block A audit business rules (asked as questions instead of defaults): "AI engine tickets:
+  What and done-when filled from docs/architecture/ai-system-design.md and the 2 Oct AI decisions; gaps become
+  questions later". The audit on live r2 (CHG-AUD-001; CHG-REL-003 found AI-ENGINE-BASELINE not buildable) found these
+  tickets a line or two long with no Done-when. Sources: ADR-0009, ADR-0020, ADR-0049, ADR-0051, CHG-FUP-008,
+  CHG-CSA-002, CHG-CSA-003.'
+keys_touched:
+  tickets: [AI-ENGINE-GATEWAY, AI-ENGINE-SCRUB-GUARD, AI-ENGINE-BASELINE, AI-ENGINE-SUGGESTIONS, AI-ENGINE-CONCIERGE,
+    AI-ENGINE-QDRANT, AI-ENGINE-GUIDED, AI-ENGINE-TRANSLATE, AI-ENGINE-PLANNER, AI-ENGINE-EVAL]
+  files: [docs/active/block-a-extra-tasks.json, tools/applied/ai-engine-tasks-3-october.py]
+root_class: A09 TICKET-ACCEPTANCE
+tickets:
+  started: []
+  unstarted: [AI-ENGINE-GATEWAY, AI-ENGINE-SCRUB-GUARD, AI-ENGINE-BASELINE, AI-ENGINE-SUGGESTIONS, AI-ENGINE-CONCIERGE,
+    AI-ENGINE-QDRANT, AI-ENGINE-GUIDED, AI-ENGINE-TRANSLATE, AI-ENGINE-PLANNER, AI-ENGINE-EVAL]
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ticket-text.py
+status: open
+notes: 'check-ticket-text T-DONE-WHEN: 152 tickets without a checkable Done-when on the plan regenerated from HEAD, 144
+  after this batch (8 gone, this batch''s among them; the 144 left are app-module features and later-block tasks
+  outside it). The gaps the design does not answer went to Chinmay as questions with defaults in the batch report
+  (Compass before its terms are signed, the weather in the Block A prior, the Help me choose job contract, the guard
+  model''s size on CPU). Not a schedule change: subject, days, owners and dependencies are as planned.'

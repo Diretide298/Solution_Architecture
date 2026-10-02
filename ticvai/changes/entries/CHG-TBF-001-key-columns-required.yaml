@@ -1,0 +1,34 @@
+id: CHG-TBF-001
+date: '2026-10-03'
+source: audit
+kind: spec
+summary: Every primary-key column is required in the schema reference; derive-schema marks it, and the frozen-mode
+  diff treats a key column's NOT NULL as implied so the baseline gets no spurious review.
+decision:
+  what: 'derive-schema.py marks required: yes on every column the DDL keys a table by (x-ticvai-primary-key, else id,
+    <table>_id, <table>_code or the only column, plus a partitioned table''s time column and any key the DDL already
+    has). ddl_forward.py strips a redundant NOT NULL from a key column before comparing, so `id uuid PRIMARY KEY NOT
+    NULL` against r1''s `id uuid PRIMARY KEY` is no change (without it the regenerated DDL listed 363 changes for a
+    person instead of 10). The DDL itself is unchanged.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Block A audit on live r2, pattern 5 in CHG-AUD-001 ("table specs that cannot be migrated as written:
+  return_policy.id PK not required"); the zero-AI count found 355 key columns required: no (212 in Block A tables).
+  Chinmay, 3 October: fix the specs before r1 (spec-fix brief, batch TBF).'
+keys_touched:
+  tables: [orders.return_policy, control.api_licence, control.partner_agreement, access.access_change, ledger.journal_line]
+  files: [tools/derive-schema.py, tools/ddl_forward.py, tools/check-table-keys.py, handoff/schema-reference.json]
+root_class: A16 STORAGE-SHAPE
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-table-keys.py
+status: open
+notes: 'Before 355 key columns not required (check-table-keys on the schema reference derived without this change),
+  after 0 of 1,116 key columns checked. derive-ddl in frozen mode writes the same forward migration and the same 10
+  review items before and after this change.'

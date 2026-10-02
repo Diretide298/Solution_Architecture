@@ -395,15 +395,99 @@ def state_facts(o: str, x: dict, models: dict, by_op: dict) -> tuple[list[str], 
 
 # ---- DDL to migrations --------------------------------------------------------------------------
 
+# A forward migration derive-ddl writes after r1 (`V0100__after_r1_20261002.sql`); the same pattern as derive-ddl's.
+FORWARD_FILE = re.compile(r"^V(\d{4})__[\w.-]+\.sql$")
+# The row-level policy each `platform.apply_<kind>_rls` gives a table (backend/<db>/920-row-level-security.sql), as the
+# documents name it (CHG-TBF-004). **`tenant` is not a missing tenant_id**: a tenant database holds one tenant
+# (ADR-0038), so the tenant-root policy is platform.tenant_root_in_scope() and needs no tenant column.
+POLICY_LABEL = {
+    "scope": "scope_path",
+    "venue": "venue_id",
+    "subject": "subject",
+    "parent": "through its owner",
+    "tenant": "tenant root (one tenant per database; no tenant_id by design)",
+}
+
+
+# **Tables the kernel writes and no operation does** (ADR-0058), so lineage never reaches them: they are created
+# with the first release because PLATFORM-OUTBOX and MIG-PARTITIONS run on them (CHG-TBF-003).
+# `platform.schema_version` is not here: it is in 002-migration-register.sql, which MIG-BASELINE applies.
+MACHINERY_TABLES = {
+    "kernel.inbox": "kernel machinery: the inbox per tenant database (ADR-0058; PLATFORM-OUTBOX, MIG-PARTITIONS)",
+    "ai.inbox": "kernel machinery: the AI consumers' inbox, since only AI writes AI tables (ADR-0058, ADR-0020)",
+    "control.outbox_relay": "kernel machinery: the relay lease per tenant database (ADR-0058; PLATFORM-OUTBOX)",
+}
+# **Forward migration file numbers** (CHG-TBF-002). V0001 is the baseline and V0002-V0099 the first release, in
+# schema order; V0100-V0999 belong to derive-ddl's frozen-mode files (backend/<db>/V01xx__after_r1_<date>.sql);
+# every later forward migration (VM-MIG-*, MIG-<SCHEMA>-<n>) takes V1000 upwards in build order and keeps the
+# number it was planned with on the next run, so a refresh never renumbers a ticket somebody may have started.
+FORWARD_TICKET_FIRST = 1000
+MIG_FILE = re.compile(r"\b(V(\d{4})[a-z]?__[\w.-]+\.sql)\b")
+
+
+def prior_migration_files() -> dict[str, str]:
+    """{task key: migration file} from the plan this run replaces (handoff/service-docs/plan-tasks.csv)."""
+    p = OUT / "plan-tasks.csv"
+    out = {}
+    if not p.exists():
+        return out
+    with p.open(encoding="utf-8", newline="") as fh:
+        for r in csv.DictReader(fh):
+            m = MIG_FILE.search(r.get("subject") or "")
+            if m and r.get("track") == "Database" and "#" not in (r.get("key") or ""):
+                out[r["key"]] = m.group(1)
+    return out
+
+
+def src_files(ddl: dict, ts) -> str:
+    """The DDL files a migration's tables come from: the baseline 010-<schema>.sql and, for a table created after
+    r1, the forward file derive-ddl wrote it into (CHG-TBF-002)."""
+    files = sorted({ddl[t]["file"] for t in ts}, key=lambda f: (f.rsplit("/", 1)[-1].startswith("V"), f))
+    return " and ".join(files)
+
+
+def screen_op_ids(s: dict) -> set:
+    """The operations a screen record binds: every distinct `operationId` in its `apis`. The count a setup
+    ticket's title gives is this one (tools/check-ticket-scope.py)."""
+    return {a["operationId"] for a in s.get("apis") or [] if isinstance(a, dict) and a.get("operationId")}
+
+
+def setup_scope(s: dict, setup_ops) -> str:
+    """`setup: 5 of its 11 operations`. **The title says how much of the screen the ticket builds and how big the screen
+    is** (3 October, CHG-TBF-005; Block A audit pattern 7): "setup: 5 operations" on BO-009, an 11-operation screen,
+    read as the whole screen and the ticket was judged out of step with it."""
+    n, k = len(screen_op_ids(s)), len(set(setup_ops))
+    return f"setup: all {n} operations" if k >= n else f"setup: {k} of its {n} operations"
+
+
+def rest_scope(s: dict, setup_ops) -> str:
+    """`the rest of the screen: 6 of its 11 operations`, the other half of setup_scope."""
+    n = len(screen_op_ids(s))
+    return f"the rest of the screen: {n - len(set(setup_ops) & screen_op_ids(s))} of its {n} operations"
+
+
 def read_ddl() -> dict[str, dict]:
     """Every table in backend/, from the derived SQL: which file declares it, its columns, and the
     tables its foreign keys point at. The SQL is the storage truth (backend/MIGRATIONS.md), so the
     migration plan is read from it rather than from the contracts' persistence notes."""
     tables: dict[str, dict] = {}
     for db in ("tenant", "control"):
-        for f in sorted((ROOT / "backend" / db).glob("010-*.sql")):
+        # **The forward migrations after r1 are DDL too** (3 October, CHG-TBF-002). Since the baseline froze,
+        # derive-ddl writes a new table into `backend/<db>/V<nnnn>__after_r1_<date>.sql`, not into 010-<schema>.sql.
+        # Reading only the 010 files left the 17 tables V0101 created (ai.spend_ceiling, whitelabel.site_package,
+        # access.hardware_certification ...) out of every migration ticket although operations read and write
+        # them; their columns added after r1 were missing from the counts as well.
+        fwd = sorted((p for p in (ROOT / "backend" / db).glob("V*.sql") if FORWARD_FILE.match(p.name)),
+                     key=lambda p: int(FORWARD_FILE.match(p.name).group(1)))
+        for f in sorted((ROOT / "backend" / db).glob("010-*.sql")) + fwd:
             name, cols_ = None, []
             for line in f.read_text(encoding="utf-8").splitlines():
+                m = re.match(r'ALTER TABLE (\w+\.\w+) ADD COLUMN IF NOT EXISTS (\w+)\s+(.+?);?$', line)
+                if m and m.group(1) in tables:
+                    have = {c for c, _ in tables[m.group(1)]["columns"]}
+                    if m.group(2) not in have:
+                        tables[m.group(1)]["columns"].append((m.group(2), m.group(3)))
+                    continue
                 m = re.match(r'CREATE TABLE IF NOT EXISTS (\w+)\."?(\w+)"? \(', line)
                 if m:
                     name, cols_ = f"{m.group(1)}.{m.group(2)}", []
@@ -412,8 +496,9 @@ def read_ddl() -> dict[str, dict]:
                 # `);`, and its key is a table constraint rather than a column.
                 if name and line.startswith(")"):
                     pm = re.search(r"PARTITION BY \w+ \((\w+)\)", line)
-                    tables[name] = {"db": db, "file": f.relative_to(ROOT).as_posix(), "columns": cols_,
-                                    "fks": set(), "partition_by": pm.group(1) if pm else ""}
+                    if name not in tables:
+                        tables[name] = {"db": db, "file": f.relative_to(ROOT).as_posix(), "columns": cols_,
+                                        "fks": set(), "partition_by": pm.group(1) if pm else ""}
                     name = None
                     continue
                 if name and line.strip().startswith("CONSTRAINT "):
@@ -421,18 +506,32 @@ def read_ddl() -> dict[str, dict]:
                 m = re.match(r"\s+(\w+)\s+(.+?),?$", line)
                 if name and m:
                     cols_.append((m.group(1), m.group(2).rstrip(",")))
-        fk = ROOT / "backend" / db / "900-foreign-keys.sql"
-        if fk.exists():
-            text = fk.read_text(encoding="utf-8").replace('"', "")
+        policy = {}
+        for f in [ROOT / "backend" / db / "900-foreign-keys.sql",
+                  ROOT / "backend" / db / "920-row-level-security.sql"] + fwd:
+            if not f.exists():
+                continue
+            text = f.read_text(encoding="utf-8").replace('"', "")
+            text = re.sub(r"--[^\n]*", "", text)
             # `(venue_id, x)` as well as `(x)`: a composite venue key (ADR-0056) is still a key.
             for m in re.finditer(r"ALTER TABLE (\w+\.\w+) ADD CONSTRAINT \w+ FOREIGN KEY \([\w, ]+\) "
                                  r"REFERENCES (\w+\.\w+)", text):
                 if m.group(1) in tables:
                     tables[m.group(1)]["fks"].add(m.group(2))
+            for m in re.finditer(r"platform\.apply_(\w+?)_rls\('(\w+\.\w+)'::regclass", text):
+                policy[m.group(2)] = m.group(1)
+        for t, kind in policy.items():
+            if t in tables:
+                tables[t]["policy"] = kind
     for t in tables.values():
         names = {c for c, _ in t["columns"]}
         t["rls"] = ("scope_path" if "scope_path" in names else
                     "venue_id" if "venue_id" in names else "")
+        # **What the row-level policy actually is**, for the documents (CHG-TBF-004). `rls` above only says
+        # which scope column a table carries and still sizes the migration tasks; a table with neither column is
+        # not unprotected. `tenant` is the tenant-root policy: one tenant per database, so the policy is
+        # platform.tenant_root_in_scope() and the table has no tenant_id column, by design (ADR-0038).
+        t["policy_label"] = POLICY_LABEL.get(t.get("policy", ""), "none")
         # ADR-0056 (amends ADR-0044): release 1 partitions by month, and the SQL says which tables.
         t["partitioned"] = bool(t.get("partition_by"))
     return tables
@@ -711,6 +810,8 @@ def _enables_label(op: str, verb: str, enables) -> str:
 
 
 def main() -> int:
+    # Read before anything is written: the file names the last run gave the forward migrations (CHG-TBF-002).
+    prior_files = {} if "--renumber-migrations" in sys.argv[1:] else prior_migration_files()
     sl = json.loads((HANDOFF / "delivery-slice.json").read_text(encoding="utf-8"))
     lineage = json.loads((HANDOFF / "api-data-lineage.json").read_text(encoding="utf-8"))
     decomp = json.loads((HANDOFF / "service-decomposition.json").read_text(encoding="utf-8"))
@@ -1151,9 +1252,23 @@ def main() -> int:
          "Done when: a seeded staff member signs in from a web app and an app, gets their effective permissions, "
          "and a request without a session gets 401."),
         ("SETUP-OBS", "Logging and monitoring basics", 2, ["SETUP-ENV"],
-         "In **ticvai-backend** and **ticvai-infra**: structured logs and traces (OpenTelemetry, already referenced by "
-         "the starter) shipped from dev and staging in the Azure UAE region (audit R057). Done when: a request "
-         "can be followed from the API log to its trace, and an error raises an alert someone receives."),
+         # Concrete from what it stands on (3 October, CHG-TBF-007): docs/architecture/observability.md (the layers
+         # and the no-PII rule), R057 (Azure UAE, Key Vault per cell), ADR-0055 (the five deployables), ADR-0009 (logs
+         # PII-free by construction). The tenant and venue attributes and the dashboards are PLATFORM-OBSERVE's; the
+         # relay-lag alert ADR-0058 asks for and the SLO dashboards of ADR-0060 come after it.
+         "In **ticvai-infra** (Terraform, in the `cell` module) and **ticvai-backend**: the OpenTelemetry SDK (already "
+         "referenced by the starter) in each of the five deployables of ADR-0055 (commerce, access, operations, workers "
+         "and ticvai-ai), exporting traces, metrics and logs over OTLP to an OpenTelemetry Collector in the cell, which "
+         "writes them to the cell's Log Analytics workspace in Azure UAE North (audit R057; nothing leaves the region). "
+         "Logs are structured, never concatenated, and carry the trace and correlation ids; they never hold guest "
+         "names, emails, phone numbers, document numbers, card data or biometric templates, only the opaque subject "
+         "id (docs/architecture/observability.md; ADR-0009: PII-free by construction, not by filtering). Metrics are "
+         "Prometheus-compatible. One alert rule to start with (the 5xx rate of each host) goes to an Azure Monitor "
+         "action group that emails the on-call person (DevOps until a rota exists). Dev and staging only; production is built "
+         "before the first live tenant. Done when: a request to a dev host can be followed from its log line to its "
+         "trace by the correlation id; a deliberate 500 on a dev host raises an alert the on-call person receives "
+         "within five minutes; and a search of a day's dev logs after the seeded test run finds no email address, "
+         "phone number or card number."),
     ]
     task("SETUP", "", "Epic", "Setup: environments, pipelines, database, seed data and sign-in",
          "Everything else depends on this epic.", 1, area="devops")
@@ -1222,6 +1337,13 @@ def main() -> int:
     not_tables = sorted(t for t in used if t not in ddl and ":" not in t)
     rel = {t for t in used if t in ddl}
     why = {t: "used by the first release" for t in rel}
+    # **Machinery no operation reads or writes is still storage the first release runs on** (CHG-TBF-003). The
+    # inbox and the relay lease are written by the kernel (ADR-0058), so no lineage reaches them and they were in no
+    # migration, while PLATFORM-OUTBOX and MIG-PARTITIONS in the same sprint stand on them.
+    for t, reason in MACHINERY_TABLES.items():
+        if t in ddl and t not in rel:
+            rel.add(t)
+            why[t] = reason
     frontier = list(rel)
     while frontier:
         t = frontier.pop()
@@ -1255,9 +1377,11 @@ def main() -> int:
          "The tables, columns, keys, indexes and row-level security are already written in backend/ as derived DDL; "
          "each migration takes its schema's first-release tables from there. Order matters: each migration only "
          "references tables created by the ones before it.", 1, area="backend")
-    task("MIG-BASELINE", "MIG", "Task", "Migration baseline: schemas, extensions, migration register, RLS helper "
-         "functions and the monthly partition helpers (ADR-0056)",
-         "From backend/tenant/000-schemas.sql, 001-extensions.sql, 002-migration-register.sql, the helper "
+    task("MIG-BASELINE", "MIG", "Task", "Migration V0001__baseline.sql: schemas, extensions, migration register, "
+         "RLS helper functions and the monthly partition helpers (ADR-0056)",
+         # `platform.schema_version` is the one table the baseline creates (CHG-TBF-003): named, so it is not a table
+         # with no migration.
+         "Tables: platform.schema_version. Source DDL: backend/tenant/000-schemas.sql, 001-extensions.sql, 002-migration-register.sql, the helper "
          "functions at the top of 920-row-level-security.sql and 930-partitioning.sql; the control database's "
          "own 000-002. Everything else in the MIG epic runs after this.", 1, pts=3, area="backend",
          assignee=devops, depends=["SETUP-DB"])
@@ -1276,7 +1400,7 @@ def main() -> int:
         load[who] += pts
         fname = f"V{i:04d}__{g[1]}.sql"
         task(mig_key[g], "MIG", "Task", f"Migration {fname}: {g[1]} ({len(ts)} tables)",
-             f"{g[0].capitalize()} database. Tables: " + ", ".join(ts) + f". Source DDL: {ddl[ts[0]]['file']} and the "
+             f"{g[0].capitalize()} database. Tables: " + ", ".join(ts) + f". Source DDL: {src_files(ddl, ts)} and the "
              f"matching rows of 900-foreign-keys, 910-indexes and 920-row-level-security. "
              + (f"Its keys into schemas created later ({deferred[g]}) go in MIG-FOREIGN-KEYS. " if g in deferred else "")
              + "Applied forward by SqlMigrationRunner; test that it applies to a database with its Follows applied and that a second run applies nothing.", 1, service=svc, pts=pts, area="backend", assignee=who,
@@ -1297,7 +1421,7 @@ def main() -> int:
                 "Points"]
     tables_rows = []
     for t in sorted(rel, key=lambda x: (mig_order.index((ddl[x]["db"], x.split(".")[0])), x)):
-        tables_rows.append([table_mig[t], t, ddl[t]["db"], len(ddl[t]["columns"]), ddl[t]["rls"] or "none",
+        tables_rows.append([table_mig[t], t, ddl[t]["db"], len(ddl[t]["columns"]), ddl[t]["policy_label"],
                             "yes" if ddl[t]["partitioned"] else "", len(used[t]["reads"]), len(used[t]["writes"]),
                             ", ".join(sorted(x for x in ddl[t]["fks"] if x in rel)), why[t],
                             schema_owner.get(t.split(".")[0], ""), ddl[t]["file"]])
@@ -1405,7 +1529,7 @@ def main() -> int:
                                                          deps_step({op_task[o] for o in setup_screens[x]}), x)):
             s = screens[sid]
             so = sorted(setup_screens[sid])
-            task(f"APP-SETUP-{sid}", "APP-SETUP", "Task", f"{sid} {s['name']} (setup: {len(so)} operations)",
+            task(f"APP-SETUP-{sid}", "APP-SETUP", "Task", f"{sid} {s['name']} ({setup_scope(s, so)})",
                  "In the slice: " + ", ".join(so), min(wave[o] for o in so),
                  platform=s["_platform"].get("shortName", ""), depends={op_task[o] for o in so},
                  pts=sizes[sid], area="SETUP", assignee=assign("SETUP", sizes[sid]))
@@ -1459,8 +1583,8 @@ def main() -> int:
             prior = [m[1] for m in migrations if m[4] == sch]
             n_cols = sum(len(ddl[t]["columns"]) for t in ts)
             pts = points_of(1 + 0.5 * len(ts) + n_cols / 40)
-            task(k, "VM-DB", "Task", f"Migration: {sch} for Venue Management ({len(ts)} tables)",
-                 "Tables: " + ", ".join(ts) + f". Source DDL: {ddl[ts[0]]['file']}. Additive to the first release; "
+            task(k, "VM-DB", "Task", f"Forward migration: {sch} for Venue Management ({len(ts)} tables)",
+                 "Tables: " + ", ".join(ts) + f". Source DDL: {src_files(ddl, ts)}. Additive to the first release; "
                  "applied forward by SqlMigrationRunner, and a second run applies nothing.", 2, pts=pts, area="VM",
                  assignee=vm_backend_owner(schema_owner.get(sch, ""), pts),
                  depends=prior or ["MIG-BASELINE"])
@@ -1821,7 +1945,7 @@ def main() -> int:
             prior = sorted({m for t, m in mig_of.items() if t.split(".")[0] == sch and m not in later_mig.values()})
             fk_into = sorted({mig_of[x] for t in ts for x in ddl[t]["fks"] if x in mig_of and x.split(".")[0] != sch})
             task(mk, k, "Task", f"Forward migration: {sch} for {am_info[k]['name']} ({len(ts)} tables)",
-                 "Tables: " + ", ".join(ts) + f". Source DDL: {ddl[ts[0]]['file']} and the matching rows of "
+                 "Tables: " + ", ".join(ts) + f". Source DDL: {src_files(ddl, ts)} and the matching rows of "
                  "900-foreign-keys, 910-indexes and 920-row-level-security. A forward migration after the r1 baseline "
                  "(frozen, check-migration-freeze); applied forward by SqlMigrationRunner, and a second run applies "
                  "nothing.", 3, service=schema_owner.get(sch, ""), pts=pts, area="backend",
@@ -1863,7 +1987,8 @@ def main() -> int:
                                                 "P15": "POS"}.get(plat_of(sid), plat_of(sid))
         what = (f"The rest of {sid}: Block A built only its setup operations ({', '.join(sorted(setup_screens.get(sid, ())))}); "
                 f"this task adds the others. " if kind == "rest" else "")
-        task(key, k, "Task", f"{sid} {s_['name']}" + (" (the rest of the screen)" if kind == "rest" else ""),
+        task(key, k, "Task", f"{sid} {s_['name']}" + (f" ({rest_scope(s_, setup_screens.get(sid, ()))})"
+                                                       if kind == "rest" else ""),
              what + f"{s_.get('purpose') or ''} Module: {s_.get('module')}. App: {sp.PLATFORM_NAME.get(plat_of(sid))}.",
              s_.get("wave") or "", platform=s_["_platform"].get("shortName", ""), depends=deps | {"SETUP-CLIENTS"},
              pts=pts, area=area)
@@ -2559,6 +2684,78 @@ def main() -> int:
     for n_ in notes:
         print(f"key stability: {n_}")
     print(f"key stability: {len(renamed)} planned keys written under the key their work was pushed as")
+
+    # **Every forward migration names its file** (3 October, CHG-TBF-002; Block A audit pattern 6). Until now only the
+    # first release's migrations had a file name (V0002-V0099, in schema order) and the 135 forward migrations of the
+    # Venue Management waves and the later app-modules said their numbers would be "given when they merge", so two
+    # developers could merge the same number and nothing in the plan said which file a ticket was. They take V1000
+    # upwards in build order: V0100-V0999 are derive-ddl's frozen-mode files (backend/<db>/V01xx__after_r1_*.sql), and
+    # a file number is never reused. **A number, once planned, is kept** (from the plan this run replaces), so a refresh
+    # never renumbers a ticket somebody may have started; `--renumber-migrations` drops the pins before a first push.
+    # Applied after key stability, so the pins are read under the keys the tickets were pushed with.
+    fwd_head = re.compile(r"^(\[DB\] )Forward migration: (\w+) for ")
+    fwd_tasks = [t_ for t_ in tasks if t_["type"] == "Task" and fwd_head.match(t_["subject"])]
+    taken, fname_of = set(), {}
+    for t_ in fwd_tasks:
+        sch = fwd_head.match(t_["subject"]).group(2)
+        m = MIG_FILE.search(prior_files.get(t_["key"], ""))
+        if m and int(m.group(2)) >= FORWARD_TICKET_FIRST and int(m.group(2)) not in taken                 and m.group(1).endswith(f"__{sch}.sql"):
+            taken.add(int(m.group(2)))
+            fname_of[t_["key"]] = m.group(1)
+    nxt = max(taken | {FORWARD_TICKET_FIRST - 1}) + 1
+    for t_ in fwd_tasks:
+        if t_["key"] not in fname_of:
+            fname_of[t_["key"]] = f"V{nxt:04d}__{fwd_head.match(t_['subject']).group(2)}.sql"
+            nxt += 1
+    fwd_rows = []
+    for t_ in fwd_tasks:
+        f_ = fname_of[t_["key"]]
+        t_["subject"] = fwd_head.sub(lambda m: f"{m.group(1)}Forward migration {f_}: {m.group(2)} for ", t_["subject"],
+                                     count=1)[:255]
+        ts_ = (re.search(r"Tables: (.+?)\. Source", t_["description"]) or [None, ""])[1].split(", ")
+        ts_ = [x for x in ts_ if x]
+        fwd_rows.append([int(MIG_FILE.search(f_).group(2)), f_, t_["key"],
+                         (ddl.get(ts_[0]) or {}).get("db", "") if ts_ else "", f_.split("__", 1)[1][:-4], len(ts_),
+                         ", ".join(ts_)])
+    fwd_rows.sort()
+    print(f"forward migrations: {len(fwd_rows)} named V{FORWARD_TICKET_FIRST:04d} upwards, "
+          f"{sum(1 for k in fname_of if MIG_FILE.search(prior_files.get(k, '')))} kept from the last plan")
+
+    # **Every table is in a migration or says why not** (CHG-TBF-003). The tables nothing reaches are storage the
+    # contracts describe and no operation reads or writes yet; they are listed with that reason rather than
+    # migrated (a table no code touches is a migration nobody can test), and the one an operation does reach is a
+    # gap tools/check-migration-tickets.py fails on.
+    assigned = set(table_mig) | set(vm_mig) | set(later_mig)
+    reached = defaultdict(set)
+    for o, x in lineage.items():
+        for kk in ("reads", "writes"):
+            for t in (x or {}).get(kk) or []:
+                reached[t].add(o)
+    storage_only = []
+    for t in sorted(set(ddl) - assigned):
+        if reached.get(t):
+            storage_only.append((t, "GAP: read or written by " + ", ".join(sorted(reached[t])[:4])
+                                 + " but in no migration"))
+        else:
+            storage_only.append((t, "storage only: no operation reads or writes it and no task names it; its "
+                                    "forward migration is planned when an operation first reaches it"))
+    M2 = ["", "## Forward migrations after the first release", "",
+          f"**{len(fwd_rows)} forward migrations**, V{FORWARD_TICKET_FIRST:04d} upwards in build order (the Venue "
+          "Management waves, then each later app-module). V0100-V0999 are derive-ddl's frozen-mode files in "
+          "`backend/<db>/`; a number is never reused, and a planned number is kept on the next refresh. "
+          "The ticket's subject names the same file.", ""]
+    M2 += table(["Number", "File", "Task", "Database", "Schema", "Tables", "Which tables"],
+                [[r[0], f"`{r[1]}`", r[2], r[3], r[4], r[5], r[6]] for r in fwd_rows])
+    M2 += ["", "## Tables no migration creates", "",
+           f"**{len(storage_only)} tables** in `backend/` that no migration above creates, each with the reason. "
+           "Row-level security on a table with no `tenant_id` is the tenant-root policy, by design: one tenant per "
+           "database (ADR-0038), `platform.tenant_root_in_scope()`.", ""]
+    M2 += table(["Table", "Database", "Source DDL", "Why"],
+                [[f"`{t}`", ddl[t]["db"], ddl[t]["file"], why_] for t, why_ in storage_only])
+    mig_md, NL = OUT / "backend" / "MIGRATIONS.md", chr(10)
+    mig_md.write_text(mig_md.read_text(encoding="utf-8").rstrip(NL) + NL + NL.join(M2) + NL, encoding="utf-8")
+    print(f"tables no migration creates: {len(storage_only)} "
+          f"({sum(1 for _, w in storage_only if w.startswith('GAP'))} reached by an operation)")
 
     # **Owners** (plan item L2, 1 October). A pushed ticket keeps the owner its last release gave it, from release
     # `sprintPlan.stableOwners.since` on, unless --rebalance; started tickets are kept by op-release.rb in any case.

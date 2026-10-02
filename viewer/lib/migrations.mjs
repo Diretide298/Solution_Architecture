@@ -305,7 +305,14 @@ export async function buildMigrations(root) {
     for (const call of uncommented.matchAll(/SELECT\s+[\w".]*apply_(\w+?)_rls\s*\(\s*'([\w".]+)'/gi)) {
       const target = call[2].replace(/"/g, '');
       const table = tables[target];
-      if (table) table.rls = { ...(table.rls ?? {}), enabled: true, forced: true, policy: `${call[1]}_isolation` };
+      // `tenant_isolation` on a table with no tenant_id is by design, not a gap (TICVAI CHG-TBF-004, 3 October):
+      // a tenant database holds one tenant (ADR-0038), so the policy is platform.tenant_root_in_scope().
+      // Said on the table so a reader (or an audit) does not report the missing column again.
+      const note = call[1] === 'tenant'
+        ? 'Tenant-root policy: one tenant per database (ADR-0038), so the policy is platform.tenant_root_in_scope() '
+          + 'and the table has no tenant_id column by design (backend/MIGRATIONS.md, "Tenant-level row-level security").'
+        : undefined;
+      if (table) table.rls = { ...(table.rls ?? {}), enabled: true, forced: true, policy: `${call[1]}_isolation`, ...(note ? { note } : {}) };
       if (!file.rlsTables.includes(target)) file.rlsTables.push(target);
       file.policies++;
     }

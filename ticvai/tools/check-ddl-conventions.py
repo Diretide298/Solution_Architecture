@@ -179,11 +179,19 @@ def main() -> int:
     # R049 / R063: MIGRATIONS.md against the DDL and the MIG tickets.
     mig = g.ROOT / "handoff" / "service-docs" / "backend" / "MIGRATIONS.md"
     if mig.exists():
-        text = mig.read_text(encoding="utf-8")
+        # **The first-release sections only** (3 October, CHG-TBF-002): the forward migrations after them have their
+        # own table, which tools/check-migration-tickets.py reads; its rows share this table's first columns.
+        text = mig.read_text(encoding="utf-8").split("\n## Forward migrations", 1)[0]
+        # A table created after r1 is in a forward file derive-ddl wrote (backend/<db>/V01nn__after_r1_*.sql), not in
+        # 010-<schema>.sql, and a first-release migration can take it from there.
+        created = set(tables)
+        for db in ("tenant", "control"):
+            for f in sorted((backend / db).glob("V*.sql")):
+                created |= {n.replace('"', "") for n, _ in CREATE.findall(f.read_text(encoding="utf-8"))}
         listed = {}
         for task, table in re.findall(r"^\| (MIG-[A-Z-]+) \| `([a-z_]+\.[a-z_0-9]+)` \|", text, re.M):
             listed.setdefault(task, set()).add(table)
-            if table not in tables:
+            if table not in created:
                 guard.add("D-MIG-TABLES", f"{task}:{table}", f"MIGRATIONS.md: {task} lists {table}, which no DDL creates")
         seen = {}
         for task, ts in listed.items():

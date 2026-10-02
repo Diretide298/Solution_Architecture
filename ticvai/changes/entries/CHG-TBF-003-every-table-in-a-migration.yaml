@@ -1,0 +1,40 @@
+id: CHG-TBF-003
+date: '2026-10-03'
+source: audit
+kind: spec
+summary: Every table in backend/ is in a migration ticket or is listed, with its reason, as storage no migration
+  creates; the kernel's inbox and relay tables go with the first release and the register with the baseline.
+decision:
+  what: 'build-service-docs.py adds kernel.inbox, ai.inbox and control.outbox_relay (ADR-0058; written by the kernel, so
+    no lineage reaches them) to the first release, names platform.schema_version on MIG-BASELINE, reads the 17 tables
+    V0101 created after r1 (CHG-TBF-002), and lists every table still in no migration under "Tables no migration
+    creates" in the generated MIGRATIONS.md with its reason. A listed table that an operation reads or writes fails
+    check-migration-tickets (M-TABLE-ASSIGNED).'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Block A audit on live r2, pattern 5 in CHG-AUD-001 ("tables with no migration"): 148 tables in backend/ had no
+  migration on the r2 tickets, none in Block A. Chinmay, 3 October (spec-fix brief, batch TBF): list them and assign or
+  mark storage-only with the reason. ADR-0058 makes the inbox and the relay lease kernel machinery that PLATFORM-OUTBOX
+  and MIG-PARTITIONS stand on in Sprint 1.'
+keys_touched:
+  tables: [kernel.inbox, ai.inbox, control.outbox_relay, platform.schema_version, ai.signal_observation,
+    ai.spend_ceiling, whitelabel.site_package, access.hardware_certification]
+  files: [tools/build-service-docs.py, tools/check-migration-tickets.py]
+root_class: A12 MIGRATION-PLAN
+tickets:
+  started: []
+  unstarted: [MIG-BASELINE, MIG-KERNEL]
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-migration-tickets.py
+status: open
+notes: 'Of the 148 on the r2 tickets, the plan regenerated from HEAD already gave 127 a later-block migration (they are
+  in plan-tasks.csv, not yet ticketed, so the audit counted them as missing); 21 had none: the 17 V0101 tables, the
+  three kernel tables and ai.signal_observation. After: 1,107 of 1,108 tables in a migration and one listed as storage
+  only, ai.signal_observation, which no operation reads or writes. MIG-KERNEL is new (V0003__kernel.sql), so the
+  first-release numbers after it move up by one; none is merged yet. On the regenerated op-release.json the audit
+  script p6 still counts 128 tables with no ticket: their migrations are planned in Blocks B to D, which are ticketed at
+  the app-module level until each block is planned.'

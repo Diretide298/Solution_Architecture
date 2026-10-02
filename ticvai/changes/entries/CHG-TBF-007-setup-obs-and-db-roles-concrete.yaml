@@ -1,0 +1,39 @@
+id: CHG-TBF-007
+date: '2026-10-03'
+source: audit
+kind: plan
+proposed: '2026-10-03'
+summary: SETUP-OBS and DB-ROLES say concretely what to build and when it is done, from the decisions and ADRs they rest
+  on.
+decision:
+  what: 'SETUP-OBS (build-service-docs.py): the OpenTelemetry SDK in the five deployables of ADR-0055, OTLP to a collector
+    in the cell, the cell''s Log Analytics workspace in Azure UAE North (R057), structured logs with trace and
+    correlation ids and no guest PII (docs/architecture/observability.md; ADR-0009), one 5xx alert to an action group
+    that emails the on-call person; done when a request is followed from log to trace, a deliberate 500 alerts within
+    five minutes and a day of dev logs holds no email, phone or card number. DB-ROLES (block-a-extra-tasks.json): one
+    login role per deployable (commerce, access, operations, workers, ticvai_ai) with DML on its modules'' schemas and
+    SELECT on the published read views, no CREATE, ownership or BYPASSRLS; ticvai_ai writes only ai.* and reads the
+    transactional schemas (ADR-0020); a separate migration role owns the tables; done when the refusals, the pg_roles
+    check and an unscoped session reading nothing all hold.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Chinmay, 3 October (spec-fix brief, batch TBF): "SETUP-OBS and DB-ROLES: make their descriptions concrete from
+  the ADRs they cite." CHG-REL-003 had found DB-ROLES not buildable from its pull on live r2 (CHG-AUD-001). Sources:
+  ADR-0055, ADR-0020, ADR-0009, ADR-0058, audit R057.'
+keys_touched:
+  tickets: [SETUP-OBS, DB-ROLES]
+  files: [tools/build-service-docs.py, docs/active/block-a-extra-tasks.json, tools/applied/ai-engine-tasks-3-october.py]
+root_class: A09 TICKET-ACCEPTANCE
+tickets:
+  started: []
+  unstarted: [SETUP-OBS, DB-ROLES]
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ticket-text.py
+status: open
+notes: 'The tenant and venue attributes and the dashboards stay with PLATFORM-OBSERVE; the relay-lag alert (ADR-0058) and
+  the SLO dashboards (ADR-0060, OBS-SLO) come after SETUP-OBS. The separate migration role is the one point the ADRs
+  do not settle: asked of Chinmay with a default in the batch report.'

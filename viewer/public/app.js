@@ -10547,6 +10547,8 @@ function renderTableLinks() {
     line('generated', table.ddl.generated?.join(', '));
     if (table.ddl.rls?.enabled) {
       line('row security', table.ddl.rls.forced ? 'enabled and FORCED' : 'enabled');
+      line('policy', table.ddl.rls.policy);
+      line('policy note', table.ddl.rls.note);
     }
     pane.append(facts);
 

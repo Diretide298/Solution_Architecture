@@ -76,6 +76,7 @@ CHECKS = [
     # 2 October (Chinmay, pre-apply round, CHG-SBO-001): every TICVAI Console screen acting in a tenant carries
     # the R098 tenant picker and platform-staff grant, and every Console screen is core.
     "check-console-grant",
+    "check-table-keys", "check-migration-tickets", "check-ticket-scope",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.

@@ -1,0 +1,47 @@
+id: CHG-TBF-002
+date: '2026-10-03'
+source: audit
+kind: spec
+summary: Every migration ticket names its V-file, the forward ones from V1000 in build order and kept once planned,
+  and backend/MIGRATIONS.md describes the files that exist instead of an older plan that named other numbers.
+decision:
+  what: 'build-service-docs.py gives every forward migration (VM-MIG-*, MIG-<SCHEMA>-<n>) a file from V1000 upwards in
+    build order, keeps a number once planned (read from the plan it replaces; --renumber-migrations drops the pins
+    before a first push), names V0001__baseline.sql on MIG-BASELINE, and adds the forward migrations to the generated
+    handoff/service-docs/backend/MIGRATIONS.md. Ranges: V0001 baseline, V0002-V0099 first release in schema order,
+    V0100-V0999 derive-ddl''s frozen-mode files (V0100 and V0101 are frozen and keep their numbers), V1000 upwards the
+    later forward migrations. read_ddl also reads the forward files derive-ddl wrote after r1, so a table created there
+    has a source file and a migration. backend/MIGRATIONS.md now lists the real layout (the baseline frozen at r1, the
+    V01nn files) and the numbering, and no longer the hand-written V0002-V0021 list. check-ddl-conventions reads only
+    the first-release sections and counts tables created in the forward files; check-ticket-text no longer counts a
+    backend/ source path as the ticket naming a V-number.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Block A audit on live r2, pattern 5 in CHG-AUD-001 ("two migration file names for MIG-RETAIL"). Before: 492 table
+  rows on forward migration tickets with no file (223 in Block A), and 304 Block A rows whose ticket named one file while
+  backend/MIGRATIONS.md named another for the same schema (17 schemas, V0026 for access on the ticket against V0007
+  in the document). Checked against what exists first: no V0002-V0099 file is in backend/, check-migration-freeze
+  freezes the baseline at r1 (a1ba956) with two forward files since (V0100, V0101), and derive-ddl numbers its own
+  from V0100 to stay clear of the plan''s first-release names. So the tickets and the generated list were right, the
+  hand-written list was stale, and the forward tickets had no numbers at all.'
+keys_touched:
+  tickets: [MIG-BASELINE, MIG-RETAIL, MIG-ACCESS, VM-MIG-FNB, MIG-CONTROL-6]
+  files: [tools/build-service-docs.py, backend/MIGRATIONS.md, tools/check-migration-tickets.py,
+    tools/check-ddl-conventions.py, tools/check-ticket-text.py, tools/run-checks.py]
+root_class: A12 MIGRATION-PLAN
+tickets:
+  started: []
+  unstarted: [MIG-BASELINE, VM-MIG-FNB, MIG-CONTROL-6]
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-migration-tickets.py
+status: open
+notes: 'On the plan regenerated from HEAD before the change: 179 migration tickets named no file (M-FILE-NAMED) and
+  backend/MIGRATIONS.md named 20 files nothing has (M-BACKEND-MD). After: 213 tickets each name a file (34 first
+  release, 179 forward from V1000), no number twice, none outside its range, none running before a migration it
+  depends on, and every name the same on the ticket and in the generated MIGRATIONS.md. The audit script p6 recounts
+  0 forward rows without a file and 0 name disagreements on the regenerated op-release.json. A second refresh kept
+  all 179 forward numbers.'

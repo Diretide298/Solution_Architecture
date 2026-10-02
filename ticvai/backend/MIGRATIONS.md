@@ -38,39 +38,65 @@ someone to search for a table that was never meant to exist.
 
 ## File layout
 
-One migration per module, applied in order. Module boundaries match the contract tiers.
+**What is in `backend/` (3 October 2026, CHG-TBF-002).** Two databases, `backend/tenant/` and
+`backend/control/`, each with the same layout. The numbered files are derived by `tools/derive-ddl.py`
+and **frozen at the git tag `r1`** (`tools/check-migration-freeze.py`): a baseline file is never edited
+again, and a later table change is a forward migration of its own.
 
-    001-extensions.sql               ltree, btree_gist, pgcrypto, vector (tenant) [DERIVED]
-    002-migration-register.sql       platform.schema_version                    [DERIVED]
-    010-<schema>.sql                 621 tables across 32 schemas               [DERIVED]
-    900-foreign-keys.sql             632 declared references                    [DERIVED]
-    910-indexes.sql                  conventions and scope paths                [DERIVED]
-    920-row-level-security.sql       242 by scope_path, 58 by venue_id          [DERIVED]
-    930-partitioning.sql             monthly range partitions (ADR-0056)        [DERIVED]
-    V0002__identity.sql              principals, roles, grants, sso, mfa
-    V0003__tenancy.sql               workstations, sale boards, devices
-    V0003a__scope-typing.sql         level-typed scope FKs, outlet, tenant projection
-    V0004__catalogue.sql             products, pricing, events, capacity, entitlements
-    V0005__orders.sql                order lines, payments, refunds, reservations
-    V0006__shift.sql                 shifts, cash movements
-    V0007__access.sql                access points, admission profiles, blacklist
-    V0008__ledger.sql                accounts, journals, entries, settlement
-    V0009__cross_cell.sql            guest links, redemption rights, DSAR
-    V0010__seating.sql               seat maps, seats, holds, blocks
-    V0011__fnb.sql                   menus, modifiers, visits, kitchen
-    V0012__inventory.sql             items, movements, counts, procurement
-    V0013__retail.sql                merchandise, returns, wallet, gift cards
-    V0014__promotions.sql            promotions, coupons, vouchers, allocation
-    V0015__marketing.sql             profiles, consent, segments, campaigns, cases
-    V0016__maintenance.sql           assets, work orders, inspections, incidents
-    V0017__queue.sql                 queues, entries, feeds
-    V0018__white_label.sql           tenant config, content, versions
-    V0019__assets.sql                media library, collections, rights
-    V0020__games.sql                 cards, games, plays, prizes
-    V0021__reporting.sql             definitions, executions, schedules
+    000-schemas.sql                  the schemas                                  [DERIVED, frozen at r1]
+    001-extensions.sql               ltree, btree_gist, pgcrypto, vector (tenant) [DERIVED, frozen at r1]
+    002-migration-register.sql       platform.schema_version                      [DERIVED, frozen at r1]
+    010-<schema>.sql                 one file per schema: its tables              [DERIVED, frozen at r1]
+    900-foreign-keys.sql             the declared references                      [DERIVED, frozen at r1]
+    910-indexes.sql                  conventions and scope paths                  [DERIVED, frozen at r1]
+    920-row-level-security.sql       one policy per table, FORCE on every one     [DERIVED, frozen at r1]
+    930-partitioning.sql             monthly range partitions (ADR-0056)          [DERIVED, frozen at r1]
+    V01nn__after_r1_<yyyymmdd>.sql   what changed after r1, additive only         [DERIVED, then frozen]
 
-`subscription` has no migration here — it is Control Plane and lives in a separate database
-outside any cell.
+Each file's header gives its own counts; they are not repeated here, where they went stale.
+
+**The migration files the developers write** are numbered by the plan, not here.
+`tools/build-service-docs.py` gives every migration ticket its file, and writes the same names, in the
+same run, into `handoff/service-docs/backend/MIGRATIONS.md` (generated), so a ticket and that list cannot
+disagree. Until 3 October this section listed twenty files numbered V0002 to V0021, a hand-written
+plan from before the DDL was derived: none of those files exists, and the tickets named other numbers
+for the same schemas (access was V0026 on its ticket and V0007 here; retail had two numbers).
+The numbering:
+
+| Range | What | Who numbers it |
+|---|---|---|
+| V0001 | the baseline: schemas, extensions, the register, the RLS and partition helpers (MIG-BASELINE) | the plan |
+| V0002 to V0099 | the first release, one migration per schema in key order, cross-schema keys last (MIG-<SCHEMA>, MIG-FOREIGN-KEYS) | the plan, in schema order |
+| V0100 to V0999 | derive-ddl's frozen-mode files in `backend/<db>/` (`V0100__after_r1_20261002.sql`, `V0101__...`) | derive-ddl, one number per run |
+| V1000 upwards | every later forward migration (VM-MIG-*, MIG-<SCHEMA>-<n>), in build order | the plan, kept once planned |
+
+**A number is never reused and never renumbered.** A forward migration keeps the number it was first
+planned with on every later refresh (`build-service-docs.py --renumber-migrations` drops that only
+before a first push); the frozen V01nn files are never renumbered. A V01nn change to a table that no
+migration has created yet is folded into that table's own migration ticket rather than applied to a
+table that does not exist. `tools/check-migration-tickets.py` fails on a ticket with no file, a number
+used twice or outside its range, a migration that runs before one it depends on, and any file name here
+or in the generated list that the tickets do not carry.
+
+**Every table is in a migration or says why not** (CHG-TBF-003). The tables no operation reads or writes
+and no task names are listed, with that reason, under "Tables no migration creates" in the generated
+`handoff/service-docs/backend/MIGRATIONS.md`; a table there that an operation does reach fails the check.
+The kernel's own tables (`kernel.inbox`, `ai.inbox`, `control.outbox_relay`, ADR-0058) go with the first
+release, and `platform.schema_version` with the baseline.
+
+`subscription` is a tenant schema with a first-release migration of its own; the Control Plane is the
+`control` database (ADR-0039), migrated as its own series and holding its own `platform.schema_version`.
+
+## Tenant-level row-level security
+
+**A table under `platform.apply_tenant_rls` has no `tenant_id` column, by design.** A tenant database
+holds one tenant (ADR-0038, a cell is a region with a database per tenant), so there is nothing to filter
+by tenant inside it. The policy is `platform.tenant_root_in_scope()`: the caller's scope must include the
+tenant root, which is how a table with no scope column, venue or owning row is still under FORCE row-level
+security rather than open. ADAM's table view calls this policy `tenant_isolation`; it is not a missing
+column, and the DDL is right as it stands. A table gets this policy only when it has no `scope_path`,
+no `venue_id`, no subject and no NOT NULL owning reference (the comment beside each call in
+`920-row-level-security.sql` says which).
 
 ## Rules
 
@@ -94,5 +120,6 @@ Migrations fan out **per region**, not per tenant (ADR-0014). A tenant in three 
 three cells and three applications, and they may legitimately sit at different versions during
 a rollout — `platform.schema_version` records where each one is.
 
-The orchestrator that performs this fan-out is **not yet built and is unowned**. Until it
-exists, migrations past V0001 can be written but not safely deployed.
+The orchestrator that performs this fan-out is the Block A task PLATFORM-MIGRATE (migration fan-out
+across tenant databases, with progress and resume). Until it exists, migrations past V0001 can be
+written but not safely deployed.

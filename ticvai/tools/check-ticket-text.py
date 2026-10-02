@@ -170,7 +170,9 @@ def main() -> int:
                 if re.search(r"rollback|restored snapshot|previous release|\bV\d{3,4}\b", d, re.I):
                     guard.add("T-MIG-DONE", key, f"{key}: Done-when '{d[:80]}' cannot be held by a "
                                                  "forward-only runner")
-            if re.search(r"\bV\d{3,4}(__|\b)", text):
+            # A source path under backend/ is the file the tables come from (derive-ddl's after-r1 forward file,
+            # CHG-TBF-002), not a number given to this migration; the ticket's own file is in its subject.
+            if re.search(r"\bV\d{3,4}(__|\b)", re.sub(r"backend/(?:tenant|control)/V\d+__[\w.-]+\.sql", "", text)):
                 guard.add("T-MIG-DONE", key + ":vnumber",
                           f"{key}: names a V-number; MIGRATIONS.md numbers the files")
         # --- boilerplate ------------------------------------------------------------------------

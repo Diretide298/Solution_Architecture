@@ -1,0 +1,34 @@
+id: CHG-TBF-005
+date: '2026-10-03'
+source: audit
+kind: spec
+summary: 'A setup ticket''s title says how many of its screen''s operations it builds and how many the screen has
+  ("setup: 5 of its 11 operations"), and the rest-of-the-screen ticket says the remainder.'
+decision:
+  what: 'build-service-docs.py writes "(setup: K of its N operations)" (or "setup: all N operations") on APP-SETUP
+    screen tasks and "(the rest of the screen: N-K of its N operations)" on their -REST tasks, N being the distinct
+    operations the screen binds. check-ticket-scope fails a title whose N is not the screen''s, whose K is not its
+    setup operations on the screen, the old form, or a setup operation the screen no longer binds.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Block A audit on live r2, pattern 6 in CHG-AUD-001 ("APP-SETUP-BO-009 title 5 operations, screen 11"); the zero-AI
+  count found 94 Block A setup titles whose count was not the screen''s (P7a). Chinmay, 3 October (spec-fix brief,
+  batch TBF).'
+keys_touched:
+  tickets: [APP-SETUP-BO-009, APP-SETUP-BO-009-REST, APP-SETUP-BO-054, APP-SETUP-ADM-243, APP-SETUP-ADM-354]
+  files: [tools/build-service-docs.py, tools/check-ticket-scope.py, tools/run-checks.py]
+root_class: A10 TICKET-DRIFT
+tickets:
+  started: []
+  unstarted: [APP-SETUP-BO-009, APP-SETUP-BO-009-REST]
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ticket-scope.py
+status: open
+notes: 'Before: 113 setup titles in the old form, none saying the screen''s size (94 of them with a count other than the
+  screen''s, p7). After: 196 setup and rest titles checked, 0 findings; p7 counts 0 title mismatches. Its other rules now
+  read the new titles as full-screen tickets (its regex expects the old form), so its screen-op-not-linked count is not
+  comparable with before; check-ticket-scope is the count to read.'
