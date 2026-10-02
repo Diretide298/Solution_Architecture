@@ -29,5 +29,6 @@ prevention:
   type: check
   ref: tools/check-design-notes.py
 notes: 'Block A. Batch SOT (screens-other, phase B), 2 October 2026; worktree D:/wt/screens-other, branch screens-other. Tickets:
-  none started (Block A starts Monday 5 October 2026). Closed by the next commit once this one has a hash.'
-status: open
+  none started (Block A starts Monday 5 October 2026).'
+status: closed
+closed_by_commit: b461f38e
