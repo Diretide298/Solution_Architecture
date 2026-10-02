@@ -353,6 +353,8 @@ def regroup(rows, mp, retire_plan, unexplained, release, structure=None):
 OP10_FORBIDDEN = [
     (re.compile(r"\.where\([^)]*parent_id\s*:"), "OpenProject 10 keeps parents in the relations table and has no "
      "work_packages.parent_id column: use w.children / w.parent"),
+    (re.compile(r"transaction\(requires_new: true\)"), "a savepoint per row inside one long transaction overflows "
+     "PostgreSQL's subtransaction cache past 64 and slows every statement (CHG-REL-002): commit each row on its own"),
 ]
 
 

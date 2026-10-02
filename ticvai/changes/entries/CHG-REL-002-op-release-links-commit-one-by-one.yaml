@@ -1,0 +1,31 @@
+id: CHG-REL-002
+date: '2026-10-03'
+source: cr
+kind: process
+summary: op-release.rb's links phase commits each follows link on its own instead of holding all of them in one
+  transaction with a savepoint each.
+decision:
+  what: 'The links phase removes the obsolete links in one transaction, then adds each wanted link in its own
+    transaction. op-release.py refuses a bundle while op-release.rb uses transaction(requires_new: true) (OP10_FORBIDDEN).'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'The r2 apply (commit 8ff2a4b8, tag r2) slowed from 3 s to 400 s per 100 links in the links phase (6,246 to add):
+  past 64 savepoints in one transaction PostgreSQL''s subtransaction cache overflows and every statement slows. The
+  SSH session dropped at link 1,800 and the whole phase rolled back. Create, priority and assign had committed.'
+keys_touched:
+  files:
+  - tools/op-release.rb
+  - tools/op-release.py
+root_class: A00 TOOLING
+tickets:
+  started: []
+  unstarted: []
+release_tag: r2
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/op-release.py
+status: open
+notes: A re-run compares first, so the links it made stay and it carries on. Run the apply under nohup so a dropped
+  session cannot stop it.

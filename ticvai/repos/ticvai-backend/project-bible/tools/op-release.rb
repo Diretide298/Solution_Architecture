@@ -480,21 +480,22 @@ if rel_run?("links")
     started = Time.now
     rows_before = Relation.count
     made = twice = 0
+    # Each link commits on its own (CHG-REL-002). The r2 apply held all 6,246 in one transaction with a savepoint
+    # each: past 64 savepoints PostgreSQL's subtransaction cache overflows and every statement slows, so 100 links
+    # went from 3 s to 400 s, and a dropped session rolled all of them back. One commit per link keeps the pace
+    # flat and keeps what was made; a re-run compares first, so it carries on where it stopped.
     rel_quietly do
-      WorkPackage.transaction do
-        obsolete.each(&:destroy)
-        todo.each do |from_id, to_id|
-          r = Relation.new(from_id: from_id, to_id: to_id)
-          r.relation_type = Relation::TYPE_FOLLOWS
-          begin
-            # a savepoint, so a duplicate does not abort the phase's transaction (PostgreSQL)
-            Relation.transaction(requires_new: true) { r.save!(validate: false) }
-            made += 1
-          rescue ActiveRecord::RecordNotUnique
-            twice += 1
-          end
-          rel_say "  #{made + twice}/#{todo.size} links (#{(Time.now - started).round}s)" if ((made + twice) % 100).zero?
+      WorkPackage.transaction { obsolete.each(&:destroy) }
+      todo.each do |from_id, to_id|
+        r = Relation.new(from_id: from_id, to_id: to_id)
+        r.relation_type = Relation::TYPE_FOLLOWS
+        begin
+          Relation.transaction { r.save!(validate: false) }
+          made += 1
+        rescue ActiveRecord::RecordNotUnique
+          twice += 1
         end
+        rel_say "  #{made + twice}/#{todo.size} links (#{(Time.now - started).round}s)" if ((made + twice) % 100).zero?
       end
     end
     rel_say "done: #{obsolete.size} removed, #{made} added, #{twice} already there, in #{(Time.now - started).round}s; " \
