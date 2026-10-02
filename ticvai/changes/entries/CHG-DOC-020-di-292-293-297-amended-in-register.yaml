@@ -1,0 +1,34 @@
+id: CHG-DOC-020
+date: '2026-10-02'
+source: audit
+kind: design-input
+summary: 'DI-292 (no F&B without admission: standalone outlets exempt), DI-293 (one receipt: not for F&B) and DI-297 (Powered by TICVAI:
+  a toggle, default on) are recorded as amended in the decisions register; the design-input index entries themselves are not yet amended.'
+decision:
+  what: 'DI-292: inside the venue needs an admission ticket, a standalone outlet does not (DEC-070, DEC-206). DI-293: F&B keeps its
+    own payment step and receipt (DEC-052, DEC-071, DEC-206). DI-297: ''Powered by TICVAI'' is a toggle, default on (DEC-160, PRE-7).'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October, batch 1 (WEB-036, GST-024), batch 4 #31 (CMS-104) and the pre-apply round. DI-292, DI-293 and DI-297 are minuted
+  agreements of 14 August (sources/mom/TICVAI_MoM_2026-08-14.docx).'
+keys_touched:
+  other:
+  - DI-292
+  - DI-293
+  - DI-297
+  files:
+  - handoff/decisions-2-october.json
+  - docs/registers/decisions-2-october.md
+root_class: 'new: package-contradicts-decision'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+client_signoff: pending
+prevention:
+  type: template-field
+  ref: handoff/design-inputs/mom-design-inputs.yaml::supersedes
+status: open
+notes: 'Open: handoff/design-inputs/mom-design-inputs.yaml is not this batch''s file. Closes when its owner adds the superseding DI
+  entries (supersedes: [DI-292], [DI-293], [DI-297]) citing these decisions; the client signs off the change to its minuted agreements.'

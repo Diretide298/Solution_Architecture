@@ -5,8 +5,6 @@
   "commit": "c9d5b383",
   "rules": {
    "CS-MISSING": [
-    "changes/entries/CHG-SEED-005-pos-v2-eight-decisions.yaml|sources/designs/TICVAI_POS_Terminal_v2.html",
-    "changes/entries/CHG-SEED-012-sources-cited-from-outside-git.yaml|sources/designs/TICVAI_POS_Terminal_v2.html",
     "docs/active/action-register-22-september.md|docs/active/build-readiness-21-september.md",
     "docs/active/adr-0038-implementation-log.md|contracts/spine/cross-cell.yaml",
     "docs/active/claude-design-runbook.md|wireframes/incoming/BATCH-LOG.md",
@@ -33,8 +31,7 @@
     "docs/registers/conflicts.md|sources/client/TAIS_Platform_RFP.pdf",
     "docs/registers/conflicts.md|sources/planning/TAIS_Product_Planning_and_Delivery_Plan_4_1.xlsx",
     "docs/registers/conflicts.md|sources/rfp/TAIS_Platform_RFP_From_Miracle_Star_Trading_2.pdf",
-    "docs/registers/conflicts.md|states/entitlement.yaml",
-    "docs/registers/pos-v2-decisions.md|sources/designs/TICVAI_POS_Terminal_v2.html"
+    "docs/registers/conflicts.md|states/entitlement.yaml"
    ],
    "CS-OUTSIDE-GIT": [
     "docs/active/action-register-22-september.md|scratchpad/partial-build-check.jsonl",

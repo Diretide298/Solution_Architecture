@@ -1,0 +1,32 @@
+id: CHG-DOC-017
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'REV3-2 carries the kiosk exception in the rev 3 register: the kiosk keeps tickets first, then date and time.'
+decision:
+  what: The kiosk keeps tickets first, then date and time (unlike web and app); supersedes REV3-2 for the kiosk only (DEC-170).
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October, batch 5 (KSK-004, workbook Q170): ''Tickets first (kiosk differs from web and app)''. REV3-2 (DI-116) put
+  date and time before tickets on every guest channel.'
+keys_touched:
+  files:
+  - handoff/rev3-decisions.json
+  - docs/registers/rev3-decisions.md
+  other:
+  - REV3-2
+  screens:
+  - KSK-004
+  flows:
+  - F07
+root_class: 'new: package-contradicts-decision'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: generator-rule
+  ref: tools/build-audit-decisions.py::amendments_marked
+status: closed
+closed_by_commit: 9b180bf2

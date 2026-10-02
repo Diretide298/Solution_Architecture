@@ -1,0 +1,33 @@
+id: CHG-DOC-011
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'New ADR-0070: configuration moves to production as a versioned package (stable keys, diff, approval, idempotent upsert, audit,
+  rollback by re-applying the previous package; no secrets); the schema only moves forward (expand then contract). The release runbook
+  points to it.'
+decision:
+  what: 'Industry standard for production change: never merge or reverse-migrate production databases; forward-only migrations; configuration
+    packages with diff, approval and idempotent upsert (DEC-168).'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October, batch 5 set 1 (ADM-122, workbook Q168): ''The biggest challenge is migration or changes in the DB… suggest
+  a better way, or the industry standard''; sent as default unless he objects. Relates to ADR-0039.'
+keys_touched:
+  files:
+  - docs/adr/0070-configuration-moves-as-a-versioned-package.md
+  - docs/adr/README.md
+  - docs/active/release-runbook.md
+  screens:
+  - ADM-122
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-key-stability.py
+status: open
+notes: check-migration-freeze already holds the forward-only schema after r1. Open until check-key-stability covers the configuration
+  package's keys, which needs the export/diff/apply operations in contracts/satellite/platform-ops.yaml (the satellite contracts owner).

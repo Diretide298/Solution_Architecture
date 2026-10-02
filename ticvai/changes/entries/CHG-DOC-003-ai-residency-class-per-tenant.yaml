@@ -1,0 +1,37 @@
+id: CHG-DOC-003
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: ADR-0009 sections 1 and 3 are amended with a per-tenant AI residency class (UAE-only by default through Core42 Compass; Global
+  allowed by opt-in; on-premise), and AI-D02 and AI-D03 are amended to match.
+decision:
+  what: 'Per-tenant AI residency class: UAE-only (default; mandatory for government, bank and health tenants) on Compass GPT-4.1 mini
+    / GPT-5 with OpenAI UAE then in-cell gpt-oss-120b as fallback; Global allowed under PDPL Art. 23; on-prem open models. Compass through
+    openaiCompatible. Scale step to Azure UAE North PTU near 100,000 calls a day (DEC-539, DEC-540).'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October (the AI residency table in docs/active/decisions/answers-2-october.md). Research section 2A (docs/active/research/ai-ml-model-selection-2-october.md):
+  Azure UAE North serves no chat model in-region on pay-per-token, so ADR-0009''s in-region inference default could not be met by AI-D02
+  as written.'
+keys_touched:
+  files:
+  - docs/adr/0009-ai-data-residency.md
+  - docs/adr/README.md
+  - handoff/ai-decisions.json
+  other:
+  - AI-D02
+  - AI-D03
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: check-ai-residency (not written yet)
+status: open
+notes: 'Open until the prevention exists: a gateway test (or check) that a call for a UAE-only tenant can only resolve to an in-UAE
+  endpoint, and that the transfer register lists every Global-allowed tenant. Depends on the spine contracts owner (RegionSettings /
+  tenant residency class in contracts/spine/tenancy.yaml), the satellite contracts owner (AiProviderKind, AiProvider in contracts/satellite/ai.yaml),
+  the AI design (docs/architecture/ai-system-design.md) and the HLD/LLD redo.'

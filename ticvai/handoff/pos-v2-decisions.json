@@ -57,7 +57,8 @@
    "POS-021",
    "POS-022"
   ],
-  "decided": "2026-10-01"
+  "decided": "2026-10-01",
+  "superseded": "2 October (Chinmay, DEC-064; CHG-DOC-013): R261 is amended to an outlet setting, Payment timing: Pay first, or Send to kitchen first then pay. The design correction stands for an outlet set to send first."
  },
  {
   "ref": "POSV2-5",
@@ -109,5 +110,65 @@
    "POS-028"
   ],
   "decided": "2026-10-01"
+ },
+ {
+  "ref": "POSV2-9",
+  "source": "POS v2 build (sources/designs/TICVAI_POS_Terminal_v2.html), the POS-000 candidate frame in wireframes/incoming/P04-pos-v2/; one of the five candidates CHG-SEED-005 left undecided",
+  "what": "Sign-in: v2 co-brands the sign-in with the venue (name and logo), shows recent cashiers, takes a cashier-ID entry and switches between PIN and password.",
+  "kind": "accept-v2",
+  "decision": "Accept all of v2: co-branding, recent cashiers, cashier-ID entry and the PIN/password switch become the spec. (Chinmay, 2 October, batch 5; DEC-550)",
+  "applied": "Pending: the POS-000 candidate block in screens/P04-point-of-sale.yaml cites POSV2-9 (decisions or applied) so check-candidate-decisions passes; recorded by CHG-DOC-018",
+  "screens": [
+   "POS-000"
+  ],
+  "decided": "2026-10-02"
+ },
+ {
+  "ref": "POSV2-10",
+  "source": "POS v2 build (sources/designs/TICVAI_POS_Terminal_v2.html), the POS-003 candidate frame in wireframes/incoming/P04-pos-v2/; one of the five candidates CHG-SEED-005 left undecided",
+  "what": "Timed entry: v2's visit-date card with Change and its entry-slot picker inside the POS-002 drawer.",
+  "kind": "accept-v2",
+  "decision": "Accept v2 as drawn. (Chinmay, 2 October, batch 5; DEC-551)",
+  "applied": "Pending: the POS-003 candidate block in screens/P04-point-of-sale.yaml cites POSV2-10 (decisions or applied) so check-candidate-decisions passes; recorded by CHG-DOC-018",
+  "screens": [
+   "POS-003"
+  ],
+  "decided": "2026-10-02"
+ },
+ {
+  "ref": "POSV2-11",
+  "source": "POS v2 build (sources/designs/TICVAI_POS_Terminal_v2.html), the POS-004 candidate frame in wireframes/incoming/P04-pos-v2/; one of the five candidates CHG-SEED-005 left undecided",
+  "what": "Seat map: v2's section-then-seat flow for a reserved event inside the POS-002 drawer.",
+  "kind": "accept-v2",
+  "decision": "Accept v2: section then seat; no hold extend, no recommendation, no booking-fee line. (Chinmay, 2 October, batch 5; DEC-552)",
+  "applied": "Pending: the POS-004 candidate block in screens/P04-point-of-sale.yaml cites POSV2-11 (decisions or applied) so check-candidate-decisions passes; recorded by CHG-DOC-018",
+  "screens": [
+   "POS-004"
+  ],
+  "decided": "2026-10-02"
+ },
+ {
+  "ref": "POSV2-12",
+  "source": "POS v2 build (sources/designs/TICVAI_POS_Terminal_v2.html), the POS-012 candidate frame in wireframes/incoming/P04-pos-v2/; one of the five candidates CHG-SEED-005 left undecided",
+  "what": "Order and fulfilment: four order types in the cart (Dine-in, Quick service, Takeaway, Delivery); delivery asks the fulfilment source.",
+  "kind": "accept-v2",
+  "decision": "Accept v2: four order types, dine-in, quick service, takeaway and delivery (own fleet or partner). (Chinmay, 2 October, batch 5; DEC-553)",
+  "applied": "Pending: the POS-012 candidate block in screens/P04-point-of-sale.yaml cites POSV2-12 (decisions or applied) so check-candidate-decisions passes; recorded by CHG-DOC-018",
+  "screens": [
+   "POS-012"
+  ],
+  "decided": "2026-10-02"
+ },
+ {
+  "ref": "POSV2-13",
+  "source": "POS v2 build (sources/designs/TICVAI_POS_Terminal_v2.html), the POS-023 candidate frame in wireframes/incoming/P04-pos-v2/; one of the five candidates CHG-SEED-005 left undecided",
+  "what": "Merchandise: category tabs including Lockers, refine chips and Scan; the approved build's operational inventory ledger under Sync is gone.",
+  "kind": "accept-v2",
+  "decision": "Accept v2: Lockers tab, refine chips and Scan; no inventory ledger on the till. (Chinmay, 2 October, batch 5; DEC-554)",
+  "applied": "Pending: the POS-023 candidate block in screens/P04-point-of-sale.yaml cites POSV2-13 (decisions or applied) so check-candidate-decisions passes; recorded by CHG-DOC-018",
+  "screens": [
+   "POS-023"
+  ],
+  "decided": "2026-10-02"
  }
 ]

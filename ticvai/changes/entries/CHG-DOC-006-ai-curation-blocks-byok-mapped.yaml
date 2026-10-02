@@ -1,0 +1,35 @@
+id: CHG-DOC-006
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'The AI decisions register: AI-D18 amended (a model outside the curated map is refused), AI-D20 closed (BYOK maps each task
+  to the provider''s curated tier, billed to the client''s key), AI-D21 added (a curated range per AI and ML task).'
+decision:
+  what: 'AI-D18: the client cannot change the model per agent; curation blocks (DEC-002). AI-D20: closed by the BYOK curated map (DEC-001).
+    AI-D21: the curated range per task (DEC-544).'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October, batch 2 #1, #2 and #7 (workbook Q1, Q2 on ADM-037) and batch 3 (''ML models too''); research sections 2.2
+  to 2.4 and 3. AI-D18 ''warns, never blocks'' is overturned (ADR-0009 section 3 for BYOK residency).'
+keys_touched:
+  files:
+  - handoff/ai-decisions.json
+  other:
+  - AI-D18
+  - AI-D20
+  - AI-D21
+  screens:
+  - ADM-037
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: check-ai-curation (not written yet)
+status: open
+notes: 'Open until the prevention exists: a check that every BYOK provider kind resolves each taskKey to a curated tier, and that setAiProvider
+  / setAiModel declare the refusal (modelNotCurated). The contract change (contracts/satellite/ai.yaml) and ADM-037''s copy belong to
+  their owners.'

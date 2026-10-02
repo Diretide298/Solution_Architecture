@@ -1,0 +1,30 @@
+id: CHG-DOC-015
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'Audit R144 is extended in the register: waste approval is a policy the venue switches on or off (value bands, a photo above
+  a value).'
+decision:
+  what: A waste-approval policy, off by default; when on, value bands and a photo above a value (DEC-192).
+  by: Chinmay
+  date: '2026-10-02'
+why: Chinmay, 2 October, batch 6 set 5 (BO-139, workbook Q192). R144 listed recounts and retail returns, not waste.
+keys_touched:
+  files:
+  - handoff/audit-decisions.json
+  - docs/registers/audit-decisions.md
+  other:
+  - R144
+  screens:
+  - BO-139
+root_class: 'new: package-contradicts-decision'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: generator-rule
+  ref: tools/build-audit-decisions.py::amendments_marked
+status: closed
+closed_by_commit: 9b180bf2

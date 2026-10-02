@@ -1,0 +1,36 @@
+id: CHG-DOC-021
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: The external dependency register gains the cookie scanner API (bought, vendor to choose), UAE Pass and ICP verification (release
+  1, client access needed), the AI providers by residency class, and the custom-domain decision; CF-127 is closed as decided.
+decision:
+  what: 'Cookie scanner: buy a scanner API, hybrid (DEC-019; closes CF-127). UAE Pass and ICP in release 1, needing client access (DEC-457).
+    Domains: a platform subdomain per cell and a customer CNAME to Front Door with a managed certificate (DEC-546, DEC-547). AI providers
+    per residency class (DEC-539).'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October: batch 5 set 2 (CMS-025 workbook Q19, domains), critical set 2 (BO-627, Q457), the AI residency table. Research:
+  docs/active/research/cookie-scanner-and-domains-2-october.md. CF-127 asked build, buy or drop.'
+keys_touched:
+  files:
+  - docs/registers/external-dependencies.md
+  - docs/registers/conflicts.md
+  - docs/registers/conflict-status.md
+  screens:
+  - CMS-025
+  - BO-627
+  - CMS-017
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: template-field
+  ref: docs/registers/external-dependencies.md::Client owner
+status: closed
+notes: Each new row names the owner and what is outstanding. The scanner vendor and its trial are not chosen yet; UAE Pass and ICP wait
+  on client credentials. The integration register (handoff/integration-register.md) and the contracts belong to their owners.
+closed_by_commit: 9b180bf2

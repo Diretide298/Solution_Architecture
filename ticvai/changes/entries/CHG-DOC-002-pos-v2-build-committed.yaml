@@ -1,0 +1,30 @@
+id: CHG-DOC-002
+date: '2026-10-02'
+source: audit
+kind: process
+summary: 'The POS v2 build, sources/designs/TICVAI_POS_Terminal_v2.html, is committed: removed from .git/info/exclude and its three
+  cited-sources baseline entries removed.'
+decision:
+  what: Commit the file to git; remove it from .git/info/exclude and from the check-cited-sources baseline (DEC-555).
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, batch 5 set 2: ''Commit the file to git''. CHG-SEED-005 and CHG-SEED-012 cited it while it was outside git; check-cited-sources
+  carried it as a known finding (handoff/audit-baseline.json).'
+keys_touched:
+  files:
+  - sources/designs/TICVAI_POS_Terminal_v2.html
+  - handoff/audit-baseline.json
+  - .git/info/exclude
+root_class: 'new: source-outside-git'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-cited-sources.py
+status: closed
+notes: The exclude file is shared by every worktree; only the one line for this file was removed (the comment above it stays). With
+  the file tracked, check-cited-sources passes without the three baseline entries.
+closed_by_commit: addcf1d4

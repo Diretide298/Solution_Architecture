@@ -1,0 +1,41 @@
+id: CHG-DOC-007
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'ADR-0063 records the biometric decisions of 2 October and becomes Accepted in part: consent on the venue''s form with a warning
+  where TICVAI holds the data, enrolment at app, counters and kiosk (never the turnstile), minors with guardian consent (configurable),
+  images behind a logged permissioned view, face dedupe only with consent.'
+decision:
+  what: 'Biometrics: consent first on the venue''s consent form (DEC-128); Face Pass enrolment at the app, counters and a self-service
+    kiosk, not the turnstile (DEC-236); minors with guardian consent, the minor age per country, switchable (DEC-237, DEC-138, DEC-283);
+    ''View images (logged)'' behind a permission (DEC-239, DEC-261); accreditation face matching only with consent and legal sign-off,
+    off by default (DEC-461); the consent-form builder (DEC-549).'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October: batch 4 (BO-188, workbook Q128) and critical sets 1 and 3 (Q236, Q237, Q239, Q261, Q283, Q461). ADR-0063 listed
+  under-18s as open for the DPO; R205 is amended in the audit register (CHG-DOC-016).'
+keys_touched:
+  files:
+  - docs/adr/0063-encryption-keys-and-biometric-templates.md
+  - docs/adr/README.md
+  screens:
+  - BO-186
+  - BO-187
+  - BO-188
+  - BO-190
+  - BO-248
+  - BO-631
+  - GST-069
+  - CMS-029
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: check-biometric-consent (not written yet)
+status: open
+notes: 'Open until the prevention exists: check-contract-shapes (or a new check) that every biometric enrolment input requires a consent
+  record reference and the channel enum has no turnstile. The contract (contracts/spine/access.yaml) and screens belong to their owners.'

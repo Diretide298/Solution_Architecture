@@ -1,0 +1,33 @@
+id: CHG-DOC-009
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: ADR-0028 records why F&B owns its own catalogue table (F&B prices migrated into F&B so ticketing scales in isolation); ADR-0055
+  notes it.
+decision:
+  what: F&B prices are owned by F&B, in its own catalogue table; an outlet may set its own price; the central catalogue prices tickets
+    and single-price booths (DEC-034).
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October, batch 1 corrected (BO-045, workbook Q34): ''the split was deliberate, so the ticketing service can scale on
+  its own''. ADR-0028 and ADR-0055 carried the module map without this reason; the MenuItem text in the F&B contract was stale.'
+keys_touched:
+  files:
+  - docs/adr/0028-service-decomposition.md
+  - docs/adr/0055-a-modular-monolith-deployed-as-five-units.md
+  screens:
+  - BO-045
+  - POS-021
+root_class: 'new: package-contradicts-decision'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: check-fnb-price-owner (not written yet)
+status: open
+notes: 'Open until the prevention exists: a text check that no fnb.yaml description says the F&B price or tax comes from the catalogue
+  variant, and check-screen-wiring that F&B price bindings point at fnb. Depends on the satellite contracts owner (MenuItem, applyMenuActions)
+  and the screens owner (BO-045, POS-021).'

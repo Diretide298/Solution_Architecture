@@ -51,6 +51,15 @@
 4. **No new feature work starts in those three days.** Developers not on the block test fix the defects it finds, or take ready work from the next block that does not touch the block under test.
 5. **Client acceptance.** The block is demonstrated in the sprint review at the block's end. The client tests on the integration environment in the following week, while the next sprint runs.
 
+## The same-numbers test (2 October)
+
+Decided by Chinmay on 2 October (DEC-559; CHG-DOC-022), as the prevention CHG-FIN-006 lacked: the till, the
+back-office reports and Analytics are windows onto one reporting area, so they must show the same numbers.
+**A frontend comparison test** reads the same figure (takings, gross sales excluding VAT, refunds) for one scope,
+one period and one as-of time on the till (POS-008), the back office (BO-058, BO-059) and Analytics (P16), and
+fails on any difference. It is a real ticket in the block that first ships all three, run in the module test and
+again in the block test.
+
 ## Environments
 
 | Environment | Used for | Data |
@@ -71,3 +80,4 @@
 - The module test task for every app-module, in the sprint it lands.
 - The block test window, the last three working days of each block's final sprint.
 - For each block, the flows it claims (fully testable) and the flows that are only partly testable until a later block.
+- The same-numbers comparison test, in the block that first ships the till, back-office and Analytics figures.
