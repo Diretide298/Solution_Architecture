@@ -592,7 +592,8 @@ decision_owner: Chinmay
 prevention:
   type: check
   ref: tools/check-design-notes.py
-status: open
+status: closed
+closed_by_commit: 5735d15e
 notes: 'check-design-notes now validates `decisions` (fields, date, a DEC id and an existing CHG id in source, questionSource
   resolved, no question left in both lists) and correction `status`/`by` (fixed, logged or withdrawn, by an existing change
   entry), and refuses any CHG id a source names that has no entry. Before this change the notes had no `decisions` key,
