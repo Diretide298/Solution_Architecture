@@ -5842,15 +5842,19 @@ paths:
         version is superseded; operational requirements are derived from the new one. Emits `ai.forecastPublished`.
 
         **Who publishes: the holder of the module''s AI publish permission, no default role** (Chinmay, 2 October,
-        workbook Q3 and Q7). The vocabulary now has one `<MODULE>_AI_PUBLISH` per module (CHG-CSA-006). Moving
-        this operation''s `x-ticvai-permission` from `AI_APPROVE` to the forecast''s module permission changes what
-        it means for a client built at r1, so it waits for the breaking change to be approved (CHG-CSA-007);
-        until then `AI_APPROVE` gates it.
+        workbook Q3 and Q7; contract follow-ups: "replacing AI_APPROVE for model publishing"). The caller needs
+        `AI_USE`, which reads forecasts, and the `<MODULE>_AI_PUBLISH` of the version''s `module`
+        (`x-ticvai-permission-by-module`; `contracts/shared/permissions.yaml` `x-ticvai-module-ai-publish`), held at
+        the version''s scope. Without it the call is refused `403 module-ai-publish-required`. `AI_APPROVE` no longer
+        publishes a forecast; the switch is a logged breaking change against r1 (BC-006, CHG-FUP-004).
 
         '
       tags:
       - forecast
-      x-ticvai-permission: AI_APPROVE
+      x-ticvai-permission: AI_USE
+      x-ticvai-permission-by-module:
+        moduleOf: AiForecastVersion.module
+        permissions: ../shared/permissions.yaml#/x-ticvai-module-ai-publish
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
@@ -5881,12 +5885,23 @@ paths:
                 $ref: '#/components/schemas/AiForecastVersion'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '403':
+          description: The caller does not hold the AI publish permission of the version's module at its scope
+            (`module-ai-publish-required`, CHG-FUP-004).
+          x-ticvai-problem-types:
+          - module-ai-publish-required
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
-          description: 'Not publishable: a quality gate failed (`quality-gate-failed`) or the version is not the
-            latest draft (`version-not-current`).'
+          description: 'Not publishable: a quality gate failed (`quality-gate-failed`), the version is not the
+            latest draft (`version-not-current`), or its definition names no module and none follows from its
+            `subject` (`module-required`, CHG-FUP-004).'
           x-ticvai-problem-types:
           - quality-gate-failed
           - version-not-current
+          - module-required
           content:
             application/problem+json:
               schema:
@@ -8187,16 +8202,22 @@ paths:
       description: '**A trained model goes live only when a person promotes it** (design 3.12, decided 29 September).
         When a shadow run passes its gate the platform raises a `promotionReady` governance alert; nothing switches
         by itself. This moves the release one stage (shadow to canary, canary to production). A tenant release needs
-        `AI_APPROVE`; a platform release needs `PLATFORM_AI_MANAGE`. **Decided 2 October** (Chinmay, workbook Q7):
-        promotion goes to whoever holds the module''s AI publish permission (`<MODULE>_AI_PUBLISH`, CHG-CSA-006); the
-        switch of the declared permission is a breaking change awaiting approval (CHG-CSA-007). **Refused to a service caller.** Where the
+        the module''s AI publish permission; a platform release needs `PLATFORM_AI_MANAGE`. **Decided 2 October**
+        (Chinmay, workbook Q7; contract follow-ups: "replacing AI_APPROVE for model publishing"): promotion goes to
+        whoever holds the `<MODULE>_AI_PUBLISH` of the release''s `module` (`x-ticvai-permission-by-module`;
+        `contracts/shared/permissions.yaml` `x-ticvai-module-ai-publish`), on top of `AI_USE`; there is no default
+        role. `AI_APPROVE` no longer promotes; the switch is a logged breaking change against r1 (BC-007,
+        CHG-FUP-004). **Refused to a service caller.** Where the
         capability answers a `requestSuggestion` kind, production rewrites that kind''s assignment in `AiPolicy.suggestionProviders`,
         the only writer besides `setSuggestionProvider`. Resolves the `promotionReady` alert.
 
         '
       tags:
       - models
-      x-ticvai-permission: AI_APPROVE
+      x-ticvai-permission: AI_USE
+      x-ticvai-permission-by-module:
+        moduleOf: AiRelease.module
+        permissions: ../shared/permissions.yaml#/x-ticvai-module-ai-publish
       x-ticvai-permission-escalated: PLATFORM_AI_MANAGE
       x-ticvai-audience:
       - staff
@@ -8238,13 +8259,25 @@ paths:
                 $ref: '#/components/schemas/AiRelease'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '403':
+          description: A tenant release, and the caller does not hold the AI publish permission of its module
+            (`module-ai-publish-required`, CHG-FUP-004); or a platform release, and the caller lacks
+            `PLATFORM_AI_MANAGE`.
+          x-ticvai-problem-types:
+          - module-ai-publish-required
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           description: 'Not promotable: the gate has not passed (`gate-not-passed`), an isolation case failed (`isolation-cases-failed`),
-            or the stage cannot follow the current one (`stage-out-of-order`).'
+            the stage cannot follow the current one (`stage-out-of-order`), or a tenant release names no module
+            (`module-required`, CHG-FUP-004).'
           x-ticvai-problem-types:
           - gate-not-passed
           - isolation-cases-failed
           - stage-out-of-order
+          - module-required
           content:
             application/problem+json:
               schema:
@@ -12427,6 +12460,18 @@ components:
           - cashCollection
           - membershipRenewals
           - churn
+        module:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/ModuleKey
+          description: '**Whose AI this forecast is, and so who publishes it** (Chinmay, 2 October, workbook Q3:
+            "the permission holder for that module''s AI"; CHG-FUP-004). `publishForecastVersion` requires the
+            permission `contracts/shared/permissions.yaml` `x-ticvai-module-ai-publish` names for this module.
+            Absent on a write, the server takes it from `subject`: ticketing for `attendance`, `arrivalPattern`,
+            `productDemand`, `timeslotDemand`, `channelPace`, `occupancy` and `refunds`; access for `entryFlow` and
+            `attractionUtilisation`; queue for `queue`; fnb for `fnbDemand`; retail for `retailDemand`; inventory
+            for `stockDemand`; resources for `resourceDemand`; membership for `membershipRenewals` and `churn`; core
+            for `revenue`, `staffing`, `posDemand` and `cashCollection`. Proposed, client to correct; a venue may
+            name the module itself. Always present on a read.'
         grain:
           type: string
           enum:
@@ -12574,6 +12619,13 @@ components:
         versionNumber:
           type: integer
           minimum: 1
+        module:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/ModuleKey
+          readOnly: true
+          description: The module of the version's definition (`AiForecastDefinition.module`), copied when the
+            version is produced; the module whose AI publish permission `publishForecastVersion` requires
+            (CHG-FUP-004).
         status:
           type: string
           enum:
@@ -14914,6 +14966,16 @@ components:
           enum:
           - platform
           - tenant
+        module:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/ModuleKey
+          nullable: true
+          description: '**Whose AI this release is, and so who promotes it** (Chinmay, 2 October, workbook Q7: "AI
+            release promotion goes to whoever holds it"; CHG-FUP-004). For a tenant release, `promoteAiRelease`
+            requires the permission `contracts/shared/permissions.yaml` `x-ticvai-module-ai-publish` names for this
+            module; a tenant release with no module cannot be promoted (`409 module-required`). Set when the
+            release is registered, from the capability''s module. Null on a platform release, which
+            `PLATFORM_AI_MANAGE` promotes.'
         suggestionKind:
           allOf:
           - $ref: '#/components/schemas/SuggestionKind'

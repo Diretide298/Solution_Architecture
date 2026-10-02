@@ -1,0 +1,33 @@
+id: CHG-FUP-002
+date: '2026-10-02'
+source: cr
+kind: process
+summary: check-contract-compat no longer reports the required fields inside a new optional request object as newly
+  required.
+decision:
+  what: 'tools/check-contract-compat.py: newly_required() counts a new required request field as breaking only where
+    every object containing it already existed at the baseline; additive() lists the others as "required only inside
+    a new optional object". A new required object is still reported, once, as itself.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Phase B brief of 2 October (apply-followup row, carrying Chinmay''s contract follow-ups): a false positive the
+  contract agents met while applying the decisions (CHG-CSP-002 onward, CHG-CSA-001 onward). A client built at r1 never
+  sends an object that did not exist, so it never meets that object''s required fields; flagging them pushed agents
+  towards making genuinely required fields optional.'
+keys_touched:
+  files:
+  - tools/check-contract-compat.py
+root_class: 'new: compat-false-positive'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'Verified with a synthetic baseline: a new optional object `opt` with required `opt.inner` and `opt.list[].z`
+  is additive, while a new top-level required field still fails. The new optional request objects of CHG-FUP-008 and
+  CHG-FUP-009 rely on it. Batch FUP (apply-followup), 2 October 2026.'

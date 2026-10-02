@@ -59,6 +59,17 @@ info:
     **Who holds the escalated permission is role configuration**, not a contract fact: the seeded
     role templates give it to the manager roles, and a tenant may move it.
 
+    ## What `x-ticvai-permission-by-module` means
+
+    **Decided 2 October (Chinmay, workbook Q3 and Q7; CHG-FUP-004).** Publishing a module's AI is that
+    module's act, so an operation that publishes a forecast or promotes a model declares, beside its
+    base permission, `x-ticvai-permission-by-module` with two keys: `moduleOf`, the field of the target
+    that holds its `ModuleKey`, and `permissions`, the map from module to permission
+    (`x-ticvai-module-ai-publish` below). The base `x-ticvai-permission` is checked first, as for any
+    operation; once the target is read, the caller must also hold the mapped permission at the same
+    scope, or the call is refused `403 module-ai-publish-required`. Like the base permission, a change to
+    it is a breaking change (`tools/check-contract-compat.py`).
+
     ## Who must use MFA
 
     **By permission, not by role — decided 28 September, audit R135.** A principal holding any
@@ -73,8 +84,11 @@ x-ticvai-permission-modules:
     role shows these modules, each with its permissions as checkboxes, and a preset below fills them. Keys are
     common `ModuleKey` values, plus `platform` for the Control Plane permissions, which only platform staff
     hold and no tenant role offers. A permission shared by several modules' screens (selling, catalogue,
-    shift and cash) sits under `core`. Each module with AI models gets its own `<MODULE>_AI_PUBLISH`, decided
-    2 October and listed in `x-ticvai-proposed-permissions` until it can join the enum (CHG-CSA-007).
+    shift and cash) sits under `core`. Each module with AI models has its own `<MODULE>_AI_PUBLISH` (Chinmay,
+    2 October, workbook Q3 and Q7), the permission that publishes that module's forecasts and promotes its AI
+    releases (`x-ticvai-module-ai-publish` below); with `BIOMETRIC_IMAGE_VIEW`, `ACCESS_DIRECTION_SET` and
+    `REPORT_GOVERNANCE_MANAGE` these twenty joined the enum on 2 October, once a new `Permission` value was
+    ruled additive (contract follow-ups; CHG-FUP-001, CHG-FUP-003).
   modules:
     core:
       - SESSION_FORCE_LOGOUT
@@ -168,21 +182,35 @@ x-ticvai-permission-modules:
       - ANNOUNCEMENT_EMERGENCY
       - PARKING_CONFIGURE
       - PAYMENT_VOID
+      - CORE_AI_PUBLISH
+    ticketing:
+      - TICKETING_AI_PUBLISH
     access:
       - ACCESS_VALIDATE
       - ACCESS_OVERRIDE
       - ACCESS_POINT_CONFIGURE
       - TURNSTILE_MODE_SET
       - TICKET_LOOKUP
+      - ACCESS_AI_PUBLISH
+      - BIOMETRIC_IMAGE_VIEW
+      - ACCESS_DIRECTION_SET
+    fnb:
+      - FNB_AI_PUBLISH
+    retail:
+      - RETAIL_AI_PUBLISH
     inventory:
       - PROCUREMENT_VIEW
       - PROCUREMENT_REQUEST
       - PROCUREMENT_MANAGE
       - PROCUREMENT_RECEIVE
+      - INVENTORY_AI_PUBLISH
+    seating:
+      - SEATING_AI_PUBLISH
     membership:
       - LOYALTY_ACCRUE
       - LOYALTY_REDEEM
       - LOYALTY_ADJUST
+      - MEMBERSHIP_AI_PUBLISH
     marketing:
       - GUEST_VIEW
       - GUEST_VIEW_PII
@@ -192,6 +220,7 @@ x-ticvai-permission-modules:
       - MARKETING_SEND
       - CASE_VIEW
       - CASE_MANAGE
+      - MARKETING_AI_PUBLISH
     resources:
       - RESOURCE_VIEW
       - RESOURCE_BOOK
@@ -205,15 +234,20 @@ x-ticvai-permission-modules:
       - RENTAL_PRICE
       - RENTAL_APPROVE
       - RENTAL_OVERRIDE
+      - RESOURCES_AI_PUBLISH
     queue:
       - QUEUE_VIEW
       - QUEUE_MANAGE
       - QUEUE_REDEEM
       - QUEUE_OVERRIDE
+      - QUEUE_AI_PUBLISH
     transport:
       - TRANSPORT_VIEW
       - TRANSPORT_MANAGE
       - TRANSPORT_PRICE
+      - TRANSPORT_AI_PUBLISH
+    games:
+      - GAMES_AI_PUBLISH
     maintenance:
       - ASSET_VIEW
       - ASSET_MANAGE
@@ -228,6 +262,7 @@ x-ticvai-permission-modules:
       - INCIDENT_MANAGE
       - MAINTENANCE_EXECUTE
       - MAINTENANCE_APPROVE
+      - MAINTENANCE_AI_PUBLISH
     accreditation:
       - ACCREDITATION_VIEW
       - ACCREDITATION_APPLY
@@ -235,9 +270,11 @@ x-ticvai-permission-modules:
       - ACCREDITATION_ISSUE
       - ACCREDITATION_MANAGE
       - ACCREDITATION_CONFIGURE
+      - ACCREDITATION_AI_PUBLISH
     partner:
       - PARTNER_VIEW
       - PARTNER_MANAGE
+      - PARTNER_AI_PUBLISH
     developerApi:
       - DEVELOPER_VIEW
       - DEVELOPER_MANAGE
@@ -252,6 +289,8 @@ x-ticvai-permission-modules:
       - REPORT_EXPORT_PII
       - REPORT_MANAGE
       - REPORT_SCHEDULE
+      - ANALYTICS_AI_PUBLISH
+      - REPORT_GOVERNANCE_MANAGE
     ai:
       - AI_USE
       - AI_CONFIGURE
@@ -275,74 +314,34 @@ x-ticvai-permission-modules:
       - PLATFORM_MIGRATION_VIEW
       - PLATFORM_MIGRATION_APPLY
       - PLATFORM_TENANT_ACCESS
-x-ticvai-proposed-permissions:
+x-ticvai-module-ai-publish:
   description: >
-    **Decided on 2 October, not yet in the `Permission` enum** (CHG-CSA-007). Adding a value to the enum is a
-    breaking change against r1 under `check-contract-compat` (session, grant and role responses carry the
-    enum), and no such change is approved. Each moves into the enum, and into its module above, when the lead
-    approves it (or approves a rule that a new permission value is additive). Until then the operations that
-    need them keep their current permission.
-  permissions:
-    - name: CORE_AI_PUBLISH
-      module: core
-      why: "Publish the module's AI forecasts and promote its AI releases (workbook Q3, Q7)"
-    - name: TICKETING_AI_PUBLISH
-      module: ticketing
-      why: "Publish the module's AI forecasts and promote its AI releases (workbook Q3, Q7)"
-    - name: ACCESS_AI_PUBLISH
-      module: access
-      why: "Publish the module's AI forecasts and promote its AI releases (workbook Q3, Q7)"
-    - name: FNB_AI_PUBLISH
-      module: fnb
-      why: "Publish the module's AI forecasts and promote its AI releases (workbook Q3, Q7)"
-    - name: RETAIL_AI_PUBLISH
-      module: retail
-      why: "Publish the module's AI forecasts and promote its AI releases (workbook Q3, Q7)"
-    - name: INVENTORY_AI_PUBLISH
-      module: inventory
-      why: "Publish the module's AI forecasts and promote its AI releases (workbook Q3, Q7)"
-    - name: SEATING_AI_PUBLISH
-      module: seating
-      why: "Publish the module's AI forecasts and promote its AI releases (workbook Q3, Q7)"
-    - name: MEMBERSHIP_AI_PUBLISH
-      module: membership
-      why: "Publish the module's AI forecasts and promote its AI releases (workbook Q3, Q7)"
-    - name: MARKETING_AI_PUBLISH
-      module: marketing
-      why: "Publish the module's AI forecasts and promote its AI releases (workbook Q3, Q7)"
-    - name: RESOURCES_AI_PUBLISH
-      module: resources
-      why: "Publish the module's AI forecasts and promote its AI releases (workbook Q3, Q7)"
-    - name: QUEUE_AI_PUBLISH
-      module: queue
-      why: "Publish the module's AI forecasts and promote its AI releases (workbook Q3, Q7)"
-    - name: TRANSPORT_AI_PUBLISH
-      module: transport
-      why: "Publish the module's AI forecasts and promote its AI releases (workbook Q3, Q7)"
-    - name: GAMES_AI_PUBLISH
-      module: games
-      why: "Publish the module's AI forecasts and promote its AI releases (workbook Q3, Q7)"
-    - name: MAINTENANCE_AI_PUBLISH
-      module: maintenance
-      why: "Publish the module's AI forecasts and promote its AI releases (workbook Q3, Q7)"
-    - name: ACCREDITATION_AI_PUBLISH
-      module: accreditation
-      why: "Publish the module's AI forecasts and promote its AI releases (workbook Q3, Q7)"
-    - name: PARTNER_AI_PUBLISH
-      module: partner
-      why: "Publish the module's AI forecasts and promote its AI releases (workbook Q3, Q7)"
-    - name: ANALYTICS_AI_PUBLISH
-      module: analytics
-      why: "Publish the module's AI forecasts and promote its AI releases (workbook Q3, Q7)"
-    - name: BIOMETRIC_IMAGE_VIEW
-      module: access
-      why: "Open the enrolled face and the new capture behind 'View images (logged)' (workbook Q239, BO-190, BO-248; ADR-0063)"
-    - name: ACCESS_DIRECTION_SET
-      module: access
-      why: "Switch a running gate's direction live, logged (workbook Q255, BO-230; R221 amended)"
-    - name: REPORT_GOVERNANCE_MANAGE
-      module: analytics
-      why: "Set analytics governance: masking, export restriction, retention, sharing, AI/API access (workbook Q225, ANL-070)"
+    **Which permission publishes each module's AI** (Chinmay, 2 October, workbook Q3 and Q7: "the permission holder
+    for that module's AI"; CHG-FUP-003, CHG-FUP-004). An operation that publishes a model's output or promotes a
+    model declares `x-ticvai-permission-by-module`: the server reads the module of the thing published (a forecast
+    definition's or an AI release's `module`) and requires the permission this map names for it, at the
+    operation's scope. There is no default role: whoever builds a role ticks a module's "Publish AI model" box.
+    `developerApi` and `ai` have no AI models of their own and no entry; a target with no module is refused
+    `409 module-required`. Replaces `AI_APPROVE` for model publishing; `AI_APPROVE` keeps the AI governance acts
+    (proposals, plans, policies, incidents).
+  modules:
+    core: CORE_AI_PUBLISH
+    ticketing: TICKETING_AI_PUBLISH
+    access: ACCESS_AI_PUBLISH
+    fnb: FNB_AI_PUBLISH
+    retail: RETAIL_AI_PUBLISH
+    inventory: INVENTORY_AI_PUBLISH
+    seating: SEATING_AI_PUBLISH
+    membership: MEMBERSHIP_AI_PUBLISH
+    marketing: MARKETING_AI_PUBLISH
+    resources: RESOURCES_AI_PUBLISH
+    queue: QUEUE_AI_PUBLISH
+    transport: TRANSPORT_AI_PUBLISH
+    games: GAMES_AI_PUBLISH
+    maintenance: MAINTENANCE_AI_PUBLISH
+    accreditation: ACCREDITATION_AI_PUBLISH
+    partner: PARTNER_AI_PUBLISH
+    analytics: ANALYTICS_AI_PUBLISH
 x-ticvai-permission-presets:
   description: >
     **Presets fill the checklist; they are not roles** (Chinmay, 2 October, pre-apply round: "default permission
@@ -350,8 +349,12 @@ x-ticvai-permission-presets:
     it"; CHG-CSA-006). Picking a preset for a module ticks its permissions below; every box stays editable and
     the role can be renamed. `all` ticks every permission of the module (`x-ticvai-permission-modules`);
     `viewer` ticks the read permissions; `midLevel` ticks the read permissions and the day-to-day operating
-    ones, leaving configuration, approval, publishing, overrides and personal-data exports unticked. The seeded
-    roles of `roles.yaml` become named presets built from these.
+    ones, leaving configuration, approval, publishing, overrides and personal-data exports unticked. So no preset
+    but `all` ticks a module's `<MODULE>_AI_PUBLISH`, `BIOMETRIC_IMAGE_VIEW` (a logged view of biometric images,
+    ADR-0063), `ACCESS_DIRECTION_SET` or `REPORT_GOVERNANCE_MANAGE` (CHG-FUP-003). The five starting
+    configurations of the seed (`docs/active/seed-data-proposal.md` section 2: Cashier, Supervisor, Venue Manager,
+    Finance, Tenant Admin) are named presets built the same way: they fill the checklist, every box stays
+    editable, and the role is renamed freely (CHG-FUP-012).
   presets:
     all: every permission of the module
     viewer:
@@ -820,6 +823,35 @@ components:
         - PROCUREMENT_REQUEST         # raise, amend and cancel a requisition
         - PROCUREMENT_MANAGE          # suppliers, quotations; raise, send, cancel and short-close a PO
         - PROCUREMENT_RECEIVE         # record and reject received goods
+
+        # --- Decided 2 October (CHG-FUP-003) -------------------------------------
+        # **A new value is additive** (Chinmay, 2 October, contract follow-ups; tools/check-contract-compat.py,
+        # CHG-FUP-001): a client that does not know a permission never checks it, so it is ignored, not mis-read.
+        # **Publishing a module's AI is that module's permission, not `AI_APPROVE`** (workbook Q3 and Q7;
+        # `x-ticvai-module-ai-publish` above names which module each serves). No default role holds them.
+        - CORE_AI_PUBLISH             # publish core forecasts, promote core AI releases
+        - TICKETING_AI_PUBLISH        # publish ticketing forecasts, promote ticketing AI releases
+        - ACCESS_AI_PUBLISH           # publish access forecasts, promote access AI releases
+        - FNB_AI_PUBLISH              # publish fnb forecasts, promote fnb AI releases
+        - RETAIL_AI_PUBLISH           # publish retail forecasts, promote retail AI releases
+        - INVENTORY_AI_PUBLISH        # publish inventory forecasts, promote inventory AI releases
+        - SEATING_AI_PUBLISH          # publish seating forecasts, promote seating AI releases
+        - MEMBERSHIP_AI_PUBLISH       # publish membership forecasts, promote membership AI releases
+        - MARKETING_AI_PUBLISH        # publish marketing forecasts, promote marketing AI releases
+        - RESOURCES_AI_PUBLISH        # publish resources forecasts, promote resources AI releases
+        - QUEUE_AI_PUBLISH            # publish queue forecasts, promote queue AI releases
+        - TRANSPORT_AI_PUBLISH        # publish transport forecasts, promote transport AI releases
+        - GAMES_AI_PUBLISH            # publish games forecasts, promote games AI releases
+        - MAINTENANCE_AI_PUBLISH      # publish maintenance forecasts, promote maintenance AI releases
+        - ACCREDITATION_AI_PUBLISH    # publish accreditation forecasts, promote accreditation AI releases
+        - PARTNER_AI_PUBLISH          # publish partner forecasts, promote partner AI releases
+        - ANALYTICS_AI_PUBLISH        # publish analytics forecasts, promote analytics AI releases
+        - BIOMETRIC_IMAGE_VIEW        # open the enrolled face and the new capture behind "View images (logged)"
+        # (workbook Q239, BO-190, BO-248; ADR-0063). Every use writes a biometric audit event; MFA required.
+        - ACCESS_DIRECTION_SET        # switch a running gate's direction live, logged (workbook Q255, BO-230; R221 amended)
+        - REPORT_GOVERNANCE_MANAGE    # analytics governance: masking, export restriction, retention, sharing,
+        # AI and API access (workbook Q225, ANL-070). Separate from `REPORT_MANAGE`: writing a report is not
+        # deciding what any report may expose.
 
     PermissionPreset:
       type: string

@@ -1,0 +1,35 @@
+id: CHG-FUP-005
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: getFaceReenrolmentImages is gated by the dedicated BIOMETRIC_IMAGE_VIEW (with MFA) instead of the interim
+  GUEST_VIEW_PII.
+decision:
+  what: 'access.yaml getFaceReenrolmentImages: x-ticvai-permission BIOMETRIC_IMAGE_VIEW; the description says neither
+    GUEST_VIEW_PII nor GUEST_MANAGE opens the images.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October, critical set 1, BO-190 (Q239, DEC-239): "Images behind ''View images (logged)'', needing a
+  specific permission"; BO-248 as BO-190; ADR-0063. The interim permission was recorded in CHG-CSP-023; the operation
+  is new since r1, so the switch is additive.'
+keys_touched:
+  operations:
+  - getFaceReenrolmentImages
+  screens:
+  - BO-190
+  - BO-248
+  files:
+  - contracts/spine/access.yaml
+root_class: A23 AUTH-SCOPE
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'From r2 on, check-contract-compat fails any change of this operation''s permission. CHG-CSP-023 stays open for
+  its own planned check (check-applied-decisions). Batch FUP (apply-followup), 2 October 2026.'

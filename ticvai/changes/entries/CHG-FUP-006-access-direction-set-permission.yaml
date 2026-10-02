@@ -1,0 +1,34 @@
+id: CHG-FUP-006
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: setAccessPointDirection is gated by the dedicated ACCESS_DIRECTION_SET instead of ACCESS_POINT_CONFIGURE.
+decision:
+  what: 'access.yaml setAccessPointDirection: x-ticvai-permission ACCESS_DIRECTION_SET; the live switch is narrower than
+    editing the access point and separate from the podium''s TURNSTILE_MODE_SET.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October, critical set 1, BO-230 (Q255, DEC-255): "Live direction switch with permission, logged; R221
+  amended" (DI-648). Recorded with an interim permission in CHG-CSP-032; the operation is new since r1.'
+keys_touched:
+  operations:
+  - setAccessPointDirection
+  screens:
+  - BO-230
+  - SCN-016
+  files:
+  - contracts/spine/access.yaml
+root_class: A23 AUTH-SCOPE
+tickets:
+  started: []
+  unstarted:
+  - SVC-ACCESS-ACCESSPOINT-2
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'No preset but a module''s all ticks it, so a venue grants it deliberately. CHG-CSP-032 stays open for its own
+  planned check. Batch FUP (apply-followup), 2 October 2026.'

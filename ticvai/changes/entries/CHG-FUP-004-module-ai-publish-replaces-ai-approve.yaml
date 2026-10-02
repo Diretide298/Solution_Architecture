@@ -1,0 +1,57 @@
+id: CHG-FUP-004
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: Publishing a forecast and promoting an AI release need the module's <MODULE>_AI_PUBLISH instead of AI_APPROVE,
+  declared by x-ticvai-permission-by-module; a logged breaking change (BC-006, BC-007).
+decision:
+  what: 'ai.yaml: publishForecastVersion and promoteAiRelease take AI_USE as the base permission and declare
+    x-ticvai-permission-by-module (moduleOf AiForecastVersion.module or AiRelease.module; the permissions.yaml
+    x-ticvai-module-ai-publish map), with 403 module-ai-publish-required and 409 module-required. New fields
+    AiForecastDefinition.module (taken from subject when absent), AiForecastVersion.module (read-only) and
+    AiRelease.module (null on a platform release, which PLATFORM_AI_MANAGE still promotes).
+    docs/active/breaking-changes.yaml BC-006 and BC-007 (tag r2). rollbackAiRelease and the governance acts keep
+    AI_APPROVE.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October: workbook Q3 (DEC-003, ADM-508: "the permission holder for that module''s AI") and Q7
+  (DEC-007, ADM-554: AI release promotion goes to whoever holds the module''s publish permission), and the contract
+  follow-ups: "per-module AI publish (replacing AI_APPROVE for model publishing)". Waiting since CHG-CSA-007; ADR-0051
+  (AI-D16).'
+keys_touched:
+  operations:
+  - publishForecastVersion
+  - promoteAiRelease
+  schemas:
+  - AiForecastDefinition
+  - AiForecastVersion
+  - AiRelease
+  screens:
+  - ADM-508
+  - ADM-519
+  - ADM-554
+  files:
+  - contracts/satellite/ai.yaml
+  - contracts/shared/permissions.yaml
+  - docs/active/breaking-changes.yaml
+root_class: A23 AUTH-SCOPE
+tickets:
+  started: []
+  unstarted:
+  - SVC-AI-FORECAST-2
+  - SVC-AI-MODELS-1
+  - APP-SETUP-ADM-508
+  - APP-SETUP-ADM-554
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'The permission switch on two r1 operations is breaking under SD-050; BC-006 and BC-007 carry Chinmay''s decision
+  as the approval and move the producer and consumer tickets to r2 (none started). The lead confirms that reading of
+  the decision (report question). x-ticvai-permission-by-module is a semantic key of check-contract-compat, so a later
+  change to it is breaking too, and vocabulary_problems() fails one that names no map or field. Screens: ADM-508 and
+  ADM-554 gate their publish and promote actions on the module permission (screens-p08-p09). Batch FUP
+  (apply-followup), 2 October 2026.'

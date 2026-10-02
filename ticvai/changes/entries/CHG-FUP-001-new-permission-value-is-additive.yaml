@@ -1,0 +1,39 @@
+id: CHG-FUP-001
+date: '2026-10-02'
+source: cr
+kind: process
+summary: check-contract-compat counts a value added to the Permission vocabulary as additive, wherever the enum
+  appears, and fails a value that lands in no module group of the role checklist.
+decision:
+  what: 'tools/check-contract-compat.py: a response field typed Permission (alone or as array items) may gain values
+    (VOCABULARY_ENUMS); an operation''s own x-ticvai-permission changing is still breaking, and the new
+    x-ticvai-permission-by-module joins the semantic keys. vocabulary_problems() fails a Permission value in no module
+    group or in two, a preset ticking a value outside its module, a bad x-ticvai-module-ai-publish entry, and an
+    x-ticvai-permission-by-module that names no known map or field.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October, contract follow-ups: "New permission values: count as additive", as security_widened was
+  (pre-apply round). Session, grant and role responses carry the Permission enum, so the 20 permissions decided on
+  2 October (CHG-CSA-007) read as 20 breaking response-enum changes under SD-050. A client ignores a permission no
+  screen it was built with checks; the guard still needed is that a new value is tickable (CHG-CSA-006).'
+keys_touched:
+  schemas:
+  - Permission
+  - PermissionSet
+  files:
+  - tools/check-contract-compat.py
+root_class: 'new: vocabulary-growth-breaks-r1'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'Verified both ways: the parent commit''s check-contract-compat fails the 20 new values (20 unapproved "gained
+  enum value(s)"), this one passes them; vocabulary_problems() was run against a copy with an unlisted value and a
+  mis-mapped module and reported both. Batch FUP (apply-followup), 2 October 2026; tickets: none started (Block A
+  starts Monday 5 October).'
