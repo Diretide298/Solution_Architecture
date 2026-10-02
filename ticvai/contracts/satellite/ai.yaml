@@ -191,6 +191,44 @@ paths:
                 $ref: '#/components/schemas/TranslationProposals'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /ai/translate/{jobId}:
+    parameters:
+    - name: jobId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getTranslationProposals
+      x-ticvai-agreed: '2 October: contract gap CHG-WIR-017 (CMS-011: no read follows a proposeTranslations job, which
+        answers 202); shape follows proposeTranslations'
+      summary: Follow a translation job
+      description: 'The drafts a `proposeTranslations` job has written so far, and whether it has finished (contract gap
+        logged in CHG-WIR-017 for CMS-011; built in CHG-CSA-045). The CMS polls it after the 202 to offer machine
+        translation as a first pass for review (DI-081, DI-083); nothing is published from here.
+
+        '
+      tags:
+      - ai
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      responses:
+        '200':
+          description: The job and its drafts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranslationProposals'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /ai/content-drafts:
     post:
       operationId: proposeMarketingContent
@@ -1383,6 +1421,13 @@ paths:
         the caller may apply through the owning contract, and applying it is a separate, permissioned,
         audited step (8.3.61–8.3.64).
 
+        **Every message is scrubbed before it leaves the cell** (Chinmay, 2 October; ADR-0020 amended;
+        CHG-CSA-003): the offline scrubber replaces personal data with reversible placeholders, the guard model
+        checks the input and the reply, and the reply is re-filled in the cell (`AiPolicy.scrubbing`). It
+        applies whatever the tenant''s residency class. With the scrubber or the guard down the call is refused
+        `503 scrubber-unavailable`, never sent raw; a message or reply the guard blocks is refused
+        `422 guard-refused`.
+
         '
       tags:
       - assist
@@ -1446,7 +1491,22 @@ paths:
           description: 'Every configured provider failed. **Reported rather than retried indefinitely**
             — an assistant that hangs is worse than one that says it cannot answer.
 
+            Also `scrubber-unavailable`: the offline PII scrubber or the guard model is down, so the call fails
+            closed rather than sending an unscrubbed prompt (CHG-CSA-003).
+
             '
+          x-ticvai-problem-types:
+          - provider-unavailable
+          - scrubber-unavailable
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: The guard model blocked the message or the reply (`guard-refused`, CHG-CSA-003). Nothing
+            unsafe is returned; the refusal is logged with the decision record.
+          x-ticvai-problem-types:
+          - guard-refused
           content:
             application/problem+json:
               schema:
@@ -2085,6 +2145,10 @@ paths:
         mixed into it. Tokens on TICVAI-managed providers are re-billed per token through
         `subscription.settleAiUsage` (decision 2); on a tenant''s own key they are metered for visibility.
 
+        **Money in the tenant''s selected currency, tokens alongside** (Chinmay, 2 October, workbook Q8;
+        CHG-CSA-004). Every cost and the spend ceiling are reported in the tenant''s selected currency (USD by
+        default), with the token counts beside them, never instead of them.
+
         '
       tags:
       - governance
@@ -2202,8 +2266,23 @@ paths:
 
         **Per agent task, and checked for fitness** (21 September minutes, M21-03 and M21-09). `taskKeys`
         binds the provider to named agent tasks; the response carries `fitnessWarnings` where the model scores
-        outside a task''s band in `AiModel.taskFitness` (underpowered, overpowered or never scored). A warning
-        is shown and kept; it never refuses the write.
+        outside a task''s band in `AiModel.taskFitness` (underpowered, overpowered or never scored).
+
+        **The client cannot change the model; TICVAI curates it** (Chinmay, 2 October, workbook Q2; amends AI-D18
+        "warns, never blocks"; CHG-CSA-001). A cheaper model picked because it is cheap breaks the AI functions,
+        so a `modelId` that is not in TICVAI''s curated range for every task in `taskKeys`
+        (`AiModel.curatedRange`) is refused `422 model-not-curated`, whoever writes it.
+
+        **Bring-your-own-key maps each task to the provider''s equivalent** (Chinmay, 2 October, workbook Q1;
+        closes AI-D20; CHG-CSA-001). With BYOK the tenant names its provider and key; the gateway assigns, per
+        task, that provider''s model from the curated range at the tier the task needs (Small, Strong, Reasoning;
+        `AiByokEnablement.taskModelMap`). Usage is billed to the tenant''s own key. Platform-owned models
+        (embeddings, reranking, moderation, PII detection, OCR, speech) are never BYOK.
+
+        **Residency class** (Chinmay, 2 October: the AI residency decision; CHG-CSA-002). A provider whose
+        `residencyClasses` does not include the tenant''s class is refused `409 residency-class-refused`; BYOK fits
+        the `globalAllowed` class only, because a tenant key outside OpenAI UAE is a cross-border transfer
+        (ADR-0009 section 3).
 
         '
       tags:
@@ -2251,10 +2330,12 @@ paths:
         '409':
           description: The provider's `residency` is not in the tenant's region's `allowedAiResidencies`
             (`residency-refused`, audit R203), or it is tenant-managed (`managedBy` is `tenant`) and bring-your-own-key is not
-            enabled for the tenant (`byok-not-enabled`, decided 29 September).
+            enabled for the tenant (`byok-not-enabled`, decided 29 September), or its `residencyClasses` does not
+            include the tenant's AI residency class (`residency-class-refused`, CHG-CSA-002).
           x-ticvai-problem-types:
           - residency-refused
           - byok-not-enabled
+          - residency-class-refused
           content:
             application/problem+json:
               schema:
@@ -2381,6 +2462,79 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /policy/spend-ceiling:
+    get:
+      operationId: getAiSpendCeiling
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q8 (BO-091): the ceiling in the tenant''s selected currency,
+        default USD, with tokens; shape follows getAiPolicy'
+      summary: The AI spend ceiling, in money
+      description: 'The ceiling in force at the caller''s scope, resolved nearest ancestor first as `getAiPolicy`
+        is (CHG-CSA-004), with its token equivalent.
+
+        '
+      tags:
+      - config
+      x-ticvai-permission: AI_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The ceiling
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiSpendCeiling'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    put:
+      operationId: setAiSpendCeiling
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q8 (BO-091); shape follows setAiPolicy'
+      summary: Set the AI spend ceiling, in money
+      description: '**The AI spend ceiling is shown and set in the tenant''s selected currency (USD by default), with
+        tokens shown alongside** (Chinmay, 2 October, workbook Q8; CHG-CSA-004). `spend.currency` must be the
+        tenant''s selected currency, or 400. The token equivalent at the current blended rate is returned beside it,
+        and `AiPolicy.monthlyTokenCeiling` stays the token limit. Where both are set, the first reached applies the
+        policy''s `ceilingBehaviour` (warn by default). A venue may narrow the tenant''s ceiling and never raise it,
+        as with `setAiPolicy`. A separate operation so the policy body is unchanged for clients built at r1.
+
+        '
+      tags:
+      - config
+      x-ticvai-permission: AI_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: One row per scope node, the caller's tenant or venue as for `setAiPolicy`; there is no
+        key in the path.
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AiSpendCeiling'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiSpendCeiling'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /index-sources:
@@ -5687,6 +5841,12 @@ paths:
         gates must pass (completeness, no blocking signal missing, no accuracy regression). The previous published
         version is superseded; operational requirements are derived from the new one. Emits `ai.forecastPublished`.
 
+        **Who publishes: the holder of the module''s AI publish permission, no default role** (Chinmay, 2 October,
+        workbook Q3 and Q7). The vocabulary now has one `<MODULE>_AI_PUBLISH` per module (CHG-CSA-006). Moving
+        this operation''s `x-ticvai-permission` from `AI_APPROVE` to the forecast''s module permission changes what
+        it means for a client built at r1, so it waits for the breaking change to be approved (CHG-CSA-007);
+        until then `AI_APPROVE` gates it.
+
         '
       tags:
       - forecast
@@ -7315,6 +7475,13 @@ paths:
                 sessionRef:
                   type: string
                   nullable: true
+                previewOnly:
+                  type: boolean
+                  default: false
+                  description: '**A staff preview that records nothing** (contract gap CHG-WIR-014, BO-102;
+                    CHG-CSA-045): the slot is filled as a guest would see it, but no impression, tracking id or
+                    decision record is written. Accepted from a staff caller only; ignored from a guest or anonymous
+                    caller.'
                 maxItems:
                   type: integer
                   minimum: 1
@@ -7695,6 +7862,11 @@ paths:
         arrives through `setAiProvider` with `managedBy: tenant` and `modelId`, where bring-your-own-key is enabled.
         Mastered in the control plane and replicated read-only into every tenant database; no configuration scope.
 
+        **This is where TICVAI curates** (Chinmay, 2 October, workbook Q2 and the AI/ML model selection; CHG-CSA-001).
+        `curatedRange` lists the tasks the model is curated for, its tier and its rank (the best-suited model, then
+        three or four alternatives where they exist). A model named in `isDefaultForTasks` for a task its own
+        `curatedRange` does not list is refused `422 model-not-curated`.
+
         '
       tags:
       - models
@@ -7724,6 +7896,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiModel'
+        '422':
+          description: '`isDefaultForTasks` names a task this model''s `curatedRange` does not list (`model-not-curated`,
+            CHG-CSA-001).'
+          x-ticvai-problem-types:
+          - model-not-curated
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '201':
           headers:
             X-Consistency-Token:
@@ -8006,7 +8187,9 @@ paths:
       description: '**A trained model goes live only when a person promotes it** (design 3.12, decided 29 September).
         When a shadow run passes its gate the platform raises a `promotionReady` governance alert; nothing switches
         by itself. This moves the release one stage (shadow to canary, canary to production). A tenant release needs
-        `AI_APPROVE`; a platform release needs `PLATFORM_AI_MANAGE`. **Refused to a service caller.** Where the
+        `AI_APPROVE`; a platform release needs `PLATFORM_AI_MANAGE`. **Decided 2 October** (Chinmay, workbook Q7):
+        promotion goes to whoever holds the module''s AI publish permission (`<MODULE>_AI_PUBLISH`, CHG-CSA-006); the
+        switch of the declared permission is a breaking change awaiting approval (CHG-CSA-007). **Refused to a service caller.** Where the
         capability answers a `requestSuggestion` kind, production rewrites that kind''s assignment in `AiPolicy.suggestionProviders`,
         the only writer besides `setSuggestionProvider`. Resolves the `promotionReady` alert.
 
@@ -8841,6 +9024,20 @@ paths:
                 remediation:
                   type: string
                   maxLength: 4000
+                impact:
+                  type: string
+                  maxLength: 4000
+                  nullable: true
+                  description: Who and what was affected (contract gap CHG-WIR-014, ADM-556; CHG-CSA-045).
+                controlFailure:
+                  type: string
+                  maxLength: 4000
+                  nullable: true
+                  description: Which control failed or was missing.
+                lessonsLearned:
+                  type: string
+                  maxLength: 4000
+                  nullable: true
       responses:
         '200':
           headers:
@@ -9111,6 +9308,11 @@ paths:
         and `setAiCredential`; the tenant then pays the provider directly and TICVAI meters for visibility only.
         Disabling does not delete the tenant''s providers; `setAiProvider` stops accepting new ones and the gateway
         routes back to TICVAI-managed models.
+
+        **The models are mapped, not chosen** (Chinmay, 2 October, workbook Q1; CHG-CSA-001): once enabled, each task
+        the key serves runs on that provider''s equivalent from TICVAI''s curated range
+        (`AiByokEnablement.taskModelMap`), billed to the tenant''s key. BYOK fits the `globalAllowed` residency class
+        only (CHG-CSA-002).
 
         '
       tags:
@@ -10833,6 +11035,51 @@ components:
           items:
             type: string
           description: Tasks this model is the default for (AIC-010), e.g. `assistant.guest.answer`, `config.extract`.
+        curatedRange:
+          type: array
+          x-ticvai-persistence-kind: valueObject
+          x-ticvai-persistence-column: jsonb
+          description: '**TICVAI''s curated range: the tasks this model may serve** (Chinmay, 2 October, workbook Q1, Q2
+            and Q9; the AI/ML model selection of 2 October; CHG-CSA-001). For each task: the tier it serves at and its
+            rank, 1 being the best-suited model and 2 to 5 the alternatives. **A model may serve a task only where
+            this lists it**: `setAiProvider` refuses any other choice (`422 model-not-curated`), and bring-your-own-key
+            maps each task to the tenant provider''s model at the same tier. `byokEligible` false marks the
+            platform-owned tiers (embeddings, reranking, moderation, PII detection, OCR, speech), never served by a
+            tenant key. Money paths (pricing, fraud scores, settlements) stay on classical models.
+
+            '
+          items:
+            type: object
+            description: Every entry names `taskKey`, `tier` and `rank`.
+            properties:
+              taskKey:
+                type: string
+              tier:
+                type: string
+                enum:
+                - small
+                - strong
+                - reasoning
+                - vision
+                - embedding
+                - reranking
+                - moderation
+                - piiDetection
+                - ocr
+                - speech
+                - classical
+              rank:
+                type: integer
+                minimum: 1
+                maximum: 5
+              byokEligible:
+                type: boolean
+                default: true
+        residencyClasses:
+          type: array
+          items:
+            $ref: ../shared/common.yaml#/components/schemas/AiResidencyClass
+          description: The tenant residency classes whose calls this model may serve (CHG-CSA-002).
         taskFitness:
           type: array
           readOnly: true
@@ -12579,7 +12826,11 @@ components:
       x-ticvai-persistence: ai.operational_requirement
       description: '**A requirement derived from a forecast version** (design 2.2 C step 6, AIP-067): staff, POS,
         gates, F&B, stock or resources, computed with the tenant''s productivity standards. **Autonomy L2 (prepare)**:
-        it is sent to the owning module as a recommendation bound to that version, and a person applies it there.'
+        it is sent to the owning module as a recommendation bound to that version, and a person applies it there.
+
+        **Every kind, from release 1** (Chinmay, 2 October, workbook Q9: "all kinds"; CHG-CSA-005). The event
+        forecast derives requirements of every `kind` below, filtered to what the venue has configured (a venue with
+        no kiosks gets no `kiosk` rows); the models in place improve with the venue''s data.'
       required:
       - versionId
       - kind
@@ -14265,6 +14516,16 @@ components:
         remediation:
           type: string
           nullable: true
+        impact:
+          type: string
+          nullable: true
+          description: The post-incident review's impact (`closeAiIncident`, CHG-CSA-045).
+        controlFailure:
+          type: string
+          nullable: true
+        lessonsLearned:
+          type: string
+          nullable: true
         ownerPrincipalId:
           type: string
           format: uuid
@@ -14745,6 +15006,26 @@ components:
           items:
             type: string
           description: 'Where `coverage` is `perTask`: the gateway tasks a tenant key may serve. Empty means any.'
+        taskModelMap:
+          type: array
+          readOnly: true
+          description: '**The provider''s equivalent model for each task, chosen by TICVAI** (Chinmay, 2 October,
+            workbook Q1; closes AI-D20; CHG-CSA-001). For each task the tenant key serves, the model of the tenant''s
+            provider at the tier the task needs, taken from TICVAI''s curated range (`AiModel.curatedRange`). The
+            tenant does not choose it; a task with no curated equivalent at the tenant''s provider stays on the
+            TICVAI-managed model and is listed with `modelId` null.'
+          items:
+            type: object
+            properties:
+              taskKey:
+                type: string
+              tier:
+                type: string
+              modelId:
+                type: string
+                format: uuid
+                nullable: true
+                x-ticvai-references: ai.model
         reason:
           type: string
           maxLength: 1000
@@ -15975,6 +16256,15 @@ components:
       description: '`openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks
         the OpenAI API, taken with no custom development (AIC-009). Any other protocol needs an adapter.
 
+        **Core42 Compass is reached through `openaiCompatible`** (Chinmay, 2 October: the AI residency decision,
+        amending AI-D02; CHG-CSA-002). Compass is the provider of the `uaeOnly` residency class (common
+        `AiResidencyClass`): Small tier Compass GPT-4.1 mini (or Seraj), Strong tier Compass GPT-5, with OpenAI
+        UAE and then the in-cell open-weights model as the fallback chain. OpenAI UAE is `openai` with a UAE
+        `endpoint`; the in-cell model is `localLlm`.
+
+        **There is no `mistral` kind.** A Mistral key (BYOK) would go through `openaiCompatible` if its API is
+        compatible, which is unconfirmed; adding a kind is open (CHG-CSA-008).
+
         '
     SuggestionKind:
       type: string
@@ -16374,6 +16664,17 @@ components:
             than assumed.
 
             '
+        residencyClasses:
+          type: array
+          items:
+            $ref: ../shared/common.yaml#/components/schemas/AiResidencyClass
+          description: '**The tenant residency classes this provider may serve** (Chinmay, 2 October: the AI
+            residency decision; CHG-CSA-002). The gateway routes a call for a tenant only to a provider whose list
+            holds the tenant''s class (tenancy, common `AiResidencyClass`, default `uaeOnly`); `setAiProvider`
+            refuses a provider that cannot serve the tenant''s class (`409 residency-class-refused`). A `uaeOnly`
+            call can only resolve to an in-UAE endpoint: Core42 Compass, OpenAI UAE, or the in-cell model.
+
+            '
         maxTokens:
           type: integer
         isActive:
@@ -16403,16 +16704,20 @@ components:
             type: string
           description: '**Which agent tasks this provider serves** (21 September minutes, M21-03: different agents
             may use different models chosen for the task). Empty means every task of its `capability`. A task
-            listed on two providers goes to the lower `priority`. **AI-D02 stands:** one managed provider (Azure
-            OpenAI in UAE North) serves every task by default, with a small and a stronger model per task; a second
-            provider or a tenant''s own key is added only where TICVAI enables it for the tenant (AI-D14,
-            `setAiByokEnablement`).'
+            listed on two providers goes to the lower `priority`. **AI-D02 as amended on 2 October** (the AI residency
+            decision, CHG-CSA-002): the managed provider depends on the tenant''s residency class (Core42 Compass for
+            `uaeOnly`, the default), with a Small and a Strong model per task; a second provider or a tenant''s own
+            key is added only where TICVAI enables it for the tenant (AI-D14, `setAiByokEnablement`). **Each task''s
+            model comes from TICVAI''s curated range** (`AiModel.curatedRange`, CHG-CSA-001): the client cannot pick
+            a model outside it.'
         fitnessWarnings:
           type: array
           readOnly: true
           description: '**The model-fitness check at the last write** (21 September minutes, M21-09). For each task
             in `taskKeys` whose model scores outside the task''s band in `AiModel.taskFitness`, or has no score, one
-            warning. A warning never blocks the write; it is shown on ADM-037 and kept so the choice is auditable.'
+            warning, shown on ADM-037 and kept so the choice is auditable. **A model outside TICVAI''s curated range
+            for a task is no longer a warning: it is refused** (`422 model-not-curated`; Chinmay, 2 October, workbook
+            Q2, amending AI-D18; CHG-CSA-001). A warning now only describes a curated model''s fit.'
           items:
             type: object
             properties:
@@ -16508,6 +16813,9 @@ components:
             nobody filled in. An entry naming no column is refused at save rather than silently masking
             nothing.
 
+            **Column masking is in addition to the gateway scrubber, never instead of it** (CHG-CSA-003): free
+            text a guest types is not a column, so every prompt also passes the offline scrubber (`scrubbing`).
+
             '
           items:
             type: string
@@ -16523,6 +16831,37 @@ components:
             - operational
             - financial
             - configuration
+        scrubbing:
+          type: object
+          readOnly: true
+          description: '**Mandatory offline PII scrubbing and moderation on every LLM call** (Chinmay, 2 October: "we
+            may need to scrub personal info no matter what"; ADR-0020 amended; CHG-CSA-003). Not a setting: it applies
+            whatever the tenant''s residency class, and a tenant cannot switch it off. Before a prompt leaves the cell
+            the gateway runs Microsoft Presidio (offline) with UAE recognisers (Emirates ID, UAE phone, passport, IBAN,
+            Luhn-checked card, email) and an Arabic NER model; each value found becomes a reversible placeholder
+            (`[GUEST_1]`) whose map never leaves the cell, and the reply is re-filled before it reaches the user. An
+            offline guard model (Qwen3Guard, which covers Arabic) checks input and output. **Fails closed**: with the
+            scrubber or the guard down, the call is refused (`503 scrubber-unavailable`), never sent raw. This object
+            reports what is in force.
+
+            '
+          properties:
+            mode:
+              type: string
+              enum:
+              - mandatory
+            recognisers:
+              type: array
+              items:
+                type: string
+              description: The recogniser set in force, e.g. `emiratesId`, `uaePhone`, `passport`, `iban`, `card`,
+                `email`, `arabicPersonName`.
+            reversibleTokens:
+              type: boolean
+              description: Always true; the placeholder map stays in the cell.
+            guardModel:
+              type: string
+              description: The input and output guard model in force, e.g. `qwen3guard`.
         monthlyTokenCeiling:
           type: integer
           nullable: true
@@ -17623,10 +17962,58 @@ components:
 
 
             **Operations write it at `venue` scope.**'
+    AiSpendCeiling:
+      type: object
+      x-ticvai-persistence: ai.spend_ceiling
+      description: '**The AI spend ceiling in money** (Chinmay, 2 October, workbook Q8; CHG-CSA-004). One row per
+        `scopePath`, as `AiPolicy`: the tenant''s default and a venue''s narrowing.'
+      required:
+      - spend
+      properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: The partition key (ADR-0005); the tenant's node or a venue's.
+        spend:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          description: Per month, in the tenant's selected currency (USD by default).
+        tokenEquivalent:
+          type: integer
+          readOnly: true
+          nullable: true
+          description: What `spend` buys at the current blended rate, shown beside it on BO-091.
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
     AiUsageReport:
       type: object
       x-ticvai-persistence: none — aggregated from ai.activity
       properties:
+        currency:
+          type: string
+          minLength: 3
+          maxLength: 3
+          readOnly: true
+          description: '**The tenant''s selected currency, USD by default** (Chinmay, 2 October, workbook Q8;
+            CHG-CSA-004). Every `cost` here is in it; token counts sit beside each cost.'
+        ceiling:
+          type: object
+          nullable: true
+          readOnly: true
+          description: The spend ceiling in force (`getAiSpendCeiling`), with the tokens it equals at
+            the current blended rate and what is used so far (CHG-CSA-004).
+          properties:
+            spend:
+              $ref: ../shared/common.yaml#/components/schemas/Money
+            tokens:
+              type: integer
+              nullable: true
+            usedSpend:
+              $ref: ../shared/common.yaml#/components/schemas/Money
+            usedTokens:
+              type: integer
         from:
           type: string
           format: date
@@ -17798,6 +18185,19 @@ components:
       properties:
         targetLocale:
           type: string
+        jobId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: The job to follow with `getTranslationProposals` (contract gap CHG-WIR-017, CMS-011; CHG-CSA-045).
+        status:
+          type: string
+          readOnly: true
+          enum:
+          - running
+          - completed
+          - failed
+          description: '`running` while drafts are still being written; `drafts` then holds those done so far.'
         drafts:
           type: array
           items:

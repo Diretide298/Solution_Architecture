@@ -1,0 +1,39 @@
+id: CHG-CSA-023
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: Cookie scanning is a bought scanner API feeding recordCookieScan through a TICVAI adapter (hybrid); the
+  manual upload stays.
+decision:
+  what: recordCookieScan documents the decision; CookieScanPolicy gains scanSource (boughtScanner default, manualUpload)
+    and scannerVendorRef.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October, batch 5 set 2: "Buy a scanner API (hybrid)" (CMS-025, workbook Q19; DEC-019), answering
+  CF-127; BL-073.'
+keys_touched:
+  operations:
+  - recordCookieScan
+  - setCookieScanPolicy
+  - listCookieScanPolicies
+  schemas:
+  - CookieScanPolicy
+  screens:
+  - CMS-025
+  files:
+  - contracts/satellite/marketing-crm.yaml
+root_class: 'new: open-question-decided'
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-CMS-025
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: template-field
+  ref: contracts/satellite/marketing-crm.yaml::scanSource
+status: closed
+closed_by_commit: 9bc4ce04
+notes: 'HLD/LLD egress (DEC-545), the integration register and the external-dependency register are apply-docs.
+  The vendor is a procurement choice (research: CookieScript, Cookiebot, OneTrust). Batch CSA (apply-contracts-satellite),
+  2 October 2026; tickets: none started (Block A starts Monday 5 October).'

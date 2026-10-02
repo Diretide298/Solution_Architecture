@@ -1538,9 +1538,10 @@ components:
 
 
         **Which limit field a kind uses.** `refundThreshold` uses `thresholdAmount`. `ageCheck`
-        uses `minimumAgeYears`. **Not yet decided:** whether a `discountLimit` or a
-        `priceOverride` limit is an amount or a percentage, and whether a `managerOverride` has a
-        limit at all. Until that is decided those kinds carry no limit field of their own.'
+        uses `minimumAgeYears`. **A `discountLimit` or a `priceOverride` limit is a percentage or an
+        amount, the venue choosing per limit** (Chinmay, 2 October, workbook Q195; CHG-CSA-019):
+        `limitKind` says which, and the limit is `thresholdAmount` or `thresholdPercent`. Whether a
+        `managerOverride` has a limit at all is still undecided; it carries none.'
       required:
       - id
       properties:
@@ -1565,7 +1566,23 @@ components:
           allOf:
           - $ref: '../shared/common.yaml#/components/schemas/Money'
           nullable: true
-          description: The amount above which `requiresPermission` is needed. For `refundThreshold`.
+          description: The amount above which `requiresPermission` is needed. For `refundThreshold`, and for a
+            `discountLimit` or `priceOverride` whose `limitKind` is `amount`.
+        limitKind:
+          type: string
+          nullable: true
+          enum:
+          - percent
+          - amount
+          description: For `discountLimit` and `priceOverride` (workbook Q195; CHG-CSA-019). `percent` uses
+            `thresholdPercent`; `amount` uses `thresholdAmount`. The venue chooses per limit.
+        thresholdPercent:
+          type: number
+          minimum: 0
+          maximum: 100
+          nullable: true
+          description: The percentage of the line or basket above which `requiresPermission` is needed, where
+            `limitKind` is `percent`.
         minimumAgeYears:
           type: integer
           minimum: 0

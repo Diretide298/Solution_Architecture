@@ -1,0 +1,38 @@
+id: CHG-CSA-046
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: 'Two Block A gaps in the satellite contracts are not built: BO-007''s bulk product write sits in inventory
+  (moving it is breaking), and BO-122''s errors per sale board have no source.'
+decision:
+  what: No contract change; logged open.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Contract gaps CHG-WIR-027 (BO-007) and CHG-WIR-024 (BO-122): moving bulkUpdateProducts from inventory to catalogue
+  removes an operation from a contract at r1 (check-contract-compat); till errors per board have no table to report
+  from.'
+keys_touched:
+  operations:
+  - bulkUpdateProducts
+  - getKpiValues
+  screens:
+  - BO-007
+  - BO-122
+  files:
+  - contracts/satellite/inventory.yaml
+  - contracts/satellite/reporting.yaml
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-BO-007
+  - VM-BO-122
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/audit-screenless-operations.py
+status: open
+notes: 'Recommended: BO-007 adds a catalogue bulkUpdateProducts and retires the inventory one at the next major;
+  BO-122 shows sales per board (takings by saleBoardId) and drops the error tile until a till error log exists.
+  Batch CSA (apply-contracts-satellite), 2 October 2026; tickets: none started (Block A starts Monday 5 October).'

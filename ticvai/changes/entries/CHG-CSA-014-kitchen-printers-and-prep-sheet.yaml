@@ -1,0 +1,46 @@
+id: CHG-CSA-014
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: Kitchen printers are in release 1, assigned per station, and prep sheets print from a venue template to
+  those printers or the browser.
+decision:
+  what: KitchenStation.printerDeviceIds (tenancy RegisteredDevice of kind receiptPrinter or labelPrinter); getPrepSheetTemplate
+    and setPrepSheetTemplate (PrepSheetTemplate); printPrepSheet (PrepSheet, target browser or stationPrinters,
+    notPrinted listed).
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October, workbook Q185 (BO-112; DEC-185) and Q187 (BO-134; DEC-187): "A print template (kitchen
+  printers and browser)"; "Kitchen printers in release 1". DI-323, ADR-0067.'
+keys_touched:
+  operations:
+  - printPrepSheet
+  - getPrepSheetTemplate
+  - setPrepSheetTemplate
+  - setKitchenStations
+  schemas:
+  - KitchenStation
+  - PrepSheetTemplate
+  - PrepSheet
+  screens:
+  - BO-112
+  - BO-134
+  files:
+  - contracts/satellite/fnb.yaml
+root_class: 'new: open-question-decided'
+tickets:
+  started: []
+  unstarted:
+  - VM-BO-112
+  - VM-BO-134
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: template-field
+  ref: contracts/satellite/fnb.yaml::printerDeviceIds
+status: closed
+closed_by_commit: 9bc4ce04
+notes: 'common DeviceHardwareType is not changed: a kitchen printer is a tenancy DeviceKind receiptPrinter/labelPrinter
+  already, and a new DeviceHardwareType value would break r1. The plan part of DEC-187 (block-a-extra-tasks POS-KDS-ROUTING,
+  the hardware workbook) is not this batch. Batch CSA (apply-contracts-satellite), 2 October 2026; tickets: none
+  started (Block A starts Monday 5 October).'

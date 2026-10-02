@@ -82,6 +82,10 @@ paths:
         will pay for, so conversion is a date change rather than a migration — and conversion is the moment
         least worth adding risk to.
 
+        **The billing entity is saved on the application** (Chinmay, 2 October, workbook Q223; CHG-CSA-030):
+        `billingEntity` carries the company to be invoiced and its documents before verification; nothing is
+        provisioned until it is verified.
+
         '
       tags:
       - subscription
@@ -2853,6 +2857,84 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /tenants/{tenantId}/billing-entity:
+    parameters:
+    - name: tenantId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getBillingEntity
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q209 (ADM-411); shape follows getTenant'
+      summary: The company TICVAI invoices for a tenant
+      description: 'The tenant''s billing entity with its documents and what is still missing (CHG-CSA-030).
+
+        '
+      tags:
+      - billing
+      x-ticvai-permission: PLATFORM_BILLING_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The billing entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingEntity'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    put:
+      operationId: setBillingEntity
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q209 and Q210 (ADM-411); shape follows the billing operations'
+      summary: Set the company TICVAI invoices for a tenant
+      description: '**A new billing-entity record in the subscription contract** (Chinmay, 2 October, workbook Q209;
+        CHG-CSA-030). Replaces the tenant''s billing entity whole. A trade licence is always required; a VAT
+        certificate is required once a `trn` is entered (workbook Q210); a country may require more (tenancy
+        `RegionSettings`). Missing documents do not refuse the save; they are listed in `missingDocuments`, and
+        invoicing waits on them.
+
+        '
+      tags:
+      - billing
+      x-ticvai-permission: PLATFORM_BILLING_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillingEntity'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingEntity'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tenants/{tenantId}/invoices:
@@ -11133,6 +11215,93 @@ components:
           type: string
           format: uuid
           nullable: true
+        billingEntity:
+          $ref: '#/components/schemas/BillingEntity'
+          description: '**The company to be invoiced, saved on the application before verification** (Chinmay,
+            2 October, workbook Q209 and Q223; CHG-CSA-030). Nothing is provisioned until the application is verified;
+            on provisioning it becomes the tenant''s billing entity (`getBillingEntity`).'
+    BillingEntity:
+      type: object
+      x-ticvai-persistence: control.billing_entity
+      description: '**The company TICVAI invoices for a tenant, with its trade licence and VAT certificate** (Chinmay,
+        2 October, workbook Q209: "a new billing-entity record in the subscription contract"; DI-830; CHG-CSA-030).
+        One per tenant, mastered in the control plane. `legalName` and `countryCode` are required on save (400
+        otherwise); they are not marked required here so the record can ride, optional, on an onboarding
+        application. **Documents** (workbook Q210, the default): a trade licence always; a VAT certificate when a
+        `trn` is entered. Which documents a country requires is configurable per country (tenancy `RegionSettings`);
+        the default is that rule.'
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        tenantId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: Null while it rides on an onboarding application.
+        legalName:
+          type: string
+          maxLength: 300
+        tradeLicenceNumber:
+          type: string
+          maxLength: 100
+          nullable: true
+        trn:
+          type: string
+          maxLength: 30
+          nullable: true
+          description: The tax registration number; entering one makes the VAT certificate required.
+        countryCode:
+          type: string
+          minLength: 2
+          maxLength: 2
+        address:
+          type: string
+          maxLength: 1000
+          nullable: true
+        invoiceEmail:
+          type: string
+          format: email
+          nullable: true
+        documents:
+          type: array
+          description: The trade licence and, where a TRN is entered, the VAT certificate, each a stored file
+            with its verification.
+          items:
+            type: object
+            properties:
+              documentType:
+                type: string
+                enum:
+                - tradeLicence
+                - vatCertificate
+              fileRef:
+                type: string
+                nullable: true
+              expiryDate:
+                type: string
+                format: date
+                nullable: true
+              verificationStatus:
+                type: string
+                enum:
+                - missing
+                - uploaded
+                - verified
+                - rejected
+                - expired
+        missingDocuments:
+          type: array
+          readOnly: true
+          description: The documents the country's rule requires that are not yet uploaded and verified.
+          items:
+            type: string
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
     VenueTypeTemplate:
       type: object
       x-ticvai-persistence: control.venue_type_template
@@ -15047,6 +15216,14 @@ components:
       - licensedModules
       - limits
       properties:
+        poweredByRemovable:
+          type: boolean
+          readOnly: true
+          default: false
+          description: '**Whether the tenant''s licence lets it switch "Powered by TICVAI" off** (Chinmay, 2 October,
+            workbook Q160 and the pre-apply round; CHG-CSA-036). False by default; true where TICVAI sold the tenant
+            the add-on keyed `poweredByRemoval` (`addLicenceAddOn`). White label''s `setBrandIdentity` refuses
+            `showPoweredBy` false while this is false.'
         tenantId:
           type: string
           format: uuid

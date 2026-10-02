@@ -3038,6 +3038,52 @@ components:
           - open
           - closed
           - archived
+        faceMatching:
+          type: object
+          description: '**Face matching for duplicate applicants: only where the venue enables it, with each
+            applicant''s consent and the venue''s legal sign-off; off by default** (Chinmay, 2 October, workbook Q461;
+            ADR-0063; CHG-CSA-031). With `enabled` false, identity conflicts are raised on names, dates of birth and
+            documents only and never on a face, and BO-631 shows no Face chip. Enabling needs `legalSignOffRef`
+            (the venue''s legal sign-off, recorded with who gave it and when), and a face is compared only for an
+            applicant whose application carries a face-matching consent (the programme''s consent form, CHG-CSA-026).'
+          properties:
+            enabled:
+              type: boolean
+              default: false
+            legalSignOffRef:
+              type: string
+              nullable: true
+              description: The venue's legal sign-off document (a stored file reference).
+            signedOffByPrincipalId:
+              type: string
+              format: uuid
+              nullable: true
+              readOnly: true
+            signedOffAt:
+              type: string
+              format: date-time
+              nullable: true
+              readOnly: true
+        identityVerification:
+          type: object
+          description: '**UAE Pass and ICP verification, in release 1** (Chinmay, 2 October, workbook Q457; CHG-CSA-031).
+            Which government identity checks an applicant passes through: UAE Pass sign-in (identity `guestUaePassLogin`)
+            and the ICP identity check (access''s verification adaptor). **Both need the client''s access to the
+            government services** (an external dependency); until it is granted, `methods` may name them but the check
+            answers `manualReview`.'
+          properties:
+            methods:
+              type: array
+              items:
+                type: string
+                enum:
+                - uaePass
+                - icp
+                - manualReview
+            required:
+              type: boolean
+              default: false
+              description: Whether an application is blocked from approval until a listed check passes.
         scopePath:
           type: string
     AccreditationRequirements:
@@ -3390,6 +3436,10 @@ components:
       type: object
       x-ticvai-persistence: accreditation.identity_conflict
       description: 'Board 2.7. **One badge revoked and the other still opening doors.**
+
+
+        **`matchedOn` names `face` only where the programme''s `faceMatching` is enabled** and both applicants
+        consented (workbook Q461; CHG-CSA-031).
 
 
         **Stored, not recomputed on each read** (data model for the agreed operations, 29 September): a

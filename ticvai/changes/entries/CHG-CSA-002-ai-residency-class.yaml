@@ -1,0 +1,44 @@
+id: CHG-CSA-002
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: A per-tenant AI residency class (uaeOnly by default, globalAllowed, onPrem) is a shared vocabulary, and
+  AI providers and models declare the classes they may serve; Core42 Compass is reached through openaiCompatible.
+decision:
+  what: Add common AiResidencyClass (uaeOnly default and mandatory for government, bank and health tenants; globalAllowed
+    under PDPL Art. 23; onPrem); AiProvider.residencyClasses and AiModel.residencyClasses; setAiProvider refuses
+    a provider that cannot serve the tenant's class (409 residency-class-refused); AiProviderKind documents Compass
+    via openaiCompatible. Amends AI-D02.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October: the AI residency decision (DEC-539; answers file "AI residency"): UAE-only through Core42
+  Compass by default, Global allowed by opt-in, on-prem. Amends AI-D02, ADR-0009 section 1 and 3, ADR-0020.'
+keys_touched:
+  operations:
+  - setAiProvider
+  schemas:
+  - AiResidencyClass
+  - AiProvider
+  - AiModel
+  - AiProviderKind
+  screens:
+  - ADM-037
+  files:
+  - contracts/shared/common.yaml
+  - contracts/satellite/ai.yaml
+root_class: 'new: open-question-decided'
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ADM-037
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: template-field
+  ref: contracts/shared/common.yaml::AiResidencyClass
+status: closed
+closed_by_commit: 9bc4ce04
+notes: 'Dependency on the spine agent: the tenant''s class is a field on tenancy (Tenant or RegionSettings, extending
+  allowedAiResidencies) that should $ref common AiResidencyClass. ADR-0009/0020 amendments, HLD/LLD and AI-ENGINE-GATEWAY
+  tasks belong to apply-docs. DEC-540 (PTU at about 100k calls a day) is docs-only. Batch CSA (apply-contracts-satellite),
+  2 October 2026; tickets: none started (Block A starts Monday 5 October).'

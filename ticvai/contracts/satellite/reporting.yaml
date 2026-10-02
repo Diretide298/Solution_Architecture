@@ -2120,6 +2120,23 @@ paths:
         `categoryCode` for the accreditation KPIs, `tierCode` for the loyalty ones — with `groupKey` set.
         Without either, one value per KPI, as before.
 
+
+        **One module''s takings** (Chinmay, 2 October, workbook Q181; CHG-CSA-020). `module` restricts a KPI to the
+        sales of one module''s outlets and products: the F&B hub (BO-104) shows `takings` with `module=fnb`, and
+        admissions are not on it. `takings` also splits by `saleBoardId`, the sales per till layout the POS
+        experience dashboard shows (contract gap CHG-WIR-024, BO-122; errors per board stay a gap, CHG-CSA-047).
+
+
+        **The restaurant measures are seeded where F&B is on** (Chinmay, 2 October, workbook Q205: "all four, from
+        reporting"; DI-400; CHG-CSA-020): `tableTurnTime`, `noShowRate`, `covers` and `waitQuoteAccuracy`, each
+        with its source in `ReportingSystemKpi`, so the staff app and the back office show the same numbers
+        (CHG-FIN-006).
+
+
+        **The finance dashboard is one P16 dashboard** (Chinmay, 2 October, workbook Q219; DI-721; CHG-CSA-022): the
+        Finance standard dashboard is seeded per tenant from the finance measures above and lives in Analytics;
+        Orders & Money (BO-1081) shows a link card to it rather than a second copy.
+
         '
       tags:
       - reporting
@@ -2172,6 +2189,12 @@ paths:
           `tierCode`. A dimension the source does not carry is `400`.
         schema:
           type: string
+      - name: module
+        in: query
+        description: Only the sales of this module's outlets and products, e.g. `fnb` for the F&B hub's takings
+          (workbook Q181; CHG-CSA-020). A KPI whose source has no module is `400`.
+        schema:
+          $ref: ../shared/common.yaml#/components/schemas/ModuleKey
       responses:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
@@ -2183,6 +2206,122 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/KpiValue'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /service-summary:
+    get:
+      operationId: getServiceSummary
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-self-scoped: principal
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q199 (EMP-008: a server without a till gets a service summary:
+        covers, tables, sales, tips); shape follows getKpiValues'
+      summary: My service summary (a server without a till)
+      description: '**Covers, tables, sales and tips for one server''s service** (Chinmay, 2 October, workbook Q199;
+        MATRIX 4.9.7, DI-492; CHG-CSA-020). For a server who works the floor on a handheld and holds no drawer, the
+        counterpart of the till''s shift summary. A reporting window over the same sources as the KPIs, so the
+        numbers match the back office (CHG-FIN-006): covers and tables from `fnb.table_visit` served by the caller,
+        sales from the orders on those visits (excluding VAT), tips from the tips recorded on their payments. The
+        caller''s own figures only; `REPORT_VIEW_OWN` is self-scoped.
+
+        '
+      tags:
+      - reporting
+      x-ticvai-permission: REPORT_VIEW_OWN
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: date
+        in: query
+        description: The service day, in the venue's time zone; today where absent.
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: The summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceSummary'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /analytics-governance-policy:
+    get:
+      operationId: getAnalyticsGovernancePolicy
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q225 (ANL-070); shape follows getSemanticModel'
+      summary: The tenant's analytics governance policy
+      description: 'Masking, export restriction, retention, sharing and AI/API access for analytics (CHG-CSA-021).
+        A tenant that never set one reads the defaults: personal fields masked, exports of personal data refused
+        without `REPORT_EXPORT_PII`, no external sharing, AI and API access through the semantic layer only.
+
+        '
+      tags:
+      - reporting
+      x-ticvai-permission: REPORT_VIEW_TENANT
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The policy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsGovernancePolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    put:
+      operationId: setAnalyticsGovernancePolicy
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q225 ("add a governance policy operation: masking, export,
+        retention, sharing, AI/API access"); shape follows setSemanticModel'
+      summary: Set the analytics governance policy
+      description: '**One policy for what analytics may show and where it may go** (Chinmay, 2 October, workbook Q225;
+        CHG-CSA-021). The semantic layer enforces it on every report, dashboard, export and natural-language answer
+        (ADR-0054): masked fields are masked before a value leaves the query, exports follow `export`, results are
+        kept as `retention` says, sharing outside the tenant follows `sharing`, and the AI assistant and the public
+        API reach analytics only as `aiAndApiAccess` allows. The whole policy is replaced. Gated by
+        `PERMISSION_MANAGE`, which writes the policies that decide what any role can see, until the decided
+        `REPORT_GOVERNANCE_MANAGE` can join the vocabulary (CHG-CSA-007).
+
+        '
+      tags:
+      - reporting
+      x-ticvai-permission: PERMISSION_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: One policy per tenant, the caller's tenant; there is no key in the path.
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalyticsGovernancePolicy'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsGovernancePolicy'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /analytics-benchmarks:
@@ -2750,6 +2889,100 @@ paths:
 components:
   schemas:
 
+    ServiceSummary:
+      x-ticvai-persistence: none — computed from fnb.table_visit, the orders and payments on it
+      type: object
+      description: One server's service day (`getServiceSummary`, CHG-CSA-020).
+      required:
+      - date
+      - covers
+      - tables
+      properties:
+        date:
+          type: string
+          format: date
+        covers:
+          type: integer
+        tables:
+          type: integer
+          description: Table visits served.
+        sales:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          description: Excluding VAT, as `grossSales` (CHG-FIN-007).
+        tips:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        openTables:
+          type: integer
+          description: Visits still open, with their bills not yet settled.
+    AnalyticsGovernancePolicy:
+      type: object
+      x-ticvai-persistence: reporting.analytics_governance_policy
+      description: '**What analytics may show and where it may go** (Chinmay, 2 October, workbook Q225; CHG-CSA-021).
+        One row per tenant.'
+      properties:
+        masking:
+          type: object
+          description: Masked fields, as `schema.table.column`, and who may see them unmasked.
+          properties:
+            maskedFields:
+              type: array
+              items:
+                type: string
+            unmaskedForPermissions:
+              type: array
+              items:
+                type: string
+        export:
+          type: object
+          properties:
+            allowedFormats:
+              type: array
+              items:
+                type: string
+            personalDataNeedsPermission:
+              type: boolean
+              default: true
+              description: An export carrying personal data needs `REPORT_EXPORT_PII`.
+            maxRows:
+              type: integer
+              nullable: true
+        retention:
+          type: object
+          properties:
+            resultDays:
+              type: integer
+              minimum: 1
+              nullable: true
+              description: How long report results and exports are kept.
+        sharing:
+          type: object
+          properties:
+            externalLinks:
+              type: boolean
+              default: false
+            allowedDomains:
+              type: array
+              items:
+                type: string
+        aiAndApiAccess:
+          type: object
+          properties:
+            aiAssistant:
+              type: boolean
+              default: true
+              description: The AI assistant may answer analytics questions through the semantic layer (ADR-0054).
+            publicApi:
+              type: boolean
+              default: false
+        scopePath:
+          type: string
+          readOnly: true
+          description: The partition key (ADR-0005). Written at `tenant` scope.
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
     KpiDefinition:
       type: object
       x-ticvai-persistence: reporting.kpi_definition
@@ -2831,6 +3064,10 @@ components:
         | `deferredRevenue` | currency | The balance of the deferred-revenue liability accounts at period end (`finance.getDeferredRevenue`): paid and not yet recognised (CHG-FIN-007) | every tenant |
         | `taxCollected` | currency | Output tax: `orders.order_line.tax_amount` on orders paid in the period less the tax reversed by refunds completed in it; labelled with the jurisdiction''s tax name (VAT in the UAE) (CHG-FIN-007) | every tenant |
         | `admissions` | count | admitted in-direction `access.scan_event` in the period | every tenant (R283) |
+        | `tableTurnTime` | duration | mean `closed_at` minus `opened_at` of `fnb.table_visit` closed in the period (`higherIsBetter` false; workbook Q205, CHG-CSA-020) | F&B module |
+        | `noShowRate` | percentage | `fnb.table_reservation` marked no-show over those due in the period (`higherIsBetter` false) | F&B module |
+        | `covers` | count | the sum of covers of `fnb.table_visit` opened in the period; `groupBy=serverPrincipalId` gives covers per server | F&B module |
+        | `waitQuoteAccuracy` | percentage | waitlist parties seated within their quoted wait over those seated in the period (`fnb.restaurant_waitlist`) | F&B module |
         | `accreditationApplications` | count | `accreditation.application` submitted in the period; `groupBy=status` gives applications by status | accreditation module (12.1.50) |
         | `accreditationTimeToDecision` | duration | mean `decided_at` minus `submitted_at` of `accreditation.application` decided in the period (`higherIsBetter` false) | accreditation module |
         | `accreditationCredentialsIssued` | count | `accreditation.credential` with `issued_at` in the period; `groupBy=kind` | accreditation module |
@@ -2863,6 +3100,10 @@ components:
       - accreditationCredentialsIssued
       - accreditationActiveHolders
       - accreditationRenewalsDue
+      - tableTurnTime
+      - noShowRate
+      - covers
+      - waitQuoteAccuracy
     KpiTarget:
       type: object
       x-ticvai-persistence: reporting.kpi_target

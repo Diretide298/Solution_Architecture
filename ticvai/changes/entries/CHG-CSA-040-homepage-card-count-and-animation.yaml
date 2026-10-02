@@ -1,0 +1,41 @@
+id: CHG-CSA-040
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: Homepage sections take every customisation of the approved wireframe, including the card count, and a scroll
+  animation; the approved web and app wireframes are the layout.
+decision:
+  what: HomepageLayout section maxItems is the venue's choice (replacing MOB-3's 1 or 2), scrollAnimation (rise,
+    scale, slide, blur, none) added; HomepageLayout documents that the approved wireframes are the layout.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October, workbook Q152 and Q153 (CMS-007; DEC-152, DEC-153) and Q163 (WEB-001; DEC-163): "All customisation
+  options from the approved wireframe"; "Must be there: add a field"; "Client-approved web and app wireframes are
+  fixed; small changes only". DI-1088, DI-396.'
+keys_touched:
+  operations:
+  - setHomepageLayout
+  - getHomepageLayout
+  schemas:
+  - HomepageLayout
+  screens:
+  - CMS-007
+  - WEB-001
+  - GST-001
+  files:
+  - contracts/satellite/white-label.yaml
+root_class: 'new: open-question-decided'
+tickets:
+  started: []
+  unstarted:
+  - APP-MOB-GST-001
+  - APP-WEB-WEB-001
+  - APP-WL-CMS-007
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: template-field
+  ref: contracts/satellite/white-label.yaml::scrollAnimation
+status: closed
+closed_by_commit: 9bc4ce04
+notes: 'Batch CSA (apply-contracts-satellite), 2 October 2026; tickets: none started (Block A starts Monday 5 October).'

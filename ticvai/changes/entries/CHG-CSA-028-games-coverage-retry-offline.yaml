@@ -1,0 +1,42 @@
+id: CHG-CSA-028
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: An all-games pass covers games added later unless the venue says not, a retry is charged in money at the
+  retry price, and a reader past the venue's maximum offline duration refuses offline taps.
+decision:
+  what: GameEntitlement.coversGamesAddedLater (default true); GamePricing.retryOfferLeadSeconds and retryWindowSeconds
+    documented; ReaderOfflineQueue.offlineSince and refusingOfflineTaps.
+  by: Chinmay
+  date: '2026-10-02'
+why: Chinmay, 2 October, workbook Q397 (BO-427; DEC-397), Q410 (BO-440; DEC-410, default; DI-877) and Q426 (BO-471;
+  DEC-426; ADR-0068).
+keys_touched:
+  operations:
+  - createGameEntitlement
+  - setGamePricing
+  - getGameplaySyncStatus
+  schemas:
+  - GameEntitlement
+  - GamePricing
+  - ReaderOfflineQueue
+  screens:
+  - BO-427
+  - BO-440
+  - BO-471
+  files:
+  - contracts/satellite/games.yaml
+root_class: 'new: open-question-decided'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: template-field
+  ref: contracts/satellite/games.yaml::coversGamesAddedLater
+status: closed
+closed_by_commit: 9bc4ce04
+notes: 'Dependency on the spine agent: the venue''s maximum offline duration is access AccessOfflinePolicy (setGateOfflinePolicy),
+  carried in the edge package. Batch CSA (apply-contracts-satellite), 2 October 2026; tickets: none started (Block
+  A starts Monday 5 October).'

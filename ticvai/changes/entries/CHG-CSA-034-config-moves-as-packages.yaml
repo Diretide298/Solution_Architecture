@@ -1,0 +1,39 @@
+id: CHG-CSA-034
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: Configuration moves between environments as a versioned package with stable keys, a diff, approval and
+  an idempotent upsert; databases are never merged or reverse-migrated.
+decision:
+  what: exportConfigPackage, diffConfigPackage and applyConfigPackage (ConfigPackage, ConfigPackageDiff, ConfigPackageApplication);
+    secrets and environment settings never travel; rollback re-applies the previous package.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October, batch 5 (ADM-122, workbook Q168; DEC-168): "Industry standard: forward-only migrations;
+  config packages with diff, approval and idempotent upsert". Relates to ADR-0039.'
+keys_touched:
+  operations:
+  - exportConfigPackage
+  - diffConfigPackage
+  - applyConfigPackage
+  schemas:
+  - ConfigPackage
+  - ConfigPackageDiff
+  - ConfigPackageApplication
+  screens:
+  - ADM-122
+  files:
+  - contracts/satellite/platform-ops.yaml
+root_class: 'new: open-question-decided'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-key-stability.py
+status: closed
+closed_by_commit: 9bc4ce04
+notes: 'The new ADR (configuration moves as a versioned package) and the release-runbook section are apply-docs.
+  Batch CSA (apply-contracts-satellite), 2 October 2026; tickets: none started (Block A starts Monday 5 October).'

@@ -1,0 +1,39 @@
+id: CHG-CSA-035
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: 'Theme.darkMode is deprecated and ignored: white label applies the venue''s chosen theme, with no light
+  or dark mode.'
+decision:
+  what: Theme.darkMode and Preview/createPreview theme marked deprecated and documented as ignored; setTheme says
+    so. Kept, not removed, for clients built at r1.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October, workbook Q150 (CMS-005; DEC-150) and the pre-apply round: "Deprecate it and ignore the
+  field".'
+keys_touched:
+  operations:
+  - setTheme
+  - getTheme
+  - createPreview
+  schemas:
+  - Theme
+  - Preview
+  screens:
+  - CMS-005
+  files:
+  - contracts/satellite/white-label.yaml
+root_class: 'new: open-question-decided'
+tickets:
+  started: []
+  unstarted:
+  - APP-WL-CMS-005
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: closed
+closed_by_commit: 9bc4ce04
+notes: 'rtl-and-theming.md is apply-docs; removing the guest app''s Light/Dark switch is the screens agent''s. Batch
+  CSA (apply-contracts-satellite), 2 October 2026; tickets: none started (Block A starts Monday 5 October).'

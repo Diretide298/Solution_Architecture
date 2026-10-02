@@ -1,0 +1,48 @@
+id: CHG-CSA-037
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: Navigation is three editors saved on their own, tenants without a landing page start from TICVAI templates,
+  and tenants with one link in through a published deep-link scheme.
+decision:
+  what: setNavigation documents the three editors (tab bar here, header setHeader, footer setFooter); listLandingPageTemplates,
+    getDeepLinkScheme, buildDeepLink (LandingPageTemplate, DeepLinkScheme); HomepageLayout.templateKey and landingSource.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October, workbook Q49 (CMS-009; DEC-049) and batch 2 #41 (DEC-548): "Three editors ... the landing
+  page is owned by the client, who redirects to us ... clients with no landing page can use templates we provide".
+  DI-285; research B4.'
+keys_touched:
+  operations:
+  - setNavigation
+  - listLandingPageTemplates
+  - getDeepLinkScheme
+  - buildDeepLink
+  - setHomepageLayout
+  schemas:
+  - HomepageLayout
+  - LandingPageTemplate
+  - DeepLinkScheme
+  screens:
+  - CMS-009
+  - CMS-007
+  - CMS-102
+  - WEB-001
+  files:
+  - contracts/satellite/white-label.yaml
+root_class: 'new: open-question-decided'
+tickets:
+  started: []
+  unstarted:
+  - APP-WEB-WEB-001
+  - APP-WL-CMS-007
+  - APP-WL-CMS-009
+  - APP-WL-CMS-102
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-key-stability.py
+status: closed
+closed_by_commit: 9bc4ce04
+notes: 'Batch CSA (apply-contracts-satellite), 2 October 2026; tickets: none started (Block A starts Monday 5 October).'

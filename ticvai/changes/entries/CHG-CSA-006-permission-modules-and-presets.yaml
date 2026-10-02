@@ -1,0 +1,42 @@
+id: CHG-CSA-006
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: Every permission sits in exactly one module, and the presets All, Viewer and Mid-level fill a role's per-module
+  checklist; there are no fixed default roles.
+decision:
+  what: permissions.yaml gains x-ticvai-permission-modules (each of the 184 permissions in one ModuleKey group,
+    platform for Control Plane), x-ticvai-permission-presets (all, viewer, midLevel per module) and the PermissionPreset
+    schema; TENANT_PUBLISH notes platform-staff publishing under a grant.
+  by: Chinmay
+  date: '2026-10-02'
+why: Chinmay, 2 October, workbook Q3 and Q7 (ADM-508, ADM-554; DEC-003, DEC-007) and the pre-apply round ("default
+  permission configs, so to speak ... they can still give that viewer more permissions and rename it"). ADR-0002.
+keys_touched:
+  schemas:
+  - PermissionPreset
+  - Permission
+  screens:
+  - ADM-554
+  - ADM-021
+  - BO-054
+  - BO-1066
+  files:
+  - contracts/shared/permissions.yaml
+root_class: 'new: open-question-decided'
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ADM-554
+  - APP-SETUP-BO-054
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: template-field
+  ref: contracts/shared/permissions.yaml::x-ticvai-permission-modules
+status: closed
+closed_by_commit: 9bc4ce04
+notes: 'The role builder operations (identity createRole, tenancy setRolePermissions) and roles.yaml presets are
+  the spine agent''s; they read these groups. A check that every preset names only enum permissions and every permission
+  is in one group was verified by hand (184 of 184); turning it into a gate needs a tools/ change outside this batch.
+  Batch CSA (apply-contracts-satellite), 2 October 2026; tickets: none started (Block A starts Monday 5 October).'
