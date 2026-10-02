@@ -348,6 +348,20 @@ def regroup(rows, mp, retire_plan, unexplained, release, structure=None):
             [k for k in unexplained if k not in set(gone)])
 
 
+# What the server's OpenProject (10.0.2, Rails 5.2, Ruby 2.6) cannot run, found in tools/op-release.rb before a
+# bundle is written (CHG-REL-001: the r2 dry run stopped in the retire phase on a parent_id query).
+OP10_FORBIDDEN = [
+    (re.compile(r"\.where\([^)]*parent_id\s*:"), "OpenProject 10 keeps parents in the relations table and has no "
+     "work_packages.parent_id column: use w.children / w.parent"),
+]
+
+
+def op10_problems():
+    rb = (ROOT / "tools" / "op-release.rb").read_text(encoding="utf-8")
+    return [f"tools/op-release.rb:{n}: {why}" for n, line in enumerate(rb.splitlines(), 1)
+            for rx, why in OP10_FORBIDDEN if rx.search(line) and not line.lstrip().startswith("#")]
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--release", help="the tag the pointers are written at (r1, r2, ...); default: the tag on HEAD")
@@ -368,6 +382,7 @@ def main() -> int:
     retire_plan, unexplained = regroup(rows, mp, retire_plan, unexplained, release)
 
     bundle, errors = build(rows, mp, sched, lineage, retire_plan, unexplained, release)
+    errors += op10_problems()
     if not a.no_key_check:
         ks = _load("check_key_stability", "check-key-stability.py")
         if hasattr(ks, "retired_keys"):      # the 1C version (1 October): a rename of a pushed key blocks too

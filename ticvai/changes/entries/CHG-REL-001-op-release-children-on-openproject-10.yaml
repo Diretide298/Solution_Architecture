@@ -1,0 +1,32 @@
+id: CHG-REL-001
+date: '2026-10-03'
+source: cr
+kind: process
+summary: op-release.rb's retire phase reads a regrouped epic's or feature's children through the children association;
+  OpenProject 10 has no work_packages.parent_id column, so the r2 dry run stopped there.
+decision:
+  what: 'The regroup check in the retire phase uses w.children (OpenProject 10 keeps parents in the relations table, as the
+    create phase already relies on). op-release.py refuses to write a bundle while tools/op-release.rb holds a query
+    OpenProject 10.0.2 cannot run (OP10_FORBIDDEN, starting with where(parent_id: ...)).'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'The r2 dry run on the OpenProject server (pms.softlabsgroup.in, OpenProject 10.0.2) failed in the retire phase with
+  PG::UndefinedColumn: column work_packages.parent_id does not exist, from the regroup check added on 1 October for the
+  Block/app-module hierarchy (council item C6, commit 82993fc1 tagged r2). The apply refused (no successful dry run), so OpenProject was not changed.'
+keys_touched:
+  files:
+  - tools/op-release.rb
+  - tools/op-release.py
+root_class: A00 TOOLING
+tickets:
+  started: []
+  unstarted: []
+release_tag: r2
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/op-release.py
+status: open
+notes: Closes on its commit. The server-side dry run is the only place the Rails schema is real; this guard catches the
+  known incompatibility before a bundle is built.

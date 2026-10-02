@@ -519,7 +519,7 @@ if rel_run?("retire")
   list.each do |e|
     w = found[e["id"]]
     target = e["action"] == "defer" ? status_hold : status_rejected
-    under = w && e["action"] == "regroup" ? WorkPackage.where(parent_id: w.id).pluck(:id) : []
+    under = w && e["action"] == "regroup" ? w.children.pluck(:id) : []  # OpenProject 10 keeps parents in relations: no parent_id column
     under = under.reject { |i| planned_ids.include?(i) } unless APPLY
     if w.nil?
       gone << "##{e['id']} #{e['key']}: not in OpenProject any more"
