@@ -107,7 +107,6 @@ EFFECT = {
     "theme.cornerRadius": "the corners of cards, buttons, inputs, sheets and the cart (0 square to 22 the prototype's roundest)",
     "theme.surfaceStyle": "cards and panels: frosted glass (default) or opaque (the `surfaceRaised` token)",
     "theme.buttonStyle": "every button's shape: solid fill, outline, or pill",
-    "theme.darkMode": "the dark variant on a device in dark mode (mobile app); derived from the light theme when absent",
     "theme.componentColours.primaryCta": "the one main call to action on each screen, when it should differ from the brand colour",
     "theme.componentColours.payButton": "the Pay button at checkout",
     "theme.componentColours.addToCart": "every Add to cart button",
@@ -118,6 +117,11 @@ EFFECT = {
     "brand.logoDarkAssetRef": "the logo on dark backgrounds (falls back to the primary logo)",
     "brand.logoVariant": "which logo lockup sits in the nav bar, and whose colours drive the theme",
     "brand.faviconAssetRef": "the browser tab icon (website only)",
+    "brand.showPoweredBy": "the *Powered by TICVAI* credit on the launch screen, at the foot of Account and in the web footer; on by default, and switching it off needs the licence add-on (403 powered-by-locked)",
+    "homepage.templateKey": "the landing-page template the home started from (listLandingPageTemplates); a tenant with no landing page of its own starts from one, and the sections it fills stay editable",
+    "homepage.landingSource": "whether the storefront home is the landing page, or the tenant's own site is and links in with deep links",
+    "homepage.sections[].maxItems": "how many cards the section shows, the counts the approved wireframe offers",
+    "homepage.sections[].scrollAnimation": "how the section enters as the guest scrolls: rise, scale, slide, blur or none (none whenever the device asks for reduced motion)",
     "fonts.primaryLatin": "headings and body text in English",
     "fonts.primaryArabic": "headings and body text in Arabic",
     "fonts.secondaryLatin": "the secondary face (eyebrows, numbers) in English",
@@ -157,12 +161,40 @@ ALT_BY_ID = {"theme.primaryColour": "#0077B6", "theme.buttonStyle": "pill", "the
              "bookingFlow.cartLayout": "floatingIcon", "bookingFlow.cartSideInRtl": "mirror",
              "navigation.buyButton.style": "floating", "languages.languages": "en, ar",
              "bookingFlow.cardSize": "standard", "bookingFlow.density": "roomy",
-             "bookingFlow.timesPerPage": "8", "bookingFlow.seatPicker": "zonesThenSeats"}
+             "bookingFlow.timesPerPage": "8", "bookingFlow.seatPicker": "zonesThenSeats",
+             "homepage.sections[].scrollAnimation": "slide", "homepage.sections[].maxItems": "6",
+             "homepage.templateKey": "a TICVAI template, picked by its name and thumbnail",
+             "brand.showPoweredBy": "off, where the licence allows it"}
+
+# **Authored: a label or control the schema name does not give** (2 October decisions, CHG-EXP-004/005).
+LABEL = {"brand.showPoweredBy": "Powered by TICVAI credit", "homepage.sections[].maxItems": "Sections: card count",
+         "homepage.templateKey": "Landing-page template"}
+CONTROL = {"homepage.templateKey": "template picker: name and thumbnail (listLandingPageTemplates)"}
 EXAMPLES = ["theme.primaryColour", "theme.buttonStyle", "theme.surfaceStyle", "theme.cornerRadius",
             "brand.logoVariant", "header.layout", "navigation.buyButton.style", "languages.languages",
             "bookingFlow.stepIndicator", "bookingFlow.cardLayout", "bookingFlow.cardSize", "bookingFlow.cartLayout",
             "bookingFlow.cartSideInRtl", "bookingFlow.timesPerPage", "bookingFlow.seatPicker",
-            "bookingFlows.steps[].enabled", "bookingFlows.settings.signInAt", "homepage.sections[].kind"]
+            "bookingFlows.steps[].enabled", "bookingFlows.settings.signInAt", "homepage.sections[].kind",
+            "homepage.sections[].maxItems", "homepage.sections[].scrollAnimation", "homepage.templateKey",
+            "brand.showPoweredBy"]
+
+# **Authored: what Chinmay decided on 2 October about the white label as a whole** (workbook Q150, Q152,
+# Q153, Q160, batch 2 #41, and the pre-apply round). Rendered in WHITE-LABEL.md and once per guest batch,
+# so no design session draws a dark mode, a fixed credit or a fixed card count (CHG-EXP-003..005).
+DECIDED = [
+    "**No dark or light mode.** The venue's chosen theme applies on every device setting; `Theme.darkMode` is "
+    "deprecated and ignored, never drawn, and the guest app has no Light/Dark switch (Chinmay, 2 October, Q150; "
+    "CHG-CSA-035).",
+    "***Powered by TICVAI* is a tenant toggle, on by default** (`brand.showPoweredBy`): shown on the launch screen, "
+    "at the foot of Account and in the web footer; switching it off needs the licence add-on, or 403 "
+    "`powered-by-locked` (Chinmay, 2 October, Q160; DI-297; CHG-CSA-036).",
+    "**Each homepage section sets its card count and its scroll animation** (`maxItems`; `scrollAnimation` rise, "
+    "scale, slide, blur or none, default rise): every customisation option of the approved wireframe "
+    "(Chinmay, 2 October, Q152 and Q153; DI-1088; CHG-CSA-040).",
+    "**Landing-page templates.** A tenant with no landing page of its own starts from a TICVAI template "
+    "(`listLandingPageTemplates`, kept as `HomepageLayout.templateKey`); one with its own site links in with deep "
+    "links (`landingSource` ownSite) (Chinmay, 2 October, batch 2 #41; CHG-CSA-037).",
+]
 
 # Names too common to mean one field when a guest screen mentions them.
 GENERIC = {"layout", "label", "kind", "enabled", "style", "name", "title", "id", "items", "steps", "settings",
@@ -310,8 +342,8 @@ def build() -> dict:
             elif r["name"] in GENERIC and lab.lower() not in label.lower():
                 lab = f"{label.split(':')[0].split(' (')[0]} {lab[:1].lower() + lab[1:]}"
             el = {
-                "id": eid, "part": key, "partLabel": label, "path": r["path"], "label": lab,
-                "control": r["control"], "mask": r["mask"], "required": r["required"],
+                "id": eid, "part": key, "partLabel": label, "path": r["path"], "label": LABEL.get(eid, lab),
+                "control": CONTROL.get(eid, r["control"]), "mask": r["mask"], "required": r["required"],
                 # With no enum or limit, the format is what is allowed (#RRGGBB, PNG or SVG ≤ 2 MB).
                 "default": DS._default(r),
                 "allowed": DS._allowed(r) if DS._allowed(r) != "—" else (r["mask"] or "—"), "help": desc,
@@ -347,7 +379,7 @@ def build() -> dict:
                                 "count": len(p["elements"]),
                                 "screens": [w["screen"] for w in p["configuredOn"]][:3] or ["—"]})
     fixed = [
-        "The *Powered by TICVAI* credit in the footer is fixed and never client-editable (MoM 3 Aug, DI-111; MoM 12 Aug, DI-250).",
+        "A dark or light mode: the guest surfaces have one theme, the venue's (Chinmay, 2 October; CHG-CSA-035).",
         "Semantic colour pairs (success, warning, danger, neutral) are not overridable: a tenant who recolours danger to "
         "their brand green has made a destructive confirmation look like a success (`screens/_design-tokens.yaml` whiteLabel).",
         "Site structure and the navigation flow are fixed and adapt to the product configuration (MoM 3 Aug, DI-119); "
@@ -360,7 +392,7 @@ def build() -> dict:
         "note": "Derived from the configuring operations' request schemas and the screens. Never edit; rerun the tool.",
         "elements": elements, "parts": parts_out,
         "guestScreens": guest, "configScreens": dict(conf),
-        "shell": shell_ids, "shellParts": shell_parts, "fixed": fixed,
+        "shell": shell_ids, "shellParts": shell_parts, "decided": DECIDED, "fixed": fixed,
         "alternateTheme": {**ALTERNATE, "keyScreens": keys},
     }
 
@@ -489,7 +521,8 @@ def write_md(m: dict) -> None:
         sp = m["guestScreens"][sid]["specific"]
         parts = collections.Counter(els[i]["partLabel"].split(":")[0] for i in sp)
         L.append(f"| `{sid}` {PKG.name_of(sid)} | " + ("; ".join(f"{k} ({n})" for k, n in parts.items()) or "the shell only") + " |")
-    L += ["", "## Never configurable", ""] + [f"- {x}" for x in m["fixed"]] + [""]
+    L += ["", "## Decided on 2 October", ""] + [f"- {x}" for x in m["decided"]] + [""]
+    L += ["## Never configurable", ""] + [f"- {x}" for x in m["fixed"]] + [""]
     # client inputs
     wl_inputs = [e for e in di.active() if set(e.get("topic") or []) & {"branding", "configurability"}
                  and any(str(t) in ("global", "P01", "P02", "P05", "P13") or str(t).startswith(("P01/", "P02/", "P05/", "P13/"))

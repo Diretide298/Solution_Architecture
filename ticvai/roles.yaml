@@ -40,6 +40,20 @@ description: >
 
   **Escalation is not the same as denial**, and the two were the same word before this file.
 
+  ## Presets, not roles (2 October 2026)
+
+  **No tenant is given these roles** (Chinmay, pre-apply round: *"Default permission configs, so to
+  speak. We still have checklists: if they select Viewer, for example, they can still give that viewer
+  more permissions and rename it."*; DEC-007; CHG-CSP-003, CHG-FUP-012). The six below are the POS
+  board's **starting configurations**: picking one in the role builder ticks its action keys (and the
+  `Permission` values a key maps to through `permission:`), every box stays editable, and the role is
+  named and renamed by whoever builds it. *Cumulative* now describes the presets: each starts from
+  everything the one before it ticks. `escalation.approverMinimumRole` reads as *a principal whose role
+  ticks the escalated key*, which the Supervisor preset does. The tenant-wide starting configurations
+  (Cashier, Supervisor, Venue Manager, Finance, Tenant Admin) are `docs/active/seed-data-proposal.md`
+  section 2; the per-module All, Viewer and Mid-level presets are `contracts/shared/permissions.yaml`
+  `x-ticvai-permission-presets`.
+
   ## What this file is not
 
   **It is not enforcement.** Permissions are enforced server-side against the operation, and this
@@ -57,7 +71,8 @@ escalation:
     Recording only the escalations loses the case where the person who had the permission was the
     problem, which is the case internal audit actually asks about.
 
-# Roles are listed weakest first. Each inherits everything above it.
+# Presets (starting configurations, not roles: see the description) are listed weakest first. Each starts
+# from everything above it.
 roleOrder: [cashier, seniorCashier, supervisor, dutyManager, venueManager, sysAdmin]
 
 roles:

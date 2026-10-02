@@ -32,7 +32,8 @@ decision_owner: Chinmay
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: c481490c
 notes: 'Recommended default: add the fields (all optional, additive) with the scanner adapter, since proving nothing
   loads before consent is the scan''s main compliance output (2.6.58). Batch CSA (apply-contracts-satellite), 2
-  October 2026; tickets: none started (Block A starts Monday 5 October).'
+  October 2026; tickets: none started (Block A starts Monday 5 October). Closed by CHG-FUP-009 (the proposed fields, kept per finding, with listCookieScanFindings) and CHG-FUP-010 (the platform catalogue): Chinmay, contract follow-ups, "add now". Batch FUP, 2 October 2026.'
