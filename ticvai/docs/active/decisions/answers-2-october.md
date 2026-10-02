@@ -375,7 +375,7 @@ This reinforces the existing rule that the LLM never reads raw data (the AI ADRs
 - AI_USE stays the base permission for the publish operations; the module permission is checked on top of it.
 
 # Lead decisions on the commercial-move questions (2 Oct)
-- The 13 duplicate first-release setup operations are kept for this release (the section merges) and retired at the next contract major version. Retiring them now would be a plan change touching 13 pushed tickets.
+- **Corrected by Chinmay (2 Oct): the 13 duplicate first-release setup operations are retired in r2**, not at the next major version. Their screens bind the venue screens' typed operations instead. The removals are logged as approved breaking changes against r1. Their 13 pushed tickets are retired in the r2 push, each naming the ticket that replaces it (no work has started).
 - ADM-068 (country tax templates) and ADM-619 (cross-tenant payments) stay on the TICVAI console (DEC-207, DEC-211) and take the R098 pattern.
 - DEC-168: a new console screen, "Configuration promotion", binds the export/diff/applyConfigPackage operations. ADM-122 stays in Venue Management for product import and export.
 - CHG-MOV-004: check-screens gains a rule that a screen name carries no tab character or trailing page number.
