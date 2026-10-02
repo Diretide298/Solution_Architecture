@@ -2889,6 +2889,7 @@ screens:
         notes: Chips from the closed sets; my own queue is the default, not a filter (VO-R12; design-notes
           correction venue-operations EMP-004). No ids are typed.
         provenance: contract maintenance.yaml GET /work-orders
+        bindsTo: WorkOrder.status
       - kind: toggle
         label: Overdue only
         operation: listWorkOrders

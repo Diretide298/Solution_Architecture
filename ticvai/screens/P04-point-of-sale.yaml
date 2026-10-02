@@ -163,6 +163,7 @@ screens:
         label: Cashier ID
         notes: Goes into `LoginRequest.username`. For anyone not on the recent-cashier tiles (v2 cashier-ID
           entry, POSV2-9, DEC-550).
+        bindsTo: LoginRequest.username
       - kind: selectField
         label: Sign in with PIN or password
         notes: 'The v2 switch (POSV2-9, DEC-550): sets `LoginRequest.method` to `pin` or `password` and
@@ -170,10 +171,12 @@ screens:
           only.'
         provenance: POS v2 candidate (sources/designs/TICVAI_POS_Terminal_v2.html), accepted 2 October
           2026 (POSV2-9)
+        bindsTo: LoginRequest.method
       - kind: numberField
         label: PIN or password
         notes: 'Goes into `LoginRequest.credential`, with `method: pin` (a 4-digit keypad) or `method:
           password` (a text field), as the switch above it says.'
+        bindsTo: LoginRequest.credential
       - kind: primaryButton
         label: Sign in
         operation: login
@@ -2566,7 +2569,7 @@ screens:
         provenance: carried from the previous definition
       - kind: seatMap
         label: Section map, then the section's seats
-        bindsTo: SeatAvailability
+        bindsTo: SeatAvailability.sections
         operation: getSeatAvailability
         notes: 'v2 (POSV2-11, DEC-552): pick the date and time, then a section on the section map, then
           seats in that section with held and sold seats shown and the price tiers as a legend; Back and
@@ -3431,6 +3434,7 @@ screens:
           principal, shift and status are fixed by the session, never typed (design-notes correction ticketing-guest
           POS-006).
         provenance: contract orders.yaml GET /orders
+        bindsTo: Order.orderNumber
       - kind: dataTable
         label: Every order
         bindsTo: OrderSummary
@@ -5650,6 +5654,7 @@ screens:
           (design-notes correction fnb-retail POS-012). The delivery partner''s reference, driver and
           fee have no contract field yet (open entry CHG-SPO-019).'
         provenance: POS v2 candidate, accepted 2 October 2026 (POSV2-12)
+        bindsTo: FnbOrder.serviceMode
     - name: contextPanel
       slot: selection
       components:
@@ -6479,6 +6484,7 @@ screens:
         operation: allocateDepositBox
         notes: Picked from the staff on shift; the deposit box is allocated to them on this workstation.
         provenance: contract shift.yaml allocateDepositBox
+        bindsTo: DepositBox.cashierPrincipalId
       - kind: numberField
         label: Float by denomination
         operation: allocateDepositBox
@@ -6486,6 +6492,7 @@ screens:
           the variance are computed or closing data and are not fields (design-notes corrections platform-foundation
           POS-016).
         provenance: contract shift.yaml allocateDepositBox
+        bindsTo: DepositBox.openingDenominations
       - kind: dataTable
         label: Every registered device
         bindsTo: RegisteredDevice
@@ -8919,6 +8926,7 @@ screens:
         notes: The guest says yes or no in person; the cashier records it on their behalf, with the notice
           version shown (design-notes correction customer-marketing POS-027; CHG-CSA-045).
         provenance: contract marketing-crm.yaml POST /guests/{subjectId}/consents
+        bindsTo: RecordConsentRequest.decision
     - name: actionBar
       components:
       - kind: secondaryButton
