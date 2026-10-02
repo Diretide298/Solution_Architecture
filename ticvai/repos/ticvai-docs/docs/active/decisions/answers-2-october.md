@@ -379,3 +379,18 @@ This reinforces the existing rule that the LLM never reads raw data (the AI ADRs
 - ADM-068 (country tax templates) and ADM-619 (cross-tenant payments) stay on the TICVAI console (DEC-207, DEC-211) and take the R098 pattern.
 - DEC-168: a new console screen, "Configuration promotion", binds the export/diff/applyConfigPackage operations. ADM-122 stays in Venue Management for product import and export.
 - CHG-MOV-004: check-screens gains a rule that a screen name carries no tab character or trailing page number.
+
+# Flow design briefs before Claude Design (Chinmay, 2 Oct)
+After the re-audit and before Claude Design, every flow gets a design brief (one agent per process, Block A first). Each brief covers:
+- every input artefact, with its formats, limits, validation and errors;
+- what the system does with each input;
+- every output, its states and failure branches;
+- what moves or animates, and how;
+- its sources.
+
+Example: the venue map takes DXF/DWG, PDF (OCR), PNG with hand-marked paths, or GLB plus pathway metadata. It animates the route line along the paths, the position dot, the camera follow and the 3D↔2D transitions.
+
+Claude Design then works per process: the flow storyboards first, then the single navigable wireframe per app.
+
+# Claude Design and HLD/LLD order (Chinmay, 2 Oct)
+Block A first: finish ALL Block A wireframes (flow briefs, then storyboards, then the navigable wireframes for the Block A apps: Guest Web, Guest App, POS, Kitchen Display and the Block A screens of Venue Management, the CMS and the console) and the HLD/LLD first. Then Blocks B, C and D.
