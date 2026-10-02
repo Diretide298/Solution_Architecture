@@ -589,6 +589,212 @@ paths:
                 $ref: '#/components/schemas/ApprovalStateProblem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /approval-requests/{requestId}/cancel:
+    parameters:
+    - name: requestId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: cancelApprovalRequest
+      x-ticvai-audience:
+      - staff
+      summary: An administrator cancels a request nobody should decide any more
+      description: '**Cancellation, beside the requester''s withdrawal** (design-notes correction on BO-380, Block B:
+        "The purpose names four lifecycle actions; only withdrawApprovalRequest exists, and cancellation, expiry and
+        reopening have no operation"; CHG-CSP-043). An approvals administrator cancels a request that is still
+        waiting (`pending`, `escalated`, `returned` or `informationRequested`) because its subject went away: the
+        order was voided, the product retired. Moves it to `cancelled`; like a withdrawal it is never counted as a
+        rejection. The reason is required and kept. **Expiry stays the timer** set by `ApprovalRule.expiresAfterMinutes`;
+        no operation forces it.
+
+        '
+      tags:
+      - request
+      x-ticvai-permission: APPROVAL_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - reason
+              properties:
+                reason:
+                  type: string
+                  minLength: 3
+                  maxLength: 300
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Cancelled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalRequest'
+        '409':
+          description: 'Already decided or closed. `refusedReason` is `alreadyDecided` and `currentStatus` names the status.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApprovalStateProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /approval-requests/{requestId}/reopen:
+    parameters:
+    - name: requestId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: reopenApprovalRequest
+      x-ticvai-audience:
+      - staff
+      summary: Reopen an expired or cancelled request as a new one
+      description: '**Reopening creates a new request that points back** (design-notes correction on BO-380, Block B;
+        CHG-CSP-043; the rule this contract already states on `ApprovalRequest.reopenedFrom`: editing a decision in
+        place destroys the record). A request that `expired` (nobody answered) or was `cancelled` is reopened by its
+        requester or an approvals administrator: a new request at `pending`, with the same subject and the current
+        matrix, and `reopenedFrom` naming the old one, which stays as it was. A `rejected` request is resubmitted
+        (`resubmitApprovalRequest`), and an `approved` one is never reopened.
+
+        '
+      tags:
+      - request
+      x-ticvai-permission: APPROVAL_REQUEST
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                justification:
+                  type: string
+                  maxLength: 1000
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The new request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalRequest'
+        '409':
+          description: 'The request is not `expired` or `cancelled`: still open or another open request covers the subject
+            (`refusedReason` `openRequestExists`), decided (`alreadyDecided`, resubmit a rejection instead) or
+            `withdrawn`; `currentStatus` names it.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApprovalStateProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /approval-requests/{requestId}/assignment:
+    parameters:
+    - name: requestId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: assignApprovalRequest
+      x-ticvai-audience:
+      - staff
+      summary: Assign, reassign or claim a request in a shared queue
+      description: '**A team queue with assign, reassign and claim** (design-notes correction on BO-366, Block B: "DI-723
+        asks for assign and reassign to department or person; the approvals contract has no assign or claim operation";
+        CHG-CSP-042; DI-723). A request routed to a role is in a shared queue that anyone in it may see. **Claiming**
+        (`assigneePrincipalId` the caller) takes it, so two people do not decide the same item; **assigning** names
+        another person or a department''s queue (`assigneeDepartmentId`). Either is refused where the assignee is not
+        among the request''s eligible approvers (`422 assignee-not-eligible`) or is the requester. A request already
+        claimed by someone else is `409 already-claimed` unless the caller holds APPROVAL_DELEGATE, which reassigns.
+        Assignment narrows who acts; it never widens who may approve, which stays the matrix''s.
+
+        '
+      tags:
+      - request
+      x-ticvai-permission: APPROVAL_DECIDE
+      x-ticvai-permission-escalated: APPROVAL_DELEGATE   # assigning or reassigning to somebody else
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                assigneePrincipalId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: The person; the caller to claim it. Null with no department returns it to the shared queue.
+                assigneeDepartmentId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: A department's queue (an org unit of kind department).
+                note:
+                  type: string
+                  maxLength: 300
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Assigned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalRequest'
+        '409':
+          description: Claimed by somebody else (`already-claimed`), or no longer waiting (`already-decided`).
+          x-ticvai-problem-types:
+          - already-claimed
+          - already-decided
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: The assignee is not an eligible approver of this request, or is its requester (`assignee-not-eligible`).
+          x-ticvai-problem-types:
+          - assignee-not-eligible
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approval-requests/{requestId}/escalate:
     parameters:
     - name: requestId
@@ -2726,6 +2932,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApprovalSignature'
+        '422':
+          description: The level's rule does not accept this signature method (`ApprovalRule.signatureMethods`;
+            `signature-method-not-accepted`; CHG-CSP-045).
+          x-ticvai-problem-types:
+          - signature-method-not-accepted
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approval-requests/{requestId}/record:
@@ -2996,6 +3211,66 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApprovalEvidencePackage'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /automation-executions:
+    get:
+      operationId: listAutomationExecutions
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      summary: What automations ran, when, on whose rule, and the outcome
+      description: '**The read a monitor of automated and autonomous actions needs** (design-notes correction on ADM-253,
+        Block B: "The only operation creates an autonomous action; nothing lists executions"; CHG-CSP-044). Returns
+        `AutomationExecution` rows: the automation, its workflow version and rule, the business object, the action,
+        the authority it ran under, the result (`AutomationExecutionResult`: succeeded, failed, awaiting confirmation,
+        reversed) and the time. `createAutomationAutonomouAction` stays as it is for clients
+        built at r1; the monitor reads this. Filters by automation, result and time. **Ordered by `executedAt`, most
+        recent first, `id` as the tiebreak.**
+
+        '
+      tags:
+      - approvals
+      x-ticvai-permission: APPROVAL_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: automationId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: result
+        in: query
+        schema:
+          $ref: '#/components/schemas/AutomationExecutionResult'
+      - name: executedFrom
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: executedTo
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Executions, most recent first
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/AutomationExecution'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approved-action-executions:
@@ -4463,6 +4738,25 @@ components:
         writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval
         under these two kinds, so a venue can route product edits and price edits to different approvers.
 
+
+        **Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028,
+        CHG-CSP-031). Each is an existing kind narrowed by the rule''s `subjectTypes`, so no kind is added (a new
+        value here would be a breaking change against r1) and each is off until the venue saves an active matrix
+        for it:
+
+        - **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a
+          single publish by a holder of the permission; a review step only where the venue sets one up (batch 1,
+          CMS-014; DEC-156).
+        - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue''s waste-approval
+          policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192,
+          BO-139; DEC-192; R144).
+        - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person
+          approval when the venue switches it on (batch 6 #230, BO-153; DEC-230).
+        - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock**
+          (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a
+          second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260);
+          the tenant default matrix names the security approver role and a venue may tighten it, never remove it.
+
         '
       enum:
       - refund
@@ -4608,6 +4902,29 @@ components:
           type: integer
           nullable: true
           description: 11.1.53. An unanswered request eventually stops waiting.
+        subjectTypes:
+          type: array
+          description: '**Which subjects of the kind this rule matches** (decided 2 October 2026, Chinmay; CHG-CSP-028,
+            CHG-CSP-036, CHG-CSP-031): the `CreateApprovalRequest.subjectType` values, for example `topologyPublication`
+            or `whiteLabelPublication` under `configurationChange`. Empty matches every subject of the kind. It is how a
+            venue switches an optional review step on for one kind of act without routing every act of the kind.'
+          items:
+            type: string
+            maxLength: 64
+        signatureMethods:
+          type: array
+          description: '**The signature methods this level accepts, where `requiresSignature` is true** (design-notes
+            correction on ADM-344, Block B: "Configuring which stages need a signature is a policy write";
+            CHG-CSP-045). Values of `ApprovalSignature.method`. Empty accepts any of them. With `requiresSignature`
+            this makes the rule the signature policy: which levels of which kinds need a signature, and how it is
+            given; `signApprovalDecision` refuses a method the level does not accept.'
+          items:
+            type: string
+            enum:
+            - platformKey
+            - uaePass
+            - externalCertificate
+            - drawnSignature
         externalProviderId:
           type: string
           format: uuid
@@ -4932,6 +5249,23 @@ components:
           type: string
           format: date-time
           nullable: true
+        assignedToPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: Who claimed or was assigned the request in a shared queue (`assignApprovalRequest`; DI-723; CHG-CSP-042). Null while it sits in the queue.
+        assignedToDepartmentId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The department queue it was assigned to, where it went to a department rather than a person (CHG-CSP-042).
+        assignedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
         requestedAt:
           type: string
           format: date-time
@@ -5101,6 +5435,9 @@ components:
         `openRequestExists`), `decideApprovalRequest` (`alreadyDecided`,
         `withdrawn`, `expired`, `cancelled`) and `withdrawApprovalRequest` (`alreadyDecided`). One
         value per cause, so "someone already approved it" and "it timed out" are told apart.
+        Since 2 October 2026 also `cancelApprovalRequest` (`alreadyDecided`, `withdrawn`, `expired`,
+        `cancelled`) and `reopenApprovalRequest` (`openRequestExists`, `alreadyDecided`, `withdrawn`),
+        with the values above (CHG-CSP-043).
 
         '
       allOf:
