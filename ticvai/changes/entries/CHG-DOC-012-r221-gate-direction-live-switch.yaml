@@ -1,0 +1,33 @@
+id: CHG-DOC-012
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'Audit R221 is amended in the register: a gate''s direction can be switched live (Entry to Exit) with a specific permission,
+  and the switch is logged.'
+decision:
+  what: Live direction switch with permission, logged; R221 amended (DEC-255).
+  by: Chinmay
+  date: '2026-10-02'
+why: Chinmay, 2 October, critical set 1 (BO-230, workbook Q255), on the client's request of 2 September (DI-648). R221's default fixed
+  the direction per access point.
+keys_touched:
+  files:
+  - handoff/audit-decisions.json
+  - docs/registers/audit-decisions.md
+  other:
+  - R221
+  screens:
+  - BO-230
+  - SCN-016
+root_class: 'new: package-contradicts-decision'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: generator-rule
+  ref: tools/build-audit-decisions.py::amendments_marked
+status: open
+notes: The register shows the amendment on R221's row (superseded field rendered by the generator). The contract (setTurnstileMode,
+  AccessPoint, the new permission) and BO-230 / SCN-016 belong to their owners. Closes on its commit.

@@ -8,22 +8,21 @@ register.
 
 | State | Count |
 |---|---|
-| OPEN — client | **9** |
+| OPEN — client | **8** |
 | OPEN — Softlabs | **0** |
-| CLOSED | **160** |
+| CLOSED | **161** |
 | WITHDRAWN | **6** |
 | **Total** | **175** |
 
 **Blocking: 0.** No conflict currently prevents contract, schema or build work.
-**9 open, 160 closed.**
+**8 open, 161 closed.**
 
 
-## Open — needs a client decision — 9
+## Open — needs a client decision — 8
 
 | ID | Issue | Owner |
 |---|---|---|
 | **CF-35** | Biometric data is sensitive under PDPL — heightened protection, explicit consent, DPIA, stricter transfer rules. Affects Face Pass, facial readers and | Allam + counsel |
-| **CF-127** | Cookie consent management is fifteen requirements, a regulatory obligation, and normally bought rather than built. 2.6.51–2.6.65 ask for a consent ban | Qossai |
 | **CF-133** | The platform cannot issue a tax invoice, and in the UAE that is a VAT obligation rather than a document feature. 5.7.93 requires tax invoices, simplif | Qossai + finance |
 | **CF-140** | The delivery plan prices 7,552 person-days and its priorities contradict the dependency order the walk found. `sources/planning/TAIS_Product_Planning_ | Chinmay + Qossai |
 | **CF-162** | Three deployment scenarios were requested and the package models one. The 24 August session asks Softlabs to document (a) independent tenant deploymen | Dinesh |
@@ -32,7 +31,7 @@ register.
 | **CF-170** | Seventeen screens promise a publication their declared operations cannot perform, and five of them are a broken workflow rather than a naming defect.  | Chinmay + Dinesh |
 | **CF-171** | A third of the API surface is a provisional draft named after a screen title, and the count is exact. Measured 8 September: 577 of the package's 1,626 |  |
 
-## Closed — 160
+## Closed — 161
 
 | ID | Issue | Owner |
 |---|---|---|
@@ -157,6 +156,7 @@ register.
 | **CF-124** | Guest parking payment is out of scope — decided by Qossai on 14 August, recorded 18 August. 19.2.78 requires the app to take parking payments and `acc |  |
 | **CF-125** | Resource management is a bounded context the platform does not have, and 47 requirements need it. Domain 1.2 asks for a first-class bookable *resource |  |
 | **CF-126** | Six balance implementations, and only one could hold an authorisation — fixed 18 August. `retail.Wallet`, `retail.GiftCard`, `games.GameCard`, `promot |  |
+| **CF-127** | Cookie consent management is fifteen requirements, a regulatory obligation, and normally bought rather than built. 2.6.51–2.6.65 ask for a consent ban |  |
 | **CF-128** | The integration register was built from the Integrations sheet and never from the 3,184 functional rows, and ten named third parties are missing from  |  |
 | **CF-129** | Three capabilities the platform does not have, found by walking domain 2, and each is a module rather than a gap. (1) Digital waivers — fourteen requi |  |
 | **CF-130** | Two access decisions the client has to make, and one of them is a legal question before it is a design one. (1) Gendered admission. 3.2.45 requires au |  |

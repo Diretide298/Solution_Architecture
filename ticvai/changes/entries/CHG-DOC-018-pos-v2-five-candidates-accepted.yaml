@@ -1,0 +1,36 @@
+id: CHG-DOC-018
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'POSV2-9 to POSV2-13 are added to the POS v2 register: the five candidates left undecided on 1 October (POS-000, -003, -004,
+  -012, -023) are accepted as drawn in v2.'
+decision:
+  what: 'Accept v2 for POS-000 (all of it), POS-003 (as drawn), POS-004 (section then seat; no hold extend, no recommendation, no booking-fee
+    line), POS-012 (four order types) and POS-023 (Lockers tab, refine chips and Scan; no inventory ledger) (DEC-550 to DEC-554: DEC-550,
+    DEC-551, DEC-552, DEC-553, DEC-554).'
+  by: Chinmay
+  date: '2026-10-02'
+why: Chinmay, 2 October, batch 5 sets 1 and 2. CHG-SEED-005 left these five candidates undecided; check-candidate-decisions reports
+  them (POSV2 decision ids are what it accepts).
+keys_touched:
+  files:
+  - handoff/pos-v2-decisions.json
+  - docs/registers/pos-v2-decisions.md
+  screens:
+  - POS-000
+  - POS-003
+  - POS-004
+  - POS-012
+  - POS-023
+root_class: 'new: design-return'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-candidate-decisions.py
+status: open
+notes: check-candidate-decisions stays report-only until the screens owner records POSV2-9..13 on the five candidate blocks in screens/P04-point-of-sale.yaml
+  (decisions or applied); then the lead baselines it and makes it gate. Closes on its commit.

@@ -1,0 +1,33 @@
+id: CHG-DOC-014
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'Audit R098 is refined in the register: the 410 workshop-pack console screens move to Venue Management under a grant, console
+  screens acting on a tenant get the tenant picker and grant, and platform staff may publish a hosted tenant''s site under a grant.'
+decision:
+  what: 'The pack screens are venue screens, merged with BO-008 to BO-011 (DEC-100); the console R098 tenant picker and grant (PRE-5);
+    hosted: publish under a grant, self-hosted: generate a site package (DEC-144).'
+  by: Chinmay
+  date: '2026-10-02'
+why: Chinmay, 2 October, batch 1 (ADM-049 Q100, ADM-016 Q144) and the pre-apply round. R098 adopted the platform-staff grant on 28 September.
+keys_touched:
+  files:
+  - handoff/audit-decisions.json
+  - docs/registers/audit-decisions.md
+  other:
+  - R098
+  screens:
+  - ADM-049
+  - ADM-016
+  - ADM-412
+root_class: 'new: package-contradicts-decision'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: generator-rule
+  ref: tools/build-audit-decisions.py::amendments_marked
+status: open
+notes: Closes on its commit.

@@ -1,0 +1,34 @@
+id: CHG-DOC-016
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'Audit R205 is amended in the register: minors may be enrolled with guardian consent on the venue''s form, the minor age is
+  set per country, and the venue can switch minors off.'
+decision:
+  what: 'Minors: guardian consent on the venue''s form; minor age per country; the venue can switch minors off (DEC-237, with DEC-138
+    and DEC-283).'
+  by: Chinmay
+  date: '2026-10-02'
+why: Chinmay, 2 October, critical set 1 (BO-187, workbook Q237; CMS-029, Q283), superseding the batch 4 GST-069 default. R205 left the
+  age to counsel.
+keys_touched:
+  files:
+  - handoff/audit-decisions.json
+  - docs/registers/audit-decisions.md
+  other:
+  - R205
+  screens:
+  - BO-187
+  - GST-069
+  - CMS-029
+root_class: 'new: package-contradicts-decision'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: generator-rule
+  ref: tools/build-audit-decisions.py::amendments_marked
+status: open
+notes: Closes on its commit.

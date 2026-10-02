@@ -1,0 +1,36 @@
+id: CHG-DOC-013
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'Audit R261 and POSV2-4 are amended in the registers: payment timing is an outlet setting, Pay first or Send to kitchen first
+  then pay.'
+decision:
+  what: 'Outlet setting ''Payment timing'': Pay first, or Send to kitchen first then pay; refines R261 per outlet (DEC-064).'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October, batch 1 (POS-021, workbook Q64): ''Two configurations: one takes the bill first, the other sends first and
+  charges after''. R261 and POSV2-4 said send first, then charge, for every order.'
+keys_touched:
+  files:
+  - handoff/audit-decisions.json
+  - handoff/pos-v2-decisions.json
+  - docs/registers/audit-decisions.md
+  - docs/registers/pos-v2-decisions.md
+  other:
+  - R261
+  - POSV2-4
+  screens:
+  - POS-021
+  - BO-044
+root_class: 'new: package-contradicts-decision'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: generator-rule
+  ref: tools/build-audit-decisions.py::amendments_marked
+status: open
+notes: The outlet field, createFnbOrder / fireCourse behaviour and F108's pay-first branch belong to the contracts, screens and flows
+  owners. Closes on its commit.
