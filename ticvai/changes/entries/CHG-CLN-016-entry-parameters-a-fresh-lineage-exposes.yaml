@@ -1,0 +1,42 @@
+id: CHG-CLN-016
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: Six screens declare the entry parameter their operations' paths need, which check-screens reports once the lineage
+  is derived afresh; CMS-011 loses a duplicate entryState key and CMS-006 its stale edge to the console.
+decision:
+  what: 'GST-011 takes cardCode (deep link, as WEB-021), POS-012 dropId (picked on the screen, optional), POS-019 venueId (the
+    till session), EMP-055 outletId (navigation), CMS-006 productId and CMS-011 jobId (picked or started on the screen, optional).
+    CMS-011 declared entryState twice (the second, empty, silently replaced the first); the empty one goes. CMS-006 drops its
+    flow-derived transition to ADM-016, which F102 no longer walks (CHG-WIR-015).'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'check-screens (entry parameters, audit R251) reads operation paths from the lineage; the derive of this branch (CHG-CLN-001)
+  added the operations the committed lineage lacked, and check-screens then failed on these six (two from CHG-CLN-006, four
+  already on main at e80beb7b and hidden by the stale lineage). The r2 refresh would have failed the same way.'
+keys_touched:
+  screens:
+  - GST-011
+  - POS-012
+  - POS-019
+  - EMP-055
+  - CMS-006
+  - CMS-011
+root_class: A29 JOURNEY-CONTRACT
+tickets:
+  started: []
+  unstarted:
+  - APP-MOB-GST-011
+  - APP-POS-POS-012
+  - APP-POS-POS-019
+  - APP-WL-CMS-006
+  - APP-WL-CMS-011
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screens.py
+status: open
+notes: check-screens failed with 6 errors on the derived state before this and passes after (run with the local derive in place,
+  not committed). POS-012's lookup also binds ShopAndDrop.dropReference so the binding ratchet does not rise.

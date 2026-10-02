@@ -11703,6 +11703,9 @@ screens:
       from: session
     - name: reservationId
       from: navigation
+    - name: outletId
+      from: navigation
+      notes: The outlet the reservation is for, picked on the way in (CHG-CLN-016).
     coldEntry: '**Resolves from the session and the shift.** A handheld is signed into at the start of
       a shift, not navigated to.'
   wireframe:

@@ -999,11 +999,6 @@ screens:
       trigger: Typography
       provenance: derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and
         CMS-006 holds bannerId, pageId, policyKind, version, so an edge into it carries them
-    - to: ADM-016
-      trigger: White-Label Branding Management
-      provenance: flow F102 step 3→4
-      crossesDevice: true
-      back: false
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
     sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **36
@@ -1111,6 +1106,11 @@ screens:
     purpose: A product's PDF ticket and Apple and Google Wallet pass proofs with the draft theme (CHG-CSP-038)
     trigger: onAction
   entryState:
+    params:
+    - name: productId
+      from: CMS-006
+      optional: true
+      notes: The product picked on this screen to preview its tickets (previewProductTickets; CHG-CLN-016).
     coldEntry: '**A version link is expected to point at something superseded — that is what versions
       are for.** The screen opens the requested version read-only, says it is not current, and links to
       the one that is. **An old version is history, not an error.** Arrives with `bannerId`, `pageId`,
@@ -2760,6 +2760,12 @@ screens:
     emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `setLanguages` requires, and
       names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
+  entryState:
+    params:
+    - name: jobId
+      from: CMS-011
+      optional: true
+      notes: The translation job this screen started; its proposals are read back by it (CHG-CLN-016).
   apis:
   - operationId: setLanguages
     contract: white-label
@@ -2781,7 +2787,6 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
-  entryState: {}
   gaps:
   - operation: proposeTranslations
     removed: true

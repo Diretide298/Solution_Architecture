@@ -5620,6 +5620,7 @@ screens:
         notes: By the guest's ticket (scanned), the drop reference or the receipt number, whichever the
           guest still has (4.4.7, R236; CHG-CLN-006).
         provenance: contract retail.yaml GET /shop-and-drop/lookup
+        bindsTo: ShopAndDrop.dropReference
       - kind: textField
         label: Venue id
         operation: listOrders
@@ -5785,6 +5786,11 @@ screens:
       from: deepLink
     - name: outletId
       from: deepLink
+    - name: dropId
+      from: POS-012
+      optional: true
+      notes: The drop picked from the lookup on this screen (lookupShopAndDrop); collectShopAndDrop hands
+        that one over (CHG-CLN-006).
     coldEntry: '**Resolves from the session, which carries the workstation** — a till is signed into,
       not navigated to. The deposit box allocated to this till for the shift.'
     preloaded:
@@ -7170,6 +7176,9 @@ screens:
     params:
     - name: workstationId
       from: session
+    - name: venueId
+      from: session
+      notes: The till session carries its venue; the till shift policy is set per venue (CHG-CLN-016).
     coldEntry: '**Resolves from the session, which carries the workstation** — a till is signed into,
       not navigated to.'
     preloaded:
