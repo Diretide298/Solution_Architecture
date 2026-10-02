@@ -79,6 +79,14 @@ the tenant configures and the references. Draw the screen to its block and tick 
 acceptance checklist. On a guest screen apply apps/1-guest-app/WHITE-LABEL.md: the default
 theme, and the alternate tenant theme on the key screens.
 
+A block also says what was decided and what is still wrong. "Decided on this screen" lists
+each answered question (question, decision, who, when): draw the decision, not the old
+default; a "Reviewable" one is drawn as decided and only flagged in the review. "Known
+correction pending" is what the package still gets wrong: draw the corrected version.
+"Fixed on main" needs nothing from you; "Contract gap logged" means draw the corrected
+version and mark what waits on the contract. The guest surfaces have no dark or light mode,
+and "Powered by TICVAI" is a tenant toggle that is on by default.
+
 WHERE YOU MUST BE CREATIVE, AND WHERE YOU MUST NOT
 
 1,292 of the 7,679 component labels in this package are scaffolding a generator wrote
