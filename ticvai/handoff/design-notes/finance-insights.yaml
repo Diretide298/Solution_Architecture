@@ -428,9 +428,13 @@ screens:
       why: There is no invoice list, no request-invoice form and no download in the layout; the design must add
         them.
       source: screens/P02-guest-mobile-app.yaml#GST-019
+      status: fixed
+      by: CHG-SGU-017
     - what: The purpose still says "order history (wallet)".
       why: The screen was renamed on 31 August; the purpose was not updated.
       source: screens/P02-guest-mobile-app.yaml#GST-019
+      status: fixed
+      by: CHG-SGU-017
     decisions:
     - question: Which fields must a UAE tax invoice and a VAT receipt show, and may a receipt be replaced by a full invoice?
       decision: UAE tax invoice / VAT receipt fields from the law (researched).

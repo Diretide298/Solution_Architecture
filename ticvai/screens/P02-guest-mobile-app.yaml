@@ -19,7 +19,6 @@ platform:
       so with the same banner.
   themes:
   - light
-  - dark
   directions:
   - ltr
   - rtl
@@ -511,13 +510,18 @@ screens:
     type tiles and one or two highlights per type; tapping a highlight opens Item Detail (GST-004). GST-005
     What''s On and GST-029 Venue Info & Services stay and are linked from here. The optional intro video
     is a first-launch state of this screen, not a screen. The Plan tab (GST-051) is in Block A (29 September
-    re-plan, superseding audit R187 and rev 3 GAP-C3), so its links no longer carry a later-release precondition.'
+    re-plan, superseding audit R187 and rev 3 GAP-C3), so its links no longer carry a later-release precondition.
+
+
+    **The client-approved app wireframe is the layout** (decided by Chinmay, 2 October 2026; DEC-163);
+    it changes only where the spec breaks. The card count per section is the venue''s choice (DEC-152)
+    (CHG-SGU-005).'
   density: comfortable
   pattern: listDetail
   patternReason: '`listMyEntitlements` reads the population and `getTenantAppStatus` reads one of them
     — list, select, act'
-  purpose: 'The Home tab: what this venue is, when it is open and what there is to do, with one or two
-    highlights per type, from which everything else is entered.'
+  purpose: 'The Home tab: what this venue is, when it is open and what there is to do, with the highlights
+    per type the venue chose, from which everything else is entered.'
   layout:
     template: split
     regions:
@@ -603,9 +607,9 @@ screens:
       - kind: cardList
         label: Highlights per type
         operation: listProducts
-        notes: One or two items per type (`HomepageLayout.sections[].maxItems`, 1-2, set on CMS-007);
-          a highlight opens Item Detail.
-        provenance: decided 29 September 2026, MOB-3
+        notes: The number of items per type the venue chose (`HomepageLayout.sections[].maxItems`, set
+          on CMS-007; DEC-152); a highlight opens Item Detail.
+        provenance: corrected 2 October 2026 (CHG-SGU-009, decided by Chinmay 2 October 2026, DEC-152, DEC-153)
     - name: contextPanel
       slot: selection
       components:
@@ -1897,7 +1901,9 @@ screens:
         - BookingFlow.steps
         operation: getPublishedBookingFlow
         notes: The steps of the published flow in their `sortOrder`, this one (date and time) highlighted.
-          A step the flow has turned off is not shown and is skipped by Continue and Back.
+          A step the flow has turned off is not shown and is skipped by Continue and Back. Drawn in the
+          venue's `BookingFlowSettings.stepIndicator` style; `embedMode` and `singleEventPage` come from
+          the same published settings (CMS-016) (CHG-SGU-022).
         provenance: decided 29 September 2026, W12; CMS-103 Booking Flows
       - kind: datePicker
         label: Next 7 days
@@ -2186,7 +2192,9 @@ screens:
         - BookingFlow.steps
         operation: getPublishedBookingFlow
         notes: The steps of the published flow in their `sortOrder`, this one (tickets) highlighted. A
-          step the flow has turned off is not shown and is skipped by Continue and Back.
+          step the flow has turned off is not shown and is skipped by Continue and Back. Drawn in the
+          venue's `BookingFlowSettings.stepIndicator` style; `embedMode` and `singleEventPage` come from
+          the same published settings (CMS-016) (CHG-SGU-022).
         provenance: decided 29 September 2026, W12; CMS-103 Booking Flows
       - kind: secondaryButton
         label: Show everything
@@ -2423,7 +2431,9 @@ screens:
         - BookingFlow.steps
         operation: getPublishedBookingFlow
         notes: The steps of the published flow in their `sortOrder`, this one (review and payment) highlighted.
-          A step the flow has turned off is not shown and is skipped by Continue and Back.
+          A step the flow has turned off is not shown and is skipped by Continue and Back. Drawn in the
+          venue's `BookingFlowSettings.stepIndicator` style; `embedMode` and `singleEventPage` come from
+          the same published settings (CMS-016) (CHG-SGU-022).
         provenance: decided 29 September 2026, W12; CMS-103 Booking Flows
       - kind: consentBlock
         label: Terms and conditions
@@ -4318,7 +4328,8 @@ screens:
   density: comfortable
   pattern: listDetail
   patternReason: '`listOrders` reads the population and `getOrder` reads one of them — list, select, act'
-  purpose: Find order history (wallet) for this venue.
+  purpose: My orders at this venue, with their tax documents; transfer tickets or ask for a refund from
+    here.
   layout:
     template: split
     regions:
@@ -4339,6 +4350,27 @@ screens:
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
         notes: Was the generated table 'Every order'; staff and plumbing columns removed (decided by Chinmay,
           fix before Block A starts, 2 October 2026 (GFIX-3)).
+      - kind: cardList
+        label: Tax invoices
+        operation: listTaxInvoices
+        notes: The VAT receipt (simplified tax invoice) and any full tax invoice for the order, with its
+          number.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction finance-insights GST-019)
+      - kind: cardList
+        label: Tax credit notes
+        operation: listCreditMemos
+        notes: Any tax credit note issued after a refund (DEC-086).
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction finance-insights GST-019)
+      - kind: detailPanel
+        label: The tax invoice
+        bindsTo: FinTaxInvoice
+        operation: getTaxInvoice
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction finance-insights GST-019)
+      - kind: secondaryButton
+        label: Download or email the PDF
+        operation: getTaxDocumentRendition
+        notes: Opens or sends the PDF in the template's languages.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction finance-insights GST-019)
     - name: contextPanel
       slot: selection
       components:
@@ -4362,6 +4394,15 @@ screens:
         operation: getOrder
         provenance: contract orders.yaml GET /orders/{orderId}
         notes: 'The selected order: lines, totals, payments and status.'
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: secondaryButton
+        label: Get a tax invoice
+        operation: issueTaxInvoice
+        notes: Issues a full invoice and shows its number; if the order is already on an invoice, says
+          so and shows it rather than an error.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction finance-insights GST-019)
   states:
     loading: The order history list.
     error: Could not load. Names which read failed and leaves the order history untouched.
@@ -4461,6 +4502,18 @@ screens:
     removed: true
     why: Transfer is GST-014's; order history views and downloads.
     source: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
+  overlays:
+  - id: formIssueTaxInvoice
+    component: modal
+    trigger: Get a tax invoice
+    body: The company name and TRN to put on the invoice, and where to email it; the order is the one
+      selected and the invoice type is full.
+    confirm:
+      label: Get a tax invoice
+      operation: issueTaxInvoice
+    dismiss:
+      label: Cancel
+    provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction finance-insights GST-019)
 - id: GST-020
   name: Saved Items / Wishlist
   module: Account & Self-Service
@@ -8837,11 +8890,10 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: comfortable
-  pattern: listDetail
+  pattern: configEditor
   patternReason: '**the screen''s operations choose no pattern** — no list, no get, no write that groups.
     It falls to the default, and the fallback is recorded rather than passed off as a decision'
-  purpose: Arabic / RTL Experience — the screen a person opens when they need to deal with arabic / rtl
-    experience.
+  purpose: Choose the app's language; Arabic turns the whole app right to left.
   gaps:
   - operation: null
     why: '**This screen declares no operation the contracts recognise.** Nothing fills it, nothing it
@@ -8849,7 +8901,17 @@ screens:
     source: the screen's own declarations
   layout:
     template: split
-    regions: []
+    regions:
+    - name: contentBody
+      slot: form
+      components:
+      - kind: selectField
+        label: Language
+        bindsTo: PublishedTenantConfig.languages
+        operation: getPublishedTenantConfig
+        notes: The languages the venue published; the choice is stored on the device and, for a signed-in
+          guest, as the profile's language (GST-039). Arabic mirrors every layout (CF-42).
+        provenance: corrected 2 October 2026 (CHG-SGU-022, design-notes correction)
   states:
     loading: The arabic rtl experience list.
     error: Could not load. Names which read failed and leaves the arabic rtl experience untouched.
@@ -8858,7 +8920,11 @@ screens:
     offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
-  apis: []
+  apis:
+  - operationId: getPublishedTenantConfig
+    contract: white-label
+    purpose: The published languages
+    trigger: onLoad
   wireframe:
     status: notStarted
     provenance: client-verified
@@ -9279,6 +9345,13 @@ screens:
     - name: contentBody
       slot: record
       components:
+      - kind: banner
+        label: Closed for maintenance
+        bindsTo: PublishedTenantConfig.maintenanceMessage
+        operation: getPublishedTenantConfig
+        notes: 'The main case: `isInMaintenance` with its message and the expected-back time ("Back at
+          14:00"), set live on CMS-001 (DI-215).'
+        provenance: corrected 2 October 2026 (CHG-SGU-022, design-notes correction)
       - kind: detailPanel
         label: The tenant app status
         bindsTo: TenantAppStatus
@@ -9333,10 +9406,16 @@ screens:
       October 2026 (GFIX-2)): the screen reads only what the tenant has published, which is public, so
       there is no no-access case. A host that belongs to no tenant shows the platform''s neutral holding
       page.'
+    maintenance: The venue's maintenance message and when it expects to be back; one way onward (try again
+      at that time). Set live on CMS-001, never published.
   apis:
   - operationId: getTenantAppStatus
     contract: white-label
     purpose: from page inventory
+    trigger: onLoad
+  - operationId: getPublishedTenantConfig
+    contract: white-label
+    purpose: Maintenance, message and expected-back time, readable without signing in
     trigger: onLoad
   wireframe:
     status: notStarted

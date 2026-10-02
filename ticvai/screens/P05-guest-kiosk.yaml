@@ -346,15 +346,19 @@ screens:
       provenance: 'derived — KSK-015 declares entryState.params conversationId, messageId and KSK-004
         holds none of them. The edge carries nothing: conversationId only pre-selects (deep link or optional);
         KSK-015 finds messageId (sendAiMessage) itself, and KSK-015 opens on its own'
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written.
+  notes: "Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.\n\n**Tickets first, then date and time (decided by Chinmay, 2 October 2026; DEC-170).**
+    The kiosk differs from the web and the app, which pick the date and time first (REV3-2); REV3-2 is
+    superseded for the kiosk only. The order is KSK-003, KSK-004 (tickets), KSK-005 (session), as F07
+    already walks it (CHG-SGU-015)."
   density: touchLarge
   boardFrames:
   - Kiosk Board 1.dc.html#KSK-004
   pattern: listDetail
   patternReason: '`listProductVariants` reads the population and `getAvailability` reads one of them —
     list, select, act'
-  purpose: Quantities, with targets a gloved hand can hit.
+  purpose: 'Choose the tickets first, then the date and time: quantities, with targets a gloved hand can
+    hit.'
   gaps:
   - operation: getAvailability
     why: '**`getAvailability` declares its response inline**, so the component that shows it names fields
@@ -373,7 +377,7 @@ screens:
         - ProductVariant.name
         - ProductVariant.description
         operation: listProductVariants
-        provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
+        provenance: corrected 2 October 2026 (CHG-SGU-015, decided by Chinmay 2 October 2026, DEC-170)
         notes: Large counters per ticket type; inactive variants never shown. Was the generated table
           'Every product variant'; staff and plumbing columns removed (decided by Chinmay, fix before
           Block A starts, 2 October 2026 (GFIX-3)).

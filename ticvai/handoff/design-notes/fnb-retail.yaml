@@ -476,31 +476,43 @@ screens:
       why: Nothing a guest reads may be a field name or an operation. The flow is location, menu, basket, pay, with the
         booking and waitlist forms holding only the inputs above.
       source: screens/P01-guest-web-storefront.yaml#WEB-036 | R251 | R254
+      status: fixed
+      by: CHG-SGU-018
     - what: claimTableSession is declared, as a button and a modal.
       why: claimLocationSession superseded it on 26 September, and a TableSession id has nowhere to go on a guest order.
         Remove it here and on GST-024, WEB-038 and GST-025.
       source: contracts/satellite/fnb.yaml#claimTableSession
+      status: fixed
+      by: CHG-SGU-018
     - what: listModifierGroups is declared to draw the modifier panel.
       why: It is the venue-wide staff list (PRODUCT_VIEW, every group, with scopePath). getGuestMenu already returns each
         dish's modifierGroups, which is all the panel needs. Drop it from WEB-036, GST-024, WEB-037 and GST-061.
       source: contracts/satellite/fnb.yaml#/components/schemas/GuestMenu | REV3-9
+      status: fixed
+      by: CHG-SGU-018
     - what: The rev 3 prototype's "At the venue → Order food" sends the order with "Send to the kitchen" and no payment
         step.
       why: The contract says payment is required before the kitchen sees a guest order, unless the outlet runs a tab, and
         F11 puts a pay step (step 4) before the kitchen (step 5). "Send to kitchen" is also staff vocabulary. The design
         shows the pay step; the prototype is wrong here.
       source: contracts/satellite/fnb.yaml#createGuestFnbOrder | F11 step 4
+      status: fixed
+      by: CHG-SGU-018
     - what: The table booking has no field for a seating-area preference or an occasion, though the client's dining flow
         asks for both and the rev 3 web prototype's "Book a table" has a seating choice.
       why: TableReservation carries only notes. The waitlist has seatingPreference; the reservation does not. Add the same
         seatingPreference (and an optional occasion) to TableReservation, or agree with the client that both go in the note.
       source: DI-688 | contracts/satellite/fnb.yaml#/components/schemas/TableReservation
+      status: fixed
+      by: CHG-SGU-018
     - what: WEB-036 can book a table but cannot change or cancel one (no updateTableReservation), while GST-070 can. And
         no guest-callable read of one's own table bookings or waitlist place exists (listTableReservations is staff-only),
         so neither surface can show "my booking" to change.
       why: This breaks web and app parity, and "cancelling is free" is a promise the web cannot keep. Add updateTableReservation
         here, plus a guest read of the guest's own reservations and waitlist entries.
       source: DI-970 | DI-1084 | contracts/satellite/fnb.yaml#updateTableReservation | contracts/satellite/fnb.yaml#listTableReservations
+      status: logged
+      by: CHG-SGU-024
     decisions:
     - question: Takeaway and delivery to an address (DG-5, DI-1039, 29 September) let someone buy food without an admission
         ticket, which DI-292 (14 August) put out of scope. Which stands?
@@ -508,7 +520,7 @@ screens:
         outlets need admission for guest ordering; a standalone restaurant sells takeaway/delivery without a ticket.'
       decidedBy: Chinmay
       date: '2026-10-02'
-      source: DEC-070 | CHG-NOTE-004
+      source: DEC-070 | CHG-NOTE-004 | CHG-SGU-001
       questionSource: DI-292 | DI-1039
     - question: Does a guest F&B order go through the one shared cart and checkout (one receipt, DI-293), or does it keep
         its own pay step after createGuestFnbOrder (F11 step 4 on GST-009)?
@@ -516,7 +528,7 @@ screens:
         F&B.
       decidedBy: Chinmay
       date: '2026-10-02'
-      source: DEC-071 | CHG-NOTE-004
+      source: DEC-071 | CHG-NOTE-004 | CHG-SGU-001
       questionSource: DI-293 | F11 step 4 | contracts/satellite/fnb.yaml#createGuestFnbOrder
     - question: When is room charge (paymentMethod roomCharge) offered to a guest, if ever?
       decision: 'Not answered: the workbook cell repeats the sibling WEB-036 answer. Room charge is not shown to guests (drawn
@@ -622,6 +634,8 @@ screens:
         dish.
       why: The page is a dish page; it needs the menuItemId (resolved inside the outlet's getGuestMenu) as an entry parameter.
       source: screens/P01-guest-web-storefront.yaml#WEB-037
+      status: fixed
+      by: CHG-SGU-018
     - what: The guest menu carries a dish's allergens as one flat list. The package's own Allergen model separates "contains"
         from "may contain" and carries vegetarian, vegan and halal flags, and the rev 3 prototype dish dialog shows a diet
         claim and kcal.
@@ -630,10 +644,14 @@ screens:
         flags), and nutrition if the client wants kcal. Until then, draw "Contains" from the current list, and draw "May
         contain" and the diet badges as pending.'
       source: contracts/satellite/fnb.yaml#/components/schemas/Allergen | contracts/satellite/fnb.yaml#/components/schemas/GuestMenu
+      status: logged
+      by: CHG-SGU-024
     - what: listModifierGroups drives the screen (a "Every modifier group" table with scopePath, the pattern "list, select,
         act"), and the empty state for no access says "Sign in to see this".
       why: The dish's groups come inside getGuestMenu, and a menu is public; browsing a dish needs no sign-in.
       source: contracts/satellite/fnb.yaml#/components/schemas/GuestMenu | screens/P01-guest-web-storefront.yaml#WEB-037
+      status: fixed
+      by: CHG-SGU-018
   WEB-038:
     summary: 'Order tracking on the web: the guest watches the order the kitchen is actually making, and at a table sees
       the one bill for the sitting. Order to ready is the kitchen''s time; ready to collected is the counter''s. The one
@@ -723,16 +741,22 @@ screens:
     - what: '"Claim table session" is the primary action of a tracking screen, on WEB-038 and GST-025.'
       why: Tracking claims nothing, and claimTableSession was superseded on 26 September. Remove it.
       source: contracts/satellite/fnb.yaml#claimTableSession | R254
+      status: fixed
+      by: CHG-SGU-018
     - what: The table bill (getGuestBill) is read through a TableSession id (/table-sessions/{sessionId}/bill), but guests
         now claim with claimLocationSession and hold a LocationSession with a visitId.
       why: A guest who scanned a table code under the current flow has no TableSession id to read the bill with. The bill
         should be readable by the location session or the visit.
       source: contracts/satellite/fnb.yaml#getGuestBill | contracts/satellite/fnb.yaml#/components/schemas/LocationSession
+      status: logged
+      by: CHG-SGU-024
     - what: The purpose says "settle the bill", but no payment operation is declared, and orders put on a table tab need
         a way to be paid.
       why: Either declare the payment of the visit's bill (card or wallet) or drop "settle the bill" and say "Pay at the
         table". The rev 3 prototype has no bill view at all.
       source: screens/P01-guest-web-storefront.yaml#WEB-038 | contracts/satellite/fnb.yaml#/components/schemas/CreateGuestOrderRequest
+      status: fixed
+      by: CHG-SGU-018
     decisions:
     - question: Can a guest pay the table's bill from the web or app, or is the bill view read-only?
       decision: 'Drawn default accepted: Read-only bill with "Ask your server to pay"; no pay button.'
@@ -862,11 +886,15 @@ screens:
       why: A guest caller never receives the stock fields (GuestMerchandiseItem). Shops and categories are chosen by name.
       source: screens/P01-guest-web-storefront.yaml#WEB-042 | contracts/satellite/retail.yaml#/components/schemas/GuestMerchandiseItem
         | R254
+      status: fixed
+      by: CHG-SGU-018
     - what: '"Check out" and "Pay" (checkoutCart, createPayment) are buttons on the shop page, and the rev 3 prototype pays
         in one tap on the page.'
       why: One cart and one checkout across tickets, F&B and retail. The shop hands off to the shared cart and checkout
         (WEB-010, WEB-012) rather than paying here.
       source: DI-293 | R236 | screens/P01-guest-web-storefront.yaml#WEB-042
+      status: fixed
+      by: CHG-SGU-018
     - what: Nothing in the contract marks a cart line "for collection" or carries the chosen collection point. OrderLineAttributes
         defines only transport, and createShopAndDrop requires a collectionPointId. No operation lists the collection points
         or their hours, and home delivery (DI-359, the prototype's "Deliver to my home") has no shape on a retail cart line.
@@ -874,19 +902,27 @@ screens:
         attribute (collection point or home delivery) and a guest read of collection points are needed.
       source: contracts/spine/orders.yaml#/components/schemas/OrderLineAttributes | contracts/satellite/retail.yaml#createShopAndDrop
         | DI-359 | F17 step 1
+      status: logged
+      by: CHG-SGU-024
     - what: An item that cannot be dropped (chilled, fragile, oversized) is refused only when payment creates the drop,
         after the money is taken.
       why: The refusal belongs before payment. Item data should say whether it can be dropped, so the card and the cart
         can say so.
       source: contracts/satellite/retail.yaml#createShopAndDrop
+      status: logged
+      by: CHG-SGU-024
     - what: lookupMerchandise (price check by barcode or SKU) is declared on the guest web shop.
       why: A guest browsing at home has no barcode, and listMerchandise already gives price and availability. Keep it only
         if "scan an item in the shop" is a wanted web feature (see open questions).
       source: contracts/satellite/retail.yaml#lookupMerchandise | R215
+      status: fixed
+      by: CHG-SGU-018
     - what: GST-026 still offers "Hold to pay at the shop" (reserveMerchandise); WEB-042 removed it under R236.
       why: Web and app differ in what a guest can do, with nothing recording it as deliberate. Either both offer an unpaid
         hold (until the end of the visit day, R169) or neither does.
       source: DI-970 | R236 | R169 | screens/P02-guest-mobile-app.yaml#GST-026
+      status: fixed
+      by: CHG-SGU-018
     decisions:
     - question: Where can shop-and-drop be collected and what hours do the points keep? Who sets the list?
       decision: 'Drawn default accepted: Draw the two points from the prototype (gate desk, car park kiosk) with their hours,
@@ -994,6 +1030,8 @@ screens:
         "Claim location session", "Create guest F&B order" and "Claim table session".'
       why: The guest reads none of these.
       source: screens/P02-guest-mobile-app.yaml#GST-024 | R254
+      status: fixed
+      by: CHG-SGU-018
     - what: The states name a permission ("Shown when the caller lacks PRODUCT_VIEW") and the empty state offers "Create
         guest F&B order".
       why: 'For a guest caller, permission does not apply (ADR-0025): an operation with a staff and guest audience resolves
@@ -1005,13 +1043,15 @@ screens:
       why: claimTableSession was superseded by claimLocationSession on 26 September. Modifier groups come with each dish
         in getGuestMenu. Same correction as WEB-036.
       source: contracts/satellite/fnb.yaml#claimTableSession | contracts/satellite/fnb.yaml#/components/schemas/GuestMenu
+      status: fixed
+      by: CHG-SGU-018
     decisions:
     - question: Takeaway or delivery to an address versus "no F&B without admission"; one cart versus the F&B order's own
         payment.
       decision: A guest F&B order keeps its own payment step and its own receipt (DI-293's one receipt does not apply to F&B).
       decidedBy: Chinmay
       date: '2026-10-02'
-      source: DEC-052 | CHG-NOTE-004
+      source: DEC-052 | CHG-NOTE-004 | CHG-SGU-001
       questionSource: DI-292 | DI-1039 | DI-293 | F11 step 4
   GST-025:
     summary: 'App order tracking, functionally identical to WEB-038: the kitchen''s real status, a pickup card when it is
@@ -1048,10 +1088,14 @@ screens:
       why: They describe a ticket picker, not order tracking (the prototype verification notes it too). They should be loading
         the order, the order not found or refunded (cold link), and the offline last status with its age.
       source: screens/P02-guest-mobile-app.yaml#GST-025
+      status: fixed
+      by: CHG-SGU-018
     - what: The tracking screen has "Claim table session"; the bill is read by a TableSession id; "settle" has no payment
         operation.
       why: Same corrections as WEB-038.
       source: contracts/satellite/fnb.yaml#claimTableSession | contracts/satellite/fnb.yaml#getGuestBill
+      status: logged
+      by: CHG-SGU-024
   GST-026:
     summary: 'The app''s merchandise shop: browse, add to the one cart, pay at checkout, and collect on the way out or have
       it delivered home (R236), functionally identical to WEB-042''s buying half. Collection status lives on GST-062. The
@@ -1104,20 +1148,30 @@ screens:
     - what: The screen requires the games module (requiresModule games).
       why: It is the retail shop. It should require retail, as WEB-042 does.
       source: screens/P02-guest-mobile-app.yaml#GST-026 | screens/P01-guest-web-storefront.yaml#WEB-042
+      status: fixed
+      by: CHG-SGU-018
     - what: getGameCard (an arcade card's balance) is declared, with a "The game card" panel. It arrived through flow F18's
         balance check.
       why: A game card has nothing to do with buying merchandise. Remove it here; it belongs on the games screen.
       source: screens/P02-guest-mobile-app.yaml#GST-026 | R254
+      status: fixed
+      by: CHG-SGU-018
     - what: 'Plumbing on screen: "Outlet id" and "Category id" text boxes, a stock table (onHand, inventoryItemId, variantId,
         barcode) and modals collecting variantId and seatIds. The empty state for no access names PRODUCT_VIEW.'
       why: A guest receives GuestMerchandiseItem and holds no permission to name (ADR-0025).
       source: screens/P02-guest-mobile-app.yaml#GST-026 | ADR-0025
+      status: fixed
+      by: CHG-SGU-018
     - what: Flow F17 step 4 ("Guest tracks it in the app") points at GST-026 with listMerchandise.
       why: Tracking a drop is lookupShopAndDrop on GST-062. The step should point there.
       source: F17 step 4 | contracts/satellite/retail.yaml#lookupShopAndDrop
+      status: logged
+      by: CHG-SGU-025
     - what: The app keeps the unpaid "Hold to pay at the shop" that the web dropped.
       why: Parity break; see WEB-042.
       source: DI-970 | R236
+      status: fixed
+      by: CHG-SGU-018
   GST-029:
     summary: 'Venue info and services in the app: how to reach the venue, plus, from the F&B side, what is open to eat right
       now and where food can be delivered. The one thing to get right: contact details show for every venue, even with no
@@ -1168,10 +1222,14 @@ screens:
       why: Contact and venue information must show for every venue (WEB-028 requires only core). Only the dining sections
         depend on F&B.
       source: screens/P02-guest-mobile-app.yaml#GST-029 | screens/P01-guest-web-storefront.yaml#WEB-028
+      status: fixed
+      by: CHG-SGU-018
     - what: '"Ordering method" is a free text box bound to a query parameter. The data tables show outlet and delivery location
         ids, venueId, tableId, seatId and servingOutletIds.'
       why: The guest reads none of these; draw chips and cards as above.
       source: screens/P02-guest-mobile-app.yaml#GST-029 | R254
+      status: fixed
+      by: CHG-SGU-018
   GST-061:
     summary: 'The app''s dish page and modifier panel: decide on a dish, choose options, check allergens. It must be functionally
       identical to WEB-037. The one thing to get right: allergens are complete and update as options are chosen; required
@@ -1211,13 +1269,19 @@ screens:
         scopePath. The empty state for no access names PRODUCT_VIEW.
       why: Same as WEB-037. A guest holds no permission to name (ADR-0025), and the dish's groups come inside getGuestMenu.
       source: screens/P02-guest-mobile-app.yaml#GST-061 | ADR-0025
+      status: fixed
+      by: CHG-SGU-018
     - what: The navigation leads from the dish page to GST-062 (Shop & Drop Collection).
       why: That edge was derived from parameters and has no meaning in the journey. Exits are back to the menu (GST-024)
         and the basket.
       source: screens/P02-guest-mobile-app.yaml#GST-061 | R251
+      status: fixed
+      by: CHG-SGU-018
     - what: The guest menu's allergens lack "may contain" and the dietary flags.
       why: Same correction as WEB-037.
       source: contracts/satellite/fnb.yaml#/components/schemas/Allergen
+      status: logged
+      by: CHG-SGU-024
   GST-062:
     summary: '"What am I collecting, where and by when." Every shop-and-drop waiting for the guest on one screen, claimed
       by the ticket they are already carrying rather than a paper slip. The one thing to get right: nothing to type for
@@ -1288,6 +1352,8 @@ screens:
       why: lookupShopAndDrop is a read, a GET with query identifiers, so it has no body by design. The screen is a status
         list, as drawn above.
       source: screens/P02-guest-mobile-app.yaml#GST-062 | contracts/satellite/retail.yaml#lookupShopAndDrop
+      status: fixed
+      by: CHG-SGU-018
     - what: The empty state for no access names ORDER_VIEW.
       why: A guest holds no permission to name; for a guest the lookup resolves to the guest's own drops.
       source: ADR-0025 | screens/P02-guest-mobile-app.yaml#GST-062
@@ -1296,9 +1362,13 @@ screens:
     - what: The navigation leads to GST-061 (Menu Item Detail).
       why: That edge was derived from parameters and has no meaning here.
       source: screens/P02-guest-mobile-app.yaml#GST-062 | R251
+      status: fixed
+      by: CHG-SGU-018
     - what: GST-062 is wave 3 while WEB-042, which does the same lookup, is wave 2.
       why: Align the pair to one wave.
       source: screens/P01-guest-web-storefront.yaml#WEB-042
+      status: fixed
+      by: CHG-SGU-018
   GST-070:
     summary: 'Book a restaurant table, change or cancel it, or join and leave a restaurant''s waitlist, in the app. Restaurant
       tables only: cabanas, loungers and non-dining tables are picked on the venue map (GST-074). No card is needed unless
@@ -1400,24 +1470,36 @@ screens:
       why: They were attached by name. A performance waitlist belongs to the event booking screens; on a table booking screen
         it gives the guest two "Join waitlist" buttons that mean different things.
       source: contracts/spine/catalogue.yaml#joinWaitlist | R254 | screens/P02-guest-mobile-app.yaml#GST-070
+      status: fixed
+      by: CHG-SGU-018
     - what: The screen requires only core, while WEB-036 and GST-024 require fnb. The route and component still say "reserve-table-cabana".
       why: It is the F&B table booking (tables only since R073(c), cabanas moved to GST-074 under GAP-C2).
       source: screens/P02-guest-mobile-app.yaml#GST-070
+      status: fixed
+      by: CHG-SGU-018
     - what: The wireframe differences note says the screen "has no deposit (R077a)".
       why: 'Stale: REV3-8b superseded R077(a) on 29 September, and the deposit is a venue option.'
       source: screens/P02-guest-mobile-app.yaml#GST-070 | REV3-8b
+      status: fixed
+      by: CHG-SGU-018
     - what: The booking and change forms collect id, status, tables, groupId, actualPartySize and tableVisitId; the waitlist
         form collects id, status, recordedAt, notifiedAt, syncedAt and holdExpiresAt.
       why: These are server-set or staff fields; the guest enters only the inputs above.
       source: screens/P02-guest-mobile-app.yaml#GST-070 | R254
+      status: fixed
+      by: CHG-SGU-018
     - what: No guest-callable read of one's own table bookings or waitlist place exists (listTableReservations is staff-only),
         yet the screen opens from reservationId and entryId links to change, cancel or leave.
       why: Without a read, the screen cannot show the booking it is changing, or the waitlist position and "your table is
         ready".
       source: contracts/satellite/fnb.yaml#listTableReservations | screens/P02-guest-mobile-app.yaml#GST-070
+      status: logged
+      by: CHG-SGU-024
     - what: TableReservation has no seating preference or occasion, which the client asked for and the prototype shows.
       why: See WEB-036.
       source: DI-688 | contracts/satellite/fnb.yaml#/components/schemas/TableReservation
+      status: fixed
+      by: CHG-SGU-018
     decisions:
     - question: Seating preference and occasion on a table booking, as fields or in the note?
       decision: 'Drawn default stands (answer: "Default / recommended accepted"): Draw both as optional choices, marked pending
@@ -3120,7 +3202,7 @@ screens:
       decision: Kiosks inside the venue need admission for F&B; F&B keeps its own receipt (from WEB-036).
       decidedBy: Chinmay
       date: '2026-10-02'
-      source: DEC-206 | CHG-NOTE-004
+      source: DEC-206 | CHG-NOTE-004 | CHG-SGU-001
       questionSource: DI-292 | DI-293
   KSK-017:
     summary: Buy merchandise at the kiosk in the same kiosk cart as tickets and food, or hold an item to pay for at the
@@ -3155,14 +3237,20 @@ screens:
         and addCartLine is declared. No path leads to the kiosk's review and payment (KSK-006, KSK-007).
       why: The screen contradicts itself. Buying goes through the kiosk cart and its payment steps; add that navigation.
       source: screens/P05-guest-kiosk.yaml#KSK-017
+      status: fixed
+      by: CHG-SGU-018
     - what: Flow F51 step 4 ("Or they collect from a kiosk") uses KSK-017 with listMerchandise and reserveMerchandise.
       why: Neither operation collects a drop, and a kiosk cannot hand goods over (collectShopAndDrop is staff-only). The
         step should be rewritten or removed.
       source: F51 step 4 | contracts/satellite/retail.yaml#collectShopAndDrop
+      status: logged
+      by: CHG-SGU-025
     - what: 'Plumbing: "Outlet id" and "Category id" boxes, a stock table (onHand, inventoryItemId, variantId), and modals
         collecting variantId and seatIds.'
       why: Guest kiosk; the guest projection carries none of these.
       source: screens/P05-guest-kiosk.yaml#KSK-017 | contracts/satellite/retail.yaml#/components/schemas/GuestMerchandiseItem
+      status: fixed
+      by: CHG-SGU-018
     decisions:
     - question: 'The size picker: GuestMerchandiseItem has no size or variant dimension. Is each size a separate item, as
         with SKUs like TSH-MB-GRN-M?'
@@ -12848,6 +12936,8 @@ screens:
     - what: The screen requires the fnb module.
       why: Every tenant needs navigation, so it should require only core (white label). Only Dining entries depend on F&B.
       source: screens/P13-white-label-cms.yaml#CMS-009 | DI-285
+      status: fixed
+      by: CHG-WIR-008
     decisions:
     - question: Is one navigation configuration held per surface (web header, web footer, mobile tabs), as DI-285 needs? The
         contract has one NavigationConfig with a kind.
@@ -12855,7 +12945,7 @@ screens:
         parts of this answer are separate decisions (see related).
       decidedBy: Chinmay
       date: '2026-10-02'
-      source: DEC-049 | CHG-NOTE-004
+      source: DEC-049 | CHG-NOTE-004 | CHG-SGU-006
       questionSource: DI-285 | contracts/satellite/white-label.yaml#getNavigation
   KIT-001:
     summary: 'The kitchen supervisor''s or head chef''s overview of the whole kitchen during service: how deep each station''s

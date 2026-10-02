@@ -981,6 +981,7 @@ paths:
         - "P08 BO-618 Accreditation Form Builder"
         - "P08 BO-815 Survey Builder"
         - "P13 CMS-042 Waiver Template Library & Master Setup"
+        - "P13 CMS-043 Digital Waiver & Form Builder"
       summary: Define a waiver, survey or capture form
       description: 'CF-129. **One mechanism, three uses.** A waiver is this with a signature, a survey
         is this with a scale, a capture is this at the point of sale.

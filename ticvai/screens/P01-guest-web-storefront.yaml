@@ -343,11 +343,14 @@ screens:
         operation: getTenantAppStatus
       - kind: cardList
         bindsTo: HomepageLayout.sections
-        notes: Section order comes from tenant configuration (WLB-011), not from code. A section referencing
-          a disabled module must not render at all The sections, their order and their styling come from
-          `getPublishedTenantConfig` `homepage`, read with no session (GFIX-1).
-        provenance: carried from the previous definition
+        notes: The sections of the published home, from the tenant's template (`templateKey`) or its own
+          layout, each with the card count the venue chose (`maxItems`) and its scroll animation. **The
+          client-approved web wireframe is the layout** (decided by Chinmay, 2 October 2026; DEC-163);
+          a tenant with its own landing page links in with deep links (DEC-548) (CHG-SGU-005).
+        provenance: corrected 2 October 2026 (CHG-SGU-005, decided by Chinmay 2 October 2026, DEC-163,
+          DEC-548)
         operation: getPublishedTenantConfig
+        label: Home sections
     - name: header
       slot: carried
       components:
@@ -1203,7 +1206,9 @@ screens:
         - BookingFlow.steps
         operation: getPublishedBookingFlow
         notes: The steps of the published flow in their `sortOrder`, this one (tickets) highlighted. A
-          step the flow has turned off is not shown and is skipped by Continue and Back.
+          step the flow has turned off is not shown and is skipped by Continue and Back. Drawn in the
+          venue's `BookingFlowSettings.stepIndicator` style; `embedMode` and `singleEventPage` come from
+          the same published settings (CMS-016) (CHG-SGU-022).
         provenance: decided 29 September 2026, W12; CMS-103 Booking Flows
       - kind: secondaryButton
         label: Show everything
@@ -1555,7 +1560,9 @@ screens:
         - BookingFlow.steps
         operation: getPublishedBookingFlow
         notes: The steps of the published flow in their `sortOrder`, this one (date and time) highlighted.
-          A step the flow has turned off is not shown and is skipped by Continue and Back.
+          A step the flow has turned off is not shown and is skipped by Continue and Back. Drawn in the
+          venue's `BookingFlowSettings.stepIndicator` style; `embedMode` and `singleEventPage` come from
+          the same published settings (CMS-016) (CHG-SGU-022).
         provenance: decided 29 September 2026, W12; CMS-103 Booking Flows
   states:
     loading: The date session selection, read by `getPerformance`.
@@ -1827,7 +1834,9 @@ screens:
         - BookingFlow.steps
         operation: getPublishedBookingFlow
         notes: The steps of the published flow in their `sortOrder`, this one (seats) highlighted. A step
-          the flow has turned off is not shown and is skipped by Continue and Back.
+          the flow has turned off is not shown and is skipped by Continue and Back. Drawn in the venue's
+          `BookingFlowSettings.stepIndicator` style; `embedMode` and `singleEventPage` come from the same
+          published settings (CMS-016) (CHG-SGU-022).
         provenance: decided 29 September 2026, W12; CMS-103 Booking Flows
     - name: actionBar
       slot: rowActions
@@ -2076,7 +2085,9 @@ screens:
         - BookingFlow.steps
         operation: getPublishedBookingFlow
         notes: The steps of the published flow in their `sortOrder`, this one (extras) highlighted. A
-          step the flow has turned off is not shown and is skipped by Continue and Back.
+          step the flow has turned off is not shown and is skipped by Continue and Back. Drawn in the
+          venue's `BookingFlowSettings.stepIndicator` style; `embedMode` and `singleEventPage` come from
+          the same published settings (CMS-016) (CHG-SGU-022).
         provenance: decided 29 September 2026, W12; CMS-103 Booking Flows
     - name: actionBar
       slot: rowActions
@@ -2775,7 +2786,9 @@ screens:
         - BookingFlow.steps
         operation: getPublishedBookingFlow
         notes: The steps of the published flow in their `sortOrder`, this one (details) highlighted. A
-          step the flow has turned off is not shown and is skipped by Continue and Back.
+          step the flow has turned off is not shown and is skipped by Continue and Back. Drawn in the
+          venue's `BookingFlowSettings.stepIndicator` style; `embedMode` and `singleEventPage` come from
+          the same published settings (CMS-016) (CHG-SGU-022).
         provenance: decided 29 September 2026, W12; CMS-103 Booking Flows
     - name: actionBar
       slot: rowActions
@@ -3028,7 +3041,9 @@ screens:
         - BookingFlow.steps
         operation: getPublishedBookingFlow
         notes: The steps of the published flow in their `sortOrder`, this one (payment) highlighted. A
-          step the flow has turned off is not shown and is skipped by Continue and Back.
+          step the flow has turned off is not shown and is skipped by Continue and Back. Drawn in the
+          venue's `BookingFlowSettings.stepIndicator` style; `embedMode` and `singleEventPage` come from
+          the same published settings (CMS-016) (CHG-SGU-022).
         provenance: decided 29 September 2026, W12; CMS-103 Booking Flows
       - kind: consentBlock
         label: Terms and conditions
@@ -4575,6 +4590,27 @@ screens:
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
         notes: Was the generated table 'Every order'; staff and plumbing columns removed (decided by Chinmay,
           fix before Block A starts, 2 October 2026 (GFIX-3)).
+      - kind: cardList
+        label: Tax invoices
+        operation: listTaxInvoices
+        notes: The VAT receipt (simplified tax invoice) and any full tax invoice for the order, with its
+          number.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction finance-insights GST-019)
+      - kind: cardList
+        label: Tax credit notes
+        operation: listCreditMemos
+        notes: Any tax credit note issued after a refund (DEC-086).
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction finance-insights GST-019)
+      - kind: detailPanel
+        label: The tax invoice
+        bindsTo: FinTaxInvoice
+        operation: getTaxInvoice
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction finance-insights GST-019)
+      - kind: secondaryButton
+        label: Download or email the PDF
+        operation: getTaxDocumentRendition
+        notes: Opens or sends the PDF in the template's languages.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction finance-insights GST-019)
     - name: contextPanel
       slot: selection
       components:
@@ -4604,6 +4640,12 @@ screens:
         label: Ask for a refund
         operation: createRefundRequest
         provenance: contract orders.yaml POST /refund-requests
+      - kind: secondaryButton
+        label: Get a tax invoice
+        operation: issueTaxInvoice
+        notes: Issues a full invoice and shows its number; if the order is already on an invoice, says
+          so and shows it rather than an error.
+        provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction finance-insights GST-019)
   states:
     loading: The order history list.
     error: Could not load. Names which read failed and leaves the order history untouched.
@@ -4653,6 +4695,10 @@ screens:
     purpose: Download the invoice / credit memo PDF
     trigger: onLoad
     provenance: build, 29 September 2026
+  - operationId: issueTaxInvoice
+    contract: finance
+    purpose: Get a full tax invoice with a company name and TRN for one of my orders (DEC-085, CHG-FIN-011)
+    trigger: onAction
   entryState:
     params:
     - name: subjectId
@@ -4702,6 +4748,17 @@ screens:
       - reason
       - lineIds
     provenance: client-verified
+  - id: formIssueTaxInvoice
+    component: modal
+    trigger: Get a tax invoice
+    body: The company name and TRN to put on the invoice, and where to email it; the order is the one
+      selected and the invoice type is full.
+    confirm:
+      label: Get a tax invoice
+      operation: issueTaxInvoice
+    dismiss:
+      label: Cancel
+    provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction finance-insights GST-019)
   gaps:
   - operation: listOrders
     removed: true
@@ -6538,31 +6595,13 @@ screens:
       slot: record
       components:
       - kind: detailPanel
-        label: The tenant app status
-        bindsTo: TenantAppStatus
-        columns:
-        - TenantAppStatus.isPublished
-        - TenantAppStatus.publishedVersion
-        - TenantAppStatus.publishedAt
-        - TenantAppStatus.isInMaintenance
-        - TenantAppStatus.maintenanceMessage
-        - TenantAppStatus.expectedBackAt
-        operation: getTenantAppStatus
-        provenance: contract white-label.yaml GET /tenant-config/status
-      - kind: detailPanel
         label: How to reach the venue
-        bindsTo: VenueContact
-        columns:
-        - VenueContact.phone
-        - VenueContact.email
-        - VenueContact.whatsapp
-        - VenueContact.address
-        - VenueContact.openingHours
-        operation: getTenantAppStatus
+        bindsTo: PublishedTenantConfig.contact
+        operation: getPublishedTenantConfig
         notes: '**From `getTenantAppStatus.contact`** (decided 28 September, audit R073 (f)): phone, email,
           WhatsApp, address and opening hours, set from CMS-001 through `setMaintenanceMode`. Each is
           optional and a missing one is left out rather than shown blank.'
-        provenance: contract white-label.yaml GET /tenant-config/status
+        provenance: corrected 2 October 2026 (CHG-SGU-022, design-notes correction)
   states:
     loading: Venue details
     error: Could not load. Falls back to the tenant contact details from the cached config
@@ -6575,9 +6614,9 @@ screens:
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
   apis:
-  - operationId: getTenantAppStatus
+  - operationId: getPublishedTenantConfig
     contract: white-label
-    purpose: App status and recent changes
+    purpose: The published contact details, readable without signing in
     trigger: onLoad
   wireframe:
     status: review
@@ -6626,6 +6665,13 @@ screens:
     - name: contentBody
       slot: record
       components:
+      - kind: banner
+        label: Closed for maintenance
+        bindsTo: PublishedTenantConfig.maintenanceMessage
+        operation: getPublishedTenantConfig
+        notes: 'The main case: `isInMaintenance` with its message and the expected-back time ("Back at
+          14:00"), set live on CMS-001 (DI-215).'
+        provenance: corrected 2 October 2026 (CHG-SGU-022, design-notes correction)
       - kind: detailPanel
         label: The tenant app status
         bindsTo: TenantAppStatus
@@ -6667,10 +6713,16 @@ screens:
     closed: '**Closed.** `getTenantAppStatus.availability` is `closed`: the page says the venue is not
       open, with the tenant''s `availabilityMessage` and the opening hours from `contact` (decided 28
       September, audit R073 (f)).'
+    maintenance: The venue's maintenance message and when it expects to be back; one way onward (try again
+      at that time). Set live on CMS-001, never published.
   apis:
   - operationId: getTenantAppStatus
     contract: white-label
     purpose: from page inventory
+    trigger: onLoad
+  - operationId: getPublishedTenantConfig
+    contract: white-label
+    purpose: Maintenance, message and expected-back time, readable without signing in
     trigger: onLoad
   wireframe:
     status: review
@@ -6682,9 +6734,10 @@ screens:
       verified: 2026-09-28
       match: exact
       view: Footer 'Service status', or Discover → 'Service status'
-      differences: Prototype has 'Maintenance' where YAML has 'closed'; sold-out offers 'Join the waitlist'
+      differences: "Prototype has 'Maintenance' where YAML has 'closed'; sold-out offers 'Join the waitlist'
         (holds a returned place for 15 minutes), which the YAML screen (getTenantAppStatus only) cannot
-        call.
+        call. **Do not draw \"Join the waitlist\" on the sold-out page**: this screen calls no waitlist
+        operation; a sold-out performance waitlist belongs to the event booking screens (CHG-SGU-022)."
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.

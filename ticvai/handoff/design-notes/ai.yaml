@@ -344,13 +344,19 @@ screens:
         28 September) is a floating chat panel. Pattern should be a conversation (assistantPanel) and getGuestMenu demoted
         to an optional "Order food" shortcut, or removed.
       source: screens/P01-guest-web-storefront.yaml#WEB-044 (wireframe.prototype.differences) | DI-207
+      status: fixed
+      by: CHG-SGU-016
     - what: dataTable "Every AI conversation" with id, principalId, scopePath, module columns on a guest screen.
       why: A guest sees only their own conversations as a simple list; the columns are staff plumbing.
       source: contracts/satellite/ai.yaml#listAiConversations
+      status: fixed
+      by: CHG-SGU-016
     - what: Overlay formCreateAiConversation asks the guest for a required `module`.
       why: >-
         The guest never chooses a module; the scope comes from the session. Open the conversation silently on first send.
       source: contracts/satellite/ai.yaml#createAiConversation
+      status: fixed
+      by: CHG-SGU-016
     - what: Overlay formRequestSuggestion offers any `kind`, and "Request suggestion" is a visible button.
       why: >-
         A guest may only ask for prepPlan, upsell, waitTime and itinerary (the contract refuses the rest), and GST-031 already
@@ -358,17 +364,23 @@ screens:
         not from a form where a guest picks an enum. Same limit as GST-031.
       source: >-
         contracts/satellite/ai.yaml#requestSuggestion | screens/P02-guest-mobile-app.yaml#GST-031 (overlays.formRequestSuggestion)
+      status: fixed
+      by: CHG-SGU-016
     - what: sendConversationMessage (CASE_MANAGE) and recordAnswerFeedback are on WEB-044 but not on GST-031.
       why: >-
         Web and app must call the same guest operations. After a handover the guest talks to the agent through sendConversationMessage
         on both; feedback belongs on both.
       source: >-
         screens/P01-guest-web-storefront.yaml#WEB-044 (notes, cross-surface parity) | screens/P02-guest-mobile-app.yaml#GST-031
+      status: fixed
+      by: CHG-SGU-016
     - what: The handover overlay requires the guest to pick a `reason` and type a summary.
       why: >-
         The reason is set by what happened (guestRequested when the guest presses the button; assistantFailed, outOfScope,
         negativeSentiment by the platform) and the summary is Sahli's own. The guest presses one button.
       source: contracts/satellite/marketing-crm.yaml#handoverToAgent
+      status: fixed
+      by: CHG-SGU-016
     decisions:
     - question: DI-195 deferred the concierge chat design to "a dedicated AI workshop" (third-party LLM with PII masking,
         token billing). The AI sessions of 18 and 21 September settled masking and providers; billing for a client-chosen
@@ -463,29 +475,41 @@ screens:
     - what: requiresModule is fnb.
       why: The concierge is gated by the AI module, as WEB-044 is (requiresModule ai).
       source: screens/P01-guest-web-storefront.yaml#WEB-044 | screens/P02-guest-mobile-app.yaml#GST-031
+      status: fixed
+      by: CHG-SGU-016
     - what: purpose reads "The screen this app sits on. Everything else is entered from here and returns to it."
       why: >-
         That is the app home (GST-001). GST-031 is the concierge home - "Ask, and be answered or handed to a person" as on
         WEB-044.
       source: screens/P02-guest-mobile-app.yaml#GST-031 | screens/P01-guest-web-storefront.yaml#WEB-044 (purpose)
+      status: fixed
+      by: CHG-SGU-016
     - what: The only read is getGuestMenu, drawn as the screen's record; no list of the guest's conversations.
       why: The guest app return already flagged this (drawn greyed). Declare listAiConversations, as WEB-044 does.
       source: >-
         screens/P02-guest-mobile-app.yaml#GST-031 (guest app return FINDINGS.md) | contracts/satellite/ai.yaml#listAiConversations
+      status: fixed
+      by: CHG-SGU-016
     - what: requestSuggestion is offered to the guest with kind prepPlan.
       why: >-
         prepPlan is the kitchen's production plan (forecast covers x menu mix); it means nothing to a guest. The concierge
         should request waitTime and upsell only, from the conversation, not from a kind picker.
       source: >-
         ADR-0051 (AI functions review 30 Sep §4 Operational suggestions) | contracts/satellite/ai.yaml#requestSuggestion
+      status: fixed
+      by: CHG-SGU-016
     - what: recordAnswerFeedback and sendConversationMessage missing (both on WEB-044).
       why: Cross-surface parity; feedback and the post-handover agent chat apply to the app too.
       source: screens/P01-guest-web-storefront.yaml#WEB-044
+      status: fixed
+      by: CHG-SGU-016
     - what: entryState.coldEntry says "A conversation link an agent opens from a notification".
       why: >-
         GST-031 is the guest app; the cold entry is a guest opening a notification about their own conversation (e.g. an agent
         replied).
       source: screens/P02-guest-mobile-app.yaml#GST-031
+      status: fixed
+      by: CHG-SGU-016
     decisions:
     - question: Is Sahli a tab of the app's bottom bar, or reached from home and the floating button only?
       decision: 'Drawn default stands (answer: "Default / recommended accepted"): Floating button on every screen plus an
@@ -555,25 +579,35 @@ screens:
         Nothing is configured or saved here; it is a conversation sheet over another screen. The states should be the conversation's
         (thinking, answered, failed, offline).
       source: screens/P02-guest-mobile-app.yaml#GST-033
+      status: fixed
+      by: CHG-SGU-016
     - what: Only sendAiMessage is declared.
       why: >-
         sendAiMessage needs a conversationId, so createAiConversation must be declared; handoverToAgent and recordAnswerFeedback
         belong here as on GST-031/WEB-044.
       source: contracts/satellite/ai.yaml#sendAiMessage | contracts/satellite/ai.yaml#createAiConversation
+      status: fixed
+      by: CHG-SGU-016
     - what: No way to pass the screen context (product, booking, cart) to the assistant.
       why: >-
         createAiConversation takes module and locale only and sendAiMessage content and collectionIds only; "contextual" help
         has no contextual field. Either add a context reference (subjectRef/route) to createAiConversation, or the client
         prefixes the question - the first is the honest one.
       source: contracts/satellite/ai.yaml#createAiConversation | contracts/satellite/ai.yaml#sendAiMessage
+      status: logged
+      by: CHG-SGU-024
     - what: '"Collection ids" multiSelect on the guest form.'
       why: Guests do not choose knowledge collections.
       source: contracts/satellite/ai.yaml#sendAiMessage
+      status: fixed
+      by: CHG-SGU-016
     - what: >-
         The prototype match is to "Account → All screens → Wave 2 → AI concierge – contextual help" (a catalogue view, not
         a drawn screen), marked client-verified.
       why: There is no client-drawn layout for this screen; it should be treated as designed, not verified.
       source: screens/P02-guest-mobile-app.yaml#GST-033 (wireframe)
+      status: fixed
+      by: CHG-SGU-016
     decisions:
     - question: On which screens does contextual help appear (product detail, cart, booking detail, ride detail)?
       decision: 'Drawn default stands (answer: "Default / recommended accepted"): Product/attraction detail, cart and booking
@@ -676,6 +710,8 @@ screens:
         Pick one. Per ADR-0052 the engine's decideRecommendations is the guest surface (placement checkout or cart, Block
         A answering from the Promotions relationship map); bind the cards to its items and drop getUpsellSuggestions.
       source: screens/P02-guest-mobile-app.yaml#GST-031 (guest app return FINDINGS.md) | ADR-0052
+      status: fixed
+      by: CHG-SGU-016
     - what: emptyNoAccess names PRODUCT_VIEW.
       why: >-
         A guest holds no permission (ADR-0025); WEB-008 already says so. With nothing to offer, the step is skipped, not shown
@@ -686,11 +722,15 @@ screens:
     - what: emptyFirstRun "No upsell cross-sell yet. Offers Add cart line".
       why: There is nothing to add when there are no offers; the step is skipped.
       source: DI-428
+      status: fixed
+      by: CHG-SGU-016
     - what: decideRecommendations maxItems defaults to 4.
       why: >-
         The client set at most three recommendations at checkout; the Extras placements should request maxItems 3 (or the
         default follow the placement strategy's limit of 3).
       source: DI-959 | contracts/satellite/ai.yaml#decideRecommendations
+      status: fixed
+      by: CHG-SGU-016
     decisions:
     - question: Does the Extras step show only add-ons and upgrades, or also cross-venue offers (another park in the tenant)?
       decision: 'Drawn default stands (answer: "Default / recommended accepted"): Only offers for the venue and date in the
@@ -776,13 +816,19 @@ screens:
         Those are the catalogue snapshots tills pull (ADR-0013), not sellable bundles; R269 says unbinding is still owed.
         Remove it; bundles on this step come from the recommendation slot and getBundle.
       source: screens/P01-guest-web-storefront.yaml#WEB-008 (notes, R269)
+      status: fixed
+      by: CHG-SGU-016
     - what: The suggestion panel binds getUpsellSuggestions, which is not in the screen's apis (decideRecommendations is).
       why: >-
         Same as GST-048 - bind the engine's decideRecommendations items; getUpsellSuggestions is not in the Block A slice.
       source: 'ADR-0052 | ADR-0059 (Block A slice: handoff/delivery-slice.json)'
+      status: fixed
+      by: CHG-SGU-016
     - what: The WEB-008 to WEB-016 transition (sign-in after add-ons) is missing from navigation.
       why: The prototype and REV3-3 put sign-in on leaving this step.
       source: screens/P01-guest-web-storefront.yaml#WEB-008 (wireframe.prototype.differences) | DI-1043
+      status: fixed
+      by: CHG-SGU-016
     decisions:
     - question: Is the swim-vest add-on offered here for non-swimmers (Help me choose answer), and is the splash-and-river
         pass a separate product?
@@ -869,6 +915,8 @@ screens:
         Opening the Plan tab would open a billed conversation every time. Open it on the first message (as on the concierge);
         the plan loads without it.
       source: screens/P02-guest-mobile-app.yaml#GST-054 (apis) | contracts/satellite/ai.yaml#createAiConversation
+      status: fixed
+      by: CHG-SGU-016
     - what: The AI review (30 Sep §8) says ai.yaml has no planner operation and GST-054 is deferred.
       why: >-
         Superseded the same day: the screen is wave 1, Block A, and the planner works through the planner.guest profile and
@@ -876,11 +924,15 @@ screens:
       source: >-
         ADR-0051 (AI functions review 30 Sep §8) | screens/P02-guest-mobile-app.yaml#GST-054 (notes) | contracts/satellite/ai.yaml#requestSuggestion
         (kind itinerary)
+      status: logged
+      by: CHG-SGU-025
     - what: The 30 September tracker says retail and kiosks are to be added to the planner.
       why: >-
         Make sure the plan operations return shops and kiosks as points; the screen draws them as plan items with their own
         icon.
       source: TRACKER Tracker row 13 | MoM 30 Sep 4.7
+      status: logged
+      by: CHG-SGU-024
     decisions:
     - question: Does each applied AI change show what it cost or saves (e.g. a fast pass it added)?
       decision: 'Drawn default stands (answer: "Default / recommended accepted"): An item that costs money shows its price
@@ -2393,6 +2445,8 @@ screens:
       why: >-
         A guest at a kiosk never sees a product table or filters by venue id; products appear as cards inside the conversation.
       source: screens/P05-guest-kiosk.yaml#KSK-015
+      status: fixed
+      by: CHG-SGU-016
     - what: emptyNoAccess names PRODUCT_VIEW; emptyFirstRun says "Offers no create action".
       why: A guest holds no permission; the first-run state of a kiosk assistant is its greeting with starter chips.
       source: ADR-0025
@@ -2401,9 +2455,13 @@ screens:
     - what: createAiConversation is not declared though sendAiMessage needs a conversation.
       why: Declare it (opened silently on the first tap).
       source: contracts/satellite/ai.yaml#createAiConversation
+      status: fixed
+      by: CHG-SGU-016
     - what: requiresModule is ticketing and the coldEntry speaks of "an agent opening a link from a notification".
       why: The assistant needs the AI module; a kiosk has no notification cold entry.
       source: screens/P05-guest-kiosk.yaml#KSK-015
+      status: fixed
+      by: CHG-SGU-016
   EMP-019:
     block: later
     summary: >-
