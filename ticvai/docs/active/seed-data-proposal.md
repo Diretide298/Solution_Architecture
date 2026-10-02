@@ -1,6 +1,6 @@
-# Seed data proposal: UAE denominations and default staff roles
+# Seed data proposal: UAE denominations and starting permission configurations
 
-> **Purpose:** The seed SETUP-SEED loads: the UAE cash denominations and the default staff role set  
+> **Purpose:** The seed SETUP-SEED loads: the UAE cash denominations and the starting permission configurations (presets; no fixed roles)  
 > **Owner:** Chinmay  
 > **Status:** **Proposed, client to correct (audit R229, decided 28 September 2026)**  
 > **Who corrects it:** client operations and client finance
@@ -33,13 +33,20 @@ All rows seed `isActive: true`. The 1, 5 and 10 fils coins are left out because 
 
 ---
 
-## 2. Default staff roles
+## 2. Starting permission configurations (presets, not roles)
 
-Seeded as **system roles** (`Role.isSystem: true` in `identity.yaml`: editable, not deletable). The glossary rule still holds: **roles are fully configurable and nothing is predefined** (12 Aug 2026). These five are templates a tenant starts from and edits, not fixed roles.
+**There are no fixed default roles** (Chinmay, 2 October 2026, pre-apply round: *"Default permission configs, so to speak. We still have checklists: if they select Viewer, for example, they can still give that viewer more permissions and rename it."*; DEC-007; CHG-CSP-003, CHG-FUP-012). A new tenant starts with **no roles**. Creating a role shows the per-module permission checklist (`contracts/shared/permissions.yaml`, `x-ticvai-permission-modules`) and the presets; **picking a preset ticks the boxes and binds nothing**. Every box stays editable, the role is named and renamed by whoever builds it, and a later change to a preset never changes a role made from it (`identity.createRole.presetCodes`, `Role.presetCode`).
 
-Every permission below is from `contracts/shared/permissions.yaml`. **No tenant role holds a `PLATFORM_*` permission** or `DEVELOPER_ADMIN`: those are TICVAI-side only. A permission says *what*; the grant's scope says *where*, so the scope column is the level each role is normally granted at.
+The seed loads two kinds of preset, as `CapabilityTemplate` rows with `isPreset: true` (`identity.yaml`):
 
-| Role | Normally granted at | Who holds it |
+1. **Per module: All, Viewer and Mid-level** (`permissions.yaml`, `x-ticvai-permission-presets`). All ticks every permission of the module; Viewer its reads; Mid-level its reads and day-to-day acts, without configuration, approval, publishing, overrides or personal-data exports.
+2. **The five starting configurations below**, across modules (`module` null), with the codes `cashier`, `supervisor`, `venueManager`, `finance` and `tenantAdmin`. They were drafted as seeded system roles on 28 September (audit R229); since 2 October they are presets with these names, nothing more.
+
+The glossary rule still holds: **roles are fully configurable and nothing is predefined** (12 Aug 2026).
+
+Every permission below is from `contracts/shared/permissions.yaml` (checked by `tools/check-contract-compat.py`, CHG-FUP-012). **No preset ticks a `PLATFORM_*` permission** or `DEVELOPER_ADMIN`: those are TICVAI-side only. **No starting configuration ticks a module's `<MODULE>_AI_PUBLISH`, `BIOMETRIC_IMAGE_VIEW`, `ACCESS_DIRECTION_SET` or `REPORT_GOVERNANCE_MANAGE`**: publishing a module's AI has no default holder (DEC-003, DEC-007), and the other three are deliberate grants (CHG-FUP-003). Only a module's All preset ticks them. A permission says *what*; the grant's scope says *where*, so the scope column is the level a role built from the preset is normally granted at.
+
+| Preset | Normally granted at | What it starts from |
 |---|---|---|
 | **Cashier** | Venue | Sells, takes payment, runs their own shift and Deposit Box |
 | **Supervisor** | Venue | Approves what a cashier cannot do alone; runs other people's shifts |
@@ -47,7 +54,7 @@ Every permission below is from `contracts/shared/permissions.yaml`. **No tenant 
 | **Finance** | Region (the ledger's level) | Journals, settlements, reconciliation, tax and accounts |
 | **Tenant Admin** | Tenant | Users, roles, hierarchy, configuration and publishing. No selling |
 
-### 2.1 Cashier
+### 2.1 Cashier (`cashier`)
 
 | Area | Permissions |
 |---|---|
@@ -57,9 +64,9 @@ Every permission below is from `contracts/shared/permissions.yaml`. **No tenant 
 | Guests and stored value | `GUEST_VIEW`, `WALLET_VIEW`, `LOYALTY_REDEEM`, `TICKET_LOOKUP` |
 | Everyday | `REPORT_VIEW_OWN`, `APPROVAL_REQUEST`, `INCIDENT_REPORT`, `ATTENDANCE_RECORD` |
 
-### 2.2 Supervisor
+### 2.2 Supervisor (`supervisor`)
 
-Everything the Cashier holds, plus:
+Everything the Cashier preset ticks, plus:
 
 | Area | Permissions |
 |---|---|
@@ -68,9 +75,9 @@ Everything the Cashier holds, plus:
 | Floor | `ACCESS_VALIDATE`, `ACCESS_OVERRIDE`, `QUEUE_VIEW`, `QUEUE_OVERRIDE`, `KIOSK_ATTEND`, `SESSION_FORCE_LOGOUT` |
 | Approvals and reports | `APPROVAL_VIEW`, `APPROVAL_ACT`, `REPORT_VIEW_WORKSTATION`, `INCIDENT_VIEW` |
 
-### 2.3 Venue Manager
+### 2.3 Venue Manager (`venueManager`)
 
-Everything the Supervisor holds, plus:
+Everything the Supervisor preset ticks, plus:
 
 | Area | Permissions |
 |---|---|
@@ -82,9 +89,9 @@ Everything the Supervisor holds, plus:
 | Operations | `ASSET_VIEW`, `WORK_ORDER_VIEW`, `INCIDENT_MANAGE` |
 | Approvals, reports, AI | `APPROVAL_DECIDE`, `APPROVAL_DELEGATE`, `REPORT_VIEW_VENUE`, `REPORT_EXPORT`, `REPORT_MANAGE`, `REPORT_SCHEDULE`, `AUDIT_VIEW`, `AI_USE`, `AI_APPROVE` |
 
-`AI_APPROVE` sits here because an AI-proposed change touching prices or permissions needs a manager (audit R213 (3)).
+`AI_APPROVE` sits here because an AI-proposed change touching prices or permissions needs a manager (audit R213 (3)). It no longer publishes a forecast or promotes a model: that is the module's `<MODULE>_AI_PUBLISH`, which this preset leaves unticked (CHG-FUP-004).
 
-### 2.4 Finance
+### 2.4 Finance (`finance`)
 
 | Area | Permissions |
 |---|---|
@@ -93,9 +100,9 @@ Everything the Supervisor holds, plus:
 | Credit and stored value | `CREDIT_MANAGE`, `WALLET_VIEW` |
 | Reading | `ORDER_VIEW`, `ORDER_VIEW_OTHER`, `REPORT_VIEW_REGION`, `REPORT_EXPORT`, `REPORT_SCHEDULE`, `APPROVAL_VIEW`, `APPROVAL_ACT` |
 
-**For the client to decide:** `createJournalEntry` says *"a finance user posts it; a finance manager or director approves it"* (12 Aug §15). If the client wants posting and approving held by different people, split this into **Finance** (without `LEDGER_APPROVE`) and **Finance Manager** (with it).
+**For the client to decide:** `createJournalEntry` says *"a finance user posts it; a finance manager or director approves it"* (12 Aug §15). If the client wants posting and approving held by different people, split this into two presets, **Finance** (without `LEDGER_APPROVE`) and **Finance Manager** (with it); a tenant can also untick `LEDGER_APPROVE` on a role built from this one.
 
-### 2.5 Tenant Admin
+### 2.5 Tenant Admin (`tenantAdmin`)
 
 | Area | Permissions |
 |---|---|
@@ -126,6 +133,6 @@ The exact station list and times are read from the prototype when SETUP-SEED bui
 
 ## 3. What happens next
 
-1. The client corrects this page (denominations, tray order, the five roles and their permissions).
+1. The client corrects this page (denominations, tray order, the five starting configurations and their permissions).
 2. SETUP-SEED loads what is agreed. The seed lives with the tenant provisioning scripts, not in a contract.
-3. `identity.yaml`'s `Role.isSystem` description names only *cashier* today; it should point at this list once agreed (handoff to the identity contract owner).
+3. `identity.yaml` describes these as presets (`CapabilityTemplate.isPreset`, `Role.presetCode`; CHG-CSP-003); `Role.isSystem` stays for clients built at r1 and is false on every role created from 2 October.

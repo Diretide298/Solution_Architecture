@@ -661,6 +661,142 @@ paths:
                 $ref: '#/components/schemas/ProductChangeImpact'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /products/bulk-update:
+    post:
+      operationId: bulkUpdateCatalogueProducts
+      x-ticvai-agreed: '2 October: Chinmay, contract follow-ups ("BO-007 bulk edit: a new catalogue operation"); the
+        BO-007 correction of CHG-WIR-027; shape follows bulkChangePrices and inventory bulkUpdateProducts'
+      summary: Change many products at once, with a preview
+      description: '**The catalogue owns a bulk edit of its own products** (Chinmay, 2 October, contract follow-ups;
+        CHG-FUP-011; the BO-007 correction logged in CHG-WIR-027 and CHG-CSP-054). It replaces inventory''s
+        `bulkUpdateProducts`, which wrote catalogue products from the inventory service and is deprecated, kept
+        for clients built at r1 and retired at the next major version. Board 2C: **retire a season, re-file a
+        category, move a range to another channel** across two hundred products without two hundred edits.
+
+
+        **A selection, not only a list of ids**, the shape `bulkChangePrices` takes: a category, a product kind, a
+        lifecycle state or up to 500 named products; an empty selection is refused. **Previewed by default**
+        (`previewOnly`), and the preview counts what would change, because a bulk act that cannot be seen before
+        it runs is one somebody runs twice. **Partial failure is reported, not rolled back**: each refused product
+        is listed with the rule it failed.
+
+
+        **What it changes** is typed in `changes`; a field left out is untouched. Prices are not here
+        (`bulkChangePrices`), and nor is the lifecycle (`transitionProductLifecycle`): stopping a range selling is
+        `onSaleTo`. Setting `taxCodeId`, which changes what a guest pays, also needs `PRICE_CONFIGURE`; without it
+        the run is refused `403 price-permission-required`. Each changed product is versioned as `updateProduct`
+        versions it.
+
+        '
+      tags:
+      - catalogue
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - selection
+              - changes
+              properties:
+                previewOnly:
+                  type: boolean
+                  default: true
+                selection:
+                  type: object
+                  description: At least one of these; they narrow together.
+                  properties:
+                    categoryId:
+                      type: string
+                      format: uuid
+                      nullable: true
+                    productKind:
+                      $ref: '#/components/schemas/ProductKind'
+                    lifecycleState:
+                      $ref: '#/components/schemas/ProductLifecycleState'
+                    productIds:
+                      type: array
+                      maxItems: 500
+                      items:
+                        type: string
+                        format: uuid
+                changes:
+                  type: object
+                  description: The fields to set on every matched product; a field left out is untouched.
+                  properties:
+                    categoryId:
+                      type: string
+                      format: uuid
+                      nullable: true
+                    responsibleDepartmentId:
+                      type: string
+                      format: uuid
+                      nullable: true
+                    onSaleFrom:
+                      type: string
+                      format: date-time
+                      nullable: true
+                    onSaleTo:
+                      type: string
+                      format: date-time
+                      nullable: true
+                      description: Retires the matched products automatically at that time (retiring a season).
+                    channels:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/Channel'
+                      description: Replaces the products' channels.
+                    addSegmentTags:
+                      type: array
+                      items:
+                        type: string
+                    removeSegmentTags:
+                      type: array
+                      items:
+                        type: string
+                    taxCodeId:
+                      type: string
+                      format: uuid
+                      nullable: true
+                      description: Set on every price of the matched products; needs `PRICE_CONFIGURE` as well.
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+          description: The preview, or the result with per-product outcomes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkProductUpdateResult'
+        '400':
+          description: The selection names nothing (`empty-selection`), or `changes` sets nothing.
+          x-ticvai-problem-types:
+          - empty-selection
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          description: '`changes` sets `taxCodeId` and the caller lacks `PRICE_CONFIGURE` (`price-permission-required`).'
+          x-ticvai-problem-types:
+          - price-permission-required
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /products/bulk-price:
     post:
       operationId: bulkChangePrices
@@ -19253,6 +19389,42 @@ components:
           description: Reasons the change would be refused outright.
           items:
             type: string
+    BulkProductUpdateResult:
+      type: object
+      description: What `bulkUpdateCatalogueProducts` matched and changed, or would change in a preview (CHG-FUP-011).
+      required:
+      - applied
+      - matched
+      properties:
+        applied:
+          type: boolean
+          description: False for a preview.
+        matched:
+          type: integer
+          minimum: 0
+        succeeded:
+          type: integer
+          minimum: 0
+        failed:
+          type: integer
+          minimum: 0
+        failures:
+          type: array
+          description: One entry per product the change was refused for. Empty on a clean run.
+          items:
+            type: object
+            required:
+            - productId
+            - code
+            properties:
+              productId:
+                type: string
+                format: uuid
+              code:
+                type: string
+                description: The validation rule the product failed, as in `Problem.errors[].code`.
+              message:
+                type: string
     BulkPriceResult:
       type: object
       description: 2.9.9. Dry run or applied — the shape is the same, `applied` says which.

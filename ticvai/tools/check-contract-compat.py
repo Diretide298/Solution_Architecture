@@ -50,7 +50,8 @@ baseline needs re-freezing instead of failing.
 **The vocabulary stays a checklist** (CHG-FUP-003). Because a new `Permission` value is additive, the check also
 fails on a value in no module group of `x-ticvai-permission-modules` (or in two), a preset ticking a value outside
 its module, an `x-ticvai-module-ai-publish` entry that is not a `ModuleKey` mapped to that module's own value, and
-an `x-ticvai-permission-by-module` that names no known map or no field of its contract.
+an `x-ticvai-permission-by-module` that names no known map or no field of its contract, and a code in the seed's
+starting configurations (`docs/active/seed-data-proposal.md` section 2) that is not a `Permission` value (CHG-FUP-012).
 
 **Every contract against the release `r1`** (plan item 1C, council of 1 October). Once the git tag
 `r1` exists, every contract is compared with its own text at r1, whether or not it was frozen with
@@ -72,6 +73,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import re
 import shutil
 import sys
 import tempfile
@@ -444,6 +446,18 @@ def against_release(ref: str | None) -> int | None:
 
 PERMISSIONS = ROOT / "contracts" / "shared" / "permissions.yaml"
 COMMON = ROOT / "contracts" / "shared" / "common.yaml"
+SEED = ROOT / "docs" / "active" / "seed-data-proposal.md"
+
+
+def seed_preset_tokens() -> list[str]:
+    """The permission names the seed's starting configurations tick: every `UPPER_CASE` code in section 2 of
+    `docs/active/seed-data-proposal.md` (CHG-FUP-012). The five starting configurations are presets as much as
+    All, Viewer and Mid-level are, and the seed loads them as written."""
+    if not SEED.exists():
+        return []
+    text = SEED.read_text(encoding="utf-8")
+    m = re.search(r"(?ms)^## 2\. .*?(?=^## (?!2\.\d))", text)
+    return re.findall(r"`([A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+)`", m.group(0)) if m else []
 
 
 def vocabulary_problems() -> list[str]:
@@ -479,6 +493,8 @@ def vocabulary_problems() -> list[str]:
             for v in perms or []:
                 if v not in (groups.get(g) or []):
                     out.append(f"preset {name} ticks {v} under {g}, which is not a permission of that module")
+    for v in sorted(set(seed_preset_tokens()) - values):
+        out.append(f"docs/active/seed-data-proposal.md section 2 ticks {v}, which is not a Permission value")
     modules = set()
     if COMMON.exists():
         common = yaml.safe_load(COMMON.read_text(encoding="utf-8")) or {}

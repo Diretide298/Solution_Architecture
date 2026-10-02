@@ -1,0 +1,53 @@
+id: CHG-FUP-008
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: Bring-your-own-key accepts any provider, named in AiProvider.vendor and reached through a native adapter or
+  openaiCompatible, with a per-tenant write-only Key Vault secret and a compatibility test before activation.
+decision:
+  what: 'ai.yaml: AiProvider.vendor (any provider, slug), credentialHint (last four characters) and compatibility;
+    new AiProviderCompatibility (per-task probes: tool calling, structured output, Arabic, context window, latency,
+    residency); AiModel.vendor so the curated task-to-tier map picks that vendor''s equivalent; taskModelMap
+    compatibilityPassed; testAiProvider takes optional taskKeys and returns compatibility; setAiProvider refuses
+    409 compatibility-test-required and 422 provider-protocol-unsupported (and now declares the 422
+    model-not-curated it already promised); setAiCredential states the per-tenant, HSM-encrypted, write-only Key
+    Vault secret; AiProviderKind says a kind is a protocol, not a vendor (no mistral value).'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October, contract follow-ups (BYOK providers): "Why just Mistral? As long as we get an API key it
+  can be any model; we just need to store it correctly." Answers the question CHG-CSA-008 left open; builds on
+  CHG-CSA-001 (curated range, DEC-001, DEC-002) and ADR-0009 (BYOK fits the globalAllowed residency class only).
+  Research: docs/active/research/ai-ml-model-selection-2-october.md sections 2.2 to 2.4.'
+keys_touched:
+  operations:
+  - setAiProvider
+  - setAiCredential
+  - testAiProvider
+  schemas:
+  - AiProvider
+  - AiProviderCompatibility
+  - AiProviderKind
+  - AiModel
+  - AiByokEnablement
+  screens:
+  - ADM-037
+  files:
+  - contracts/satellite/ai.yaml
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - SVC-AI-CONFIG-1
+  - SVC-AI-AI-1
+  - APP-SETUP-ADM-037
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'All additive against r1: no AiProviderKind value was added (a new native adapter later is a breaking change
+  with an approval). The new optional testAiProvider body relies on CHG-FUP-002. ADM-037 (P09, screens-p08-p09) shows
+  vendor, the compatibility result and the key hint, and offers activation only after a pass. Batch FUP
+  (apply-followup), 2 October 2026; tickets: none started.'
