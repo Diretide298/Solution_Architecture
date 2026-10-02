@@ -1235,7 +1235,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -1486,7 +1486,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -2019,7 +2019,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -4709,7 +4709,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -5120,7 +5120,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.id
         - Tenant.code
@@ -5587,7 +5587,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.id
         - Tenant.code
@@ -5867,7 +5867,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.id
         - Tenant.code
@@ -6091,7 +6091,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.id
         - Tenant.code
@@ -6339,7 +6339,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -6612,7 +6612,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -7891,7 +7891,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -8534,7 +8534,7 @@ screens:
       components:
       - kind: selectField
         label: Source environment
-        bindsTo: Environment
+        bindsTo: Environment.id
         operation: listEnvironments
         notes: Pick lists of the environment registry (ADM-028), never typed.
         provenance: contract platform-ops.yaml GET /environments
@@ -9270,7 +9270,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.id
         - Tenant.code
@@ -10386,7 +10386,7 @@ screens:
         provenance: check-screens publish rule, 29 September 2026
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.id
         - Tenant.code
@@ -10888,7 +10888,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -11082,7 +11082,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -11269,7 +11269,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -11486,7 +11486,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -11719,7 +11719,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -11871,7 +11871,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -12081,7 +12081,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -12241,7 +12241,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -12431,7 +12431,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -12639,7 +12639,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -12878,7 +12878,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -13479,7 +13479,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -13650,7 +13650,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -13854,7 +13854,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -14055,7 +14055,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -14232,7 +14232,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -14399,7 +14399,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -14568,7 +14568,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -14721,7 +14721,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -14905,7 +14905,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -15087,7 +15087,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -15262,7 +15262,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -15444,7 +15444,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -15599,7 +15599,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -15768,7 +15768,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -15935,7 +15935,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -16101,7 +16101,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -16267,7 +16267,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -16435,7 +16435,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -16605,7 +16605,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -16792,7 +16792,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -16979,7 +16979,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -17147,7 +17147,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -17352,7 +17352,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -17397,7 +17397,7 @@ screens:
         impliedBy: setStepUpPolicy
       - kind: multiSelect
         label: Permissions that require MFA
-        bindsTo: PasswordPolicy
+        bindsTo: PasswordPolicy.id
         columns:
         - PasswordPolicy.mfaRequiredForPermissions
         operation: setPasswordPolicy
@@ -17596,7 +17596,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -17856,7 +17856,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -18044,7 +18044,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -18233,7 +18233,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -18410,7 +18410,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -18592,7 +18592,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -18789,7 +18789,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -18939,7 +18939,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -19153,7 +19153,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -19321,7 +19321,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -19491,7 +19491,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -19735,7 +19735,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -19915,7 +19915,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -20103,7 +20103,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -20268,7 +20268,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -20460,7 +20460,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -20633,7 +20633,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -20789,7 +20789,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -20939,7 +20939,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -21132,7 +21132,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -21277,7 +21277,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -21461,7 +21461,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -21637,7 +21637,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -21804,7 +21804,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -21969,7 +21969,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -26477,7 +26477,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -26680,7 +26680,7 @@ screens:
       components:
       - kind: multiSelect
         label: Payment methods
-        bindsTo: PaymentProvider
+        bindsTo: PaymentProvider.id
         columns:
         - PaymentProvider.supportedMethods
         operation: setPaymentProvider
@@ -26697,7 +26697,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.id
         - Tenant.code
@@ -26710,7 +26710,7 @@ screens:
         provenance: contract subscription.yaml GET /tenants
       - kind: selectField
         label: Venue
-        bindsTo: OrgUnit
+        bindsTo: OrgUnit.id
         columns:
         - OrgUnit.name
         operation: listOrgUnits
@@ -27600,7 +27600,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -27797,7 +27797,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.id
         - Tenant.code
@@ -27975,7 +27975,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -28268,7 +28268,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -28472,7 +28472,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -28621,7 +28621,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -30947,7 +30947,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -31180,7 +31180,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -31394,7 +31394,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -31676,7 +31676,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -31851,7 +31851,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -32038,7 +32038,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -32210,7 +32210,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -32375,7 +32375,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -32542,7 +32542,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -32738,7 +32738,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -32965,7 +32965,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -33160,7 +33160,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -33348,7 +33348,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -33535,7 +33535,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -33722,7 +33722,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -33928,7 +33928,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -34116,7 +34116,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -34302,7 +34302,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -34485,7 +34485,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -34670,7 +34670,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -34943,7 +34943,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -35196,7 +35196,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -35366,7 +35366,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -35579,7 +35579,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -35751,7 +35751,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -35934,7 +35934,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -36169,7 +36169,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -36385,7 +36385,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -36560,7 +36560,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -36743,7 +36743,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -37086,7 +37086,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -37279,7 +37279,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -37564,7 +37564,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -37750,7 +37750,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -37929,7 +37929,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -38117,7 +38117,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -38311,7 +38311,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -38497,7 +38497,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -38714,7 +38714,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -38907,7 +38907,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -39220,7 +39220,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -39436,7 +39436,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -39625,7 +39625,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -39804,7 +39804,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -39963,7 +39963,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -40164,7 +40164,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -40364,7 +40364,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -40529,7 +40529,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -40684,7 +40684,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -40900,7 +40900,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -41094,7 +41094,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -41324,7 +41324,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -41551,7 +41551,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -41719,7 +41719,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -41926,7 +41926,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -42141,7 +42141,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -42351,7 +42351,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -42513,7 +42513,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -42755,7 +42755,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -42956,7 +42956,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -43211,7 +43211,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -43469,7 +43469,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -43665,7 +43665,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -43842,7 +43842,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -44040,7 +44040,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -44251,7 +44251,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -44473,7 +44473,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -44730,7 +44730,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -45022,7 +45022,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -45200,7 +45200,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -45417,7 +45417,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -45632,7 +45632,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -45815,7 +45815,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -45976,7 +45976,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -46134,7 +46134,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -46327,7 +46327,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -46555,7 +46555,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -46720,7 +46720,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -46914,7 +46914,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -47069,7 +47069,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -47299,7 +47299,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -47590,7 +47590,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -47752,7 +47752,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -47922,7 +47922,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -48132,7 +48132,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -48371,7 +48371,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -48665,7 +48665,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -48846,7 +48846,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -49197,7 +49197,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -49360,7 +49360,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name
@@ -49561,7 +49561,7 @@ screens:
       components:
       - kind: selectField
         label: Tenant
-        bindsTo: Tenant
+        bindsTo: Tenant.id
         columns:
         - Tenant.code
         - Tenant.name

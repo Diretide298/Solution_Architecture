@@ -34,9 +34,13 @@ release_tag: pending
 decision_owner: Chinmay
 triage: fix-forward
 prevention:
-  type: none
-  reason: 'No check reads screen names for a trailing tab or page number. Proposed for the lead: a check-screens rule that
-    a screen name carries no tab (real or escaped) and does not end in a pack page number; until it exists or the lead approves
-    none, this entry stays open.'
-status: open
-notes: About 80 Block C names still carry the artefact; the proposed rule would list them.
+  type: check
+  ref: tools/check-screens.py
+status: closed
+notes: 'About 80 Block C names still carry the artefact; the proposed rule would list them.
+
+
+  Closed by CHG-SBO-023: check-screens refuses a screen name that carries a tab (real or escaped) and the pack page number
+  after it; it fails on the parent commit (75 names) and passes after, every moved name cleaned (screens-p08-p09, 2 October
+  2026).'
+closed_by_commit: 51ede7a3

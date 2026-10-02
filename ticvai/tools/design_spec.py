@@ -234,10 +234,18 @@ class Package:
         def load():
             ops, schemas, params, resps = {}, {}, {}, {}
             for f in sorted((ROOT / "contracts").rglob("*.yaml")):
+                text = f.read_text(encoding="utf-8")
                 try:
-                    doc = _sane(load_yaml(f.read_text(encoding="utf-8"))) or {}
+                    doc = _sane(load_yaml(text)) or {}
                 except Exception:
-                    continue
+                    # **libyaml refuses escaped surrogate pairs** (subscription.yaml): fall back to the
+                    # pure-Python loader, as check-design-notes does (d3b5b854), rather than skip the
+                    # contract and report every one of its operations and fields as undefined
+                    # (CHG-SBO-001, 2 October 2026).
+                    try:
+                        doc = _sane(yaml.load(text, Loader=yaml.SafeLoader)) or {}
+                    except Exception:
+                        continue
                 comp = doc.get("components") or {}
                 for n, s in (comp.get("schemas") or {}).items():
                     schemas.setdefault(n, s)
@@ -435,10 +443,18 @@ def notes() -> dict:
         procs, by = {}, collections.defaultdict(list)
         if NOTES_DIR.is_dir():
             for f in sorted(NOTES_DIR.glob("*.yaml")):
+                text = f.read_text(encoding="utf-8")
                 try:
-                    doc = _sane(load_yaml(f.read_text(encoding="utf-8"))) or {}
+                    doc = _sane(load_yaml(text)) or {}
                 except Exception:
-                    continue
+                    # **libyaml refuses escaped surrogate pairs** (subscription.yaml): fall back to the
+                    # pure-Python loader, as check-design-notes does (d3b5b854), rather than skip the
+                    # contract and report every one of its operations and fields as undefined
+                    # (CHG-SBO-001, 2 October 2026).
+                    try:
+                        doc = _sane(yaml.load(text, Loader=yaml.SafeLoader)) or {}
+                    except Exception:
+                        continue
                 if not isinstance(doc, dict):
                     continue
                 name = str(doc.get("process") or f.stem)

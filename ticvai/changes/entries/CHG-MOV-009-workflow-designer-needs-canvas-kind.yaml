@@ -26,5 +26,10 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-screens.py
-status: open
-notes: screens/_components.yaml belongs to screens-other (PHASE-B ownership).
+status: closed
+notes: 'screens/_components.yaml belongs to screens-other (PHASE-B ownership).
+
+
+  Closed by CHG-SBO-023: ADM-241 declares the canvas kind (CHG-SOT-020) bound to VisualWorkflowDesignerInput.definition; the
+  design-note correction is marked fixed.'
+closed_by_commit: 51ede7a3

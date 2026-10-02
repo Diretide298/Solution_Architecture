@@ -46,7 +46,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-screen-wiring.py
-status: open
+status: closed
 notes: 'BO-111 is kept rather than BO-110 because flows F31 and F93 run on it. Anchors keep their navigation so the board
   flows (F243, F223, F127) still walk. check-screen-wiring S-DUP-SCREEN guards duplicates.
 
@@ -72,3 +72,4 @@ notes: 'BO-111 is kept rather than BO-110 because flows F31 and F93 run on it. A
   Batch SBO (screens-p08-p09, phase B), 2 October 2026; worktree D:/wt/screens-p08-p09, branch screens-p08-p09. Tickets: none
   started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched screen. Applied with
   the screen files'' own dump settings (width 100).'
+closed_by_commit: 6ad22977

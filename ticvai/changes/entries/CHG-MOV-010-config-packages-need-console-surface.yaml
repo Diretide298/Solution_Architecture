@@ -30,6 +30,11 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-screen-wiring.py
-status: open
+status: closed
 notes: 'Question for Chinmay, recommended default: a new console screen "Configuration promotion" (P09, screens-p08-p09) binds
-  the three operations, and ADM-122 stays a venue screen for product import and export.'
+  the three operations, and ADM-122 stays a venue screen for product import and export.
+
+
+  Closed by CHG-SBO-024: the new console screen ADM-700 Configuration Promotion binds exportConfigPackage, diffConfigPackage
+  and applyConfigPackage; ADM-122 stays in Venue Management.'
+closed_by_commit: 51ede7a3

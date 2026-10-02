@@ -122,7 +122,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-screens.py
-status: open
+status: closed
 notes: 'check-screens gains the rule "a screen name carries no tab (real or escaped) and the pack page number after it" (closes
   CHG-MOV-004; fails on the parent commit on 75 names, passes after). The consumed-by lines of the renamed screens lose the
   same artefact (only the consumed-by lines are touched). The P17 twins are copied field by field from their P09 twins, keeping
@@ -136,3 +136,4 @@ notes: 'check-screens gains the rule "a screen name carries no tab (real or esca
   Batch SBO (screens-p08-p09, phase B), 2 October 2026; worktree D:/wt/screens-p08-p09, branch screens-p08-p09. Tickets: none
   started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched screen. Applied with
   the screen files'' own dump settings (width 100).'
+closed_by_commit: 6ad22977

@@ -2,8 +2,8 @@ id: CHG-CSP-052
 date: '2026-10-02'
 source: audit
 kind: contract
-summary: New listOwnSessions and endOwnSession let any staff or partner user, including a platform operator, see and end
-  their own sessions for "My account & security".
+summary: New listOwnSessions and endOwnSession let any staff or partner user, including a platform operator, see and end their
+  own sessions for "My account & security".
 decision:
   what: GET /auth/sessions/mine and POST /auth/sessions/mine/{sessionId}/end (self-service, no permission, MFA step-up to
     end).
@@ -30,7 +30,12 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-binding-ratchet.py
-status: open
+status: closed
 notes: 'Open until the new console screen exists and binds them with the MFA operations (screens owner). Applied in worktree
   apply-contracts-spine (batch CSP, 2 October 2026). Tickets: none started (Block A starts Monday 5 October 2026); unstarted
-  keys are the tasks.csv keys naming a touched operation or screen.'
+  keys are the tasks.csv keys naming a touched operation or screen.
+
+
+  Closed by CHG-SBO-022: the new console screen ADM-699 My Account & Security binds listOwnSessions and endOwnSession with
+  the MFA operations.'
+closed_by_commit: 51ede7a3

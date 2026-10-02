@@ -6867,7 +6867,7 @@ screens:
         operation: listOutlets
         notes: A pick list in words, never a typed id (design-note correction, 2 October 2026).
         provenance: contract fnb.yaml GET /fnb-orders
-        bindsTo: Outlet
+        bindsTo: Outlet.id
         columns:
         - Outlet.name
       - kind: multiSelect
@@ -11927,7 +11927,7 @@ screens:
         operation: listWorkstations
         notes: A pick list in words, never a typed id (design-note correction, 2 October 2026).
         provenance: contract shift.yaml GET /shifts
-        bindsTo: Workstation
+        bindsTo: Workstation.id
         columns:
         - Workstation.name
       - kind: multiSelect
@@ -12184,7 +12184,7 @@ screens:
         operation: listWorkstations
         notes: A pick list in words, never a typed id (design-note correction, 2 October 2026).
         provenance: contract shift.yaml GET /shifts
-        bindsTo: Workstation
+        bindsTo: Workstation.id
         columns:
         - Workstation.name
       - kind: multiSelect
@@ -13821,7 +13821,7 @@ screens:
         operation: listOutlets
         notes: A pick list in words, never a typed id (design-note correction, 2 October 2026).
         provenance: contract fnb.yaml GET /menus
-        bindsTo: Outlet
+        bindsTo: Outlet.id
         columns:
         - Outlet.name
       - kind: datePicker
@@ -14915,7 +14915,7 @@ screens:
         operation: listOutlets
         notes: A pick list in words, never a typed id (design-note correction, 2 October 2026).
         provenance: contract retail.yaml GET /merchandise
-        bindsTo: Outlet
+        bindsTo: Outlet.id
         columns:
         - Outlet.name
       - kind: selectField
@@ -16346,7 +16346,7 @@ screens:
         provenance: contract identity.yaml GET /roles
       - kind: multiSelect
         label: Start from presets
-        bindsTo: CapabilityTemplate
+        bindsTo: CapabilityTemplate.id
         columns:
         - CapabilityTemplate.name
         - CapabilityTemplate.module
@@ -16605,7 +16605,7 @@ screens:
         operation: listOrgUnits
         notes: A pick list in words, never a typed id (design-note correction, 2 October 2026).
         provenance: contract workforce.yaml GET /rota-assignments
-        bindsTo: OrgUnit
+        bindsTo: OrgUnit.id
         columns:
         - OrgUnit.name
       - kind: dataTable
@@ -19880,7 +19880,7 @@ screens:
         operation: listOrgUnits
         notes: A pick list in words, never a typed id (design-note correction, 2 October 2026).
         provenance: contract tenancy.yaml GET /audit-records
-        bindsTo: OrgUnit
+        bindsTo: OrgUnit.id
         columns:
         - OrgUnit.name
       - kind: selectField
@@ -19894,7 +19894,7 @@ screens:
         operation: listWorkstations
         notes: A pick list in words, never a typed id (design-note correction, 2 October 2026).
         provenance: contract tenancy.yaml GET /audit-records
-        bindsTo: Workstation
+        bindsTo: Workstation.id
         columns:
         - Workstation.name
       - kind: textField
@@ -21416,7 +21416,7 @@ screens:
         operation: listLegalEntities
         notes: 'The entity switcher: legal entities by name.'
         provenance: contract finance.yaml GET /accounts
-        bindsTo: LegalEntity
+        bindsTo: LegalEntity.id
         columns:
         - LegalEntity.name
       - kind: selectField
@@ -23716,7 +23716,7 @@ screens:
         operation: listInventoryItems
         notes: A pick list in words, never a typed id (design-note correction, 2 October 2026).
         provenance: contract inventory.yaml GET /stock-movements
-        bindsTo: InventoryItem
+        bindsTo: InventoryItem.id
         columns:
         - InventoryItem.name
       - kind: selectField
@@ -23724,7 +23724,7 @@ screens:
         operation: listStockLocations
         notes: A pick list in words, never a typed id (design-note correction, 2 October 2026).
         provenance: contract inventory.yaml GET /stock-movements
-        bindsTo: StockLocation
+        bindsTo: StockLocation.id
         columns:
         - StockLocation.name
       - kind: multiSelect
@@ -34144,7 +34144,7 @@ screens:
         operation: listWorkstations
         notes: A pick list in words, never a typed id (design-note correction, 2 October 2026).
         provenance: contract orders.yaml GET /sync/rejections
-        bindsTo: Workstation
+        bindsTo: Workstation.id
         columns:
         - Workstation.name
       - kind: selectField
@@ -118650,7 +118650,7 @@ screens:
           by
       - kind: multiSelect
         label: Job title
-        bindsTo: WorkforceJobTitle
+        bindsTo: WorkforceJobTitle.id
         operation: listJobTitles
         notes: 'The role filter: job titles by name.'
         provenance: contract workforce.yaml GET /job-titles
