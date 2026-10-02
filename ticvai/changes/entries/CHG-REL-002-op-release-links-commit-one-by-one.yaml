@@ -26,6 +26,7 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/op-release.py
-status: open
+status: closed
+closed_by_commit: 4ff7c5cf
 notes: A re-run compares first, so the links it made stay and it carries on. Run the apply under nohup so a dropped
   session cannot stop it.
