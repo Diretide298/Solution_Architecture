@@ -1,0 +1,41 @@
+id: CHG-EXP-004
+date: '2026-10-02'
+source: cr
+kind: design-input
+summary: The design handoff shows "Powered by TICVAI" as a tenant toggle, on by default, instead of a fixed, never-editable credit.
+decision:
+  what: >-
+    tools/build-white-label-map.py drops "Powered by TICVAI is fixed and never client-editable" from Never configurable,
+    labels and explains brand.showPoweredBy (launch screen, foot of Account, web footer; off only with the licence
+    add-on, 403 powered-by-locked) with an input-to-output example; design_spec.py's guest block says the credit is a
+    toggle on by default.
+  by: Chinmay
+  date: '2026-10-02'
+why: >-
+  Chinmay, 2 October, workbook Q160 (DEC-160, CMS-104) and the pre-apply round: "Powered by: a toggle, default on ...
+  shown unless the venue's licence allows switching it off"; consistent with DI-297. Contract: CHG-CSA-036. The map
+  still said the opposite (MoM 3 Aug DI-111 wording), and every guest batch carried it.
+keys_touched:
+  schemas:
+  - BrandIdentity
+  screens:
+  - CMS-002
+  - CMS-004
+  - CMS-104
+  files:
+  - tools/build-white-label-map.py
+  - tools/design_spec.py
+root_class: 'new: package-contradicts-decision'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: generator-rule
+  ref: tools/build-white-label-map.py::DECIDED
+status: closed
+closed_by_commit: 5ded35eb
+notes: >-
+  The map finds showPoweredBy on CMS-002, CMS-004 and ADM-016 (the screens that call setBrandIdentity). CMS-104,
+  where the decision was asked, does not call setBrandIdentity: binding it there is the screens-guest agent's (SGU).

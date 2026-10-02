@@ -1,0 +1,45 @@
+id: CHG-EXP-005
+date: '2026-10-02'
+source: cr
+kind: design-input
+summary: The white-label map and every guest batch carry the decided homepage options, card count and scroll animation per section, and the landing-page templates.
+decision:
+  what: >-
+    tools/build-white-label-map.py labels, explains and gives an alternate-tenant example for
+    homepage.sections[].maxItems ("Sections: card count"), homepage.sections[].scrollAnimation (rise, scale, slide,
+    blur, none; default rise), homepage.templateKey (a template picker over listLandingPageTemplates) and
+    homepage.landingSource, and adds them to a "Decided on 2 October" list rendered in WHITE-LABEL.md and once per
+    guest batch.
+  by: Chinmay
+  date: '2026-10-02'
+why: >-
+  Chinmay, 2 October: workbook Q152 (DEC-152, every customisation option of the approved wireframe, including the
+  card count per section), Q153 (DEC-153, scroll animation "must be there"; DI-1088) and batch 2 #41 (DEC-548,
+  templates for tenants without a landing page). Contracts: CHG-CSA-040 and CHG-CSA-037. The map derived the fields
+  but showed a bare number field and a free-text template key with no effect, so a session could not tell what they
+  change.
+keys_touched:
+  schemas:
+  - HomepageLayout
+  - LandingPageTemplate
+  operations:
+  - setHomepageLayout
+  - listLandingPageTemplates
+  screens:
+  - CMS-007
+  files:
+  - tools/build-white-label-map.py
+root_class: 'new: package-contradicts-decision'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: generator-rule
+  ref: tools/build-white-label-map.py::DECIDED
+status: closed
+closed_by_commit: 5ded35eb
+notes: >-
+  No screen calls listLandingPageTemplates yet, and GST-001's text (screens/P02) still says "One or two items per type
+  (maxItems, 1-2)": both are the screens-guest agent's (SGU).
