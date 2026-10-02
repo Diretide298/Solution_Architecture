@@ -3961,10 +3961,9 @@ screens:
     #1, batch 6 #173 to #175 and the pre-apply round; DEC-059, DEC-175; CHG-SPO-003). A shift over the
     threshold is "Under review" on the cashier''s view, never blocks the next cashier''s shift on this
     till, and is resolved by a supervisor with their PIN on any till (accept, or ask for a recount) or
-    in the daily cash reconciliation (BO-043). **Pending: `closeShift` on this screen** (the pre-apply
-    round declares it here, supervisor PIN, any till) is refused by check-finance-rules F-BLIND-CLOSE,
-    which forbids `closeShift` on every P04 and P06 screen; it is bound once that rule admits a supervisor-permissioned
-    close (open entry CHG-SPO-021).'
+    in the daily cash reconciliation (BO-043). The supervisor''s close is on this screen: `closeShift`
+    behind SHIFT_CLOSE_OTHER and the supervisor''s PIN, any till (pre-apply round; CHG-SPO-021; check-finance-rules
+    admits closeShift on a till only from a supervisor''s control).'
   density: touchLarge
   boardFrames:
   - POS Board 3.dc.html#pos-3f
@@ -3984,9 +3983,9 @@ screens:
         operation: acceptShiftVariance
         note: '**Counted, and the supervisor has been alerted; the cashier sees "Under review" and may
           sign out.** A supervisor holding OVERSHORT_ACCEPT, after a PIN step-up on any till, sees counted,
-          expected and variance and accepts it, asks for a recount (`rejectShiftVariance`); or does so
-          in the daily cash reconciliation (BO-043). Not the cashier whose shift it is (audit R080 (e);
-          CHG-FIN-003; DEC-059, DEC-175).'
+          expected and variance and accepts it, asks for a recount (`rejectShiftVariance`) or closes it
+          (`closeShift`, CHG-SPO-021); or does so in the daily cash reconciliation (BO-043). Not the cashier
+          whose shift it is (audit R080 (e); CHG-FIN-003; DEC-059, DEC-175).'
       recountRequested:
         operation: rejectShiftVariance
         note: The supervisor asked for a recount; the cashier recounts blind and resubmits (DEC-175; CHG-CSP-013).
@@ -4140,6 +4139,16 @@ screens:
           the amount). The shift stays pendingVariance with the recount requested; the cashier recounts
           blind at any till and resubmits with `submitShiftCount` (DEC-175; DI-804; CHG-CSP-013).'
         provenance: contract shift.yaml POST /shifts/{shiftId}/reject-variance
+      - kind: secondaryButton
+        label: Close shift for the cashier
+        operation: closeShift
+        permission: SHIFT_CLOSE_OTHER
+        notes: 'Supervisor only, after their own PIN on this till (any till of the venue): closes the
+          cashier''s shift, or resolves one that is "Under review". The supervisor sees counted, expected
+          and variance; the cashier never does (decided 2 October 2026, Chinmay, pre-apply round: "closeShift
+          is declared on POS-007 (supervisor PIN, any till) and in the daily cash reconciliation"; DEC-059;
+          CHG-CSP-012; CHG-SPO-021).'
+        provenance: contract shift.yaml POST /shifts/{shiftId}/close
   overlays:
   - id: confirmCloseShift
     component: confirmDialog
@@ -4187,6 +4196,20 @@ screens:
       discards:
       - reason
     provenance: contract shift.yaml POST /shifts/{shiftId}/reject-variance
+  - id: formCloseShiftForCashier
+    component: modal
+    trigger: Close shift for the cashier
+    body: '**The supervisor''s close.** Asks for the supervisor''s PIN (step-up on this device), then
+      shows counted, expected and variance to the supervisor only, and closes the shift. The cashier''s
+      own count stays on `submitShiftCount`; this is the close on their behalf (decided 2 October 2026,
+      Chinmay; CHG-CSP-012). Dismissing sends nothing.'
+    confirm:
+      label: Close shift
+      operation: closeShift
+    dismiss:
+      label: Cancel
+      discards: []
+    provenance: contract shift.yaml POST /shifts/{shiftId}/close
   states:
     loading: The close shift list.
     error: Could not load. Names which read failed and leaves the close shift untouched.
@@ -4205,11 +4228,10 @@ screens:
     pendingVariance: '**Counted; "Under review".** `submitShiftCount` answered `referredToSupervisor`.
       The cashier sees "Under review" and no amount, **and may sign out**: the shift waits, and the next
       cashier opens a shift on this till meanwhile (it never blocks the next one). A supervisor resolves
-      it with their PIN on this till or any till of the venue (accept the variance or ask for a recount),
-      or in the daily cash reconciliation, which lists every shift of the day and resolves them one by
-      one; the supervisor''s close on the till itself (`closeShift`) waits on CHG-SPO-021 (decided 2 October
-      2026, Chinmay, batch 3 #1 and pre-apply round; DEC-059, DEC-173; CHG-CSP-012; CHG-FIN-003; audit
-      R080 (e)).'
+      it with their PIN on this till or any till of the venue (accept the variance, ask for a recount,
+      or close it with `closeShift`), or in the daily cash reconciliation, which lists every shift of
+      the day and resolves them one by one (decided 2 October 2026, Chinmay, batch 3 #1 and pre-apply
+      round; DEC-059, DEC-173; CHG-CSP-012; CHG-FIN-003; audit R080 (e)).'
     recountRequested: '**"Recount requested".** A supervisor rejected the variance (`rejectShiftVariance`)
       with a reason the cashier reads; the shift is still pendingVariance with `recountRequestedAt` set.
       The cashier counts the drawer blind again, at any till of the venue, and submits with `submitShiftCount`;
@@ -4253,6 +4275,14 @@ screens:
     purpose: The denominations the cashier counted, line by line, for the supervisor reviewing the shift;
       counted values only, never the expected figure (CHG-CSP-014)
     trigger: onAction
+  - operationId: closeShift
+    contract: shift
+    trigger: onAction
+    purpose: A supervisor closes a cashier's shift on this till or any till of the venue, with their own
+      PIN; counted, expected and variance go to the supervisor only (decided 2 October 2026, Chinmay,
+      pre-apply round; DEC-059; CHG-CSP-012, CHG-SPO-021)
+    invalidates:
+    - listCashMovements
   entryState:
     params:
     - name: shiftId
@@ -7036,13 +7066,21 @@ screens:
         label: The rules this till opens and closes to
         bindsTo: TillShiftPolicy
         operation: getTillShiftPolicy
-        notes: 'Read-only on the till: open approval, deposit box and bag number, the abandoned-shift
-          limit and the exception alerts, set for the venue in the back office (CHG-CSP-020). The variance
-          threshold and drawer limit are venue settings shown beside them.'
+        notes: 'The rules: open approval, deposit box and bag number, the abandoned-shift limit and the
+          exception alerts, set for the whole venue (CHG-CSP-020). The variance threshold and drawer limit
+          are venue settings shown beside them.'
         provenance: contract shift.yaml GET /venues/{venueId}/till-shift-policy
     - name: actionBar
       slot: rowActions
-      components: []
+      components:
+      - kind: secondaryButton
+        label: Edit the till rules
+        operation: setTillShiftPolicy
+        permission: WORKSTATION_CONFIGURE
+        notes: 'Venue scope, never per till: open approval, deposit box and bag number, the opening-float
+          tolerance, the abandoned-shift limit and the no-sale alert. A change applies to shifts opened
+          after it (CHG-CSP-020). Hidden without WORKSTATION_CONFIGURE.'
+        provenance: contract shift.yaml PUT /venues/{venueId}/till-shift-policy
   states:
     loading: The shift templates policies list.
     error: Could not load. Names which read failed and leaves the shift templates policies untouched.
@@ -7063,6 +7101,13 @@ screens:
     contract: shift
     purpose: The venue's till opening, closing and exception rules that this till's shifts run under (CHG-CSP-020)
     trigger: onLoad
+  - operationId: setTillShiftPolicy
+    contract: shift
+    trigger: onAction
+    purpose: A manager sets the venue's till opening, closing and exception rules from the till (WORKSTATION_CONFIGURE;
+      venue scope, applies to shifts opened after it; CHG-CSP-020)
+    invalidates:
+    - getTillShiftPolicy
   entryState:
     params:
     - name: workstationId
@@ -7113,12 +7158,27 @@ screens:
     why: 'Contract gap recorded 2 October 2026 (CHG-WIR-024): No operation reads or writes a till shift
       policy (opening and closing rules, exceptions and alerts) for F73 step 2.'
     source: DI-309 | screens/P04-point-of-sale.yaml#POS-019 | F73 step 2
-  - why: '2 October 2026 (CHG-SPO-014): the shift-policy read now exists (`getTillShiftPolicy`, CHG-CSP-020)
-      and is bound; the CHG-WIR-024 gap for this screen is closed on the read side. Writing the policy
-      stays in the back office.'
+  - why: '2 October 2026 (CHG-SPO-014, CHG-SPO-021): the shift-policy operations now exist (`getTillShiftPolicy`,
+      `setTillShiftPolicy`, CHG-CSP-020) and are bound, read on load and written by a holder of WORKSTATION_CONFIGURE;
+      the CHG-WIR-024 gap for this screen is closed.'
     source: contracts/spine/shift.yaml#getTillShiftPolicy
   purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the pasted board placeholder
     "Shift Templates & Policies — from the client design board, 20 August" (DI-309).'
+  overlays:
+  - id: formSetTillShiftPolicy
+    component: modal
+    trigger: Edit the till rules
+    body: '**Collects the whole policy** (`setTillShiftPolicy` replaces it; a field left out returns to
+      its default), prefilled from `getTillShiftPolicy`. Says it applies to shifts opened after it. Dismissing
+      sends nothing.'
+    bindsTo: TillShiftPolicy
+    confirm:
+      label: Save the till rules
+      operation: setTillShiftPolicy
+    dismiss:
+      label: Cancel
+      discards: []
+    provenance: contract shift.yaml PUT /venues/{venueId}/till-shift-policy
 - id: POS-020
   name: Shift Exceptions & Alerts
   module: Sell

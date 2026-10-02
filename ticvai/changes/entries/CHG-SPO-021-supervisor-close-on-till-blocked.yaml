@@ -1,36 +1,46 @@
 id: CHG-SPO-021
 date: '2026-10-02'
 source: audit
-kind: process
-summary: 'closeShift is not yet bound on POS-007: check-finance-rules F-BLIND-CLOSE refuses closeShift on every P04 and P06
-  screen, while the pre-apply round declares it on POS-007 for the supervisor.'
+kind: spec
+summary: POS-007 declares closeShift for the supervisor (PIN, any till), POS-019 declares setTillShiftPolicy, and check-finance-rules
+  F-BLIND-CLOSE admits closeShift on a till only from a supervisor's control.
 decision:
-  what: 'Hold the closeShift binding on POS-007 until the tools owner amends F-BLIND-CLOSE to admit closeShift on a cashier
-    platform when the component is permissioned SHIFT_CLOSE_OTHER or OVERSHORT_ACCEPT (the supervisor), then bind it: button
-    "Close shift for the cashier", supervisor PIN, any till.'
+  what: 'Bind closeShift on POS-007 behind SHIFT_CLOSE_OTHER with the supervisor''s PIN (button "Close shift for the cashier"
+    and its form), and setTillShiftPolicy on POS-019 behind WORKSTATION_CONFIGURE. Amend F-BLIND-CLOSE: a P04 or P06 screen
+    may declare closeShift only when every component calling it is permissioned SHIFT_CLOSE_OTHER or OVERSHORT_ACCEPT and
+    every form calling it is triggered by such a component; otherwise it still fails.'
   by: Chinmay
   date: '2026-10-02'
 why: 'Chinmay, 2 October 2026, pre-apply round: "closeShift is declared on POS-007 (supervisor PIN, any till) and in the daily
-  cash reconciliation" (DEC-059; CHG-CSP-012). check-finance-rules (CHG-FIN-003) predates it and fails the binding; the apply
-  brief forbids new check failures.'
+  cash reconciliation" (DEC-059; CHG-CSP-012). check-finance-rules (CHG-FIN-003) predated the decision and refused closeShift
+  on any till screen; the lead asked that POS-007 declare closeShift and POS-019 the till shift policy operations, which flows
+  F74 step 1 and F73 step 2 (CHG-SOT-004) now expect (CHG-CSP-020).'
 keys_touched:
   screens:
   - POS-007
+  - POS-019
   operations:
   - closeShift
+  - setTillShiftPolicy
+  - getTillShiftPolicy
+  flows:
+  - F74
+  - F73
   files:
   - tools/check-finance-rules.py
+  - screens/P04-point-of-sale.yaml
 root_class: 'new: package-contradicts-decision'
 tickets:
   started: []
   unstarted:
   - APP-POS-POS-007
+  - APP-POS-POS-019
 release_tag: pending
 decision_owner: Chinmay
 prevention:
   type: check
   ref: tools/check-finance-rules.py
 status: open
-notes: 'Open: needs the tools owner (check-finance-rules) first, then a one-line screen change. Applied in worktree screens-pos-staff
-  (batch SPO, phase B, 2 October 2026). Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are the
-  tasks.csv keys of the touched screens.'
+notes: 'The check still refuses a cashier''s closeShift (a component without SHIFT_CLOSE_OTHER or OVERSHORT_ACCEPT); run on
+  the parent commit it failed POS-007 the moment closeShift was declared, and passes with the supervisor control. Closes on
+  its commit. Applied in worktree screens-pos-staff (batch SPO, phase B, 2 October 2026). Tickets: none started.'
