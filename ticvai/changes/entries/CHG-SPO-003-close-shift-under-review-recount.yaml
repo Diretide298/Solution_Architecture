@@ -5,10 +5,10 @@ kind: spec
 summary: POS-007 shows a counted shift as "Under review", lets the cashier sign out without blocking the next shift, and gives
   the supervisor Ask for a recount and the count lines on any till.
 decision:
-  what: 'POS-007 binds rejectShiftVariance (supervisor PIN, reason) and getShiftCountLines (permissioned OVERSHORT_ACCEPT);
+  what: POS-007 binds rejectShiftVariance (supervisor PIN, reason) and getShiftCountLines (permissioned OVERSHORT_ACCEPT);
     the pendingVariance state reads "Under review" with sign-out allowed and resolution at any till or in the daily cash reconciliation;
     a recountRequested state and machine transition; POS-001 notes that a pending shift never blocks the next. closeShift
-    on POS-007 is NOT bound: see CHG-SPO-021.'
+    on POS-007 followed in CHG-SPO-021, once check-finance-rules admitted the supervisor's close.
   by: Chinmay
   date: '2026-10-02'
 why: 'Chinmay, 2 October 2026: batch 3 #1 (POS-007, "The cashier may sign out ... must not stop the next cashier starting

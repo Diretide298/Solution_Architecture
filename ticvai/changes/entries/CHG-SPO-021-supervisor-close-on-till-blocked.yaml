@@ -40,7 +40,8 @@ decision_owner: Chinmay
 prevention:
   type: check
   ref: tools/check-finance-rules.py
-status: open
+status: closed
+closed_by_commit: 973dd678
 notes: 'The check still refuses a cashier''s closeShift (a component without SHIFT_CLOSE_OTHER or OVERSHORT_ACCEPT); run on
   the parent commit it failed POS-007 the moment closeShift was declared, and passes with the supervisor control. Closes on
   its commit. Applied in worktree screens-pos-staff (batch SPO, phase B, 2 October 2026). Tickets: none started.'
