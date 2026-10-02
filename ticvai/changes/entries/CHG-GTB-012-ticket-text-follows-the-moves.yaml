@@ -1,0 +1,54 @@
+id: CHG-GTB-012
+date: '2026-10-02'
+source: cr
+kind: process
+summary: Ticket text survives the 2 October moves - a Venue Management screen ticket on the backend track gets its screen
+  and Done-when, "Used by" names every consumer, and only a row-creating operation is said to make a table non-empty.
+decision:
+  what: 'tools/op-descriptions.py: a backend-track Venue Management task whose subject opens with its screen id (seven pushed
+    APP-SETUP-ADM tickets now on P08: ADM-050, 055, 075, 090, 091, 095, 219) is written as that screen''s ticket, with its
+    screen block and Done-when; "Used by" lists every declared consumer instead of the first twelve and "...", by screen id
+    past twelve. tools/build-service-docs.py: an update, approve, delete or other change-only operation in the slice is
+    labelled "changes rows of <table> that another operation creates", not "makes <table> non-empty". The slice itself is
+    unchanged.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'check-ticket-text failed the r2 full refresh with 14 new findings: T-DONE-WHEN on the seven tickets the ADM-049 move
+  (CHG-MOV-001) put on the P08 backend track; T-USED-BY (R042) on getForecast and the platform-staff grant reads, whose
+  consumers grew past twelve with the console grant (R098); T-NONEMPTY-LABEL (R064) on updatePerformance, updateMenu,
+  updateRotaAssignment and deleteReport.'
+keys_touched:
+  files:
+  - tools/op-descriptions.py
+  - tools/build-service-docs.py
+  tickets:
+  - APP-SETUP-ADM-050
+  - APP-SETUP-ADM-055
+  - APP-SETUP-ADM-075
+  - APP-SETUP-ADM-090
+  - APP-SETUP-ADM-091
+  - APP-SETUP-ADM-095
+  - APP-SETUP-ADM-219
+  - SVC-AI-FORECAST-1
+  - SVC-IDENTITY-ADMINISTRATION-1
+  - SVC-IDENTITY-ADMINISTRATION-2
+root_class: A10 TICKET-DRIFT
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ADM-050
+  - APP-SETUP-ADM-055
+  - APP-SETUP-ADM-075
+  - APP-SETUP-ADM-090
+  - APP-SETUP-ADM-091
+  - APP-SETUP-ADM-095
+  - APP-SETUP-ADM-219
+release_tag: r2
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-ticket-text.py
+status: open
+notes: The text reaches OpenProject only through op-descriptions.rb at the release, and only for unstarted tickets (rule 6).
+  If any of the seven was started, it keeps its text and takes a comment instead.

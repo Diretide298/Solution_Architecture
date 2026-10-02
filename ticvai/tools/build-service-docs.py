@@ -694,6 +694,22 @@ def replaced_screens() -> frozenset:
     return frozenset(out)
 
 
+# **Only an operation that can create a row makes a table non-empty** (2 October, CHG-GTB-012; audit R064).
+# The slice adds every setup writer of a table the release reads, so `updatePerformance`, `updateMenu`,
+# `updateRotaAssignment` and `deleteReport` were labelled as making their tables non-empty, which only a create
+# (or a PUT upsert) can do. The same rule check-ticket-text (T-NONEMPTY-LABEL) applies; the slice is unchanged.
+_CHANGES_ONLY = re.compile(r"(update|approve|reject|escalate|cancel|delete|remove|archive|close|suspend|resume|"
+                           r"acknowledge|withdraw|revoke|disable|deactivate)")
+
+def _enables_label(op: str, verb: str, enables) -> str:
+    if not enables:
+        return ""
+    tables = ", ".join("`" + t + "`" for t in enables)
+    if str(verb).upper() in ("PATCH", "DELETE") or _CHANGES_ONLY.match(op):
+        return f", changes rows of {tables} that another operation creates"
+    return f", makes {tables} non-empty"
+
+
 def main() -> int:
     sl = json.loads((HANDOFF / "delivery-slice.json").read_text(encoding="utf-8"))
     lineage = json.loads((HANDOFF / "api-data-lineage.json").read_text(encoding="utf-8"))
@@ -932,8 +948,7 @@ def main() -> int:
                 if x["description"]:
                     L += [x["description"], ""]
                 facts = [["Permission", f"`{x['permission']}`"], ["Scope level", x["scopeLevel"]],
-                         ["Part of slice", so["part"] + (f", makes {', '.join('`' + t + '`' for t in so['enables'])} non-empty"
-                                                          if so["enables"] else "")],
+                         ["Part of slice", so["part"] + _enables_label(o, x["verb"], so["enables"])],
                          ["Wave", wave[o]], ["Offline", "yes" if x["offline"] else "no"]]
                 for label, key in (("Config scope", "configScope"), ("Conflict policy", "conflict"),
                                    ("Read routing", "routing"), ("Step-up auth", "stepUp"),

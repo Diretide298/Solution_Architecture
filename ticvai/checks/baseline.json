@@ -1,7 +1,7 @@
 {
  "_about": "Binding counts per app|block|kind that may only fall (tools/check-binding-ratchet.py). Written by --update-baseline in a reviewed commit, never by hand.",
  "recorded": "2026-10-02",
- "commit": "25806c40",
+ "commit": "267b6cf2",
  "totals": {
   "unbound-control": 5471,
   "undefined-operation": 0,
@@ -9,21 +9,28 @@
  },
  "screens": 2450,
  "fully_resolved": 1406,
- "block_source": "tasks.csv",
+ "block_source": "plan-tasks.csv",
  "counts": {
-  "guest|-|unbound-control": 5,
   "guest|A|unbound-control": 76,
   "guest|A|unknown-field": 17,
-  "ticvai-control|-|unbound-control": 477,
-  "ticvai-control|-|unknown-field": 2,
+  "guest|C|unbound-control": 5,
+  "ticvai-control|A|unbound-control": 38,
   "ticvai-control|A|unknown-field": 1,
-  "venue-management|-|unbound-control": 4602,
+  "ticvai-control|B|unbound-control": 328,
+  "ticvai-control|B|unknown-field": 1,
+  "ticvai-control|C|unbound-control": 2,
+  "ticvai-control|C|unknown-field": 1,
+  "ticvai-control|D|unbound-control": 109,
+  "venue-management|-|unbound-control": 4129,
   "venue-management|-|unknown-field": 1,
-  "venue-management|A|unbound-control": 222,
-  "venue-pos|-|unbound-control": 7,
-  "venue-pos|A|unbound-control": 20,
+  "venue-management|A|unbound-control": 131,
+  "venue-management|B|unbound-control": 60,
+  "venue-management|C|unbound-control": 16,
+  "venue-management|D|unbound-control": 488,
+  "venue-pos|A|unbound-control": 27,
   "venue-pos|A|unknown-field": 1,
-  "venue-staff-mobile|-|unbound-control": 60,
-  "venue-staff-mobile|A|unbound-control": 2
+  "venue-staff-mobile|A|unbound-control": 20,
+  "venue-staff-mobile|C|unbound-control": 30,
+  "venue-staff-mobile|D|unbound-control": 12
  }
 }

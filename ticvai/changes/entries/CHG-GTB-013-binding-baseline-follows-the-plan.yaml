@@ -1,0 +1,35 @@
+id: CHG-GTB-013
+date: '2026-10-02'
+source: cr
+kind: process
+summary: The binding-ratchet baseline is re-recorded from the refreshed r2 state - the four rises were screens changing block
+  in the regenerated plan, not new unbound controls.
+decision:
+  what: 'checks/baseline.json re-recorded with check-binding-ratchet --update-baseline in the refresh-safe worktree of the r2
+    gate (267b6cf2 refreshed, with this branch''s contract and screen changes applied). Totals are identical before and after
+    the refresh: 5471 unbound-control, 0 undefined-operation, 22 unknown-field, 1406 of 2450 screens fully resolved. The
+    block source moves from tasks.csv (Block A only; B-D read as "-") to the plan-tasks.csv the refresh writes (A-D).'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'check-binding-ratchet failed the r2 full refresh with four rises (ticvai-control A 0->38, venue-management - 4602->4693,
+  venue-pos A 20->27, venue-staff-mobile A 2->20), each matched by an equal fall in the same app (ticvai-control - 477->439,
+  venue-management A 222->131, venue-pos - 7->0, venue-staff-mobile - 60->42): the baseline of commit 267b6cf2 was recorded
+  on main before the refresh, against a plan the refresh regenerates after the 2 October screen moves. An artefact of the
+  regeneration, so re-recorded in the same commit as the council rule allows (counts only fall from here).'
+keys_touched:
+  files:
+  - checks/baseline.json
+root_class: 'new: ratchet-baseline-drift'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r2
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-binding-ratchet.py
+status: open
+notes: 'The recorded commit field says 267b6cf2 because the tool writes the worktree HEAD; the counts are of the refreshed tree
+  with this branch applied. Record the baseline from a refreshed tree (refresh-safe --keep-worktree), never from an
+  unrefreshed main: on main without plan-tasks.csv the blocks read differently.'
