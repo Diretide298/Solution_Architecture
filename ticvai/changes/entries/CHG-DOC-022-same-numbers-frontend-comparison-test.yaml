@@ -1,0 +1,28 @@
+id: CHG-DOC-022
+date: '2026-10-02'
+source: audit
+kind: process
+summary: 'The block test strategy gains the same-numbers comparison test: the till, back-office and Analytics figures are compared for
+  one scope and period.'
+decision:
+  what: CHG-FIN-006's prevention is a frontend comparison test (DEC-559).
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October, batch 5 set 2: ''Frontend comparison test''. CHG-FIN-006 recorded prevention none, approved_by pending.'
+keys_touched:
+  files:
+  - docs/active/block-test-strategy.md
+  other:
+  - CHG-FIN-006
+root_class: 'new: duplicated-definition'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: template-field
+  ref: docs/active/block-test-strategy.md::same-numbers
+status: open
+notes: Open until the test task exists in the plan (CHG-DOC-023, a plan change) and CHG-FIN-006 names it as its prevention (that entry
+  is the finance batch's).
