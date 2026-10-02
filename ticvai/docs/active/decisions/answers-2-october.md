@@ -373,3 +373,9 @@ This reinforces the existing rule that the LLM never reads raw data (the AI ADRs
 - BC-006/BC-007 approved: per Chinmay's follow-up, model publishing moves from AI_APPROVE to the per-module AI publish permission (no tickets started).
 - The platform cookie catalogue is curated under PLATFORM_PLAN_MANAGE, the permission for the platform's other catalogues.
 - AI_USE stays the base permission for the publish operations; the module permission is checked on top of it.
+
+# Lead decisions on the commercial-move questions (2 Oct)
+- The 13 duplicate first-release setup operations are kept for this release (the section merges) and retired at the next contract major version. Retiring them now would be a plan change touching 13 pushed tickets.
+- ADM-068 (country tax templates) and ADM-619 (cross-tenant payments) stay on the TICVAI console (DEC-207, DEC-211) and take the R098 pattern.
+- DEC-168: a new console screen, "Configuration promotion", binds the export/diff/applyConfigPackage operations. ADM-122 stays in Venue Management for product import and export.
+- CHG-MOV-004: check-screens gains a rule that a screen name carries no tab character or trailing page number.
