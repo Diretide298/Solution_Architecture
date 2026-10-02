@@ -394,3 +394,14 @@ Claude Design then works per process: the flow storyboards first, then the singl
 
 # Claude Design and HLD/LLD order (Chinmay, 2 Oct)
 Block A first: finish ALL Block A wireframes (flow briefs, then storyboards, then the navigable wireframes for the Block A apps: Guest Web, Guest App, POS, Kitchen Display and the Block A screens of Venue Management, the CMS and the console) and the HLD/LLD first. Then Blocks B, C and D.
+
+# Claude Design inputs (Chinmay, 3 Oct)
+For the handoffs, after the final clean refresh. These replace the earlier order where they differ.
+1. **Order:** the HLD/LLD first, then Block A, then the rest.
+2. **One navigable single HTML file per app**, built the way our POS, web app and mobile app files are. For those three apps, start from the local files and add the missing screens to them:
+   - POS: `sources/designs/TICVAI_POS_Terminal_v2.html`;
+   - web app: `TICVAI Guest Booking v2.dc.html` (guest-rev3) and the 30 September web app export;
+   - mobile app: `TICVAI Mobile App v4.dc.html` (guest-rev3) and the 29 September guest web and mobile export.
+   The newest copies are confirmed with Chinmay at handoff.
+3. **One board per app**, and one board for the HLD/LLD.
+4. **No quick generation:** every batch is double-checked before it goes to Claude Design, covering inputs, outputs, navigation and decisions.
