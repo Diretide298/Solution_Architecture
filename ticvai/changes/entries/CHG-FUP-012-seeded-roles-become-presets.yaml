@@ -1,0 +1,48 @@
+id: CHG-FUP-012
+date: '2026-10-02'
+source: cr
+kind: spec
+summary: The seeded staff roles become named starting configurations (presets) that fill an editable checklist; no
+  tenant is given a fixed role.
+decision:
+  what: 'docs/active/seed-data-proposal.md section 2 rewritten as "Starting permission configurations (presets, not
+    roles)": the seed loads per-module All, Viewer and Mid-level and the five starting configurations (cashier,
+    supervisor, venueManager, finance, tenantAdmin) as CapabilityTemplate presets; none ticks a module''s AI publish
+    permission or the three other permissions of 2 October. roles.yaml says its six POS roles are starting
+    configurations. permissions.yaml presets text points at both. check-contract-compat fails a code in the seed''s
+    section 2 that is not a Permission value.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October, pre-apply round (Roles): "Default permission configs, so to speak. We still have checklists:
+  if they select Viewer, for example, they can still give that viewer more permissions and rename it." Workbook Q7
+  (DEC-007, ADM-554). The identity contract was changed to presets in CHG-CSP-003; the seed was drafted as roles in
+  audit R229.'
+keys_touched:
+  screens:
+  - ADM-554
+  - BO-054
+  - BO-1066
+  files:
+  - docs/active/seed-data-proposal.md
+  - roles.yaml
+  - contracts/shared/permissions.yaml
+  - tools/check-contract-compat.py
+  tickets:
+  - SETUP-SEED
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - SETUP-SEED
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: closed
+closed_by_commit: c481490c
+notes: 'roles.yaml keeps its shape (check-screens, check-step-up and derive-app-roles read it); only its description
+  and a comment change. Verified: vocabulary_problems() reports a seed code that is not a Permission value. With this
+  entry the planned prevention of CHG-CSP-003 (every preset lists only vocabulary permissions, every permission in one
+  module group) exists in check-contract-compat. Batch FUP (apply-followup), 2 October 2026. Closed on its commit; the prevention exists and run-checks runs it.'
