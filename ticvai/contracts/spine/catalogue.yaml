@@ -18330,10 +18330,12 @@ components:
           format: uuid
           nullable: true
           description: One performance only; null for every performance on the seat map.
-        sectionIds:
+        seatSectionCodes:
           type: array
           items:
             type: string
+          description: The seat map's sections the rule covers, by `Section.code` (the `Seat.sectionCode` of their
+            seats); empty or absent for none.
         rows:
           type: array
           items:

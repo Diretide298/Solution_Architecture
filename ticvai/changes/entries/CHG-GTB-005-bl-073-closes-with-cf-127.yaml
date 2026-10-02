@@ -1,0 +1,31 @@
+id: CHG-GTB-005
+date: '2026-10-02'
+source: cr
+kind: spec
+summary: Backlog entry BL-073 (cookie consent) is done, closed by CF-127's decision (buy a scanner API, hybrid).
+decision:
+  what: 'handoff/contract-backlog.json BL-073: status done, closed 2026-10-02, closedBy citing DEC-019, CHG-DOC-021 and
+    CHG-CSA-023 (banner, runtime, registry and consent logs ours; a bought scanner API feeds recordCookieScan; manual upload
+    stays; vendor still to choose).'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'check-backlog failed the r2 full refresh: BL-073 was blocked on CF-127, which commit 9b180bf2 closed (CHG-DOC-021,
+  DEC-019) without closing the backlog entry it blocked.'
+keys_touched:
+  files:
+  - handoff/contract-backlog.json
+  other:
+  - BL-073
+  - CF-127
+root_class: A10 TICKET-DRIFT
+tickets:
+  started: []
+  unstarted: []
+release_tag: r2
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-backlog.py
+status: open
+notes: Prevention is check-backlog's closed-blocker rule, which caught it.

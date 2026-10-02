@@ -2762,7 +2762,7 @@ screens:
       to support with the wrong question.
   entryState:
     params:
-    - name: jobId
+    - name: translationJobId
       from: CMS-011
       optional: true
       notes: The translation job this screen started; its proposals are read back by it (CHG-CLN-016).

@@ -1,0 +1,32 @@
+id: CHG-GTB-004
+date: '2026-10-02'
+source: cr
+kind: spec
+summary: GST-070's component is apps/guest-app/src/routes/ReserveTable.tsx, under routes/ as every other screen's, not src/screens/.
+decision:
+  what: 'GST-070 implementation.component moves from apps/guest-app/src/screens/ReserveTable.tsx to
+    apps/guest-app/src/routes/ReserveTable.tsx, the convention for an ungrouped route (/search -> routes/Search.tsx,
+    /loyalty-rewards -> routes/LoyaltyRewards.tsx). The route /reserve-table stays.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'check-frontend failed the r2 full refresh ("component path breaks the convention"); the guest design-note corrections
+  of commit 8efe20df (CHG-SGU-018) renamed GST-070 to Reserve a Table and wrote its component under src/screens/, a
+  directory no app has.'
+keys_touched:
+  screens:
+  - GST-070
+  files:
+  - screens/P02-guest-mobile-app.yaml
+root_class: A05 STARTER-APPS
+tickets:
+  started: []
+  unstarted:
+  - APP-MOB-GST-070
+release_tag: r2
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-frontend.py
+status: open
+notes: Prevention is check-frontend's component-path rule, which caught it.

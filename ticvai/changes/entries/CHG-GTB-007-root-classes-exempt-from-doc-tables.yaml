@@ -1,0 +1,29 @@
+id: CHG-GTB-007
+date: '2026-10-02'
+source: cr
+kind: process
+summary: check-doc-tables exempts docs/active/root-classes.md, whose R160 row is about the platform.org_unit rename itself.
+decision:
+  what: 'root-classes.md joins EXEMPT_NAMES in tools/check-doc-tables.py. Not --fix: it rewrote the R160 row to
+    "platform.scope -> platform.scope rename", which destroys what the row records.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'check-doc-tables failed the r2 full refresh on the root-class register, the cited copy CHG-SEED-012 brought into git on
+  2 October; its R160 row names the old table because the root issue is that rename. The tool''s own rule: "exempt the file in
+  EXEMPT_NAMES if it is about the rename".'
+keys_touched:
+  files:
+  - tools/check-doc-tables.py
+root_class: A25 PROSE-QUALITY
+tickets:
+  started: []
+  unstarted: []
+release_tag: r2
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-doc-tables.py
+status: open
+notes: The rest of root-classes.md is still read by nothing that checks table names; the file is a cited copy rebuilt only by
+  a logged change (CHG-SEED-012).

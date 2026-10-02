@@ -10863,6 +10863,9 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-072
+    workshopBoard: wireframes/WS163 TICVAI Finance Backend Structure Reference v1.0 Board 1.dc.html#bo-1081
+    note: The client's workshop frame for this dashboard is the one drawn for BO-1081 (the same pack, board 1, number
+      1), whose content ANL-072 carries since DEC-219 (CHG-SOT-008; CHG-GTB-006).
   notes: '**Issued 2 October 2026 (CHG-SOT-008, DEC-219).** The Finance standard dashboard of the one
     reporting area (DI-721), carrying DI-260''s content from BO-1081, which becomes a link card on Orders
     & Money (P08, the back-office agent''s change). The design notes of BO-1081 (finance-insights) apply

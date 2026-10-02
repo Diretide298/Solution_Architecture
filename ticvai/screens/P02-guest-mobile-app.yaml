@@ -12707,7 +12707,7 @@ screens:
   implementation:
     app: guest-app
     route: /reserve-table
-    component: apps/guest-app/src/screens/ReserveTable.tsx
+    component: apps/guest-app/src/routes/ReserveTable.tsx
     status: notStarted
   navigation:
     exitTo:

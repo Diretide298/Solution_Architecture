@@ -1,0 +1,30 @@
+id: CHG-GTB-006
+date: '2026-10-02'
+source: cr
+kind: spec
+summary: ANL-072 (the Finance dashboard in P16 Venue Analytics) names its design source, the client's workshop frame drawn
+  for BO-1081.
+decision:
+  what: 'ANL-072 wireframe.workshopBoard is wireframes/WS163 TICVAI Finance Backend Structure Reference v1.0 Board 1.dc.html#bo-1081
+    (the same pack, board 1, number 1 as ANL-072''s own source), with a note saying why.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'check-wireframe-coverage (W-NO-DESIGN, R252) failed the r2 full refresh: ANL-072 was issued on 2 October (CHG-SOT-008,
+  DEC-219) carrying BO-1081''s content without the design source BO-1081 has.'
+keys_touched:
+  screens:
+  - ANL-072
+  files:
+  - screens/P16-venue-analytics.yaml
+root_class: A33 WIREFRAMES
+tickets:
+  started: []
+  unstarted: []
+release_tag: r2
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-wireframe-coverage.py
+status: open
+notes: Prevention is W-NO-DESIGN, which caught it.

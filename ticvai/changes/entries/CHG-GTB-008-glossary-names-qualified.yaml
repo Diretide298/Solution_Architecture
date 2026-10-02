@@ -1,0 +1,43 @@
+id: CHG-GTB-008
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: Two new r2 fields named with a bare glossary-banned word are qualified - ai TranslationProposals.translationJobId
+  (and its path parameter), catalogue SeatPricingRule.seatSectionCodes.
+decision:
+  what: 'ai: TranslationProposals.jobId -> translationJobId; GET /ai/translate/{jobId} -> /ai/translate/{translationJobId};
+    CMS-011 entryState param jobId -> translationJobId. catalogue: SeatPricingRule.sectionIds -> seatSectionCodes, described
+    as the seat map''s sections by Section.code (the values were always plain strings, and a seating Section has a code, not
+    an id). A qualified compound names the entity (a translation job, a seat-map section), which is how the glossary check
+    reads a compound; the bare words Job (Work Order) and Section (Department, Operating Area) stay banned.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'check-glossary-terms (G-BANNED-NAME, R194, A24) failed the r2 full refresh on two fields added on 2 October:
+  CHG-CSA-045 (getTranslationProposals, CMS-011) and CHG-CSP-049 (seat-level dynamic pricing, BO-1044). The same fix the
+  r1 refresh made (commit 4be64f5f: WaitingRoomAdmission.admissionId -> tokenId).'
+keys_touched:
+  operations:
+  - getTranslationProposals
+  - proposeTranslations
+  schemas:
+  - TranslationProposals
+  - SeatPricingRule
+  screens:
+  - CMS-011
+  files:
+  - contracts/satellite/ai.yaml
+  - contracts/spine/catalogue.yaml
+  - screens/P13-white-label-cms.yaml
+root_class: A24 GLOSSARY
+tickets:
+  started: []
+  unstarted: []
+release_tag: r2
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-glossary-terms.py
+status: open
+notes: Additive against r1 - neither field nor the path existed in r1, so the rename breaks no released contract
+  (check-contract-compat). No screen bound sectionIds.

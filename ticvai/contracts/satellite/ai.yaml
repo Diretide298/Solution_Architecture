@@ -191,9 +191,9 @@ paths:
                 $ref: '#/components/schemas/TranslationProposals'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /ai/translate/{jobId}:
+  /ai/translate/{translationJobId}:
     parameters:
-    - name: jobId
+    - name: translationJobId
       in: path
       required: true
       schema:
@@ -18400,7 +18400,7 @@ components:
       properties:
         targetLocale:
           type: string
-        jobId:
+        translationJobId:
           type: string
           format: uuid
           readOnly: true
