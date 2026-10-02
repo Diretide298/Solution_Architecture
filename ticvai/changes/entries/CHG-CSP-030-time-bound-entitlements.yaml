@@ -35,8 +35,9 @@ release_tag: pending
 decision_owner: Chinmay
 triage: fix-forward
 prevention:
-  type: check
-  ref: tools/check-access-time-bound.py
+  type: none
+  reason: 'Planned, not yet written: check-access-time-bound (see notes). The entry stays open until the tools owner writes
+    it and registers it in run-checks; then the prevention becomes that check.'
 status: open
 notes: 'Open: the prevention is an access test that a second scan after the window is refused and the offline package carries
   the rule (DEC-232 hint), not yet written. listAccessValidityTime has no write yet (logged in CHG-WIR-004 class). Applied

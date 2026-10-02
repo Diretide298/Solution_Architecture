@@ -5280,8 +5280,8 @@ paths:
         BO-153: "A policy the venue switches on/off (second-person approval when on)"; DEC-230; CHG-CSP-028). Off by
         default: a holder of ACCESS_POINT_CONFIGURE publishes at once. On (an active approvals matrix of kind
         `configurationChange` whose rule names subject type `topologyPublication`; approvals
-        `ApprovalRule.subjectTypes`): the publication is held, the response is `202` with `awaitingApproval` and
-        `approvalRequestId`, and it publishes when a second person approves; the approvals engine refuses the
+        `ApprovalRule.subjectTypes`): the publication is held, the `200` response carries `awaitingApproval` true and
+        `approvalRequestId`, and it publishes when a second person approves (the approval inbox follows it); the approvals engine refuses the
         author as approver (`approverIsRequester`).
 
         '
@@ -5309,12 +5309,6 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Topology Validation & Publication
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TopologyValidationPublicationView'
-        '202':
-          description: Held for a second person's approval; the venue's approval policy is on (DEC-230; CHG-CSP-028)
           content:
             application/json:
               schema:

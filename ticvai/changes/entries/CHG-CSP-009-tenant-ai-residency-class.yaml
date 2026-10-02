@@ -40,8 +40,9 @@ release_tag: pending
 decision_owner: Chinmay
 triage: fix-forward
 prevention:
-  type: check
-  ref: tools/check-ai-residency.py
+  type: none
+  reason: 'Planned, not yet written: check-ai-residency (see notes). The entry stays open until the tools owner writes it
+    and registers it in run-checks; then the prevention becomes that check.'
 status: open
 notes: 'Open: the prevention is a gateway check that a uaeOnly tenant''s call resolves only to an in-UAE endpoint (DEC-539
   hint), not yet written. Depends on ADR-0009/ADR-0020 amendments, ai.yaml AiProvider routing and the HLD/LLD (other owners).

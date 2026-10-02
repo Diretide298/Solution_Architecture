@@ -48,8 +48,9 @@ release_tag: pending
 decision_owner: Chinmay
 triage: fix-forward
 prevention:
-  type: check
-  ref: tools/check-presets.py
+  type: none
+  reason: 'Planned, not yet written: check-presets (see notes). The entry stays open until the tools owner writes it and
+    registers it in run-checks; then the prevention becomes that check.'
 status: open
 notes: 'Open: the prevention is a check that every preset lists only permissions in contracts/shared/permissions.yaml and
   every permission sits in exactly one module group (DEC-007 hint), not yet written. Depends on the permissions owner for

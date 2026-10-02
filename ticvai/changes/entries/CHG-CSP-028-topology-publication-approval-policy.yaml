@@ -5,8 +5,9 @@ kind: contract
 summary: Topology publication approval is a venue policy, off by default; when on, a second person approves; approval rules
   can target subject types.
 decision:
-  what: publishTopologyValidation answers 202 with awaitingApproval and approvalRequestId when the venue's configurationChange
-    matrix names subject topologyPublication; ApprovalRule.subjectTypes added so a venue switches one kind of act on.
+  what: publishTopologyValidation returns awaitingApproval and approvalRequestId (200, so BO-153 needs no poll) when the
+    venue's configurationChange matrix names subject topologyPublication; ApprovalRule.subjectTypes added so a venue switches
+    one kind of act on.
   by: Chinmay
   date: '2026-10-02'
 why: 'Chinmay, 2 October 2026, batch 6 set 10a, BO-153 (Q230): "A policy the venue switches on/off (second-person approval
@@ -37,12 +38,13 @@ release_tag: pending
 decision_owner: Chinmay
 triage: fix-forward
 prevention:
-  type: check
-  ref: tools/check-applied-decisions.py
+  type: none
+  reason: 'Planned, not yet written: check-applied-decisions (see notes). The entry stays open until the tools owner writes
+    it and registers it in run-checks; then the prevention becomes that check.'
 status: open
-notes: 'Open: Planned check (not yet written; the tools owner writes it): for every decision the decisions register marks
-  applied, each contract key the decision names exists in the named contract and its decided default or enum is unchanged,
-  so a decided behaviour cannot be dropped or reverted silently. Until it exists this entry stays open. No ApprovalKind
-  value is added (a breaking change against r1); subject types narrow existing kinds. Applied in worktree apply-contracts-spine
-  (batch CSP, 2 October 2026). Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv
-  keys naming a touched operation or screen.'
+notes: 'Open: Planned check check-applied-decisions (not yet written; the tools owner writes it): for every decision the
+  decisions register marks applied, each contract key the decision names exists in the named contract and its decided default
+  or enum is unchanged, so a decided behaviour cannot be dropped or reverted silently. Until it exists this entry stays
+  open. No ApprovalKind value is added (a breaking change against r1); subject types narrow existing kinds. Applied in worktree
+  apply-contracts-spine (batch CSP, 2 October 2026). Tickets: none started (Block A starts Monday 5 October 2026); unstarted
+  keys are the tasks.csv keys naming a touched operation or screen.'
