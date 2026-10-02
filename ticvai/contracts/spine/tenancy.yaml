@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Tenancy & Organisation
   version: 1.0.0
-  x-ticvai-screen-count: 42
+  x-ticvai-screen-count: 44
   x-ticvai-tier: spine
   x-ticvai-module: "Cross-cutting — organisation hierarchy"
   x-ticvai-capabilities: [C95, C20]
@@ -252,6 +252,7 @@ paths:
         - "P08 BO-145 Venue & Park Access Structure"
         - "P09 ADM-006 Tenant Hierarchy Explorer"
         - "P09 ADM-420 Tenant & Organization Provisioning"
+        - "P09 ADM-421 Venue & Operational Structure Creation"
       x-ticvai-audience: [staff]
       summary: Create a scope node
       tags: [scope]
@@ -285,13 +286,14 @@ paths:
       operationId: listAuditRecords
       x-ticvai-consumed-by:
         - "P08 BO-035 Override Audit"
-        - "P08 BO-036 Device Registry"
         - "P08 BO-068 Audit Log"
+        - "P08 BO-1079 Immutable Seat Audit Logs"
         - "P08 BO-1162 Security Governance, Audit & Rule Publication"
-        - "P08 BO-124 Layout & Journey Builder"
         - "P08 BO-126 Deployment, Preview & Audit"
         - "P08 BO-133 Offline Alerts, Limits & Audit"
         - "P08 BO-503 Product Validation, Approval & Publication"
+        - "P09 ADM-004 Platform Audit Log"
+        - "P16 ANL-070 Analytics Governance, Security & Audit Center"
       summary: Who did what, where, and when
       description: >
         POS board 1 and 4, 24 August. **`platform.audit_record` existed and nothing read it** —
@@ -382,8 +384,7 @@ paths:
     put:
       operationId: setRolePermissions
       x-ticvai-consumed-by:
-        - "P08 BO-071 Planned Maintenance"
-        - "P08 BO-116 Merchandising & Product Presentation"
+        - "P08 BO-054 Role Assignment"
       summary: What this role may do
       description: >
         POS board 4B. **`Role.permissions` was added on 20 August after Hrushikant found
@@ -464,8 +465,6 @@ paths:
         - "P04 POS-001 Begin Shift"
         - "P04 POS-025 Till Home"
         - "P08 BO-036 Device Registry"
-        - "P08 BO-1069 Platform Health & Observability"
-        - "P08 BO-125 Product & Category Button Configuration"
         - "P08 BO-128 Live Workstation Health Monitor"
         - "P08 BO-129 Software, Configuration & Version Management"
       summary: A score a manager can sort by, and what is dragging it down
@@ -511,6 +510,8 @@ paths:
   /configuration-profiles:
     get:
       operationId: listConfigurationProfiles
+      x-ticvai-consumed-by:
+        - "P08 BO-1070 Setup, Clone & Inheritance"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Every configuration profile, at its current version
@@ -701,7 +702,6 @@ paths:
     post:
       operationId: deployConfigurationProfile
       x-ticvai-consumed-by:
-        - "P08 BO-036 Device Registry"
         - "P08 BO-1068 Lifecycle & Environment Promotion"
         - "P08 BO-124 Layout & Journey Builder"
         - "P08 BO-126 Deployment, Preview & Audit"
@@ -799,13 +799,7 @@ paths:
       operationId: setOfflinePolicy
       x-ticvai-consumed-by:
         - "P08 BO-037 Offline Package Status"
-        - "P08 BO-128 Live Workstation Health Monitor"
         - "P08 BO-130 Offline Policy & Rules Configuration"
-        - "P08 BO-171 Offline Cryptographic Validation Profile"
-        - "P08 BO-206 Offline Validation Policy Builder"
-        - "P08 BO-208 Offline Credential & Revocation Cache"
-        - "P08 BO-210 Connectivity Failure & Degraded Mode Policy"
-        - "P08 BO-241 Policy Evaluation Architecture & Offline Distribution"
       summary: What a workstation may do with no network, and for how long
       description: >
         Board 5 of the client's POS set, and **one of only two things in 36 board screens the package
@@ -895,9 +889,7 @@ paths:
     put:
       operationId: setConnectivityThresholds
       x-ticvai-consumed-by:
-        - "P08 BO-129 Software, Configuration & Version Management"
         - "P08 BO-131 Connectivity & Auto-Switch Settings"
-        - "P08 BO-210 Connectivity Failure & Degraded Mode Policy"
       summary: When a workstation decides it is offline, and when it is back
       description: >
         Board 5 of the client's POS set, and the second genuine gap. **Nothing held a threshold**, so
@@ -958,22 +950,15 @@ paths:
     get:
       operationId: getVenueSettings
       x-ticvai-consumed-by:
-        - "P04 POS-019 Shift Templates & Policies"
         - "P08 BO-063 Opening Hours & Calendar"
         - "P08 BO-065 Venue Configuration"
         - "P08 BO-100 Venue Home"
         - "P08 BO-101 Orders & Money"
         - "P08 BO-102 Sell"
-        - "P08 BO-103 Access & Venue"
-        - "P08 BO-104 Food & Beverage"
-        - "P08 BO-105 Stock & Supply"
         - "P08 BO-106 People & Access Rights"
         - "P08 BO-1063 Venue-Specific Configuration"
         - "P08 BO-107 Guests & Marketing"
-        - "P08 BO-108 Venue Operations"
         - "P08 BO-136 F&B Global Settings & Controls"
-        - "P08 BO-142 Store Rules, Controls & Permissions"
-        - "P08 BO-143 Retail Global Settings & Controls"
       summary: Operational settings for this venue
       description: >
         **What this returns, and what it does not.** `VenueSettings` holds the venue's trading
@@ -1013,14 +998,10 @@ paths:
     put:
       operationId: setVenueSettings
       x-ticvai-consumed-by:
-        - "P04 POS-019 Shift Templates & Policies"
         - "P08 BO-065 Venue Configuration"
         - "P08 BO-1063 Venue-Specific Configuration"
-        - "P08 BO-116 Merchandising & Product Presentation"
         - "P08 BO-136 F&B Global Settings & Controls"
-        - "P08 BO-143 Retail Global Settings & Controls"
         - "P08 BO-600 Venue, Calendar & Operational Setup"
-        - "P15 KIT-009 SLA, Priority & Service Rules"
       summary: Set support hours, quiet hours, segregated access and alerting
       description: >
         **The four things a venue answers and no other level can** (CF-100, CF-130, CF-134).
@@ -1088,6 +1069,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1062 Tenant & Brand Context"
         - "P09 ADM-019 Global Configuration & Defaults"
+        - "P09 ADM-426 Initial Configuration & Regional Defaults"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: The tenant's default for every venue setting
@@ -1117,6 +1099,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1062 Tenant & Brand Context"
         - "P09 ADM-019 Global Configuration & Defaults"
+        - "P09 ADM-426 Initial Configuration & Regional Defaults"
       x-ticvai-audience: [staff]
       summary: Set the tenant's default for every venue setting
       description: >
@@ -1237,7 +1220,9 @@ paths:
       operationId: getRegionSettings
       x-ticvai-consumed-by:
         - "P08 BO-1064 Naming, Numbering & Localization"
+        - "P08 BO-1065 Currency, Timezone & Channels"
         - "P09 ADM-037 AI Provider & Credentials"
+        - "P09 ADM-426 Initial Configuration & Regional Defaults"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read region settings
@@ -1263,7 +1248,7 @@ paths:
       operationId: updateRegionSettings
       x-ticvai-consumed-by:
         - "P08 BO-1065 Currency, Timezone & Channels"
-        - "P09 ADM-425 Venue Template Application"
+        - "P09 ADM-426 Initial Configuration & Regional Defaults"
       x-ticvai-audience: [staff]
       x-ticvai-config-scope: region
       summary: Update region settings
@@ -1314,14 +1299,12 @@ paths:
     get:
       operationId: listWorkstations
       x-ticvai-consumed-by:
-        - "P04 POS-009 Staff Roster"
         - "P08 BO-036 Device Registry"
         - "P08 BO-037 Offline Package Status"
         - "P08 BO-116 Merchandising & Product Presentation"
         - "P08 BO-126 Deployment, Preview & Audit"
         - "P08 BO-128 Live Workstation Health Monitor"
         - "P08 BO-129 Software, Configuration & Version Management"
-        - "P08 BO-135 Order Routing & KDS/Printer Rules"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List workstations
@@ -1401,7 +1384,6 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-016 Till Configuration"
         - "P08 BO-036 Device Registry"
-        - "P08 BO-129 Software, Configuration & Version Management"
         - "P08 BO-602 POS, Payment & Access Setup"
       x-ticvai-audience: [staff]
       x-ticvai-config-scope: venue
@@ -1452,12 +1434,11 @@ paths:
     get:
       operationId: listOutlets
       x-ticvai-consumed-by:
-        - "P04 POS-011 Returns, Refunds & Exchanges"
-        - "P04 POS-024 Outlet Setup"
         - "P08 BO-044 F&B Outlets"
         - "P08 BO-134 Kitchen & Preparation Stations"
         - "P08 BO-727 F&B Command Center"
         - "P08 BO-728 Outlet Management"
+        - "P08 BO-731 Operating Hours & Service Periods"
         - "P08 BO-732 POS & Device Assignment"
       x-ticvai-audience: [staff]
       summary: List outlets
@@ -1496,6 +1477,7 @@ paths:
       operationId: createOutlet
       x-ticvai-consumed-by:
         - "P08 BO-044 F&B Outlets"
+        - "P08 BO-729 Create / Edit Outlet"
       x-ticvai-audience: [staff]
       summary: Create an outlet
       tags: [workstation]
@@ -1536,6 +1518,8 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getOutlet
+      x-ticvai-consumed-by:
+        - "P08 BO-729 Create / Edit Outlet"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read an outlet
@@ -1563,6 +1547,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-044 F&B Outlets"
         - "P08 BO-063 Opening Hours & Calendar"
+        - "P08 BO-729 Create / Edit Outlet"
+        - "P08 BO-731 Operating Hours & Service Periods"
       x-ticvai-audience: [staff]
       summary: Amend an outlet
       tags: [workstation]
@@ -1608,12 +1594,10 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-025 Till Home"
-        - "P08 BO-115 Category, Brand & Merchandise Hierarchy"
         - "P08 BO-116 Merchandising & Product Presentation"
-        - "P08 BO-117 Product Import, Governance & AI Configuration Assistant"
-        - "P08 BO-118 Campaign & Audience Management"
         - "P08 BO-122 POS Experience Dashboard"
         - "P08 BO-123 POS Profile Management"
+        - "P08 BO-124 Layout & Journey Builder"
         - "P08 BO-126 Deployment, Preview & Audit"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
@@ -1647,6 +1631,7 @@ paths:
     post:
       operationId: createSaleBoard
       x-ticvai-consumed-by:
+        - "P08 BO-109 Menu Builder & POS Layout Designer"
         - "P08 BO-124 Layout & Journey Builder"
       x-ticvai-audience: [staff]
       x-ticvai-config-scope: venue
@@ -1695,8 +1680,6 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-109 Menu Builder & POS Layout Designer"
         - "P08 BO-116 Merchandising & Product Presentation"
-        - "P08 BO-117 Product Import, Governance & AI Configuration Assistant"
-        - "P08 BO-118 Campaign & Audience Management"
         - "P08 BO-124 Layout & Journey Builder"
         - "P08 BO-125 Product & Category Button Configuration"
         - "P08 BO-126 Deployment, Preview & Audit"
@@ -1750,6 +1733,8 @@ paths:
         - "P06 EMP-043 Device settings"
         - "P08 BO-036 Device Registry"
         - "P08 BO-124 Layout & Journey Builder"
+        - "P08 BO-405 Reader Directory"
+        - "P08 BO-732 POS & Device Assignment"
         - "P09 ADM-580 Payment Terminal & Device Inventory\t49"
         - "P16 ANL-003 Operational Performance"
       x-ticvai-audience: [staff]
@@ -1804,7 +1789,6 @@ paths:
       x-ticvai-consumed-by:
         - "P06 EMP-043 Device settings"
         - "P08 BO-036 Device Registry"
-        - "P08 BO-194 Device & Gate Command Center"
         - "P08 BO-196 Physical Device Registration & Provisioning"
         - "P08 BO-405 Reader Directory"
       x-ticvai-audience: [staff]
@@ -1871,6 +1855,8 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getDevice
+      x-ticvai-consumed-by:
+        - "P08 BO-406 Reader Profile & Device Setup"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read one registered device
@@ -1902,11 +1888,6 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: recordDeviceHeartbeat
-      x-ticvai-consumed-by:
-        - "P04 POS-016 Till Configuration"
-        - "P08 BO-036 Device Registry"
-        - "P08 BO-124 Layout & Journey Builder"
-        - "P08 BO-125 Product & Category Button Configuration"
       security:
       - apiKeyAuth: []
       - serviceAuth: []
@@ -1973,7 +1954,6 @@ paths:
     post:
       operationId: enrolDevice
       x-ticvai-consumed-by:
-        - "P08 BO-407 Reader Credit & Payment Configuration"
         - "P09 ADM-581 Terminal Provisioning & Device Configuration\t51"
       x-ticvai-conflict-policy: serverWins
       summary: Take a registered device through enrolment to activation
@@ -2036,6 +2016,7 @@ paths:
       operationId: setDeviceAssignment
       x-ticvai-consumed-by:
         - "P04 POS-016 Till Configuration"
+        - "P08 BO-732 POS & Device Assignment"
         - "P09 ADM-582 POS, Kiosk & Terminal Assignment Manager\t52"
       x-ticvai-conflict-policy: serverWins
       summary: Who owns it, who holds it, and where it is

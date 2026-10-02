@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Wallet Configuration
   version: 1.0.0
-  x-ticvai-screen-count: 57
+  x-ticvai-screen-count: 58
   x-ticvai-tier: satellite
   x-ticvai-module: 4 — Bundles and Promotions
   x-ticvai-platforms:
@@ -74,7 +74,11 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1083 Wallet Command Center"
         - "P08 BO-1084 Wallet Type Library"
-        - "P08 BO-1174 Wallet API Catalogue & Endpoint Configuration"
+        - "P08 BO-1085 Wallet Creation & Provisioning Rules"
+        - "P08 BO-1087 Wallet Currency & Monetary Configuration"
+        - "P08 BO-1089 Wallet Feature Profile"
+        - "P08 BO-1090 Wallet Lifecycle Configuration"
+        - "P08 BO-1091 Wallet Numbering, Identity & Digital Credentials"
       summary: The kinds of wallet that may exist — who owns one
       description: 'Board 1.2. Guest, registered customer, family, parent, child, corporate, school,
         employee.
@@ -197,7 +201,11 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1088 Credit & Balance Type Configuration"
         - "P08 BO-1103 Stored Value & Credit Command Center"
+        - "P08 BO-1104 Credit Type Definition Studio"
+        - "P08 BO-1105 Credit Issuance Rule Configuration"
+        - "P08 BO-1108 Expiry & Validity Policy Configuration"
         - "P08 BO-415 Wallet & Credit Type Configuration"
+        - "P08 BO-420 Bonus Validity & Expiry Configuration"
         - "P08 BO-722 Prepaid Minute Package & Customer Balance Configuration"
       summary: The kinds of value that may sit in a wallet
       description: 'Board 1.6, and **the acceptance condition of the whole pack depends on this being a
@@ -374,6 +382,8 @@ paths:
       operationId: getCreditConsumptionPolicy
       x-ticvai-consumed-by:
         - "P08 BO-1107 Consumption Priority Engine"
+        - "P08 BO-1110 Split Tender & Multi-Credit Consumption"
+        - "P08 BO-1112 Consumption Simulator, Validation & Rule Publication"
         - "P09 ADM-604 Stored Value, Gift Card & Voucher Tender Controls\t97"
       summary: Which credit is spent first
       tags:
@@ -448,6 +458,8 @@ paths:
       operationId: listCreditLots
       x-ticvai-consumed-by:
         - "P08 BO-1109 FEFO & Credit Lot Management"
+        - "P08 BO-1111 Credit Expiry, Extension & Forfeiture Operations"
+        - "P08 BO-1130 Gift Card & Voucher Expiry Management"
         - "P08 BO-416 Wallet Account & Balance View"
       summary: The tranches behind a balance, with their expiry
       description: 'Board 3.7. **Expiry is a property of a tranche, not of a wallet.** Fifty dirhams of
@@ -570,7 +582,6 @@ paths:
         - "P08 BO-1112 Consumption Simulator, Validation & Rule Publication"
         - "P08 BO-1122 Shared Wallet Simulator, Monitoring & Audit"
         - "P08 BO-1142 Wallet Transaction Simulator, Monitoring & Channel Audit"
-        - "P08 BO-1161 Security Rules Testing, Simulation & AI Sandbox"
       x-ticvai-conflict-policy: serverWins
       summary: Which credit this purchase would actually use
       description: 'Board 3.10. **Split tender across several credit types and lots is hard to reason
@@ -624,6 +635,15 @@ paths:
       operationId: getWalletFundingRules
       x-ticvai-consumed-by:
         - "P08 BO-1093 Funding Command Center"
+        - "P08 BO-1094 Funding Method Configuration"
+        - "P08 BO-1095 Top-Up Rule Configuration"
+        - "P08 BO-1096 Channel & Funding Source Mapping"
+        - "P08 BO-1097 Auto-Reload Configuration"
+        - "P08 BO-1098 Recurring Funding Schedule"
+        - "P08 BO-1099 Funding Authorization & Approval Rules"
+        - "P08 BO-1101 Funding Limits & Velocity Controls"
+        - "P08 BO-417 Top-Up Configuration"
+        - "P08 BO-418 Top-Up Bonus Rule Configuration"
       summary: How a wallet may be topped up
       tags:
       - wallet
@@ -775,7 +795,13 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1086 Wallet Ownership & Account Association"
         - "P08 BO-1113 Shared Wallet Command Center"
+        - "P08 BO-1114 Shared Wallet Model Configuration"
+        - "P08 BO-1115 Family & Household Structure Configuration"
+        - "P08 BO-1116 Parent–Child Stored Value Distribution"
+        - "P08 BO-1117 Allowance & Budget Allocation Engine"
+        - "P08 BO-1118 Member Spending Controls & Permissions"
         - "P08 BO-1119 Corporate Wallet & Organizational Hierarchy"
+        - "P08 BO-1120 Corporate Budget, Policy & Approval Rules"
         - "P08 BO-1122 Shared Wallet Simulator, Monitoring & Audit"
       summary: Family, household and corporate structures
       description: 'Board 4. **The money is in one place and the authority to spend it is distributed.**
@@ -917,6 +943,7 @@ paths:
       operationId: listVoucherTypes
       x-ticvai-consumed-by:
         - "P08 BO-1126 Voucher & Coupon Type Configuration"
+        - "P08 BO-1127 Voucher Eligibility & Redemption Rule Studio"
         - "P08 BO-1128 Membership Benefits & Entitlement Mapping"
         - "P08 BO-1129 Benefit Packaging & Digital Wallet Presentation"
       summary: Voucher, coupon and benefit definitions
@@ -1028,7 +1055,6 @@ paths:
     put:
       operationId: setWalletChannelRules
       x-ticvai-consumed-by:
-        - "P08 BO-1133 Wallet Usage & Channel Command Center"
         - "P08 BO-1134 Wallet Channel Configuration"
         - "P08 BO-1135 Wallet Payment & Redemption Policy"
         - "P08 BO-1136 Wearable & Credential Type Configuration"
@@ -1829,10 +1855,15 @@ paths:
         - "P01 WEB-021 Wallet & Gift Cards"
         - "P02 GST-011 Wallet Overview"
         - "P08 BO-1086 Wallet Ownership & Account Association"
+        - "P08 BO-1100 Funding Reversal & Correction Management"
+        - "P08 BO-1149 Administrative Balance Adjustment Studio"
+        - "P08 BO-1150 Wallet Block, Freeze & Restriction Management"
         - "P08 BO-414 Wallet & Credit Management Dashboard"
         - "P08 BO-416 Wallet Account & Balance View"
+        - "P08 BO-422 Refund, Adjustment & Manual Bonus Control"
         - "P08 BO-448 Redemption Wallet & Balance View"
         - "P08 BO-487 Customer Wallet & Balance Summary"
+        - "P08 BO-488 Self-Service Wallet Top-Up"
       parameters:
       - $ref: '../shared/common.yaml#/components/parameters/ConsistencyToken'
       security:
@@ -1867,6 +1898,7 @@ paths:
     post:
       operationId: topUpWallet
       x-ticvai-consumed-by:
+        - "P04 POS-027 Guest Lookup"
         - "P08 BO-488 Self-Service Wallet Top-Up"
       x-ticvai-note: >-
         **Through the one balance writer** (system-design review SD-027, 29 September): the `wallet.balance` row is
@@ -1940,8 +1972,10 @@ paths:
         - "P08 BO-1102 Funding Transaction Audit & Reconciliation"
         - "P08 BO-1142 Wallet Transaction Simulator, Monitoring & Channel Audit"
         - "P08 BO-1143 Wallet Operations Command Center"
+        - "P08 BO-1148 Reversal & Transaction Correction Management"
         - "P08 BO-414 Wallet & Credit Management Dashboard"
         - "P08 BO-423 Wallet Credit Transaction Ledger & Audit"
+        - "P08 BO-453 Redemption Transaction Ledger, Reconciliation & Audit"
         - "P08 BO-469 Wallet & Deduction Transaction Monitor"
       security:
       - guestAuth: []
@@ -2095,6 +2129,7 @@ paths:
         - "P01 WEB-021 Wallet & Gift Cards"
         - "P02 GST-071 Payment Methods"
         - "P08 BO-1123 Gift Card & Digital Benefit Command Center"
+        - "P08 BO-1125 Gift Card Issuance, Activation & Distribution"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -2415,6 +2450,9 @@ paths:
   /wallets/{walletId}/balance:
     get:
       operationId: getWalletBalance
+      x-ticvai-consumed-by:
+        - "P08 BO-1116 Parent–Child Stored Value Distribution"
+        - "P08 BO-1121 Shared Wallet Transfers & Balance Reallocation"
       summary: A wallet's balance
       description: >
         **Keyed by wallet, not by guest, and that is the cross-cell decision.** A shared wallet
@@ -2740,7 +2778,11 @@ paths:
     get:
       operationId: listWalletConfigurationVersions
       x-ticvai-consumed-by:
+        - "P08 BO-1092 Wallet Configuration Preview, Validation & Publication"
+        - "P08 BO-1132 Gift Card & Voucher Simulator, Validation & Publication"
         - "P08 BO-1162 Security Governance, Audit & Rule Publication"
+        - "P08 BO-1180 Wallet Configuration Governance & Version Control"
+        - "P08 BO-1181 Approval, Publication & Change Management"
       x-ticvai-agreed: '29 September: VM close-out; pack ''Wallet_Configuration_Backend_Structure_v1.0.pdf''
         board 8 p.98 (Version comparison, Rollback); shape follows white-label listConfigVersions'
       summary: Wallet configuration versions, newest first
@@ -3096,6 +3138,7 @@ paths:
     post:
       operationId: resolveWalletDispute
       x-ticvai-consumed-by:
+        - "P08 BO-1151 Wallet Disputes & Operational Exception Queue"
         - "P08 BO-1179 Integration Monitoring & Exception Workbench"
       x-ticvai-agreed: '29 September: VM close-out; pack ''Wallet_Configuration_Backend_Structure_v1.0.pdf''
         board 10 p.122 (Reprocess, Escalate, Mark resolved); shape follows raiseWalletDispute'

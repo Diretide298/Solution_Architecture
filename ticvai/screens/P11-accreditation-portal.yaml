@@ -289,7 +289,6 @@ screens:
     exitTo:
     - ACC-001
     - ACC-003
-    - ACC-007
     transitions:
     - to: ACC-003
       trigger: Application Review & Submit
@@ -298,12 +297,6 @@ screens:
       - applicationRef
       provenance: derived — ACC-003 declares entryState.params applicationId, applicationRef and ACC-002
         holds applicationId, applicationRef, so an edge into it carries them
-    - to: ACC-007
-      trigger: A reviewer checks and approves
-      provenance: flow F23 step 1→2
-      carries:
-      - applicationId
-      - documentId
   implementation:
     app: accreditation-web
     route: /applicant-journey/registration-form
@@ -335,11 +328,6 @@ screens:
 
     '
   apis:
-  - operationId: createAccreditationApplication
-    contract: accreditation
-    purpose: Submit the reviewed application
-    trigger: onAction
-    provenance: readiness close-out, 29 September 2026
   - operationId: submitAccreditationApplication
     contract: accreditation
     purpose: Submit the reviewed draft; blocking-submission requirements are checked here
@@ -464,6 +452,13 @@ screens:
     holder monitoring is to be a filtered view inside general entitlement monitoring, not a separate system.
     Capability and API mapping can now be done; 74 pages of ACCREDITATION.pdf are also in the design corpus
     and no operation has been drafted from them yet.
+  gaps:
+  - operation: createAccreditationApplication
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-001): By step four a draft already exists; Submit calls submitAccreditationApplication
+      only, and creating again would make a second application (design-notes correction venue-operations
+      ACC-003).'
+    source: contracts/satellite/accreditation.yaml#createAccreditationApplication | contracts/satellite/accreditation.yaml#submitAccreditationApplication
 - id: ACC-004
   name: Application Status Tracking
   module: Applicant Journey
@@ -728,7 +723,6 @@ screens:
   navigation:
     entryFrom:
     - ACC-004
-    - ACC-007
     exitTo:
     - ACC-004
     transitions:
@@ -780,6 +774,11 @@ screens:
     purpose: Applications awaiting review, oldest first
     trigger: onLoad
     provenance: readiness close-out, 29 September 2026
+  - operationId: decideAccreditationApplication
+    contract: accreditation
+    purpose: Approve a straightforward application from the queue
+    trigger: onAction
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-001)
   gaps:
   - operation: getWaitTimes
     removed: true
@@ -834,6 +833,11 @@ screens:
       - kind: primaryButton
         label: Approve
         permission: APPROVAL_DECIDE
+      - kind: secondaryButton
+        label: Approve
+        operation: decideAccreditationApplication
+        provenance: contract accreditation.yaml POST /accreditation-applications/{applicationId}/decide;
+          wiring fix, 2 October 2026
   states:
     loading: The queue.
     emptyFirstRun: '**An empty queue is success, not a broken screen.** Nothing is waiting — says so as
@@ -885,6 +889,19 @@ screens:
     holder monitoring is to be a filtered view inside general entitlement monitoring, not a separate system.
     Capability and API mapping can now be done; 74 pages of ACCREDITATION.pdf are also in the design corpus
     and no operation has been drafted from them yet.
+  overlays:
+  - id: formDecideAccreditationApplication
+    component: modal
+    trigger: Approve
+    body: '**Collects what `decideAccreditationApplication` sends before it is called.** Dismissing sends
+      nothing; the screen behind is unchanged.'
+    confirm:
+      label: Approve
+      operation: decideAccreditationApplication
+    dismiss:
+      label: Cancel
+    provenance: contract accreditation.yaml POST /accreditation-applications/{applicationId}/decide; wiring
+      fix, 2 October 2026
 - id: ACC-007
   name: Reviewer Application Detail
   module: Reviewer (Internal)
@@ -1002,10 +1019,8 @@ screens:
       '
   navigation:
     entryFrom:
-    - ACC-002
     - ACC-006
     exitTo:
-    - ACC-005
     - ACC-006
     - ACC-008
     transitions:
@@ -1018,11 +1033,6 @@ screens:
       trigger: Credential Register
       provenance: 'derived — ACC-008 declares entryState.params  and ACC-007 holds none of them. The edge
         carries nothing: ACC-008 needs nothing to open'
-    - to: ACC-005
-      trigger: The badge is issued
-      provenance: flow F23 step 2→3
-      carries:
-      - holderId
   implementation:
     app: accreditation-web
     route: /reviewer-internal/reviewer-application-detail
@@ -1064,6 +1074,11 @@ screens:
     purpose: Every credential issued, with its validity
     trigger: onLoad
     provenance: readiness close-out, 29 September 2026
+  - operationId: listAccreditationAccessActivity
+    contract: accreditation
+    purpose: Where and when a credential was last used
+    trigger: onAction
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-001)
   gaps:
   - operation: revokeAccreditationBadge
     why: 'The register offers **Revoke** and nothing performs it. `AccreditationBadge.state` and `revokedReason`
@@ -1089,6 +1104,12 @@ screens:
         label: Season
         notes: Defaults to the current season. **A register scoped to all time is a register nobody reads.**
         provenance: frame claude-design/Accreditation Board.dc.html#acc-008
+      - kind: dataTable
+        label: Last used
+        bindsTo: AccreditationAccessEvent
+        operation: listAccreditationAccessActivity
+        provenance: contract accreditation.yaml GET /accreditation-access-activity; wiring fix, 2 October
+          2026
     - name: contentBody
       slot: collection
       components:

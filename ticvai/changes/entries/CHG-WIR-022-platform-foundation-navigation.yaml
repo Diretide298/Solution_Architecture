@@ -1,0 +1,49 @@
+id: CHG-WIR-022
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'platform-foundation: 3 screens lose inferred or misplaced navigation edges (or gain the edge a repointed
+  flow needs).'
+decision:
+  what: 'Fix the wrong wiring now: drop the derived exits to unrelated screens (and their entryFrom mirrors), and
+    add only the edges a repointed flow step needs.'
+  by: Chinmay
+  date: '2026-10-02'
+  quote: 'Chinmay, 2 Oct 2026: fix the wrong wiring now'
+why: Design-note corrections for platform-foundation (handoff/design-notes/platform-foundation.yaml) and the adopted
+  audit decision R251 (re-derive navigation so a screen links only to screens it can pass ids to; inferred exits
+  such as Stock Count to Queue Directory are removed).
+keys_touched:
+  screens:
+  - BO-084
+  - BO-364
+  - PTR-002
+  tickets:
+  - VM-BO-084
+root_class: A32 NAVIGATION
+tickets:
+  started: []
+  unstarted:
+  - VM-BO-084
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-navigation.py
+status: closed
+closed_by_commit: 16fd732e
+notes: 'check-navigation (N-ENTRY-MIRROR, N-CARRIES-HELD) and check-flows (consecutive steps joined by navigation
+  or a declared device handover) guard the edges; an edge that is well formed but meaningless still needs review.
+  Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are every tasks.csv or pushed key
+  naming a touched screen. Per screen and flow:
+
+  - BO-364: exits dropped BO-365; exits added BO-084 — BO-365 My Approval Inbox is merged into BO-084 Approval Inbox
+  (CHG-WIR-021); the command-centre tile now opens the kept inbox (design-notes correction platform-foundation BO-365).
+
+  - PTR-002: exits added PTR-008 — F10 step 1 (sign in and see the allocation) reads credit on the dashboard now
+  that the sign-in screen carries no credit (CHG-WIR-021); the dashboard needs the edge to Booking Creation for
+  step 2.
+
+  - BO-084: exits added BO-364 — BO-365 My Approval Inbox was merged into BO-084 (CHG-WIR-021); the kept inbox inherits
+  its return to the board landing BO-364, so flow F123 still walks (design-notes correction platform-foundation
+  BO-365).'

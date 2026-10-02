@@ -17,7 +17,7 @@ trigger:
 offlineBehaviour: None of it offline.
 steps:
 - step: 1
-  screen: ADM-017
+  screen: CMS-017
   action: Domain & Certificate Management.
   operations:
   - claimCustomDomain
@@ -25,6 +25,7 @@ steps:
   - relinquishCustomDomain
   - verifyCustomDomain
   outcome: 4 operations, 4 of them previously unwalked.
+  note: 'Repointed 2 October (CHG-WIR-015): the tenant claims its domain on CMS-017; ADM-017 is the platform support path.'
 - step: 2
   screen: ADM-016
   action: White-Label Branding Management.

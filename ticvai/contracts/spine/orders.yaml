@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Order & Payment
   version: 0.1.0
-  x-ticvai-screen-count: 205
+  x-ticvai-screen-count: 204
   x-ticvai-tier: spine
   x-ticvai-module: 2 — Ticketing Sales
   x-ticvai-requirements: 343
@@ -523,6 +523,7 @@ paths:
         - "P02 GST-072 Share & Group Booking"
         - "P04 POS-031 Reservations & Group Arrivals"
         - "P08 BO-026 Group Bookings"
+        - "P08 BO-273 Group Booking 360° & Handover Workspace"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1855,6 +1856,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-633 Fraud Alert, Investigation & Case Management\t170"
         - "P09 ADM-634 Chargeback & Dispute Command Center\t172"
+        - "P09 ADM-635 Chargeback Evidence & Representment Workspace\t173"
       summary: Open disputes, by deadline
       description: '**Sorted by `evidenceDueBy`, not by date received.** A case received yesterday with
         two days left outranks one received last week with twelve.
@@ -3722,13 +3724,13 @@ paths:
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
-        - "P08 BO-082 Stock Movements"
         - "P08 BO-101 Orders & Money"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
         - "P10 PTR-016 Voucher / Ticket Download"
+        - "P12 SUP-014 Order, Booking & Ticket Service Workspace"
         - "P16 ANL-009 AI Assistant & Action Center"
       x-ticvai-api-scope: ticketing.read
       security:
@@ -3841,18 +3843,13 @@ paths:
         - "P04 POS-005 Payment"
         - "P04 POS-006 Held Orders"
         - "P04 POS-013 Mobile POS, Event Sales & Offline Operations"
-        - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
         - "P08 BO-022 Order Detail"
-        - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
-        - "P08 BO-130 Offline Policy & Rules Configuration"
         - "P10 PTR-002 Partner Dashboard"
-        - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
-        - "P10 PTR-016 Voucher / Ticket Download"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-latency-budget-ms: 400
       security:
@@ -3977,6 +3974,9 @@ paths:
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
+        - "P08 BO-1147 Refund Routing & Credit Restoration Engine"
+        - "P08 BO-305 Order Detail & Transaction Workspace"
+        - "P08 BO-315 Order Amendment Workspace"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
@@ -4167,17 +4167,13 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
-        - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
         - "P08 BO-022 Order Detail"
-        - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
         - "P10 PTR-002 Partner Dashboard"
-        - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
-        - "P10 PTR-016 Voucher / Ticket Download"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -4268,17 +4264,13 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
-        - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
         - "P08 BO-022 Order Detail"
-        - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
         - "P10 PTR-002 Partner Dashboard"
-        - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
-        - "P10 PTR-016 Voucher / Ticket Download"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -4342,17 +4334,11 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
         - "P04 POS-014 Sales Exceptions, Controls & Operational Actions"
-        - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
-        - "P10 PTR-002 Partner Dashboard"
-        - "P10 PTR-005 Inventory & Allocation View"
-        - "P10 PTR-008 Booking Creation"
-        - "P10 PTR-015 Order History"
-        - "P10 PTR-016 Voucher / Ticket Download"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -4415,21 +4401,14 @@ paths:
     post:
       operationId: voidOrder
       x-ticvai-consumed-by:
-        - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
         - "P04 POS-014 Sales Exceptions, Controls & Operational Actions"
-        - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
         - "P08 BO-319 Void, Reversal & Same-Day Correction Management"
-        - "P10 PTR-002 Partner Dashboard"
-        - "P10 PTR-005 Inventory & Allocation View"
-        - "P10 PTR-008 Booking Creation"
-        - "P10 PTR-015 Order History"
-        - "P10 PTR-016 Voucher / Ticket Download"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -4517,7 +4496,6 @@ paths:
     get:
       operationId: listOrderRefunds
       x-ticvai-consumed-by:
-        - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
         - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
@@ -4525,7 +4503,9 @@ paths:
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
+        - "P08 BO-1147 Refund Routing & Credit Restoration Engine"
         - "P09 ADM-609 Refund & Payment Adjustment Command Center\t116"
+        - "P09 ADM-616 Payment Adjustment & Financial Correction Manager\t123"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
@@ -4569,19 +4549,16 @@ paths:
     post:
       operationId: createRefund
       x-ticvai-consumed-by:
-        - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
         - "P04 POS-011 Returns, Refunds & Exchanges"
-        - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
         - "P08 BO-1147 Refund Routing & Credit Restoration Engine"
+        - "P09 ADM-610 Refund Request & Eligibility Workspace\t117"
         - "P09 ADM-616 Payment Adjustment & Financial Correction Manager\t123"
-        - "P10 PTR-008 Booking Creation"
-        - "P10 PTR-015 Order History"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -4660,7 +4637,7 @@ paths:
     post:
       operationId: approveRefund
       x-ticvai-consumed-by:
-        - "P08 BO-004 Manual Wait Time Entry"
+        - "P08 BO-028 Refund Approval Queue"
         - "P09 ADM-614 Refund Approval & Exception Workflow\t121"
       x-ticvai-audience:
       - staff
@@ -4727,7 +4704,7 @@ paths:
     post:
       operationId: createBulkRefund
       x-ticvai-consumed-by:
-        - "P08 BO-004 Manual Wait Time Entry"
+        - "P08 BO-023 Refunds & Exchanges"
       x-ticvai-audience:
       - staff
       summary: Refund every order against an event, performance or date
@@ -4810,8 +4787,6 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-019 Order History"
         - "P02 GST-067 Refunds & Resale"
-        - "P08 BO-028 Refund Approval Queue"
-        - "P09 ADM-610 Refund Request & Eligibility Workspace\t117"
       x-ticvai-audience:
       - guest
       security:
@@ -4893,7 +4868,10 @@ paths:
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-062 Venue Profile"
         - "P08 BO-065 Venue Configuration"
+        - "P08 BO-1146 Refund-to-Wallet Policy Configuration"
+        - "P08 BO-318 Refund Policy & Refund Calculation Configuration"
         - "P09 ADM-610 Refund Request & Eligibility Workspace\t117"
+        - "P09 ADM-611 Refund Policy & Rule Configuration\t118"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -4986,7 +4964,6 @@ paths:
         - "P05 KSK-007 Payment"
         - "P06 EMP-035 Payment on device"
         - "P06 EMP-059 Table Order, Bill & Payment Management"
-        - "P08 BO-024 Payment Exceptions"
         - "P10 PTR-012 Checkout / Credit Purchase"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-note: >-
@@ -5185,8 +5162,6 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-005 Payment"
         - "P06 EMP-035 Payment on device"
-        - "P08 BO-024 Payment Exceptions"
-        - "P10 PTR-012 Checkout / Credit Purchase"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -5415,12 +5390,8 @@ paths:
     post:
       operationId: syncOrders
       x-ticvai-consumed-by:
-        - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-013 Mobile POS, Event Sales & Offline Operations"
-        - "P06 EMP-017 Sync & reconciliation"
-        - "P07 SCN-014 Sync & reconciliation"
         - "P08 BO-037 Offline Package Status"
-        - "P08 BO-130 Offline Policy & Rules Configuration"
         - "P08 BO-132 Offline Transaction Monitor & Sync Queue"
       x-ticvai-note: >-
         **Ingest, per entry** (system-design review SD-028, 29 September; supersedes "stopping at the first entry").
@@ -5495,9 +5466,11 @@ paths:
     get:
       operationId: listSyncRejections
       x-ticvai-consumed-by:
+        - "P04 POS-013 Mobile POS, Event Sales & Offline Operations"
         - "P06 EMP-017 Sync & reconciliation"
         - "P07 SCN-014 Sync & reconciliation"
         - "P08 BO-037 Offline Package Status"
+        - "P08 BO-038 Reconciliation Queue"
         - "P08 BO-130 Offline Policy & Rules Configuration"
         - "P08 BO-132 Offline Transaction Monitor & Sync Queue"
         - "P08 BO-133 Offline Alerts, Limits & Audit"
@@ -5574,6 +5547,9 @@ paths:
         format: uuid
     post:
       operationId: resolveSyncRejection
+      x-ticvai-consumed-by:
+        - "P08 BO-038 Reconciliation Queue"
+        - "P08 BO-130 Offline Policy & Rules Configuration"
       x-ticvai-audience:
       - staff
       summary: Record what was done about a refused entry
@@ -5633,20 +5609,17 @@ paths:
     post:
       operationId: modifyOrder
       x-ticvai-consumed-by:
-        - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
-        - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
         - "P08 BO-281 Group Amendments, Cancellation & Refund Operations"
+        - "P08 BO-315 Order Amendment Workspace"
         - "P10 PTR-002 Partner Dashboard"
-        - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
-        - "P10 PTR-016 Voucher / Ticket Download"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -5712,7 +5685,6 @@ paths:
         - "P04 POS-010 Add to Existing Ticket"
         - "P06 EMP-036 Issue media"
         - "P08 BO-027 Reissue & Media Replacement"
-        - "P13 CMS-010 Media Library"
       x-ticvai-audience:
       - staff
       summary: What is already on this media
@@ -5751,7 +5723,6 @@ paths:
         - "P04 POS-010 Add to Existing Ticket"
         - "P06 EMP-036 Issue media"
         - "P08 BO-027 Reissue & Media Replacement"
-        - "P13 CMS-010 Media Library"
       x-ticvai-audience:
       - staff
       summary: Add something to a ticket the guest already holds
@@ -5824,21 +5795,18 @@ paths:
     post:
       operationId: exchangeOrderLines
       x-ticvai-consumed-by:
-        - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
         - "P04 POS-010 Add to Existing Ticket"
         - "P04 POS-011 Returns, Refunds & Exchanges"
-        - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
+        - "P08 BO-315 Order Amendment Workspace"
         - "P10 PTR-002 Partner Dashboard"
-        - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
-        - "P10 PTR-016 Voucher / Ticket Download"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -5907,20 +5875,17 @@ paths:
     post:
       operationId: rescheduleOrder
       x-ticvai-consumed-by:
-        - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
-        - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
         - "P08 BO-281 Group Amendments, Cancellation & Refund Operations"
+        - "P08 BO-315 Order Amendment Workspace"
         - "P10 PTR-002 Partner Dashboard"
-        - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
-        - "P10 PTR-016 Voucher / Ticket Download"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -6367,7 +6332,6 @@ paths:
     get:
       operationId: getOrderStatement
       x-ticvai-consumed-by:
-        - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
         - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
@@ -6375,6 +6339,7 @@ paths:
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
+        - "P08 BO-305 Order Detail & Transaction Workspace"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
@@ -6699,9 +6664,6 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setB2bCreditLimit
-      x-ticvai-consumed-by:
-        - "P10 PTR-002 Partner Dashboard"
-        - "P10 PTR-013 Credit Limit & Balance"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -6766,9 +6728,6 @@ paths:
         format: uuid
     post:
       operationId: overrideCreditLimit
-      x-ticvai-consumed-by:
-        - "P10 PTR-002 Partner Dashboard"
-        - "P10 PTR-013 Credit Limit & Balance"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -8757,8 +8716,6 @@ paths:
   /order-detail-transaction:
     put:
       operationId: setOrderDetailTransaction
-      x-ticvai-consumed-by:
-        - "P08 BO-305 Order Detail & Transaction Workspace"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.5; MoM 1 Sep 4.11-4.12 (orders, holds, amendments, deposits); shape fixed (13 non-field properties removed; added lines)'
@@ -9335,8 +9292,6 @@ paths:
   /order-amendment:
     put:
       operationId: setOrderAmendment
-      x-ticvai-consumed-by:
-        - "P08 BO-315 Order Amendment Workspace"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.22; MoM 1 Sep 4.11-4.12 (orders, holds, amendments, deposits); shape fixed (12 non-field properties removed)'
@@ -9517,6 +9472,7 @@ paths:
       operationId: listVoidReversalSame
       x-ticvai-consumed-by:
         - "P08 BO-319 Void, Reversal & Same-Day Correction Management"
+        - "P09 ADM-613 Void, Reversal & Cancellation Manager\t120"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -10224,6 +10180,7 @@ paths:
     get:
       operationId: listPaymentReconciliationException
       x-ticvai-consumed-by:
+        - "P08 BO-024 Payment Exceptions"
         - "P08 BO-331 Payment Reconciliation & Exception Management"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
@@ -10530,7 +10487,6 @@ paths:
     put:
       operationId: setResaleEligibilityRule
       x-ticvai-consumed-by:
-        - "P09 ADM-199 Eligibility Rule Builder"
         - "P09 ADM-279 Resale Eligibility Rule Configuration"
       x-ticvai-audience:
       - staff
@@ -12151,6 +12107,8 @@ paths:
   /deposits:
     get:
       operationId: listDeposits
+      x-ticvai-consumed-by:
+        - "P08 BO-024 Payment Exceptions"
       summary: Deposits and their authorisation state
       description: >
         **The authorisation lifecycle, not the accounting one.** `required`, `authorized`,
@@ -12273,6 +12231,8 @@ paths:
   /upgrades:
     get:
       operationId: listUpgrades
+      x-ticvai-consumed-by:
+        - "P09 ADM-316 Upgrade Execution, Credential Regeneration & Channel Controls"
       summary: Upgrade requests and their outcome
       description: >
         **`quoteUpgrade` priced an upgrade and nothing recorded that one happened.** The quote is
@@ -13192,7 +13152,10 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-278 Resale Marketplace Command Center"
         - "P09 ADM-280 Resale Policy & Marketplace Settings"
+        - "P09 ADM-281 Listing Creation & Seller Configuration"
         - "P09 ADM-282 Resale Pricing & Price Guardrails"
+        - "P09 ADM-284 Listing Approval & Moderation"
+        - "P09 ADM-287 AI Resale Configuration & Marketplace Recommendations"
       summary: How the venue's resale marketplace runs
       description: '**The one row per venue in `orders.resale_marketplace_config`**: pricing mode and
         guardrails, moderation, listing lifecycle, checkout hold, seller settlement timing and the
@@ -14020,7 +13983,7 @@ paths:
         - "P08 BO-025 Chargebacks & Disputes"
         - "P09 ADM-633 Fraud Alert, Investigation & Case Management\t170"
         - "P09 ADM-634 Chargeback & Dispute Command Center\t172"
-        - "P09 ADM-637 AI Fraud, Anomaly & Payment Intelligence Center\t175"
+        - "P09 ADM-637 AI Fraud, Anomaly & Payment Intelligence Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (retrace 4.2.21); shape follows getPaymentPerformance'

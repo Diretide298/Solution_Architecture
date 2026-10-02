@@ -461,9 +461,9 @@ paths:
     get:
       operationId: getTenantConfig
       x-ticvai-consumed-by:
-        - "P08 BO-599 Manual Configuration Center"
         - "P08 BO-834 Digital Experience Center"
         - "P13 CMS-001 Tenant Workspace"
+        - "P13 CMS-011 Translations"
         - "P13 CMS-012 RTL Preview"
         - "P13 CMS-016 Site Settings"
       x-ticvai-audience:
@@ -661,6 +661,7 @@ paths:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-002 Brand Kit"
         - "P13 CMS-004 Logo & Assets"
+        - "P13 CMS-006 Component Preview"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -826,6 +827,7 @@ paths:
     get:
       operationId: getBookingFlowConfig
       x-ticvai-consumed-by:
+        - "P13 CMS-006 Component Preview"
         - "P13 CMS-016 Site Settings"
       summary: How the guest booking flow looks and steps
       tags:
@@ -926,8 +928,8 @@ paths:
       operationId: getTheme
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
-        - "P13 CMS-003 Typography"
         - "P13 CMS-005 Theme Editor"
+        - "P13 CMS-006 Component Preview"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -953,7 +955,6 @@ paths:
       operationId: setTheme
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
-        - "P13 CMS-003 Typography"
         - "P13 CMS-005 Theme Editor"
       x-ticvai-audience:
       - staff
@@ -1007,6 +1008,7 @@ paths:
       operationId: getFonts
       x-ticvai-consumed-by:
         - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1946,7 +1948,7 @@ paths:
     get:
       operationId: listPolicies
       x-ticvai-consumed-by:
-        - "P08 BO-243 Policy Approval, Audit, Analytics & AI Optimization"
+        - "P08 BO-748 Consent Capture & Versions"
         - "P09 ADM-018 Localisation & Language Pack"
         - "P13 CMS-018 Consent & Legal"
       x-ticvai-audience:
@@ -2066,6 +2068,7 @@ paths:
     get:
       operationId: getModuleEnablement
       x-ticvai-consumed-by:
+        - "P09 ADM-424 Module Activation & Dependency Validation"
         - "P13 CMS-001 Tenant Workspace"
         - "P13 CMS-007 Page Builder"
       x-ticvai-audience:
@@ -2096,6 +2099,7 @@ paths:
     put:
       operationId: setModuleEnablement
       x-ticvai-consumed-by:
+        - "P09 ADM-424 Module Activation & Dependency Validation"
         - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
@@ -2304,6 +2308,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-006 Component Preview"
+        - "P13 CMS-014 Publishing Workflow"
       x-ticvai-audience:
       - staff
       summary: Generate a preview link
@@ -2400,7 +2405,6 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-843 Publishing, Analytics & Audit"
         - "P09 ADM-016 White-Label Branding Management"
-        - "P13 CMS-006 Component Preview"
         - "P13 CMS-014 Publishing Workflow"
         - "P13 CMS-103 Booking Flows"
       x-ticvai-audience:
@@ -2474,7 +2478,6 @@ paths:
       operationId: listConfigVersions
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
-        - "P13 CMS-006 Component Preview"
         - "P13 CMS-015 Version History"
       x-ticvai-audience:
       - staff
@@ -2516,7 +2519,6 @@ paths:
       operationId: restoreConfigVersion
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
-        - "P13 CMS-006 Component Preview"
         - "P13 CMS-015 Version History"
       x-ticvai-config-scope: tenant
       x-ticvai-audience:
@@ -2560,7 +2562,7 @@ paths:
       operationId: diffConfigVersion
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
-        - "P13 CMS-006 Component Preview"
+        - "P13 CMS-014 Publishing Workflow"
         - "P13 CMS-015 Version History"
       x-ticvai-audience:
       - staff

@@ -39,20 +39,17 @@ steps:
   action: Component Preview.
   operations:
   - createPreview
-  - diffConfigVersion
   outcome: 2 operations, 2 of them previously unwalked.
   crossesDevice: true
 - step: 4
-  screen: ADM-016
+  screen: CMS-014
   action: White-Label Branding Management.
   operations:
-  - createPreview
   - diffConfigVersion
-  - getAppIcons
-  - getBrandIdentity
-  - setAppIcons
+  - publishTenantConfig
   outcome: 5 operations, 5 of them previously unwalked.
   crossesDevice: true
+  note: 'Repointed 2 October (CHG-WIR-015): a tenant''s journey never continues on the platform console (ADM-016); the draft is reviewed and published on CMS-014.'
 branches:
 - at: 1
   condition: The acting principal lacks the permission at this scope.

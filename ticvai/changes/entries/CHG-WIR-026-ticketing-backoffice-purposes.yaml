@@ -1,0 +1,217 @@
+id: CHG-WIR-026
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'ticketing-backoffice: 36 screen purposes rewritten that were copied from another screen, a generator template
+  or a pasted board placeholder.'
+decision:
+  what: 'Fix the wrong wiring now: give each screen its own one-sentence purpose, keeping what the screen is for.'
+  by: Chinmay
+  date: '2026-10-02'
+  quote: 'Chinmay, 2 Oct 2026: fix the wrong wiring now'
+why: 'Design-note corrections for ticketing-backoffice (handoff/design-notes/ticketing-backoffice.yaml): the purposes
+  were generator templates, board titles with their date, or text copied from another screen (the boilerplate the
+  26 September audit traced under R250 and R260); a designer cannot act on them. Each screen''s correction is cited
+  below. The old text is kept in each screen''s purposeNote.'
+keys_touched:
+  screens:
+  - ADM-110
+  - ADM-187
+  - BO-1061
+  - BO-1162
+  - BO-694
+  - BO-695
+  - BO-696
+  - BO-697
+  - BO-698
+  - BO-699
+  - BO-700
+  - BO-701
+  - BO-702
+  - BO-703
+  - BO-704
+  - BO-705
+  - BO-706
+  - BO-707
+  - BO-708
+  - BO-709
+  - BO-710
+  - BO-711
+  - BO-712
+  - BO-713
+  - BO-715
+  - BO-716
+  - BO-717
+  - BO-719
+  - BO-720
+  - BO-721
+  - BO-722
+  - BO-723
+  - BO-724
+  - BO-725
+  - BO-726
+  - BO-922
+  tickets:
+  - APP-SETUP-BO-1162
+  - APP-SETUP-BO-696
+  - APP-SETUP-BO-716
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-BO-1162
+  - APP-SETUP-BO-696
+  - APP-SETUP-BO-716
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: 16fd732e
+notes: 'check-screen-wiring gains S-PURPOSE-BOILERPLATE, which flags the generator and board-placeholder purposes.
+  Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are every tasks.csv or pushed key
+  naming a touched screen. Per screen and flow:
+
+  - ADM-187: purpose rewritten — The purpose was ADM-157''s word for word (testing promotional rules); the pack
+  attached it by page, and this screen validates a bundle before it is published (pack page 73) (design-notes correction
+  ticketing-backoffice ADM-187).
+
+  - BO-694: purpose rewritten — The purpose was pack text attached by page rather than by screen and does not describe
+  this screen; it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
+  BO-694)
+
+  - BO-695: purpose rewritten — The purpose was pack text attached by page rather than by screen and does not describe
+  this screen; it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
+  BO-695)
+
+  - BO-696: purpose rewritten — The purpose was pack text attached by page rather than by screen and does not describe
+  this screen; it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
+  BO-696)
+
+  - BO-697: purpose rewritten — The purpose was pack text attached by page rather than by screen and does not describe
+  this screen; it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
+  BO-697)
+
+  - BO-698: purpose rewritten — The purpose was pack text attached by page rather than by screen and does not describe
+  this screen; it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
+  BO-698)
+
+  - BO-699: purpose rewritten — The purpose was pack text attached by page rather than by screen and does not describe
+  this screen; it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
+  BO-699)
+
+  - BO-700: purpose rewritten — The purpose was pack text attached by page rather than by screen and does not describe
+  this screen; it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
+  BO-700)
+
+  - BO-701: purpose rewritten — The purpose was pack text attached by page rather than by screen and does not describe
+  this screen; it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
+  BO-701)
+
+  - BO-702: purpose rewritten — The purpose was pack text attached by page rather than by screen and does not describe
+  this screen; it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
+  BO-702)
+
+  - BO-703: purpose rewritten — The purpose was pack text attached by page rather than by screen and does not describe
+  this screen; it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
+  BO-703)
+
+  - BO-704: purpose rewritten — The purpose was pack text attached by page rather than by screen and does not describe
+  this screen; it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
+  BO-704)
+
+  - BO-705: purpose rewritten — The purpose was pack text attached by page rather than by screen and does not describe
+  this screen; it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
+  BO-705)
+
+  - BO-706: purpose rewritten — The purpose was pack text attached by page rather than by screen and does not describe
+  this screen; it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
+  BO-706)
+
+  - BO-707: purpose rewritten — The purpose was pack text attached by page rather than by screen and does not describe
+  this screen; it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
+  BO-707)
+
+  - BO-708: purpose rewritten — The purpose was pack text attached by page rather than by screen and does not describe
+  this screen; it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
+  BO-708)
+
+  - BO-709: purpose rewritten — The purpose was pack text attached by page rather than by screen and does not describe
+  this screen; it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
+  BO-709)
+
+  - BO-710: purpose rewritten — The purpose was pack text attached by page rather than by screen and does not describe
+  this screen; it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
+  BO-710)
+
+  - BO-711: purpose rewritten — The purpose was pack text attached by page rather than by screen and does not describe
+  this screen; it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
+  BO-711)
+
+  - BO-712: purpose rewritten — The purpose was pack text attached by page rather than by screen and does not describe
+  this screen; it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
+  BO-712)
+
+  - BO-713: purpose rewritten — The purpose was pack text attached by page rather than by screen and does not describe
+  this screen; it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
+  BO-713)
+
+  - BO-715: purpose rewritten — The purpose was pack text attached by page rather than by screen and does not describe
+  this screen; it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
+  BO-715)
+
+  - BO-716: purpose rewritten — The purpose was pack text attached by page rather than by screen and does not describe
+  this screen; it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
+  BO-716)
+
+  - BO-717: purpose rewritten — The purpose was pack text attached by page rather than by screen and does not describe
+  this screen; it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
+  BO-717)
+
+  - BO-719: purpose rewritten — The purpose was pack text attached by page rather than by screen and does not describe
+  this screen; it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
+  BO-719)
+
+  - BO-720: purpose rewritten — The purpose was pack text attached by page rather than by screen and does not describe
+  this screen; it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
+  BO-720)
+
+  - BO-721: purpose rewritten — The purpose was pack text attached by page rather than by screen and does not describe
+  this screen; it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
+  BO-721)
+
+  - BO-722: purpose rewritten — The purpose was pack text attached by page rather than by screen and does not describe
+  this screen; it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
+  BO-722)
+
+  - BO-723: purpose rewritten — The purpose was pack text attached by page rather than by screen and does not describe
+  this screen; it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
+  BO-723)
+
+  - BO-724: purpose rewritten — The purpose was pack text attached by page rather than by screen and does not describe
+  this screen; it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
+  BO-724)
+
+  - BO-725: purpose rewritten — The purpose was pack text attached by page rather than by screen and does not describe
+  this screen; it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
+  BO-725)
+
+  - BO-726: purpose rewritten — The purpose was pack text attached by page rather than by screen and does not describe
+  this screen; it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
+  BO-726)
+
+  - BO-922: purpose rewritten — Two pack screens'' text was merged into one purpose (the second describes an AI
+  resource intelligence engine); the purpose keeps the screen''s own sentence (design-notes correction ticketing-backoffice
+  BO-922)
+
+  - BO-1061: purpose rewritten — The purpose described a platform-wide tenant and environment command centre, which
+  belongs to the TICVAI Console; a venue back-office screen cannot show other tenants, and its operations are venue
+  map lists (design-notes correction ticketing-backoffice BO-1061)
+
+  - BO-1162: purpose rewritten — The purpose carried the financial-control layer text of another board (liabilities,
+  breakage, reconciliation); the operations are versioning, audit and risk-rule status, so the screen''s own sentence
+  is kept (design-notes correction ticketing-backoffice BO-1162)
+
+  - ADM-110: purpose rewritten — The purpose repeated the screen name (a board placeholder) (design-notes correction
+  ticketing-backoffice ADM-110)'

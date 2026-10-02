@@ -32,7 +32,6 @@ steps:
   action: The cashier takes the order from the menu board.
   operations:
   - getGuestMenu
-  - listModifierGroups
   - addCartLine
   outcome: '**Sections in the order the outlet set them, not alphabetical.** A menu board that sorts
     by name puts Desserts above Mains forever.'
@@ -40,7 +39,6 @@ steps:
   screen: POS-021
   action: Modifiers are chosen — no onions, large, extra shot.
   operations:
-  - listModifierGroups
   - evaluatePromotions
   outcome: '**The group is attached to the item, not chosen per sale.** *How would you like that cooked*
     is one group on nine steaks.'

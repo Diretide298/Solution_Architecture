@@ -97,21 +97,24 @@ paths:
     get:
       operationId: listApprovalRequests
       x-ticvai-consumed-by:
+        - "P06 EMP-037 Notifications"
         - "P08 BO-084 Approval Inbox"
         - "P08 BO-085 Approval Request"
+        - "P08 BO-1181 Approval, Publication & Change Management"
         - "P08 BO-364 Approval Command Center Dashboard"
-        - "P08 BO-365 My Approval Inbox"
         - "P08 BO-366 Team / Shared Approval Queue"
         - "P08 BO-367 Approval Request Detail"
         - "P08 BO-368 AI Decision Support"
         - "P08 BO-369 High Priority & Risk Queue"
         - "P08 BO-371 Completed Approval History"
+        - "P08 BO-374 Approval Decision Workspace"
         - "P08 BO-375 Business Context & Evidence Viewer"
         - "P08 BO-393 AI SLA & Escalation Advisor"
         - "P08 BO-940 Manager Mobile Approval Center"
+        - "P09 ADM-130 Approval Review & Decision Workspace"
         - "P09 ADM-145 Promotion Approval Inbox"
+        - "P09 ADM-224 Approval Inbox & Decision Workspace"
         - "P09 ADM-249 Unified Approval Inbox & Decision Workspace"
-        - "P09 ADM-351 Approval API Management"
       x-ticvai-audience:
       - staff
       - public
@@ -186,10 +189,12 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-020 Shift Exceptions & Alerts"
+        - "P08 BO-045 Menu Management"
         - "P08 BO-1010 Hold Approval Workflow"
         - "P08 BO-1031 Contracts & Approval Workflow"
         - "P08 BO-1080 Integration Approval & Compliance"
         - "P08 BO-1181 Approval, Publication & Change Management"
+        - "P08 BO-163 Rule Simulation, Conflict Check & Publication"
         - "P08 BO-243 Policy Approval, Audit, Analytics & AI Optimization"
         - "P08 BO-301 Member Exceptions, Overrides & Service Recovery"
         - "P08 BO-718 Event Change Request Configuration"
@@ -347,9 +352,6 @@ paths:
       operationId: evaluateApprovalRequirement
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
-        - "P04 POS-004 Sell — Seat Map"
-        - "P08 BO-085 Approval Request"
-        - "P08 BO-368 AI Decision Support"
         - "P09 ADM-337 Routing Simulator & Conflict Detection"
         - "P09 ADM-530 AI Approval Requirement & Routing Configuration"
         - "P09 ADM-532 Conditional Approval & Approval Conditions"
@@ -421,6 +423,7 @@ paths:
         - "P08 BO-133 Offline Alerts, Limits & Audit"
         - "P08 BO-243 Policy Approval, Audit, Analytics & AI Optimization"
         - "P08 BO-367 Approval Request Detail"
+        - "P08 BO-374 Approval Decision Workspace"
         - "P08 BO-377 Approve & Sensitive Action Confirmation"
         - "P08 BO-378 Reject / Return / Request Information"
         - "P08 BO-940 Manager Mobile Approval Center"
@@ -706,6 +709,11 @@ paths:
       operationId: listApprovalMatrices
       x-ticvai-consumed-by:
         - "P08 BO-086 Approval Matrix"
+        - "P08 BO-1120 Corporate Budget, Policy & Approval Rules"
+        - "P08 BO-1149 Administrative Balance Adjustment Studio"
+        - "P09 ADM-083 Pricing Approval Workflow & Authority Matrix"
+        - "P09 ADM-129 Approval Workflow Designer"
+        - "P09 ADM-223 Campaign Approval Workflow Designer"
         - "P09 ADM-242 Approval Matrix & Multi-Level Approval Configuration"
         - "P09 ADM-329 Approval Matrix Command Center"
         - "P09 ADM-338 AI Routing Advisor & Matrix Optimization"
@@ -1314,6 +1322,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1067 Seat Approval Workflows"
         - "P08 BO-638 Approval Rules & Conditions"
+        - "P08 BO-643 Approval Policy Validation & Publication"
         - "P09 ADM-241 Visual Workflow Designer"
         - "P09 ADM-320 Create Approval Workflow"
         - "P09 ADM-322 Approval Stage Configuration"
@@ -1596,6 +1605,7 @@ paths:
     put:
       operationId: simulateWorkflowTestingImpact
       x-ticvai-consumed-by:
+        - "P08 BO-643 Approval Policy Validation & Publication"
         - "P09 ADM-246 Workflow Testing, Simulation & Impact Analysis"
         - "P09 ADM-326 Workflow Validation & Simulation"
         - "P09 ADM-337 Routing Simulator & Conflict Detection"
@@ -1714,6 +1724,7 @@ paths:
     get:
       operationId: listWorkflow
       x-ticvai-consumed-by:
+        - "P08 BO-643 Approval Policy Validation & Publication"
         - "P09 ADM-248 Workflow Operations Command Center"
       x-ticvai-audience:
       - staff
@@ -2670,7 +2681,6 @@ paths:
       operationId: signApprovalDecision
       x-ticvai-consumed-by:
         - "P08 BO-377 Approve & Sensitive Action Confirmation"
-        - "P09 ADM-344 Digital Signature Management"
       summary: Sign a decision, so it can be proved later
       description: 'Approvals board 6.5. **A decision record says somebody approved; a signature proves
         it.** For the decisions that end up in front of a regulator or a court — a licence, a safety
@@ -2764,7 +2774,7 @@ paths:
         - "P08 BO-388 Approval SLA Policy Configuration"
         - "P08 BO-389 Reminder & Breach Notification Rules"
         - "P08 BO-390 Escalation Policy Builder"
-        - "P08 BO-809 SLA Policy Configuration"
+        - "P09 ADM-244 SLA, Escalation, Reminder & Timeout Rules"
         - "P09 ADM-534 Escalation, Delegation & Approval SLA Management"
       summary: How long a decision may take, and what happens when it does not
       description: 'Approvals boards 5.5 and 5.6. **`listSlaEscalationReminder` could read them and
@@ -2876,7 +2886,6 @@ paths:
       operationId: setApprovalRetentionPolicy
       x-ticvai-consumed-by:
         - "P09 ADM-346 Approval Record Retention Policy"
-        - "P16 ANL-050 Retention, Archive & Governance Policy"
       summary: How long decision records are kept, and what survives
       description: 'Approvals board 6.7. **Approval records outlive the things they approved**, and
         deliberately: the refund is history in ninety days and the evidence that it was authorised is
@@ -3141,6 +3150,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-384 Delegation & Escalation Command Center"
         - "P08 BO-391 Live Escalation Operations Center"
+        - "P08 BO-635 Accreditation Review Queue"
         - "P09 ADM-250 Workflow Instance Monitor & Process Timeline"
         - "P09 ADM-251 Workflow Exception, Failure & Recovery Center"
         - "P09 ADM-252 SLA, Escalation & Bottleneck Monitor"
@@ -3370,6 +3380,7 @@ paths:
       operationId: listApprovalExternalDispatches
       x-ticvai-consumed-by:
         - "P09 ADM-349 Approval Integration Command Center"
+        - "P09 ADM-354 External Workflow System Integration"
         - "P09 ADM-357 Integration Monitoring, Error & Retry Center"
       x-ticvai-agreed: '29 September: re-trace 11.1.65 (retry and failure handling of the external
         connector); our build plan; shape follows listApprovedActionExecutions'

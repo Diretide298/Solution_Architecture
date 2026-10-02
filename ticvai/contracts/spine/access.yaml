@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Access Control
   version: 1.0.0
-  x-ticvai-screen-count: 240
+  x-ticvai-screen-count: 237
   x-ticvai-tier: spine
   x-ticvai-module: 3 — Admission and Access
   x-ticvai-requirements: 201
@@ -78,14 +78,9 @@ paths:
         - "P06 EMP-015 Group scan"
         - "P06 EMP-017 Sync & reconciliation"
         - "P07 SCN-003 Ready to scan"
-        - "P07 SCN-007 Group admission"
         - "P07 SCN-008 Manual entry"
-        - "P07 SCN-009 Ticket lookup"
         - "P07 SCN-013 Offline journal"
         - "P07 SCN-014 Sync & reconciliation"
-        - "P07 SCN-015 Offline package"
-        - "P08 BO-034 Scan Activity"
-        - "P08 BO-035 Override Audit"
         - "P08 BO-060 Attendance & Footfall"
       x-ticvai-latency-budget-ms: 300
       x-ticvai-audience:
@@ -317,6 +312,7 @@ paths:
         - "P02 GST-012 My Tickets"
         - "P02 GST-013 Ticket Details"
         - "P02 GST-055 Dynamic QR Ticket"
+        - "P08 BO-355 Virtual Ticket & Credential 360° Workspace"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -373,6 +369,7 @@ paths:
         - "P02 GST-012 My Tickets"
         - "P02 GST-013 Ticket Details"
         - "P02 GST-055 Dynamic QR Ticket"
+        - "P08 BO-355 Virtual Ticket & Credential 360° Workspace"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -487,6 +484,7 @@ paths:
         - "P01 WEB-018 My Tickets"
         - "P02 GST-012 My Tickets"
         - "P02 GST-013 Ticket Details"
+        - "P08 BO-355 Virtual Ticket & Credential 360° Workspace"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1422,14 +1420,8 @@ paths:
         - "P06 EMP-015 Group scan"
         - "P06 EMP-017 Sync & reconciliation"
         - "P07 SCN-003 Ready to scan"
-        - "P07 SCN-007 Group admission"
-        - "P07 SCN-008 Manual entry"
-        - "P07 SCN-009 Ticket lookup"
         - "P07 SCN-013 Offline journal"
         - "P07 SCN-014 Sync & reconciliation"
-        - "P07 SCN-015 Offline package"
-        - "P08 BO-034 Scan Activity"
-        - "P08 BO-035 Override Audit"
         - "P08 BO-060 Attendance & Footfall"
         - "P08 BO-228 Manual Override & Supervisor Approval"
       x-ticvai-audience:
@@ -1516,6 +1508,7 @@ paths:
         - "P08 BO-034 Scan Activity"
         - "P08 BO-035 Override Audit"
         - "P08 BO-060 Attendance & Footfall"
+        - "P08 BO-358 Media Binding, Activation & Assignment Operations"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1562,19 +1555,11 @@ paths:
     post:
       operationId: syncScans
       x-ticvai-consumed-by:
-        - "P06 EMP-010 Scan — ready"
         - "P06 EMP-015 Group scan"
         - "P06 EMP-017 Sync & reconciliation"
         - "P06 EMP-049 Hand over the journal"
-        - "P07 SCN-003 Ready to scan"
-        - "P07 SCN-007 Group admission"
-        - "P07 SCN-008 Manual entry"
-        - "P07 SCN-009 Ticket lookup"
         - "P07 SCN-013 Offline journal"
         - "P07 SCN-014 Sync & reconciliation"
-        - "P07 SCN-015 Offline package"
-        - "P08 BO-034 Scan Activity"
-        - "P08 BO-035 Override Audit"
         - "P08 BO-060 Attendance & Footfall"
       x-ticvai-audience:
       - staff
@@ -1640,17 +1625,11 @@ paths:
     get:
       operationId: listScans
       x-ticvai-consumed-by:
-        - "P06 EMP-010 Scan — ready"
         - "P06 EMP-015 Group scan"
         - "P06 EMP-017 Sync & reconciliation"
         - "P06 EMP-049 Hand over the journal"
-        - "P07 SCN-003 Ready to scan"
-        - "P07 SCN-007 Group admission"
-        - "P07 SCN-008 Manual entry"
         - "P07 SCN-009 Ticket lookup"
-        - "P07 SCN-013 Offline journal"
         - "P07 SCN-014 Sync & reconciliation"
-        - "P07 SCN-015 Offline package"
         - "P08 BO-034 Scan Activity"
         - "P08 BO-035 Override Audit"
         - "P08 BO-060 Attendance & Footfall"
@@ -1719,22 +1698,15 @@ paths:
     get:
       operationId: getOfflinePackage
       x-ticvai-consumed-by:
-        - "P04 POS-013 Mobile POS, Event Sales & Offline Operations"
-        - "P06 EMP-010 Scan — ready"
         - "P06 EMP-015 Group scan"
         - "P06 EMP-017 Sync & reconciliation"
-        - "P07 SCN-003 Ready to scan"
         - "P07 SCN-007 Group admission"
         - "P07 SCN-008 Manual entry"
         - "P07 SCN-009 Ticket lookup"
         - "P07 SCN-013 Offline journal"
         - "P07 SCN-014 Sync & reconciliation"
         - "P07 SCN-015 Offline package"
-        - "P08 BO-034 Scan Activity"
-        - "P08 BO-035 Override Audit"
-        - "P08 BO-037 Offline Package Status"
         - "P08 BO-060 Attendance & Footfall"
-        - "P08 BO-207 Edge Package & Data Distribution"
       x-ticvai-note: >-
         **The active admission policy version travels in the package** (ADR-0068, accepted 1 October): the
         dynamic policies at their active versions with their closed-format `conditionRule`, and `policySetVersion`,
@@ -1821,10 +1793,7 @@ paths:
     put:
       operationId: setTurnstileMode
       x-ticvai-consumed-by:
-        - "P07 SCN-002 Access point & direction"
         - "P07 SCN-016 Gate mode"
-        - "P08 BO-064 Zones & Areas"
-        - "P08 BO-194 Device & Gate Command Center"
         - "P08 BO-230 Live Gate Mode & Lane Control"
       x-ticvai-audience:
       - staff
@@ -1918,7 +1887,6 @@ paths:
       x-ticvai-consumed-by:
         - "P07 SCN-002 Access point & direction"
         - "P07 SCN-016 Gate mode"
-        - "P08 BO-006 Parking Configuration"
         - "P08 BO-064 Zones & Areas"
         - "P08 BO-103 Access & Venue"
         - "P08 BO-148 Access Point Directory"
@@ -1964,7 +1932,7 @@ paths:
       operationId: createAccessPoint
       x-ticvai-consumed-by:
         - "P08 BO-064 Zones & Areas"
-        - "P08 BO-144 Access Control Command Center"
+        - "P08 BO-148 Access Point Directory"
       x-ticvai-audience:
       - staff
       summary: Create an access point
@@ -2037,8 +2005,8 @@ paths:
     patch:
       operationId: updateAccessPoint
       x-ticvai-consumed-by:
-        - "P08 BO-006 Parking Configuration"
         - "P08 BO-064 Zones & Areas"
+        - "P08 BO-148 Access Point Directory"
       x-ticvai-audience:
       - staff
       summary: Update an access point
@@ -2099,6 +2067,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-032 Admission Profiles"
         - "P08 BO-154 Access Rule Command Center"
+        - "P08 BO-155 Visual Access Rule Builder"
         - "P08 BO-156 Entry, Exit & Re-entry Rules"
         - "P08 BO-158 Access Validity & Time Rules"
         - "P08 BO-160 Multi-Park & Crossover Rules"
@@ -2142,7 +2111,6 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-032 Admission Profiles"
         - "P08 BO-154 Access Rule Command Center"
-        - "P08 BO-214 Guest Journey Command Center"
         - "P08 BO-222 Special Event, Free View & Alternative Admission"
       x-ticvai-audience:
       - staff
@@ -2256,7 +2224,6 @@ paths:
     get:
       operationId: listBlacklist
       x-ticvai-consumed-by:
-        - "P07 SCN-003 Ready to scan"
         - "P08 BO-033 Blacklist Management"
       x-ticvai-audience:
       - staff
@@ -2385,13 +2352,8 @@ paths:
         - "P06 EMP-017 Sync & reconciliation"
         - "P07 SCN-003 Ready to scan"
         - "P07 SCN-007 Group admission"
-        - "P07 SCN-008 Manual entry"
-        - "P07 SCN-009 Ticket lookup"
         - "P07 SCN-013 Offline journal"
         - "P07 SCN-014 Sync & reconciliation"
-        - "P07 SCN-015 Offline package"
-        - "P08 BO-034 Scan Activity"
-        - "P08 BO-035 Override Audit"
         - "P08 BO-060 Attendance & Footfall"
       x-ticvai-audience:
       - staff
@@ -2739,7 +2701,6 @@ paths:
     get:
       operationId: listVirtualTicketStatus
       x-ticvai-consumed-by:
-        - "P08 BO-334 Virtual Ticket Command Center"
         - "P08 BO-336 Virtual Ticket Status & Lifecycle Model"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
@@ -2789,7 +2750,6 @@ paths:
     get:
       operationId: listMediaTypeCredential
       x-ticvai-consumed-by:
-        - "P08 BO-174 Media & Credential Command Center"
         - "P08 BO-337 Media Type & Credential Technology Registry"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
@@ -3165,7 +3125,6 @@ paths:
     get:
       operationId: listVirtualTicketArchitecture
       x-ticvai-consumed-by:
-        - "P08 BO-334 Virtual Ticket Command Center"
         - "P08 BO-343 Virtual Ticket Architecture Testing, Governance & Audit"
       x-ticvai-audience:
       - staff
@@ -3555,7 +3514,6 @@ paths:
     put:
       operationId: setRfidNfcCard
       x-ticvai-consumed-by:
-        - "P08 BO-180 RFID & NFC Configuration"
         - "P08 BO-349 RFID, NFC, Card & Wristband Media Designer"
       x-ticvai-audience:
       - staff
@@ -3893,7 +3851,6 @@ paths:
       operationId: listCredential
       x-ticvai-consumed-by:
         - "P08 BO-354 Credential Operations Command Center"
-        - "P08 BO-653 Credential Registry & Credential History"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.41-42 (15.3.1); MoM
@@ -4020,8 +3977,6 @@ paths:
   /virtual-ticket-credential:
     put:
       operationId: setVirtualTicketCredential
-      x-ticvai-consumed-by:
-        - "P08 BO-355 Virtual Ticket & Credential 360° Workspace"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.43-44 (15.3.2); MoM
@@ -4084,7 +4039,6 @@ paths:
       operationId: listCredentialGenerationIssuance
       x-ticvai-consumed-by:
         - "P08 BO-356 Credential Generation & Issuance Monitor"
-        - "P08 BO-644 Credential Issuance Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.45-46 (15.3.3); our
@@ -5326,8 +5280,6 @@ paths:
   /entry-exit-rule:
     get:
       operationId: listEntryExitRule
-      x-ticvai-consumed-by:
-        - "P08 BO-156 Entry, Exit & Re-entry Rules"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -5574,7 +5526,6 @@ paths:
     get:
       operationId: listMultiParkCrossover
       x-ticvai-consumed-by:
-        - "P08 BO-160 Multi-Park & Crossover Rules"
         - "P08 BO-220 Multi-Park & Crossover Journey Orchestrator"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
@@ -5892,7 +5843,6 @@ paths:
     put:
       operationId: setDynamicSecurityProfile
       x-ticvai-consumed-by:
-        - "P08 BO-164 Digital Credential Security Command Center"
         - "P08 BO-165 Dynamic QR Security Profile Builder"
       x-ticvai-audience:
       - staff
@@ -7252,9 +7202,7 @@ paths:
     put:
       operationId: setBiometricVerificationProfile
       x-ticvai-consumed-by:
-        - "P08 BO-184 Biometric Access Command Center"
         - "P08 BO-185 Biometric Verification Profile Builder"
-        - "P08 BO-191 Biometric Validation at Gate"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.58 (5.2); MoM 2 Sep 2026 (Face Pass,
@@ -7312,7 +7260,6 @@ paths:
     put:
       operationId: setFacePassEnrollment
       x-ticvai-consumed-by:
-        - "P08 BO-184 Biometric Access Command Center"
         - "P08 BO-186 Face Pass Enrollment Configuration"
       x-ticvai-audience:
       - staff
@@ -8083,6 +8030,7 @@ paths:
       operationId: listDeviceTypeHardware
       x-ticvai-consumed-by:
         - "P08 BO-195 Device Type & Hardware Library"
+        - "P08 BO-475 Reader Manufacturer & Model Profile"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -8643,7 +8591,6 @@ paths:
       operationId: setEdgeNodeLocal
       x-ticvai-consumed-by:
         - "P08 BO-205 Edge Node & Local Processing Configuration"
-        - "P08 BO-241 Policy Evaluation Architecture & Offline Distribution"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' 7.2 p.87; MoM 2 Sep 2026 (offline local
@@ -9056,6 +9003,7 @@ paths:
       operationId: listGuestJourney
       x-ticvai-consumed-by:
         - "P08 BO-214 Guest Journey Command Center"
+        - "P08 BO-223 Journey Simulation, Audit & Publication"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' 8.1 p.101; MoM 2 Sep 2026 (group/B2B
@@ -9324,8 +9272,6 @@ paths:
   /entry-temporary-exit:
     get:
       operationId: listEntryTemporaryExit
-      x-ticvai-consumed-by:
-        - "P08 BO-219 Re-entry & Temporary Exit Journey"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -10172,6 +10118,7 @@ paths:
       operationId: listDynamicAccessPolicy
       x-ticvai-consumed-by:
         - "P08 BO-234 Dynamic Access Policy Command Center"
+        - "P08 BO-236 Visual Dynamic Policy Builder"
         - "P08 BO-243 Policy Approval, Audit, Analytics & AI Optimization"
       x-ticvai-audience:
       - staff
@@ -10332,7 +10279,6 @@ paths:
     put:
       operationId: setVisualDynamicPolicy
       x-ticvai-consumed-by:
-        - "P08 BO-234 Dynamic Access Policy Command Center"
         - "P08 BO-236 Visual Dynamic Policy Builder"
         - "P08 BO-238 Identity, Membership & Accreditation Policies"
       x-ticvai-audience:
@@ -10394,7 +10340,6 @@ paths:
     put:
       operationId: setContextTimeEvent
       x-ticvai-consumed-by:
-        - "P08 BO-222 Special Event, Free View & Alternative Admission"
         - "P08 BO-237 Context, Time, Event & Capacity Policy Builder"
       x-ticvai-audience:
       - staff
@@ -10701,7 +10646,6 @@ paths:
       operationId: simulatePolicyConflictImpact
       x-ticvai-consumed-by:
         - "P08 BO-242 Policy Simulation, Conflict & Impact Analysis"
-        - "P08 BO-981 Conflict & Impact Simulation"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.144 (10.9 scenario results, Show list,
@@ -11313,7 +11257,6 @@ paths:
       operationId: listSecurityDetectionGovernance
       x-ticvai-consumed-by:
         - "P08 BO-253 Security Analytics, AI Detection & Governance"
-        - "P16 ANL-070 Analytics Governance, Security & Audit Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.164 (11.10 Show, Analyze by, Measure,
@@ -12758,6 +12701,7 @@ paths:
     post:
       operationId: replaceCredential
       x-ticvai-consumed-by:
+        - "P08 BO-027 Reissue & Media Replacement"
         - "P08 BO-359 Credential Replacement, Reissue, Revocation & Recovery"
       x-ticvai-audience:
       - staff
@@ -12957,6 +12901,7 @@ paths:
       operationId: setGateOfflinePolicy
       x-ticvai-consumed-by:
         - "P08 BO-171 Offline Cryptographic Validation Profile"
+        - "P08 BO-206 Offline Validation Policy Builder"
         - "P08 BO-208 Offline Credential & Revocation Cache"
         - "P08 BO-210 Connectivity Failure & Degraded Mode Policy"
       x-ticvai-audience:
@@ -13171,6 +13116,7 @@ paths:
       operationId: setHardwareModel
       x-ticvai-consumed-by:
         - "P08 BO-195 Device Type & Hardware Library"
+        - "P08 BO-475 Reader Manufacturer & Model Profile"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listDeviceTypeHardware reads (pack ''Access Control
@@ -13327,7 +13273,6 @@ paths:
     put:
       operationId: updateAccessDevicePlacement
       x-ticvai-consumed-by:
-        - "P08 BO-194 Device & Gate Command Center"
         - "P08 BO-196 Physical Device Registration & Provisioning"
       x-ticvai-audience:
       - staff
@@ -13669,7 +13614,6 @@ paths:
       operationId: startPodiumShift
       x-ticvai-consumed-by:
         - "P07 SCN-002 Access point & direction"
-        - "P08 BO-225 Podium Operations Console"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listPodiumConsole reads (pack ''Access Control
@@ -14278,7 +14222,6 @@ paths:
     put:
       operationId: setDeviceBindingPolicy
       x-ticvai-consumed-by:
-        - "P08 BO-164 Digital Credential Security Command Center"
         - "P08 BO-167 Device Binding & Session Security"
       x-ticvai-audience:
       - staff
@@ -14421,7 +14364,6 @@ paths:
       operationId: releaseCredentialDevice
       x-ticvai-consumed-by:
         - "P08 BO-167 Device Binding & Session Security"
-        - "P08 BO-169 Credential Transfer & Rebinding"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listDeviceBindingSession reads (pack ''Access

@@ -33,9 +33,9 @@ steps:
   screen: EMP-002
   action: Selects venue and role
   operations:
-  - listRoles
   - selectRole
   outcome: A person may hold several roles; the shift needs one
+  note: '**Repointed 2 October (CHG-WIR-021).** listRoles needs ROLE_MANAGE, which a steward never holds; the roles to choose from come from the login response (availableRoles).'
 - step: 3
   screen: EMP-048
   action: Works the opening checklist
@@ -68,9 +68,9 @@ steps:
   screen: EMP-007
   action: Writes handover notes
   operations:
-  - listAnnouncements
-  - publishAnnouncement
+  - listWorkOrders
   outcome: What the next shift needs to know
+  note: '**Repointed 2 October (CHG-WIR-001).** The handover step published a staff announcement (ANNOUNCEMENT_PUBLISH, whole audience); a handover carries the open work to the next person on the post, read from listWorkOrders. Writing the note itself has no operation yet (open contract gap CHG-WIR-004 on EMP-007).'
 - step: 8
   screen: EMP-009
   action: Ends the shift with a blind count (no expected cash shown; CHG-FIN-003)

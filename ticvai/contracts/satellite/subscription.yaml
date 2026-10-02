@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Subscription & Licensing
   version: 0.1.0
-  x-ticvai-screen-count: 129
+  x-ticvai-screen-count: 126
   x-ticvai-tier: satellite
   x-ticvai-module: 20 — Subscription & Licensing Management
   x-ticvai-requirements: 59
@@ -115,7 +115,7 @@ paths:
     get:
       operationId: listVenueTypeTemplates
       x-ticvai-consumed-by:
-        - "P09 ADM-424 Module Activation & Dependency Validation"
+        - "P09 ADM-425 Venue Template Application"
       summary: Starting configurations by venue kind
       description: '**A water park and a theatre need different defaults**, and asking a prospect to configure
         300 settings from empty is asking them to leave.
@@ -255,7 +255,6 @@ paths:
       operationId: setChannelListing
       x-ticvai-consumed-by:
         - "P08 BO-013 Channel & Distribution"
-        - "P08 BO-601 Product, Pricing & Sales Channel Setup"
       summary: List a product on a channel, with its own allocation
       description: 'BL-076. **An OTA pulls a feed, caches it and sells against the cache**, so the gap
         between pushes is the oversell window and the allocation is the bound on it.
@@ -556,7 +555,6 @@ paths:
     get:
       operationId: listPartnerAgreements
       x-ticvai-consumed-by:
-        - "P09 ADM-008 Subscription & Plan Management"
         - "P10 PTR-011 Quote Management"
         - "P10 PTR-017 Commission Statement"
       x-ticvai-api-scope: partner.read
@@ -602,8 +600,6 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createPartnerAgreement
-      x-ticvai-consumed-by:
-        - "P09 ADM-008 Subscription & Plan Management"
       x-ticvai-audience:
       - staff
       summary: Agree commercial terms with a partner
@@ -651,8 +647,6 @@ paths:
         format: uuid
     patch:
       operationId: updatePartnerAgreement
-      x-ticvai-consumed-by:
-        - "P09 ADM-008 Subscription & Plan Management"
       x-ticvai-audience:
       - staff
       summary: Amend, suspend or terminate
@@ -855,6 +849,8 @@ paths:
         - "P09 ADM-374 Trial & Conversion Monitor"
         - "P09 ADM-412 Payment Method & Settlement Setup"
         - "P09 ADM-421 Venue & Operational Structure Creation"
+        - "P09 ADM-424 Module Activation & Dependency Validation"
+        - "P09 ADM-426 Initial Configuration & Regional Defaults"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -900,6 +896,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-005 Tenant Directory"
         - "P09 ADM-419 Provisioning Command Center"
+        - "P09 ADM-420 Tenant & Organization Provisioning"
       x-ticvai-audience:
       - staff
       summary: Create a tenant
@@ -1226,7 +1223,6 @@ paths:
       operationId: listPlans
       x-ticvai-consumed-by:
         - "P09 ADM-008 Subscription & Plan Management"
-        - "P09 ADM-019 Global Configuration & Defaults"
         - "P09 ADM-392 Subscription Tier Configuration"
         - "P09 ADM-400 Commercial Model & Tier Selection"
         - "P17 SGN-012 Commercial Model & Tier Selection"
@@ -1276,7 +1272,6 @@ paths:
       operationId: createPlan
       x-ticvai-consumed-by:
         - "P09 ADM-008 Subscription & Plan Management"
-        - "P09 ADM-019 Global Configuration & Defaults"
         - "P09 ADM-392 Subscription Tier Configuration"
       x-ticvai-audience:
       - staff
@@ -1336,7 +1331,6 @@ paths:
       operationId: getPlan
       x-ticvai-consumed-by:
         - "P09 ADM-008 Subscription & Plan Management"
-        - "P09 ADM-019 Global Configuration & Defaults"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1362,7 +1356,6 @@ paths:
       operationId: createPlanVersion
       x-ticvai-consumed-by:
         - "P09 ADM-008 Subscription & Plan Management"
-        - "P09 ADM-019 Global Configuration & Defaults"
         - "P09 ADM-398 Rule Versioning, Approval & Publication"
       x-ticvai-audience:
       - staff
@@ -1596,6 +1589,7 @@ paths:
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
         - "P09 ADM-015 API Rate Limit & Quota Management"
         - "P09 ADM-422 Administrator & Security Initialization"
+        - "P09 ADM-424 Module Activation & Dependency Validation"
         - "P09 ADM-450 Entitlement & License Inventory"
       x-ticvai-audience:
       - staff
@@ -1785,11 +1779,9 @@ paths:
         - "P09 ADM-006 Tenant Hierarchy Explorer"
         - "P09 ADM-007 Module & Feature Entitlement"
         - "P09 ADM-008 Subscription & Plan Management"
-        - "P09 ADM-009 Tenant Billing & Invoicing"
         - "P09 ADM-010 Usage Metering"
         - "P09 ADM-011 Licence & Seat Management"
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
-        - "P09 ADM-015 API Rate Limit & Quota Management"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1912,13 +1904,7 @@ paths:
       operationId: updateCellTier
       x-ticvai-consumed-by:
         - "P09 ADM-003 Cross-Tenant Health Dashboard"
-        - "P09 ADM-013 Tenant Performance Monitor"
-        - "P09 ADM-014 Auto-Scaling Configuration"
-        - "P09 ADM-029 Deployment Monitor"
         - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
-        - "P09 ADM-032 WAF & Security Policy View"
-        - "P09 ADM-033 Backup & DR Status"
-        - "P09 ADM-034 Archival Job Monitor"
       x-ticvai-audience:
       - staff
       summary: Change a cell's tier
@@ -1977,13 +1963,6 @@ paths:
       operationId: decommissionCell
       x-ticvai-consumed-by:
         - "P09 ADM-003 Cross-Tenant Health Dashboard"
-        - "P09 ADM-013 Tenant Performance Monitor"
-        - "P09 ADM-014 Auto-Scaling Configuration"
-        - "P09 ADM-029 Deployment Monitor"
-        - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
-        - "P09 ADM-032 WAF & Security Policy View"
-        - "P09 ADM-033 Backup & DR Status"
-        - "P09 ADM-034 Archival Job Monitor"
       x-ticvai-audience:
       - staff
       summary: Begin decommissioning a cell
@@ -2035,13 +2014,6 @@ paths:
       operationId: cancelDecommission
       x-ticvai-consumed-by:
         - "P09 ADM-003 Cross-Tenant Health Dashboard"
-        - "P09 ADM-013 Tenant Performance Monitor"
-        - "P09 ADM-014 Auto-Scaling Configuration"
-        - "P09 ADM-029 Deployment Monitor"
-        - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
-        - "P09 ADM-032 WAF & Security Policy View"
-        - "P09 ADM-033 Backup & DR Status"
-        - "P09 ADM-034 Archival Job Monitor"
       x-ticvai-audience:
       - staff
       summary: Halt a decommission
@@ -2536,6 +2508,7 @@ paths:
         - "P09 ADM-032 WAF & Security Policy View"
         - "P09 ADM-033 Backup & DR Status"
         - "P09 ADM-034 Archival Job Monitor"
+        - "P09 ADM-419 Provisioning Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -3250,7 +3223,6 @@ paths:
     post:
       operationId: createPartnerQuote
       x-ticvai-consumed-by:
-        - "P09 ADM-408 Final Package Approval & Handoff"
         - "P10 PTR-011 Quote Management"
       x-ticvai-api-scope: partner.write
       x-ticvai-audience:
@@ -3789,7 +3761,6 @@ paths:
       operationId: setRenewalAutoMembership
       x-ticvai-consumed-by:
         - "P08 BO-292 Renewal, Auto-Renewal & Membership Continuity Configuration"
-        - "P09 ADM-464 Renewal Management Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.15-16 (13.1.9
@@ -3843,7 +3814,6 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-284 Membership & Annual Pass Command Center"
         - "P08 BO-293 Membership Product Validation, Approval, Publication & Versioning"
-        - "P08 BO-503 Product Validation, Approval & Publication"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.17-18 (13.1.10
@@ -4441,8 +4411,6 @@ paths:
       operationId: listRenewalAuto
       x-ticvai-consumed-by:
         - "P08 BO-300 Renewal Operations & Auto-Renewal Management"
-        - "P09 ADM-376 Commercial Optimization & Expansion Opportunities"
-        - "P09 ADM-464 Renewal Management Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.30-31 (13.2.7
@@ -4733,7 +4701,6 @@ paths:
       operationId: listMembershipRenewalRetention
       x-ticvai-consumed-by:
         - "P08 BO-303 Membership Analytics, Renewal Intelligence & AI Retention Center"
-        - "P09 ADM-375 Renewal & Retention Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.35-37 (13.2.10
@@ -7536,7 +7503,6 @@ paths:
       operationId: scoreVsiAssessment
       x-ticvai-consumed-by:
         - "P09 ADM-372 Operational Profile, VSI & Commercial Model Intelligence"
-        - "P09 ADM-379 Welcome & Start Your TICVAI Journey"
         - "P09 ADM-381 Venue Type & Business Profile"
         - "P09 ADM-382 Visitor, Capacity & Operational Scale"
         - "P09 ADM-383 Sales Channel Assessment"
@@ -7545,7 +7511,6 @@ paths:
         - "P09 ADM-386 Additional Business Module Assessment"
         - "P09 ADM-387 Integration, Payment & Technical Readiness"
         - "P09 ADM-388 AI Assessment Summary & Handoff"
-        - "P17 SGN-001 Welcome & Start Your TICVAI Journey"
         - "P17 SGN-003 Venue Type & Business Profile"
         - "P17 SGN-004 Visitor, Capacity & Operational Scale"
         - "P17 SGN-005 Sales Channel Assessment"
@@ -7672,6 +7637,7 @@ paths:
         - "P09 ADM-403 Module Detail & Commercial Treatment"
         - "P09 ADM-404 Module Dependency & Compatibility Manager"
         - "P09 ADM-423 License & Entitlement Activation"
+        - "P09 ADM-424 Module Activation & Dependency Validation"
         - "P17 SGN-008 Additional Business Module Assessment"
         - "P17 SGN-013 Module Marketplace"
         - "P17 SGN-014 AI Module & Package Recommendations"
@@ -7712,9 +7678,6 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setModuleListing
-      x-ticvai-consumed-by:
-        - "P09 ADM-404 Module Dependency & Compatibility Manager"
-        - "P17 SGN-016 Module Dependency & Compatibility Manager"
       summary: Define a module's dependencies, incompatibilities and price
       tags:
       - subscription
@@ -7799,10 +7762,7 @@ paths:
     put:
       operationId: setTrialConfiguration
       x-ticvai-consumed-by:
-        - "P09 ADM-374 Trial & Conversion Monitor"
-        - "P09 ADM-409 Purchase / Trial Journey Selection"
         - "P09 ADM-413 Trial Configuration & Conversion Rules"
-        - "P17 SGN-018 Purchase / Trial Journey Selection"
       summary: What a trial includes, how long it lasts and how it converts
       description: 'Board 5.5. **A trial that expires with no conversion path is a tenant full of a
         customer''s real data that nobody can bill.** So the configuration states the conversion
@@ -7938,6 +7898,7 @@ paths:
     get:
       operationId: getLicenceEnforcement
       x-ticvai-consumed-by:
+        - "P09 ADM-377 Subscription Exceptions & Commercial Alerts"
         - "P09 ADM-378 Executive AI Commercial Intelligence"
         - "P09 ADM-452 Operational Usage & Threshold Monitor"
         - "P09 ADM-454 Minimum Guarantee & Variable Consumption Monitor"

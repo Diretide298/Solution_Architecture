@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Shift & Deposit Box
   version: 1.0.0
-  x-ticvai-screen-count: 21
+  x-ticvai-screen-count: 20
   x-ticvai-tier: spine
   x-ticvai-module: "2 — Ticketing Sales (cash handling)"
   x-ticvai-capabilities: [C01]
@@ -116,17 +116,13 @@ paths:
     get:
       operationId: listShifts
       x-ticvai-consumed-by:
-        - "P04 POS-001 Begin Shift"
-        - "P04 POS-007 Close Shift"
         - "P04 POS-009 Staff Roster"
         - "P04 POS-019 Shift Templates & Policies"
-        - "P06 EMP-003 Home — on duty"
         - "P06 EMP-008 Shift summary"
         - "P06 EMP-009 End shift"
         - "P08 BO-039 Shift Directory"
         - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
-        - "P08 BO-042 Banking & Safe"
         - "P08 BO-100 Venue Home"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary   # open-shift state gates workstation actions
@@ -172,13 +168,6 @@ paths:
       operationId: openShift
       x-ticvai-consumed-by:
         - "P04 POS-001 Begin Shift"
-        - "P04 POS-007 Close Shift"
-        - "P04 POS-009 Staff Roster"
-        - "P04 POS-012 Omnichannel Order & Fulfilment Center"
-        - "P06 EMP-003 Home — on duty"
-        - "P06 EMP-009 End shift"
-        - "P08 BO-039 Shift Directory"
-        - "P08 BO-040 Variance Approval"
       x-ticvai-audience: [staff]
       summary: Open a shift
       description: >
@@ -228,9 +217,6 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-001 Begin Shift"
         - "P04 POS-007 Close Shift"
-        - "P04 POS-011 Returns, Refunds & Exchanges"
-        - "P04 POS-012 Omnichannel Order & Fulfilment Center"
-        - "P04 POS-013 Mobile POS, Event Sales & Offline Operations"
         - "P08 BO-1065 Currency, Timezone & Channels"
       summary: The notes and coins a till counts
       description: >
@@ -340,6 +326,7 @@ paths:
       operationId: listDepositBoxes
       x-ticvai-consumed-by:
         - "P04 POS-015 Cash Operations Dashboard"
+        - "P04 POS-018 Safe Drop & Cash Transfer Management"
         - "P08 BO-042 Banking & Safe"
       x-ticvai-audience: [staff]
       summary: Cash boxes and who holds them
@@ -425,12 +412,6 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: adjustDepositBoxFloat
-      x-ticvai-consumed-by:
-        - "P04 POS-001 Begin Shift"
-        - "P04 POS-007 Close Shift"
-        - "P04 POS-011 Returns, Refunds & Exchanges"
-        - "P04 POS-012 Omnichannel Order & Fulfilment Center"
-        - "P04 POS-013 Mobile POS, Event Sales & Offline Operations"
       x-ticvai-audience: [staff]
       summary: Change the initial fund
       description: >
@@ -502,7 +483,6 @@ paths:
     post:
       operationId: withdrawFromDepositBox
       x-ticvai-consumed-by:
-        - "P04 POS-013 Mobile POS, Event Sales & Offline Operations"
         - "P04 POS-018 Safe Drop & Cash Transfer Management"
         - "P08 BO-042 Banking & Safe"
       x-ticvai-audience: [staff]
@@ -578,7 +558,6 @@ paths:
     post:
       operationId: closeDepositBoxes
       x-ticvai-consumed-by:
-        - "P04 POS-007 Close Shift"
         - "P08 BO-024 Payment Exceptions"
       x-ticvai-audience: [staff]
       summary: Close one box or all of them
@@ -655,13 +634,9 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-001 Begin Shift"
         - "P04 POS-007 Close Shift"
-        - "P04 POS-009 Staff Roster"
         - "P04 POS-012 Omnichannel Order & Fulfilment Center"
         - "P06 EMP-008 Shift summary"
         - "P06 EMP-009 End shift"
-        - "P06 EMP-022 My rota"
-        - "P08 BO-039 Shift Directory"
-        - "P08 BO-040 Variance Approval"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary   # cash position drives close-out
       summary: The open or suspended shift on the session's workstation
@@ -739,16 +714,12 @@ paths:
     get:
       operationId: getShift
       x-ticvai-consumed-by:
-        - "P04 POS-001 Begin Shift"
-        - "P04 POS-007 Close Shift"
-        - "P04 POS-009 Staff Roster"
         - "P06 EMP-003 Home — on duty"
         - "P06 EMP-008 Shift summary"
         - "P06 EMP-009 End shift"
         - "P08 BO-039 Shift Directory"
         - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
-        - "P08 BO-042 Banking & Safe"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary
       summary: Read a shift
@@ -778,12 +749,6 @@ paths:
       operationId: approveShiftOpen
       x-ticvai-consumed-by:
         - "P04 POS-001 Begin Shift"
-        - "P04 POS-007 Close Shift"
-        - "P04 POS-009 Staff Roster"
-        - "P06 EMP-003 Home — on duty"
-        - "P06 EMP-009 End shift"
-        - "P08 BO-039 Shift Directory"
-        - "P08 BO-040 Variance Approval"
       x-ticvai-audience: [staff]
       summary: Approve a shift opening outside tolerance
       description: >
@@ -832,13 +797,7 @@ paths:
     post:
       operationId: reopenShift
       x-ticvai-consumed-by:
-        - "P04 POS-001 Begin Shift"
-        - "P04 POS-007 Close Shift"
-        - "P04 POS-009 Staff Roster"
-        - "P06 EMP-003 Home — on duty"
-        - "P06 EMP-009 End shift"
-        - "P08 BO-039 Shift Directory"
-        - "P08 BO-040 Variance Approval"
+        - "P04 POS-025 Till Home"
       x-ticvai-audience: [staff]
       summary: Reopen a shift closed in error
       description: >
@@ -919,14 +878,8 @@ paths:
     post:
       operationId: suspendShift
       x-ticvai-consumed-by:
-        - "P04 POS-001 Begin Shift"
-        - "P04 POS-007 Close Shift"
-        - "P04 POS-009 Staff Roster"
-        - "P06 EMP-003 Home — on duty"
-        - "P06 EMP-008 Shift summary"
+        - "P04 POS-025 Till Home"
         - "P06 EMP-009 End shift"
-        - "P08 BO-039 Shift Directory"
-        - "P08 BO-040 Variance Approval"
       x-ticvai-audience: [staff]
       summary: Suspend a shift so another user can log in
       description: >
@@ -982,12 +935,6 @@ paths:
       operationId: resumeShift
       x-ticvai-consumed-by:
         - "P04 POS-001 Begin Shift"
-        - "P04 POS-007 Close Shift"
-        - "P04 POS-009 Staff Roster"
-        - "P06 EMP-003 Home — on duty"
-        - "P06 EMP-009 End shift"
-        - "P08 BO-039 Shift Directory"
-        - "P08 BO-040 Variance Approval"
       x-ticvai-audience: [staff]
       summary: Resume a suspended shift
       description: >
@@ -1044,9 +991,6 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: closeShift
-      x-ticvai-consumed-by:
-        - "P08 BO-039 Shift Directory"
-        - "P08 BO-040 Variance Approval"
       x-ticvai-audience: [staff]
       summary: Blind close-out
       description: >
@@ -1140,13 +1084,8 @@ paths:
     post:
       operationId: acceptShiftVariance
       x-ticvai-consumed-by:
-        - "P04 POS-001 Begin Shift"
         - "P04 POS-007 Close Shift"
-        - "P04 POS-009 Staff Roster"
-        - "P06 EMP-003 Home — on duty"
         - "P06 EMP-009 End shift"
-        - "P08 BO-039 Shift Directory"
-        - "P08 BO-040 Variance Approval"
       x-ticvai-audience: [staff]
       summary: Accept an over/short beyond the threshold
       description: >
@@ -1218,10 +1157,7 @@ paths:
     post:
       operationId: submitShiftCount
       x-ticvai-consumed-by:
-        - "P04 POS-001 Begin Shift"
         - "P04 POS-007 Close Shift"
-        - "P04 POS-009 Staff Roster"
-        - "P06 EMP-003 Home — on duty"
         - "P06 EMP-009 End shift"
       x-ticvai-audience: [staff]
       summary: The cashier's blind count, closing their own shift
@@ -1356,16 +1292,8 @@ paths:
     post:
       operationId: recordNoSale
       x-ticvai-consumed-by:
-        - "P04 POS-001 Begin Shift"
-        - "P04 POS-007 Close Shift"
-        - "P04 POS-009 Staff Roster"
         - "P04 POS-014 Sales Exceptions, Controls & Operational Actions"
         - "P04 POS-020 Shift Exceptions & Alerts"
-        - "P06 EMP-003 Home — on duty"
-        - "P06 EMP-009 End shift"
-        - "P08 BO-039 Shift Directory"
-        - "P08 BO-040 Variance Approval"
-        - "P08 BO-041 Cash Movements"
       x-ticvai-audience: [staff]
       summary: Open the Deposit Box without a sale
       description: >
@@ -1422,18 +1350,13 @@ paths:
     get:
       operationId: listCashMovements
       x-ticvai-consumed-by:
-        - "P04 POS-001 Begin Shift"
         - "P04 POS-007 Close Shift"
-        - "P04 POS-009 Staff Roster"
-        - "P04 POS-013 Mobile POS, Event Sales & Offline Operations"
         - "P04 POS-015 Cash Operations Dashboard"
-        - "P06 EMP-003 Home — on duty"
         - "P06 EMP-008 Shift summary"
         - "P06 EMP-009 End shift"
         - "P08 BO-039 Shift Directory"
         - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
-        - "P08 BO-042 Banking & Safe"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary
       summary: Lifts, adds and the opening float
@@ -1465,14 +1388,8 @@ paths:
     post:
       operationId: createCashMovement
       x-ticvai-consumed-by:
-        - "P04 POS-001 Begin Shift"
-        - "P04 POS-007 Close Shift"
-        - "P04 POS-013 Mobile POS, Event Sales & Offline Operations"
         - "P04 POS-017 Cash In / Cash Out Operations"
         - "P04 POS-018 Safe Drop & Cash Transfer Management"
-        - "P06 EMP-009 End shift"
-        - "P08 BO-039 Shift Directory"
-        - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
       x-ticvai-audience: [staff]
       summary: Record a cash lift or add

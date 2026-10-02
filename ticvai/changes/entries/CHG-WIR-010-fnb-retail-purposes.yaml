@@ -1,0 +1,77 @@
+id: CHG-WIR-010
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'fnb-retail: 7 screen purposes rewritten that were copied from another screen, a generator template or
+  a pasted board placeholder.'
+decision:
+  what: 'Fix the wrong wiring now: give each screen its own one-sentence purpose, keeping what the screen is for.'
+  by: Chinmay
+  date: '2026-10-02'
+  quote: 'Chinmay, 2 Oct 2026: fix the wrong wiring now'
+why: 'Design-note corrections for fnb-retail (handoff/design-notes/fnb-retail.yaml): the purposes were generator
+  templates, board titles with their date, or text copied from another screen (the boilerplate the 26 September
+  audit traced under R250 and R260); a designer cannot act on them. Each screen''s correction is cited below. The
+  old text is kept in each screen''s purposeNote.'
+keys_touched:
+  screens:
+  - BO-040
+  - BO-109
+  - KIT-004
+  - POS-011
+  - POS-013
+  - POS-015
+  - POS-018
+  tickets:
+  - APP-POS-KIT-004
+  - APP-POS-POS-011
+  - APP-POS-POS-013
+  - APP-POS-POS-015
+  - APP-POS-POS-018
+  - VM-BO-040
+  - VM-BO-109
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-KIT-004
+  - APP-POS-POS-011
+  - APP-POS-POS-013
+  - APP-POS-POS-015
+  - APP-POS-POS-018
+  - VM-BO-040
+  - VM-BO-109
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: 16fd732e
+notes: 'check-screen-wiring gains S-PURPOSE-BOILERPLATE, which flags the generator and board-placeholder purposes.
+  Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are every tasks.csv or pushed key
+  naming a touched screen. Per screen and flow:
+
+  - BO-040: purpose rewritten — The purpose "Accept or refuse a till that did not balance" promises an act the screen
+  does not have; nothing is approved here and the contract has no refuse (R080; design-notes correction fnb-retail
+  BO-040).
+
+  - BO-109: purpose rewritten — The purpose was a placeholder ("from the client design board, 20 August") (design-notes
+  correction fnb-retail BO-109).
+
+  - POS-011: purpose rewritten — The purpose read "Returns, Refunds & Exchanges — from the client design board,
+  20 August", not a purpose a designer can act on (design-notes correction fnb-retail POS-011).
+
+  - POS-013: purpose rewritten — The purpose read "Mobile POS, Event Sales & Offline Operations — from the client
+  design board, 20 August"; the prototype covers only offline and sync (design-notes correction fnb-retail POS-013).
+
+  - POS-015: purpose rewritten — The purpose read "Cash Operations Dashboard — from the client design board, 20
+  August"; the client asked for live cash status per till with expected cash and card totals for supervisors (DI-273,
+  DI-308; design-notes correction fnb-retail POS-015).
+
+  - POS-018: purpose rewritten — The purpose was the board title ("Safe Drop & Cash Transfer Management — from the
+  client design board, 20 August"), and cash transfer between drawers has no operation (design-notes correction
+  fnb-retail POS-018).
+
+  - KIT-004: purpose rewritten — The purpose was the board title ("Active Order Management & Fulfilment Journey
+  — board 3 of the client F&B design set") (design-notes correction fnb-retail KIT-004).'

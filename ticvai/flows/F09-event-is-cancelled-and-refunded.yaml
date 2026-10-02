@@ -12,24 +12,25 @@ offlineBehaviour: Not offline. Cancellation touches the ledger, entitlements and
 trigger:
   description: A performance is cancelled — weather, a technical failure, an artist. Every ticket sold
     for it needs handling, and the guests need telling before they travel.
-  entryScreen: BO-001
+  entryScreen: BO-015
   entryPoints:
   - Duty manager cancels
   - Automatic on a safety closure
   - Promoter withdraws
 steps:
 - step: 1
-  screen: BO-001
+  screen: BO-015
   action: Finds the performance
   operations:
   - listPerformances
   outcome: Sees what is sold and what it is worth
 - step: 2
-  screen: BO-002
+  screen: BO-015
   action: Cancels it and states the reason
   operations:
   - cancelPerformance
   outcome: Sales stop immediately. Nothing new can be sold
+  note: '**Repointed 2 October (CHG-WIR-001).** Steps 1 and 2 ran through BO-001 Queue Directory and BO-002 Queue Configuration, which carried the event and performance operations from this flow; a performance is found and cancelled on BO-015 Performance Calendar, which declares both.'
 - step: 3
   screen: BO-023
   action: Reviews the refund exposure
@@ -41,17 +42,18 @@ steps:
     17 order operations from the bulk attach and has four queue ones. **A refund is worked on the refunds
     screen** — `BO-023` — and it needed `getRefundPolicy` wiring, because it had none.'
 - step: 4
-  screen: BO-004
+  screen: BO-023
   action: Authorises the bulk refund
   operations:
   - createBulkRefund
   outcome: Refunds queue against the original payment method
+  note: '**Repointed 2 October (CHG-WIR-001).** The bulk refund was authorised on BO-004 Manual Wait Time Entry, a queue screen; it is worked on the refunds screen with the rest of the refund exposure.'
 - step: 5
-  screen: BO-005
+  screen: BO-023
   action: Confirms guests were notified
-  operations:
-  - listCampaigns
+  operations: []
   outcome: Told before they travel, not after
+  note: '**Repointed 2 October (CHG-WIR-001, CHG-WIR-004).** This step read listCampaigns on BO-005 Queue Monitor; a cancellation notice is transactional, not a campaign. No operation lists message dispatches yet (open contract gap CHG-WIR-004), so the step has no read until one exists.'
 branches:
 - at: 2
   condition: Performance is part of a bundle

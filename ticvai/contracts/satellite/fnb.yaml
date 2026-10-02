@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Food & Beverage
   version: 0.1.0
-  x-ticvai-screen-count: 109
+  x-ticvai-screen-count: 114
   x-ticvai-tier: satellite
   x-ticvai-module: 7 — F&B POS  ·  5 — F&B & Guest Management (service)
   x-ticvai-requirements: 151
@@ -82,6 +82,8 @@ paths:
   /reservation-policy:
     get:
       operationId: getFnbReservationPolicy
+      x-ticvai-consumed-by:
+        - "P06 EMP-055 Create / Edit Reservation"
       summary: How long a table is held, by party size
       description: '**`fnb.table_reservation.duration_minutes` was set per booking with no default
         behind it.** A turn time is the single most tuned number in a restaurant — it differs by party
@@ -121,8 +123,6 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setFnbReservationPolicy
-      x-ticvai-consumed-by:
-        - "P08 BO-733 Service Channel Configuration"
       summary: Set turn times and seating buffers
       description: '**The booking keeps its own duration as the snapshot.** A turn time revised in
         March must not shorten a reservation already made in February — the same rule-and-record
@@ -164,6 +164,8 @@ paths:
   /service-charge-policy:
     get:
       operationId: getFnbServiceChargePolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-733 Service Channel Configuration"
       summary: The service charge a venue applies, and on what
       description: '**`fnb.sub_bill.service_charge` was stored and nothing said what the rate was.**
         `F29` recomputes tax and service charge per bill on a split rather than apportioning them, so
@@ -363,6 +365,9 @@ paths:
         format: uuid
     get:
       operationId: getAllergenVerification
+      x-ticvai-consumed-by:
+        - "P08 BO-045 Menu Management"
+        - "P08 BO-111 Ingredient Substitution, Allergen & Nutrition"
       summary: The last allergen verdict recorded for a dish
       description: '**The read for the automatic check** (decided 28 September, audit R241). The server runs
         `verifyAllergens` after every recipe, substitution or modifier change and records the verdict;
@@ -394,7 +399,7 @@ paths:
     post:
       operationId: buildProductionPlan
       x-ticvai-consumed-by:
-        - "P08 BO-136 F&B Global Settings & Controls"
+        - "P08 BO-112 Production Planning & Production Sheets"
       summary: Turn a forecast into a prep list
       description: 'Board 2M. **Demand forecast through recipes to quantities per item and per station.**
 
@@ -445,7 +450,7 @@ paths:
     post:
       operationId: releaseProductionPlan
       x-ticvai-consumed-by:
-        - "P08 BO-136 F&B Global Settings & Controls"
+        - "P08 BO-112 Production Planning & Production Sheets"
       summary: Make the plan real
       description: 'Board 2M. **A plan becomes production runs, grouped by station** (decided 28 September,
         audit R125 (7)). Each line becomes a run of its recipe carrying the line''s `stationId`, and the
@@ -498,6 +503,7 @@ paths:
       operationId: getProductionRun
       x-ticvai-consumed-by:
         - "P08 BO-137 Recipe Consumption & Theoretical Inventory"
+        - "P08 BO-138 Production Execution & Batch Management"
       summary: One run — its plan, its output, and the gap
       description: 'Board 5D and 2M. **The prep sheet, the batch detail and the yield are three views
         of one run**, and the boards drew them as three panels.
@@ -534,6 +540,8 @@ paths:
         format: uuid
     post:
       operationId: sendBookingConfirmation
+      x-ticvai-consumed-by:
+        - "P06 EMP-055 Create / Edit Reservation"
       summary: Confirm a booking, and ask them to confirm back
       description: 'Board 4E, 24 August. **A reservation nobody confirms is a no-show waiting to happen**,
         and the package created bookings and never told anybody about them.
@@ -600,6 +608,8 @@ paths:
   /table-reservations/conflicts:
     get:
       operationId: resolveBookingConflict
+      x-ticvai-consumed-by:
+        - "P06 EMP-054 Reservation Calendar & Timeline"
       summary: Two bookings, one table — and what to do about it
       description: 'Board 4D. **Double bookings happen and the package had no way to see one.** A phone
         booking and an online booking land on the same table for the same hour, and the host finds out
@@ -680,9 +690,6 @@ paths:
   /tables:
     post:
       operationId: createTable
-      x-ticvai-consumed-by:
-        - "P06 EMP-053 Table & Seating Configuration"
-        - "P08 BO-729 Create / Edit Outlet"
       summary: A table as a thing, not an inference
       description: 'Board 4C, 24 August. **The package inferred a table from a visit and from `setTableLayout`**,
         and `setSectionLayout` and `setTableCombinations` — both built this week — reference a table that
@@ -733,9 +740,6 @@ paths:
         format: uuid
     put:
       operationId: updateTable
-      x-ticvai-consumed-by:
-        - "P06 EMP-053 Table & Seating Configuration"
-        - "P08 BO-729 Create / Edit Outlet"
       summary: Change what a table is
       description: 'Board 4C. **Capacity, label, section, whether it is out of service** (`isOutOfService`).
 
@@ -801,6 +805,8 @@ paths:
         format: uuid
     get:
       operationId: listMenuSchedules
+      x-ticvai-consumed-by:
+        - "P08 BO-045 Menu Management"
       summary: What is scheduled to go live, and when
       description: '**Added 26 September.** A scheduled publish was accepted and never shown again, so a
         venue with three scheduled price changes could not see them and `cancelScheduleId` had no way
@@ -1514,6 +1520,7 @@ paths:
     get:
       operationId: list86Events
       x-ticvai-consumed-by:
+        - "P08 BO-140 Product Availability, 86 & Operational Food Safety"
         - "P15 KIT-008 Exceptions, Re-Fire & Unavailable Items"
       summary: What came off the menu today, when, and for how long
       description: 'Board 5J. **`setItemAvailability` records the current state and not the history.**
@@ -1636,7 +1643,6 @@ paths:
       operationId: setSectionLayout
       x-ticvai-consumed-by:
         - "P06 EMP-053 Table & Seating Configuration"
-        - "P08 BO-729 Create / Edit Outlet"
       summary: Divide the floor into sections and give each a server
       description: 'Board 4. **`setTableLayout` places tables and nothing groups them.** A section is
         how a restaurant actually assigns work — a server takes a section, not fourteen table ids.
@@ -1689,7 +1695,7 @@ paths:
       operationId: setTableCombinations
       x-ticvai-consumed-by:
         - "P04 POS-024 Outlet Setup"
-        - "P06 EMP-058 Live Table & Service Management"
+        - "P06 EMP-053 Table & Seating Configuration"
       summary: Which tables can be pushed together, and to what capacity
       description: 'Board 4. **A party of nine at a restaurant of four-tops is the everyday case**, and
         the package had no way to say that tables 6 and 7 make a nine.
@@ -1953,7 +1959,7 @@ paths:
     post:
       operationId: quoteWaitTime
       x-ticvai-consumed-by:
-        - "P06 EMP-058 Live Table & Service Management"
+        - "P06 EMP-056 Walk-In & Waitlist Management"
       summary: Tell a party how long, and mean it
       description: 'Board 4. **`joinRestaurantWaitlist` existed and nothing quoted a wait** — a waitlist
         a guest joins and never hears about is a queue with no service.
@@ -2006,7 +2012,7 @@ paths:
     post:
       operationId: notifyWaitlistParty
       x-ticvai-consumed-by:
-        - "P06 EMP-058 Live Table & Service Management"
+        - "P06 EMP-056 Walk-In & Waitlist Management"
       summary: Their table is ready
       description: 'Board 4. **The message a waitlist exists to send**, and nothing sent it.
 
@@ -2159,7 +2165,6 @@ paths:
     post:
       operationId: requestRecount
       x-ticvai-consumed-by:
-        - "P06 EMP-066 Stock Count & Cycle Count Management"
         - "P08 BO-079 Stock Count"
       summary: Send a line back to be counted again
       description: 'Board 5. **A variance a supervisor does not believe.** The alternative is posting
@@ -2339,6 +2344,8 @@ paths:
         format: uuid
     get:
       operationId: listMenuVersions
+      x-ticvai-consumed-by:
+        - "P08 BO-045 Menu Management"
       summary: Every published version of a menu
       description: '**Added 26 September.** `publishMenu` promised that the previous version stays readable
         and `rollbackMenu` takes a `toVersion`, and nothing listed the versions — so the number a rollback
@@ -2694,7 +2701,7 @@ paths:
     put:
       operationId: setCourseRules
       x-ticvai-consumed-by:
-        - "P15 KIT-003 Order Firing & Course Management"
+        - "P08 BO-136 F&B Global Settings & Controls"
       summary: How this outlet courses by default
       description: 'Board 3. **Coursing was a per-ticket field with no default**, so every table was coursed
         by hand or not at all.
@@ -2987,6 +2994,8 @@ paths:
   /food-safety/checkpoints:
     get:
       operationId: listTemperatureCheckpoints
+      x-ticvai-consumed-by:
+        - "P08 BO-140 Product Availability, 86 & Operational Food Safety"
       summary: The units that get read, and the range each must hold
       description: '**`TemperatureLog.checkPointId` is required and pointed at nothing.** No
         `fnb.check_point` existed in 628 tables, so every HACCP reading was obliged to reference a
@@ -3074,7 +3083,6 @@ paths:
     post:
       operationId: logTemperature
       x-ticvai-consumed-by:
-        - "P06 EMP-062 Store Stock & SKU Availability"
         - "P06 EMP-067 Damage, Loss, Shrinkage & Stock Adjustment"
       summary: Record a temperature check, in range or not
       description: 'Board 5J. **HACCP records are a UAE regulatory obligation and nothing in the package
@@ -3174,8 +3182,9 @@ paths:
     get:
       operationId: getHaccpStatus
       x-ticvai-consumed-by:
-        - "P06 EMP-062 Store Stock & SKU Availability"
+        - "P06 EMP-067 Damage, Loss, Shrinkage & Stock Adjustment"
         - "P08 BO-044 F&B Outlets"
+        - "P08 BO-140 Product Availability, 86 & Operational Food Safety"
         - "P15 KIT-008 Exceptions, Re-Fire & Unavailable Items"
       summary: Where this venue stands, right now
       description: 'Board 5J. **What an inspector asks for and what a manager checks before service.**
@@ -3302,8 +3311,10 @@ paths:
     get:
       operationId: listProductionRuns
       x-ticvai-consumed-by:
-        - "P08 BO-136 F&B Global Settings & Controls"
+        - "P08 BO-112 Production Planning & Production Sheets"
+        - "P08 BO-113 Central Kitchen & Commissary Management"
         - "P08 BO-137 Recipe Consumption & Theoretical Inventory"
+        - "P08 BO-138 Production Execution & Batch Management"
       summary: What is being made, and what was
       description: 'Board 5D, 24 August. **`planProductionRun` and `completeProductionRun` existed and
         nothing read one** — found by mapping the board panels rather than the operations, which is the
@@ -3574,7 +3585,6 @@ paths:
         - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-070 Reserve a Table"
         - "P06 EMP-056 Walk-In & Waitlist Management"
-        - "P06 EMP-058 Live Table & Service Management"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -3631,6 +3641,7 @@ paths:
     post:
       operationId: requestBill
       x-ticvai-consumed-by:
+        - "P04 POS-028 Table Service"
         - "P06 EMP-059 Table Order, Bill & Payment Management"
       x-ticvai-audience:
       - staff
@@ -3733,7 +3744,6 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-070 Reserve a Table"
-        - "P06 EMP-055 Create / Edit Reservation"
       security:
       - guestAuth: []
       x-ticvai-self-scoped: subject
@@ -3970,9 +3980,6 @@ paths:
         - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-024 F&B – Browse & Order"
         - "P02 GST-029 Venue Info & Services"
-        - "P06 EMP-030 Venue map"
-        - "P08 BO-062 Venue Profile"
-        - "P08 BO-065 Venue Configuration"
       x-ticvai-audience:
       - guest
       summary: Where a guest can eat, right now
@@ -4045,7 +4052,6 @@ paths:
         - "P02 GST-061 Menu Item Detail"
         - "P04 POS-021 Sell — Food & Drink"
         - "P05 KSK-016 Order Food"
-        - "P08 BO-044 F&B Outlets"
       x-ticvai-audience:
       - guest
       - staff
@@ -4124,9 +4130,6 @@ paths:
         - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-024 F&B – Browse & Order"
         - "P02 GST-029 Venue Info & Services"
-        - "P06 EMP-030 Venue map"
-        - "P08 BO-062 Venue Profile"
-        - "P08 BO-065 Venue Configuration"
       x-ticvai-audience:
       - guest
       summary: Where an order can be delivered
@@ -4294,6 +4297,7 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-012 Omnichannel Order & Fulfilment Center"
         - "P08 BO-021 Order Search"
+        - "P15 KIT-006 Expeditor & Order Assembly"
         - "P15 KIT-007 Guest Collection, Buzzer & Digital Notification"
       x-ticvai-audience:
       - staff
@@ -4766,7 +4770,6 @@ paths:
         - "P02 GST-024 F&B – Browse & Order"
         - "P02 GST-025 F&B – Order Tracking"
         - "P02 GST-032 AI Concierge – Chat"
-        - "P08 BO-021 Order Search"
       x-ticvai-audience:
       - guest
       summary: Track an order
@@ -4846,16 +4849,10 @@ paths:
     get:
       operationId: listMenus
       x-ticvai-consumed-by:
-        - "P04 POS-021 Sell — Food & Drink"
-        - "P04 POS-024 Outlet Setup"
         - "P08 BO-007 Product Directory"
         - "P08 BO-011 Packages & Bundles"
         - "P08 BO-045 Menu Management"
-        - "P08 BO-104 Food & Beverage"
         - "P08 BO-109 Menu Builder & POS Layout Designer"
-        - "P08 BO-729 Create / Edit Outlet"
-        - "P08 BO-730 Outlet Types & Templates"
-        - "P13 CMS-009 Navigation & Menus"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -4905,8 +4902,6 @@ paths:
       operationId: createMenu
       x-ticvai-consumed-by:
         - "P08 BO-045 Menu Management"
-        - "P08 BO-104 Food & Beverage"
-        - "P13 CMS-009 Navigation & Menus"
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: outlet
@@ -4951,7 +4946,7 @@ paths:
       operationId: getMenu
       x-ticvai-consumed-by:
         - "P08 BO-045 Menu Management"
-        - "P13 CMS-009 Navigation & Menus"
+        - "P08 BO-140 Product Availability, 86 & Operational Food Safety"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -4977,8 +4972,6 @@ paths:
       operationId: updateMenu
       x-ticvai-consumed-by:
         - "P08 BO-045 Menu Management"
-        - "P08 BO-111 Ingredient Substitution, Allergen & Nutrition"
-        - "P13 CMS-009 Navigation & Menus"
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: outlet
@@ -5034,7 +5027,6 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-045 Menu Management"
         - "P08 BO-109 Menu Builder & POS Layout Designer"
-        - "P13 CMS-009 Navigation & Menus"
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: outlet
@@ -5091,9 +5083,7 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-021 Sell — Food & Drink"
         - "P04 POS-024 Outlet Setup"
-        - "P06 EMP-062 Store Stock & SKU Availability"
         - "P08 BO-014 Catalogue Publishing"
-        - "P08 BO-049 Stock Levels"
         - "P08 BO-140 Product Availability, 86 & Operational Food Safety"
         - "P15 KIT-008 Exceptions, Re-Fire & Unavailable Items"
       x-ticvai-audience:
@@ -5176,7 +5166,7 @@ paths:
         - "P01 WEB-037 Menu Item Detail"
         - "P02 GST-024 F&B – Browse & Order"
         - "P02 GST-061 Menu Item Detail"
-        - "P04 POS-021 Sell — Food & Drink"
+        - "P08 BO-045 Menu Management"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -5274,7 +5264,7 @@ paths:
         - "P04 POS-029 Order Queue"
         - "P06 EMP-051 Restaurant Service Command Center"
         - "P08 BO-020 F&B Order Management"
-        - "P08 BO-044 F&B Outlets"
+        - "P08 BO-021 Order Search"
         - "P15 KIT-001 Kitchen Operations Command Center"
       x-ticvai-audience:
       - staff
@@ -5325,7 +5315,6 @@ paths:
         - "P04 POS-022 Send to Kitchen"
         - "P06 EMP-058 Live Table & Service Management"
         - "P06 EMP-059 Table Order, Bill & Payment Management"
-        - "P08 BO-020 F&B Order Management"
       x-ticvai-calls:
       - access.validateAccess
       x-ticvai-note: >-
@@ -5489,6 +5478,7 @@ paths:
     post:
       operationId: cancelFnbOrder
       x-ticvai-consumed-by:
+        - "P04 POS-022 Send to Kitchen"
         - "P08 BO-020 F&B Order Management"
       x-ticvai-audience:
       - staff
@@ -5699,6 +5689,7 @@ paths:
     get:
       operationId: getTableMap
       x-ticvai-consumed-by:
+        - "P04 POS-024 Outlet Setup"
         - "P04 POS-028 Table Service"
         - "P06 EMP-051 Restaurant Service Command Center"
         - "P06 EMP-052 Floor Plan & Table Map"
@@ -5733,7 +5724,6 @@ paths:
       operationId: setTableLayout
       x-ticvai-consumed-by:
         - "P04 POS-024 Outlet Setup"
-        - "P06 EMP-052 Floor Plan & Table Map"
         - "P06 EMP-053 Table & Seating Configuration"
         - "P08 BO-044 F&B Outlets"
       x-ticvai-audience:
@@ -5845,6 +5835,7 @@ paths:
     get:
       operationId: getTableVisit
       x-ticvai-consumed-by:
+        - "P04 POS-028 Table Service"
         - "P06 EMP-058 Live Table & Service Management"
       x-ticvai-audience:
       - staff
@@ -6010,6 +6001,7 @@ paths:
     get:
       operationId: getBill
       x-ticvai-consumed-by:
+        - "P04 POS-028 Table Service"
         - "P06 EMP-059 Table Order, Bill & Payment Management"
       x-ticvai-audience:
       - staff
@@ -6047,6 +6039,7 @@ paths:
     post:
       operationId: splitBill
       x-ticvai-consumed-by:
+        - "P04 POS-028 Table Service"
         - "P06 EMP-059 Table Order, Bill & Payment Management"
       x-ticvai-audience:
       - staff
@@ -6256,7 +6249,6 @@ paths:
         - "P04 POS-022 Send to Kitchen"
         - "P08 BO-020 F&B Order Management"
         - "P08 BO-046 Kitchen Display"
-        - "P08 BO-731 Operating Hours & Service Periods"
         - "P15 KIT-001 Kitchen Operations Command Center"
         - "P15 KIT-002 Kitchen Display System (KDS)"
         - "P15 KIT-003 Order Firing & Course Management"
@@ -6344,7 +6336,6 @@ paths:
         - "P15 KIT-002 Kitchen Display System (KDS)"
         - "P15 KIT-003 Order Firing & Course Management"
         - "P15 KIT-006 Expeditor & Order Assembly"
-        - "P15 KIT-008 Exceptions, Re-Fire & Unavailable Items"
       x-ticvai-audience:
       - staff
       summary: Advance a kitchen ticket
@@ -6426,7 +6417,6 @@ paths:
         - "P08 BO-020 F&B Order Management"
         - "P08 BO-046 Kitchen Display"
         - "P15 KIT-003 Order Firing & Course Management"
-        - "P15 KIT-009 SLA, Priority & Service Rules"
       x-ticvai-audience:
       - staff
       summary: Move a ticket up the queue
@@ -6480,8 +6470,6 @@ paths:
     get:
       operationId: listKitchenStations
       x-ticvai-consumed-by:
-        - "P08 BO-020 F&B Order Management"
-        - "P08 BO-046 Kitchen Display"
         - "P08 BO-134 Kitchen & Preparation Stations"
         - "P15 KIT-001 Kitchen Operations Command Center"
         - "P15 KIT-005 Kitchen Station Workload & Dynamic Routing"
@@ -6523,11 +6511,7 @@ paths:
     put:
       operationId: setKitchenStations
       x-ticvai-consumed-by:
-        - "P08 BO-020 F&B Order Management"
-        - "P08 BO-046 Kitchen Display"
         - "P08 BO-134 Kitchen & Preparation Stations"
-        - "P08 BO-135 Order Routing & KDS/Printer Rules"
-        - "P15 KIT-005 Kitchen Station Workload & Dynamic Routing"
       x-ticvai-audience:
       - staff
       summary: Configure stations and item routing
@@ -6694,7 +6678,6 @@ paths:
       operationId: recordWaste
       x-ticvai-consumed-by:
         - "P06 EMP-067 Damage, Loss, Shrinkage & Stock Adjustment"
-        - "P08 BO-044 F&B Outlets"
         - "P08 BO-139 Wastage, Spoilage, Returns & Write-Off"
       x-ticvai-audience:
       - staff

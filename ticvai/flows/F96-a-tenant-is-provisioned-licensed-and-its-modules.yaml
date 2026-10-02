@@ -34,56 +34,44 @@ steps:
   screen: ADM-008
   action: Subscription & Plan Management.
   operations:
-  - createPartnerAgreement
   - createPlan
   - createPlanVersion
   - generateInvoice
   - getEntitlementUsage
   outcome: 22 operations, 22 of them previously unwalked.
   crossesDevice: true
-  note: '**Corrected 24 August**: addLicenceAddOn removed. **This step was written against a screen
-    carrying bulk-attached operations** — 121 were stripped from P09 the same day, and a flow that depended
-    on them was depending on a defect.'
+  note: '**Repointed 2 October (CHG-WIR-021).** Partner agreements are the tenant''s B2B terms (PARTNER_MANAGE), not TICVAI''s plan catalogue.'
 - step: 3
   screen: ADM-011
   action: Licence & Seat Management.
   operations:
   - addLicenceAddOn
   - getEntitlementUsage
-  - getSsoConfig
   - getSubscription
   - getTenant
   outcome: 15 operations, 15 of them previously unwalked.
   crossesDevice: true
-  note: '**Corrected 24 August**: generateInvoice removed. **This step was written against a screen
-    carrying bulk-attached operations** — 121 were stripped from P09 the same day, and a flow that depended
-    on them was depending on a defect.'
+  note: '**Repointed 2 October (CHG-WIR-021).** getSsoConfig was bulk-attached to the Console''s tenant screens; tenant SSO is read and set on ADM-005.'
 - step: 4
   screen: ADM-007
   action: Module & Feature Entitlement.
   operations:
   - addLicenceAddOn
   - getEntitlementUsage
-  - getSsoConfig
   - getSubscription
   - getTenant
   outcome: 15 operations, 15 of them previously unwalked.
   crossesDevice: true
-  note: '**Corrected 24 August**: generateInvoice removed. **This step was written against a screen
-    carrying bulk-attached operations** — 121 were stripped from P09 the same day, and a flow that depended
-    on them was depending on a defect.'
+  note: '**Repointed 2 October (CHG-WIR-021).** getSsoConfig was bulk-attached to the Console''s tenant screens; tenant SSO is read and set on ADM-005.'
 - step: 5
   screen: ADM-012
   action: Tenant Isolation & Resource Pool.
   operations:
   - getCellCapacity
   - getEntitlementUsage
-  - getSsoConfig
   outcome: 16 operations, 16 of them previously unwalked.
   crossesDevice: true
-  note: '**Corrected 24 August**: addLicenceAddOn, generateInvoice, getSubscription removed. **This
-    step was written against a screen carrying bulk-attached operations** — 121 were stripped from P09
-    the same day, and a flow that depended on them was depending on a defect.'
+  note: '**Repointed 2 October (CHG-WIR-021).** getSsoConfig was bulk-attached to the Console''s tenant screens; tenant SSO is read and set on ADM-005.'
 branches:
 - at: 1
   condition: The acting principal lacks the permission at this scope.

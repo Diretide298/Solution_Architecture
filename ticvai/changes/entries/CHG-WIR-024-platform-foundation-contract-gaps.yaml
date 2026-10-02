@@ -1,0 +1,130 @@
+id: CHG-WIR-024
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: 'Contract gap (platform-foundation): 17 wiring fixes need an operation the contracts do not have; logged,
+  not invented.'
+decision:
+  what: 'Log, do not invent: each wiring fix below needs an operation (or an audience) the contracts lack. The gap
+    is recorded on the screen (gaps, operation: null) and here, open, for the contract owner.'
+  by: Chinmay
+  date: '2026-10-02'
+  quote: 'Chinmay, 2 Oct 2026: fix the wrong wiring now'
+why: Design-note corrections for platform-foundation (handoff/design-notes/platform-foundation.yaml) name operations
+  that do not exist; the brief for the wiring fixes (Chinmay, 2 October 2026) says to log such a gap as an open
+  contract-gap change and not invent the operation. Each gap cites its correction below; the class is the audit's
+  A28 missing-operation class (R254 re-derivation exposed these).
+keys_touched:
+  screens:
+  - ADM-035
+  - ADM-253
+  - ADM-344
+  - ADM-375
+  - ADM-376
+  - ADM-408
+  - ADM-425
+  - ADM-464
+  - ADM-618
+  - BO-1069
+  - BO-122
+  - BO-366
+  - BO-380
+  - BO-483
+  - BO-727
+  - POS-019
+  - SGN-018
+  tickets:
+  - APP-POS-POS-019
+  - VM-BO-122
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-019
+  - VM-BO-122
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/audit-screenless-operations.py
+status: open
+notes: 'type: contract-gap. Open until the contract change is decided; the wiring fix that needs it lands with it.
+  Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are every tasks.csv or pushed key
+  naming a touched screen. Per screen and flow:
+
+  - POS-019: gap: No operation reads or writes a till shift policy (opening and closing rules, exceptions and alerts)
+  for F73 step 2. — The name and DI-309 promise shift templates and policies (opening and closing rules, exceptions
+  and alerts); the shift contract offers no such operation, and workforce shift templates (listShiftTemplates) are
+  rota patterns, not till rules (design-notes correction platform-foundation POS-019).
+
+  - BO-122: gap: No operation reports sales and errors per sale board. — A POS experience dashboard needs measures
+  per sale board (sales per board, errors); the only operation is listSaleBoards (design-notes correction platform-foundation
+  BO-122).
+
+  - BO-727: gap: No operation returns outlet KPIs (sales, orders, preparation time, stock alerts) per outlet. —
+  Ten tiles (sales, orders, preparation time, stock alerts) with only listOutlets behind them (design-notes correction
+  platform-foundation BO-727).
+
+  - BO-366: gap: No operation assigns, reassigns or claims an approval request in a shared queue. — DI-723 asks
+  for assigning and reassigning an approval to a department or a person; the approvals contract has no assign or
+  claim operation (design-notes correction platform-foundation BO-366).
+
+  - BO-380: gap: No operation cancels, expires or reopens an approval request. — The purpose names four lifecycle
+  actions; only withdrawApprovalRequest exists, and cancellation, expiry and reopening have no operation (design-notes
+  correction platform-foundation BO-380).
+
+  - BO-483: gap: No operation records or reads the certification of a reader (access or games hardware) model. —
+  Testing and approving a new reader model before deployment needs a hardware certification record; certifyIntegration
+  certifies API listings and listPaymentTerminalCertifications covers payment terminals only (design-notes correction
+  platform-foundation BO-483).
+
+  - BO-1069: gap: No tenant-facing operation reports platform service status (API, events, locks, cache, database,
+  queue, webhooks). — The tenant should see the status of the platform services behind seat-state correctness, not
+  their internals; no tenant-facing status read exists (design-notes correction platform-foundation BO-1069).
+
+  - ADM-035: gap: No operation lists or works the support escalations that reach TICVAI. — An escalation console
+  needs the escalation queue; the screen''s operations are support notices only and no platform-ops operation lists
+  support escalations (design-notes correction platform-foundation ADM-035).
+
+  - ADM-408: gap: No operation approves a prospect''s commercial package and hands it to purchase and contract activation.
+  — Final package approval and hand-off to purchase is a TICVAI commercial act; after removing createPartnerQuote
+  the screen has no operation (design-notes correction platform-foundation ADM-408).
+
+  - ADM-464: gap: No operation lists tenant subscriptions coming up for renewal or sets a subscription''s renewal
+  terms. — The renewal pipeline of TICVAI customers is a subscription matter; the subscription contract has no list
+  of subscriptions coming up for renewal or a renewal setting (design-notes correction platform-foundation ADM-464).
+
+  - SGN-018: gap: No prospect-callable operation records whether the prospect buys or starts a trial. — The prospect
+  chooses between purchase and trial; with setTrialConfiguration removed, no prospect-callable operation records
+  the choice (design-notes correction platform-foundation SGN-018).
+
+  - ADM-253: gap: A read listing automated and autonomous action executions (what ran, when, on whose rule, outcome),
+  paged; createAutomationAutonomouAction should become that GET or be split from it. — A monitor of automated and
+  autonomous actions needs a read of what ran; the only operation, createAutomationAutonomouAction, is drafted as
+  a POST create that returns the monitor view, and nothing lists executions (design-notes correction platform-foundation
+  ADM-253).
+
+  - ADM-344: gap: A signature policy read and write in approvals: which approval kinds or levels require a signature,
+  and the accepted signature methods. — Configuring which approval stages require a digital signature, and with
+  which method, is a policy write that no operation offers; signApprovalDecision only signs one decided request
+  (design-notes correction platform-foundation ADM-344).
+
+  - ADM-375: gap: A cross-tenant read of subscriptions approaching renewal (term end, auto-renew, value, retention
+  risk), paged; getSubscription reads one tenant only. — Renewal & Retention Center has no read once the guest membership
+  read is removed (CHG-WIR-021); no operation lists tenant subscriptions approaching renewal (design-notes correction
+  platform-foundation ADM-375).
+
+  - ADM-376: gap: A cross-tenant read of commercial opportunities (expansion, module, model and cost optimisation,
+  retention value), paged. — Commercial Optimization & Expansion Opportunities has no read once the guest membership
+  renewal queue is removed (CHG-WIR-021); no operation lists tenant expansion, retention or cost-optimisation opportunities
+  (design-notes correction platform-foundation ADM-376).
+
+  - ADM-425: gap: An operation that applies a venue-type template to a tenant or venue (creating the editable starting
+  configuration), with a preview of what it creates. — Venue Template Application applies a template, and listVenueTypeTemplates
+  only reads them; no operation applies a template to a tenant or venue (design-notes correction platform-foundation
+  ADM-425).
+
+  - ADM-618: gap: A refund simulation operation: for an order, payment, items, amount, reason and channel, return
+  the refundable balance, the approval required, the tender and provider route and the cash impact, witho… — Refund
+  Simulator declares no operation; a simulator needs a simulate operation, and none exists for refunds (design-notes
+  correction platform-foundation ADM-618).'

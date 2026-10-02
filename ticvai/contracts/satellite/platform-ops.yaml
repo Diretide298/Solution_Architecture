@@ -166,7 +166,6 @@ paths:
       operationId: createRelease
       x-ticvai-consumed-by:
         - "P09 ADM-022 Release & Version Management"
-        - "P09 ADM-023 Staging Promotion & Approval"
       x-ticvai-audience:
       - staff
       summary: Cut a release
@@ -311,7 +310,6 @@ paths:
       operationId: withdrawRelease
       x-ticvai-consumed-by:
         - "P09 ADM-022 Release & Version Management"
-        - "P09 ADM-023 Staging Promotion & Approval"
       x-ticvai-audience:
       - staff
       summary: Withdraw a release
@@ -558,7 +556,6 @@ paths:
     post:
       operationId: startRollout
       x-ticvai-consumed-by:
-        - "P08 BO-126 Deployment, Preview & Audit"
         - "P09 ADM-029 Deployment Monitor"
       x-ticvai-audience:
       - staff

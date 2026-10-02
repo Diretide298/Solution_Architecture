@@ -47,7 +47,24 @@ RULES = {
     "S-CONSUMED-MIRROR": "apis and the contract's x-ticvai-consumed-by disagree (R254 R042)",
     "S-FIELD-BINDING": "a component bound to Schema.field where the schema has no such field (R275)",
     "S-PANEL-ENTITY": "a list and its detail panel bound to different entities (R256)",
+    "S-STAFF-AUDIENCE": "a staff screen calls an operation whose audience has no staff: guest-, device-, service- or partner-only (R254, CHG-WIR-001)",
+    "S-PURPOSE-BOILERPLATE": "a screen purpose that is a generator template or a pasted board placeholder (CHG-WIR-003)",
 }
+# **The staff surfaces.** A screen on one of these is operated by venue or platform staff, so every operation
+# it calls must accept a staff caller. Added 2 October 2026 with the wiring fixes (CHG-WIR-001): guest-only
+# reads (listMyCases, getLoyaltyPosition), device heartbeats and service-only writes had been bulk-attached to
+# back-office, till and staff-app screens, where the call is refused or answers for the wrong principal.
+# Partner (P10), accreditation-applicant (P11), developer (P14) and sign-up (P17) surfaces are not staff.
+STAFF_CODES = ("P04", "P06", "P07", "P08", "P09", "P12", "P13", "P15", "P16")
+STAFF_OK = {"staff", "public", "anonymous"}
+# **Generator purposes.** The 18 August generator wrote one of these when a screen had no purpose of its own,
+# and board imports pasted the board's title with its date. Each reads like a purpose and says nothing a
+# designer can act on; several were copied between screens (CHG-WIR-003).
+PURPOSE_BOILERPLATE = re.compile(
+    r"^(Work with|See|Find|Add) .{2,80} for this venue\.?$"
+    r"|Change how .{2,60} behaves here, and see which level the current value came from"
+    r"|from the client design board"
+    r"|^The screen this app sits on", re.I)
 GUEST_CODES = ("P01", "P02", "P05")
 FILE_REF = re.compile(r"^(storageRef|fileRef|fileReference|documentRef|imageRef|assetRef|attachmentRef|"
                       r"uploadRef|storageKey|fileKey|blobRef|mediaAssetId|photoRef)s?$")
@@ -123,6 +140,17 @@ def main() -> int:
                         and not f["op"].get("x-ticvai-guest-callable") and f["op"].get("x-ticvai-auth") != "none":
                     guard.add("S-GUEST-AUDIENCE", f"{sid}:{o}",
                               f"{sid}: a guest screen calls {o}, audience {', '.join(aud)}")
+        # --- CHG-WIR-001 staff surfaces call staff operations -----------------------------------
+        if plat.startswith(STAFF_CODES) and s.get("audience") in (None, "staff", "platform"):
+            for o in sorted(op_ids):
+                f = ops.get(o)
+                aud = set((f or {}).get("op", {}).get("x-ticvai-audience") or [])
+                if f and aud and not (aud & STAFF_OK):
+                    guard.add("S-STAFF-AUDIENCE", f"{sid}:{o}",
+                              f"{sid} ({plat}): a staff screen calls {o}, audience {', '.join(sorted(aud))}")
+        # --- CHG-WIR-003 template purposes ---------------------------------------------------------
+        if PURPOSE_BOILERPLATE.search(str(s.get("purpose") or "")):
+            guard.add("S-PURPOSE-BOILERPLATE", sid, f"{sid}: purpose is a template: {str(s.get('purpose'))[:80]!r}")
         # --- R196 file references --------------------------------------------------------------
         needs_file = sorted(o for o in op_ids if ops.get(o) and any(FILE_REF.match(p) for p in body_props(ops[o])))
         if needs_file and not any(re.search(r"(upload|presign|createMediaAsset|createAsset)", o, re.I) for o in op_ids):

@@ -269,8 +269,8 @@ screens:
     emptyNoAccess: Signed in, and the person holds no role in this app. Says who at the tenant grants
       access; distinct from a wrong password. A door has no permission of its own to name, because the
       person is not signed in until it succeeds.
-    emptyNoResults: 'Never shown: `listSsoProviders` takes no filter; a tenant with no identity provider shows
-      no SSO buttons at all, and the form is the whole door.'
+    emptyNoResults: 'Never shown: `listSsoProviders` takes no filter; a tenant with no identity provider
+      shows no SSO buttons at all, and the form is the whole door.'
     sessionHeld: '`login` answered 409: this person already holds a session elsewhere (audit R184, ADR-0004).
       Says where and since when; only a holder of SESSION_FORCE_LOGOUT ends it, on the staff directory
       (BO-053), and signing in never ends it by itself.'
@@ -353,6 +353,31 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-001
+  gaps:
+  - operation: forceLogout
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-021): The Venue Management door carried active-session management
+      (listActiveSessions, forceLogout, revokeAllSessions); a person signing in has no session yet, and
+      session management belongs to a signed-in security screen. SSO sign-in was missing though listSsoProviders
+      is declared: startSsoAuthorization/completeSsoAuthorization are the SSO path (design-notes corrections
+      platform-foundation SUP-001, ADM-001).'
+    source: screens/P12-support-agent-console.yaml#SUP-001 | contracts/spine/identity.yaml#completeSsoAuthorization
+  - operation: listActiveSessions
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-021): The Venue Management door carried active-session management
+      (listActiveSessions, forceLogout, revokeAllSessions); a person signing in has no session yet, and
+      session management belongs to a signed-in security screen. SSO sign-in was missing though listSsoProviders
+      is declared: startSsoAuthorization/completeSsoAuthorization are the SSO path (design-notes corrections
+      platform-foundation SUP-001, ADM-001).'
+    source: screens/P12-support-agent-console.yaml#SUP-001 | contracts/spine/identity.yaml#completeSsoAuthorization
+  - operation: revokeAllSessions
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-021): The Venue Management door carried active-session management
+      (listActiveSessions, forceLogout, revokeAllSessions); a person signing in has no session yet, and
+      session management belongs to a signed-in security screen. SSO sign-in was missing though listSsoProviders
+      is declared: startSsoAuthorization/completeSsoAuthorization are the SSO path (design-notes corrections
+      platform-foundation SUP-001, ADM-001).'
+    source: screens/P12-support-agent-console.yaml#SUP-001 | contracts/spine/identity.yaml#completeSsoAuthorization
 - id: SUP-002
   name: Agent Dashboard
   module: Overview
@@ -381,7 +406,6 @@ screens:
     - to: SUP-004
       trigger: Conversation Queue
       carries:
-      - caseId
       - conversationId
       provenance: derived — SUP-004 declares entryState.params caseId, conversationId and SUP-002 holds
         caseId, conversationId, so an edge into it carries them
@@ -756,7 +780,7 @@ screens:
   pattern: configEditor
   patternReason: the screen declares only writes (`setAgentAvailability`) and no read of a population
     — it is settings, not a list
-  purpose: Change how availability behaves here, and see which level the current value came from.
+  purpose: Set yourself available, away or offline, and see how work is routed to you.
   layout:
     template: form
     regions:
@@ -802,6 +826,9 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-006): The purpose was the configuration-screen
+    template ("Change how availability behaves here, and see which level the current value came from");
+    the screen sets the agent''s own availability (design-notes correction customer-marketing SUP-003).'
 - id: SUP-004
   name: Conversation Queue
   module: Conversations
@@ -830,15 +857,12 @@ screens:
         edge is the way back and SUP-001 keeps its own state'
     - to: SUP-002
       trigger: Agent Dashboard
-      carries:
-      - caseId
       provenance: derived — SUP-002 declares entryState.params caseId and SUP-004 holds caseId, so an
         edge into it carries them
     - to: SUP-005
       trigger: Reads the history and replies
       provenance: flow F05 step 1→2, F24 step 3→4
       carries:
-      - caseId
       - conversationId
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
@@ -855,44 +879,6 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: textField
-        label: Status
-        operation: listCases
-        notes: Sends `?status=` to `listCases`.
-        provenance: contract marketing-crm.yaml GET /cases
-      - kind: textField
-        label: Assigned to principal id
-        operation: listCases
-        notes: Sends `?assignedToPrincipalId=` to `listCases`.
-        provenance: contract marketing-crm.yaml GET /cases
-      - kind: toggle
-        label: Breached sla
-        operation: listCases
-        notes: Sends `?breachedSla=` to `listCases`.
-        provenance: contract marketing-crm.yaml GET /cases
-      - kind: textField
-        label: Priority
-        operation: listCases
-        notes: Sends `?priority=` to `listCases`.
-        provenance: contract marketing-crm.yaml GET /cases
-      - kind: dataTable
-        label: Every case
-        bindsTo: Case
-        columns:
-        - Case.id
-        - Case.caseNumber
-        - Case.subjectId
-        - Case.guestName
-        - Case.subject
-        - Case.categoryId
-        - Case.status
-        - Case.priority
-        - Case.assignedToPrincipalId
-        - Case.venueId
-        - Case.relatedOrderId
-        - Case.slaDueAt
-        operation: listCases
-        provenance: contract marketing-crm.yaml GET /cases
       - kind: dataTable
         label: Every conversation
         bindsTo: Conversation
@@ -913,74 +899,10 @@ screens:
         provenance: contract marketing-crm.yaml GET /conversations
     - name: contextPanel
       slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected case
-        bindsTo: Case
-        columns:
-        - Case.id
-        - Case.caseNumber
-        - Case.subjectId
-        - Case.guestName
-        - Case.subject
-        - Case.kind
-        - Case.channel
-        - Case.recordedAt
-        - Case.syncedAt
-        - Case.categoryId
-        - Case.status
-        - Case.priority
-        - Case.assignedToPrincipalId
-        - Case.venueId
-        - Case.relatedOrderId
-        - Case.slaDueAt
-        operation: listCases
-        provenance: contract marketing-crm.yaml GET /cases
-      - kind: detailPanel
-        label: The case
-        bindsTo: CaseDetail
-        columns:
-        - CaseDetail.id
-        - CaseDetail.caseNumber
-        - CaseDetail.subjectId
-        - CaseDetail.guestName
-        - CaseDetail.subject
-        - CaseDetail.kind
-        - CaseDetail.channel
-        - CaseDetail.recordedAt
-        - CaseDetail.syncedAt
-        - CaseDetail.categoryId
-        - CaseDetail.status
-        - CaseDetail.priority
-        - CaseDetail.assignedToPrincipalId
-        - CaseDetail.venueId
-        - CaseDetail.relatedOrderId
-        - CaseDetail.slaDueAt
-        operation: getCase
-        provenance: contract marketing-crm.yaml GET /cases/{caseId}
+      components: []
     - name: actionBar
       slot: rowActions
       components:
-      - kind: primaryButton
-        label: Add case message
-        operation: addCaseMessage
-        provenance: contract marketing-crm.yaml POST /cases/{caseId}/messages
-      - kind: secondaryButton
-        label: Create case
-        operation: createCase
-        provenance: contract marketing-crm.yaml POST /cases
-      - kind: secondaryButton
-        label: Escalate case
-        operation: escalateCase
-        provenance: contract marketing-crm.yaml POST /cases/{caseId}/escalate
-      - kind: secondaryButton
-        label: Reopen case
-        operation: reopenCase
-        provenance: contract marketing-crm.yaml POST /cases/{caseId}/reopen
-      - kind: secondaryButton
-        label: Save case
-        operation: updateCase
-        provenance: contract marketing-crm.yaml PATCH /cases/{caseId}
       - kind: secondaryButton
         label: Claim conversation
         operation: claimConversation
@@ -992,52 +914,14 @@ screens:
   states:
     loading: The conversation queue list.
     error: Could not load. Names which read failed and leaves the conversation queue untouched.
-    emptyFirstRun: No conversation queue yet. Offers Add case message (`addCaseMessage`); distinct from
-      a filter that matched nothing.
+    emptyFirstRun: No conversation queue yet. Offers no create action — this screen declares no operation
+      that makes one; distinct from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on status, assignedToPrincipalId, breachedSla, priority
       and the conversation queue are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `CASE_VIEW`, which `listCases` requires, and names that
-      permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support
-      with the wrong question.
+    emptyNoAccess: Shown when the caller lacks `CASE_VIEW`, which `listConversations` requires, and names
+      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question.
   apis:
-  - operationId: listCases
-    contract: marketing-crm
-    purpose: from page inventory
-    trigger: onLoad
-  - operationId: addCaseMessage
-    contract: marketing-crm
-    purpose: Add a message or internal note
-    trigger: onAction
-    invalidates:
-    - listCases
-  - operationId: createCase
-    contract: marketing-crm
-    purpose: Raise a service case
-    trigger: onAction
-    invalidates:
-    - listCases
-  - operationId: escalateCase
-    contract: marketing-crm
-    purpose: Escalate a case
-    trigger: onAction
-    invalidates:
-    - listCases
-  - operationId: getCase
-    contract: marketing-crm
-    purpose: Read a case with its thread
-    trigger: onAction
-  - operationId: reopenCase
-    contract: marketing-crm
-    purpose: Reopen a resolved case
-    trigger: onAction
-    invalidates:
-    - listCases
-  - operationId: updateCase
-    contract: marketing-crm
-    purpose: Assign, reprioritise or resolve a case
-    trigger: onAction
-    invalidates:
-    - listCases
   - operationId: listConversations
     contract: marketing-crm
     purpose: The omnichannel inbox
@@ -1046,18 +930,12 @@ screens:
     contract: marketing-crm
     purpose: An agent takes it
     trigger: onAction
-    invalidates:
-    - listCases
   - operationId: transferConversation
     contract: marketing-crm
     purpose: Pass it to another agent or queue
     trigger: onAction
-    invalidates:
-    - listCases
   entryState:
     params:
-    - name: caseId
-      from: deepLink
     - name: conversationId
       from: deepLink
     coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
@@ -1076,97 +954,6 @@ screens:
     pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
     them to the ones that matter is work a person still owes this screen.
   overlays:
-  - id: formAddCaseMessage
-    component: modal
-    trigger: Add case message
-    body: '**Collects what `addCaseMessage` sends before it is called.** Required: `id`, `body`, `isInternal`,
-      `recordedAt`. Optional: `channel`, `attachmentRefs`. Dismissing sends nothing; the screen behind
-      is unchanged.'
-    confirm:
-      label: Add case message
-      operation: addCaseMessage
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - body
-      - isInternal
-      - recordedAt
-      - channel
-      - attachmentRefs
-    provenance: contract marketing-crm.yaml POST /cases/{caseId}/messages
-  - id: formCreateCase
-    component: modal
-    trigger: Create case
-    body: '**Collects what `createCase` sends before it is called.** Required: `id`, `subject`, `description`,
-      `channel`, `recordedAt`. Optional: `subjectId`, `categoryId`, `priority`, `kind`, `venueId`, `relatedOrderId`,
-      `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: CreateCaseRequest
-    confirm:
-      label: Create case
-      operation: createCase
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - subject
-      - description
-      - channel
-      - recordedAt
-      - subjectId
-      - categoryId
-      - priority
-      - kind
-      - venueId
-      - relatedOrderId
-      - attachmentRefs
-    provenance: contract marketing-crm.yaml POST /cases
-  - id: formEscalateCase
-    component: modal
-    trigger: Escalate case
-    body: '**Collects what `escalateCase` sends before it is called.** Required: `reason`. Optional: `assignToPrincipalId`,
-      `newPriority`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Escalate case
-      operation: escalateCase
-    dismiss:
-      label: Cancel
-      discards:
-      - reason
-      - assignToPrincipalId
-      - newPriority
-    provenance: contract marketing-crm.yaml POST /cases/{caseId}/escalate
-  - id: formReopenCase
-    component: modal
-    trigger: Reopen case
-    body: '**Collects what `reopenCase` sends before it is called.** Required: `reason`. Dismissing sends
-      nothing; the screen behind is unchanged.'
-    confirm:
-      label: Reopen case
-      operation: reopenCase
-    dismiss:
-      label: Cancel
-      discards:
-      - reason
-    provenance: contract marketing-crm.yaml POST /cases/{caseId}/reopen
-  - id: formUpdateCase
-    component: modal
-    trigger: Save case
-    body: '**Collects what `updateCase` sends before it is called.** Nothing in the body is required.
-      Optional: `status`, `priority`, `assignedToPrincipalId`, `categoryId`, `resolutionNote`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Save case
-      operation: updateCase
-    dismiss:
-      label: Cancel
-      discards:
-      - status
-      - priority
-      - assignedToPrincipalId
-      - categoryId
-      - resolutionNote
-    provenance: contract marketing-crm.yaml PATCH /cases/{caseId}
   - id: formTransferConversation
     component: modal
     trigger: Transfer conversation
@@ -1183,6 +970,49 @@ screens:
       - toQueueId
       - note
     provenance: contract marketing-crm.yaml POST /conversations/{conversationId}/transfer
+  gaps:
+  - operation: addCaseMessage
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-005): The conversation queue carried the full case toolset;
+      the queue is about conversations and case work happens in SUP-013 and SUP-005. Keep listConversations,
+      claim and transfer (design-notes correction customer-marketing SUP-004).'
+    source: screens/P12-support-agent-console.yaml#SUP-004
+  - operation: createCase
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-005): The conversation queue carried the full case toolset;
+      the queue is about conversations and case work happens in SUP-013 and SUP-005. Keep listConversations,
+      claim and transfer (design-notes correction customer-marketing SUP-004).'
+    source: screens/P12-support-agent-console.yaml#SUP-004
+  - operation: escalateCase
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-005): The conversation queue carried the full case toolset;
+      the queue is about conversations and case work happens in SUP-013 and SUP-005. Keep listConversations,
+      claim and transfer (design-notes correction customer-marketing SUP-004).'
+    source: screens/P12-support-agent-console.yaml#SUP-004
+  - operation: getCase
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-005): The conversation queue carried the full case toolset;
+      the queue is about conversations and case work happens in SUP-013 and SUP-005. Keep listConversations,
+      claim and transfer (design-notes correction customer-marketing SUP-004).'
+    source: screens/P12-support-agent-console.yaml#SUP-004
+  - operation: listCases
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-005): The conversation queue carried the full case toolset;
+      the queue is about conversations and case work happens in SUP-013 and SUP-005. Keep listConversations,
+      claim and transfer (design-notes correction customer-marketing SUP-004).'
+    source: screens/P12-support-agent-console.yaml#SUP-004
+  - operation: reopenCase
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-005): The conversation queue carried the full case toolset;
+      the queue is about conversations and case work happens in SUP-013 and SUP-005. Keep listConversations,
+      claim and transfer (design-notes correction customer-marketing SUP-004).'
+    source: screens/P12-support-agent-console.yaml#SUP-004
+  - operation: updateCase
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-005): The conversation queue carried the full case toolset;
+      the queue is about conversations and case work happens in SUP-013 and SUP-005. Keep listConversations,
+      claim and transfer (design-notes correction customer-marketing SUP-004).'
+    source: screens/P12-support-agent-console.yaml#SUP-004
 - id: SUP-005
   name: Live Chat Workspace
   module: Conversations
@@ -1225,7 +1055,7 @@ screens:
   density: compact
   pattern: listDetail
   patternReason: '`listCases` reads the population and `getCase` reads one of them — list, select, act'
-  purpose: Work with live chat workspace for this venue.
+  purpose: Serve one live conversation to its end, with the guest's case beside it.
   layout:
     template: split
     regions:
@@ -1588,6 +1418,9 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop
     pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
     them to the ones that matter is work a person still owes this screen.
+  purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-006): The purpose was the generic template ("Work
+    with live chat workspace for this venue"); the workspace serves one conversation (design-notes correction
+    customer-marketing SUP-005).'
 - id: SUP-006
   name: Knowledge Base Search
   module: Knowledge & Responses
@@ -1631,24 +1464,6 @@ screens:
       slot: collection
       components:
       - kind: dataTable
-        label: Every knowledge collection
-        bindsTo: KnowledgeCollection
-        columns:
-        - KnowledgeCollection.id
-        - KnowledgeCollection.name
-        - KnowledgeCollection.description
-        - KnowledgeCollection.scopeLevel
-        - KnowledgeCollection.scopePath
-        - KnowledgeCollection.documentCount
-        - KnowledgeCollection.shardKey
-        - KnowledgeCollection.retrieval
-        - KnowledgeCollection.sparseModel
-        - KnowledgeCollection.idfScope
-        - KnowledgeCollection.embeddingModel
-        - KnowledgeCollection.isActive
-        operation: listKnowledgeCollections
-        provenance: contract ai.yaml GET /collections
-      - kind: dataTable
         label: Every faq category
         bindsTo: FaqCategory
         columns:
@@ -1661,40 +1476,24 @@ screens:
         provenance: contract white-label.yaml GET /tenant-config/faqs
     - name: contextPanel
       slot: selection
+      components: []
+    - name: actionBar
       components:
-      - kind: detailPanel
-        label: The selected knowledge collection
-        bindsTo: KnowledgeCollection
-        columns:
-        - KnowledgeCollection.id
-        - KnowledgeCollection.name
-        - KnowledgeCollection.description
-        - KnowledgeCollection.scopeLevel
-        - KnowledgeCollection.scopePath
-        - KnowledgeCollection.documentCount
-        - KnowledgeCollection.shardKey
-        - KnowledgeCollection.retrieval
-        - KnowledgeCollection.sparseModel
-        - KnowledgeCollection.idfScope
-        - KnowledgeCollection.embeddingModel
-        - KnowledgeCollection.isActive
-        operation: listKnowledgeCollections
-        provenance: contract ai.yaml GET /collections
+      - kind: secondaryButton
+        label: Search
+        operation: semanticSearch
+        provenance: contract ai.yaml POST /search; wiring fix, 2 October 2026
   states:
     loading: The knowledge base search list.
     error: Could not load. Names which read failed and leaves the knowledge base search untouched.
     emptyFirstRun: No knowledge base search yet. **Offers no create action** — this screen declares no
       operation that makes one — and says so rather than showing an empty table.
-    emptyNoResults: 'Never shown: `listKnowledgeCollections` takes no filter, so an empty list is always
+    emptyNoResults: 'Never shown: nothing on this screen filters its list, so an empty list is always
       the first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `AI_CONFIGURE`, which `listKnowledgeCollections` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `listFaqs` requires, and names
+      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question.
   apis:
-  - operationId: listKnowledgeCollections
-    contract: ai
-    purpose: Collections an agent may search
-    trigger: onLoad
   - operationId: listFaqs
     contract: white-label
     purpose: Published answers, as the guest sees them
@@ -1704,16 +1503,12 @@ screens:
     purpose: Questions the assistant could not answer
     trigger: onLoad
     provenance: build, 29 September 2026
+  - operationId: semanticSearch
+    contract: ai
+    purpose: Search the knowledge an agent may use
+    trigger: onAction
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-012)
   entryState:
-    params:
-    - name: bannerId
-      from: deepLink
-    - name: pageId
-      from: deepLink
-    - name: policyKind
-      from: deepLink
-    - name: version
-      from: deepLink
     coldEntry: '**A version link is expected to point at something superseded — that is what versions
       are for.** The screen opens the requested version read-only, says it is not current, and links to
       the one that is. **An old version is history, not an error.** Arrives with `bannerId`, `pageId`,
@@ -1731,6 +1526,26 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: formSemanticSearch
+    component: modal
+    trigger: Search
+    body: '**Collects what `semanticSearch` sends before it is called.** Dismissing sends nothing; the
+      screen behind is unchanged.'
+    confirm:
+      label: Search
+      operation: semanticSearch
+    dismiss:
+      label: Cancel
+    provenance: contract ai.yaml POST /search; wiring fix, 2 October 2026
+  gaps:
+  - operation: listKnowledgeCollections
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-012): Agents search content; collection engineering (listKnowledgeCollections,
+      AI_CONFIGURE, with shard and embedding columns) belongs to knowledge administration, and the agent''s
+      search is semanticSearch. The entry parameters bannerId, pageId, policyKind and version were left
+      from the white-label bulk attach (design-notes corrections ai SUP-006).'
+    source: contracts/satellite/ai.yaml#listKnowledgeCollections | contracts/satellite/ai.yaml#semanticSearch
 - id: SUP-007
   name: Canned Response Management
   module: Knowledge & Responses
@@ -2770,6 +2585,10 @@ screens:
       - kind: primaryButton
         label: Create
         provenance: contract operation createCaseClassificationIntelligent
+      - kind: secondaryButton
+        label: Create case
+        operation: createCase
+        provenance: contract marketing-crm.yaml POST /cases; wiring fix, 2 October 2026
   states:
     loading: The case creation classification configuration as saved.
     error: Could not load. Names which read failed and leaves the case creation classification untouched.
@@ -2786,6 +2605,11 @@ screens:
     contract: marketing-crm
     purpose: List case categories and subcategories
     trigger: onLoad
+  - operationId: createCase
+    contract: marketing-crm
+    purpose: Raise the classified case
+    trigger: onAction
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-005)
   wireframe:
     status: notStarted
     provenance: generated
@@ -2794,6 +2618,19 @@ screens:
   apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 9. 0 of 0 labels bound
     to a contract property; 14 of 48 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  overlays:
+  - id: formCreateCase
+    component: modal
+    trigger: Create case
+    body: '**Collects what `createCase` sends before it is called.** Dismissing sends nothing; the screen
+      behind is unchanged.'
+    confirm:
+      label: Create case
+      operation: createCase
+    dismiss:
+      label: Cancel
+    provenance: contract marketing-crm.yaml POST /cases; wiring fix, 2 October 2026
+  entryState: {}
 - id: SUP-013
   name: Case Investigation & Resolution Workspace
   module: Support
@@ -2857,6 +2694,11 @@ screens:
         bindsTo: CaseInvestigationResolutionWorkspaceView
         operation: setCaseInvestigationResolution
         provenance: pack Customer Service_Reference.pdf, page 11 §Display
+      - kind: detailPanel
+        label: The case
+        bindsTo: CaseDetail
+        operation: getCase
+        provenance: contract marketing-crm.yaml GET /cases/{caseId}; wiring fix, 2 October 2026
     - name: contextPanel
       slot: selection
       components:
@@ -2884,6 +2726,23 @@ screens:
       - kind: primaryButton
         label: Action history
         provenance: pack Customer Service_Reference.pdf, page 11 §Support
+      - kind: secondaryButton
+        label: Add message
+        operation: addCaseMessage
+        provenance: contract marketing-crm.yaml POST /cases/{caseId}/messages; wiring fix, 2 October 2026
+      - kind: secondaryButton
+        label: Save case
+        operation: updateCase
+        provenance: contract marketing-crm.yaml PATCH /cases/{caseId}; wiring fix, 2 October 2026
+      - kind: secondaryButton
+        label: Attach file
+        operation: createUpload
+        provenance: contract assets.yaml POST /media/uploads; wiring fix, 2 October 2026
+      - kind: secondaryButton
+        label: Confirm attachment
+        operation: completeUpload
+        provenance: contract assets.yaml POST /media/uploads/{uploadId}/complete; wiring fix, 2 October
+          2026
   states:
     loading: The case investigation resolution list.
     error: Could not load. Names which read failed and leaves the case investigation resolution untouched.
@@ -2898,6 +2757,31 @@ screens:
     contract: marketing-crm
     purpose: Case Investigation & Resolution Workspace
     trigger: onAction
+  - operationId: getCase
+    contract: marketing-crm
+    purpose: The case with its thread
+    trigger: onLoad
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-005)
+  - operationId: addCaseMessage
+    contract: marketing-crm
+    purpose: Reply or add an internal note
+    trigger: onAction
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-005)
+  - operationId: updateCase
+    contract: marketing-crm
+    purpose: Resolve or reprioritise the case
+    trigger: onAction
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-005)
+  - operationId: createUpload
+    contract: assets
+    purpose: Get a signed URL for an attachment
+    trigger: onAction
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-005)
+  - operationId: completeUpload
+    contract: assets
+    purpose: Confirm the attachment
+    trigger: onAction
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-005)
   entryState:
     preloaded:
     - CaseInvestigationResolutionWorkspaceView.caseId
@@ -2906,6 +2790,9 @@ screens:
     - CaseInvestigationResolutionWorkspaceView.category
     - CaseInvestigationResolutionWorkspaceView.priority
     - CaseInvestigationResolutionWorkspaceView.status
+    params:
+    - name: caseId
+      from: navigation
   wireframe:
     status: notStarted
     provenance: generated
@@ -2915,6 +2802,40 @@ screens:
     bound to a contract property; 12 of 48 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formAddCaseMessage
+    component: modal
+    trigger: Add message
+    body: '**Collects what `addCaseMessage` sends before it is called.** Dismissing sends nothing; the
+      screen behind is unchanged.'
+    confirm:
+      label: Add message
+      operation: addCaseMessage
+    dismiss:
+      label: Cancel
+    provenance: contract marketing-crm.yaml POST /cases/{caseId}/messages; wiring fix, 2 October 2026
+  - id: formUpdateCase
+    component: modal
+    trigger: Save case
+    body: '**Collects what `updateCase` sends before it is called.** Dismissing sends nothing; the screen
+      behind is unchanged.'
+    confirm:
+      label: Save case
+      operation: updateCase
+    dismiss:
+      label: Cancel
+    provenance: contract marketing-crm.yaml PATCH /cases/{caseId}; wiring fix, 2 October 2026
+  - id: formCreateUpload
+    component: modal
+    trigger: Attach file
+    body: '**Collects what `createUpload` sends before it is called.** Dismissing sends nothing; the screen
+      behind is unchanged.'
+    confirm:
+      label: Attach file
+      operation: createUpload
+    dismiss:
+      label: Cancel
+    provenance: contract assets.yaml POST /media/uploads; wiring fix, 2 October 2026
 - id: SUP-014
   name: Order, Booking & Ticket Service Workspace
   module: Support
@@ -2974,6 +2895,10 @@ screens:
         notes: The pack filters this screen by order number, ticket number, booking reference, customer,
           email, mobile and 3 more — which are present is a decision the pack already made.
         provenance: pack Customer Service_Reference.pdf, page 13 §Search by
+      - kind: dataTable
+        label: Orders
+        operation: listOrders
+        provenance: contract orders.yaml GET /orders; wiring fix, 2 October 2026
     - name: contentBody
       slot: collection
       components:
@@ -3037,6 +2962,11 @@ screens:
     contract: marketing-crm
     purpose: Order, Booking & Ticket Service Workspace
     trigger: onAction
+  - operationId: listOrders
+    contract: orders
+    purpose: Find the guest's order
+    trigger: onLoad
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-005)
   entryState:
     preloaded:
     - OrderBookingTicketServiceWorkspaceView.order
@@ -3276,6 +3206,11 @@ screens:
   apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 16. 0 of 0 labels bound
     to a contract property; 8 of 36 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  gaps:
+  - operation: null
+    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-007): No operation raises an internal collaboration
+      request on a case.'
+    source: contracts/satellite/marketing-crm.yaml#listEscalationCollaborationInternal
 - id: SUP-017
   name: Case Resolution, Closure & Customer Feedback
   module: Support
@@ -3383,6 +3318,12 @@ screens:
       - kind: selectField
         label: Feedback request
         provenance: pack Customer Service_Reference.pdf, page 17 §Where configured, send
+    - name: actionBar
+      components:
+      - kind: secondaryButton
+        label: Close case
+        operation: updateCase
+        provenance: contract marketing-crm.yaml PATCH /cases/{caseId}; wiring fix, 2 October 2026
   states:
     loading: The case resolution closure configuration as saved.
     error: Could not load. Names which read failed and leaves the case resolution closure untouched.
@@ -3395,6 +3336,11 @@ screens:
     contract: marketing-crm
     purpose: Case Resolution, Closure & Customer Feedback
     trigger: onLoad
+  - operationId: updateCase
+    contract: marketing-crm
+    purpose: Resolve and close a case with its note
+    trigger: onAction
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-005)
   wireframe:
     status: notStarted
     provenance: generated
@@ -3403,6 +3349,22 @@ screens:
   apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 17. 0 of 0 labels bound
     to a contract property; 22 of 45 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  overlays:
+  - id: formUpdateCase
+    component: modal
+    trigger: Close case
+    body: '**Collects what `updateCase` sends before it is called.** Dismissing sends nothing; the screen
+      behind is unchanged.'
+    confirm:
+      label: Close case
+      operation: updateCase
+    dismiss:
+      label: Cancel
+    provenance: contract marketing-crm.yaml PATCH /cases/{caseId}; wiring fix, 2 October 2026
+  entryState:
+    params:
+    - name: caseId
+      from: navigation
 - id: SUP-018
   name: AI Customer Service Copilot & Knowledge Workspace
   module: Support
@@ -3427,18 +3389,15 @@ screens:
     notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups
       its screens ten to a board behind a command centre, and that grouping is the navigation.'
   density: compact
-  purposeNote: Agents receive explainable, context-aware AI assistance that reduces handling time and
-    improves consistency without bypassing TICVAI's policies, permissions or transactional systems. Board
-    1 — Final Screen Register
+  purposeNote: 'Agents receive explainable, context-aware AI assistance that reduces handling time and
+    improves consistency without bypassing TICVAI''s policies, permissions or transactional systems. Board
+    1 — Final Screen Register Purpose rewritten 2 October 2026 (CHG-WIR-013): The purpose was a pasted
+    board description (design-notes correction ai SUP-018).'
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
-  purpose: Create the AI intelligence layer assisting agents throughout the service journey. This should
-    not be a simple chatbot added to the side of the screen. It should understand the customer + transaction
-    + policy + case context. Board 1 focused on the individual customer-service agent and individual customer
-    case. Board 2 moves one level higher and provides the supervisor, contact-center manager, operations
-    manager and service leadership layer.
+  purpose: Configure the agent copilot and the assistant profile it answers with.
   gaps:
   - operation: null
     why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Review
@@ -3721,7 +3680,6 @@ screens:
     - to: SUP-019
       trigger: Returns to the board's landing screen
       provenance: flow F135 step 2→3
-      operation: listQueues
   density: compact
   purposeNote: Administrators can configure specialized service queues and supervisors can operationally
     adjust them without changing application code.
@@ -3736,6 +3694,12 @@ screens:
       from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
       side.'
     source: pack Customer Service_Reference.pdf, page 25 §Support configurable queues such as
+  - operation: listQueues
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-005): listQueues reads ride and attraction virtual queues (queue
+      contract); customer-service queues are listServiceQueues (declared) (design-notes correction customer-marketing
+      SUP-020).'
+    source: contracts/satellite/queue.yaml#listQueues
   layout:
     template: form
     regions:
@@ -3846,15 +3810,11 @@ screens:
   states:
     loading: The queue configuration as saved.
     error: Could not load. Names which read failed and leaves the queue untouched.
-    emptyFirstRun: No queue configured yet. Carries the create action and says what the platform does
-      in the meantime.
+    emptyFirstRun: No queue configured yet. Offers no create action — this screen declares no operation
+      that makes one and says what the platform does in the meantime.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: listQueues
-    contract: queue
-    purpose: List queues
-    trigger: onLoad
   - operationId: listServiceQueues
     contract: marketing-crm
     purpose: List customer-service queues
@@ -3864,7 +3824,6 @@ screens:
     purpose: Create or change a customer-service queue
     trigger: onAction
     invalidates:
-    - listQueues
     - listServiceQueues
   wireframe:
     status: notStarted
@@ -4103,6 +4062,10 @@ screens:
       - kind: primaryButton
         label: Venue operating hours
         provenance: pack Customer Service_Reference.pdf, page 29 §Support
+      - kind: secondaryButton
+        label: Save SLA policy
+        operation: setSlaPolicy
+        provenance: contract marketing-crm.yaml PUT /sla-policies; wiring fix, 2 October 2026
   states:
     loading: The sla policy service-level configuration as saved.
     error: Could not load. Names which read failed and leaves the sla policy service-level untouched.
@@ -4115,6 +4078,11 @@ screens:
     contract: marketing-crm
     purpose: SLA Policy & Service-Level Management
     trigger: onLoad
+  - operationId: setSlaPolicy
+    contract: marketing-crm
+    purpose: Define a case SLA policy
+    trigger: onAction
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-005)
   entryState:
     preloaded:
     - SlaPolicyServiceLevelManagementView.withinSla
@@ -4128,6 +4096,18 @@ screens:
   apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 29. 0 of 0 labels bound
     to a contract property; 13 of 41 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  overlays:
+  - id: formSetSlaPolicy
+    component: modal
+    trigger: Save SLA policy
+    body: '**Collects what `setSlaPolicy` sends before it is called.** Dismissing sends nothing; the screen
+      behind is unchanged.'
+    confirm:
+      label: Save SLA policy
+      operation: setSlaPolicy
+    dismiss:
+      label: Cancel
+    provenance: contract marketing-crm.yaml PUT /sla-policies; wiring fix, 2 October 2026
 - id: SUP-023
   name: Agent Workload, Availability & Workforce Control
   module: Support
@@ -4210,6 +4190,12 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Authorized supervisors
           can”, “Resource Management Integration”.'
         provenance: pack Customer Service_Reference.pdf, page 31 §Display
+    - name: actionBar
+      components:
+      - kind: secondaryButton
+        label: Reassign
+        operation: updateCase
+        provenance: contract marketing-crm.yaml PATCH /cases/{caseId}; wiring fix, 2 October 2026
   states:
     loading: The agent workload availability list.
     error: Could not load. Names which read failed and leaves the agent workload availability untouched.
@@ -4224,6 +4210,11 @@ screens:
     contract: marketing-crm
     purpose: Agent Workload, Availability & Workforce Control
     trigger: onLoad
+  - operationId: updateCase
+    contract: marketing-crm
+    purpose: Reassign a case to balance load
+    trigger: onAction
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-005)
   entryState:
     preloaded:
     - AgentWorkloadAvailabilityWorkforceControlView.agentName
@@ -4232,6 +4223,9 @@ screens:
     - AgentWorkloadAvailabilityWorkforceControlView.languages
     - AgentWorkloadAvailabilityWorkforceControlView.status
     - AgentWorkloadAvailabilityWorkforceControlView.activeCases
+    params:
+    - name: caseId
+      from: navigation
   wireframe:
     status: notStarted
     provenance: generated
@@ -4241,6 +4235,18 @@ screens:
     bound to a contract property; 13 of 37 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formUpdateCase
+    component: modal
+    trigger: Reassign
+    body: '**Collects what `updateCase` sends before it is called.** Dismissing sends nothing; the screen
+      behind is unchanged.'
+    confirm:
+      label: Reassign
+      operation: updateCase
+    dismiss:
+      label: Cancel
+    provenance: contract marketing-crm.yaml PATCH /cases/{caseId}; wiring fix, 2 October 2026
 - id: SUP-024
   name: Escalation & Critical Case Monitor
   module: Support

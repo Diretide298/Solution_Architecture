@@ -1,0 +1,623 @@
+id: CHG-WIR-021
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'platform-foundation: 75 screens rewired — 115 operations taken off screens they do not belong on (bulk-attached,
+  another module''s, guest-, device- or service-only on staff screens, writes on read-only lists), 43 existing operations
+  declared where the screen needed them, 1 duplicate screen(s) merged; 15 flows repointed to match.'
+decision:
+  what: 'Fix the wrong wiring now: take each listed operation off the screen it does not belong on, declare the
+    existing operation the screen needs instead, merge the duplicate screens into the one kept, and repoint the
+    flow steps that called them.'
+  by: Chinmay
+  date: '2026-10-02'
+  quote: 'Chinmay, 2 Oct 2026: fix the wrong wiring now'
+why: 'Process-agent design-note corrections for platform-foundation (handoff/design-notes/platform-foundation.yaml,
+  1-2 October 2026) found these screens wired by the 18 August bulk attach, by name resemblance or from the wrong
+  contract, against the adopted audit decision R254 (re-derive each screen''s operations from its purpose and journeys)
+  and R276 (duplicate screens). Each screen''s reason and source is below and on the screen itself (gaps with removed:
+  true).'
+keys_touched:
+  screens:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  - ADM-006
+  - ADM-007
+  - ADM-008
+  - ADM-009
+  - ADM-010
+  - ADM-011
+  - ADM-012
+  - ADM-013
+  - ADM-014
+  - ADM-015
+  - ADM-019
+  - ADM-023
+  - ADM-029
+  - ADM-030
+  - ADM-032
+  - ADM-033
+  - ADM-034
+  - ADM-036
+  - ADM-244
+  - ADM-342
+  - ADM-344
+  - ADM-351
+  - ADM-354
+  - ADM-356
+  - ADM-374
+  - ADM-375
+  - ADM-376
+  - ADM-377
+  - ADM-379
+  - ADM-408
+  - ADM-419
+  - ADM-420
+  - ADM-421
+  - ADM-422
+  - ADM-424
+  - ADM-425
+  - ADM-426
+  - ADM-464
+  - ANL-050
+  - BO-036
+  - BO-054
+  - BO-057
+  - BO-067
+  - BO-068
+  - BO-085
+  - BO-088
+  - BO-1069
+  - BO-1073
+  - BO-116
+  - BO-1173
+  - BO-124
+  - BO-125
+  - BO-126
+  - BO-128
+  - BO-129
+  - BO-143
+  - BO-365
+  - BO-368
+  - BO-385
+  - BO-483
+  - BO-732
+  - CMS-010
+  - CMS-019
+  - EMP-002
+  - POS-016
+  - POS-019
+  - PTR-001
+  - SCN-001
+  - SGN-001
+  - SGN-016
+  - SGN-018
+  - SUP-001
+  operations:
+  - appendEntitlementToMedia
+  - cancelDecommission
+  - certifyIntegration
+  - completeSsoAuthorization
+  - configureWorkstation
+  - createApiClient
+  - createOrgUnit
+  - createPartnerAgreement
+  - createPartnerQuote
+  - createPlan
+  - createPlanVersion
+  - createPrincipal
+  - createRelease
+  - createTenant
+  - decommissionCell
+  - deployConfigurationProfile
+  - evaluateApprovalRequirement
+  - forceLogout
+  - getApiUsage
+  - getApprovalRequestScore
+  - getB2bCredit
+  - getCrossRegionEntitlement
+  - getCurrentShift
+  - getLicenceEnforcement
+  - getMediaEntitlements
+  - getModuleEnablement
+  - getPasswordPolicy
+  - getPlan
+  - getRegionSettings
+  - getReturnPolicy
+  - getSsoConfig
+  - getTenantLicences
+  - getVenueSettings
+  - getVenueSettingsDefaults
+  - getWalletAllocation
+  - getWorkstationHealth
+  - listActiveSessions
+  - listAlerts
+  - listAnnouncements
+  - listApiClients
+  - listApiScopes
+  - listApprovalExternalDispatches
+  - listApprovalRequests
+  - listAuditRecords
+  - listCellJobs
+  - listDelegations
+  - listDevices
+  - listIndexJobs
+  - listMembershipRenewalRetention
+  - listMfaMethods
+  - listModuleCatalogue
+  - listPartnerAgreements
+  - listPlans
+  - listRenewalAuto
+  - listRoles
+  - listSaleBoards
+  - listSsoProviders
+  - listTenantCells
+  - listTenants
+  - listTrainingRecords
+  - listVenueTypeTemplates
+  - openPlatformStaffGrant
+  - overrideCreditLimit
+  - propagateCrossRegionEntitlement
+  - publishAnnouncement
+  - reconcileRedemptions
+  - recordDeviceHeartbeat
+  - reportIncident
+  - resolvePermissions
+  - revokeAllSessions
+  - runReport
+  - scoreVsiAssessment
+  - setApiClientStatus
+  - setApprovalRetentionPolicy
+  - setApprovalSlaPolicy
+  - setB2bCreditLimit
+  - setConnectivityThresholds
+  - setDeviceAssignment
+  - setModuleEnablement
+  - setModuleListing
+  - setOfflinePolicy
+  - setPasswordPolicy
+  - setRenewalAutoMembership
+  - setReturnPolicy
+  - setRolePermissions
+  - setTrialConfiguration
+  - setVenueSettings
+  - setVenueSettingsDefaults
+  - setWalletAllocationPolicy
+  - signApprovalDecision
+  - startRollout
+  - startSsoAuthorization
+  - updateCellTier
+  - updatePartnerAgreement
+  - updatePrincipal
+  - updateRegionSettings
+  - withdrawRelease
+  flows:
+  - F06
+  - F08
+  - F10
+  - F104
+  - F106
+  - F123
+  - F19
+  - F61
+  - F64
+  - F73
+  - F79
+  - F86
+  - F89
+  - F96
+  - F97
+  tickets:
+  - APP-POS-POS-016
+  - APP-POS-POS-019
+  - APP-SETUP-ADM-008
+  - APP-SETUP-ADM-342
+  - APP-SETUP-ADM-354
+  - APP-SETUP-BO-054
+  - APP-SETUP-BO-116
+  - APP-SETUP-BO-124
+  - APP-WL-CMS-010
+  - APP-WL-CMS-019
+  - VM-BO-036
+  - VM-BO-067
+  - VM-BO-068
+  - VM-BO-085
+  - VM-BO-125
+  - VM-BO-126
+  - VM-BO-128
+  - VM-BO-129
+  - VM-BO-143
+root_class: A31 SCREEN-WRONG-OP
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-016
+  - APP-POS-POS-019
+  - APP-SETUP-ADM-008
+  - APP-SETUP-ADM-342
+  - APP-SETUP-ADM-354
+  - APP-SETUP-BO-054
+  - APP-SETUP-BO-116
+  - APP-SETUP-BO-124
+  - APP-WL-CMS-010
+  - APP-WL-CMS-019
+  - VM-BO-036
+  - VM-BO-067
+  - VM-BO-068
+  - VM-BO-085
+  - VM-BO-125
+  - VM-BO-126
+  - VM-BO-128
+  - VM-BO-129
+  - VM-BO-143
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: 16fd732e
+notes: 'check-screen-wiring gains S-STAFF-AUDIENCE (a staff screen calling a guest-, device-, service- or partner-only
+  operation) beside the existing S-DUP-SCREEN and S-CONSUMED-MIRROR rules, and check-screens keeps its R254 attachment
+  warnings; check-flows rule 3 holds every repointed flow step to its screen. Tickets: none started (Block A starts
+  Monday 5 October 2026); unstarted keys are every tasks.csv or pushed key naming a touched screen. Per screen and
+  flow:
+
+  - BO-036: removed recordDeviceHeartbeat — recordDeviceHeartbeat is a device-audience operation the device sends
+  itself; a back-office browser is not the device (device operations on staff screens are wrong wiring; R254).
+
+  - BO-124: removed recordDeviceHeartbeat — recordDeviceHeartbeat is a device-audience operation the device sends
+  itself; a layout builder in the back office is not the device (R254).
+
+  - BO-125: removed recordDeviceHeartbeat — recordDeviceHeartbeat is a device-audience operation the device sends
+  itself; a button configuration screen in the back office is not the device (R254).
+
+  - POS-016: removed recordDeviceHeartbeat — recordDeviceHeartbeat is device-audience only; the peripheral reports
+  its own heartbeat and a cashier pressing the button is refused 403. The last heartbeat shows read-only on the
+  device list (ADR-0025; design-notes correction platform-foundation POS-016).
+
+  - POS-019: removed getVenueSettings, setVenueSettings — Venue-wide settings (setVenueSettings, TENANT_CONFIGURE)
+  were edited and read from a till; venue configuration belongs in Venue Management (BO-1063), and a till is a device
+  the venue configures, not a place to configure the venue (ADR-0018; design-notes correction platform-foundation
+  POS-019).
+
+  - BO-116: removed setRolePermissions, setVenueSettings — Save role permissions (setRolePermissions) and Save venue
+  settings (setVenueSettings) were attached to a merchandising screen by board position; role permissions move to
+  Role Assignment BO-054 (design-notes correction platform-foundation BO-116).
+
+  - BO-126: removed runReport, startRollout — Start rollout (startRollout, PLATFORM_RELEASE_PROMOTE) is TICVAI''s
+  platform release act that tenant staff cannot hold (ADM-029 keeps it), and Run report is unrelated to deploying
+  a workstation configuration (design-notes correction platform-foundation BO-126).
+
+  - BO-128: removed setOfflinePolicy — Save offline policy (setOfflinePolicy) on a live monitor; offline policy
+  is configuration, set on BO-130 and BO-206, and the monitor links there (design-notes correction platform-foundation
+  BO-128).
+
+  - BO-129: removed configureWorkstation, setConnectivityThresholds — configureWorkstation and setConnectivityThresholds
+  shared the firmware and profile screen; connectivity thresholds have their own screen (BO-131) and workstation
+  configuration is done where the device is registered (BO-036, F79 step 1) or at the till (POS-016). F89 step 2
+  moves to BO-131 (design-no…
+
+  - BO-143: removed getVenueSettings, setVenueSettings; declared getReturnPolicy, setReturnPolicy — The only settings
+  write was setVenueSettings (support and quiet hours); retail global settings such as returns are outlet configuration
+  in retail, served by getReturnPolicy/setReturnPolicy (design-notes correction platform-foundation BO-143).
+
+  - BO-732: declared listDevices, setDeviceAssignment — POS & Device Assignment read only listOutlets and nothing
+  assigned a device; setDeviceAssignment exists, and the devices to assign come from listDevices (design-notes correction
+  platform-foundation BO-732).
+
+  - BO-054: declared setRolePermissions, updatePrincipal, resolvePermissions — The purpose is "Give somebody the
+  permissions their job needs" and the screen only listed and created roles. setRolePermissions sets what a role
+  may do (removed from BO-116), updatePrincipal grants roles (Principal.roles, primaryRoleId) and resolvePermissions,
+  the permission simulator removed from…
+
+  - CMS-019: declared updatePrincipal — The purpose is "Say who in the tenant may change what" and the screen declared
+  only reads; updatePrincipal grants or removes a role (Principal.roles) (design-notes correction platform-foundation
+  CMS-019).
+
+  - BO-057: declared listTrainingRecords — The only operation was listPrincipals; nothing read training or certification,
+  which the purpose ("Know who is allowed to do what") needs. listTrainingRecords exists (design-notes correction
+  platform-foundation BO-057).
+
+  - BO-068: removed resolvePermissions — Resolve permissions (a permission simulator) was a button on the audit
+  log; it belongs to role management and is declared on BO-054 (design-notes correction platform-foundation BO-068).
+
+  - BO-085: removed evaluateApprovalRequirement — evaluateApprovalRequirement answers "does this need approval,
+  and from whom" for the raising screen (till, purchase order) before a request exists; it has no meaning for the
+  approver of an existing request (design-notes correction platform-foundation BO-085).
+
+  - BO-088: removed listIndexJobs — listIndexJobs (AI index jobs, AI_CONFIGURE) has nothing to do with approval
+  analytics (design-notes correction platform-foundation BO-088).
+
+  - BO-365: removed listApprovalRequests; merged into BO-084 — My Approval Inbox duplicated BO-084''s queue with
+  its own unbound columns and the same single read; one inbox, and the board tile opens BO-084 (design-notes correction
+  platform-foundation BO-365).
+
+  - BO-368: removed evaluateApprovalRequirement; declared getApprovalRequestScore — AI Decision Support used evaluateApprovalRequirement
+  (whether approval is required) where the AI context is the request''s score, getApprovalRequestScore (design-notes
+  correction platform-foundation BO-368).
+
+  - BO-385: removed listDelegations — listDelegations (GUEST_VIEW) lists who may act for a guest; approval delegation
+  is listApprovalDelegations, already declared (design-notes correction platform-foundation BO-385).
+
+  - SUP-001: removed forceLogout, listActiveSessions, revokeAllSessions; declared startSsoAuthorization, completeSsoAuthorization
+  — The Venue Management door carried active-session management (listActiveSessions, forceLogout, revokeAllSessions);
+  a person signing in has no session yet, and session management belongs to a signed-in security screen. SSO sign-in
+  was missing though listSsoProviders is declared: startSsoAuthorization…
+
+  - ADM-001: removed forceLogout, listActiveSessions, revokeAllSessions; declared startSsoAuthorization, completeSsoAuthorization
+  — The Console sign-in carried tables of active sessions with Force logout and Revoke all sessions; a person signing
+  in has no session and must see none of that. listSsoProviders was declared with no operation that signs in through
+  a provider (design-notes correction platform-foundation ADM-001).
+
+  - SCN-001: removed getCurrentShift, resolvePermissions — resolvePermissions (an administration simulator, PERMISSION_VIEW)
+  and getCurrentShift (SHIFT_OPEN, a cash shift) were on the scanner sign-in; a steward never calls the first and
+  a scanner has no cash shift, so the second showed a missing-permission state at sign-in (design-notes correction
+  platform…
+
+  - EMP-002: removed listMfaMethods, listRoles, listSsoProviders — Venue-and-role selection listed roles with listRoles
+  (ROLE_MANAGE), which a steward never holds, and tables of MFA methods and SSO providers; the roles to choose from
+  come from the login response (availableRoles) and selectRole takes the choice (design-notes correction platform-foundation
+  EMP-002).
+
+  - BO-067: removed createApiClient — createApiClient on the tenant''s integrations screen; production clients are
+  issued by TICVAI on an approved request and sandbox clients belong to developers (DEV-003), so a tenant creating
+  clients bypasses certification (DI-927; design-notes correction platform-foundation BO-067).
+
+  - BO-1073: removed createApiClient — createApiClient on a tenant screen, as BO-067: clients are issued by TICVAI
+  or created by developers (DI-927; design-notes correction platform-foundation BO-1073).
+
+  - BO-1173: removed createApiClient, setApiClientStatus — createApiClient and setApiClientStatus on the tenant''s
+  wallet integration screen, as BO-067: API clients are issued and suspended in the developer programme, not from
+  a wallet screen (DI-927; design-notes correction platform-foundation BO-1173).
+
+  - BO-1069: removed getWorkstationHealth — The only read was getWorkstationHealth, a till''s health score, labelled
+  "Platform health"; API, cache and database health are TICVAI''s and a workstation score is not platform health
+  (design-notes correction platform-foundation BO-1069). See the CHG-WIR-024 gap.
+
+  - BO-483: removed certifyIntegration — certifyIntegration (DEVELOPER_ADMIN, a TICVAI permission) certifies an
+  API integration listing; a tenant cannot hold it and reader-model certification is a different object (DEV-008
+  keeps the operation; design-notes correction platform-foundation BO-483). See the CHG-WIR-024 gap.
+
+  - CMS-010: removed appendEntitlementToMedia, getMediaEntitlements — getMediaEntitlements and appendEntitlementToMedia
+  (orders) operate on ticket media, a wristband or card carrying entitlements, not on digital assets; the word "media"
+  collided (design-notes correction platform-foundation CMS-010).
+
+  - ANL-050: removed setApprovalRetentionPolicy — setApprovalRetentionPolicy on the analytics retention screen;
+  approval decision records are not reports, and ADM-346 keeps the operation (design-notes correction platform-foundation
+  ANL-050).
+
+  - SGN-016: removed setModuleListing — setModuleListing edits TICVAI''s module catalogue and was offered to a prospect;
+  ADM-404 keeps it (design-notes correction platform-foundation SGN-016).
+
+  - SGN-018: removed setTrialConfiguration — setTrialConfiguration sets TICVAI''s trial rules (PLATFORM_PLAN_MANAGE);
+  the prospect chooses, TICVAI configures trials on ADM-413 (design-notes correction platform-foundation SGN-018).
+  See the CHG-WIR-024 gap.
+
+  - ADM-002: removed getSsoConfig — getSsoConfig (USER_MANAGE) on the platform home; tenant SSO is not platform-home
+  content and needs a tenant grant (R098; design-notes correction platform-foundation ADM-002).
+
+  - ADM-003: removed getCrossRegionEntitlement, getWalletAllocation, propagateCrossRegionEntitlement, reconcileRedemptions,
+  setWalletAllocationPolicy — propagateCrossRegionEntitlement and reconcileRedemptions are service-audience calls
+  between cells (F19) that no operator makes, and getCrossRegionEntitlement, getWalletAllocation and setWalletAllocationPolicy
+  (tenant permissions) put tenant data and a region money policy on platform cell health (R0…
+
+  - ADM-006: removed getSsoConfig — getSsoConfig was bulk-attached to every tenant screen of the Console; tenant
+  SSO is configured on the Tenant Directory (ADM-005, setSsoConfig) and is not part of the hierarchy (R098; design-notes
+  corrections platform-foundation ADM-002, ADM-006).
+
+  - ADM-007: removed getSsoConfig — getSsoConfig was bulk-attached to every tenant screen of the Console; module
+  entitlement does not read SSO (R098; design-notes corrections platform-foundation ADM-002, ADM-007).
+
+  - ADM-008: removed createPartnerAgreement, getSsoConfig, listPartnerAgreements, updatePartnerAgreement — Partner
+  agreements (list, create, update, PARTNER_MANAGE) are the tenant''s B2B commercial terms and the tenant SSO config
+  is tenant identity; neither belongs to TICVAI''s plan catalogue (R098; design-notes correction platform-foundation
+  ADM-008).
+
+  - ADM-009: removed getSsoConfig, listTenantCells — Cells and SSO were repeated from the tenant directory; tenant
+  billing needs invoices, credit notes and the subscription only (design-notes correction platform-foundation ADM-009).
+
+  - ADM-010: removed getSsoConfig — getSsoConfig was bulk-attached to every tenant screen of the Console; usage
+  metering does not read SSO (R098; design-notes corrections platform-foundation ADM-002, ADM-010).
+
+  - ADM-011: removed getSsoConfig — getSsoConfig was bulk-attached to every tenant screen of the Console; licences
+  and seats do not read SSO (R098; design-notes corrections platform-foundation ADM-002, ADM-011).
+
+  - ADM-012: removed getSsoConfig — getSsoConfig was bulk-attached to every tenant screen of the Console; cell placement
+  does not read SSO (R098; design-notes corrections platform-foundation ADM-002, ADM-012).
+
+  - ADM-015: removed getSsoConfig, listTenantCells — Cells and SSO tables were copied from the tenant directory;
+  quotas are per API client within a tenant''s budget (ADR-0064; design-notes correction platform-foundation ADM-015).
+
+  - ADM-013: removed cancelDecommission, decommissionCell, updateCellTier — Six screens offered Decommission cell,
+  six places to make the worst mistake; decommission stays on ADM-003 only, and a performance monitor does not change
+  a cell''s tier (design-notes correction platform-foundation ADM-013).
+
+  - ADM-014: removed cancelDecommission, decommissionCell, updateCellTier — The cell operations were copied onto
+  the scaling screen; decommission stays on ADM-003 only and tier changes on ADM-003 and ADM-030 (design-notes corrections
+  platform-foundation ADM-013, ADM-014).
+
+  - ADM-029: removed cancelDecommission, decommissionCell, updateCellTier — Decommission cell and Save cell tier
+  on a deployment monitor were copied cell actions; decommission stays on ADM-003 only (design-notes corrections
+  platform-foundation ADM-029, ADM-013).
+
+  - ADM-030: removed cancelDecommission, decommissionCell — Copied cell operations; decommission stays on ADM-003
+  only. The tier change stays here as sizing, beside the scaling policy (getScalingPolicy/setScalingPolicy) (design-notes
+  corrections platform-foundation ADM-030, ADM-013).
+
+  - ADM-032: removed cancelDecommission, decommissionCell, updateCellTier — Copied cell actions (decommission, tier)
+  on the WAF policy screen; decommission stays on ADM-003 only (design-notes corrections platform-foundation ADM-032,
+  ADM-013).
+
+  - ADM-033: removed cancelDecommission, decommissionCell, updateCellTier — Copied cell actions (decommission, tier)
+  are not part of backup status; decommission stays on ADM-003 only (design-notes corrections platform-foundation
+  ADM-033, ADM-013).
+
+  - ADM-034: removed cancelDecommission, decommissionCell, updateCellTier — Copied cell actions are not part of
+  archival; decommission stays on ADM-003 only (ADR-0047; design-notes corrections platform-foundation ADM-034,
+  ADM-013).
+
+  - ADM-019: removed createPlan, createPlanVersion, getPlan, listPlans — Plan creation (createPlan, createPlanVersion,
+  with listPlans and getPlan) on global configuration and defaults; plans belong to ADM-008 and ADM-392 (design-notes
+  correction platform-foundation ADM-019).
+
+  - ADM-023: removed createRelease, withdrawRelease — ADM-022 and ADM-023 declared the same seven release operations;
+  ADM-023 is the staging approval step only, so cutting and withdrawing a release stay on ADM-022 (design-notes
+  corrections platform-foundation ADM-022, ADM-023).
+
+  - ADM-036: removed listAnnouncements, publishAnnouncement — listAnnouncements and publishAnnouncement are the
+  tenant''s staff announcements (WORKFORCE_VIEW, ANNOUNCEMENT_PUBLISH); a platform broadcast is a support notice,
+  already declared (design-notes correction platform-foundation ADM-036).
+
+  - ADM-342: declared getPasswordPolicy — The screen wrote the password and MFA policy (setPasswordPolicy) and its
+  gaps entry said nothing reads it; getPasswordPolicy now exists (design-notes correction platform-foundation ADM-342).
+
+  - ADM-354: removed listApiClients; declared listApprovalExternalDispatches — listApiClients was used as "External
+  workflow systems"; API clients are developer integrations, and the providers are listApprovalExternalProviders
+  (declared). DI-733 asks for retry handling, seen through the dispatch list listApprovalExternalDispatches (design-notes
+  correction platform-foundation…
+
+  - ADM-374: removed setTrialConfiguration — setTrialConfiguration on a monitor; trial rules are configured on ADM-413
+  and the monitor links there (design-notes correction platform-foundation ADM-374).
+
+  - ADM-408: removed createPartnerQuote — The only operation was createPartnerQuote (partner audience, PARTNER_MANAGE),
+  a tenant''s B2B quote; final package approval is a TICVAI commercial act (design-notes correction platform-foundation
+  ADM-408). See the CHG-WIR-024 gap.
+
+  - ADM-419: declared listCellJobs — The provisioning command centre only created the tenant and read nothing; provisioning
+  progress is the cell jobs (listCellJobs) (design-notes correction platform-foundation ADM-419).
+
+  - ADM-421: removed createPrincipal, setPasswordPolicy; declared createOrgUnit — Venue structure creation declared
+  createPrincipal and setPasswordPolicy (the administrator and security baseline, ADM-422''s job) and nothing created
+  a venue; createOrgUnit is the venue write (design-notes corrections platform-foundation ADM-421, ADM-422).
+
+  - ADM-422: declared openPlatformStaffGrant, createPrincipal, setPasswordPolicy — Administrator and security initialisation
+  declared only licence operations and nothing created the administrator; createPrincipal under a platform-staff
+  grant and setPasswordPolicy are the writes, moved from ADM-421 (R098; design-notes corrections platform-foundation
+  ADM-422, ADM-421).
+
+  - ADM-464: removed listRenewalAuto, setRenewalAutoMembership — listRenewalAuto and setRenewalAutoMembership are
+  guest membership renewal operations; TICVAI customer renewal is a subscription matter (design-notes correction
+  platform-foundation ADM-464). See the CHG-WIR-024 gap.
+
+  - ADM-244: declared setApprovalSlaPolicy — The screen defines SLA, reminder and timeout rules but declared only
+  the read (listSlaEscalationReminder), so nothing could be saved; setApprovalSlaPolicy is the write, already used
+  for the same rules on BO-388 to BO-390 (design-notes correction platform-foundation ADM-244).
+
+  - ADM-344: removed signApprovalDecision — signApprovalDecision is the approver''s act (it signs one decided request,
+  and BO-377 is where the approver does it); a Digital Signature Management screen configures which approvals need
+  a signature, which is a policy write. The requestId entry parameter existed only for the signing call (design-no…
+
+  - ADM-351: removed listApprovalRequests; declared listApiScopes, listApiClients, getApiUsage — Approval API Management
+  configures and monitors the APIs that create, read and process approval requests; it was wired to listApprovalRequests,
+  the approval inbox read. The API side is the scope catalogue (one read and one write scope per module, approvals
+  included), the clients that hold those sco…
+
+  - ADM-356: declared listApiClients, setApiClientStatus — The screen governs which applications and external systems
+  may reach the Approval Engine, and declared only listAuthorisationPolicies with an empty table and no write. The
+  applications are API clients: listApiClients lists them and setApiClientStatus suspends or reactivates one (design-notes
+  correc…
+
+  - ADM-375: removed listMembershipRenewalRetention — listMembershipRenewalRetention is the guest membership renewal
+  and retention read (BO-303); TICVAI''s customer renewals are tenant subscriptions, not guest memberships. The
+  read that fits does not exist (contract gap, CHG-WIR-024) (design-notes correction platform-foundation ADM-375).
+
+  - ADM-376: removed listRenewalAuto — listRenewalAuto is the guest membership renewal queue (memberships approaching
+  expiry, BO-300); a TICVAI commercial optimisation and expansion screen is about tenants, not guest memberships.
+  The read that fits does not exist (contract gap, CHG-WIR-024) (design-notes correction platform-foundation A…
+
+  - ADM-377: declared getLicenceEnforcement — Subscription Exceptions & Commercial Alerts declared only simulateCommercialPackage,
+  so it had nothing to list; getLicenceEnforcement is the read of where a tenant stands against its entitlements
+  (approaching, at or over a limit) and what happens next (design-notes correction platform-foundation AD…
+
+  - ADM-379: removed scoreVsiAssessment — The welcome page scores nothing; the assessment is scored on the assessment
+  screens ADM-381 to ADM-388. Removed together with its prospect-side copy SGN-001, which the notes keep in step
+  with this screen (design-notes correction platform-foundation SGN-001).
+
+  - SGN-001: removed scoreVsiAssessment — The welcome page scores nothing (scoreVsiAssessment is called on the assessment
+  screens SGN-003 to SGN-010); the operator-led copy ADM-379 loses it too, so the two stay in step (design-notes
+  correction platform-foundation SGN-001).
+
+  - ADM-420: declared createTenant — Tenant & Organization Provisioning creates the customer''s isolated environment,
+  and declared only createOrgUnit; the tenant itself is created by createTenant (design-notes correction platform-foundation
+  ADM-420).
+
+  - ADM-424: removed listVenueTypeTemplates; declared listTenants, openPlatformStaffGrant, getTenantLicences, listModuleCatalogue,
+  getModuleEnablement, setModuleEnablement — Module Activation was wired to listVenueTypeTemplates, which belongs
+  to the next screen (ADM-425 Venue Template Application); activation reads licence data (getTenantLicences), checks
+  dependencies (listModuleCatalogue) and switches modules on (getModuleEnablement, setModuleEnablement). setModuleEna…
+
+  - ADM-425: removed updateRegionSettings; declared listVenueTypeTemplates — Venue Template Application was wired
+  to updateRegionSettings (region money and time settings), which is initial configuration (ADM-426); the template
+  list (listVenueTypeTemplates) had landed on ADM-424. The regionId entry parameter existed only for the region
+  write. Applying a template has no opera…
+
+  - ADM-426: declared listTenants, openPlatformStaffGrant, getVenueSettingsDefaults, setVenueSettingsDefaults, getRegionSettings,
+  updateRegionSettings — Initial Configuration & Regional Defaults declared only runGoLiveValidation; applying defaults
+  is a configuration write (setVenueSettingsDefaults, region settings). Both are tenant-scoped, so the screen carries
+  the R098 tenant picker and grant like its sibling ADM-421 (design-notes correction platf…
+
+  - PTR-001: removed getB2bCredit, listPartnerAgreements, overrideCreditLimit, setB2bCreditLimit — A sign-in door
+  shows no credit and no agreements: the credit read and the limit writes (getB2bCredit, setB2bCreditLimit, overrideCreditLimit)
+  belong to the partner''s credit screens (PTR-002, PTR-013), and setting or overriding a limit is the tenant''s
+  act, not the partner''s; partner agreements live…
+
+  - BO-124: removed listAuditRecords; declared listSaleBoards — The main table was the audit log (listAuditRecords,
+  AUDIT_VIEW) while the designer works on sale boards, which it did not read; the audit log belongs to BO-068 and
+  BO-126 (DI-157, DI-310; design-notes correction platform-foundation BO-124).
+
+  - BO-125: removed getWorkstationHealth, listAlerts, reportIncident — getWorkstationHealth, listAlerts and Report
+  incident were attached to a button editor by board position; fleet health is BO-128 and incidents are maintenance
+  (design-notes correction platform-foundation BO-125).
+
+  - BO-036: removed deployConfigurationProfile, listAuditRecords — The device register carried profile deployment
+  (deployConfigurationProfile) and the audit log (listAuditRecords); deployment is BO-126''s and the audit log BO-068''s.
+  Keep devices, credentials and assignment. configureWorkstation and listAlerts stay because F79 step 1 and F95
+  step 2 use them here (de…
+
+  - F73: step 2 operations [''getVenueSettings'', ''setVenueSettings''] -> []; step 2 note
+
+  - F79: step 2 operations [''setConfigurationProfile'', ''setConnectivityThresholds''] -> [''setConfigurationProfile''];
+  step 2 note; step 4 operations [''deployConfigurationProfile'', ''startRollout''] -> [''deployConfigurationProfile''];
+  step 4 note
+
+  - F86: step 2 operations [''setRolePermissions'', ''updateMerchandise''] -> [''updateMerchandise'']; step 2 note
+
+  - F89: step 2 screen BO-129 -> BO-131; step 2 note
+
+  - F106: step 3 operations [''listAuditRecords'', ''resolvePermissions''] -> [''listAuditRecords'']; step 3 note
+
+  - F104: step 3 operations [''getCurrentSession'', ''listActiveSessions''] -> [''getCurrentSession'']; step 3 note
+
+  - F19: step 2 operations [''propagateCrossRegionEntitlement'', ''getCrossRegionEntitlement''] -> []; step 2 note;
+  step 5 operations [''reconcileRedemptions''] -> []; step 5 note
+
+  - F96: step 2 operations [''createPartnerAgreement'', ''createPlan'', ''createPlanVersion'', ''generateInvoice'',
+  ''getEntitlementUsage''] -> [''createPlan'', ''createPlanVersion'', ''generateInvoice'', ''getEntitlementUsage''];
+  step 2 note; step 3 operations [''addLicenceAddOn'', ''getEntitlementUsage'', ''getSsoConfig'', ''getSubscription'',
+  ''getTenant''] -> [''addLicenceAddOn'', ''getEntitlementUsage'', ''getSubscription'', ''getTenant'']; step 3 note;
+  step 4 operations [''addLicenceAddOn'', ''getEntitlementUsage'', ''getSsoConfig'', ''getSubscription'', ''getTenant'']
+  -> [''addLicenceAddOn'', ''getEntitlementUsage'', ''getSubscription'', ''getTenant'']; step 4 note; step 5 operations
+  [''getCellCapacity'', ''getEntitlementUsage'', ''getSsoConfig''] -> [''getCellCapacity'', ''getEntitlementUsage''];
+  step 5 note
+
+  - F97: step 1 operations [''getCellCapacity'', ''getEntitlementUsage'', ''getSsoConfig''] -> [''getCellCapacity'',
+  ''getEntitlementUsage'']; step 1 note; step 2 operations [''cancelDecommission'', ''decommissionCell'', ''getCell'',
+  ''getCellCapacity'', ''getCellHealth'', ''listCellJobs''] -> [''getCell'', ''getCellCapacity'', ''getCellHealth'',
+  ''listCellJobs'']; step 2 note; step 3 operations [''cancelDecommission'', ''decommissionCell'', ''getCell'',
+  ''getCellCapacity'', ''getCellHealth'', ''listCellJobs''] -> [''getCell'', ''getCellCapacity'', ''getCellHealth'',
+  ''listCellJobs'']; step 3 note
+
+  - F08: step 2 operations [''listRoles'', ''selectRole''] -> [''selectRole'']; step 2 note
+
+  - F64: step 2 operations [''listRoles'', ''getCurrentSession''] -> [''getCurrentSession'']; step 2 note
+
+  - F06: step 1 operations [''login'', ''getCurrentShift''] -> [''login'']; step 1 note
+
+  - F61: step 1 operations [''login'', ''selectRole'', ''resolvePermissions''] -> [''login'', ''selectRole'']; step
+  1 note
+
+  - F10: entryScreen PTR-001 -> PTR-002; step 1 screen PTR-001 -> PTR-002; step 1 note
+
+  - F123: step 2 screen BO-365 -> BO-084; step 2 note'

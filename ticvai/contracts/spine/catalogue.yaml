@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Catalogue & Entitlement
   version: 0.1.0
-  x-ticvai-screen-count: 233
+  x-ticvai-screen-count: 231
   x-ticvai-tier: spine
   x-ticvai-module: 1 — Ticketing Catalogue
   x-ticvai-requirements: 312
@@ -1613,7 +1613,6 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-007 Product Directory"
         - "P08 BO-012 Membership Products"
-        - "P08 BO-014 Catalogue Publishing"
         - "P09 ADM-119 Product Creation Workspace"
       x-ticvai-audience:
       - staff
@@ -1923,6 +1922,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-031 My Reservations"
         - "P02 GST-072 Share & Group Booking"
+        - "P08 BO-268 Group Package & Experience Builder"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -2033,7 +2033,6 @@ paths:
         - "P08 BO-007 Product Directory"
         - "P08 BO-008 Product Detail & Variants"
         - "P08 BO-012 Membership Products"
-        - "P08 BO-014 Catalogue Publishing"
         - "P13 CMS-103 Booking Flows"
       x-ticvai-audience:
       - staff
@@ -2108,11 +2107,9 @@ paths:
     put:
       operationId: setProductAttributes
       x-ticvai-consumed-by:
-        - "P06 EMP-034 Walk-up sale"
         - "P08 BO-007 Product Directory"
         - "P08 BO-008 Product Detail & Variants"
         - "P08 BO-012 Membership Products"
-        - "P08 BO-014 Catalogue Publishing"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: M17-04 (MoM 17 September): partners never create products, prices
@@ -2221,7 +2218,6 @@ paths:
         - "P08 BO-007 Product Directory"
         - "P08 BO-008 Product Detail & Variants"
         - "P08 BO-012 Membership Products"
-        - "P08 BO-014 Catalogue Publishing"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
@@ -2361,6 +2357,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-009 Pricing Rules"
         - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
+        - "P09 ADM-049 Price List Master Configuration"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
@@ -2460,6 +2457,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-009 Pricing Rules"
         - "P08 BO-014 Catalogue Publishing"
+        - "P08 BO-601 Product, Pricing & Sales Channel Setup"
+        - "P09 ADM-051 Rate Structure Builder"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
@@ -2560,10 +2559,8 @@ paths:
     get:
       operationId: listEvents
       x-ticvai-consumed-by:
-        - "P08 BO-001 Queue Directory"
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
-        - "P08 BO-063 Opening Hours & Calendar"
         - "P08 BO-694 Event Catalogue Command Center"
         - "P13 CMS-101 Help Me Choose"
       x-ticvai-audience:
@@ -2598,10 +2595,8 @@ paths:
     post:
       operationId: createEvent
       x-ticvai-consumed-by:
-        - "P08 BO-001 Queue Directory"
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
-        - "P08 BO-063 Opening Hours & Calendar"
       x-ticvai-audience:
       - staff
       summary: Create an event
@@ -2653,10 +2648,9 @@ paths:
         - "P02 GST-005 What's On"
         - "P02 GST-007 Select Date & Time"
         - "P02 GST-049 Interactive Seat Selection"
-        - "P08 BO-001 Queue Directory"
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
-        - "P08 BO-063 Opening Hours & Calendar"
+        - "P08 BO-725 Performance Operations Command Center"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -2733,10 +2727,8 @@ paths:
     post:
       operationId: createPerformances
       x-ticvai-consumed-by:
-        - "P08 BO-001 Queue Directory"
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
-        - "P08 BO-063 Opening Hours & Calendar"
       x-ticvai-audience:
       - staff
       summary: Create performances, singly or by schedule
@@ -2838,7 +2830,6 @@ paths:
     post:
       operationId: createChannelCapacity
       x-ticvai-consumed-by:
-        - "P06 EMP-033 Capacity view"
         - "P08 BO-013 Channel & Distribution"
         - "P08 BO-017 Capacity Management"
       x-ticvai-audience:
@@ -2924,9 +2915,9 @@ paths:
     put:
       operationId: setChannelAllocations
       x-ticvai-consumed-by:
-        - "P06 EMP-033 Capacity view"
         - "P08 BO-013 Channel & Distribution"
         - "P08 BO-017 Capacity Management"
+        - "P09 ADM-272 Channel Allocation & Rebalancing Operations"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: M17-04 (MoM 17 September): partners never create products, prices
@@ -3104,7 +3095,6 @@ paths:
     post:
       operationId: publishBundle
       x-ticvai-consumed-by:
-        - "P08 BO-011 Packages & Bundles"
         - "P08 BO-013 Channel & Distribution"
         - "P08 BO-014 Catalogue Publishing"
         - "P08 BO-037 Offline Package Status"
@@ -3238,7 +3228,6 @@ paths:
       operationId: reportBundleApplied
       x-ticvai-consumed-by:
         - "P06 EMP-018 Offline package"
-        - "P08 BO-011 Packages & Bundles"
         - "P08 BO-037 Offline Package Status"
       x-ticvai-audience:
       - staff
@@ -3290,7 +3279,6 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-003 Sell — Timed Entry"
         - "P08 BO-018 Allocation & Holds"
-        - "P08 BO-1057 Hold Inventory Reporting"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: primary
@@ -3342,7 +3330,6 @@ paths:
       operationId: acquireInventoryHold
       x-ticvai-consumed-by:
         - "P04 POS-003 Sell — Timed Entry"
-        - "P08 BO-018 Allocation & Holds"
       x-ticvai-audience:
       - staff
       - service
@@ -3454,9 +3441,6 @@ paths:
         format: uuid
     delete:
       operationId: relinquishInventoryHold
-      x-ticvai-consumed-by:
-        - "P04 POS-003 Sell — Timed Entry"
-        - "P08 BO-018 Allocation & Holds"
       x-ticvai-audience:
       - staff
       summary: Return unsold units
@@ -3537,9 +3521,6 @@ paths:
         format: uuid
     post:
       operationId: renewInventoryHold
-      x-ticvai-consumed-by:
-        - "P04 POS-003 Sell — Timed Entry"
-        - "P08 BO-018 Allocation & Holds"
       x-ticvai-audience:
       - staff
       summary: Extend an inventory hold's TTL
@@ -3871,7 +3852,6 @@ paths:
     post:
       operationId: transitionProductLifecycle
       x-ticvai-consumed-by:
-        - "P06 EMP-034 Walk-up sale"
         - "P08 BO-007 Product Directory"
         - "P08 BO-012 Membership Products"
         - "P08 BO-014 Catalogue Publishing"
@@ -3984,7 +3964,6 @@ paths:
         - "P06 EMP-034 Walk-up sale"
         - "P08 BO-007 Product Directory"
         - "P08 BO-012 Membership Products"
-        - "P08 BO-014 Catalogue Publishing"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
@@ -4016,10 +3995,8 @@ paths:
     put:
       operationId: setAlternativeCodes
       x-ticvai-consumed-by:
-        - "P06 EMP-034 Walk-up sale"
         - "P08 BO-007 Product Directory"
         - "P08 BO-012 Membership Products"
-        - "P08 BO-014 Catalogue Publishing"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: M17-04 (MoM 17 September): partners never create products, prices
@@ -4090,7 +4067,6 @@ paths:
         - "P06 EMP-034 Walk-up sale"
         - "P08 BO-007 Product Directory"
         - "P08 BO-012 Membership Products"
-        - "P08 BO-014 Catalogue Publishing"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
@@ -4312,10 +4288,22 @@ paths:
     get:
       operationId: getEvent
       x-ticvai-consumed-by:
-        - "P08 BO-001 Queue Directory"
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
-        - "P08 BO-063 Opening Hours & Calendar"
+        - "P08 BO-696 Event Duplication & Clone Configuration"
+        - "P08 BO-697 Event Schedule Command Center"
+        - "P08 BO-698 Dynamic Performance Duration Configuration"
+        - "P08 BO-699 Schedule Change & Rescheduling Configuration"
+        - "P08 BO-703 Seating & Capacity Command Center"
+        - "P08 BO-704 Event Capacity Profile Configuration"
+        - "P08 BO-705 Seating Mode & Reservation Configuration"
+        - "P08 BO-706 Registration & Attendance Command Center"
+        - "P08 BO-707 Attendee Data & Registration Form Configuration"
+        - "P08 BO-709 Event Admission & Entry Policy Configuration"
+        - "P08 BO-716 Event Lifecycle & Change Command Center"
+        - "P08 BO-717 Lifecycle Transition Configuration"
+        - "P08 BO-719 Event Cancellation Workflow Configuration"
+        - "P08 BO-720 Ticket, Reservation & Customer Treatment Configuration"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -4340,10 +4328,8 @@ paths:
     patch:
       operationId: updateEvent
       x-ticvai-consumed-by:
-        - "P08 BO-001 Queue Directory"
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
-        - "P08 BO-063 Opening Hours & Calendar"
       x-ticvai-audience:
       - staff
       summary: Amend an event
@@ -4400,10 +4386,9 @@ paths:
         - "P02 GST-006 Item Detail – Event / Exhibition"
         - "P02 GST-041 Checkout Entry"
         - "P04 POS-004 Sell — Seat Map"
-        - "P08 BO-002 Queue Configuration"
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
-        - "P08 BO-063 Opening Hours & Calendar"
+        - "P08 BO-726 Participant Photo & Video Assignment"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -4441,11 +4426,9 @@ paths:
     patch:
       operationId: updatePerformance
       x-ticvai-consumed-by:
-        - "P04 POS-004 Sell — Seat Map"
-        - "P08 BO-002 Queue Configuration"
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
-        - "P08 BO-063 Opening Hours & Calendar"
+        - "P08 BO-978 Multi-Performance Assignment"
       x-ticvai-audience:
       - staff
       summary: Amend a performance
@@ -4526,10 +4509,8 @@ paths:
     post:
       operationId: cancelPerformance
       x-ticvai-consumed-by:
-        - "P08 BO-002 Queue Configuration"
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
-        - "P08 BO-063 Opening Hours & Calendar"
         - "P08 BO-1187 Transport Departure Board"
       x-ticvai-audience:
       - staff
@@ -4632,7 +4613,6 @@ paths:
     patch:
       operationId: updateChannelCapacity
       x-ticvai-consumed-by:
-        - "P06 EMP-033 Capacity view"
         - "P08 BO-013 Channel & Distribution"
         - "P08 BO-017 Capacity Management"
       x-ticvai-audience:
@@ -5192,6 +5172,7 @@ paths:
       operationId: publishChannelAvailability
       x-ticvai-consumed-by:
         - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
+        - "P08 BO-601 Product, Pricing & Sales Channel Setup"
         - "P09 ADM-124 Channel Publication & Availability"
       x-ticvai-audience:
         - staff
@@ -5664,7 +5645,6 @@ paths:
         - "P08 BO-637 Approval Workflow Builder"
         - "P09 ADM-129 Approval Workflow Designer"
         - "P09 ADM-319 Approval Workflow Library"
-        - "P09 ADM-492 Configuration Approval Workflow"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Product_Lifecycle___Catalogue_Governance_Reference.pdf'' pp.17-18
@@ -6270,7 +6250,6 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-137 Governance Risk, AI Monitoring & Control Center"
         - "P09 ADM-365 Risk & Governance Analytics"
-        - "P09 ADM-549 AI Governance Monitoring Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Product_Lifecycle___Catalogue_Governance_Reference.pdf'' pp.26-27
@@ -6371,8 +6350,6 @@ paths:
       operationId: listSaleChannel
       x-ticvai-consumed-by:
         - "P09 ADM-258 Sales Channel Command Center"
-        - "P09 ADM-383 Sales Channel Assessment"
-        - "P17 SGN-005 Sales Channel Assessment"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Sales_Channel_Management_Reference.pdf'' pp.3-5 (Channel Types,
@@ -6579,7 +6556,6 @@ paths:
       operationId: setChannelPricingCommercial
       x-ticvai-consumed-by:
         - "P09 ADM-261 Channel Pricing & Commercial Profile Assignment"
-        - "P09 ADM-483 Pricing & Commercial Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Sales_Channel_Management_Reference.pdf'' pp.8-9 (Pricing Associations,
@@ -7979,7 +7955,6 @@ paths:
     get:
       operationId: listCommercialPricing
       x-ticvai-consumed-by:
-        - "P08 BO-533 Pricing Simulation, Validation & AI Commercial Intelligence"
         - "P09 ADM-048 Commercial Pricing Command Center"
       x-ticvai-audience:
         - staff
@@ -8811,7 +8786,6 @@ paths:
     get:
       operationId: listCustomerSegmentProfile
       x-ticvai-consumed-by:
-        - "P08 BO-737 Customer 360 Profile"
         - "P09 ADM-059 Customer Segment & Profile Pricing Rules"
       x-ticvai-audience:
         - staff
@@ -11021,6 +10995,7 @@ paths:
       operationId: requestPricingRollback
       x-ticvai-consumed-by:
         - "P09 ADM-086 Pricing Rollback & Emergency Control Center"
+        - "P09 ADM-132 Rollback & Recovery Management"
       summary: Roll pricing back, or take an emergency pricing action
       description: '**A pricing rollback or emergency action, as a record first** (29 September, writers pass).
         Writes a `catalogue.rollback_action` with `subject: pricing`: a rollback restores an earlier
@@ -11234,6 +11209,7 @@ paths:
         - "P08 BO-1044 Dynamic Seat Pricing"
         - "P08 BO-528 Dynamic Pricing & AI Recommendation"
         - "P09 ADM-088 Dynamic Pricing Strategy Command Center"
+        - "P09 ADM-089 Dynamic Pricing Strategy Builder"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.75-76 (KPI Cards,
@@ -11592,7 +11568,6 @@ paths:
       operationId: listChannelCustomerSegment
       x-ticvai-consumed-by:
         - "P09 ADM-093 Channel, Customer Segment & Location Dynamic Rules"
-        - "P09 ADM-234 Customer, Segment, Channel & Partner Analytics"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.83-84 (Channel
@@ -12063,7 +12038,6 @@ paths:
     get:
       operationId: listPricing
       x-ticvai-consumed-by:
-        - "P08 BO-443 Pricing Audit, Approval & Publication"
         - "P09 ADM-098 AI Pricing Intelligence Command Center"
       x-ticvai-audience:
         - staff
@@ -14167,6 +14141,8 @@ paths:
       operationId: listSpaces
       x-ticvai-consumed-by:
         - "P08 BO-700 Venue & Space Command Center"
+        - "P08 BO-701 Venue Master Configuration"
+        - "P08 BO-702 Space Access Rules Configuration"
         - "P08 BO-915 Venue & Space Allocation"
       summary: Halls, rooms and areas an event can occupy
       description: 'Event boards 3.2 and 3.3. **A space is bookable and a venue map zone is
@@ -14339,7 +14315,12 @@ paths:
       operationId: getEventResourcePlan
       x-ticvai-consumed-by:
         - "P08 BO-710 Event Resource Command Center"
+        - "P08 BO-711 Event Resource Requirement Configuration"
+        - "P08 BO-712 Staff & Role Assignment Configuration"
+        - "P08 BO-713 Contractor & External Workforce Configuration"
+        - "P08 BO-715 Resource Location & Deployment Configuration"
         - "P08 BO-913 Event Resource Planning Command Center"
+        - "P08 BO-914 Event Resource Requirement Builder"
         - "P08 BO-920 Event Resource Cost Estimator"
         - "P08 BO-922 Event Resource Approval & Readiness Gate"
       summary: Everything an event needs, and whether it has been secured
@@ -14478,6 +14459,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-016 Performance Template"
         - "P08 BO-721 Activity Performance & Slot Template Configuration"
+        - "P08 BO-723 Peak, Off-Peak & Super Prime Time Configuration"
+        - "P08 BO-724 Walk-In / There-and-Then Booking Configuration"
         - "P08 BO-725 Performance Operations Command Center"
       summary: Slot templates, peak bands and walk-in rules
       description: 'Event board 8. **An activity venue sells time, not seats**, and the template is how
@@ -15100,6 +15083,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-009 Pricing Rules"
         - "P08 BO-443 Pricing Audit, Approval & Publication"
+        - "P09 ADM-090 Demand, Occupancy & Availability Rule Builder"
+        - "P09 ADM-091 Booking Velocity & Time-to-Event Rule Builder"
       summary: Dynamic pricing rules
       description: >
         Decision 5 of the schema merge took all three `pricing` tables and said the schema needed an
@@ -15481,6 +15466,7 @@ paths:
     post:
       operationId: decidePricingRecommendation
       x-ticvai-consumed-by:
+        - "P09 ADM-106 AI Pricing Recommendation & Explainability Center"
         - "P09 ADM-113 AI Recommendation Review & Decision Queue"
       x-ticvai-audience:
         - staff

@@ -33,12 +33,12 @@ steps:
   - login
   outcome: Session carries the workstation, so every scan is attributable. A scanner runs no cash shift,
     so the door reads none (CHG-DOOR-003)
+  note: '**Repointed 2 October (CHG-WIR-021).** A scanner has no cash shift; getCurrentShift (SHIFT_OPEN) showed stewards a missing-permission state at sign-in.'
 - step: 2
   screen: SCN-002
   action: Confirms access point and direction
   operations:
   - listAccessPoints
-  - setTurnstileMode
   outcome: The device knows what it is doing before it does it
 - step: 3
   screen: SCN-015

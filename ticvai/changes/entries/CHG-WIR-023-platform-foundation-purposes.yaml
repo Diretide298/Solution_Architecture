@@ -1,0 +1,245 @@
+id: CHG-WIR-023
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'platform-foundation: 45 screen purposes rewritten that were copied from another screen, a generator template
+  or a pasted board placeholder.'
+decision:
+  what: 'Fix the wrong wiring now: give each screen its own one-sentence purpose, keeping what the screen is for.'
+  by: Chinmay
+  date: '2026-10-02'
+  quote: 'Chinmay, 2 Oct 2026: fix the wrong wiring now'
+why: 'Design-note corrections for platform-foundation (handoff/design-notes/platform-foundation.yaml): the purposes
+  were generator templates, board titles with their date, or text copied from another screen (the boilerplate the
+  26 September audit traced under R250 and R260); a designer cannot act on them. Each screen''s correction is cited
+  below. The old text is kept in each screen''s purposeNote.'
+keys_touched:
+  screens:
+  - ADM-003
+  - ADM-005
+  - ADM-006
+  - ADM-007
+  - ADM-008
+  - ADM-009
+  - ADM-010
+  - ADM-011
+  - ADM-012
+  - ADM-013
+  - ADM-014
+  - ADM-015
+  - ADM-019
+  - ADM-020
+  - ADM-021
+  - ADM-022
+  - ADM-023
+  - ADM-024
+  - ADM-025
+  - ADM-026
+  - ADM-027
+  - ADM-028
+  - ADM-029
+  - ADM-030
+  - ADM-032
+  - ADM-033
+  - ADM-034
+  - ADM-035
+  - ADM-036
+  - BO-116
+  - BO-122
+  - BO-123
+  - BO-124
+  - BO-125
+  - BO-126
+  - BO-128
+  - BO-129
+  - BO-131
+  - BO-143
+  - BO-718
+  - POS-016
+  - POS-019
+  - PTR-003
+  - PTR-011
+  - PTR-020
+  tickets:
+  - APP-POS-POS-016
+  - APP-POS-POS-019
+  - APP-SETUP-ADM-005
+  - APP-SETUP-ADM-008
+  - APP-SETUP-BO-116
+  - APP-SETUP-BO-124
+  - VM-BO-122
+  - VM-BO-123
+  - VM-BO-125
+  - VM-BO-126
+  - VM-BO-128
+  - VM-BO-129
+  - VM-BO-131
+  - VM-BO-143
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-016
+  - APP-POS-POS-019
+  - APP-SETUP-ADM-005
+  - APP-SETUP-ADM-008
+  - APP-SETUP-BO-116
+  - APP-SETUP-BO-124
+  - VM-BO-122
+  - VM-BO-123
+  - VM-BO-125
+  - VM-BO-126
+  - VM-BO-128
+  - VM-BO-129
+  - VM-BO-131
+  - VM-BO-143
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: 16fd732e
+notes: 'check-screen-wiring gains S-PURPOSE-BOILERPLATE, which flags the generator and board-placeholder purposes.
+  Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are every tasks.csv or pushed key
+  naming a touched screen. Per screen and flow:
+
+  - POS-016: purpose rewritten — The purpose was the pasted board placeholder "Till Configuration — from the client
+  design board, 20 August"; the screen configures this workstation in place (F73 step 1; design-notes correction
+  platform-foundation POS-016).
+
+  - POS-019: purpose rewritten — The purpose was the pasted board placeholder "Shift Templates & Policies — from
+  the client design board, 20 August" (DI-309).
+
+  - BO-116: purpose rewritten — The purpose was the pasted board placeholder "Merchandising & Product Presentation
+  — from the client design board, 20 August"; the job is arranging products on a board (design-notes correction
+  platform-foundation BO-116).
+
+  - BO-122: purpose rewritten — The purpose was the pasted board placeholder "POS Experience Dashboard — from the
+  client design board, 20 August" (design-notes correction platform-foundation BO-122).
+
+  - BO-123: purpose rewritten — The purpose was the pasted board placeholder "POS Profile Management — from the
+  client design board, 20 August"; the screen defines the profiles workstations are assigned (ADR-0018; design-notes
+  correction platform-foundation BO-123).
+
+  - BO-124: purpose rewritten — The purpose was the pasted board placeholder "Layout & Journey Builder — from the
+  client design board, 20 August"; DI-157 and DI-310 describe a visual designer per workstation type (design-notes
+  correction platform-foundation BO-124).
+
+  - BO-125: purpose rewritten — The purpose was the pasted board placeholder "Product & Category Button Configuration
+  — from the client design board, 20 August".
+
+  - BO-126: purpose rewritten — The purpose was the pasted board placeholder "Deployment, Preview & Audit — from
+  the client design board, 20 August".
+
+  - BO-128: purpose rewritten — The purpose was the pasted board placeholder "Live Workstation Health Monitor —
+  from the client design board, 20 August".
+
+  - BO-129: purpose rewritten — The purpose was the pasted board placeholder "Software, Configuration & Version
+  Management — from the client design board, 20 August".
+
+  - BO-131: purpose rewritten — The purpose was the pasted board placeholder "Connectivity & Auto-Switch Settings
+  — from the client design board, 20 August".
+
+  - BO-143: purpose rewritten — The purpose was the pasted board placeholder "Retail Global Settings & Controls
+  — from the client design board, 20 August".
+
+  - BO-718: purpose rewritten — The purpose ("Define how financial performance should be measured and attributed
+  to an event") did not match the screen, which raises an event change request (createApprovalRequest) (design-notes
+  correction platform-foundation BO-718).
+
+  - PTR-003: purpose rewritten — The purpose "What we hold about staff" was copied from a staff screen; these are
+  the partner''s own users (design-notes correction platform-foundation PTR-003).
+
+  - ADM-003: purpose rewritten — The purpose "The screen this app sits on. Everything else is entered from here"
+  belongs to ADM-002, the dashboard ADM-003 is entered from; this screen is cross-tenant cell health (design-notes
+  correction platform-foundation ADM-003).
+
+  - ADM-005: purpose rewritten — The purpose was the generic list template ("Find the right one quickly, and act
+  on it without opening it").
+
+  - ADM-006: purpose rewritten — The purpose was the generator template ("See tenant hierarchy explorer for this
+  venue"); a tenant hierarchy has no venue (design-notes correction platform-foundation ADM-006).
+
+  - ADM-007: purpose rewritten — The purpose was the generator template ("See module & feature entitlement for this
+  venue"); licences are per tenant (design-notes correction platform-foundation ADM-007).
+
+  - ADM-008: purpose rewritten — The purpose was the generator template ("Find subscription & plan management for
+  this venue"); subscriptions are per tenant, not per venue (design-notes correction platform-foundation ADM-008).
+
+  - ADM-009: purpose rewritten — The purpose was the generator template ("Find tenant billing & invoicing for this
+  venue") (design-notes correction platform-foundation ADM-009).
+
+  - ADM-010: purpose rewritten — The purpose was the generator template ("See usage metering for this venue"); usage
+  is per tenant (design-notes correction platform-foundation ADM-010).
+
+  - ADM-011: purpose rewritten — The purpose was the generator template ("See licence & seat management for this
+  venue").
+
+  - ADM-012: purpose rewritten — The purpose was the generator template ("Work with tenant isolation & resource
+  pool for this venue"); cells are per tenant and region (design-notes correction platform-foundation ADM-012).
+
+  - ADM-013: purpose rewritten — The purpose was the generator template ("See tenant performance monitor for this
+  venue").
+
+  - ADM-014: purpose rewritten — The purpose was the configuration template ("Change how auto-scaling behaves here,
+  and see which level the current value came from") (design-notes correction platform-foundation ADM-014).
+
+  - ADM-015: purpose rewritten — The purpose was the generator template ("See api rate limit & quota management
+  for this venue"); quotas are per API client within a tenant''s budget (ADR-0064; design-notes correction platform-foundation
+  ADM-015).
+
+  - ADM-019: purpose rewritten — The purpose was the configuration template ("Change how global behaves here, and
+  see which level the current value came from"); the screen sets the tenant-level venue defaults (R094).
+
+  - ADM-020: purpose rewritten — The purpose was the generic list template ("Find the right one quickly, and act
+  on it without opening it"); say platform staff (design-notes correction platform-foundation ADM-020).
+
+  - ADM-021: purpose rewritten — The purpose was the generator template ("Find platform role management for this
+  venue"); platform roles have no venue (design-notes correction platform-foundation ADM-021).
+
+  - ADM-022: purpose rewritten — The purpose was the generator template ("Find release & version management for
+  this venue"); releases are platform-wide (design-notes correction platform-foundation ADM-022).
+
+  - ADM-023: purpose rewritten — The purpose was the generator template ("Work with staging promotion & approval
+  for this venue"); platform-wide, and the screen is the staging approval step (design-notes correction platform-foundation
+  ADM-023).
+
+  - ADM-024: purpose rewritten — The purpose was the generator template ("Push live release notification composer
+  for this venue"); release notices target tenants (design-notes correction platform-foundation ADM-024).
+
+  - ADM-025: purpose rewritten — The purpose was the generator template ("Find tenant upgrade scheduler for this
+  venue"); upgrades are per tenant (design-notes correction platform-foundation ADM-025).
+
+  - ADM-026: purpose rewritten — The purpose "Answer a question without needing a person" was copied from a help
+  screen (design-notes correction platform-foundation ADM-026).
+
+  - ADM-027: purpose rewritten — The purpose was the generator template ("Find database migration console for this
+  venue"); platform-wide (design-notes correction platform-foundation ADM-027).
+
+  - ADM-028: purpose rewritten — The purpose was the generator template ("Find environment registry for this venue");
+  platform-wide (design-notes correction platform-foundation ADM-028).
+
+  - ADM-029: purpose rewritten — The purpose was the generator template ("Find deployment monitor for this venue").
+
+  - ADM-030: purpose rewritten — The purpose was the generator template ("See infrastructure sizing & scaling policy
+  for this venue").
+
+  - ADM-032: purpose rewritten — The purpose was the generator template ("See waf & security policy view for this
+  venue").
+
+  - ADM-033: purpose rewritten — The purpose was the generator template ("See backup & dr status for this venue").
+
+  - ADM-034: purpose rewritten — The purpose was the generator template ("Find archival job monitor for this venue").
+
+  - ADM-035: purpose rewritten — The purpose "Answer a question without needing a person" was copied from a help
+  screen; an escalation console works the escalation queue (design-notes correction platform-foundation ADM-035).
+
+  - ADM-036: purpose rewritten — The purpose was the generator template ("Push live platform notification broadcast
+  for this venue").
+
+  - PTR-011: purpose rewritten — The purpose ("Find quote management for this venue") was the generic template;
+  quotes belong to the partner, not a venue (design-notes correction platform-foundation PTR-011).
+
+  - PTR-020: purpose rewritten — The purpose ("Add sub-agent management for this venue") was the generic template;
+  sub-agents belong to the partner, not a venue (design-notes correction platform-foundation PTR-020).'

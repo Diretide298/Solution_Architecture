@@ -97,7 +97,7 @@ steps:
     An alert arrives; a supervisor opens the console.'
   crossesDevice: true
 - step: 6
-  screen: POS-002
+  screen: POS-013
   action: The journal syncs.
   operations:
   - syncOrders
@@ -106,7 +106,7 @@ steps:
     is authoritative within a workstation.
 
     '
-  note: '`syncOrders` is a real call and the till makes it.'
+  note: 'Repointed 2 October (CHG-WIR-018): offline orders are replayed from POS-013, not the sell screen.'
 - step: 7
   screen: BO-130
   action: Four transactions are rejected — a product retired while the till was offline.
@@ -124,13 +124,12 @@ steps:
   action: The supervisor resolves each one.
   operations:
   - listSyncRejections
-  - createOrder
+  - resolveSyncRejection
   outcome: 'Posted against the retired product at the price the guest paid. **The catalogue moved and
     the transaction did not** — repricing it now would change what was charged.
 
     '
-  note: '**Resolved remotely.** `listSyncRejections` is venue-scoped and this is a web screen — the
-    supervisor need not be on site, which is what makes an unstaffed kiosk workable.'
+  note: '**Repointed 2 October (CHG-WIR-025).** The supervisor resolves each refused entry with resolveSyncRejection; posting a new order (createOrder) from the policy screen re-sold outside the till, and createOrder and syncOrders came off BO-130. **Resolved remotely.** `listSyncRejections` is venue-scoped and this is a web screen, so the supervisor need not be on site.'
 branches:
 - at: 2
   condition: The offline window passes `maxOfflineHours`.

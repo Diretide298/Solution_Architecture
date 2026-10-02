@@ -108,20 +108,15 @@ screens:
   states:
     loading: The welcome start your configuration as saved.
     error: Could not load. Names which read failed and leaves the welcome start your untouched.
-    emptyFirstRun: No welcome start your configured yet. Carries the create action and says what the platform
-      does in the meantime.
+    emptyFirstRun: No welcome start your configured yet. Offers no create action — this screen declares
+      no operation that makes one and says what the platform does in the meantime.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
       wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on
       2.1, which is where somebody without access to a saved setup would be sent; no minute has decided
       it.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis:
-  - operationId: scoreVsiAssessment
-    contract: subscription
-    purpose: Begin the assessment
-    trigger: onAction
-    provenance: board reading, 19 September 2026
+  apis: []
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 21. 0 of
     0 labels bound to a contract property; 4 of 16 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
@@ -136,6 +131,13 @@ screens:
       provenance: structural — the book's own journey, 2.1 "Journey Preview", 11 September 2026
     entryFrom:
     - SGN-002
+  gaps:
+  - operation: scoreVsiAssessment
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-021): The welcome page scores nothing (scoreVsiAssessment is
+      called on the assessment screens SGN-003 to SGN-010); the operator-led copy ADM-379 loses it too,
+      so the two stay in step (design-notes correction platform-foundation SGN-001).'
+    source: screens/P17-ticvai-signup.yaml#SGN-001
 - id: SGN-002
   name: Customer & Organization Registration
   module: Onboarding & Assessment
@@ -505,19 +507,15 @@ screens:
   states:
     loading: The sales channel assessment configuration as saved.
     error: Could not load. Names which read failed and leaves the sales channel assessment untouched.
-    emptyFirstRun: No sales channel assessment configured yet. Carries the create action and says what
-      the platform does in the meantime.
+    emptyFirstRun: No sales channel assessment configured yet. Offers no create action — this screen declares
+      no operation that makes one and says what the platform does in the meantime.
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
       wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on
       2.1, which is where somebody without access to a saved setup would be sent; no minute has decided
       it.
-    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
-      somebody concluding the record does not exist'
   apis:
-  - operationId: listSaleChannel
-    contract: catalogue
-    purpose: Sales Channel Command Center
-    trigger: onLoad
   - operationId: scoreVsiAssessment
     contract: subscription
     purpose: Record the answers and score them
@@ -542,6 +540,13 @@ screens:
     - to: SGN-006
       trigger: Ticketing & Product Requirements
       provenance: structural — the book's own journey, 2.1 "Journey Preview", 11 September 2026
+  gaps:
+  - operation: listSaleChannel
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-025): listSaleChannel reads a live tenant''s configured channels,
+      and a prospect has no cell and no channels; the assessment uses the answers only (scoreVsiAssessment)
+      (design-notes correction ticketing-backoffice ADM-383)'
+    source: contracts/spine/catalogue.yaml#listSaleChannel
 - id: SGN-006
   name: Ticketing & Product Requirements
   module: Onboarding & Assessment
@@ -1575,26 +1580,16 @@ screens:
     regions:
     - name: contentBody
       components:
-      - kind: primaryButton
-        derived: true
-        impliedBy: setModuleListing
-        label: Save module listing
-        notes: The act the screen exists for.
       - kind: dataTable
         derived: true
         impliedBy: listModuleCatalogue
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setModuleListing
   states:
     loading: The module dependency compatibility list.
     error: Could not load. Names which read failed and leaves the module dependency compatibility untouched.
-    emptyFirstRun: No module dependency compatibility yet. Carries the create action; distinct from a
-      filter that matched nothing.
+    emptyFirstRun: No module dependency compatibility yet. Offers no create action — this screen declares
+      no operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the module dependency compatibility are still there. Names
       the active filter and offers to clear it.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
@@ -1618,14 +1613,12 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 49
+  - operation: setModuleListing
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-021): setModuleListing edits TICVAI''s module catalogue and
+      was offered to a prospect; ADM-404 keeps it (design-notes correction platform-foundation SGN-016).'
+    source: contracts/satellite/subscription.yaml#setModuleListing
   apis:
-  - operationId: setModuleListing
-    contract: subscription
-    purpose: Dependencies and compatibility
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - listModuleCatalogue
   - operationId: listModuleCatalogue
     contract: subscription
     purpose: What depends on what
@@ -1766,22 +1759,12 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components:
-      - kind: primaryButton
-        derived: true
-        impliedBy: setTrialConfiguration
-        label: Save trial configuration
-        notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setTrialConfiguration
+      components: []
   states:
     loading: The purchase trial journey list.
     error: Could not load. Names which read failed and leaves the purchase trial journey untouched.
-    emptyFirstRun: No purchase trial journey yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: No purchase trial journey yet. Offers no create action — this screen declares no operation
+      that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the purchase trial journey are still there. Names the active
       filter and offers to clear it.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
@@ -1799,12 +1782,17 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 58
-  apis:
-  - operationId: setTrialConfiguration
-    contract: subscription
-    purpose: Purchase or trial
-    trigger: onAction
-    provenance: board reading, 19 September 2026
+  - operation: setTrialConfiguration
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-021): setTrialConfiguration sets TICVAI''s trial rules (PLATFORM_PLAN_MANAGE);
+      the prospect chooses, TICVAI configures trials on ADM-413 (design-notes correction platform-foundation
+      SGN-018). See the CHG-WIR-024 gap.'
+    source: contracts/satellite/subscription.yaml#setTrialConfiguration
+  - operation: null
+    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-024): No prospect-callable operation records whether
+      the prospect buys or starts a trial.'
+    source: screens/P17-ticvai-signup.yaml#SGN-018
+  apis: []
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 58. 0 of
     0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
@@ -2063,10 +2051,10 @@ screens:
         columns:
         - PaymentProvider.supportedMethods
         operation: setPaymentProvider
-        notes: '**The methods follow the contract (decided 28 September, audit R275 (a))**: the options are
-          the `PaymentProvider.supportedMethods` enum that `setPaymentProvider` accepts. The pack''s Credit
-          / Debit Card is `card` and its Bank Transfer is `bankTransfer`; its Other Approved Method is not
-          in the contract and is dropped.'
+        notes: '**The methods follow the contract (decided 28 September, audit R275 (a))**: the options
+          are the `PaymentProvider.supportedMethods` enum that `setPaymentProvider` accepts. The pack''s
+          Credit / Debit Card is `card` and its Bank Transfer is `bankTransfer`; its Other Approved Method
+          is not in the contract and is dropped.'
         provenance: contract orders.yaml PUT /payment-providers
       - kind: primaryButton
         label: Save payment provider

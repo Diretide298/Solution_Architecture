@@ -1,0 +1,157 @@
+id: CHG-WIR-012
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'ai: 19 screens rewired — 12 operations taken off screens they do not belong on (bulk-attached, another
+  module''s, guest-, device- or service-only on staff screens, writes on read-only lists), 10 existing operations
+  declared where the screen needed them.'
+decision:
+  what: 'Fix the wrong wiring now: take each listed operation off the screen it does not belong on, declare the
+    existing operation the screen needs instead, merge the duplicate screens into the one kept, and repoint the
+    flow steps that called them.'
+  by: Chinmay
+  date: '2026-10-02'
+  quote: 'Chinmay, 2 Oct 2026: fix the wrong wiring now'
+why: 'Process-agent design-note corrections for ai (handoff/design-notes/ai.yaml, 1-2 October 2026) found these
+  screens wired by the 18 August bulk attach, by name resemblance or from the wrong contract, against the adopted
+  audit decision R254 (re-derive each screen''s operations from its purpose and journeys) and R276 (duplicate screens).
+  Each screen''s reason and source is below and on the screen itself (gaps with removed: true).'
+keys_touched:
+  screens:
+  - ADM-004
+  - ADM-471
+  - ADM-483
+  - ADM-492
+  - ADM-523
+  - ADM-549
+  - ADM-637
+  - ADM-696
+  - ANL-019
+  - ANL-055
+  - ANL-059
+  - ANL-060
+  - BO-091
+  - BO-102
+  - BO-598
+  - BO-793
+  - BO-970
+  - EMP-020
+  - SUP-006
+  operations:
+  - approveWorkflow
+  - askReportingQuestion
+  - decideProposedAction
+  - getAiByokEnablement
+  - getChargebackAnalytics
+  - listAiInteractions
+  - listAnalyticsAnomalies
+  - listAuditRecords
+  - listGovernanceRiskMonitoring
+  - listKnowledgeCollections
+  - pauseAiCapability
+  - publishPromptTemplate
+  - recordRecommendationEvents
+  - rollbackAiRelease
+  - searchAiDecisions
+  - semanticSearch
+  - setAiTool
+  - setAiVenueSettings
+  - setChannelPricingCommercial
+  - setLocalizationBrandingCustomer
+  - updateSeats
+  tickets:
+  - APP-SETUP-ADM-523
+  - APP-SETUP-ANL-019
+  - APP-SETUP-BO-091
+  - VM-BO-102
+root_class: A31 SCREEN-WRONG-OP
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ADM-523
+  - APP-SETUP-ANL-019
+  - APP-SETUP-BO-091
+  - VM-BO-102
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: 16fd732e
+notes: 'check-screen-wiring gains S-STAFF-AUDIENCE (a staff screen calling a guest-, device-, service- or partner-only
+  operation) beside the existing S-DUP-SCREEN and S-CONSUMED-MIRROR rules, and check-screens keeps its R254 attachment
+  warnings; check-flows rule 3 holds every repointed flow step to its screen. Tickets: none started (Block A starts
+  Monday 5 October 2026); unstarted keys are every tasks.csv or pushed key naming a touched screen. Per screen and
+  flow:
+
+  - BO-091: declared getAiByokEnablement — getAiByokEnablement''s own description says BO-091 reads it, and it was
+  not declared; the screen must say whether the venue may bring its own key (design-notes correction ai BO-091).
+
+  - ADM-523: removed setAiTool — setAiTool (PLATFORM_AI_MANAGE) was declared on a tenant policy screen; tools are
+  platform facts replicated read-only into tenants, so the tenant board only reads them (listAiTools) (design-notes
+  correction ai ADM-523).
+
+  - ANL-019: removed listAnalyticsAnomalies — Two sources of anomalies on one card list show the same situation
+  twice; ADR-0053 and the insight layer make ai.listAiInsights (kind anomaly) the one list (design-notes correction
+  ai ANL-019).
+
+  - ANL-055: removed listAnalyticsAnomalies — The same duplication as ANL-019; listAiInsights (kind anomaly) is
+  the one list (ADR-0053; design-notes correction ai ANL-055).
+
+  - ANL-059: declared searchAiDecisions, listAiInteractions — Who asked, what was accessed and whether it was exported
+  live in decision records and interactions (searchAiDecisions, listAiInteractions), which were not declared (design-notes
+  correction ai ANL-059).
+
+  - ANL-060: removed publishPromptTemplate — publishPromptTemplate (AI_APPROVE) is model governance on the console
+  (ADM-037); on a venue analytics screen prompts are read-only (design-notes correction ai ANL-060).
+
+  - EMP-020: declared askReportingQuestion — AI-D13: knowledge from the vector store, numbers from the semantic
+  layer. Staff numeric questions went through sendAiMessage only; askReportingQuestion is the numeric path (ADR-0054;
+  design-notes correction ai EMP-020).
+
+  - SUP-006: removed listKnowledgeCollections; declared semanticSearch — Agents search content; collection engineering
+  (listKnowledgeCollections, AI_CONFIGURE, with shard and embedding columns) belongs to knowledge administration,
+  and the agent''s search is semanticSearch. The entry parameters bannerId, pageId, policyKind and version were
+  left from the white-label bulk a…
+
+  - ADM-471: declared setAiVenueSettings — The AI review names the configuration assistant as the place to collect
+  the venue AI profile, and setAiVenueSettings was not declared (design-notes correction ai ADM-471).
+
+  - ADM-483: removed setChannelPricingCommercial — The assistant only drafts (ADR-0020); pricing is written by the
+  plan''s executor after approval, through the owning API, so the direct write setChannelPricingCommercial comes
+  off this screen (design-notes correction ai ADM-483).
+
+  - ADM-492: removed approveWorkflow — The "Approve workflow" button was bound to catalogue approveWorkflow, which
+  designs approval workflows; approving this plan is decideProposedAction (declared) (design-notes correction ai
+  ADM-492).
+
+  - BO-598: declared decideProposedAction — Only generateConfiguration and getActionPlan were declared, with no
+  decide operation; approval needs decideProposedAction (design-notes correction ai BO-598).
+
+  - ADM-549: removed listGovernanceRiskMonitoring — catalogue listGovernanceRiskMonitoring (PRODUCT_VIEW) is a product-governance
+  read attached by name resemblance; AI governance health comes from the ai operations, which are declared (design-notes
+  correction ai ADM-549).
+
+  - BO-102: removed recordRecommendationEvents — Staff previewing a recommendation slot must not write impressions
+  or declines into the guest decline store; recordRecommendationEvents on a back-office landing does exactly that
+  (design-notes correction ai BO-102).
+
+  - ADM-004: declared listAuditRecords — The screen is named Platform Audit Log and its purpose is to find the platform
+  audit log, but it listed AI interactions only and misled auditors looking for platform actions; the platform audit
+  log is listAuditRecords (design-notes correction ai ADM-004).
+
+  - ADM-637: removed getChargebackAnalytics (duplicate declaration); set name=AI Fraud, Anomaly & Payment Intelligence
+  Center — getChargebackAnalytics was declared twice and the name carried a stray tab and "175" (design-notes correction
+  ai ADM-637).
+
+  - ADM-696: declared pauseAiCapability, rollbackAiRelease — Disable, raise threshold and suspend bound no operation;
+  only explainRecommendationDecision was declared. pauseAiCapability and rollbackAiRelease exist (design-notes correction
+  ai ADM-696).
+
+  - BO-793: removed setLocalizationBrandingCustomer — setLocalizationBrandingCustomer (waiver form languages, GUEST_MANAGE)
+  is unrelated waiver configuration (design-notes correction ai BO-793).
+
+  - BO-970: removed updateSeats — "Save seats" called updateSeats directly next to the AI proposal; applying the
+  AI''s proposal goes through its approval (decideProposedAction, declared), not a direct seat write (ADR-0020;
+  design-notes correction ai BO-970).'

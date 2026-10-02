@@ -1,0 +1,133 @@
+id: CHG-WIR-007
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: 'Contract gap (customer-marketing): 23 wiring fixes need an operation the contracts do not have; logged,
+  not invented.'
+decision:
+  what: 'Log, do not invent: each wiring fix below needs an operation (or an audience) the contracts lack. The gap
+    is recorded on the screen (gaps, operation: null) and here, open, for the contract owner.'
+  by: Chinmay
+  date: '2026-10-02'
+  quote: 'Chinmay, 2 Oct 2026: fix the wrong wiring now'
+why: Design-note corrections for customer-marketing (handoff/design-notes/customer-marketing.yaml) name operations
+  that do not exist; the brief for the wiring fixes (Chinmay, 2 October 2026) says to log such a gap as an open
+  contract-gap change and not invent the operation. Each gap cites its correction below; the class is the audit's
+  A28 missing-operation class (R254 re-derivation exposed these).
+keys_touched:
+  screens:
+  - BO-678
+  - BO-679
+  - BO-734
+  - BO-748
+  - BO-755
+  - BO-773
+  - BO-777
+  - BO-788
+  - BO-797
+  - BO-812
+  - BO-817
+  - BO-822
+  - BO-824
+  - BO-825
+  - BO-831
+  - CMS-036
+  - CMS-044
+  - CMS-046
+  - CMS-047
+  - CMS-053
+  - CMS-057
+  - POS-027
+  - SUP-016
+  tickets:
+  - APP-POS-POS-027
+  - APP-SETUP-BO-755
+  - APP-SETUP-BO-825
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-027
+  - APP-SETUP-BO-755
+  - APP-SETUP-BO-825
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/audit-screenless-operations.py
+status: open
+notes: 'type: contract-gap. Open until the contract change is decided; the wiring fix that needs it lands with it.
+  Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are every tasks.csv or pushed key
+  naming a touched screen. Per screen and flow:
+
+  - CMS-044: gap: No write saves a waiver''s dynamic fields, questions and conditional logic. — The field editor
+  needs a write; only listDynamicFieldQuestion exists.
+
+  - CMS-046: gap: No write creates or changes a waiver''s product, event and experience associations. — Product,
+  event and experience associations cannot be created; only listProductEventExperience exists.
+
+  - CMS-047: gap: No write saves waiver trigger, eligibility and completion rules. — The trigger, eligibility and
+  completion rules cannot be saved; only listWaiverTriggerEligibility exists.
+
+  - CMS-053: gap: No operation sends or resends a waiver signing link (email, SMS, WhatsApp, QR). — Sending or resending
+  a waiver link has no operation.
+
+  - CMS-057: gap: No write records an on-site waiver exception with its reason. — The on-site resolution options
+  are actions; the supervisor exception needs a write with a reason and only a lookup read exists.
+
+  - CMS-036: gap: No operation performs or approves deletion, pseudonymisation, restriction or biometric removal.
+  — Delete, pseudonymise, restrict and remove-biometric actions cannot be performed or approved; only a list exists.
+
+  - POS-027: gap: No staff operation creates a guest profile at the till; recordConsent lacks the staff audience
+  for agent-recorded consent. — The prototype''s "Create and link to sale" (guest enrolment at the till, client-verified)
+  has no staff operation that creates a guest profile; recordConsent is guest-audience only although an agent may
+  record consent on a guest''s behalf.
+
+  - BO-748: gap: recordConsent needs the staff audience with the agent-recorded rule (see POS-027). — recordConsent
+  is guest-audience only, but this staff screen captures the decision a guest gives in person.
+
+  - BO-755: gap: No preview of unsaved criteria; CreateSegmentRequest has no nested rule groups, effective dates,
+  owner or approval. — previewSegment works only on a saved segment while the purpose asks for a live count during
+  editing, and CreateSegmentRequest holds a flat criteria list where the purpose requires nested AND/OR/NOT groups.
+
+  - BO-825: gap: No listChallenges or getChallenge, and no activate step. — No list or read operation for challenges
+  exists (only createChallenge and the guest''s getMyChallenges), so a builder cannot reopen a draft.
+
+  - BO-824: gap: No staff read of challenges across the programme. — A gamification command centre needs programme-wide
+  figures; there is no list or analytics operation for challenges.
+
+  - BO-831: gap: No staff-audience leaderboard read. — The leaderboard read (listLeaderboard) is guest-audience
+  only; staff have no leaderboard read.
+
+  - BO-773: gap: No read lists recorded marketing touches. — Multi-touch attribution views need a read of recorded
+  touches; none exists.
+
+  - BO-679: gap: No staff-audience bulk send for accreditation communications. — A staff bulk send needs a staff-audience
+  operation and a population selector; sendTransactionalMessage is service and partner only and per message.
+
+  - BO-788: gap: No staff read of a guest''s marketing subscriptions or of subscribers. — Staff need a staff read
+  of a guest''s subscriptions and a list of subscribers; the subscription operations are guest-only.
+
+  - BO-797: gap: No chatbot configuration operation (identity, channels, hours, handover). — The guest-facing chatbot
+  needs its own configuration (identity, channels, hours, handover); only the agent copilot write exists.
+
+  - BO-678: gap: No operation configures accreditation communication branding and sender identity. — Accreditation
+  communication branding and sender identity have no configuration operation.
+
+  - BO-812: gap: No operation configures the service-recovery compensation matrix and thresholds. — Nothing configures
+  the compensation matrix or its thresholds.
+
+  - BO-822: gap: No operation stores service-recovery automation rules. — Service-recovery automation rules need
+  their own configuration operation.
+
+  - BO-817: gap: No operation configures NPS, CSAT and CES metrics and follow-up thresholds. — NPS, CSAT and CES
+  metric definitions and follow-up thresholds have no configuration operation.
+
+  - BO-734: gap: No CRM summary operation for the command centre tiles. — A command centre needs a summary read;
+  no operation returns the counts, trends or indicators (R283 bars counts without a summary operation).
+
+  - SUP-016: gap: No operation raises an internal collaboration request on a case. — The collaboration cannot be
+  started; no operation raises an internal request.
+
+  - BO-777: gap: No operation simulates a marketing journey. — Branch simulation needs an operation; nothing in
+  the contract simulates a marketing journey.'

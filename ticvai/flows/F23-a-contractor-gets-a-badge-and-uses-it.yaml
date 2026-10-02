@@ -28,17 +28,21 @@ steps:
     `listAccreditationApplications`, which is the reviewer''s call on ACC-006/ACC-007, not the applicant''s.'
 - step: 2
   screen: ACC-007
+  crossesDevice: true
   action: A reviewer checks and approves
   operations:
   - getAccreditationApplication
   - decideAccreditationApplication
   outcome: '**Through `approvals`** — one mechanism, not a fifth'
+  note: '**Hand-over 2 October (CHG-WIR-002).** The applicant''s form no longer links to the reviewer''s workspace; the reviewer opens the application from the queue (ACC-006) on their own session.'
 - step: 3
   screen: ACC-005
+  crossesDevice: true
   action: The badge is issued
   operations:
   - listMyAccreditationCredentials
   outcome: QR, NFC or printed — `MediaKind` already covers all four
+  note: '**Hand-over 2 October (CHG-WIR-002).** The reviewer''s workspace no longer links to the holder''s badge view (a guest read); the holder sees the issued badge on their own device.'
 - step: 4
   screen: SCN-003
   action: A steward scans it at a service gate
@@ -49,8 +53,9 @@ steps:
   screen: SCN-003
   action: Revoked immediately when the contract ends
   operations:
-  - listBlacklist
+  - validateAccess
   outcome: '**The blacklist is in the bundle**, so revocation works offline'
+  note: '**Corrected 2 October (CHG-WIR-001).** listBlacklist was a table on the ready screen; the revoked badge is refused by validateAccess, and the blacklist reaches the scanner in its offline package.'
 branches:
 - at: 2
   condition: Background check required and not complete

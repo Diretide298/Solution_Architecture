@@ -22,25 +22,27 @@ offlineBehaviour: Partner portal is online only. The redemption half runs on the
 trigger:
   description: A tour operator books a block, distributes vouchers to their customers, those customers
     arrive over weeks, and at month end the two businesses reconcile.
-  entryScreen: PTR-001
+  entryScreen: PTR-002
   entryPoints:
   - Contracted allocation
   - Ad-hoc block booking
   - API integration
 steps:
 - step: 1
-  screen: PTR-001
-  action: Signs in; the partner home shows the allocation and the credit
+  screen: PTR-002
+  action: Signs in and sees the allocation
   operations:
-  - login
-  outcome: Knows what they may sell and what they owe. The door reads no credit (CHG-DOOR-003); the partner
-    home PTR-002 reads `getB2bCredit`
+  - getB2bCredit
+  outcome: Knows what they may sell and what they owe. The door PTR-001 reads no credit (CHG-DOOR-003); the
+    partner home PTR-002 reads `getB2bCredit`
+  note: 'Repointed 2 October (CHG-WIR-021): the sign-in screen PTR-001 no longer reads credit; the partner signs in and lands on the dashboard PTR-002, which reads the credit position (getB2bCredit).'
 - step: 2
-  screen: PTR-005
+  screen: PTR-008
   action: Books against the allocation
   operations:
   - createOrder
   outcome: Held on credit, not paid
+  note: 'Repointed 2 October (CHG-WIR-018): PTR-005 is the inventory and allocation view, which reads and returns allocation; the booking is made on PTR-008 Booking Creation.'
 - step: 3
   screen: PTR-008
   action: Receives vouchers

@@ -1,0 +1,136 @@
+id: CHG-WIR-002
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'venue-operations: 17 screens lose inferred or misplaced navigation edges (or gain the edge a repointed
+  flow needs).'
+decision:
+  what: 'Fix the wrong wiring now: drop the derived exits to unrelated screens (and their entryFrom mirrors), and
+    add only the edges a repointed flow step needs.'
+  by: Chinmay
+  date: '2026-10-02'
+  quote: 'Chinmay, 2 Oct 2026: fix the wrong wiring now'
+why: Design-note corrections for venue-operations (handoff/design-notes/venue-operations.yaml) and the adopted audit
+  decision R251 (re-derive navigation so a screen links only to screens it can pass ids to; inferred exits such
+  as Stock Count to Queue Directory are removed).
+keys_touched:
+  screens:
+  - ACC-002
+  - ACC-007
+  - BO-006
+  - BO-015
+  - BO-019
+  - BO-031
+  - BO-032
+  - BO-033
+  - BO-034
+  - BO-035
+  - BO-038
+  - BO-063
+  - BO-070
+  - BO-103
+  - EMP-004
+  - EMP-007
+  - EMP-048
+  flows:
+  - F23
+  tickets:
+  - APP-SETUP-BO-006
+  - APP-SETUP-BO-032
+  - APP-SETUP-BO-033
+  - APP-SETUP-EMP-048
+  - VM-BO-015
+  - VM-BO-019
+  - VM-BO-031
+  - VM-BO-034
+  - VM-BO-035
+  - VM-BO-038
+  - VM-BO-063
+  - VM-BO-070
+  - VM-BO-103
+root_class: A32 NAVIGATION
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-BO-006
+  - APP-SETUP-BO-032
+  - APP-SETUP-BO-033
+  - APP-SETUP-EMP-048
+  - VM-BO-015
+  - VM-BO-019
+  - VM-BO-031
+  - VM-BO-034
+  - VM-BO-035
+  - VM-BO-038
+  - VM-BO-063
+  - VM-BO-070
+  - VM-BO-103
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-navigation.py
+status: closed
+closed_by_commit: 16fd732e
+notes: 'check-navigation (N-ENTRY-MIRROR, N-CARRIES-HELD) and check-flows (consecutive steps joined by navigation
+  or a declared device handover) guard the edges; an edge that is well formed but meaningless still needs review.
+  Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are every tasks.csv or pushed key
+  naming a touched screen. Per screen and flow:
+
+  - BO-006: exits dropped BO-001 — Inferred exit to BO-001 Queue Directory, left over from when BO-001 was the back-office
+  entry point (R251; design-notes corrections venue-operations BO-001, BO-006).
+
+  - BO-031: exits dropped BO-001 — Inferred exit to BO-001 Queue Directory with no business meaning (R251; design-notes
+  correction venue-operations BO-031).
+
+  - BO-032: exits dropped BO-001 — Inferred exit to BO-001 Queue Directory; admission profiles belong to the access
+  estate (BO-103), not the ride queue (R251; design-notes correction venue-operations BO-032).
+
+  - BO-033: exits dropped BO-001 — Inferred exit to BO-001 Queue Directory; the blacklist belongs to the access
+  estate (R251; design-notes correction venue-operations BO-033).
+
+  - BO-034: exits dropped BO-001 — Inferred exit to BO-001 Queue Directory, an unrelated screen (R251; design-notes
+  correction venue-operations BO-034).
+
+  - BO-035: exits dropped BO-001 — Inferred exit to BO-001 Queue Directory, an unrelated screen (R251; design-notes
+  correction venue-operations BO-035).
+
+  - BO-038: exits dropped BO-001 — Inferred exit to BO-001 Queue Directory; scan reconciliation is admission and
+  access, not the virtual queue (R251; design-notes corrections venue-operations BO-001, BO-038).
+
+  - BO-015: exits dropped BO-001; exits added BO-023 — Inferred exit to BO-001 Queue Directory from a ticketing
+  screen, leftover from when BO-001 was the back-office entry point (R251; design-notes correction venue-operations
+  BO-001). F09 now cancels a performance here and hands the refund exposure to BO-023.
+
+  - BO-019: exits dropped BO-001 — Inferred exit to BO-001 Queue Directory from a ticketing screen (R251; design-notes
+  correction venue-operations BO-001).
+
+  - BO-063: exits dropped BO-001 — Inferred exit to BO-001 Queue Directory from a ticketing screen (R251; design-notes
+  correction venue-operations BO-001).
+
+  - BO-070: exits dropped BO-031; exits added BO-069 — BO-031 was merged into BO-069 Asset Register (CHG-WIR-001);
+  "Open the asset" now opens the kept register (design-notes corrections venue-operations BO-031, BO-069; R251).
+
+  - BO-103: exits dropped BO-031 — BO-031 was merged into BO-069 (CHG-WIR-001), which the hub already opens; the
+  derived edge to the merged id goes (R251).
+
+  - EMP-048: exits dropped EMP-001, EMP-002 — Inferred exits to Sign in and Select venue; the checklist is reached
+  from the home screen on duty (F08 step 3) and returns there (design-notes correction venue-operations EMP-048).
+
+  - EMP-004: exits dropped EMP-001, EMP-002 — Inferred exits to Sign in (EMP-001) and Select venue (EMP-002); the
+  task list is reached from the on-duty home (F08 step 5) and returns there (design-notes correction venue-operations
+  EMP-004).
+
+  - EMP-007: exits dropped EMP-001, EMP-002 — Inferred exits to Sign in (EMP-001) and Select venue (EMP-002); the
+  handover is written at the end of a shift and returns to the home or goes on to end the shift (F08 step 8; design-notes
+  correction venue-operations EMP-007).
+
+  - ACC-002: exits dropped ACC-007 — An applicant''s form does not lead to the reviewer''s workspace; the reviewer
+  reaches ACC-007 from the queue ACC-006. F23 step 2 is now a hand-over to another person (design-notes correction
+  venue-operations ACC-002).
+
+  - ACC-007: exits dropped ACC-005 — ACC-005 is the holder''s own view through a guest read; the reviewer goes on
+  to the credential register (ACC-008) or issuance (BO-645). F23 step 3 is now a hand-over to the holder (design-notes
+  correction venue-operations ACC-007).
+
+  - F23: step 2 crossesDevice; step 2 note; step 3 crossesDevice; step 3 note'

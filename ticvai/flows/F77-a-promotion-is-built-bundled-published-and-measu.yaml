@@ -36,9 +36,9 @@ steps:
   action: Packages & Bundles.
   operations:
   - createBundle
-  - publishBundle
   outcome: '**Drawn by the client as RET-5H.** 2 operations on this step.'
   crossesDevice: true
+  note: '**Repointed 2 October (CHG-WIR-025).** publishBundle publishes the whole catalogue release (BO-014), not the sellable bundle; the name collision put it on BO-011, which keeps createBundle.'
 - step: 3
   screen: ANL-009
   action: AI Assistant & Action Center.

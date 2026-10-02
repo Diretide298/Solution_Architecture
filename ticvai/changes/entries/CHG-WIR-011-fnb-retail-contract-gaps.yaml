@@ -1,0 +1,99 @@
+id: CHG-WIR-011
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: 'Contract gap (fnb-retail): 14 wiring fixes need an operation the contracts do not have; logged, not invented.'
+decision:
+  what: 'Log, do not invent: each wiring fix below needs an operation (or an audience) the contracts lack. The gap
+    is recorded on the screen (gaps, operation: null) and here, open, for the contract owner.'
+  by: Chinmay
+  date: '2026-10-02'
+  quote: 'Chinmay, 2 Oct 2026: fix the wrong wiring now'
+why: Design-note corrections for fnb-retail (handoff/design-notes/fnb-retail.yaml) name operations that do not exist;
+  the brief for the wiring fixes (Chinmay, 2 October 2026) says to log such a gap as an open contract-gap change
+  and not invent the operation. Each gap cites its correction below; the class is the audit's A28 missing-operation
+  class (R254 re-derivation exposed these).
+keys_touched:
+  screens:
+  - BO-065
+  - BO-112
+  - BO-139
+  - BO-510
+  - BO-733
+  - EMP-030
+  - EMP-055
+  - EMP-056
+  - EMP-068
+  - EMP-088
+  - EMP-095
+  - EMP-100
+  - KIT-009
+  - POS-028
+  tickets:
+  - APP-POS-KIT-009
+  - APP-POS-POS-028
+  - APP-SETUP-BO-065
+  - VM-BO-112
+  - VM-BO-139
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-KIT-009
+  - APP-POS-POS-028
+  - APP-SETUP-BO-065
+  - VM-BO-112
+  - VM-BO-139
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/audit-screenless-operations.py
+status: open
+notes: 'type: contract-gap. Open until the contract change is decided; the wiring fix that needs it lands with it.
+  Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are every tasks.csv or pushed key
+  naming a touched screen. Per screen and flow:
+
+  - POS-028: gap: No staff-audience table reservation create for the till. — The v2 Reservations tab needs a staff
+  booking create; createTableReservation is guest-only (guestAuth, self-scoped).
+
+  - EMP-055: gap: No staff-audience create, amend or cancel of a table reservation. — A host booking for a caller
+  needs a staff-audience create with a permission that records who took it, and amendment and cancellation (MATRIX
+  4.9.10, 13.3.11); createTableReservation and updateTableReservation are guest-only.
+
+  - EMP-056: gap: No read of an outlet''s waitlist entries; no operation seats a waiting party or records walked
+  away. — No operation lists an outlet''s waitlist (POST /waitlist and quote, notify and leave exist, no GET), and
+  nothing seats a waiting party or records walked away (DI-337).
+
+  - EMP-030: gap: No staff-audience read of dining outlets and delivery locations (or the venue-map live state must
+  carry them). — The staff map needs outlet and delivery-location data; the only reads are guest-audience.
+
+  - EMP-068: gap: No read lists merchandise reservations (holds) for an outlet. — There is no list of merchandise
+  reservations to cancel or collect from.
+
+  - EMP-088: gap: No staff-callable reminder for an overdue rental. — The overdue screen needs a staff-callable
+  "remind guest about rental", or the message operation''s audience widened, with the template chosen by name.
+
+  - EMP-095: gap: No read returns a rental booking''s inspections. — A before-and-after comparison needs both inspections
+  read back; no operation returns a booking''s inspections.
+
+  - EMP-100: gap: returnRental carries no per-unit disposition. — The unit''s next state should be part of the return,
+  in the two simplified states (DI-500); returnRental has no per-unit disposition.
+
+  - BO-065: gap: No staff-audience read of delivery locations. — Delivery locations can be created and edited here
+  but only a guest-audience list exists.
+
+  - BO-139: gap: No read lists recorded waste per item, with value and reason. — No read of recorded waste exists,
+  so the screen is a lone form with no list, history or totals (FNB-5E, DI-341, MATRIX 6.1.38).
+
+  - BO-510: gap: No rental-station allocation operation. — Stations are rental locations; no operation allocates
+  rental units to stations.
+
+  - BO-733: gap: No operation configures F&B service channels. — No channel-configuration operation exists for F&B
+  service channels.
+
+  - KIT-009: gap: No read of an outlet''s course rules or kitchen SLA. — Course rules and kitchen targets have setters
+  (setCourseRules, setKitchenSla) but no read, so an editor cannot load the current values.
+
+  - BO-112: gap: No read of production plans (list or get). — A draft plan cannot be reopened, edited or released
+  after the page is left; no list or get of production plans exists.'

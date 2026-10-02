@@ -38,7 +38,7 @@ steps:
   - step: 2
     screen: POS-003
     action: The ticket is timed entry, so a slot is taken.
-    operations: [getAvailability, acquireInventoryHold, renewInventoryHold]
+    operations: [getAvailability, acquireInventoryHold]
     outcome: >
       A lease on the slot. **Contended inventory is leased, not reserved** (CF-115): a slot held
       without a lease is a slot two tills can sell, and the lease expires if the sale stalls.

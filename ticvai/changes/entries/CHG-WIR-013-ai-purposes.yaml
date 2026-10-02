@@ -1,0 +1,65 @@
+id: CHG-WIR-013
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'ai: 7 screen purposes rewritten that were copied from another screen, a generator template or a pasted
+  board placeholder.'
+decision:
+  what: 'Fix the wrong wiring now: give each screen its own one-sentence purpose, keeping what the screen is for.'
+  by: Chinmay
+  date: '2026-10-02'
+  quote: 'Chinmay, 2 Oct 2026: fix the wrong wiring now'
+why: 'Design-note corrections for ai (handoff/design-notes/ai.yaml): the purposes were generator templates, board
+  titles with their date, or text copied from another screen (the boilerplate the 26 September audit traced under
+  R250 and R260); a designer cannot act on them. Each screen''s correction is cited below. The old text is kept
+  in each screen''s purposeNote.'
+keys_touched:
+  screens:
+  - ADM-491
+  - ADM-506
+  - ADM-508
+  - ADM-527
+  - BO-932
+  - EMP-019
+  - SUP-018
+  tickets:
+  - APP-SETUP-ADM-508
+  - APP-SETUP-ADM-527
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ADM-508
+  - APP-SETUP-ADM-527
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: 16fd732e
+notes: 'check-screen-wiring gains S-PURPOSE-BOILERPLATE, which flags the generator and board-placeholder purposes.
+  Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are every tasks.csv or pushed key
+  naming a touched screen. Per screen and flow:
+
+  - EMP-019: purpose rewritten — "The tab that is already in the shell" is not a purpose (DI-964; design-notes correction
+  ai EMP-019).
+
+  - BO-932: purpose rewritten — The purpose carried pasted board text describing the Employee App''s mobile workspace;
+  the mobile part belongs to the Staff App, and this screen is the back-office copilot (design-notes correction
+  ai BO-932).
+
+  - ADM-508: purpose rewritten — The purpose was truncated from the board ("... Forecast vs Actual Example:"); the
+  example belongs in sample data (design-notes correction ai ADM-508).
+
+  - ADM-491: purpose rewritten — The purpose was cut mid-sentence ("so the administrator understands what") (design-notes
+  correction ai ADM-491).
+
+  - ADM-527: purpose rewritten — The board''s example (user, capability, request, steps, final decision) was pasted
+  into the purpose; it belongs in sample data (design-notes correction ai ADM-527).
+
+  - ADM-506: purpose rewritten — The board example (attendance figure, confidence range, "Confidence Status High")
+  was pasted into the purpose; it belongs in sample data, and confidence is never a bare percentage (ADR-0051; design-notes
+  correction ai ADM-506).
+
+  - SUP-018: purpose rewritten — The purpose was a pasted board description (design-notes correction ai SUP-018).'

@@ -1,0 +1,753 @@
+id: CHG-WIR-008
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'fnb-retail: 80 screens rewired — 184 operations taken off screens they do not belong on (bulk-attached,
+  another module''s, guest-, device- or service-only on staff screens, writes on read-only lists), 65 existing operations
+  declared where the screen needed them, 1 duplicate screen(s) merged; 16 flows repointed to match.'
+decision:
+  what: 'Fix the wrong wiring now: take each listed operation off the screen it does not belong on, declare the
+    existing operation the screen needs instead, merge the duplicate screens into the one kept, and repoint the
+    flow steps that called them.'
+  by: Chinmay
+  date: '2026-10-02'
+  quote: 'Chinmay, 2 Oct 2026: fix the wrong wiring now'
+why: 'Process-agent design-note corrections for fnb-retail (handoff/design-notes/fnb-retail.yaml, 1-2 October 2026)
+  found these screens wired by the 18 August bulk attach, by name resemblance or from the wrong contract, against
+  the adopted audit decision R254 (re-derive each screen''s operations from its purpose and journeys) and R276 (duplicate
+  screens). Each screen''s reason and source is below and on the screen itself (gaps with removed: true).'
+keys_touched:
+  screens:
+  - BO-020
+  - BO-021
+  - BO-039
+  - BO-040
+  - BO-041
+  - BO-042
+  - BO-044
+  - BO-045
+  - BO-046
+  - BO-048
+  - BO-049
+  - BO-052
+  - BO-065
+  - BO-080
+  - BO-082
+  - BO-104
+  - BO-105
+  - BO-1065
+  - BO-109
+  - BO-111
+  - BO-112
+  - BO-113
+  - BO-135
+  - BO-136
+  - BO-138
+  - BO-140
+  - BO-142
+  - BO-452
+  - BO-503
+  - BO-504
+  - BO-505
+  - BO-510
+  - BO-513
+  - BO-533
+  - BO-542
+  - BO-561
+  - BO-729
+  - BO-730
+  - BO-731
+  - BO-733
+  - CMS-009
+  - EMP-003
+  - EMP-008
+  - EMP-009
+  - EMP-030
+  - EMP-052
+  - EMP-053
+  - EMP-054
+  - EMP-055
+  - EMP-056
+  - EMP-058
+  - EMP-062
+  - EMP-063
+  - EMP-064
+  - EMP-065
+  - EMP-066
+  - EMP-067
+  - EMP-068
+  - EMP-074
+  - EMP-088
+  - EMP-099
+  - EMP-100
+  - KIT-003
+  - KIT-005
+  - KIT-006
+  - KIT-008
+  - KIT-009
+  - POS-001
+  - POS-007
+  - POS-009
+  - POS-011
+  - POS-012
+  - POS-013
+  - POS-018
+  - POS-021
+  - POS-022
+  - POS-023
+  - POS-024
+  - POS-025
+  - POS-028
+  operations:
+  - acceptShiftVariance
+  - acknowledgePurchaseOrder
+  - adjustDepositBoxFloat
+  - approveMembershipProductValidation
+  - approveShiftOpen
+  - buildProductionPlan
+  - cancelFnbOrder
+  - cancelMerchandiseReservation
+  - cancelPurchaseOrder
+  - closeDepositBoxes
+  - closePurchaseOrderShort
+  - closeShift
+  - closeTransferShort
+  - collectMerchandiseReservation
+  - createApprovalRequest
+  - createCashMovement
+  - createFnbOrder
+  - createGoodsReceipt
+  - createMenu
+  - createOutlet
+  - createPurchaseOrder
+  - createRentalBooking
+  - createRotaAssignment
+  - createSaleBoard
+  - createStockLocation
+  - createStockTransfer
+  - createTable
+  - createTableReservation
+  - getAllergenVerification
+  - getBill
+  - getCountVariance
+  - getCurrentShift
+  - getFnbReservationPolicy
+  - getFnbServiceChargePolicy
+  - getGuestMenu
+  - getGuestOrderStatus
+  - getHaccpStatus
+  - getKpiValues
+  - getMenu
+  - getOfflinePackage
+  - getOutlet
+  - getOutletStock
+  - getProductionRun
+  - getRegionSettings
+  - getRentalAvailability
+  - getShift
+  - getStockPositions
+  - getStockTransfer
+  - getSuggestedRequisitions
+  - getTableMap
+  - getTableVisit
+  - getVenueSettings
+  - joinRestaurantWaitlist
+  - list86Events
+  - listAlerts
+  - listAssets
+  - listCashMovements
+  - listCommercialPricing
+  - listDeliveryLocations
+  - listDenominations
+  - listDepositActivity
+  - listDepositBoxes
+  - listDiningOutlets
+  - listExpiringBatches
+  - listFnbOrders
+  - listGames
+  - listInventoryItems
+  - listKitchenStations
+  - listKitchenTickets
+  - listMenuSchedules
+  - listMenuVersions
+  - listMenus
+  - listMerchandise
+  - listModifierGroups
+  - listOrders
+  - listOutlets
+  - listPrincipals
+  - listProductionRuns
+  - listPurchaseOrders
+  - listReaders
+  - listRentalBookings
+  - listRoles
+  - listRotaAssignments
+  - listSerialisedItems
+  - listShifts
+  - listStockCounts
+  - listStockTransfers
+  - listSyncRejections
+  - listTemperatureCheckpoints
+  - listWorkstations
+  - logTemperature
+  - lookupMerchandise
+  - lookupRetailSale
+  - notifyWaitlistParty
+  - openShift
+  - postStockCount
+  - prioritiseKitchenTicket
+  - quoteWaitTime
+  - receiveStockTransfer
+  - recordNoSale
+  - recordOrderHandover
+  - recordWaste
+  - releaseProductionPlan
+  - reopenShift
+  - reprintReceipt
+  - requestBill
+  - requestRecount
+  - reserveMerchandise
+  - resolveBookingConflict
+  - resumeShift
+  - sendBookingConfirmation
+  - sendPurchaseOrder
+  - sendTransactionalMessage
+  - setAssetStatus
+  - setCourseRules
+  - setFnbReservationPolicy
+  - setGamePricing
+  - setItemAvailability
+  - setKitchenStations
+  - setKitchenTicketStatus
+  - setMenuSections
+  - setSectionLayout
+  - setTableCombinations
+  - setTableLayout
+  - setVenueSettings
+  - splitBill
+  - suspendShift
+  - updateMenu
+  - updateOutlet
+  - updateRequisitionLines
+  - updateTable
+  - withdrawFromDepositBox
+  flows:
+  - F108
+  - F13
+  - F28
+  - F31
+  - F32
+  - F35
+  - F70
+  - F76
+  - F80
+  - F81
+  - F83
+  - F85
+  - F87
+  - F88
+  - F92
+  - F94
+  tickets:
+  - APP-POS-KIT-003
+  - APP-POS-KIT-005
+  - APP-POS-KIT-006
+  - APP-POS-KIT-008
+  - APP-POS-KIT-009
+  - APP-POS-POS-001
+  - APP-POS-POS-007
+  - APP-POS-POS-009
+  - APP-POS-POS-011
+  - APP-POS-POS-012
+  - APP-POS-POS-013
+  - APP-POS-POS-018
+  - APP-POS-POS-021
+  - APP-POS-POS-022
+  - APP-POS-POS-023
+  - APP-POS-POS-024
+  - APP-POS-POS-025
+  - APP-POS-POS-028
+  - APP-SETUP-BO-044
+  - APP-SETUP-BO-045
+  - APP-SETUP-BO-065
+  - APP-SETUP-BO-1065
+  - APP-SETUP-BO-136
+  - APP-SETUP-EMP-062
+  - APP-SETUP-EMP-065
+  - APP-WL-CMS-009
+  - VM-BO-020
+  - VM-BO-021
+  - VM-BO-039
+  - VM-BO-040
+  - VM-BO-041
+  - VM-BO-042
+  - VM-BO-046
+  - VM-BO-048
+  - VM-BO-049
+  - VM-BO-052
+  - VM-BO-080
+  - VM-BO-082
+  - VM-BO-104
+  - VM-BO-105
+  - VM-BO-109
+  - VM-BO-111
+  - VM-BO-112
+  - VM-BO-113
+  - VM-BO-135
+  - VM-BO-138
+  - VM-BO-140
+  - VM-BO-142
+root_class: A31 SCREEN-WRONG-OP
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-KIT-003
+  - APP-POS-KIT-005
+  - APP-POS-KIT-006
+  - APP-POS-KIT-008
+  - APP-POS-KIT-009
+  - APP-POS-POS-001
+  - APP-POS-POS-007
+  - APP-POS-POS-009
+  - APP-POS-POS-011
+  - APP-POS-POS-012
+  - APP-POS-POS-013
+  - APP-POS-POS-018
+  - APP-POS-POS-021
+  - APP-POS-POS-022
+  - APP-POS-POS-023
+  - APP-POS-POS-024
+  - APP-POS-POS-025
+  - APP-POS-POS-028
+  - APP-SETUP-BO-044
+  - APP-SETUP-BO-045
+  - APP-SETUP-BO-065
+  - APP-SETUP-BO-1065
+  - APP-SETUP-BO-136
+  - APP-SETUP-EMP-062
+  - APP-SETUP-EMP-065
+  - APP-WL-CMS-009
+  - VM-BO-020
+  - VM-BO-021
+  - VM-BO-039
+  - VM-BO-040
+  - VM-BO-041
+  - VM-BO-042
+  - VM-BO-046
+  - VM-BO-048
+  - VM-BO-049
+  - VM-BO-052
+  - VM-BO-080
+  - VM-BO-082
+  - VM-BO-104
+  - VM-BO-105
+  - VM-BO-109
+  - VM-BO-111
+  - VM-BO-112
+  - VM-BO-113
+  - VM-BO-135
+  - VM-BO-138
+  - VM-BO-140
+  - VM-BO-142
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: 16fd732e
+notes: 'check-screen-wiring gains S-STAFF-AUDIENCE (a staff screen calling a guest-, device-, service- or partner-only
+  operation) beside the existing S-DUP-SCREEN and S-CONSUMED-MIRROR rules, and check-screens keeps its R254 attachment
+  warnings; check-flows rule 3 holds every repointed flow step to its screen. Tickets: none started (Block A starts
+  Monday 5 October 2026); unstarted keys are every tasks.csv or pushed key naming a touched screen. Per screen and
+  flow:
+
+  - POS-001: removed acceptShiftVariance, adjustDepositBoxFloat, closeShift, createCashMovement, getShift, listCashMovements,
+  listShifts, recordNoSale, reopenShift, suspendShift — Thirteen operations that belong to other screens were bulk-attached
+  to Begin Shift: closing and variance acceptance are POS-007, cash in/out POS-017, safe drops POS-018, no-sale
+  and suspend the till''s shift menu. Kept: openShift, getCurrentShift, resumeShift, approveShiftOpen, listDenominations,
+  ge…
+
+  - POS-007: removed adjustDepositBoxFloat, approveShiftOpen, closeDepositBoxes, createCashMovement, getShift, listShifts,
+  openShift, recordNoSale, reopenShift, reprintReceipt, resumeShift, suspendShift — Close Shift carried fourteen
+  bulk-attached operations; its purpose is to count the drawer and close. Kept: closeShift, acceptShiftVariance,
+  getCurrentShift, listDenominations and listCashMovements for the supervisor''s review (R254, F87 step 4; design-notes
+  correction fnb-retail POS-007).
+
+  - POS-025: declared suspendShift, reopenShift — Suspend and reopen came off Begin Shift, Close Shift, the roster,
+  the staff app and the back office, where they were bulk-attached; a suspend belongs on the till''s shift menu
+  (design-notes correction fnb-retail POS-001), and a reopen is the supervisor''s reversal on the same till with
+  a PIN step-up…
+
+  - POS-009: removed acceptShiftVariance, approveShiftOpen, closeShift, createRotaAssignment, getCurrentShift, getShift,
+  listAlerts, listCashMovements, listWorkstations, openShift, recordNoSale, reopenShift, resumeShift, suspendShift
+  — A roster is a read plus attendance; twelve shift and money operations, the workstation and alert tables and
+  rota planning (createRotaAssignment, a back-office workforce task) were bulk-attached (R254; design-notes corrections
+  fnb-retail POS-009).
+
+  - POS-011: removed adjustDepositBoxFloat, listDenominations, listOutlets — The cash count, denominations, outlets
+  and the deposit-box float adjustment were attached by resemblance and serve no return (R254; design-notes correction
+  fnb-retail POS-011).
+
+  - POS-012: removed adjustDepositBoxFloat, listDenominations, openShift — Denominations, Adjust deposit box float
+  and Open shift were bulk-attached; a collection counter needs the order list and the handover (R254; design-notes
+  correction fnb-retail POS-012).
+
+  - POS-013: removed adjustDepositBoxFloat, createCashMovement, getOfflinePackage, listCashMovements, listDenominations,
+  withdrawFromDepositBox; declared listSyncRejections — Cash operations (movements, withdraw, float) and getOfflinePackage
+  (a gate scanner''s package needing ACCESS_VALIDATE) are other screens''; the refused-on-replay list (listSyncRejections)
+  is this screen''s job and was missing (MATRIX 2.3.1, R254; design-notes correction fnb-retail POS-013).
+
+  - POS-018: removed createRotaAssignment, listPrincipals, listRotaAssignments; declared listDepositBoxes — listPrincipals
+  (needs USER_MANAGE), the principal and rota tables and Create rota assignment are unrelated to a safe drop, which
+  needs the open drawers (listDepositBoxes) and the withdrawal (R254; design-notes correction fnb-retail POS-018).
+
+  - POS-021: removed listMenus, listModifierGroups — listMenus is a back-office read needing PRODUCT_VIEW ("A terminal
+  reads its menu from the catalogue bundle"), and getGuestMenu already returns each item''s option groups, so listModifierGroups
+  is not needed on the till (R254; design-notes correction fnb-retail POS-021).
+
+  - POS-022: declared cancelFnbOrder — Send-then-charge (R261) makes an unpaid sent order an everyday case; F108
+  resolves "guest walks away" with cancelFnbOrder, which the counter did not declare (design-notes correction fnb-retail
+  POS-022).
+
+  - POS-023: removed listMerchandise — listMerchandise was loaded although "a terminal does not call this"; the
+  till reads its catalogue from the local bundle and checks stock with the barcode lookup (R254; design-notes correction
+  fnb-retail POS-023).
+
+  - POS-024: removed listMenus, listOutlets — The outlet is the till''s and the menu is not edited here (86 needs
+  only the items); the outlet and menu tables were plumbing on a manager''s screen (R254; design-notes correction
+  fnb-retail POS-024).
+
+  - POS-028: declared getTableVisit, getBill, requestBill, splitBill — DI-106 puts bill splitting on POS-028, but
+  reading the visit, the bill, splitting and requesting it existed only on the staff app''s EMP-059; without them
+  the till cannot recall or settle a table (design-notes correction fnb-retail POS-028).
+
+  - EMP-003: removed acceptShiftVariance, approveShiftOpen, closeShift, listCashMovements, listShifts, openShift,
+  recordNoSale, reopenShift, resumeShift, suspendShift — Till and cash-shift writes on the staff-app home are bulk-attach
+  residue; the screen''s own notes removed createCashMovement because a screen that does not handle money should
+  not move it, and a variance is accepted on the till by a supervisor (R080(e)). F08 step 4 and F64 step 4 need
+  only getCurren…
+
+  - EMP-009: removed approveShiftOpen, createCashMovement, openShift, recordNoSale, reopenShift, resumeShift — An
+  end-of-shift screen does not open a shift, approve an opening float or open the drawer; F72 step 3 needs closeShift,
+  acceptShiftVariance and listCashMovements (R254; design-notes correction fnb-retail EMP-009).
+
+  - EMP-008: removed suspendShift — F72 step 1 declares the shift summary read-only ("the person being reviewed
+  could sign off their own review"); suspending is the break mechanism and belongs on the till (R254; design-notes
+  correction fnb-retail EMP-008).
+
+  - EMP-030: removed listDeliveryLocations, listDiningOutlets — listDiningOutlets and listDeliveryLocations are
+  guest-audience operations with no permission; a staff screen calling them bypasses the staff permission model
+  (design-notes correction fnb-retail EMP-030).
+
+  - EMP-052: removed setTableLayout — "Save table layout" (setTableLayout, PRODUCT_CONFIGURE) is configuration on
+  the live service map; layout editing is EMP-053, and F80 says configuration does not work offline while service
+  does (F94 step 1, R254; design-notes correction fnb-retail EMP-052).
+
+  - EMP-053: removed createTable, updateTable; declared setTableCombinations — Three ways to write the same table
+  (setTableLayout for the whole outlet, createTable and updateTable for one) mean two conflict behaviours on one
+  screen; the editor saves the whole layout. Table combinations are declared before service and saved with the layout,
+  so setTableCombinations moves here f…
+
+  - EMP-054: declared resolveBookingConflict — The double-booking read (resolveBookingConflict, "Board 4D") was
+  consumed by no screen, though this screen is the client''s frame fnb-4d (design-notes correction fnb-retail EMP-054).
+
+  - EMP-055: removed createTableReservation; declared getFnbReservationPolicy, sendBookingConfirmation — createTableReservation
+  is a guest operation (guestAuth, self-scoped, no permission); a host booking for a caller is not the caller, so
+  it comes off the staff app until a staff-audience create exists (open contract gap CHG-WIR-011). The confirmation
+  ("Board 4E") and the default duration were not wir…
+
+  - EMP-056: declared quoteWaitTime, notifyWaitlistParty — The quote and the call belong to the waitlist (F29 branch
+  at 1); quoteWaitTime and notifyWaitlistParty were on EMP-058, not on the waitlist screen (design-notes correction
+  fnb-retail EMP-056).
+
+  - EMP-058: removed joinRestaurantWaitlist, notifyWaitlistParty, quoteWaitTime, setTableCombinations — Combinations
+  are pre-service configuration (EMP-053) and the waitlist actions belong to EMP-056; R254 re-derives operations
+  from purpose (F94 step 1, F29 step 1; design-notes correction fnb-retail EMP-058).
+
+  - EMP-062: removed getHaccpStatus, logTemperature, setItemAvailability; declared getOutletStock, lookupMerchandise;
+  set requiresModule=retail — The client defined this screen as retail store stock and availability; the HACCP status,
+  Log temperature and the F&B 86 toggle are other processes attached through F28 and the F&B board. The shop-floor
+  reads that exist for exactly this (getOutletStock, consumed only by BO-044, and lookupMerchandise…
+
+  - EMP-067: declared getHaccpStatus — F28 step 1 read the food-safety checks due on EMP-062, a retail stock screen;
+  the staff app''s food-safety section (log temperature, sign corrective action) is here, and needs the status read
+  to show what is due (design-notes corrections fnb-retail EMP-062, EMP-067).
+
+  - EMP-063: declared getSuggestedRequisitions, updateRequisitionLines — The smart replenishment half (suggestions
+  from reorder points) and editing lines before approval were missing; both operations exist (DI-234; design-notes
+  correction fnb-retail EMP-063).
+
+  - EMP-064: declared listStockTransfers, getStockTransfer, receiveStockTransfer — The transfer screen could only
+  create; it had no transfer list, no manifest and no Receive, though the operations exist (design-notes correction
+  fnb-retail EMP-064).
+
+  - EMP-065: declared listPurchaseOrders, receiveStockTransfer — A receipt needs a purchase order the handheld could
+  not look up, and a transfer manifest could be read but not received; a transfer refused at the door is a received
+  quantity lower than sent (receiveStockTransfer), not rejectReceivedGoods (F35 steps 2-3; design-notes corrections
+  fnb-retail EMP-065).
+
+  - EMP-066: removed getCountVariance, postStockCount, requestRecount; declared listStockCounts — In F30, variance
+  review, recount requests and posting are the supervisor''s steps on BO-079 (steps 4, 5 and 7); a counter''s device
+  showing variance weakens the blind count. Without the open-count list the counter cannot find the count (F30,
+  R110; design-notes correction fnb-retail EMP-066).
+
+  - EMP-068: declared collectMerchandiseReservation, cancelMerchandiseReservation — A hold that cannot be released
+  or collected from the handheld is held until it expires; cancel and collect exist (design-notes correction fnb-retail
+  EMP-068).
+
+  - EMP-074: declared getRentalAvailability — The manual pick from available units (DI-760) had no operation; getRentalAvailability
+  returns the available asset ids (design-notes correction fnb-retail EMP-074).
+
+  - EMP-088: removed sendTransactionalMessage — sendTransactionalMessage declares the service and partner audiences,
+  not staff, so a staff device cannot call it as declared (design-notes correction fnb-retail EMP-088).
+
+  - EMP-099: declared listDepositActivity — The deposit history the purpose requires was not bound; payments already
+  has the deposit movement history (listDepositActivity) (design-notes correction fnb-retail EMP-099).
+
+  - EMP-100: removed setAssetStatus — setAssetStatus needs ASSET_MANAGE (a configure-tier grant on the staff app),
+  offers six maintenance statuses and takes one asset per screen; the unit''s next state belongs to the return (DI-500;
+  design-notes correction fnb-retail EMP-100).
+
+  - BO-020: removed createFnbOrder, listKitchenStations, setKitchenStations — Station set-up and item routing are
+  configuration owned by Kitchen & Preparation Stations, and the back office has no tender step, so a quick-service
+  order created here is unpaid; F&B orders are sent to the kitchen and then charged on the till (R254, R261, POSV2-4,
+  DI-323; design-notes corrections…
+
+  - BO-021: removed getGuestOrderStatus; declared listFnbOrders, lookupRetailSale — Order Search bound only getGuestOrderStatus,
+  a guest-audience read of one order by id, and had no search; a staff lookup is listFnbOrders (F&B) and lookupRetailSale
+  (retail receipt) (R254; design-notes correction fnb-retail BO-021).
+
+  - BO-039: removed acceptShiftVariance, approveShiftOpen, closeShift, createCashMovement, getCurrentShift, openShift,
+  recordNoSale, reopenShift, resumeShift, suspendShift — Till acts were bound to the back-office directory, including
+  getCurrentShift ("the shift on the session''s workstation", which a browser has not) and acceptShiftVariance,
+  whose one path is a supervisor on the till with a PIN step-up (R080, POSV2-3); the directory''s purpose "See every
+  till, open or c…
+
+  - BO-040: removed acceptShiftVariance, approveShiftOpen, closeShift, createCashMovement, getCurrentShift, openShift,
+  recordNoSale, reopenShift, resumeShift, suspendShift — acceptShiftVariance on BO-040 contradicts R080 (e) and
+  the contract itself ("BO-040 lists the shifts waiting here; it does not approve them by another route"); the till
+  and lifecycle operations were bulk-attached (R254, POSV2-3; design-notes corrections fnb-retail BO-040).
+
+  - BO-041: removed recordNoSale — A no-sale is a drawer opening at a till (F32 step 5, POS-020); recorded from
+  a browser it opens no drawer and fabricates an incident. Keep the log, drop the act (R254; design-notes correction
+  fnb-retail BO-041).
+
+  - BO-042: removed getShift, listCashMovements, listShifts — The box list is the queue; the "Waiting for a decision"
+  cash-movement table and the "Every shift" table were bulk plumbing (R251; design-notes correction fnb-retail BO-042).
+
+  - BO-044: removed getGuestMenu, getOutletStock, listFnbOrders, listMerchandise, recordWaste, reserveMerchandise
+  — Reserve merchandise (a guest or till act), Record waste (a stock act), the F&B order and merchandise tables,
+  and the outlet stock and guest menu panels were attached by resemblance; the outlet register''s purpose does not
+  need them (R254, R236, R215; design-notes correction fnb-retail BO-044).
+
+  - BO-045: declared getAllergenVerification, listMenuVersions, listMenuSchedules, listModifierGroups, createApprovalRequest
+  — getAllergenVerification exists and names BO-045; rollback needs the version list and cancelling a schedule the
+  pending list (both added 26 September for this); attaching an existing group needs listModifierGroups; and a repricing
+  above threshold needs its approval (createApprovalRequest) before pub…
+
+  - BO-046: removed listKitchenStations, setKitchenStations — Station configuration (the station table and Save
+  kitchen stations) sat on a monitoring screen; configuration lives on BO-134 (R254; design-notes correction fnb-retail
+  BO-046).
+
+  - BO-048: removed lookupMerchandise — On a back-office product list search covers lookup and the primary act is
+  adding an item; the price check (lookupMerchandise) belongs to the till and the handheld (design-notes correction
+  fnb-retail BO-048).
+
+  - BO-049: removed setItemAvailability — "Save item availability" (the F&B 86 operation) acts on a menu item, not
+  a stock item, and has its own screen (BO-140) (R254, R110; design-notes correction fnb-retail BO-049).
+
+  - BO-052: removed acknowledgePurchaseOrder, cancelPurchaseOrder, closePurchaseOrderShort, closeTransferShort,
+  createPurchaseOrder, getStockTransfer, sendPurchaseOrder — The purchase-order lifecycle belongs to BO-051 and
+  the transfer actions to BO-080; F76 step 5 and F92 step 5 attached them here before BO-051 existed in the chain.
+  Kept receipt, rejection, the order list for picking and receipt history (R254; design-notes correction fnb-retail
+  BO-052).
+
+  - BO-065: removed listDeliveryLocations, listDiningOutlets — listDiningOutlets (a guest read of outlets open now)
+  and listDeliveryLocations are guest-audience reads, not venue configuration; outlets are configured on BO-044
+  (R254; design-notes correction fnb-retail BO-065).
+
+  - BO-080: removed createGoodsReceipt — Transfers are received with Receive; a goods receipt needs a supplier purchase
+  order and was attached by resemblance (R254; design-notes correction fnb-retail BO-080).
+
+  - BO-082: removed createStockTransfer, listOrders — An "Every order" table (sales orders) and "Create stock transfer"
+  sit on the movement ledger, attached through F35 step 7; sourcing belongs with transfers (BO-080) and the order
+  screens (R254; design-notes correction fnb-retail BO-082).
+
+  - BO-104: removed createMenu, getVenueSettings, listMenus — Menu management (the menu table and Start a menu)
+  belongs to BO-045, and getVenueSettings carries no module enablement (R279), so "What is enabled here" cannot
+  come from it (design-notes corrections fnb-retail BO-104).
+
+  - BO-105: removed getVenueSettings, listInventoryItems, listPurchaseOrders — The hub bound an inventory-item table,
+  a purchase-order table and a venue-settings panel, duplicating BO-081 and BO-051; a hub''s operations are the
+  KPI read plus the add-item shortcut, and getVenueSettings carries no module enablement (R254, R283; design-notes
+  corrections fnb-retail BO-105).
+
+  - BO-109: declared createSaleBoard — An outlet with no board yet could not start from the builder; createSaleBoard
+  exists (on BO-124) (design-notes correction fnb-retail BO-109).
+
+  - BO-111: removed updateMenu; declared getAllergenVerification — "Save menu" (updateMenu: name, service period,
+  active) has nothing to do with allergens and was attached by name (R254); re-verification is automatic after a
+  change (R241), and the automatic verdict is getAllergenVerification, which exists and names BO-111 (design-notes
+  corrections fnb-retail BO-11…
+
+  - BO-112: declared buildProductionPlan, releaseProductionPlan, listProductionRuns — Planning is this screen''s
+  job (DI-329 scopes BO-112), but buildProductionPlan and releaseProductionPlan were declared on BO-136 (F&B Global
+  Settings) because the production frames were mis-mapped there; F85 step 1 moves here with them (design-notes corrections
+  fnb-retail BO-112, BO-136).
+
+  - BO-136: removed buildProductionPlan, listProductionRuns, releaseProductionPlan; declared setCourseRules — Production
+  operations (build and release plan, the run list) and F85 step 1 belong to BO-112; their frames (fnb-2m, 2n, 5d)
+  were attached to this settings screen by mistake. Course rules are set before service, here (KIT-003 correction),
+  not on the live pass (R254; design-notes corrections fnb-reta…
+
+  - BO-113: declared listProductionRuns, createStockTransfer — No read was declared (the batches with their allocation
+  are listProductionRuns), and each outlet''s share "becomes a transfer" (FNB-2N) with no transfer operation wired
+  (R254; design-notes corrections fnb-retail BO-113).
+
+  - BO-135: removed listWorkstations, setKitchenStations; merged into BO-134 — BO-134 and BO-135 both save stations
+  (setKitchenStations) and the client board draws them as two tabs of one area ("Kitchens & Stations | Routing Rules");
+  merged into one "Kitchen stations & routing" screen, BO-134 (DI-987, DI-671; design-notes corrections fnb-retail
+  BO-134, BO-135).
+
+  - BO-138: removed listExpiringBatches; declared listProductionRuns, getProductionRun — The population was listExpiringBatches
+  (supplier stock batches with lot and expiry), not production batches; production execution is listProductionRuns
+  and getProductionRun, and expiring stock belongs to the stock screens (DI-341; design-notes correction fnb-retail
+  BO-138).
+
+  - BO-140: removed listExpiringBatches; declared getMenu, list86Events, getHaccpStatus, listTemperatureCheckpoints
+  — The population was listExpiringBatches (stock batches), so the Available toggle had no menu item to bind; the
+  list is the outlet''s menu items with availability (getMenu), and the 86 history, HACCP status and checkpoint
+  list the frame and F28 show were not declared (design-notes corrections fnb-reta…
+
+  - BO-142: removed getVenueSettings, listRoles — The roles list (needs the role-management permission) and venue
+  settings (no retail setting) are not this screen''s data (R091, R254; design-notes correction fnb-retail BO-142).
+
+  - BO-452: declared listGames, listReaders, setGamePricing — The only operation was the prize stock read; machine,
+  type, play price and reader are game, pricing and reader data (listGames, setGamePricing, listReaders) (design-notes
+  correction fnb-retail BO-452).
+
+  - BO-503: removed approveMembershipProductValidation — approveMembershipProductValidation (a membership operation)
+  was bulk-attached by name; rental publication is publishRentalProduct (R254; design-notes correction fnb-retail
+  BO-503).
+
+  - BO-504: removed getStockPositions, listInventoryItems; declared listRentalBookings, listAssets — General inventory
+  positions have no rented, reserved or maintenance state; rental unit status lives with rental bookings and assets
+  (DI-744; design-notes correction fnb-retail BO-504).
+
+  - BO-505: removed listSerialisedItems — listSerialisedItems is retail serials (in stock, sold, returned); rental
+  units are assets with rental states (listAssets, declared) (design-notes correction fnb-retail BO-505).
+
+  - BO-510: removed createStockLocation — Creating a stock location is warehouse set-up, not allocation of rental
+  units to stations (R254; design-notes correction fnb-retail BO-510).
+
+  - BO-513: removed getSuggestedRequisitions — Reorder suggestions buy stock; rebalancing moves rental units between
+  stations (R254; design-notes correction fnb-retail BO-513).
+
+  - BO-533: removed listCommercialPricing — listCommercialPricing is ticket catalogue pricing, not rental pricing;
+  bulk-attached (R254; design-notes correction fnb-retail BO-533).
+
+  - BO-542: removed createRentalBooking — Modifying is updateRentalBooking; a second booking (createRentalBooking)
+  is not a change (R254; design-notes correction fnb-retail BO-542).
+
+  - BO-729: removed createTable, listMenus, setSectionLayout, updateTable; declared createOutlet, updateOutlet —
+  A Create / Edit Outlet screen bound createTable, updateTable, setSectionLayout and listMenus and neither createOutlet
+  nor updateOutlet, so it could not create or edit an outlet (design-notes correction fnb-retail BO-729).
+
+  - BO-730: removed listMenus — The content table was bound to listMenus ("Menu items"); the templates list (listOutletTemplates,
+  declared) is the screen (design-notes correction fnb-retail BO-730).
+
+  - BO-731: removed listKitchenTickets; declared listOutlets, updateOutlet — The only operation was listKitchenTickets
+  (the kitchen rail), nothing to do with hours or periods; opening hours are Outlet.openingHours, written by updateOutlet
+  (R254; design-notes correction fnb-retail BO-731).
+
+  - BO-733: removed getKpiValues, setFnbReservationPolicy — The table was bound to getKpiValues (no per-channel
+  KPI is seeded) and setFnbReservationPolicy (table turn times) belongs to reservations; the screen could read and
+  save nothing it shows (R254; design-notes correction fnb-retail BO-733).
+
+  - BO-1065: declared getRegionSettings; set requiresModule=core — updateRegionSettings replaces the whole record
+  and no read was declared, so a save would reset fields it never loaded; currency, time zone and denominations
+  are region settings every till needs, so the screen requires core, not seating (design-notes corrections fnb-retail
+  BO-1065).
+
+  - CMS-009: removed createMenu, getMenu, listMenus, setMenuSections, updateMenu; set requiresModule=core — "Navigation
+  & Menus" means site navigation menus; the F&B menu operations (listMenus, getMenu, createMenu, setMenuSections,
+  updateMenu) were attached by name resemblance and belong to BO-045 and BO-109. Every tenant needs navigation,
+  so the screen requires core (R254; design-notes corrections fnb-r…
+
+  - KIT-003: removed setCourseRules — "Save course rules" (setCourseRules, outlet configuration) sat on the live
+  pass; course rules are set up before service (now on BO-136) (R254; design-notes correction fnb-retail KIT-003).
+
+  - KIT-005: removed setKitchenStations — setKitchenStations is permanent station set-up and display assignment;
+  the contract says a temporary move is the rebalance, and permanent set-up belongs in BO-134 (design-notes correction
+  fnb-retail KIT-005).
+
+  - KIT-006: declared recordOrderHandover — Collection was recorded with markOrderCollected only; a runner''s delivery
+  needs recordOrderHandover with the location (R125(1); design-notes correction fnb-retail KIT-006).
+
+  - KIT-009: removed prioritiseKitchenTicket, setVenueSettings — setVenueSettings (the whole venue record, TENANT_CONFIGURE)
+  on a kitchen device is a permission leak, and prioritising one ticket is a live act on the pass (KIT-003), not
+  a rules setting (R254; design-notes corrections fnb-retail KIT-009).
+
+  - KIT-008: removed setKitchenTicketStatus — "Save kitchen ticket status" on an exceptions screen is plumbing;
+  the screen shows today''s events and has no ticket status to save (R254; design-notes correction fnb-retail KIT-008).
+
+  - BO-561: removed sendTransactionalMessage — sendTransactionalMessage declares the service and partner audiences,
+  not staff; BO-561 is the back-office twin of EMP-088, corrected the same way (design-notes corrections fnb-retail
+  EMP-088, EMP-071 twins).
+
+  - BO-729: declared getOutlet — The outlet form now creates and amends the outlet (createOutlet, updateOutlet);
+  an edit needs the outlet it edits, read by getOutlet (design-notes correction fnb-retail BO-729; check-screen-wiring
+  S-NO-READ, R265).
+
+  - BO-733: declared getFnbServiceChargePolicy — With the attached reads gone, the service charge write (setFnbServiceChargePolicy)
+  needs the policy in force, getFnbServiceChargePolicy (design-notes correction fnb-retail BO-733; R265).
+
+  - POS-024: declared getTableMap — With the outlet and menu tables gone, the layout writes (setTableLayout, setTableCombinations)
+  need the outlet''s floor as it is, getTableMap (design-notes correction fnb-retail POS-024; R265).
+
+  - F32: step 2 operations [''adjustDepositBoxFloat'', ''listDenominations'', ''openShift''] -> [''listDenominations'',
+  ''openShift'']; step 4 screen POS-013 -> POS-018; step 4 note
+
+  - F35: step 3 operations [''rejectReceivedGoods'', ''logColdChain''] -> [''receiveStockTransfer'', ''logColdChain''];
+  step 3 note; step 4 screen BO-052 -> BO-080; step 4 operations [''createGoodsReceipt'', ''closeTransferShort'']
+  -> [''receiveStockTransfer'', ''closeTransferShort'']; step 4 note; step 7 screen BO-082 -> BO-080; step 7 operations
+  [''createStockTransfer'', ''listOrders''] -> [''createStockTransfer'']; step 7 note
+
+  - F76: step 5 screen BO-052 -> BO-051; step 5 operations [''acknowledgePurchaseOrder'', ''cancelPurchaseOrder'',
+  ''closePurchaseOrderShort'', ''createPurchaseOrder'', ''getPurchaseOrder'', ''listGoodsReceipts''] -> [''acknowledgePurchaseOrder'',
+  ''cancelPurchaseOrder'', ''closePurchaseOrderShort'', ''createPurchaseOrder'', ''getPurchaseOrder'']
+
+  - F92: step 4 operations [''closeTransferShort'', ''createGoodsReceipt'', ''createStockTransfer'', ''getStockTransfer'']
+  -> [''closeTransferShort'', ''createStockTransfer'', ''getStockTransfer'']; step 5 screen BO-052 -> BO-051
+
+  - F80: step 2 operations [''holdCourse'', ''joinRestaurantWaitlist'', ''mergeTableVisits'', ''moveTableVisit'',
+  ''notifyWaitlistParty'', ''quoteWaitTime''] -> [''holdCourse'', ''mergeTableVisits'', ''moveTableVisit'']
+
+  - F94: step 1 operations [''reassignServer'', ''setTableCombinations'', ''transferTableVisit'', ''updateTableVisit'']
+  -> [''reassignServer'', ''transferTableVisit'', ''updateTableVisit'']
+
+  - F87: step 2 operations [''adjustDepositBoxFloat'', ''getCurrentShift'', ''listDenominations'', ''listOrders'']
+  -> [''getCurrentShift'', ''listOrders'']; step 3 operations [''adjustDepositBoxFloat'', ''createCashMovement'',
+  ''createOrder'', ''getOfflinePackage''] -> [''createOrder'']; step 4 operations [''approveShiftOpen'', ''reopenShift'',
+  ''resumeShift'', ''suspendShift''] -> [''closeShift'']
+
+  - F81: step 1 operations [''getGuestOrderStatus'', ''recordOrderHandover''] -> [''listFnbOrders'', ''recordOrderHandover'']
+
+  - F13: step 2 operations [''listShifts'', ''acceptShiftVariance''] -> [''listShifts'']; step 2 note
+
+  - F85: step 1 screen BO-136 -> BO-112
+
+  - F28: step 1 screen EMP-062 -> EMP-067; step 1 note
+
+  - F108: step 1 operations [''getGuestMenu'', ''listModifierGroups'', ''addCartLine''] -> [''getGuestMenu'', ''addCartLine''];
+  step 2 operations [''listModifierGroups'', ''evaluatePromotions''] -> [''evaluatePromotions'']
+
+  - F31: step 3 operations [''updateMenu''] -> [''getAllergenVerification'']
+
+  - F83: step 3 operations [''prioritiseKitchenTicket'', ''setCourseRules''] -> [''prioritiseKitchenTicket'']
+
+  - F88: step 3 operations [''fireCourse'', ''holdCourse'', ''prioritiseKitchenTicket'', ''setCourseRules''] ->
+  [''fireCourse'', ''holdCourse'', ''prioritiseKitchenTicket'']
+
+  - F70: step 2 operations [''getVenueMap'', ''getVenueMapLive'', ''listDiningOutlets''] -> [''getVenueMap'', ''getVenueMapLive'']'

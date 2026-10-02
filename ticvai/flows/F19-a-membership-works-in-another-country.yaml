@@ -33,10 +33,9 @@ steps:
 - step: 2
   screen: ADM-003
   action: The right is propagated to the other cell
-  operations:
-  - propagateCrossRegionEntitlement
-  - getCrossRegionEntitlement
+  operations: []
   outcome: A copy of the entitlement to redeem against, not the entitlement itself
+  note: '**Repointed 2 October (CHG-WIR-021).** propagateCrossRegionEntitlement is a service-audience call between cells and getCrossRegionEntitlement a tenant read; no operator makes either from platform cell health. The service propagates the right at purchase; ADM-003 shows the cells'' health only.'
 - step: 3
   screen: SCN-003
   action: Guest scans at the other venue
@@ -53,9 +52,9 @@ steps:
 - step: 5
   screen: ADM-003
   action: Reconciliation confirms it
-  operations:
-  - reconcileRedemptions
+  operations: []
   outcome: Or names the difference
+  note: '**Repointed 2 October (CHG-WIR-021).** reconcileRedemptions is a service-audience call between cells; the reconciliation runs without a person, and ADM-003 shows the cells'' health only.'
 branches:
 - at: 2
   condition: The target cell is unreachable when the right is propagated

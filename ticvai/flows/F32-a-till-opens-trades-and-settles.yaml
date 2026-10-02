@@ -39,7 +39,7 @@ steps:
   - step: 2
     screen: POS-001
     action: They count the opening float into the drawer.
-    operations: [adjustDepositBoxFloat, listDenominations, openShift]
+    operations: [listDenominations, openShift]
     outcome: >
       Shift `open`. **`listDenominations` orders the count for the drawer, not by value** — a
       cashier counts notes highest first and coins as they sit in the tray, and a screen that
@@ -55,12 +55,13 @@ steps:
       till.
 
   - step: 4
-    screen: POS-013
+    screen: POS-018
     action: A guest wants cash back and the drawer is heavy. A safe drop is recorded.
     operations: [createCashMovement, withdrawFromDepositBox]
     outcome: >
       **The drawer never holds more than the venue's ceiling.** A safe drop mid-shift is a security
       control, not bookkeeping, and it is recorded as a movement so the settlement adds up.
+    note: 'Repointed 2 October (CHG-WIR-008): a safe drop is POS-018''s act; POS-013 carried the cash operations by bulk attach.'
 
   - step: 5
     screen: POS-020

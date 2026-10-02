@@ -1,0 +1,45 @@
+id: CHG-WIR-017
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: 'Contract gap (white-label): 2 wiring fixes need an operation the contracts do not have; logged, not invented.'
+decision:
+  what: 'Log, do not invent: each wiring fix below needs an operation (or an audience) the contracts lack. The gap
+    is recorded on the screen (gaps, operation: null) and here, open, for the contract owner.'
+  by: Chinmay
+  date: '2026-10-02'
+  quote: 'Chinmay, 2 Oct 2026: fix the wrong wiring now'
+why: Design-note corrections for white-label (handoff/design-notes/white-label.yaml) name operations that do not
+  exist; the brief for the wiring fixes (Chinmay, 2 October 2026) says to log such a gap as an open contract-gap
+  change and not invent the operation. Each gap cites its correction below; the class is the audit's A28 missing-operation
+  class (R254 re-derivation exposed these).
+keys_touched:
+  screens:
+  - CMS-011
+  - CMS-014
+  tickets:
+  - APP-WL-CMS-011
+  - APP-WL-CMS-014
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - APP-WL-CMS-011
+  - APP-WL-CMS-014
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/audit-screenless-operations.py
+status: open
+notes: 'type: contract-gap. Open until the contract change is decided; the wiring fix that needs it lands with it.
+  Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are every tasks.csv or pushed key
+  naming a touched screen. Per screen and flow:
+
+  - CMS-014: gap: getTenantAppStatus and getPublishedBookingFlow need the staff audience for the CMS (CMS-001, CMS-014,
+  CMS-102, CMS-103). — getTenantAppStatus is device- and guest-audience, yet CMS-001, CMS-014 and CMS-102 (tenant
+  staff) read it, and getPublishedBookingFlow (guest) is read on CMS-103.
+
+  - CMS-011: gap: No read follows a proposeTranslations job, so the CMS cannot offer machine translation. — The
+  translation workflow the client asked for (machine draft, then review; DI-081, DI-083) needs a read that follows
+  proposeTranslations (202); none exists.'

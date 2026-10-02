@@ -1,0 +1,57 @@
+id: CHG-WIR-019
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'ticketing-guest: 2 screens lose inferred or misplaced navigation edges (or gain the edge a repointed flow
+  needs).'
+decision:
+  what: 'Fix the wrong wiring now: drop the derived exits to unrelated screens (and their entryFrom mirrors), and
+    add only the edges a repointed flow step needs.'
+  by: Chinmay
+  date: '2026-10-02'
+  quote: 'Chinmay, 2 Oct 2026: fix the wrong wiring now'
+why: Design-note corrections for ticketing-guest (handoff/design-notes/ticketing-guest.yaml) and the adopted audit
+  decision R251 (re-derive navigation so a screen links only to screens it can pass ids to; inferred exits such
+  as Stock Count to Queue Directory are removed).
+keys_touched:
+  screens:
+  - POS-002
+  - POS-005
+  flows:
+  - F14
+  - F18
+  - F31
+  tickets:
+  - APP-POS-POS-002
+  - APP-POS-POS-005
+root_class: A32 NAVIGATION
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-002
+  - APP-POS-POS-005
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-navigation.py
+status: closed
+closed_by_commit: 16fd732e
+notes: 'check-navigation (N-ENTRY-MIRROR, N-CARRIES-HELD) and check-flows (consecutive steps joined by navigation
+  or a declared device handover) guard the edges; an edge that is well formed but meaningless still needs review.
+  Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are every tasks.csv or pushed key
+  naming a touched screen. Per screen and flow:
+
+  - POS-002: exits dropped BO-045, BO-130, BO-133, BO-084, GST-026 — A till does not navigate to the back office
+  or the guest app; the cross-device edges to BO-045, BO-130, BO-133, BO-084 and GST-026 stayed in navigation although
+  the notes say they were removed. The flows that cross keep the device handover on the arriving step (design-notes
+  correction ticketing-gue…
+
+  - POS-005: exits added POS-026 — The success branch of Payment had nowhere to go; POS-026 Receipt & Reprint is
+  its exit (design-notes correction ticketing-guest POS-005).
+
+  - F31: step 7 crossesDevice
+
+  - F14: step 3 crossesDevice
+
+  - F18: step 2 crossesDevice'
