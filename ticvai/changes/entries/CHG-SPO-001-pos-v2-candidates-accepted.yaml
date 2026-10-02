@@ -46,7 +46,8 @@ decision_owner: Chinmay
 prevention:
   type: check
   ref: tools/check-candidate-decisions.py
-status: open
+status: closed
+closed_by_commit: b137fa8a
 notes: 'check-candidate-decisions: 5 CD-UNDECIDED on the parent commit, 0 after (run in the worktree). The registers docs/registers/pos-v2-decisions.md
   and handoff/pos-v2-decisions.json still say "Pending" for POSV2-9..13; their owner updates the applied column to CHG-SPO-001,
   and the lead can then make the check gate. Applied in worktree screens-pos-staff (batch SPO, phase B, 2 October 2026). Tickets:

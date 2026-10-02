@@ -35,7 +35,8 @@ decision_owner: Chinmay
 prevention:
   type: check
   ref: tools/check-screen-wiring.py
-status: open
+status: closed
+closed_by_commit: b137fa8a
 notes: 'The till only reads these outlet settings; setting them is BO-044 and BO-140 (screens-p08-p09). CHG-DOC-009 asked
   the screens owner for POS-021''s F&B price binding: it reads getGuestMenu (fnb), never the catalogue variant. Applied in
   worktree screens-pos-staff (batch SPO, phase B, 2 October 2026). Tickets: none started (Block A starts Monday 5 October

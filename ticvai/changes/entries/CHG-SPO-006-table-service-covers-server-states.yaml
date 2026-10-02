@@ -34,7 +34,8 @@ decision_owner: Chinmay
 prevention:
   type: check
   ref: tools/check-screen-wiring.py
-status: open
+status: closed
+closed_by_commit: b137fa8a
 notes: 'check-screen-wiring S-CONSUMED-MIRROR now holds POS-028 to updateTableVisit and transferTableVisit. The lead time
   for Reserved lives in two places on main: VenueSettings.fnb.tableReservedLeadMinutes (CHG-CSP-017) and FnbReservationPolicy.reservedLeadMinutes
   (CHG-CSA-012); the screen says "the venue''s lead time" until one is chosen (reported to the lead). Applied in worktree

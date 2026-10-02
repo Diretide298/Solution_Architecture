@@ -66,7 +66,8 @@ decision_owner: Chinmay
 prevention:
   type: check
   ref: tools/check-design-notes.py
-status: open
+status: closed
+closed_by_commit: b137fa8a
 notes: 'check-design-notes requires every correction marked fixed to name an existing entry; the corrections are marked fixed
   by CHG-SPO-015. Applied in worktree screens-pos-staff (batch SPO, phase B, 2 October 2026). Tickets: none started (Block
   A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys of the touched screens.'

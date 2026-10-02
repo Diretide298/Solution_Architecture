@@ -48,6 +48,7 @@ decision_owner: Chinmay
 prevention:
   type: check
   ref: tools/check-design-notes.py
-status: open
+status: closed
+closed_by_commit: b137fa8a
 notes: 'Applied in worktree screens-pos-staff (batch SPO, phase B, 2 October 2026). Tickets: none started (Block A starts
   Monday 5 October 2026); unstarted keys are the tasks.csv keys of the touched screens.'
