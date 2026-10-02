@@ -2164,9 +2164,13 @@ screens:
       - what: The case filters are text fields ("Assigned to principal id", "Status", "Priority").
         why: An agent cannot type a principal id; these are choices.
         source: screens/P12-support-agent-console.yaml#SUP-002
+        status: fixed
+        by: CHG-SOT-019
       - what: emptyFirstRun reads "No agent yet. Offers Add case message".
         why: Pattern-derived nonsense; the empty state is "No cases assigned to you - you are available for new work".
         source: screens/P12-support-agent-console.yaml#SUP-002
+        status: fixed
+        by: CHG-SOT-019
 
   CMS-013:
     summary: >-

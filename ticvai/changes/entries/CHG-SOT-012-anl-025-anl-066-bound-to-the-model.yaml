@@ -1,0 +1,45 @@
+id: CHG-SOT-012
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: The KPI Builder (ANL-025) asks only what KpiDefinition holds, with one higher-is-better toggle, and the semantic
+  model screen (ANL-066) binds domains, datasets, fields and relationships.
+decision:
+  what: 'ANL-025: labelled fields bound to KpiDefinition (name, code, description, domain, owner, formula, unit, higherIsBetter,
+    defaultPeriod, isActive), the arrow examples and the currency, decimals, measure, aggregation, data source and effective-date
+    fields removed, the stale gap replaced. ANL-066: a tree of SemanticModel domains, datasets and fields, the relationships
+    table, publish with a confirmation, the stale gap replaced.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Design-notes corrections finance-insights ANL-025 (0, 1, 2) and ANL-066 (0, 1), process-agent findings of 1-2 October
+  2026 against contracts/satellite/reporting.yaml KpiDefinition and SemanticModel. Chinmay, 2 October: apply the open corrections
+  on Block A screens (phase B). ANL-025 correction 3 was fixed by CHG-FIN-007.'
+keys_touched:
+  screens:
+  - ANL-025
+  - ANL-066
+  operations:
+  - listKpis
+  - createKpi
+  - getSemanticModel
+  - setSemanticModel
+  schemas:
+  - KpiDefinition
+  - SemanticModel
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ANL-025 (#20783)
+  - APP-SETUP-ANL-066 (#20784)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-design-notes.py
+notes: 'Block A. Logged in CHG-SOT-016: no KPI update or retire operation (ANL-025 correction 2); no certification, owner,
+  glossary or lineage on the model (ANL-066 correction 1). Batch SOT (screens-other, phase B), 2 October 2026; worktree D:/wt/screens-other,
+  branch screens-other. Tickets: none started (Block A starts Monday 5 October 2026).'
+status: closed
+closed_by_commit: b461f38e

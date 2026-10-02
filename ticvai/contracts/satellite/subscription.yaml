@@ -71,6 +71,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-380 Customer & Organization Registration"
         - "P17 SGN-002 Customer & Organization Registration"
+        - "P17 SGN-020 Billing & Legal Entity Information"
       summary: A prospect signs themselves up
       description: 'BL-165. **The operator-led path assumes somebody at Softlabs decided this tenant exists.**
         This is the other one.

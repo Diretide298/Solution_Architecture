@@ -3078,6 +3078,12 @@ paths:
         - "P08 BO-053 Staff Directory"
         - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
+        - "P10 PTR-029 Partner Access, Roles & Permission Profile"
+        - "P10 PTR-030 Partner Approval, Status & Lifecycle Management"
+        - "P10 PTR-035 Commission, Margin & Incentive Management"
+        - "P10 PTR-036 Credit Limit & Exposure Management"
+        - "P10 PTR-040 Booking Limits, Commercial Exceptions & Approval"
+        - "P10 PTR-048 Commission Calculation & Settlement Management"
         - "P12 SUP-001 Venue Management Sign In"
       security:
       - guestAuth: []
@@ -3192,6 +3198,12 @@ paths:
         - "P08 BO-053 Staff Directory"
         - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
+        - "P10 PTR-029 Partner Access, Roles & Permission Profile"
+        - "P10 PTR-030 Partner Approval, Status & Lifecycle Management"
+        - "P10 PTR-035 Commission, Margin & Incentive Management"
+        - "P10 PTR-036 Credit Limit & Exposure Management"
+        - "P10 PTR-040 Booking Limits, Commercial Exceptions & Approval"
+        - "P10 PTR-048 Commission Calculation & Settlement Management"
         - "P12 SUP-001 Venue Management Sign In"
       security:
       - guestAuth: []
@@ -3593,6 +3605,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1066 Roles, Permissions & Masking"
         - "P13 CMS-086 Role-Based Asset Access & Permission Management"
+        - "P16 ANL-047 Report Access & Sharing Control"
       x-ticvai-conflict-policy: serverWins
       summary: Write a policy without writing code
       description: '3.3.5. *"Administrators shall configure access policies without software
@@ -3667,6 +3680,7 @@ paths:
       operationId: updateAuthorisationPolicy
       x-ticvai-consumed-by:
         - "P08 BO-1066 Roles, Permissions & Masking"
+        - "P16 ANL-047 Report Access & Sharing Control"
       x-ticvai-conflict-policy: serverWins
       summary: Change a policy, as a new version
       description: '3.3.24 and 3.3.39. **Every change is a version and the old one is kept.** An access

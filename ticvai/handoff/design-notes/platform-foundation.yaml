@@ -2641,9 +2641,13 @@ screens:
     - what: Text fields for id, status, verifiedAt and partnerId.
       why: Server-set; registration asks name, email, website and country.
       source: contracts/satellite/public-api.yaml#registerDeveloper
+      status: fixed
+      by: CHG-SOT-014
     - what: registerDeveloper requires DEVELOPER_VIEW with audience public.
       why: A person registering holds no permission yet; the operation must be callable without one.
       source: contracts/satellite/public-api.yaml#registerDeveloper
+      status: logged
+      by: CHG-SOT-016
     - what: >-
         8 text fields are raw schema property names, not inputs: id, organisationName, contactEmail, websiteUrl,
         countryCode, partnerId, status, verifiedAt.
@@ -2651,6 +2655,8 @@ screens:
         They were generated from a response schema; ids, statuses and computed totals are not typed by anybody.
         Replace with the real form the write operation needs (or a read-only summary).
       source: screens/P14-developer-portal.yaml#DEV-002
+      status: fixed
+      by: CHG-SOT-014
     decisions:
     - question: Which door does a developer sign in through? P14 belongs to TICVAI Control, whose doors are ADM-001 (platform
         staff) and PTR-001 (partners).
@@ -2746,6 +2752,8 @@ screens:
     - what: formCreateApiClient requires id, status and environment and offers lastUsedAt.
       why: Server values, and environment must be sandbox here (production is issued by TICVAI).
       source: contracts/satellite/public-api.yaml#createApiClient; DI-927
+      status: fixed
+      by: CHG-SOT-014
     - what: >-
         Tables show every schema field, plumbing included: 'Every API client' drop id, developerId, clientId, allowedTenantIds.
       why: >-
@@ -2753,6 +2761,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P14-developer-portal.yaml#DEV-003
+      status: fixed
+      by: CHG-SOT-014
   DEV-008:
     block: A
     summary: >-
@@ -2827,9 +2837,13 @@ screens:
         Text fields named id, clientId, sustainedPerMinute, burstPerSecond, dailyCap, perOperationOverrides, onBreach.
       why: Raw schema names as labels; the quota form needs labelled number fields and a client picker.
       source: screens/P14-developer-portal.yaml#DEV-008
+      status: fixed
+      by: CHG-SOT-014
     - what: listProductionAccessRequests allows the partner audience with DEVELOPER_VIEW.
       why: The queue is TICVAI's; a developer should see only their own requests (on DEV-003).
       source: contracts/satellite/public-api.yaml#listProductionAccessRequests
+      status: logged
+      by: CHG-SOT-016
   EMP-001:
     block: B
     summary: >-
@@ -9181,12 +9195,16 @@ screens:
     - what: Only listAuthorisationPolicies with an empty table.
       why: No columns and no write.
       source: screens/P16-venue-analytics.yaml#ANL-047
+      status: fixed
+      by: CHG-SOT-013
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P16-venue-analytics.yaml#ANL-047; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SOT-013
   ANL-050:
     block: B
     summary: How long reports, exports and analytics history are kept, archived and deleted, with legal hold.
@@ -16180,6 +16198,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P10-partner-reseller-portal.yaml#PTR-003
+      status: fixed
+      by: CHG-SOT-015
   PTR-011:
     block: B
     summary: >-
@@ -16207,6 +16227,8 @@ screens:
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P10-partner-reseller-portal.yaml#PTR-011
+      status: fixed
+      by: CHG-SOT-015
     - what: >-
         Tables show every schema field, plumbing included: 'Every partner agreement' drop id, partnerId, brandingAssetId;
         'Every partner quote' drop id, partnerId, agreementId.
@@ -16215,6 +16237,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P10-partner-reseller-portal.yaml#PTR-011
+      status: fixed
+      by: CHG-SOT-015
   PTR-017:
     block: B
     summary: A partner's commission statement for a period, with each line traceable to the booking it came from.
@@ -16232,12 +16256,16 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P10-partner-reseller-portal.yaml#PTR-017
+      status: fixed
+      by: CHG-SOT-015
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P10-partner-reseller-portal.yaml#PTR-017; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SOT-015
   PTR-019:
     block: B
     summary: >-
@@ -16291,6 +16319,8 @@ screens:
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P10-partner-reseller-portal.yaml#PTR-019
+      status: fixed
+      by: CHG-SOT-015
     - what: >-
         Tables show every schema field, plumbing included: 'Every API client' drop id, developerId, clientId, allowedTenantIds.
       why: >-
@@ -16298,6 +16328,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P10-partner-reseller-portal.yaml#PTR-019
+      status: fixed
+      by: CHG-SOT-015
   PTR-020:
     block: B
     summary: >-
@@ -16338,6 +16370,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P10-partner-reseller-portal.yaml#PTR-020
+      status: fixed
+      by: CHG-SOT-015
   PTR-022:
     block: B
     summary: >-
@@ -16362,6 +16396,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P10-partner-reseller-portal.yaml#PTR-022; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SOT-015
   PTR-023:
     block: B
     summary: >-
@@ -16396,6 +16432,8 @@ screens:
         or yes/no; a drop-down for a name, a code or a date has no options to offer.
       source: >-
         screens/P10-partner-reseller-portal.yaml#PTR-023; contracts/satellite/subscription.yaml#setPartnerProfileOrganization
+      status: fixed
+      by: CHG-SOT-015
   PTR-024:
     block: B
     summary: >-
@@ -16443,6 +16481,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P10-partner-reseller-portal.yaml#PTR-024; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SOT-015
   PTR-025:
     block: B
     summary: >-
@@ -16484,6 +16524,8 @@ screens:
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P10-partner-reseller-portal.yaml#PTR-025
+      status: fixed
+      by: CHG-SOT-015
   PTR-026:
     block: B
     summary: >-
@@ -16519,6 +16561,8 @@ screens:
         screen managing partners (then it belongs in Venue Management or the Console and is gated as staff), or
         the operation needs the partner audience and a partner-scoped filter.
       source: ADR-0025; contracts/satellite/subscription.yaml#setPartnerDistributionRights
+      status: logged
+      by: CHG-SOT-016
   PTR-027:
     block: B
     summary: Which brands and venues the partner relationship covers (separate from product assignment).
@@ -16557,6 +16601,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P10-partner-reseller-portal.yaml#PTR-028; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SOT-015
   PTR-029:
     block: B
     summary: >-
@@ -16611,12 +16657,16 @@ screens:
         The operation refuses without a fresh stepUpToken, so the action can never succeed from this screen. Add
         createMfaChallenge/verifyMfaChallenge (or the supervisor-PIN overlay for pin) in the action's confirmation.
       source: contracts/satellite/subscription.yaml#setPartnerCapabilityGrants
+      status: fixed
+      by: CHG-SOT-015
     - what: 'Partner portal screen calls staff-only operations: setPartnerCapabilityGrants (staff).'
       why: >-
         A partner user is refused these (audience excludes partner). Either the screen is a tenant/TICVAI staff
         screen managing partners (then it belongs in Venue Management or the Console and is gated as staff), or
         the operation needs the partner audience and a partner-scoped filter.
       source: ADR-0025; contracts/satellite/subscription.yaml#setPartnerCapabilityGrants
+      status: logged
+      by: CHG-SOT-016
   PTR-030:
     block: B
     summary: >-
@@ -16648,12 +16698,16 @@ screens:
         The operation refuses without a fresh stepUpToken, so the action can never succeed from this screen. Add
         createMfaChallenge/verifyMfaChallenge (or the supervisor-PIN overlay for pin) in the action's confirmation.
       source: contracts/satellite/subscription.yaml#approvePartnerStatuLifecycle
+      status: fixed
+      by: CHG-SOT-015
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P10-partner-reseller-portal.yaml#PTR-030; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SOT-015
   PTR-031:
     block: B
     summary: One partner's profile, readiness and AI review before activation and throughout.
@@ -16668,6 +16722,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P10-partner-reseller-portal.yaml#PTR-031; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SOT-015
   PTR-032:
     block: B
     summary: 'All partner agreements and their commercial health: expiring, on credit hold, exposure, receivables.'
@@ -16705,6 +16761,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P10-partner-reseller-portal.yaml#PTR-032; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SOT-015
   PTR-033:
     block: B
     summary: >-
@@ -16736,6 +16794,8 @@ screens:
         or yes/no; a drop-down for a name, a code or a date has no options to offer.
       source: >-
         screens/P10-partner-reseller-portal.yaml#PTR-033; contracts/satellite/subscription.yaml#setAgreementContractTerm
+      status: fixed
+      by: CHG-SOT-015
   PTR-034:
     block: B
     summary: >-
@@ -16765,6 +16825,8 @@ screens:
         or yes/no; a drop-down for a name, a code or a date has no options to offer.
       source: >-
         screens/P10-partner-reseller-portal.yaml#PTR-034; contracts/satellite/subscription.yaml#setPartnerRateNet
+      status: fixed
+      by: CHG-SOT-015
   PTR-035:
     block: B
     summary: How partner commissions and incentives are calculated; saving rules requires a second factor.
@@ -16819,12 +16881,16 @@ screens:
         The operation refuses without a fresh stepUpToken, so the action can never succeed from this screen. Add
         createMfaChallenge/verifyMfaChallenge (or the supervisor-PIN overlay for pin) in the action's confirmation.
       source: contracts/satellite/subscription.yaml#setPartnerCommissionRules
+      status: fixed
+      by: CHG-SOT-015
     - what: 'Partner portal screen calls staff-only operations: setPartnerCommissionRules (staff).'
       why: >-
         A partner user is refused these (audience excludes partner). Either the screen is a tenant/TICVAI staff
         screen managing partners (then it belongs in Venue Management or the Console and is gated as staff), or
         the operation needs the partner audience and a partner-scoped filter.
       source: ADR-0025; contracts/satellite/subscription.yaml#setPartnerCommissionRules
+      status: logged
+      by: CHG-SOT-016
   PTR-036:
     block: B
     summary: >-
@@ -16870,17 +16936,23 @@ screens:
         The operation refuses without a fresh stepUpToken, so the action can never succeed from this screen. Add
         createMfaChallenge/verifyMfaChallenge (or the supervisor-PIN overlay for pin) in the action's confirmation.
       source: contracts/satellite/subscription.yaml#setPartnerCreditProfile
+      status: fixed
+      by: CHG-SOT-015
     - what: formSetPartnerCreditProfile asks the person for id.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P10-partner-reseller-portal.yaml#PTR-036
+      status: fixed
+      by: CHG-SOT-015
     - what: 'Partner portal screen calls staff-only operations: setPartnerCreditProfile (staff).'
       why: >-
         A partner user is refused these (audience excludes partner). Either the screen is a tenant/TICVAI staff
         screen managing partners (then it belongs in Venue Management or the Console and is gated as staff), or
         the operation needs the partner audience and a partner-scoped filter.
       source: ADR-0025; contracts/satellite/subscription.yaml#setPartnerCreditProfile
+      status: logged
+      by: CHG-SOT-016
   PTR-037:
     block: B
     summary: Deposits and guarantees securing partner credit; unsecured exposure shown.
@@ -16928,12 +17000,16 @@ screens:
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P10-partner-reseller-portal.yaml#PTR-037
+      status: fixed
+      by: CHG-SOT-015
     - what: 'Partner portal screen calls staff-only operations: setPartnerSecurity (staff).'
       why: >-
         A partner user is refused these (audience excludes partner). Either the screen is a tenant/TICVAI staff
         screen managing partners (then it belongs in Venue Management or the Console and is gated as staff), or
         the operation needs the partner audience and a partner-scoped filter.
       source: ADR-0025; contracts/satellite/subscription.yaml#setPartnerSecurity
+      status: logged
+      by: CHG-SOT-016
   PTR-038:
     block: B
     summary: How a partner pays and how transactions are grouped for billing.
@@ -16956,6 +17032,8 @@ screens:
     - what: Payment methods drawn as buttons.
       why: A choice of accepted methods.
       source: screens/P10-partner-reseller-portal.yaml#PTR-038
+      status: fixed
+      by: CHG-SOT-015
   PTR-039:
     block: B
     summary: >-
@@ -16996,12 +17074,16 @@ screens:
     - what: Allocation types drawn as buttons.
       why: Choices.
       source: screens/P10-partner-reseller-portal.yaml#PTR-039
+      status: fixed
+      by: CHG-SOT-015
     - what: 'Partner portal screen calls staff-only operations: setPartnerAllocations (staff).'
       why: >-
         A partner user is refused these (audience excludes partner). Either the screen is a tenant/TICVAI staff
         screen managing partners (then it belongs in Venue Management or the Console and is gated as staff), or
         the operation needs the partner audience and a partner-scoped filter.
       source: ADR-0025; contracts/satellite/subscription.yaml#setPartnerAllocations
+      status: logged
+      by: CHG-SOT-016
   PTR-040:
     block: B
     summary: >-
@@ -17039,6 +17121,8 @@ screens:
         The operation refuses without a fresh stepUpToken, so the action can never succeed from this screen. Add
         createMfaChallenge/verifyMfaChallenge (or the supervisor-PIN overlay for pin) in the action's confirmation.
       source: contracts/satellite/subscription.yaml#approveBookingLimitCommercial
+      status: fixed
+      by: CHG-SOT-015
     - what: >-
         Fields drawn as drop-downs that cannot be choices: text field: Agreement, Current Rule, Requested Exception,
         Reason.
@@ -17047,12 +17131,16 @@ screens:
         or yes/no; a drop-down for a name, a code or a date has no options to offer.
       source: >-
         screens/P10-partner-reseller-portal.yaml#PTR-040; contracts/satellite/subscription.yaml#approveBookingLimitCommercial
+      status: fixed
+      by: CHG-SOT-015
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P10-partner-reseller-portal.yaml#PTR-040; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SOT-015
   PTR-041:
     block: B
     summary: The complete commercial relationship with one partner, its health and AI review.
@@ -17073,6 +17161,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P10-partner-reseller-portal.yaml#PTR-041; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SOT-015
   PTR-042:
     block: B
     summary: >-
@@ -17104,6 +17194,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P10-partner-reseller-portal.yaml#PTR-042; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SOT-015
   PTR-043:
     block: B
     summary: Orders created by partners with their references, agent user, customer, event and value.
@@ -17136,6 +17228,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P10-partner-reseller-portal.yaml#PTR-043; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SOT-015
   PTR-044:
     block: B
     summary: 'Inventory held by partners before confirmation: expiring today, expired, converted, released.'
@@ -17155,6 +17249,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P10-partner-reseller-portal.yaml#PTR-044; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SOT-015
   PTR-045:
     block: B
     summary: Partner cancellations, refunds and amendments under the agreement's policies.
@@ -17210,6 +17306,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P10-partner-reseller-portal.yaml#PTR-046; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SOT-015
   PTR-047:
     block: B
     summary: Bookings reconciled against financial and channel records, with mismatches to investigate.
@@ -17247,12 +17345,16 @@ screens:
         screen managing partners (then it belongs in Venue Management or the Console and is gated as staff), or
         the operation needs the partner audience and a partner-scoped filter.
       source: ADR-0025; contracts/satellite/subscription.yaml#actOnPartnerReconciliationException
+      status: logged
+      by: CHG-SOT-016
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P10-partner-reseller-portal.yaml#PTR-047; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SOT-015
   PTR-048:
     block: B
     summary: Calculate, approve and settle commission; acting on a settlement batch requires a second factor.
@@ -17308,6 +17410,8 @@ screens:
         The operation refuses without a fresh stepUpToken, so the action can never succeed from this screen. Add
         createMfaChallenge/verifyMfaChallenge (or the supervisor-PIN overlay for pin) in the action's confirmation.
       source: contracts/satellite/subscription.yaml#actOnPartnerSettlementBatch
+      status: fixed
+      by: CHG-SOT-015
     - what: >-
         Partner portal screen calls staff-only operations: actOnPartnerCommissionLine (staff), actOnPartnerSettlementBatch
         (staff).
@@ -17316,12 +17420,16 @@ screens:
         screen managing partners (then it belongs in Venue Management or the Console and is gated as staff), or
         the operation needs the partner audience and a partner-scoped filter.
       source: ADR-0025; contracts/satellite/subscription.yaml#actOnPartnerCommissionLine
+      status: logged
+      by: CHG-SOT-016
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P10-partner-reseller-portal.yaml#PTR-048; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SOT-015
   PTR-049:
     block: B
     summary: Partner disputes and cases by type with SLA.
@@ -17355,11 +17463,15 @@ screens:
     - what: Case types drawn as buttons.
       why: A type choice when creating a case.
       source: screens/P10-partner-reseller-portal.yaml#PTR-049
+      status: fixed
+      by: CHG-SOT-015
     - what: formCreatePartnerCase asks the person for status, id.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P10-partner-reseller-portal.yaml#PTR-049
+      status: fixed
+      by: CHG-SOT-015
   PTR-050:
     block: B
     summary: A consistent partner scorecard (sales, cancellations, payment behaviour, compliance) with risk.
@@ -17382,6 +17494,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P10-partner-reseller-portal.yaml#PTR-050; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SOT-015
   PTR-051:
     block: B
     summary: AI insights across the partner lifecycle with the inputs considered.
@@ -17400,6 +17514,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P10-partner-reseller-portal.yaml#PTR-051; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SOT-015
   DEV-001:
     block: B
     summary: >-
@@ -17459,12 +17575,16 @@ screens:
         Nothing is promoted; production access is a request for a certified integration and TICVAI issues a new
         client (F36 step 5).
       source: F36 step 5
+      status: fixed
+      by: CHG-SOT-014
     - what: 'Tables show every schema field, plumbing included: ''Every sandbox'' drop id, developerId.'
       why: >-
         Identifiers and partition keys mean nothing to the reader; show the name each id points at (principal name,
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P14-developer-portal.yaml#DEV-004
+      status: fixed
+      by: CHG-SOT-014
   DEV-005:
     block: B
     summary: >-
@@ -17500,11 +17620,15 @@ screens:
     - what: The subscription table shows signingSecret.
       why: A secret displayed in a list is a leak; show once at creation.
       source: contracts/satellite/public-api.yaml#createWebhookSubscription
+      status: fixed
+      by: CHG-SOT-014
     - what: formCreateWebhookSubscription asks the person for status, id.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P14-developer-portal.yaml#DEV-005
+      status: fixed
+      by: CHG-SOT-014
     - what: >-
         Tables show every schema field, plumbing included: 'Every webhook subscription' drop id, clientId; 'Every
         webhook delivery' drop id, subscriptionId, eventId.
@@ -17513,6 +17637,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P14-developer-portal.yaml#DEV-005
+      status: fixed
+      by: CHG-SOT-014
   DEV-006:
     block: B
     summary: >-
@@ -17543,6 +17669,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P14-developer-portal.yaml#DEV-006
+      status: fixed
+      by: CHG-SOT-014
   DEV-007:
     block: B
     summary: The developer's view of support and status for the API.
@@ -17573,12 +17701,16 @@ screens:
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P14-developer-portal.yaml#DEV-007
+      status: fixed
+      by: CHG-SOT-014
     - what: 'Tables show every schema field, plumbing included: ''Every integration listing'' drop id, developerId.'
       why: >-
         Identifiers and partition keys mean nothing to the reader; show the name each id points at (principal name,
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P14-developer-portal.yaml#DEV-007
+      status: fixed
+      by: CHG-SOT-014
   SGN-001:
     block: B
     summary: >-
@@ -17627,6 +17759,8 @@ screens:
         A prospect holds no tenant permission; the registration must be callable by the prospect's own sign-up session.
       source: >-
         contracts/satellite/subscription.yaml#submitOnboardingApplication; screens/P17-ticvai-signup.yaml#SGN-002
+      status: logged
+      by: CHG-SOT-016
   SGN-003:
     block: B
     summary: The prospect's venue type and business profile (waterpark, museum, stadium...), multi-select.
@@ -17666,6 +17800,8 @@ screens:
         401/403 as drawn. Either the call moves behind the prospect's own sign-up session, or the operation needs
         a public/prospect audience.
       source: ADR-0025; contracts/satellite/subscription.yaml#scoreVsiAssessment
+      status: logged
+      by: CHG-SOT-016
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -17693,6 +17829,8 @@ screens:
         401/403 as drawn. Either the call moves behind the prospect's own sign-up session, or the operation needs
         a public/prospect audience.
       source: ADR-0025; contracts/satellite/subscription.yaml#scoreVsiAssessment
+      status: logged
+      by: CHG-SOT-016
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -17725,6 +17863,8 @@ screens:
         401/403 as drawn. Either the call moves behind the prospect's own sign-up session, or the operation needs
         a public/prospect audience.
       source: ADR-0025; contracts/satellite/subscription.yaml#scoreVsiAssessment
+      status: logged
+      by: CHG-SOT-016
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -17747,6 +17887,8 @@ screens:
         401/403 as drawn. Either the call moves behind the prospect's own sign-up session, or the operation needs
         a public/prospect audience.
       source: ADR-0025; contracts/satellite/subscription.yaml#scoreVsiAssessment
+      status: logged
+      by: CHG-SOT-016
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -17773,6 +17915,8 @@ screens:
         401/403 as drawn. Either the call moves behind the prospect's own sign-up session, or the operation needs
         a public/prospect audience.
       source: ADR-0025; contracts/satellite/subscription.yaml#listModuleCatalogue
+      status: logged
+      by: CHG-SOT-016
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -17793,6 +17937,8 @@ screens:
         401/403 as drawn. Either the call moves behind the prospect's own sign-up session, or the operation needs
         a public/prospect audience.
       source: ADR-0025; contracts/satellite/subscription.yaml#scoreVsiAssessment
+      status: logged
+      by: CHG-SOT-016
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -17818,6 +17964,8 @@ screens:
         401/403 as drawn. Either the call moves behind the prospect's own sign-up session, or the operation needs
         a public/prospect audience.
       source: ADR-0025; contracts/satellite/subscription.yaml#scoreVsiAssessment
+      status: logged
+      by: CHG-SOT-016
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -17839,6 +17987,8 @@ screens:
         401/403 as drawn. Either the call moves behind the prospect's own sign-up session, or the operation needs
         a public/prospect audience.
       source: ADR-0025; contracts/satellite/subscription.yaml#simulateCommercialPackage
+      status: logged
+      by: CHG-SOT-016
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -17875,6 +18025,8 @@ screens:
         401/403 as drawn. Either the call moves behind the prospect's own sign-up session, or the operation needs
         a public/prospect audience.
       source: ADR-0025; contracts/satellite/subscription.yaml#listPlans
+      status: logged
+      by: CHG-SOT-016
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -17917,6 +18069,8 @@ screens:
         401/403 as drawn. Either the call moves behind the prospect's own sign-up session, or the operation needs
         a public/prospect audience.
       source: ADR-0025; contracts/satellite/subscription.yaml#listModuleCatalogue
+      status: logged
+      by: CHG-SOT-016
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -17929,6 +18083,8 @@ screens:
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P17-ticvai-signup.yaml#SGN-013
+      status: logged
+      by: CHG-SOT-016
   SGN-014:
     block: B
     summary: AI module recommendations with cost impact and the reason for each.
@@ -17970,6 +18126,8 @@ screens:
         401/403 as drawn. Either the call moves behind the prospect's own sign-up session, or the operation needs
         a public/prospect audience.
       source: ADR-0025; contracts/satellite/subscription.yaml#listModuleCatalogue
+      status: logged
+      by: CHG-SOT-016
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -17982,6 +18140,8 @@ screens:
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P17-ticvai-signup.yaml#SGN-014
+      status: logged
+      by: CHG-SOT-016
   SGN-015:
     block: B
     summary: One module's detail and commercial treatment before adding it.
@@ -18000,6 +18160,8 @@ screens:
         401/403 as drawn. Either the call moves behind the prospect's own sign-up session, or the operation needs
         a public/prospect audience.
       source: ADR-0025; contracts/satellite/subscription.yaml#listModuleCatalogue
+      status: logged
+      by: CHG-SOT-016
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -18047,6 +18209,8 @@ screens:
         401/403 as drawn. Either the call moves behind the prospect's own sign-up session, or the operation needs
         a public/prospect audience.
       source: ADR-0025; contracts/satellite/subscription.yaml#addCapacityPack
+      status: logged
+      by: CHG-SOT-016
   SGN-018:
     block: B
     summary: Choose a trial or a purchase to enter activation.
@@ -18094,6 +18258,8 @@ screens:
         401/403 as drawn. Either the call moves behind the prospect's own sign-up session, or the operation needs
         a public/prospect audience.
       source: ADR-0025; contracts/satellite/subscription.yaml#setSubscription
+      status: logged
+      by: CHG-SOT-016
   SGN-022:
     block: B
     summary: >-
@@ -18131,6 +18297,8 @@ screens:
         401/403 as drawn. Either the call moves behind the prospect's own sign-up session, or the operation needs
         a public/prospect audience.
       source: ADR-0025; contracts/satellite/subscription.yaml#previewSubscriptionChange
+      status: logged
+      by: CHG-SOT-016
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -18143,6 +18311,8 @@ screens:
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P17-ticvai-signup.yaml#SGN-022
+      status: logged
+      by: CHG-SOT-016
   SGN-023:
     block: B
     summary: >-
@@ -18181,12 +18351,16 @@ screens:
         401/403 as drawn. Either the call moves behind the prospect's own sign-up session, or the operation needs
         a public/prospect audience.
       source: ADR-0025; contracts/satellite/subscription.yaml#setAgreementContractTerm
+      status: logged
+      by: CHG-SOT-016
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 8 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P17-ticvai-signup.yaml#SGN-023
+      status: logged
+      by: CHG-SOT-016
   SGN-024:
     block: B
     summary: >-
@@ -18222,3 +18396,5 @@ screens:
         401/403 as drawn. Either the call moves behind the prospect's own sign-up session, or the operation needs
         a public/prospect audience.
       source: ADR-0025; contracts/satellite/subscription.yaml#setSubscription
+      status: logged
+      by: CHG-SOT-016

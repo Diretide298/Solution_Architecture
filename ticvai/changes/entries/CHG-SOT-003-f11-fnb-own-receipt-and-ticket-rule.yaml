@@ -1,0 +1,40 @@
+id: CHG-SOT-003
+date: '2026-10-02'
+source: client-review
+kind: spec
+summary: F11 says a guest F&B order is paid in its own step with its own receipt, and that an inside-venue outlet refuses
+  an order from a guest with no admission ticket.
+decision:
+  what: Step 4 states the F&B order keeps its own payment step and receipt (DI-293 one receipt does not apply to F&B); a branch
+    at step 3 walks 403 entry-ticket-required at an inside-venue outlet.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 1 (WEB-036, GST-024; workbook Q52, Q70, Q71): "F&B has its own receipt"; "Inside the
+  venue, a ticket is needed. A restaurant outside the venue (standalone) can sell without one". Decision ledger DEC-052, DEC-070;
+  contract CHG-CSA-011, CHG-CSP-004; DI-292, DI-293.'
+keys_touched:
+  flows:
+  - F11
+  screens:
+  - GST-024
+  - GST-009
+  operations:
+  - createGuestFnbOrder
+  - createPayment
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - APP-MOB-GST-024 (#18150)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-flows.py
+notes: 'Contract naming to settle (contracts owner): fnb createGuestFnbOrder describes the outlet field as `siting` (common
+  OutletSiting, CHG-CSA-011) while tenancy Outlet carries `admissionContext` (OutletAdmissionContext, CHG-CSP-004); the flow
+  names neither field. Batch SOT (screens-other, phase B), 2 October 2026; worktree D:/wt/screens-other, branch screens-other.
+  Tickets: none started (Block A starts Monday 5 October 2026).'
+status: closed
+closed_by_commit: b461f38e

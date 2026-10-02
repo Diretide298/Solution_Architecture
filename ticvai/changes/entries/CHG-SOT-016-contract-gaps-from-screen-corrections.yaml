@@ -1,0 +1,107 @@
+id: CHG-SOT-016
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: 'Open: the contract gaps that block 37 design-note corrections on P10, P14, P16 and P17 (prospect and partner audiences,
+  missing update operations, unbound response shapes, a missing query on explanations), logged rather than invented.'
+decision:
+  what: 'Log, do not invent: (1) P17 sign-up screens call operations a prospect cannot call (scoreVsiAssessment, listModuleCatalogue,
+    simulateCommercialPackage, listPlans, addCapacityPack, setSubscription, previewSubscriptionChange, setAgreementContractTerm)
+    and submitOnboardingApplication requires TENANT_CONFIGURE while public; no operation amends a submitted onboarding application
+    and no public upload exists for its documents; SGN-013/014/022/023 columns have no response fields. (2) Partner screens
+    call staff-only operations (setPartnerDistributionRights, setPartnerCapabilityGrants, setPartnerCommissionRules, setPartnerCreditProfile,
+    setPartnerSecurity, setPartnerAllocations, actOnPartnerReconciliationException, actOnPartnerCommissionLine, actOnPartnerSettlementBatch).
+    (3) registerDeveloper requires DEVELOPER_VIEW while public; listProductionAccessRequests admits partners to TICVAI''s
+    queue. (4) No dashboard draft, version, publish or rollback; no KPI update or retire; no certification, owner, glossary
+    or lineage on the semantic model; AiMetricChangeExplanation carries no query. (5) listAiInsights is missing from the Block
+    A slice for ANL-019.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Design-notes corrections (process-agent findings, 1-2 October 2026) on P10, P14, P16 and P17 that need an operation,
+  an audience or a field the contracts do not have; phase B rule: "If a correction needs an operation that doesn''t exist,
+  mark it logged and add it to an open CHG entry (kind contract)". ADR-0025 (audiences); ADR-0054; MATRIX 7.1.46.'
+keys_touched:
+  operations:
+  - scoreVsiAssessment
+  - listModuleCatalogue
+  - simulateCommercialPackage
+  - listPlans
+  - addCapacityPack
+  - setSubscription
+  - previewSubscriptionChange
+  - setAgreementContractTerm
+  - submitOnboardingApplication
+  - createUpload
+  - setPartnerDistributionRights
+  - setPartnerCapabilityGrants
+  - setPartnerCommissionRules
+  - setPartnerCreditProfile
+  - setPartnerSecurity
+  - setPartnerAllocations
+  - actOnPartnerReconciliationException
+  - actOnPartnerCommissionLine
+  - actOnPartnerSettlementBatch
+  - registerDeveloper
+  - listProductionAccessRequests
+  - updateDashboard
+  - createKpi
+  - setSemanticModel
+  - explainMetricChange
+  - listAiInsights
+  screens:
+  - SGN-002
+  - SGN-003
+  - SGN-004
+  - SGN-006
+  - SGN-007
+  - SGN-008
+  - SGN-009
+  - SGN-010
+  - SGN-011
+  - SGN-012
+  - SGN-013
+  - SGN-014
+  - SGN-015
+  - SGN-017
+  - SGN-019
+  - SGN-020
+  - SGN-022
+  - SGN-023
+  - SGN-024
+  - PTR-026
+  - PTR-029
+  - PTR-035
+  - PTR-036
+  - PTR-037
+  - PTR-039
+  - PTR-047
+  - PTR-048
+  - DEV-002
+  - DEV-008
+  - ANL-019
+  - ANL-023
+  - ANL-025
+  - ANL-066
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ANL-019 (#20757)
+  - APP-SETUP-ANL-023 (#20782)
+  - APP-SETUP-ANL-025 (#20783)
+  - APP-SETUP-ANL-066 (#20784)
+  - APP-SETUP-DEV-002 (#20609)
+  - APP-SETUP-DEV-008 (#20616)
+release_tag: pending
+decision_owner: Chinmay
+triage: defer
+prevention:
+  type: none
+  reason: Open until the contracts owner adds the audiences, operations and fields (or Chinmay moves the partner-management
+    screens to Venue Management); then check-design-notes holds the corrections, which move from logged to fixed with the
+    contract change's id.
+status: open
+notes: 'Questions for Chinmay in the SOT report: whether the partner-management screens move to Venue Management (staff) or
+  the operations gain the partner audience; whether P17 runs on a prospect session audience. Block A items (ANL-019, ANL-023,
+  ANL-025, ANL-066, DEV-002, DEV-008) are the urgent ones. Batch SOT (screens-other, phase B), 2 October 2026; worktree D:/wt/screens-other,
+  branch screens-other. Tickets: none started (Block A starts Monday 5 October 2026).'

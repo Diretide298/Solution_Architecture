@@ -127,7 +127,7 @@ steps:
   - listDynamicPricingStrategy
   outcome: Ready for the next screen on this board
 - step: 18
-  screen: ADM-097
+  screen: BO-441
   action: Works in Rule Priority, Conflict Resolution & Dynamic Pricing Test Console
   operations:
   - listRulePriorityConflict

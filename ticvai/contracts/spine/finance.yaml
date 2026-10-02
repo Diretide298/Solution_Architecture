@@ -463,6 +463,7 @@ paths:
         - "P08 BO-1172 Finance Validation, Reporting & Audit Center"
         - "P08 ADM-627 Reconciliation Audit, Trace & Evidence Center\t149"
         - "P08 ADM-628 Reconciliation Simulator, Forecast & AI Operations Advisor\t150"
+        - "P16 ANL-072 Finance Dashboard"
       summary: Every money source against the ledger, in one view
       description: '4.2.19. **Reconciliation was per provider and the question is not per provider.**
         `ingestSettlementFile` and its siblings are good and gateway-scoped; **a venue closing a day needs
@@ -2946,7 +2947,6 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-074 Chart of Accounts"
         - "P09 ADM-411 Billing & Legal Entity Information"
-        - "P17 SGN-020 Billing & Legal Entity Information"
       x-ticvai-audience:
       - staff
       summary: Create a legal entity
@@ -3653,6 +3653,7 @@ paths:
         - "P08 BO-022 Order Detail"
         - "P08 BO-1081 Finance Dashboard"
         - "P09 ADM-068 Tax, Fee & Calculation Command Center"
+        - "P16 ANL-072 Finance Dashboard"
       x-ticvai-audience:
       - staff
       - guest
@@ -3981,6 +3982,7 @@ paths:
         - "P02 GST-019 Order History"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-1081 Finance Dashboard"
+        - "P16 ANL-072 Finance Dashboard"
       x-ticvai-audience:
       - staff
       - guest
@@ -4291,6 +4293,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1081 Finance Dashboard"
         - "P08 ADM-077 Calculation Validation, Reconciliation & Service Interface"
+        - "P16 ANL-072 Finance Dashboard"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (retrace 6.1.1); shape follows listSettlementExceptions'

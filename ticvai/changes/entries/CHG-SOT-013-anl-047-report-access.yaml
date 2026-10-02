@@ -1,0 +1,37 @@
+id: CHG-SOT-013
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: ANL-047 Report Access & Sharing Control lists and edits the access policies that speak to reporting permissions and
+  shows the sharing and export rules, with an empty state that says what empty means.
+decision:
+  what: A status filter and a table on listAuthorisationPolicies with readable columns; a detail panel; New and Save access
+    policy on createAuthorisationPolicy and updateAuthorisationPolicy with forms that never ask for id, status or version;
+    the governance policy's sharing and export rules read-only; the screen permission PERMISSION_VIEW.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Design-notes corrections platform-foundation ANL-047 (0: "No columns and no write"; 1: the empty state promised a create
+  action), process-agent findings of 1-2 October 2026; DEC-225 for the sharing rules (CHG-SOT-009). Chinmay, 2 October: apply
+  the open corrections on Block B screens (phase B).'
+keys_touched:
+  screens:
+  - ANL-047
+  operations:
+  - listAuthorisationPolicies
+  - createAuthorisationPolicy
+  - updateAuthorisationPolicy
+  - getAnalyticsGovernancePolicy
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+notes: 'Block B. Batch SOT (screens-other, phase B), 2 October 2026; worktree D:/wt/screens-other, branch screens-other. Tickets:
+  none started (Block A starts Monday 5 October 2026).'
+status: closed
+closed_by_commit: b461f38e

@@ -1,0 +1,46 @@
+id: CHG-SOT-006
+date: '2026-10-02'
+source: client-review
+kind: spec
+summary: 'F103 is rewritten as the tenant-side walk of claiming a custom domain: CNAME to Front Door with a TXT _dnsauth record,
+  verification and managed certificate, readiness and primary domain, and release, with nine failure branches.'
+decision:
+  what: Steps 1-4 on CMS-017 (claim, publish and verify, live with readiness and primary, release with the takeover warning);
+    branches for the hostname held elsewhere, the validation timeout and a new token, a wrong or CAA-blocked record, hostname-taken,
+    pending revalidation, a lost CNAME, the only live domain and a dangling CNAME after release; actor venueManager; the ADM-016
+    branding step dropped.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 5 set 2 ("Subdomain plus CNAME"), batch 2 #41 and batch 3 (DNS options; CMS-017 covers
+  the guest web app). Decision ledger DEC-546, DEC-547; contract CHG-CSA-043, CHG-CSP-010; DI-283; SD-021.'
+keys_touched:
+  flows:
+  - F103
+  screens:
+  - CMS-017
+  - ADM-017
+  operations:
+  - claimCustomDomain
+  - verifyCustomDomain
+  - relinquishCustomDomain
+  - listCustomDomains
+  - setPrimaryDomain
+  - regenerateDomainToken
+  - getPlatformSubdomain
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - APP-WL-CMS-017 (#18109)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-flows.py
+notes: 'Cross-file: setPrimaryDomain, regenerateDomainToken and getPlatformSubdomain join steps 1-3 once CMS-017 declares
+  them (screens-guest, CHG-CSA-043 keys_touched); until then they appear only as branch resolvers. Closes the F103 dependency
+  named in CHG-CSA-043 and CHG-CSP-010. Batch SOT (screens-other, phase B), 2 October 2026; worktree D:/wt/screens-other,
+  branch screens-other. Tickets: none started (Block A starts Monday 5 October 2026).'
+status: closed
+closed_by_commit: b461f38e

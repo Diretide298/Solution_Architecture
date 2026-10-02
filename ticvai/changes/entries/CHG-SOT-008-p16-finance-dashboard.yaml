@@ -1,0 +1,51 @@
+id: CHG-SOT-008
+date: '2026-10-02'
+source: client-review
+kind: spec
+summary: The Finance standard dashboard is drawn once, in Analytics (P16), as new screen ANL-072, carrying BO-1081's content;
+  the same-numbers test TEST-SAME-NUMBERS is named on it.
+decision:
+  what: Issue ANL-072 Finance Dashboard (legal entity, venue, product category and period filters; the six finance tiles and
+    VAT from the seeded KPIs; the gross-to-net waterfall; the money position; the tax-document counts), entered from the Dashboard
+    Library (ANL-021); register the id; add its consumed-by lines.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 6 set 8 (BO-1081, workbook Q219): "One P16 Finance dashboard; Orders & Money shows a
+  link card"; Q217 excluding VAT with fees on their own line, Q218 the attraction filter is a product category. Decision ledger
+  DEC-219, DEC-217, DEC-218, DEC-559 (TEST-SAME-NUMBERS); DI-721, DI-260; CHG-FIN-006, CHG-FIN-007, CHG-FIN-002.'
+keys_touched:
+  screens:
+  - ANL-072
+  - ANL-021
+  - BO-1081
+  operations:
+  - getKpiValues
+  - getUnifiedReconciliation
+  - listTaxInvoices
+  - listCreditMemos
+  - listEInvoiceTransmissions
+  files:
+  - screens/P16-venue-analytics.yaml
+  - screens/_id-register.yaml
+  - contracts/satellite/reporting.yaml
+  - contracts/spine/finance.yaml
+  other:
+  - TEST-SAME-NUMBERS
+root_class: 'new: duplicated-definition'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-finance-rules.py
+notes: 'Cross-file (screens-p08-p09): BO-1081 becomes the Orders & Money link card (a merged anchor) whose exitTo names ANL-072,
+  and its design-notes correction 3 (DI-721) is then fixed by that change and this one; ANL-072 can then add the link card
+  to entryFrom. No service-fee KPI is seeded (DEC-217), recorded as a gap on the screen. check-finance-rules holds the measure
+  labels; the same-numbers guard is the frontend test TEST-SAME-NUMBERS (DEC-559). Ticket: no ticket exists for ANL-072 yet;
+  the plan refresh issues one. Batch SOT (screens-other, phase B), 2 October 2026; worktree D:/wt/screens-other, branch screens-other.
+  Tickets: none started (Block A starts Monday 5 October 2026).'
+status: closed
+closed_by_commit: b461f38e

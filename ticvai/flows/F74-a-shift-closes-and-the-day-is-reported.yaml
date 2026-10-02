@@ -19,12 +19,16 @@ offlineBehaviour: '**Reporting needs the network.** A day report from one till i
 steps:
 - step: 1
   screen: POS-007
-  action: The shift closes on a blind count and settles (CHG-FIN-003).
+  action: The shift closes on a blind count and settles (CHG-FIN-003). A supervisor closes or resolves
+    it with their own PIN at any till of the venue (decided 2 October 2026, DEC-059, CHG-CSP-012).
   operations:
   - submitShiftCount
   - acceptShiftVariance
   - listDenominations
-  outcome: F32 walks this in detail; here it is the input to the day.
+  outcome: F32 walks this in detail; here it is the input to the day. **A counted shift waiting for
+    review is still an input to the day**, shown as "Under review", not as missing.
+  note: '**2 October (CHG-SOT-001).** `closeShift` (supervisor PIN, any till) joins this step''s operations
+    once POS-007 declares it; that screen is the POS agent''s (CHG-CSP-012 keys_touched).'
 - step: 2
   screen: POS-008
   action: The day is reported.
@@ -42,6 +46,18 @@ steps:
   outcome: '**Takings per staffed hour is the number a venue manager actually wants**, and it needs
     both sides.'
   crossesDevice: true
+- step: 4
+  screen: BO-043
+  action: The daily cash reconciliation lists every shift of the day and resolves the ones still under
+    review, one by one.
+  operations: []
+  outcome: '**Daily per venue, shift by shift** (decided 2 October 2026, Chinmay, batch 3 #1 and batch
+    6 #215; DEC-059, CHG-CSP-012). Each pending shift is accepted, sent back for a recount or closed by a
+    supervisor with their PIN; the count lines are read note by note, never the expected figure first.'
+  crossesDevice: true
+  note: '**Added 2 October (CHG-SOT-001).** BO-043 is the back-office agent''s screen; `acceptShiftVariance`,
+    `rejectShiftVariance`, `getShiftCountLines` and `closeShift` join this step once BO-043 declares them
+    (CHG-CSP-012 notes). Until then the step names the screen and calls nothing, as F73 step 2 does.'
 branches:
 - at: 2
   condition: A till has not closed yet.
@@ -49,11 +65,39 @@ branches:
     that quietly excludes a lane is worse than a number that is late.'
   severity: high
   resolvedBy: listShifts
+- at: 1
+  condition: The count is over the variance threshold and no supervisor is at the till.
+  behaviour: '**The cashier signs out and the shift waits as "Under review"** (decided 2 October 2026,
+    Chinmay, batch 3 #1, POS-007: "The cashier may sign out, and the shift stays pending until the supervisor
+    accepts. That must not stop the next cashier starting a shift"; DEC-059, CHG-CSP-012, DI-805). The shift
+    is `pendingVariance` with its own deposit box and count; `openShift` refuses only while a shift is
+    `open` or `suspended`, so the next cashier opens on that till with a new box and float. The cashier''s
+    view shows "Under review"; a supervisor resolves it later at any till with their PIN, or in the daily
+    reconciliation (step 4).'
+  severity: requiresStaff
+  resolvedBy: Supervisor, with acceptShiftVariance or closeShift (supervisor PIN), on POS-007 or BO-043
+- at: 4
+  condition: The supervisor does not accept the count.
+  behaviour: '**Sent back for a recount, not reopened for trading** (decided 2 October 2026, batch 6 #175,
+    BO-040: "Add Reject + recount (DI-804)"; CHG-CSP-013). The shift stays `pendingVariance` and the cashier
+    sees "Recount requested" rather than "Under review", recounts at any till of the venue and resubmits
+    with `submitShiftCount`. Still blind: the rejection carries the reason, never the expected figure.'
+  severity: requiresStaff
+  resolvedBy: rejectShiftVariance, then the cashier's submitShiftCount
+- at: 4
+  condition: A shift is still under review when the day is reported.
+  behaviour: '**The day report names it as under review rather than leaving it out.** Its counted figure
+    is in the day; its variance is pending until the reconciliation resolves it.'
+  severity: recoverable
+  resolvedBy: Supervisor, in the daily cash reconciliation (BO-043)
 exitStates:
 - state: reported
   description: All tills closed, day reported.
 - state: partial
   description: '**Incomplete and labelled as such.**'
+- state: deferred
+  description: '**Reported, with one or more shifts "Under review"** until the daily reconciliation resolves
+    them (DEC-059).'
 notes: '**Written 24 August.** `POS-008` could create and update report definitions — removed. **A till
   runs reports; it does not write them.**'
 openQuestions: null
