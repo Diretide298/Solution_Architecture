@@ -12,7 +12,7 @@ decision:
   date: '2026-10-02'
 why: 'Chinmay, 2 October 2026, batch 6 set 9 (ANL-070, workbook Q225): "Add a governance policy operation (masking, export,
   retention, sharing, AI/API access)". Decision ledger DEC-225; contract CHG-CSA-021, CHG-CSA-007; ADR-0054; contract gap
-  CHG-WIR-004.'
+  CHG-WIR-004; permission CHG-FUP-007.'
 keys_touched:
   screens:
   - ANL-070
@@ -32,9 +32,9 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-screen-wiring.py
-notes: 'The two operations have no x-ticvai-consumed-by list yet, so none was added. setAnalyticsGovernancePolicy is gated
-  by PERMISSION_MANAGE until REPORT_GOVERNANCE_MANAGE joins the vocabulary (CHG-CSA-007, apply-followup). The ANL-070 block
-  C corrections (columns, process module) stay open for its sprint. Batch SOT (screens-other, phase B), 2 October 2026; worktree
-  D:/wt/screens-other, branch screens-other. Tickets: none started (Block A starts Monday 5 October 2026). Closed by the next
-  commit once this one has a hash.'
+notes: 'The two operations have no x-ticvai-consumed-by list yet, so none was added. setAnalyticsGovernancePolicy requires
+  REPORT_GOVERNANCE_MANAGE since CHG-FUP-007 (merged from main); ANL-070 names it on the save control and in its no-access
+  state, and ANL-047 says who edits the rules. The ANL-070 block C corrections (columns, process module) stay open for its
+  sprint. Batch SOT (screens-other, phase B), 2 October 2026; worktree D:/wt/screens-other, branch screens-other. Tickets:
+  none started (Block A starts Monday 5 October 2026). Closed by the next commit once this one has a hash.'
 status: open

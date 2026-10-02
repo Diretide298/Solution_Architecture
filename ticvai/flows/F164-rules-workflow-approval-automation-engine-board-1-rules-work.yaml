@@ -60,7 +60,7 @@ steps:
   - listRuleWorkflow
   outcome: Ready for the next screen on this board
 - step: 8
-  screen: ADM-242
+  screen: BO-086
   action: Works in Approval Matrix & Multi-Level Approval Configuration
   operations:
   - listApprovalMatrices

@@ -1,0 +1,43 @@
+id: CHG-SOT-021
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: Four workshop-board flow steps that called operations on screens merged into venue screens now run on the venue screen
+  that holds the operations.
+decision:
+  what: F147 step 18 ADM-097 to BO-441; F164 step 8 ADM-242 to BO-086; F165 step 2 ADM-249 to BO-084; F165 step 8 ADM-252
+    to BO-391.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'DEC-100 (Chinmay, 2 October 2026: "They are venue screens"), applied by CHG-MOV-001 and CHG-MOV-002, which kept ADM-097,
+  ADM-242, ADM-249 and ADM-252 as full merged anchors with no operations; check-flows then failed six steps on main 19d69b6b.
+  The lead asked screens-other (flows owner) to retarget them.'
+keys_touched:
+  flows:
+  - F147
+  - F164
+  - F165
+  screens:
+  - ADM-097
+  - ADM-242
+  - ADM-249
+  - ADM-252
+  - BO-441
+  - BO-086
+  - BO-084
+  - BO-391
+root_class: A32 NAVIGATION
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-flows.py
+status: open
+notes: 'Open: check-flows went from six failures on main to three; the three left are navigation edges the P08 owner adds
+  (ADM-088 to BO-441; ADM-248 to and from BO-391), or the anchor transitions repointed to the merged screens. Batch SOT (screens-other,
+  phase B), 2 October 2026; worktree D:/wt/screens-other, branch screens-other. Tickets: none started (Block A starts Monday
+  5 October 2026).'

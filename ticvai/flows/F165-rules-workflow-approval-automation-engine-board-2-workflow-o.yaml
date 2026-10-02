@@ -24,7 +24,7 @@ steps:
   outcome: Provide administrators and operational managers with a real-time view of all workflow activity
     across TICVAI.
 - step: 2
-  screen: ADM-249
+  screen: BO-084
   action: Works in Unified Approval Inbox & Decision Workspace
   operations:
   - listApprovalRequests
@@ -63,7 +63,7 @@ steps:
   - listWorkflow
   outcome: Ready for the next screen on this board
 - step: 8
-  screen: ADM-252
+  screen: BO-391
   action: Works in SLA, Escalation & Bottleneck Monitor
   operations:
   - listSlaEscalationBottleneck
