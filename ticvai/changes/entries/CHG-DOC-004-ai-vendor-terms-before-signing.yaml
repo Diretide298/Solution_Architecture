@@ -1,0 +1,28 @@
+id: CHG-DOC-004
+date: '2026-10-02'
+source: audit
+kind: process
+summary: 'Open, nothing applied: Core42 Compass, OpenAI UAE and Microsoft PTU terms, and the legal opinion on Miral and Dubai Holding,
+  are to be had in writing before signing.'
+decision:
+  what: 'Get in writing before signing: Compass retention, logging, sub-processors, minimums and per-model region; OpenAI UAE approval
+    and Modified Abuse Monitoring; the PTU calculator figures; legal advice on whether Miral and Dubai Holding are government entities
+    (DEC-541).'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October (AI residency: ''to get in writing before signing''); research section 4 ''Not confirmed''. Needs the vendors
+  and counsel, so per the apply brief it is recorded open and nothing is applied; ADR-0009''s amendment names the items.'
+keys_touched:
+  other:
+  - DEC-541
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: template-field
+  ref: docs/registers/external-dependencies.md::Core42
+status: open
+notes: Closes when external-dependencies lists each item with an owner and a date, and the answers are in.

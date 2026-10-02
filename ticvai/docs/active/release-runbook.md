@@ -56,6 +56,14 @@ Once everything is green:
 - Pull a **sample of 20 to 30 tickets** through ADAM at the new tag, across every developer's board.
 - A new root issue gets a check before it counts as closed.
 
+## 8. Configuration promotion after go-live
+A package release moves the specification; a tenant's **configuration** moves between its environments by
+[ADR-0070](../adr/0070-configuration-moves-as-a-versioned-package.md) (Chinmay, 2 October, DEC-168; CHG-DOC-011):
+never copy, merge or reverse-migrate a production database. The schema goes forward only, expand then contract
+(`check-migration-freeze` after r1). Configuration goes as a versioned package with stable keys: a diff against
+production, approval by someone other than its author, an idempotent upsert by key and an audit record; rollback
+re-applies the previous package. Secrets and environment settings never travel in a package.
+
 ## Rules from 5 October (council of 2 October)
 Source: the council's final reports, `docs/active/council/council-report-2026-10-02-opus.html` and `docs/active/council/council-report-2026-10-02.html`. The short form every agent loads is `ticvai/CLAUDE.md`. These
 rules add to sections 1 to 7; they do not replace them.

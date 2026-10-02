@@ -1,0 +1,31 @@
+id: CHG-DOC-008
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'Open: retention periods per data category and region wait for research into UAE and GCC law (defaults to be marked ''pending
+  counsel''); ADR-0047 records the pending item and nothing in its table changes.'
+decision:
+  what: Research UAE/GCC law and propose retention defaults per category, marked 'pending counsel' (DEC-240); rejected and superseded
+    accreditation document files follow the same research (DEC-459).
+  by: Chinmay
+  date: '2026-10-02'
+why: Chinmay, 2 October, critical set 1 (BO-192, workbook Q240; BO-629, Q459). Status needs-research in the decisions register, so per
+  the apply brief nothing is applied; ADR-0047 and ADR-0063 note the item as pending.
+keys_touched:
+  files:
+  - docs/adr/0047-how-long-data-is-kept-and-where-it-goes-next.md
+  screens:
+  - BO-192
+  - BO-629
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: template-field
+  ref: contracts/spine/tenancy.yaml::pendingCounsel
+status: open
+notes: Closes when the research lands, the defaults enter ADR-0047 marked pending counsel, and a seeded retention setting carries a
+  pending-counsel flag (the template field) until the DPO signs off.

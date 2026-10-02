@@ -1,0 +1,38 @@
+id: CHG-DOC-010
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'ADR-0029 is extended with the outlet settings decided on 2 October: payment timing, inside the venue or standalone, outlet
+  type and department, the till layout with a till override, the producing outlet and the default kitchen station.'
+decision:
+  what: Each is an outlet property or setting resolving at outlet (DEC-064, DEC-070, DEC-206, DEC-196, DEC-183, DEC-186, DEC-188, DEC-189,
+    DEC-190).
+  by: Chinmay
+  date: '2026-10-02'
+why: Chinmay, 2 October, batch 1 (POS-021 Q64, WEB-036 Q70) and batch 6 (BO-109 Q183, BO-113 Q186, BO-134 Q188, BO-135 Q189 and Q190,
+  BO-729 Q196). ADR-0029 and ADR-0018 fix where outlet configuration resolves; R261 and DI-292 are amended.
+keys_touched:
+  files:
+  - docs/adr/0029-outlet-configuration-scope.md
+  - docs/adr/README.md
+  screens:
+  - POS-021
+  - WEB-036
+  - BO-109
+  - BO-113
+  - BO-134
+  - BO-135
+  - BO-729
+root_class: A20 TYPES-AND-VOCAB
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-config-scope.py
+status: open
+notes: check-config-scope fails an operation on /outlets/{outletId} whose scope is not outlet, so the new outlet settings cannot land
+  venue-scoped. The fields and operations are the contracts owners' to add (contracts/spine/tenancy.yaml Outlet; contracts/satellite/fnb.yaml).
+  Closes on its commit.

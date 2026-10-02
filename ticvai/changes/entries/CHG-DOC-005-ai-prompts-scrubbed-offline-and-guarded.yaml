@@ -1,0 +1,31 @@
+id: CHG-DOC-005
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'ADR-0020 section 2 is amended: every LLM call is scrubbed offline in the cell (Presidio with UAE and Arabic recognisers, reversible
+  placeholders) and checked by an in-cell guard model (Qwen3Guard) on input and output, failing closed, whatever the residency class.'
+decision:
+  what: Mandatory offline PII scrubbing on every LLM call, not tied to residency; an offline guard model on input and output (DEC-542,
+    DEC-543).
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October: ''we may need to scrub personal info no matter what: an offline NLP-based scrubber or censorship''. Research
+  T12 and T13: Azure Content Safety''s harm models are not trained on Arabic. Reinforces ADR-0020 (masking fails closed); ADR-0023 relates.'
+keys_touched:
+  files:
+  - docs/adr/0020-ai-isolation-boundary.md
+  - docs/adr/0023-pii-separation.md
+  - docs/adr/README.md
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: check-ai-scrubbing (not written yet)
+status: open
+notes: 'Open until the prevention exists: a gateway test corpus (Arabic and English; Emirates IDs, phones, IBANs, cards) with no raw
+  value in an outbound prompt, and a scrubber or guard outage refusing the call. Depends on the AI contract (sendAiMessage, the gateway
+  scrubbing policy in contracts/satellite/ai.yaml), the AI design, the HLD/LLD redo and the AI-ENGINE-GATEWAY task (CHG-DOC-023).'
