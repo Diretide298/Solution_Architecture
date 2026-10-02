@@ -1,0 +1,46 @@
+id: CHG-SPO-016
+date: '2026-10-02'
+source: client-review
+kind: spec
+summary: The till's food, kitchen-send, merchandise and guest screens lose their ticket words and raw forms, and POS-027 records
+  consent given in person.
+decision:
+  what: POS-021 no add-line or promotions form, no ticket chips; POS-022 order from the cart and ticket gestures, send before
+    charge; POS-023 offline follows the contract; POS-027 binds recordConsent (staff) and shows open reservations.
+  by: Chinmay
+  date: '2026-10-02'
+why: Design-notes corrections fnb-retail POS-021, POS-022, POS-023 and customer-marketing POS-027 (Block A); POSV2-2, POSV2-4;
+  audit R261; DI-102; contract CHG-CSA-045 (recordConsent staff audience).
+keys_touched:
+  screens:
+  - POS-021
+  - POS-022
+  - POS-023
+  - POS-027
+  operations:
+  - recordConsent
+  - addCartLine
+  - evaluatePromotions
+  - createFnbOrder
+  files:
+  - screens/P04-point-of-sale.yaml
+  - contracts/satellite/marketing-crm.yaml (consumed-by lines only)
+  - handoff/design-notes/fnb-retail.yaml
+  - handoff/design-notes/customer-marketing.yaml
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-021
+  - APP-POS-POS-022
+  - APP-POS-POS-023
+  - APP-POS-POS-027
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-design-notes.py
+status: closed
+closed_by_commit: b137fa8a
+notes: 'Applied in worktree screens-pos-staff (batch SPO, phase B, 2 October 2026). Tickets: none started (Block A starts
+  Monday 5 October 2026); unstarted keys are the tasks.csv keys of the touched screens.'

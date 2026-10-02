@@ -1642,12 +1642,16 @@ screens:
     - what: The offline state says "Opens locally and syncs".
       why: openShift is online only (F32, R257) and the screen's own transition says opening does not work offline.
       source: contracts/spine/shift.yaml#openShift | screens/P04-point-of-sale.yaml#POS-001
+      status: fixed
+      by: CHG-SPO-015
     - what: 'A panel shows the "Suggested float from the venue default", and the client-approved and v2 builds show "Expected
         float AED 1,000.00" with "Matches expected float — no variance".
 
         '
       why: POSV2-3 decided the expected float and the live variance are not shown while counting.
       source: POSV2-3 | R080
+      status: fixed
+      by: CHG-SPO-015
     - what: The edge to Close Shift is guarded by shift.reopen.
       why: Closing needs the close permission; reopen is a supervisor reversal of a closed shift.
       source: screens/P04-point-of-sale.yaml#POS-001 | contracts/spine/shift.yaml#closeShift
@@ -1667,9 +1671,13 @@ screens:
         '
       why: The flow and the contract disagree; decide which wins.
       source: F32 step 1 | contracts/spine/shift.yaml#openShift
+      status: logged
+      by: CHG-SPO-020
     - what: The v2 frame's "Report to facilities" button on a failed device.
       why: No operation behind it; dropped (POSV2-8).
       source: POSV2-8
+      status: fixed
+      by: CHG-SPO-015
     decisions:
     - question: Is a float count needed for a cashier who does not handle cash (a card-only F&B counter)?
       decision: 'Drawn default stands (answer: "Default / recommended accepted"): Always count when the till has a cash drawer;
@@ -1889,6 +1897,8 @@ screens:
     - what: The screen notes describe foreign-currency counting at close ("Close counts each foreign currency separately").
       why: That note belongs to the close (POS-007); it misleads a roster design.
       source: screens/P04-point-of-sale.yaml#POS-009
+      status: fixed
+      by: CHG-SPO-015
     - what: createRotaAssignment ("Create rota assignment") is on the till.
       why: Rota planning is a back-office workforce task; the till shows the rota and takes attendance.
       source: contracts/satellite/workforce.yaml#createRotaAssignment | R254
@@ -2000,6 +2010,8 @@ screens:
     - what: The offline state says "Working from the local journal. The till keeps taking money".
       why: Refunds and returns are refused offline (F58 branch at 8); the state must say so.
       source: F58 step 8 | screens/P04-point-of-sale.yaml#POS-011
+      status: fixed
+      by: CHG-SPO-007
     - what: 'Two approval models on one screen: a merchandise return takes a supervisor PIN step-up (R144), a ticket refund
         takes a "second user names themselves" dual authorisation; the client asked that a POS refund be routed for approval
         before it reaches the bank.
@@ -2007,6 +2019,8 @@ screens:
         '
       why: The design cannot show one consistent approval step; confirm which applies to which refund.
       source: contracts/spine/orders.yaml#createRefund | contracts/satellite/retail.yaml#createRetailReturn | R144 | DI-253
+      status: logged
+      by: CHG-SPO-020
     - what: The purpose reads "Returns, Refunds & Exchanges — from the client design board, 20 August".
       why: Not a purpose a designer can act on.
       source: screens/P04-point-of-sale.yaml#POS-011
@@ -2107,10 +2121,14 @@ screens:
         '
       why: Two meanings for one screen id; delivery-partner capture (partner, reference, driver, fee) has no contract field.
       source: screens/P04-point-of-sale.yaml#POS-012 | F60 step 1
+      status: fixed
+      by: CHG-SPO-001
     - what: The v2 F&B delivery cart shows "Inventory held 4:56 · Extend +2 min".
       why: Food lines hold no capacity (a cart line's hold is null for products without capacity), so a hold timer on a
         food cart is false.
       source: contracts/spine/orders.yaml#/components/schemas/CartLine
+      status: fixed
+      by: CHG-SPO-001
   POS-013:
     summary: 'The till''s offline picture: whether it is online, what it sold while offline and has not yet synced, and
       the entries the server refused on replay that need a supervisor. Offline is switched automatically and synced automatically
@@ -2154,6 +2172,8 @@ screens:
     - what: '"Sync orders" is the primary button.'
       why: The client agreed sync is automatic with no manual action.
       source: DI-798 | DI-071
+      status: fixed
+      by: CHG-SPO-015
     - what: 'Cash operations (cash movements, withdraw, adjust float), "Every denomination", and getOfflinePackage (a gate
         scanner''s package needing ACCESS_VALIDATE) are attached; listSyncRejections is not.
 
@@ -2236,9 +2256,13 @@ screens:
         '
       why: The permission that sees expected figures must be named (supervisor only) so the screen cannot leak it to a cashier.
       source: DI-273 | R080 | POSV2-3
+      status: fixed
+      by: CHG-SPO-014
     - what: F73 step 3 says "cash limits and the drawer ceiling are set" here; no operation or setting holds a drawer limit.
       why: The configurable drawer limit (DI-274) has nowhere to live, so no safe-drop prompt can fire.
       source: F73 step 3 | DI-274
+      status: fixed
+      by: CHG-SPO-014
   POS-017:
     summary: 'Mid-shift cash in and cash out on this till: a cashier or supervisor records cash taken out of the drawer
       (a pickup when the drawer is heavy) or added (change). Both adjust the expected figure used at close, so a busy cashier
@@ -2280,9 +2304,13 @@ screens:
     - what: The layout is text fields bound to the raw request (id, kind, amount, denominations, reference, reason, recordedAt).
       why: Ids and device times are generated; kind is a two-way choice; amounts are counted by denomination.
       source: screens/P04-point-of-sale.yaml#POS-017
+      status: fixed
+      by: CHG-SPO-014
     - what: The configurable drawer limit the client asked for has no setting in any contract.
       why: Without it the till cannot prompt a cash out when the drawer is heavy (DI-274, F32 step 4).
       source: DI-274 | F32 step 4
+      status: fixed
+      by: CHG-SPO-014
   POS-018:
     summary: 'A supervisor takes cash out of a cashier''s drawer for the safe or banking (a safe drop), with the cashier
       as witness; it reduces the expected close figure and is not a variance. The one thing to get right: two people sign
@@ -2546,6 +2574,8 @@ screens:
 
         '
       source: contracts/spine/orders.yaml#addCartLine | contracts/satellite/promotions.yaml#evaluatePromotions | DI-102
+      status: fixed
+      by: CHG-SPO-016
     - what: 'A till cart line cannot carry dish options. AddCartLineRequest and CartLine have no modifier options, kitchen
         note, course or seat, and their price ignores the options'' price changes, while createFnbOrder needs menuItemId
         and modifierOptionIds per line. OrderLineAttributes defines only a transport shape.
@@ -2558,6 +2588,8 @@ screens:
         '
       source: contracts/spine/orders.yaml#/components/schemas/CartLine | contracts/spine/orders.yaml#/components/schemas/OrderLineAttributes
         | contracts/satellite/fnb.yaml#/components/schemas/CreateFnbOrderLine | DI-328
+      status: logged
+      by: CHG-SPO-019
     - what: 'Offline selling of recipe-linked items: the fnb contract refuses them offline ("F&B is blocked offline where
         inventory is tracked"), while the client agreed F&B sells offline with stock depleted at day end, and outlets choose
         real-time or end-of-day depletion.
@@ -2568,6 +2600,8 @@ screens:
 
         '
       source: contracts/satellite/fnb.yaml#createFnbOrder | DI-075 | DI-320
+      status: logged
+      by: CHG-SPO-019
     - what: 'The v2 candidate shows "kitchen fires on payment" in the header, an "Open-dated · any day" validity chip on
         every food tile, REFINE chips "Today" and "Low capacity", and a "Reserve" button in a food-only cart.
 
@@ -2577,6 +2611,8 @@ screens:
 
         '
       source: screens/P04-point-of-sale.yaml#POS-021 | POSV2-4 | POSV2-2
+      status: fixed
+      by: CHG-SPO-016
     decisions:
     - question: 'The client still lists "F&B quick service vs dine-in" as an open policy item. Does every POS F&B order send
         before charging, or does quick service at some outlets charge first?
@@ -2715,6 +2751,8 @@ screens:
         '
       why: The order comes from the cart; ids and device times are generated, never typed.
       source: screens/P04-point-of-sale.yaml#POS-022 | R254
+      status: fixed
+      by: CHG-SPO-016
     - what: 'createFnbOrder says "Quick service pays immediately" and its salesOrderId is "the order it took payment on".
 
         '
@@ -2723,6 +2761,8 @@ screens:
 
         '
       source: contracts/satellite/fnb.yaml#createFnbOrder | R261 | POSV2-4
+      status: logged
+      by: CHG-SPO-019
     - what: There is no cancel on the screen, although F108 resolves "guest walks away" with cancelFnbOrder.
       why: Send-then-charge makes an unpaid sent order an everyday case; the counter needs Cancel order.
       source: F108 step 3 | contracts/satellite/fnb.yaml#cancelFnbOrder
@@ -2731,6 +2771,8 @@ screens:
     - what: F108's exit state "uncollected" has no operation; markOrderCollected only records a collection.
       why: The flow says uncollected orders are recorded and counted; nothing can record one from the counter.
       source: F108 step 6 | contracts/satellite/fnb.yaml#markOrderCollected
+      status: logged
+      by: CHG-SPO-019
     - what: 'createFnbOrder takes no guest name, mobile, pickup time, delivery location or delivery-partner reference, and
         nothing writes the kitchen ticket''s buzzer number from a till.
 
@@ -2738,12 +2780,16 @@ screens:
       why: Takeaway and delivery need contact and timing details (DI-790) and a delivery needs a location (R125(1)); the
         buzzer is BL-128.
       source: contracts/satellite/fnb.yaml#/components/schemas/CreateFnbOrderRequest | DI-790 | R125
+      status: logged
+      by: CHG-SPO-019
     - what: 'The v2 capture for this screen is the Queue (partner orders sent from Received); the counter still has no send-to-kitchen
         step.
 
         '
       why: POSV2-4 requires the send step at the counter before Charge.
       source: screens/P04-point-of-sale.yaml#POS-022 | POSV2-4
+      status: fixed
+      by: CHG-SPO-016
   POS-023:
     summary: 'The merchandise till: a cashier at a shop or a souvenir counter scans or taps items, picks the size or colour,
       and charges through the same cart and payment as tickets and food (DI-795). Stock is the outlet''s system stock and
@@ -2845,6 +2891,8 @@ screens:
 
         '
       source: screens/P04-point-of-sale.yaml#POS-023 | contracts/satellite/retail.yaml#createRetailSale | DI-075 | DI-294
+      status: logged
+      by: CHG-SPO-020
     - what: 'Two sale paths are attached: the shared cart (addCartLine, then Payment) and createRetailSale, which creates
         its own order and stock depletion.
 
@@ -2854,6 +2902,8 @@ screens:
 
         '
       source: contracts/satellite/retail.yaml#createRetailSale | contracts/spine/orders.yaml#addCartLine | DI-293
+      status: logged
+      by: CHG-SPO-020
     - what: 'The layout shows text fields "Outlet id" and "Category id", an "In stock only" toggle, a table "Every merchandise",
         and modals for "Add cart line", "Create retail sale" and "Evaluate promotions"; listMerchandise is loaded although
         "a terminal does not call this".
@@ -2869,6 +2919,8 @@ screens:
       why: Variants with their own barcodes and stock were agreed (DI-354); validity and capacity are ticket words (use
         "Low stock").
       source: screens/P04-point-of-sale.yaml#POS-023 | DI-354
+      status: fixed
+      by: CHG-SPO-001
   POS-024:
     summary: 'Outlet configuration from the floor, for a manager signed in on the same till a cashier uses: the table layout
       (halls, tables, shapes, capacity, position), which tables combine, and taking items off sale. The one thing to get
@@ -3082,6 +3134,8 @@ screens:
 
         '
       source: contracts/satellite/fnb.yaml#closeTableVisit | F108 step 4
+      status: logged
+      by: CHG-SPO-019
     - what: 'The contract''s table status has needsClearing (closeTableVisit leaves a table needing clearing; clearTable
         frees it), while the client decided there is no cleaning status (Available → Ordered → Table closed → Reserved).
 
@@ -3091,6 +3145,8 @@ screens:
 
         '
       source: DI-336 | contracts/satellite/fnb.yaml#closeTableVisit | contracts/satellite/fnb.yaml#/components/schemas/TableStatus
+      status: fixed
+      by: CHG-SPO-006
     - what: 'The table model cannot draw the agreed floor: TableDefinition has x/y position and shape but no size or rotation,
         zones are bare strings with no hall dimensions, and nothing tags a table or visit VIP.
 
@@ -3098,9 +3154,13 @@ screens:
       why: DI-793 asks for a to-scale plan of each hall and DI-335 for VIP tagging.
       source: contracts/satellite/fnb.yaml#/components/schemas/TableDefinition | contracts/satellite/fnb.yaml#/components/schemas/TableMap
         | DI-793 | DI-335
+      status: logged
+      by: CHG-SPO-019
     - what: The offline state talks about "two tills moving the same party", but moving is deferred.
       why: POSV2-8 took move and merge off this screen.
       source: screens/P04-point-of-sale.yaml#POS-028 | POSV2-8
+      status: fixed
+      by: CHG-SPO-006
     decisions:
     - question: Should Add guest (covers change), Change server and Transfer table from the table activity log be on the till
         in r1?
@@ -4296,21 +4356,31 @@ screens:
         per act: reassignServer or transferTableVisit for Change server, moveTableVisit for Transfer table. updateTableVisit
         covers only.'
       source: DI-338 | contracts/satellite/fnb.yaml#updateTableVisit | contracts/satellite/fnb.yaml#reassignServer | contracts/satellite/fnb.yaml#transferTableVisit
+      status: logged
+      by: CHG-SPO-019
     - what: Naming collision. The client's "Transfer table" means move the party to another table (moveTableVisit). The
         contract's transferTableVisit means hand the check to another server.
       why: A designer following the operation names will put "Transfer" on the wrong act.
       source: DI-338 | contracts/satellite/fnb.yaml#transferTableVisit | contracts/satellite/fnb.yaml#moveTableVisit
+      status: fixed
+      by: CHG-SPO-018
     - what: No operation or field gives a table's activity log.
       why: The client asked for a per-table activity log. TableVisit carries orders and no events.
       source: DI-338 | TRACKER Workshops/Actions row 89 | contracts/satellite/fnb.yaml#getTableVisit
+      status: logged
+      by: CHG-SPO-019
     - what: '"Fire course" and "Hold course" on the server''s handheld (F29 step 5), while the agreed decision says the
         kitchen pass fires courses and the vocabulary keeps "Fire" on the kitchen side.'
       why: Contradiction between the flow and DI-407. Either the server may release the next course from the floor, or only
         the pass does.
       source: DI-407 | DI-333 | F29 step 5 | contracts/satellite/fnb.yaml#fireCourse
+      status: logged
+      by: CHG-SPO-020
     - what: '"Notify server" as a button on the server''s own table sheet.'
       why: It is the kitchen calling the server to the pass. On the staff app it is an incoming notification, not an action.
       source: contracts/satellite/fnb.yaml#notifyServer | F29 step 4
+      status: fixed
+      by: CHG-SPO-018
     - what: '"Save table combinations" (setTableCombinations, PRODUCT_CONFIGURE) and the waitlist actions (join, quote wait,
         notify party) on the table sheet.'
       why: Combinations are pre-service configuration (EMP-053). The waitlist actions belong to EMP-056. R254 re-derives
@@ -4323,10 +4393,14 @@ screens:
       why: Plumbing on a user's screen. recordedAt is device time, set by the app. Ordering is a menu, like the till's order
         pad.
       source: screens/P06-staff-app.yaml#EMP-058
+      status: fixed
+      by: CHG-SPO-018
     - what: F29 step 1 seats with seatTableReservation and openTableVisit, but the table state model moves a table from
         free to seated only by claimTableSession (the guest's claim).
       why: The host's seat has no transition on the table, so the map's state after a host seats is undefined.
       source: F29 step 1 | contracts/satellite/fnb.yaml#openTableVisit
+      status: logged
+      by: CHG-SPO-019
     decisions:
     - question: May a server release the next course from the handheld (F29 step 5), or does only the kitchen pass fire (DI-407)?
       decision: 'Drawn default stands (answer: "Default / recommended accepted"): Show the course strip read-only, plus a
@@ -4804,6 +4878,8 @@ screens:
 
         '
       source: DI-346
+      status: fixed
+      by: CHG-SPO-018
     - what: 'The screen has no way to find the expected supplier order (no order list or read), and no "Receive" for an
         inbound transfer (receiveStockTransfer), although it opens transfer manifests.
 
@@ -4828,6 +4904,8 @@ screens:
     - what: The rejection reasons are a fixed list.
       why: The client asked for a user-defined reason list that can be extended without development.
       source: DI-363
+      status: logged
+      by: CHG-SPO-019
   EMP-066:
     summary: 'The counter''s handheld. Open the count assigned to my location, walk the shelves and enter what is there,
       line by line, blind, offline if needed. Recount the lines a supervisor sends back. The daily count list lives here
@@ -13007,17 +13085,23 @@ screens:
       why: A command centre spans every station; the rail is KIT-002. Copying its states makes the supervisor screen look
         broken when unassigned.
       source: screens/P15-kitchen-display.yaml#KIT-001 | DI-332
+      status: fixed
+      by: CHG-SPO-017
     - what: 'The loading state says "oldest ticket first" while the cards say "ordered by promise time"; the contract says
         the rail order is the server''s, by priority weights.
 
         '
       why: Three orders for one rail. The design must keep the server's order and never re-sort.
       source: screens/P15-kitchen-display.yaml#KIT-001 | contracts/satellite/fnb.yaml#listKitchenTickets
+      status: fixed
+      by: CHG-SPO-017
     - what: The meeting input "Softlabs need not build a full KDS, only an integration point" (31 July) is still in force
         in the design-input index.
       why: The fnb contract records it as superseded on 19 September (the kitchen display is TICVAI's own); mark DI-077
         superseded so bundles stop carrying it.
       source: DI-077 | contracts/satellite/fnb.yaml#listKitchenTickets
+      status: logged
+      by: CHG-SPO-020
   KIT-002:
     summary: 'The station display on the kitchen wall: the tickets this station must make, in the order the kitchen should
       make them, bumped with one touch or a bump bar by someone wearing gloves. The one thing to get right: each ticket
@@ -13119,13 +13203,19 @@ screens:
         '
       why: Status changes are gestures on the card; the course filter is chips; times are device times.
       source: screens/P15-kitchen-display.yaml#KIT-002 | R254
+      status: fixed
+      by: CHG-SPO-017
     - what: Fire course and Hold course are on the station display.
       why: The pass fires and holds courses (DI-407); a station cook working one section should not release a table's next
         course.
       source: DI-407 | contracts/satellite/fnb.yaml#fireCourse
+      status: logged
+      by: CHG-SPO-020
     - what: The cards say "ordered by promise time not arrival", the loading state "oldest ticket first".
       why: The rail order is the server's (priority weights); re-sorting on the device would disagree with every other display.
       source: contracts/satellite/fnb.yaml#listKitchenTickets
+      status: fixed
+      by: CHG-SPO-017
   KIT-003:
     summary: 'The pass (head chef or expeditor) for table service: courses of each table — starters before mains — and when
       the next course goes. The pass fires a held course when the table is ready, holds one when the table has gone quiet,
@@ -13232,6 +13322,8 @@ screens:
     - what: The layout repeats the station rail (cards, Bump, course number, status text field) instead of one order's detail.
       why: The purpose is one order's journey; it has no actions of its own.
       source: screens/P15-kitchen-display.yaml#KIT-004
+      status: fixed
+      by: CHG-SPO-017
     - what: The purpose is "Active Order Management & Fulfilment Journey — board 3 of the client F&B design set".
       why: Not a purpose a designer can act on.
       source: screens/P15-kitchen-display.yaml#KIT-004
@@ -13331,6 +13423,8 @@ screens:
     - what: The layout repeats the station rail (course number, status text field, "Every kitchen ticket", Bump).
       why: The pass works whole orders, not one station's tickets.
       source: screens/P15-kitchen-display.yaml#KIT-006
+      status: fixed
+      by: CHG-SPO-017
     - what: Collection is recorded with markOrderCollected only; a runner's delivery has no action here.
       why: Delivered needs recordOrderHandover with the location (R125(1)).
       source: contracts/satellite/fnb.yaml#recordOrderHandover | R125
@@ -13387,9 +13481,13 @@ screens:
         '
       why: The board is an unattended customer display; staff controls and kitchen states must not appear on it.
       source: screens/P15-kitchen-display.yaml#KIT-007 | POSV2-7
+      status: fixed
+      by: CHG-SPO-017
     - what: The buzzer number exists on the ticket, but nothing writes it from the till and nothing dispatches to a pager.
       why: The screen promises "Buzzer" in its name; pagers cannot work as specified.
       source: contracts/satellite/fnb.yaml#/components/schemas/KitchenTicket | screens/P15-kitchen-display.yaml#KIT-007
+      status: logged
+      by: CHG-SPO-019
     decisions:
     - question: Does the guest board carry the venue's branding (it is guest-facing) or TICVAI branding (it runs on a staff
         device)?
@@ -13442,6 +13540,8 @@ screens:
     - what: The food-safety status read declares its response inline, so the panel cannot bind to a named shape.
       why: The screen's own gap; the contract should name the schema.
       source: screens/P15-kitchen-display.yaml#KIT-008 | contracts/satellite/fnb.yaml#getHaccpStatus
+      status: logged
+      by: CHG-SPO-019
     - what: A "From" date picker and a raw "Every eighty six event" table, plus "Save kitchen ticket status" on an exceptions
         screen.
       why: Plumbing; the screen shows today's events and has no ticket status to save.
@@ -13496,3 +13596,5 @@ screens:
         targets.
       why: Prioritising is a live act on the pass (KIT-003); a rules editor needs to load what is set.
       source: screens/P15-kitchen-display.yaml#KIT-009 | contracts/satellite/fnb.yaml#setKitchenSla
+      status: fixed
+      by: CHG-SPO-017

@@ -3315,7 +3315,6 @@ paths:
     get:
       operationId: getFinancialReport
       x-ticvai-consumed-by:
-        - "P04 POS-008 Reports"
         - "P08 BO-029 Report Builder"
         - "P08 BO-058 Reporting Home"
         - "P08 BO-059 Sales Reports"

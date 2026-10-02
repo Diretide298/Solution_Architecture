@@ -1,0 +1,36 @@
+id: CHG-SPO-013
+date: '2026-10-02'
+source: client-review
+kind: spec
+summary: SCN-016 switches a gate's direction live with a permission, and SCN-003 names the time-window and offline-limit denials.
+decision:
+  what: SCN-016 binds setAccessPointDirection (ACCESS_POINT_CONFIGURE, reason, optional effective time); SCN-003's denied
+    state names timeBoundWindowElapsed and offlineLimitExceeded.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026: critical set 1, BO-230 (Q255: "Live direction switch with permission, logged; R221 amended";
+  DEC-255), BO-159 (Q232; time-bound entitlements) and BO-471 (Q426; maximum offline duration). Contract CHG-CSP-032, CHG-CSP-030,
+  CHG-CSP-035; register CHG-DOC-012.'
+keys_touched:
+  screens:
+  - SCN-016
+  - SCN-003
+  operations:
+  - setAccessPointDirection
+  - validateAccess
+  files:
+  - screens/P07-staff-scanner.yaml
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: b137fa8a
+notes: 'If the permissions owner adds ACCESS_DIRECTION_SET (apply-followup), SCN-016''s component permission moves to it.
+  Applied in worktree screens-pos-staff (batch SPO, phase B, 2 October 2026). Tickets: none started (Block A starts Monday
+  5 October 2026); unstarted keys are the tasks.csv keys of the touched screens.'

@@ -948,6 +948,7 @@ paths:
         - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
         - "P12 SUP-001 Venue Management Sign In"
+        - "P06 EMP-001 Sign in"
       x-ticvai-self-service: true
       x-ticvai-audience:
       - staff

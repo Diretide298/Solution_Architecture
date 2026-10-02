@@ -8,8 +8,9 @@ that the package used to contradict; each fails on the state before the decision
                    "Total revenue", "Gross revenue", "Revenue today", "Revenue by ...", "Revenue vs ...".
                    Takings, Gross sales, Net revenue, Recognised revenue and Deferred revenue are
                    different measures and a label names one of them.
-  F-BLIND-CLOSE    (CHG-FIN-003) A cashier's screen (P04 till, P06 staff app) never calls `closeShift`
-                   (it returns the expected cash; the cashier counts through `submitShiftCount`) and
+  F-BLIND-CLOSE    (CHG-FIN-003) A cashier's screen (P04 till, P06 staff app) calls `closeShift` only from
+                   a supervisor's control (SHIFT_CLOSE_OTHER or OVERSHORT_ACCEPT; CHG-SPO-021) (it returns
+                   the expected cash; the cashier counts through `submitShiftCount`) and
                    never shows `Shift.expectedCash`, `Shift.variance` or `ShiftCloseResult.*` unless
                    the component is permissioned OVERSHORT_ACCEPT (the supervisor).
   F-TAX-BASE       (CHG-FIN-004) `CalculateTaxRequest.discountsAreTaxInclusive` stays deprecated: the
@@ -52,6 +53,9 @@ def load(p):
     return yaml.safe_load(open(ROOT / p, encoding="utf-8"))
 
 
+SUPERVISOR_CLOSE = {"SHIFT_CLOSE_OTHER", "OVERSHORT_ACCEPT"}
+
+
 def components(screen):
     for region in (screen.get("layout") or {}).get("regions") or []:
         for c in region.get("components") or []:
@@ -73,8 +77,19 @@ def main() -> int:
             if code in CASHIER_PLATFORMS:
                 ops = [a.get("operationId") for a in s.get("apis") or []]
                 if "closeShift" in ops:
-                    errors.append(f"F-BLIND-CLOSE {s['id']}: a cashier screen declares closeShift, which "
-                                  "returns the expected cash; use submitShiftCount (CHG-FIN-003)")
+                    # **The supervisor's close is allowed on the till** (decided 2 October 2026, Chinmay,
+                    # pre-apply round: "closeShift is declared on POS-007 (supervisor PIN, any till)";
+                    # CHG-CSP-012, CHG-SPO-021). It stays blind for the cashier: every control and form
+                    # that calls closeShift must be a supervisor's (SUPERVISOR_CLOSE), never the cashier's.
+                    callers = [c for c in components(s) if c.get("operation") == "closeShift"]
+                    sup = {c.get("label") for c in callers if c.get("permission") in SUPERVISOR_CLOSE}
+                    forms = [o for o in s.get("overlays") or []
+                             if (o.get("confirm") or {}).get("operation") == "closeShift"]
+                    if not callers or len(sup) != len(callers) or any(o.get("trigger") not in sup for o in forms):
+                        errors.append(f"F-BLIND-CLOSE {s['id']}: a cashier screen declares closeShift, which "
+                                      "returns the expected cash, outside a supervisor's control "
+                                      f"({' or '.join(sorted(SUPERVISOR_CLOSE))}); the cashier uses "
+                                      "submitShiftCount (CHG-FIN-003)")
                 for c in components(s):
                     if c.get("permission") == "OVERSHORT_ACCEPT":
                         continue

@@ -1,0 +1,37 @@
+id: CHG-SPO-002
+date: '2026-10-02'
+source: client-review
+kind: spec
+summary: POS-025 Till Home no longer takes shiftId from navigation; the shift is the session workstation's, read on load with
+  getWorkstationShift.
+decision:
+  what: 'POS-025 entryState shiftId is from: session, not navigation; getWorkstationShift onLoad returns the shift, and Suspend
+    and Reopen act on its id (check-screens requires the path parameter declared). The empty state says who configures the
+    till''s boards instead of offering a create.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, pre-apply round: "POS-025 shiftId parameter: read the shift on load with getWorkstationShift;
+  drop the navigation parameter". CHG-DOOR-005 added the read. Design-notes correction platform-foundation POS-025 (empty
+  state) applied with it.'
+keys_touched:
+  screens:
+  - POS-025
+  operations:
+  - getWorkstationShift
+  files:
+  - screens/P04-point-of-sale.yaml
+root_class: A32 NAVIGATION
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-025
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: b137fa8a
+notes: 'check-screen-wiring holds getWorkstationShift''s consumed-by (POS-025) to the screen declaring it, so the read cannot
+  be dropped again silently. Applied in worktree screens-pos-staff (batch SPO, phase B, 2 October 2026). Tickets: none started
+  (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys of the touched screens.'

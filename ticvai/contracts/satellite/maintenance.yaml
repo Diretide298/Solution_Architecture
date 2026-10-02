@@ -2003,7 +2003,6 @@ paths:
       operationId: updateIncident
       x-ticvai-consumed-by:
         - "P06 EMP-003 Home — on duty"
-        - "P06 EMP-026 Incident report"
         - "P06 EMP-027 Incident detail"
         - "P06 EMP-029 Guest assistance"
         - "P06 EMP-050 Post-incident restore"
@@ -2090,7 +2089,6 @@ paths:
       operationId: recordAuthorityNotification
       x-ticvai-consumed-by:
         - "P06 EMP-003 Home — on duty"
-        - "P06 EMP-026 Incident report"
         - "P06 EMP-027 Incident detail"
         - "P06 EMP-029 Guest assistance"
         - "P08 BO-072 Incident Log"

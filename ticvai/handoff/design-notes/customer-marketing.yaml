@@ -1826,9 +1826,13 @@ screens:
       - what: recordConsent is declared guest-audience only, although its description says an agent may record consent on a guest's behalf with GUEST_MANAGE.
         why: A till (and BO-748) cannot record the consent a guest gives in person. Add the staff audience to recordConsent with the agent-recorded rule.
         source: contracts/satellite/marketing-crm.yaml#recordConsent
+        status: fixed
+        by: CHG-SPO-016
       - what: Open reservations are not shown on the prototype's guest card.
         why: The panel's purpose names them (visible before the sale, not after); add them to the build.
         source: screens/P04-point-of-sale.yaml#POS-027
+        status: fixed
+        by: CHG-SPO-016
     decisions:
     - question: What does the till do with a barred guest (refuse the sale, require a supervisor, or only warn)?
       decision: 'Drawn default stands (answer: "Default / recommended accepted"): Show the red banner and disable "Attach

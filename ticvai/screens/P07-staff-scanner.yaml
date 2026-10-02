@@ -637,8 +637,13 @@ screens:
       disagree.'
     admitted: '**Green, and gone in 1.5 seconds.** The absorbed SCN-004. Shows what was admitted and against
       which right; at a gate doing 40 a minute this is the state the device is in most of the time.'
-    denied: Denied with the reason and the time of the previous scan. **The reason matters more than the
-      refusal** — a steward has to explain it to somebody standing in front of them. The absorbed SCN-005.
+    denied: 'Denied with the reason and the time of the previous scan. **The reason matters more than
+      the refusal** — a steward has to explain it to somebody standing in front of them. The absorbed
+      SCN-005. Two causes read differently on the device: **"Time window ended"** for a time-bound entitlement
+      scanned after its N minutes from the first scan (`timeBoundWindowElapsed`, CHG-CSP-030), and **"Reader
+      offline too long"** when the reader is past the venue''s maximum offline duration and must reconnect
+      before admitting anyone offline (`offlineLimitExceeded`, CHG-CSP-035). Both hold offline too, from
+      the offline package.'
     overrideRequired: A supervisor override, which requires a permission a steward may not hold, and records
       who, why and when. The absorbed SCN-006.
     blocked: Blacklisted or otherwise barred. **No override is offered on the device** — this is not a
@@ -1376,8 +1381,8 @@ screens:
   states:
     loading: The delegated right, read by `getCrossRegionEntitlement`.
     error: Could not load. Names which read failed and leaves the delegated right untouched.
-    emptyFirstRun: No delegated right yet. **Offers no create action** — this screen declares no operation
-      that makes one — and says so rather than showing an empty table.
+    emptyFirstRun: 'Never a create action: a delegated right arrives by scan. With nothing scanned the
+      screen says "Scan the ticket from the other venue".'
     emptyNoAccess: Shown when the caller lacks `TICKET_LOOKUP`, which `getCrossRegionEntitlement` requires,
       and names that permission. **Never an empty table** — that reads as *there is no data* and sends
       somebody to support with the wrong question.
@@ -1412,15 +1417,14 @@ screens:
   - id: formConsumeCrossRegionEntitlement
     component: modal
     trigger: Consume cross region entitlement
-    body: '**Collects what `consumeCrossRegionEntitlement` sends before it is called.** Required: `id`,
-      `entries`, `scanId`, `recordedAt`. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Confirms the redemption.** The id is a UUIDv7 the device generates; status and time are the
+      server''s, so nothing here is typed (design-notes correction platform-foundation SCN-011).'
     confirm:
       label: Consume cross region entitlement
       operation: consumeCrossRegionEntitlement
     dismiss:
       label: Cancel
       discards:
-      - id
       - entries
       - scanId
       - recordedAt
@@ -2230,6 +2234,15 @@ screens:
         permission: TURNSTILE_MODE_SET
         notes: Cancels a `pending` gate mode change, one `setTurnstileMode` scheduled with a future `effectiveAt`.
         provenance: contract access.yaml POST /gate-mode-changes/{changeId}/cancel
+      - kind: secondaryButton
+        label: Switch direction
+        operation: setAccessPointDirection
+        permission: ACCESS_POINT_CONFIGURE
+        notes: '**Live, with a specific permission, and logged** (decided 2 October 2026, Chinmay, critical
+          set 1, BO-230: "Live direction switch with permission, logged; R221 amended"; DEC-255; CHG-CSP-032).
+          Entry to Exit or back, with a reason and an optional time it takes effect; the gate mode change
+          records the from and to direction. Hidden without the permission.'
+        provenance: contract access.yaml PUT /access-points/{accessPointId}/direction
   states:
     loading: The gate mode list.
     error: Could not load. Names which read failed and leaves the gate mode untouched.
@@ -2259,6 +2272,13 @@ screens:
   - operationId: cancelGateModeChange
     contract: access
     purpose: Cancel a scheduled gate mode change
+    trigger: onAction
+    invalidates:
+    - listAccessPoints
+  - operationId: setAccessPointDirection
+    contract: access
+    purpose: Switch the gate's direction live (Entry to Exit), with a reason; the switch is logged (DEC-255;
+      CHG-CSP-032)
     trigger: onAction
     invalidates:
     - listAccessPoints
@@ -2315,3 +2335,16 @@ screens:
       not just counted. **Collects what `cancelGateModeChange` sends before it is called.** Nothing in
       the body is required. Optional: `reason`.'
     provenance: contract access.yaml POST /gate-mode-changes/{changeId}/cancel
+  - id: formSetAccessPointDirection
+    component: modal
+    trigger: Switch direction
+    body: '**Collects what `setAccessPointDirection` sends**: the new direction (Entry or Exit), a reason,
+      and optionally when it takes effect. Names the gate and its current direction. Dismissing sends
+      nothing.'
+    confirm:
+      label: Switch direction
+      operation: setAccessPointDirection
+    dismiss:
+      label: Cancel
+      discards: []
+    provenance: contract access.yaml PUT /access-points/{accessPointId}/direction
