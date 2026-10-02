@@ -974,17 +974,17 @@ screens:
         label: Every principal
         bindsTo: Principal
         columns:
-        - Principal.id
         - Principal.username
         - Principal.displayName
         - Principal.isActive
         - Principal.validFrom
         - Principal.validTo
-        - Principal.primaryRoleId
         - Principal.roles
         - Principal.lastLoginAt
         operation: listPrincipals
         provenance: contract identity.yaml GET /principals
+        notes: The role is shown by name (from `roles`); the principal id is in the detail panel with
+          a copy action.
     - name: contextPanel
       slot: selection
       components:
@@ -2910,8 +2910,6 @@ screens:
         label: Every partner agreement
         bindsTo: PartnerAgreement
         columns:
-        - PartnerAgreement.id
-        - PartnerAgreement.partnerId
         - PartnerAgreement.partnerName
         - PartnerAgreement.status
         - PartnerAgreement.rateMode
@@ -2920,23 +2918,21 @@ screens:
         - PartnerAgreement.volumeWindow
         - PartnerAgreement.seasonalRates
         - PartnerAgreement.segmentTier
-        - PartnerAgreement.brandingAssetId
         - PartnerAgreement.storefrontSubdomain
         operation: listPartnerAgreements
         provenance: contract subscription.yaml GET /partner-agreements
+        notes: The partner and agreement are shown by name; ids stay in the detail panel with a copy action.
       - kind: dataTable
         label: Every partner quote
         bindsTo: PartnerQuote
         columns:
-        - PartnerQuote.id
-        - PartnerQuote.partnerId
-        - PartnerQuote.agreementId
         - PartnerQuote.currency
         - PartnerQuote.totalMinor
         - PartnerQuote.state
         - PartnerQuote.validUntil
         operation: listPartnerQuotes
         provenance: contract subscription.yaml GET /partner-quotes
+        notes: The partner and agreement are shown by name; ids stay in the detail panel with a copy action.
     - name: contextPanel
       slot: selection
       components:
@@ -3039,9 +3035,10 @@ screens:
   - id: formCreatePartnerQuote
     component: modal
     trigger: Create partner quote
-    body: '**Collects what `createPartnerQuote` sends before it is called.** Required: `id`. Optional:
-      `partnerId`, `agreementId`, `currency`, `totalMinor`, `state`, `validUntil`. Dismissing sends nothing;
-      the screen behind is unchanged.'
+    body: '**Collects what `createPartnerQuote` sends before it is called.** The person picks the agreement
+      and enters the amount, currency and validity; `partnerId` comes from the session. Never `id` or
+      `status`: an id is a client UUIDv7 generated silently and the status and timestamps are the server''s
+      (design-notes correction, CHG-SOT-015). Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: PartnerQuote
     confirm:
       label: Create partner quote
@@ -3049,12 +3046,9 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - partnerId
       - agreementId
       - currency
       - totalMinor
-      - state
       - validUntil
     provenance: contract subscription.yaml POST /partner-quotes
   purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose ("Find quote management for
@@ -4264,8 +4258,6 @@ screens:
         label: Every partner agreement
         bindsTo: PartnerAgreement
         columns:
-        - PartnerAgreement.id
-        - PartnerAgreement.partnerId
         - PartnerAgreement.partnerName
         - PartnerAgreement.status
         - PartnerAgreement.rateMode
@@ -4274,10 +4266,10 @@ screens:
         - PartnerAgreement.volumeWindow
         - PartnerAgreement.seasonalRates
         - PartnerAgreement.segmentTier
-        - PartnerAgreement.brandingAssetId
         - PartnerAgreement.storefrontSubdomain
         operation: listPartnerAgreements
         provenance: contract subscription.yaml GET /partner-agreements
+        notes: The partner is shown by name; ids stay in the detail panel with a copy action.
     - name: contextPanel
       slot: selection
       components:
@@ -4323,8 +4315,8 @@ screens:
   states:
     loading: The commission statement list.
     error: Could not load. Names which read failed and leaves the commission statement untouched.
-    emptyFirstRun: No commission statement yet. **Offers no create action** — this screen declares no
-      operation that makes one — and says so rather than showing an empty table.
+    emptyFirstRun: 'No commission statement for this agreement and period yet: nothing has settled against
+      it. Offers no action; the statement fills as bookings settle.'
     emptyNoResults: Nothing matches the filter on expiringWithinDays, status and the commission statement
       are still there. Names the active filter and offers to clear it.
     emptyNoAccess: Shown when the caller lacks `PARTNER_VIEW`, which `getCommissionStatement` requires,
@@ -4736,18 +4728,16 @@ screens:
         label: Every API client
         bindsTo: ApiClient
         columns:
-        - ApiClient.id
-        - ApiClient.developerId
         - ApiClient.name
-        - ApiClient.clientId
         - ApiClient.environment
         - ApiClient.scopes
-        - ApiClient.allowedTenantIds
         - ApiClient.ipAllowList
         - ApiClient.status
         - ApiClient.lastUsedAt
         operation: listApiClients
         provenance: contract public-api.yaml GET /api-clients
+        notes: Name, environment, scopes, IP allow-list, status and last used; the client id is in the
+          detail panel with a copy action, allowed tenants by venue name.
     - name: contextPanel
       slot: selection
       components:
@@ -4819,9 +4809,12 @@ screens:
   - id: formCreateApiClient
     component: modal
     trigger: Create API client
-    body: '**Collects what `createApiClient` sends before it is called.** Required: `id`, `developerId`,
-      `name`, `environment`, `scopes`, `status`. Optional: `clientId`, `allowedTenantIds`, `ipAllowList`,
-      `lastUsedAt`. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `createApiClient` sends before it is called.** The person enters `name`, picks
+      `scopes` and an optional `ipAllowList`. **The environment is sandbox**: production clients are issued
+      by TICVAI after certification (DI-927); `developerId` comes from the session; `clientId` and `lastUsedAt`
+      are the server''s. Never `id` or `status`: an id is a client UUIDv7 generated silently and the status
+      and timestamps are the server''s (design-notes correction, CHG-SOT-015). Dismissing sends nothing;
+      the screen behind is unchanged.'
     bindsTo: ApiClient
     confirm:
       label: Create API client
@@ -4829,16 +4822,9 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - developerId
       - name
-      - environment
       - scopes
-      - status
-      - clientId
-      - allowedTenantIds
       - ipAllowList
-      - lastUsedAt
     provenance: contract public-api.yaml POST /api-clients
   - id: formRotateApiCredential
     component: modal
@@ -4976,20 +4962,16 @@ screens:
         label: Every delegated access
         bindsTo: DelegatedAccess
         columns:
-        - DelegatedAccess.id
-        - DelegatedAccess.principalId
-        - DelegatedAccess.roleId
         - DelegatedAccess.permission
-        - DelegatedAccess.subjectId
-        - DelegatedAccess.overSubjectId
         - DelegatedAccess.overObjectRef
         - DelegatedAccess.delegationKind
         - DelegatedAccess.quota
         - DelegatedAccess.isRevocableBySubject
-        - DelegatedAccess.scopePath
         - DelegatedAccess.effect
         operation: listDelegatedAccess
         provenance: contract identity.yaml GET /delegated-access
+        notes: The sub-agent, the role and the subject are shown by name; the scope as the venue or branch
+          it names; ids stay in the detail panel.
     - name: contextPanel
       slot: selection
       components:
@@ -5566,7 +5548,8 @@ screens:
   states:
     loading: The partner list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the partner untouched.
-    emptyFirstRun: No partner yet. Carries the create action; distinct from a filter that matched nothing.
+    emptyFirstRun: 'No partners yet. Offers no create action here: a partner arrives through onboarding
+      (PTR-024), and this screen says so rather than showing an empty table.'
     emptyNoResults: The filter narrowed it and the partner are still there. The pack's own statuses are
       Suspended → Terminated → Archived — the state names which is selected.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -5640,34 +5623,34 @@ screens:
       - kind: selectField
         label: Partner ID
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 7 §Capture
-      - kind: selectField
+      - kind: textField
         label: Legal Entity Name
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 7 §Capture
-      - kind: selectField
+      - kind: textField
         label: Trading Name
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 7 §Capture
       - kind: selectField
         label: Partner Type
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 7 §Capture
-      - kind: selectField
+      - kind: textField
         label: Registration Number
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 7 §Capture
-      - kind: selectField
+      - kind: textField
         label: Tax/VAT Number
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 7 §Capture
       - kind: selectField
         label: Country
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 7 §Capture
-      - kind: selectField
+      - kind: textField
         label: City
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 7 §Capture
-      - kind: selectField
+      - kind: textField
         label: Registered Address
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 7 §Capture
-      - kind: selectField
+      - kind: textField
         label: Business Address
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 7 §Capture
-      - kind: selectField
+      - kind: textField
         label: Website
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 7 §Capture
       - kind: selectField
@@ -5823,8 +5806,8 @@ screens:
   states:
     loading: The partner onboarding application configuration as saved.
     error: Could not load. Names which read failed and leaves the partner onboarding application untouched.
-    emptyFirstRun: No partner onboarding application configured yet. Carries the create action and says
-      what the platform does in the meantime.
+    emptyFirstRun: 'No applications waiting: nothing to review, which is good news. Offers no create action;
+      applications arrive from the partner sign-up.'
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
@@ -6074,10 +6057,11 @@ screens:
   - id: formCreatePartnerUser
     component: modal
     trigger: Create partner user
-    body: '**Collects what `createPartnerUser` sends before it is called.** Required: `id`, `partnerId`,
-      `principalId`, `branchScopePath`. Optional: `role`, `salesLocation`, `currency`, `accountExpiresAt`,
-      `allocationQuota`, `creditLimitOverride`, `canManageUsers`. Dismissing sends nothing; the screen
-      behind is unchanged.'
+    body: '**Collects what `createPartnerUser` sends before it is called.** The person picks the user
+      (by name) and their branch, then the role, sales location, currency, expiry and limits; `partnerId`
+      comes from the session. Never `id` or `status`: an id is a client UUIDv7 generated silently and
+      the status and timestamps are the server''s (design-notes correction, CHG-SOT-015). Dismissing sends
+      nothing; the screen behind is unchanged.'
     bindsTo: PartnerUser
     confirm:
       label: Create partner user
@@ -6085,8 +6069,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - partnerId
       - principalId
       - branchScopePath
       - role
@@ -6410,8 +6392,8 @@ screens:
   states:
     loading: The partner documentation compliance configuration as saved.
     error: Could not load. Names which read failed and leaves the partner documentation compliance untouched.
-    emptyFirstRun: No partner documentation compliance configured yet. Carries the create action and says
-      what the platform does in the meantime.
+    emptyFirstRun: 'No documents on file for this partner yet. Offers no action on this screen: documents
+      arrive with the onboarding application; it names which documents the partner type requires.'
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
@@ -6557,6 +6539,19 @@ screens:
         permission: PARTNER_MANAGE
         notes: The writer for PTR-029's organisation ceiling (decided 29 September, writers pass; DM4).
         provenance: contract subscription.yaml PUT /partners/{partnerId}/capability-grants
+      - kind: textField
+        label: Authentication code
+        operation: verifyMfaChallenge
+        notes: 'Asked in place inside the Save partner capability grants confirmation, because `setPartnerCapabilityGrants`
+          needs a fresh step-up token (`x-ticvai-step-up: mfa`); its result is the `stepUpToken`. Five
+          wrong codes lock step-up for the lockout minutes (audit R126).'
+        provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
+      - kind: secondaryButton
+        label: Email me a code instead
+        operation: createMfaChallenge
+        notes: Opens the step-up challenge for Save partner capability grants; the emailed code is the
+          fallback to the authenticator app (audit R126 (5)).
+        provenance: contract identity.yaml POST /auth/mfa/challenge
   states:
     loading: The partner access roles configuration as saved.
     error: Could not load. Names which read failed and leaves the partner access roles untouched.
@@ -6575,6 +6570,16 @@ screens:
     trigger: onAction
     invalidates:
     - listPartnerAccessRole
+  - operationId: createMfaChallenge
+    contract: identity
+    purpose: The step-up challenge Save partner capability grants asks for in place
+    trigger: onAction
+    provenance: design-notes correction PTR-029, 2 October 2026 (CHG-SOT-015)
+  - operationId: verifyMfaChallenge
+    contract: identity
+    purpose: Answers the step-up challenge; its token goes into setPartnerCapabilityGrants
+    trigger: onAction
+    provenance: design-notes correction PTR-029, 2 October 2026 (CHG-SOT-015)
   wireframe:
     status: notStarted
     provenance: generated
@@ -6589,7 +6594,8 @@ screens:
     component: modal
     trigger: Save partner capability grants
     body: '**Collects what `setPartnerCapabilityGrants` sends before it is called.** Required: `grants`.
-      Dismissing sends nothing; the screen behind is unchanged.'
+      Dismissing sends nothing; the screen behind is unchanged. **Asks for the authentication code in
+      place** (step-up, `stepUpToken`), with "Email me a code instead".'
     confirm:
       label: Save partner capability grants
       operation: setPartnerCapabilityGrants
@@ -6676,11 +6682,24 @@ screens:
           it gates, or the screen needs the control.'
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 18 §Authorized users
           can
+      - kind: textField
+        label: Authentication code
+        operation: verifyMfaChallenge
+        notes: 'Asked in place inside the Approve confirmation, because `approvePartnerStatuLifecycle`
+          needs a fresh step-up token (`x-ticvai-step-up: mfa`); its result is the `stepUpToken`. Five
+          wrong codes lock step-up for the lockout minutes (audit R126).'
+        provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
+      - kind: secondaryButton
+        label: Email me a code instead
+        operation: createMfaChallenge
+        notes: Opens the step-up challenge for Approve; the emailed code is the fallback to the authenticator
+          app (audit R126 (5)).
+        provenance: contract identity.yaml POST /auth/mfa/challenge
   states:
     loading: The partner approval status configuration as saved.
     error: Could not load. Names which read failed and leaves the partner approval status untouched.
-    emptyFirstRun: No partner approval status configured yet. Carries the create action and says what
-      the platform does in the meantime.
+    emptyFirstRun: 'Nothing waiting for approval: every partner is in a settled state. Offers no create
+      action.'
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
@@ -6688,6 +6707,16 @@ screens:
     contract: subscription
     purpose: Partner Approval, Status & Lifecycle Management
     trigger: onAction
+  - operationId: createMfaChallenge
+    contract: identity
+    purpose: The step-up challenge Approve asks for in place
+    trigger: onAction
+    provenance: design-notes correction PTR-030, 2 October 2026 (CHG-SOT-015)
+  - operationId: verifyMfaChallenge
+    contract: identity
+    purpose: Answers the step-up challenge; its token goes into approvePartnerStatuLifecycle
+    trigger: onAction
+    provenance: design-notes correction PTR-030, 2 October 2026 (CHG-SOT-015)
   wireframe:
     status: notStarted
     provenance: generated
@@ -6759,8 +6788,8 @@ screens:
   states:
     loading: The partner 360° profile list.
     error: Could not load. Names which read failed and leaves the partner 360° profile untouched.
-    emptyFirstRun: No partner 360° profile yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: 'No partner profile to review yet: readiness appears once a partner has an application.
+      Offers no create action.'
     emptyNoResults: The filter narrowed it and the partner 360° profile are still there. The pack's own
       statuses are 8.1.9 Partner lifecycle governance — the state names which is selected.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -6999,8 +7028,8 @@ screens:
   states:
     loading: The commercial agreement list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the commercial agreement untouched.
-    emptyFirstRun: No commercial agreement yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: 'No commercial agreements yet. Offers no create action here: agreements are drafted
+      on the terms builder (PTR-033).'
     emptyNoResults: The filter narrowed it and the commercial agreement are still there. Names the active
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -7073,19 +7102,19 @@ screens:
       - kind: selectField
         label: Agreement ID
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure
-      - kind: selectField
+      - kind: textField
         label: Agreement Name
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure
-      - kind: selectField
+      - kind: textField
         label: Partner
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure
       - kind: selectField
         label: Agreement Type
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure
-      - kind: selectField
+      - kind: textField
         label: Contract Reference
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure
-      - kind: selectField
+      - kind: textField
         label: Legal Entity
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure
       - kind: selectField
@@ -7094,13 +7123,13 @@ screens:
       - kind: selectField
         label: Venue
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure
-      - kind: selectField
+      - kind: textField
         label: Territory
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure
       - kind: selectField
         label: Currency
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure
-      - kind: selectField
+      - kind: datePicker
         label: Effective From
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure
       - kind: selectField
@@ -7124,13 +7153,13 @@ screens:
       - kind: selectField
         label: Pricing Basis
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure/reference
-      - kind: selectField
+      - kind: textField
         label: Credit Terms
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure/reference
-      - kind: selectField
+      - kind: textField
         label: Allocation Terms
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure/reference
-      - kind: selectField
+      - kind: textField
         label: Cancellation Conditions
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure/reference
       - kind: selectField
@@ -7222,16 +7251,16 @@ screens:
     - name: contentBody
       slot: fields
       components:
-      - kind: selectField
+      - kind: textField
         label: Partner
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 27 §Configure by
-      - kind: selectField
+      - kind: textField
         label: Agreement
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 27 §Configure by
       - kind: selectField
         label: Product
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 27 §Configure by
-      - kind: selectField
+      - kind: textField
         label: Product Family
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 27 §Configure by
       - kind: selectField
@@ -7240,13 +7269,13 @@ screens:
       - kind: selectField
         label: Event
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 27 §Configure by
-      - kind: selectField
+      - kind: textField
         label: Ticket Type
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 27 §Configure by
-      - kind: selectField
+      - kind: textField
         label: Price Category
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 27 §Configure by
-      - kind: selectField
+      - kind: textField
         label: Market
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 27 §Configure by
       - kind: selectField
@@ -7339,6 +7368,19 @@ screens:
         permission: PARTNER_MANAGE
         notes: The writer for PTR-035 (decided 29 September, writers pass; DM4).
         provenance: contract subscription.yaml PUT /partner-agreements/{agreementId}/commission-rules
+      - kind: textField
+        label: Authentication code
+        operation: verifyMfaChallenge
+        notes: 'Asked in place inside the Save partner commission rules confirmation, because `setPartnerCommissionRules`
+          needs a fresh step-up token (`x-ticvai-step-up: mfa`); its result is the `stepUpToken`. Five
+          wrong codes lock step-up for the lockout minutes (audit R126).'
+        provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
+      - kind: secondaryButton
+        label: Email me a code instead
+        operation: createMfaChallenge
+        notes: Opens the step-up challenge for Save partner commission rules; the emailed code is the
+          fallback to the authenticator app (audit R126 (5)).
+        provenance: contract identity.yaml POST /auth/mfa/challenge
     - name: contentBody
       components:
       - kind: dataTable
@@ -7366,6 +7408,16 @@ screens:
     trigger: onAction
     invalidates:
     - listCommissionMarginIncentive
+  - operationId: createMfaChallenge
+    contract: identity
+    purpose: The step-up challenge Save partner commission rules asks for in place
+    trigger: onAction
+    provenance: design-notes correction PTR-035, 2 October 2026 (CHG-SOT-015)
+  - operationId: verifyMfaChallenge
+    contract: identity
+    purpose: Answers the step-up challenge; its token goes into setPartnerCommissionRules
+    trigger: onAction
+    provenance: design-notes correction PTR-035, 2 October 2026 (CHG-SOT-015)
   wireframe:
     status: notStarted
     provenance: generated
@@ -7380,7 +7432,8 @@ screens:
     component: modal
     trigger: Save partner commission rules
     body: '**Collects what `setPartnerCommissionRules` sends before it is called.** Required: `rules`.
-      Dismissing sends nothing; the screen behind is unchanged.'
+      Dismissing sends nothing; the screen behind is unchanged. **Asks for the authentication code in
+      place** (step-up, `stepUpToken`), with "Email me a code instead".'
     confirm:
       label: Save partner commission rules
       operation: setPartnerCommissionRules
@@ -7484,6 +7537,19 @@ screens:
         permission: CREDIT_MANAGE
         notes: The writer for PTR-036 (decided 29 September, writers pass; DM4).
         provenance: contract subscription.yaml PUT /partner-agreements/{agreementId}/credit-profile
+      - kind: textField
+        label: Authentication code
+        operation: verifyMfaChallenge
+        notes: 'Asked in place inside the Save partner credit profile confirmation, because `setPartnerCreditProfile`
+          needs a fresh step-up token (`x-ticvai-step-up: mfa`); its result is the `stepUpToken`. Five
+          wrong codes lock step-up for the lockout minutes (audit R126).'
+        provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
+      - kind: secondaryButton
+        label: Email me a code instead
+        operation: createMfaChallenge
+        notes: Opens the step-up challenge for Save partner credit profile; the emailed code is the fallback
+          to the authenticator app (audit R126 (5)).
+        provenance: contract identity.yaml POST /auth/mfa/challenge
   states:
     loading: The credit limit exposure configuration as saved.
     error: Could not load. Names which read failed and leaves the credit limit exposure untouched.
@@ -7502,6 +7568,16 @@ screens:
     trigger: onAction
     invalidates:
     - listCreditLimitExposure
+  - operationId: createMfaChallenge
+    contract: identity
+    purpose: The step-up challenge Save partner credit profile asks for in place
+    trigger: onAction
+    provenance: design-notes correction PTR-036, 2 October 2026 (CHG-SOT-015)
+  - operationId: verifyMfaChallenge
+    contract: identity
+    purpose: Answers the step-up challenge; its token goes into setPartnerCreditProfile
+    trigger: onAction
+    provenance: design-notes correction PTR-036, 2 October 2026 (CHG-SOT-015)
   entryState:
     preloaded:
     - 'Open Invoices: AED 210,000'
@@ -7525,11 +7601,13 @@ screens:
   - id: formSetPartnerCreditProfile
     component: modal
     trigger: Save partner credit profile
-    body: '**Collects what `setPartnerCreditProfile` sends before it is called.** Required: `id`, `partnerId`,
-      `agreementId`, `creditEnabled`, `creditStatus`. Optional: `temporaryCreditLimit`, `temporaryLimitUntil`,
-      `creditOwnerPrincipalId`, `approvalAuthority`, `riskClassification`, `warningThresholdPercent`,
-      `highRiskThresholdPercent`, `blockThresholdPercent`, `effectiveFrom`, `effectiveTo`, `approvalRequestId`,
-      `scopePath`. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setPartnerCreditProfile` sends before it is called.** The person picks the
+      agreement and sets credit on or off, the temporary limit and its end, the owner (by name), the approval
+      authority, the risk class and the three thresholds; `partnerId` comes from the selection; `creditStatus`
+      and `approvalRequestId` are the server''s. Never `id` or `status`: an id is a client UUIDv7 generated
+      silently and the status and timestamps are the server''s (design-notes correction, CHG-SOT-015).
+      Dismissing sends nothing; the screen behind is unchanged. **Asks for the authentication code in
+      place** (step-up, `stepUpToken`), with "Email me a code instead".'
     bindsTo: PartnerCreditProfile
     confirm:
       label: Save partner credit profile
@@ -7537,11 +7615,8 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - partnerId
       - agreementId
       - creditEnabled
-      - creditStatus
       - temporaryCreditLimit
       - temporaryLimitUntil
       - creditOwnerPrincipalId
@@ -7552,8 +7627,6 @@ screens:
       - blockThresholdPercent
       - effectiveFrom
       - effectiveTo
-      - approvalRequestId
-      - scopePath
     provenance: contract subscription.yaml PUT /partner-agreements/{agreementId}/credit-profile
 - id: PTR-037
   name: Deposit, Guarantee & Financial Security Management
@@ -7678,10 +7751,11 @@ screens:
   - id: formSetPartnerSecurity
     component: modal
     trigger: Save partner security
-    body: '**Collects what `setPartnerSecurity` sends before it is called.** Required: `id`, `partnerId`,
-      `securityType`, `amount`, `currency`, `effectiveDate`, `verificationStatus`. Optional: `agreementId`,
-      `issuingInstitution`, `reference`, `expiryDate`, `documentId`, `expiryAction`, `scopePath`. Dismissing
-      sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setPartnerSecurity` sends before it is called.** The person picks the security
+      type and enters the amount, currency, dates, issuer and reference, and attaches the document; `partnerId`
+      comes from the selection; `verificationStatus` is the server''s. Never `id` or `status`: an id is
+      a client UUIDv7 generated silently and the status and timestamps are the server''s (design-notes
+      correction, CHG-SOT-015). Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: PartnerSecurity
     confirm:
       label: Save partner security
@@ -7689,20 +7763,16 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - partnerId
       - securityType
       - amount
       - currency
       - effectiveDate
-      - verificationStatus
       - agreementId
       - issuingInstitution
       - reference
       - expiryDate
       - documentId
       - expiryAction
-      - scopePath
     provenance: contract subscription.yaml PUT /partners/{partnerId}/securities
 - id: PTR-038
   name: Payment Terms, Billing & Account Configuration
@@ -7751,6 +7821,11 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: multiSelect
+        label: Accepted payment methods
+        notes: 'The payment methods this partner account may use. Options: Immediate Payment; Credit Account;
+          Deposit Balance; Bank Transfer; Card; Payment Link; Prepaid Balance; Other approved method.'
+        provenance: 'design-notes correction PTR-038, 2 October 2026 (CHG-SOT-015): a choice, not buttons'
       - kind: dataTable
         label: Every payment terms billing
         columns:
@@ -7782,31 +7857,7 @@ screens:
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Show
     - name: actionBar
       slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Immediate Payment
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Support
-      - kind: secondaryButton
-        label: Credit Account
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Support
-      - kind: secondaryButton
-        label: Deposit Balance
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Support
-      - kind: secondaryButton
-        label: Bank Transfer
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Allow/reference
-      - kind: secondaryButton
-        label: Card
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Allow/reference
-      - kind: secondaryButton
-        label: Payment Link
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Allow/reference
-      - kind: secondaryButton
-        label: Prepaid Balance
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Allow/reference
-      - kind: secondaryButton
-        label: Other approved method
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Allow/reference
+      components: []
   states:
     loading: The payment terms billing list.
     error: Could not load. Names which read failed and leaves the payment terms billing untouched.
@@ -7878,6 +7929,12 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: selectField
+        label: Allocation type
+        notes: 'One type per allocation. Options: Guaranteed Allocation; On-Request Allocation; Shared
+          Allocation; Fixed Quantity; Percentage Allocation; Rolling Allocation; Seasonal Allocation;
+          Take-or-pay where commercially applicable.'
+        provenance: 'design-notes correction PTR-039, 2 October 2026 (CHG-SOT-015): a choice, not buttons'
       - kind: dataTable
         label: Every commercial allocation quota
         columns:
@@ -7911,30 +7968,6 @@ screens:
     - name: actionBar
       slot: rowActions
       components:
-      - kind: primaryButton
-        label: Guaranteed Allocation
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support
-      - kind: secondaryButton
-        label: On-Request Allocation
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support
-      - kind: secondaryButton
-        label: Shared Allocation
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support
-      - kind: secondaryButton
-        label: Fixed Quantity
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support
-      - kind: secondaryButton
-        label: Percentage Allocation
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support
-      - kind: secondaryButton
-        label: Rolling Allocation
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support
-      - kind: secondaryButton
-        label: Seasonal Allocation
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support
-      - kind: secondaryButton
-        label: Take-or-pay where commercially applicable
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support
       - kind: secondaryButton
         label: Save partner allocations
         operation: setPartnerAllocations
@@ -8074,22 +8107,22 @@ screens:
       - kind: selectField
         label: Partner
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Capture
-      - kind: selectField
+      - kind: textField
         label: Agreement
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Capture
       - kind: selectField
         label: Request Type
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Capture
-      - kind: selectField
+      - kind: textField
         label: Current Rule
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Capture
-      - kind: selectField
+      - kind: textField
         label: Requested Exception
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Capture
       - kind: selectField
         label: Amount/Impact
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Capture
-      - kind: selectField
+      - kind: textField
         label: Reason
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Capture
       - kind: selectField
@@ -8113,11 +8146,24 @@ screens:
       - kind: secondaryButton
         label: Booking Limit Exception
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Support
+      - kind: textField
+        label: Authentication code
+        operation: verifyMfaChallenge
+        notes: 'Asked in place inside the Approve the exception confirmation, because `approveBookingLimitCommercial`
+          needs a fresh step-up token (`x-ticvai-step-up: mfa`); its result is the `stepUpToken`. Five
+          wrong codes lock step-up for the lockout minutes (audit R126).'
+        provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
+      - kind: secondaryButton
+        label: Email me a code instead
+        operation: createMfaChallenge
+        notes: Opens the step-up challenge for Approve the exception; the emailed code is the fallback
+          to the authenticator app (audit R126 (5)).
+        provenance: contract identity.yaml POST /auth/mfa/challenge
   states:
     loading: The booking limits commercial configuration as saved.
     error: Could not load. Names which read failed and leaves the booking limits commercial untouched.
-    emptyFirstRun: No booking limits commercial configured yet. Carries the create action and says what
-      the platform does in the meantime.
+    emptyFirstRun: 'No booking-limit exception waiting: nothing to approve, which is good news. Offers
+      no create action.'
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
@@ -8125,6 +8171,16 @@ screens:
     contract: subscription
     purpose: Booking Limits, Commercial Exceptions & Approval
     trigger: onAction
+  - operationId: createMfaChallenge
+    contract: identity
+    purpose: The step-up challenge Approve the exception asks for in place
+    trigger: onAction
+    provenance: design-notes correction PTR-040, 2 October 2026 (CHG-SOT-015)
+  - operationId: verifyMfaChallenge
+    contract: identity
+    purpose: Answers the step-up challenge; its token goes into approveBookingLimitCommercial
+    trigger: onAction
+    provenance: design-notes correction PTR-040, 2 October 2026 (CHG-SOT-015)
   wireframe:
     status: notStarted
     provenance: generated
@@ -8209,8 +8265,8 @@ screens:
   states:
     loading: The commercial agreement 360° list.
     error: Could not load. Names which read failed and leaves the commercial agreement 360° untouched.
-    emptyFirstRun: No commercial agreement 360° yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: 'No agreement to review yet: health appears once an agreement is active. Offers no
+      create action.'
     emptyNoResults: The filter narrowed it and the commercial agreement 360° are still there. Names the
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -8438,8 +8494,8 @@ screens:
   states:
     loading: The partner operations list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the partner operations untouched.
-    emptyFirstRun: No partner operations yet. Carries the create action; distinct from a filter that matched
-      nothing.
+    emptyFirstRun: No partner activity yet today. Offers no create action; the tiles show zero sales,
+      not missing data.
     emptyNoResults: The filter narrowed it and the partner operations are still there. Names the active
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -8586,8 +8642,8 @@ screens:
   states:
     loading: The partner orders booking list.
     error: Could not load. Names which read failed and leaves the partner orders booking untouched.
-    emptyFirstRun: No partner orders booking yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: 'No partner bookings yet. Offers no create action: partners book on their own booking
+      screens.'
     emptyNoResults: The filter narrowed it and the partner orders booking are still there. Names the active
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -8719,8 +8775,7 @@ screens:
   states:
     loading: The reservations holds release list.
     error: Could not load. Names which read failed and leaves the reservations holds release untouched.
-    emptyFirstRun: No reservations holds release yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: 'No holds open: no partner inventory is reserved right now. Offers no create action.'
     emptyNoResults: The filter narrowed it and the reservations holds release are still there. Names the
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -9007,8 +9062,8 @@ screens:
   states:
     loading: The partner statement account list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the partner statement account untouched.
-    emptyFirstRun: No partner statement account yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: 'No account activity in this period: the opening balance is the closing balance. Offers
+      no create action.'
     emptyNoResults: The filter narrowed it and the partner statement account are still there. Names the
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -9144,8 +9199,8 @@ screens:
   states:
     loading: The partner reconciliation exception list.
     error: Could not load. Names which read failed and leaves the partner reconciliation exception untouched.
-    emptyFirstRun: No partner reconciliation exception yet. Carries the create action; distinct from a
-      filter that matched nothing.
+    emptyFirstRun: 'No reconciliation exceptions: every partner record matched. Good news; offers no create
+      action.'
     emptyNoResults: The filter narrowed it and the partner reconciliation exception are still there. Names
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -9321,11 +9376,24 @@ screens:
         permission: SETTLEMENT_RECONCILE
         notes: The batch actions on PTR-048 (decided 29 September, writers pass; DM4).
         provenance: contract subscription.yaml POST /partner-settlement-batches/{batchId}/actions
+      - kind: textField
+        label: Authentication code
+        operation: verifyMfaChallenge
+        notes: 'Asked in place inside the Act on partner settlement batch confirmation, because `actOnPartnerSettlementBatch`
+          needs a fresh step-up token (`x-ticvai-step-up: mfa`); its result is the `stepUpToken`. Five
+          wrong codes lock step-up for the lockout minutes (audit R126).'
+        provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
+      - kind: secondaryButton
+        label: Email me a code instead
+        operation: createMfaChallenge
+        notes: Opens the step-up challenge for Act on partner settlement batch; the emailed code is the
+          fallback to the authenticator app (audit R126 (5)).
+        provenance: contract identity.yaml POST /auth/mfa/challenge
   states:
     loading: The commission calculation settlement list.
     error: Could not load. Names which read failed and leaves the commission calculation settlement untouched.
-    emptyFirstRun: No commission calculation settlement yet. Carries the create action; distinct from
-      a filter that matched nothing.
+    emptyFirstRun: 'No commission lines in this period yet: nothing has been sold through the partner.
+      Offers no create action.'
     emptyNoResults: The filter narrowed it and the commission calculation settlement are still there.
       Names the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -9347,6 +9415,16 @@ screens:
     trigger: onAction
     invalidates:
     - listCommissionCalculationSettlement
+  - operationId: createMfaChallenge
+    contract: identity
+    purpose: The step-up challenge Act on partner settlement batch asks for in place
+    trigger: onAction
+    provenance: design-notes correction PTR-048, 2 October 2026 (CHG-SOT-015)
+  - operationId: verifyMfaChallenge
+    contract: identity
+    purpose: Answers the step-up challenge; its token goes into actOnPartnerSettlementBatch
+    trigger: onAction
+    provenance: design-notes correction PTR-048, 2 October 2026 (CHG-SOT-015)
   entryState:
     preloaded:
     - CommissionCalculationSettlementManagementSummary.commissionEarned
@@ -9391,7 +9469,8 @@ screens:
     component: modal
     trigger: Act on partner settlement batch
     body: '**Collects what `actOnPartnerSettlementBatch` sends before it is called.** Required: `action`.
-      Optional: `scheduledDate`, `reason`, `caseId`. Dismissing sends nothing; the screen behind is unchanged.'
+      Optional: `scheduledDate`, `reason`, `caseId`. Dismissing sends nothing; the screen behind is unchanged.
+      **Asks for the authentication code in place** (step-up, `stepUpToken`), with "Email me a code instead".'
     confirm:
       label: Act on partner settlement batch
       operation: actOnPartnerSettlementBatch
@@ -9451,6 +9530,12 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: selectField
+        label: Case type
+        notes: 'Chosen when creating a case (`createPartnerCase.category`). Options: Booking Dispute;
+          Pricing Dispute; Credit Dispute; Ticket Issue; Allocation Issue; API Issue; Finance review;
+          Technical review.'
+        provenance: 'design-notes correction PTR-049, 2 October 2026 (CHG-SOT-015): a choice, not buttons'
       - kind: dataTable
         label: Every partner disputes cases
         columns:
@@ -9477,30 +9562,6 @@ screens:
     - name: actionBar
       slot: rowActions
       components:
-      - kind: primaryButton
-        label: Booking Dispute
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support
-      - kind: secondaryButton
-        label: Pricing Dispute
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support
-      - kind: secondaryButton
-        label: Credit Dispute
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support
-      - kind: secondaryButton
-        label: Ticket Issue
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support
-      - kind: secondaryButton
-        label: Allocation Issue
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support
-      - kind: secondaryButton
-        label: API Issue
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support
-      - kind: secondaryButton
-        label: Finance review
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Allow
-      - kind: secondaryButton
-        label: Technical review
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Allow
       - kind: secondaryButton
         label: Create partner case
         operation: createPartnerCase
@@ -9560,10 +9621,13 @@ screens:
   - id: formCreatePartnerCase
     component: modal
     trigger: Create partner case
-    body: '**Collects what `createPartnerCase` sends before it is called.** Required: `id`, `partnerId`,
-      `category`, `priority`, `description`, `status`, `resolutionTargetAt`. Optional: `contactId`, `orderId`,
-      `invoiceReference`, `settlementBatchId`, `amountInDispute`, `evidence`, `ownerPrincipalId`, `slaPolicyId`,
-      `firstResponseAt`, `resolvedAt`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `createPartnerCase` sends before it is called.** The person picks the **case
+      type** (booking dispute, pricing dispute, credit dispute, ticket issue, allocation issue, API issue)
+      and the priority, describes it and links the order, invoice or settlement batch; `partnerId` comes
+      from the session; the owner, SLA policy, resolution target and response times are the server''s.
+      Never `id` or `status`: an id is a client UUIDv7 generated silently and the status and timestamps
+      are the server''s (design-notes correction, CHG-SOT-015). Dismissing sends nothing; the screen behind
+      is unchanged.'
     bindsTo: PartnerCase
     confirm:
       label: Create partner case
@@ -9571,24 +9635,15 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - partnerId
       - category
       - priority
       - description
-      - status
-      - resolutionTargetAt
       - contactId
       - orderId
       - invoiceReference
       - settlementBatchId
       - amountInDispute
       - evidence
-      - ownerPrincipalId
-      - slaPolicyId
-      - firstResponseAt
-      - resolvedAt
-      - scopePath
     provenance: contract subscription.yaml POST /partner-cases
   - id: formActOnPartnerCase
     component: modal
@@ -9670,8 +9725,8 @@ screens:
   states:
     loading: The partner performance scorecard list.
     error: Could not load. Names which read failed and leaves the partner performance scorecard untouched.
-    emptyFirstRun: No partner performance scorecard yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: 'No scorecard yet: a partner is scored after its first full period of trading. Offers
+      no create action.'
     emptyNoResults: The filter narrowed it and the partner performance scorecard are still there. Names
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -9752,8 +9807,8 @@ screens:
   states:
     loading: The partner intelligence relationship list.
     error: Could not load. Names which read failed and leaves the partner intelligence relationship untouched.
-    emptyFirstRun: No partner intelligence relationship yet. Carries the create action; distinct from
-      a filter that matched nothing.
+    emptyFirstRun: 'No recommendations yet: there is not enough partner history to learn from. Offers
+      no create action.'
     emptyNoResults: The filter narrowed it and the partner intelligence relationship are still there.
       Names the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no

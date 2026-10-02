@@ -357,3 +357,25 @@ This reinforces the existing rule that the LLM never reads raw data (the AI ADRs
 | "Powered by TICVAI" | A toggle, default on | Shown unless the venue's licence allows switching it off. |
 | listGuestMemberships | Keep it for staff and partner use | Bound to the membership admin screen as a staff-facing operation. |
 | POS-025 shiftId parameter | (lead) Read the shift on load with getWorkstationShift; drop the navigation parameter | — |
+
+# Contract follow-ups (2 Oct)
+| Item | Answer | Applied as |
+|---|---|---|
+| New permission values | Count as additive | check-contract-compat: adding a value to the Permission enum is additive, as security_widened is. Add the 20 permissions: per-module AI publish (replacing AI_APPROVE for model publishing), BIOMETRIC_IMAGE_VIEW, ACCESS_DIRECTION_SET, REPORT_GOVERNANCE_MANAGE. |
+| BYOK providers | "Why just Mistral? As long as we get an API key it can be any model; we just need to store it correctly." | BYOK accepts any provider. The key is stored in Key Vault, per tenant, encrypted and never shown again. Native adapter or OpenAI-compatible. The curated task-to-tier mapping picks that provider's equivalent model, with a compatibility test before activation. |
+| Cookie scan consent state | Add now | Each finding records the consent state it was seen in, plus a platform-wide catalogue of known cookies. |
+| BO-007 bulk edit | A new catalogue operation | catalogue.bulkUpdateProducts is added; the inventory one is deprecated and retired at the next major version. |
+| Response enum values (spine agent) | (lead) Keep the additive fields | No breaking enum additions. |
+| Workshop-pack console gaps | (lead) Defer them to the ADM-049 move | — |
+
+
+# Lead decisions on the follow-up agent's questions (2 Oct)
+- BC-006/BC-007 approved: per Chinmay's follow-up, model publishing moves from AI_APPROVE to the per-module AI publish permission (no tickets started).
+- The platform cookie catalogue is curated under PLATFORM_PLAN_MANAGE, the permission for the platform's other catalogues.
+- AI_USE stays the base permission for the publish operations; the module permission is checked on top of it.
+
+# Lead decisions on the commercial-move questions (2 Oct)
+- **Corrected by Chinmay (2 Oct): the 13 duplicate first-release setup operations are retired in r2**, not at the next major version. Their screens bind the venue screens' typed operations instead. The removals are logged as approved breaking changes against r1. Their 13 pushed tickets are retired in the r2 push, each naming the ticket that replaces it (no work has started).
+- ADM-068 (country tax templates) and ADM-619 (cross-tenant payments) stay on the TICVAI console (DEC-207, DEC-211) and take the R098 pattern.
+- DEC-168: a new console screen, "Configuration promotion", binds the export/diff/applyConfigPackage operations. ADM-122 stays in Venue Management for product import and export.
+- CHG-MOV-004: check-screens gains a rule that a screen name carries no tab character or trailing page number.

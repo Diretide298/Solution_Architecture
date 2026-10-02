@@ -35,4 +35,4 @@ prevention:
 status: open
 notes: 'Recommended: BO-007 adds a catalogue bulkUpdateProducts and retires the inventory one at the next major;
   BO-122 shows sales per board (takings by saleBoardId) and drops the error tile until a till error log exists.
-  Batch CSA (apply-contracts-satellite), 2 October 2026; tickets: none started (Block A starts Monday 5 October).'
+  Batch CSA (apply-contracts-satellite), 2 October 2026; tickets: none started (Block A starts Monday 5 October). BO-007 half resolved by CHG-FUP-011 (catalogue bulkUpdateCatalogueProducts; inventory bulkUpdateProducts deprecated); stays open for BO-122. Batch FUP, 2 October 2026.'

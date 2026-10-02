@@ -11,7 +11,9 @@ behind that operation, the enum that schema names, the meeting where the client 
 
 This assembles it, per screen, from the package and nothing else:
 
-     1  header        id, app, module, block (tasks.csv), who, purpose, device, offline, entry
+     1  header        id, app, module, block (tasks.csv), who, purpose, device, offline, entry;
+                      from the process notes: the summary, the corrections by status (pending,
+                      contract gap logged, fixed) and the decisions taken on the screen
      2  inputs        every control: label, type, required, default, limits, allowed values with
                       labels, conditions, mask, helper text, errors -- from the request schemas
                       in contracts/ and the screen's own components; where each comes from
@@ -480,22 +482,81 @@ def notes_for(sid: str) -> list[tuple[str, str, dict]]:
     return notes()["byScreen"].get(sid, [])
 
 
+def _status(c) -> str:
+    """A correction's status: '' while it is open, else fixed | logged | withdrawn (design-notes README)."""
+    return str(c.get("status") or "").strip().lower() if isinstance(c, dict) else ""
+
+
+def open_corrections(sid: str) -> list[tuple[str, object]]:
+    """[(process title, correction)] still open on this screen: no `status` yet."""
+    return [(title, c) for _, title, e in notes_for(sid) for c in _items(e.get("corrections")) if not _status(c)]
+
+
+def screen_decisions(sid: str) -> list[tuple[str, dict]]:
+    """[(process title, decision)]: the screen's answered questions (design-notes `decisions`)."""
+    return [(title, d) for _, title, e in notes_for(sid) for d in _items(e.get("decisions")) if isinstance(d, dict)]
+
+
+def _chg(c: dict) -> str:
+    by = _src(c.get("by"))
+    return f" ({_flat(by, 80)})" if by else ""
+
+
 def render_notes_summary(sid: str) -> list[str]:
+    """The process summary, then the corrections by status, then the decisions taken on the screen.
+
+    **Only an open correction is pending** (2 October, CHG-EXP-001): main has fixed 947 of the notes'
+    corrections and logged 161 as contract gaps (CHG-NOTE-*, CHG-WIR-*), and a bundle that still listed them
+    as "pending" sent a design session to redraw a fix the package already carries. A fixed correction is one
+    line with its change id; a logged one says the contract gap is open; a withdrawn one is left out."""
     L = []
     for name, title, e in notes_for(sid):
         if e.get("summary"):
             L += [f"**From the {_flat(title)} process.** {_flat(e['summary'], 1200)}", ""]
     for name, title, e in notes_for(sid):
         cs = _items(e.get("corrections"))
-        if cs:
+        pend = [c for c in cs if not _status(c)]
+        if pend:
             L += ["**Known correction pending (do not draw the wrong version)**", ""]
-            for c in cs:
+            for c in pend:
                 if isinstance(c, dict):
                     L.append(f"- **{_flat(c.get('what'), 300)}**" + (f" Why: {_flat(c.get('why'), 400)}" if c.get("why") else "")
                              + (f" *(source: {_flat(_src(c.get('source')), 200)}; {title})*" if c.get("source") else f" *({title})*"))
                 else:
                     L.append(f"- {_flat(c, 500)}")
             L.append("")
+        logged = [c for c in cs if _status(c) == "logged"]
+        if logged:
+            L += ["**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the "
+                  "corrected version and mark what waits on the contract, as the open change entry says)", ""]
+            L += [f"- {_flat(c.get('what'), 220)}{_chg(c)}" for c in logged] + [""]
+        fixed = [c for c in cs if _status(c) == "fixed"]
+        if fixed:
+            L += ["**Fixed on main** (the package already carries these; draw what it says): "
+                  + "; ".join(f"{_flat(c.get('what'), 140)}{_chg(c)}" for c in fixed) + ".", ""]
+    L += render_notes_decisions(sid)
+    return L
+
+
+def render_notes_decisions(sid: str) -> list[str]:
+    """**Decided** (2 October, CHG-EXP-001): each answered question on the screen, with who decided it and when.
+    A decision wins over the generated tables below and over the screen's own text where they differ;
+    a `reviewable` one is a default the lead may still overrule before its block is tasked, so it is drawn
+    as decided and flagged in the review, not left open."""
+    ds = screen_decisions(sid)
+    if not ds:
+        return []
+    L = ["#### Decided on this screen", "",
+         "Answered questions: draw the decision, not the old default. Where a decision and the tables below "
+         "differ, the decision wins.", ""]
+    for title, d in ds:
+        by = d.get("decidedBy") or d.get("by") or "not recorded"
+        flag = (" **Reviewable:** a default the lead may still overrule before the block is tasked."
+                if d.get("reviewable") else "")
+        L.append(f"- **{_flat(d.get('question'), 300)}** → {_flat(d.get('decision'), 600) or 'not stated'} "
+                 f"*(decided by {_flat(by, 40)}, {_flat(d.get('date'), 20) or 'date not recorded'}"
+                 + (f"; {_flat(_src(d.get('source')), 120)}" if d.get("source") else "") + ")*" + flag)
+    L.append("")
     return L
 
 
@@ -610,7 +671,22 @@ def _refname(ref: str) -> str:
 
 
 def resolve(node, depth: int = 0) -> tuple[dict, str | None]:
-    """A schema node with `$ref` followed and `allOf` merged. Returns (schema, name it came from)."""
+    """A schema node with `$ref` followed and `allOf` merged. Returns (schema, name it came from).
+
+    An OpenAPI 3.1 type list (`type: [string, 'null']`) comes back as its one non-null type with
+    `nullable: true`, so every reader can treat `type` as a string (check-binding-ratchet crashed on a
+    list concatenated to a string in describe())."""
+    s, name = _resolve(node, depth)
+    t = s.get("type")
+    if isinstance(t, list):
+        ts = [x for x in t if x not in (None, "null")]
+        s = {**s, "type": str(ts[0]) if ts else ""}
+        if len(ts) < len(t):
+            s["nullable"] = True
+    return s, name
+
+
+def _resolve(node, depth: int = 0) -> tuple[dict, str | None]:
     if not isinstance(node, dict) or depth > 8:
         return {}, None
     meta = {k: node[k] for k in ("description", "default", "readOnly", "nullable", "example")
@@ -797,12 +873,17 @@ def describe(name: str, node: dict, required: bool, prefix: str = "") -> dict:
         "ref": ref, "required": required, "default": default, "enum": en,
         "limits": _limits(s, name), "help": _first(desc), "conditions": [_flat(c, 200) for c in conds],
         "readOnly": bool(s.get("readOnly") or node.get("readOnly")), "nullable": bool(s.get("nullable")),
+        "deprecated": bool(s.get("deprecated") or node.get("deprecated")),
         "display": display_for(name, s, ref),
     }
 
 
 def flatten(node, prefix: str = "", depth: int = 0, inputs: bool = True, out: list | None = None) -> list[dict]:
-    """Every field of a schema, nested objects expanded to MAX_DEPTH. Inputs skip read-only fields."""
+    """Every field of a schema, nested objects expanded to MAX_DEPTH. Inputs skip read-only fields.
+
+    **A deprecated field is never drawn** (Chinmay, 2 October: `Theme.darkMode` is "kept for compatibility,
+    marked deprecated, never used or drawn"; CHG-CSA-035, CHG-EXP-003): it is left out of every form, every
+    output table and the white-label map, with whatever it nests."""
     out = [] if out is None else out
     s, ref = resolve(node)
     if s.get("type") == "array" and not s.get("properties"):
@@ -810,6 +891,8 @@ def flatten(node, prefix: str = "", depth: int = 0, inputs: bool = True, out: li
     req = set(s.get("required") or [])
     for k, v in (s.get("properties") or {}).items():
         rec = describe(k, v if isinstance(v, dict) else {}, k in req, prefix)
+        if rec["deprecated"]:
+            continue
         if inputs and rec["readOnly"]:
             continue
         if not inputs and k in PLUMBING_FIELDS:
@@ -1193,6 +1276,11 @@ def render_screen(s: dict, plat: dict, stats: dict | None = None) -> str:
     device = guide.get("device") or f"{plat.get('formFactor')}"
     dirs = " and ".join(d.upper() for d in plat.get("directions") or ["ltr"])
     themes = ", ".join(plat.get("themes") or []) or "light"
+    if code in GUEST_PLATFORMS:
+        # **White label has no dark or light mode** (Chinmay, 2 October, workbook Q150 and the pre-apply
+        # round; CHG-CSA-035, CHG-EXP-003): a guest screen is drawn in the venue's theme on every device
+        # setting, whatever a platform file still lists.
+        themes = "the venue's"
     if s.get("offline"):
         offline = _flat(json.dumps(s["offline"], ensure_ascii=False) if not isinstance(s["offline"], str) else s["offline"], 300)
     elif (s.get("states") or {}).get("offline"):
@@ -1267,6 +1355,8 @@ def render_screen(s: dict, plat: dict, stats: dict | None = None) -> str:
         ctrl = rec["control"] if rec else kind
         if c.get("kind") == "textField" and rec and rec["control"].startswith("picker"):
             ctrl = rec["control"] + " (drawn as a picker, not a text box)"
+        if rec and rec.get("deprecated"):
+            ctrl = "**do not draw**: the field is deprecated and ignored"
         ctrl_rows.append(f"| {_flat(c.get('label'))} | {ctrl} | {('required' if rec['required'] else 'optional') if rec else '—'} | "
                          f"{_default(rec) if rec else '—'} | {_allowed(rec) if rec else '—'} | "
                          f"{_flat(rec['mask'], 60) if rec and rec['mask'] else '—'} | "
@@ -1551,9 +1641,10 @@ def render_screen(s: dict, plat: dict, stats: dict | None = None) -> str:
             els = {e["id"]: e for e in wl.get("elements") or []}
             specific = [els[i] for i in g.get("specific", []) if i in els]
             L += ["#### Configurable by the tenant", "",
-                  f"This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the fixed "
-                  f"*Powered by TICVAI* credit). Draw it with the **default theme**, and on the key screens one **alternate "
-                  f"tenant theme** (`{WHITE_LABEL_DOC}`).", "",
+                  f"This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the "
+                  f"*Powered by TICVAI* credit, a tenant toggle that is on by default: `brand.showPoweredBy`). It has "
+                  f"no dark or light mode: the venue's theme applies on every device setting. Draw it with the "
+                  f"**default theme**, and on the key screens one **alternate tenant theme** (`{WHITE_LABEL_DOC}`).", "",
                   f"**Shell-wide, on every guest screen:** " + "; ".join(
                       f"{p['label']} ({p['count']}, {', '.join(p['screens'])})" for p in wl.get("shellParts") or []) +
                   f". Each element, its CMS field, allowed values and default: `{WHITE_LABEL_DOC}`.", ""]
@@ -1641,11 +1732,14 @@ def render_screen(s: dict, plat: dict, stats: dict | None = None) -> str:
     if wl and (wl.get("configScreens") or {}).get(sid) is not None:
         L.append("- [ ] Every field shows its allowed values and default, and a live preview shows the output on the guest screen it reaches.")
     n_edge = sum(len(_items(e.get("edgeCases"))) for _, _, e in notes_for(sid))
-    n_corr = sum(len(_items(e.get("corrections"))) for _, _, e in notes_for(sid))
+    n_corr = len(open_corrections(sid))
+    n_dec = len(screen_decisions(sid))
     if n_edge:
         L.append(f"- [ ] The {n_edge} edge case(s) from the process notes are drawn.")
     if n_corr:
         L.append(f"- [ ] The {n_corr} pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.")
+    if n_dec:
+        L.append(f"- [ ] The {n_dec} decision(s) taken on this screen are drawn as decided, not as the old default.")
     L += ["- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).", ""]
     return "\n".join(L)
 
@@ -1716,6 +1810,9 @@ def batch_tenant_section(screens: list[tuple[dict, dict]]) -> str:
         L += ["", f"**The alternate tenant theme ({alt.get('name')})**: " + "; ".join(
             f"{k} {v}" for k, v in (alt.get("values") or {}).items()) + ".",
             "**Key screens to show in it:** " + ", ".join(f"`{x}`" for x in alt.get("keyScreens") or []) + "."]
+    dec = wl.get("decided") or []
+    if dec:
+        L += ["", "**Decided for every guest screen:** " + " ".join(_flat(x, 300) for x in dec)]
     fixed = wl.get("fixed") or []
     if fixed:
         L += ["", "**Never configurable:** " + " ".join(_flat(x, 240) for x in fixed)]

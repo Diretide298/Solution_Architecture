@@ -1,0 +1,38 @@
+id: CHG-EXP-002
+date: '2026-10-02'
+source: audit
+kind: process
+summary: check-binding-ratchet no longer crashes with a TypeError; the design-spec generator reads an OpenAPI 3.1 type list as its non-null type plus nullable.
+decision:
+  what: >-
+    design_spec.resolve() normalises `type: [x, 'null']` to `type: x` with `nullable: true` for every caller, so
+    describe() no longer concatenates a list to a string and the ratchet, the exporter and the white-label map all run.
+  by: Chinmay
+  date: '2026-10-02'
+why: >-
+  Phase B apply brief of 2 October (exporter row): check-binding-ratchet, the ratchet the council of 2 October made
+  the first gate, crashed on main 2a05ef95 (TypeError: can only concatenate list (not "str") to list, in describe()),
+  because contracts merged since its baseline (contracts/shared/common.yaml, satellite/payments.yaml, white-label.yaml,
+  reporting.yaml, spine/access.yaml) type some fields as a list. A crashed ratchet guards nothing.
+keys_touched:
+  files:
+  - tools/design_spec.py
+  - tools/check-binding-ratchet.py
+root_class: 'new: check-crash'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-binding-ratchet.py
+status: closed
+closed_by_commit: 5ded35eb
+notes: >-
+  Before the fix the check raised the TypeError on the parent commit 2a05ef95; after it, it runs to its verdict. That
+  verdict is FAIL: four counts rose against the baseline recorded at f495bbf6 (guest A unbound-control 80 -> 87,
+  ticvai-control - 1715 -> 1721, ticvai-control A 148 -> 151, venue-management A 178 -> 179), and five fell. The rises
+  are not from this change: a minimal variant of the fix (only the string join in describe) gives identical counts.
+  They come from the screen and contract branches merged after the baseline; the lead decides whether to fix them or
+  re-record the baseline (--update-baseline) in a reviewed commit.

@@ -1,0 +1,32 @@
+id: CHG-FUP-007
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: setAnalyticsGovernancePolicy is gated by REPORT_GOVERNANCE_MANAGE instead of the interim PERMISSION_MANAGE.
+decision:
+  what: 'reporting.yaml setAnalyticsGovernancePolicy: x-ticvai-permission REPORT_GOVERNANCE_MANAGE.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October, workbook Q225 (DEC-225, ANL-070): analytics governance (masking, export restriction,
+  retention, sharing, AI and API access) is its own right. The interim permission was recorded in CHG-CSA-021 and
+  CHG-CSA-007; the operation is new since r1.'
+keys_touched:
+  operations:
+  - setAnalyticsGovernancePolicy
+  screens:
+  - ANL-070
+  files:
+  - contracts/satellite/reporting.yaml
+root_class: A23 AUTH-SCOPE
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: closed
+closed_by_commit: a7895ea6
+notes: 'Batch FUP (apply-followup), 2 October 2026; tickets: none started. Closed on its commit; the prevention exists and run-checks runs it.'

@@ -1,7 +1,7 @@
 $schema: ./_schema.yaml
 id: F103
 name: A tenant claims a domain and gets a certificate
-actor: platformAdmin
+actor: venueManager
 capability: A tenant claims a domain and gets a certificate
 wave: 2
 frequency: As needed.
@@ -9,47 +9,126 @@ criticality: operational
 primaryContract: white-label
 contracts:
 - white-label
+- tenancy
 - platform-ops
 platforms:
+- P13
 - P09
 trigger:
-  description: A tenant wants their storefront on their own hostname.
+  description: A tenant wants their storefront on their own hostname (tickets.venue.com) rather than the
+    platform subdomain every tenant already has (venue.<cell>.ticvai.app).
+  entryScreen: CMS-017
 offlineBehaviour: None of it offline.
 steps:
 - step: 1
   screen: CMS-017
-  action: Domain & Certificate Management.
+  action: The tenant claims the hostname for an app (guest web, guest app links, partner or developer portal).
   operations:
-  - claimCustomDomain
   - listCustomDomains
-  - relinquishCustomDomain
-  - verifyCustomDomain
-  outcome: 4 operations, 4 of them previously unwalked.
-  note: 'Repointed 2 October (CHG-WIR-015): the tenant claims its domain on CMS-017; ADM-017 is the platform support path.'
+  - claimCustomDomain
+  outcome: '**Claiming is not owning.** The claim answers with every record to publish (`dnsRecords`): the
+    TXT `_dnsauth` validation record and the CNAME to the Front Door endpoint (decided 2 October 2026,
+    Chinmay, batch 5: "Subdomain plus CNAME"; DEC-547, CHG-CSA-043, CHG-CSP-010). A delegated subdomain is
+    an option, the apex only on request, and there is no path proxy. The platform subdomain keeps serving
+    throughout.'
+  note: 'Rewritten 2 October 2026 (CHG-SOT-006) as the tenant-side walk with its failure branches. Step 2
+    of the earlier version (ADM-016 branding) is not part of claiming a domain; ADM-017 is the platform
+    support path under a staff grant (CHG-WIR-015).'
 - step: 2
-  screen: ADM-016
-  action: White-Label Branding Management.
+  screen: CMS-017
+  action: The tenant publishes the records at their DNS provider and the domain is verified.
   operations:
-  - createPreview
-  - diffConfigVersion
-  - getAppIcons
-  - getBrandIdentity
-  - setAppIcons
-  outcome: 5 operations, 5 of them previously unwalked.
-  crossesDevice: true
+  - verifyCustomDomain
+  - listCustomDomains
+  outcome: '**Retried by a job, not by the tenant.** The records list shows each record with the value
+    observed now and its status; verification routes the hostname (tenancy `setTenantDomainMapping`) and
+    Front Door issues a managed certificate in the same act. Until the routing write succeeds the domain is
+    not reported live.'
+  duration: Minutes to hours; DNS propagation decides.
+- step: 3
+  screen: CMS-017
+  action: The domain is live; the tenant checks its readiness and makes it the primary domain.
+  operations:
+  - listCustomDomains
+  outcome: '**A live domain is not a ready one.** Per-domain readiness shows the UAE Pass redirect, the Apple
+    Pay merchant domain and the app links (`CustomDomain.readiness`). The primary domain for each kind takes
+    the traffic and the others, the platform subdomain included, redirect to it (`setPrimaryDomain`,
+    CHG-CSA-043).'
+  note: '`setPrimaryDomain`, `regenerateDomainToken` and `getPlatformSubdomain` join steps 1 to 3 once CMS-017
+    declares them (the white-label screen agent''s file, CHG-CSA-043 keys_touched).'
+- step: 4
+  screen: CMS-017
+  action: Later, the tenant gives a domain up.
+  operations:
+  - relinquishCustomDomain
+  outcome: '**The takeover warning is in the confirmation** (DEC-547): remove the CNAME and the TXT record
+    from your DNS, because a record left pointing at TICVAI could be claimed by somebody else. Releasing
+    unroutes the hostname in the same step; the row is kept for the audit trail.'
 branches:
 - at: 1
   condition: The acting principal lacks the permission at this scope.
   behaviour: '**Refused at the first step, not the last.** ADR-0002 makes authorisation user-driven
     — a person who gets three steps in and then cannot finish has been told the wrong thing.'
-  severity: medium
+  severity: requiresStaff
   resolvedBy: resolvePermissions
+- at: 1
+  condition: Another tenant already holds the hostname.
+  behaviour: '**Refused as unavailable, never attributed** (409). Telling one tenant that another owns a
+    hostname is telling them something about a customer.'
+  severity: abandonsFlow
+  resolvedBy: Tenant, with another hostname
+- at: 2
+  condition: The records are not published within the validation window.
+  behaviour: '**The claim times out and says so** (`CustomDomain.revalidation` `timedOut`, DEC-547). The tenant
+    starts again with a new `_dnsauth` token; the old one stops validating. The records list shows which
+    record was never observed.'
+  severity: recoverable
+  resolvedBy: regenerateDomainToken
+- at: 2
+  condition: A record is published with the wrong value, or a CAA record forbids the certificate authority.
+  behaviour: '**The records list names the record, the value expected and the value observed** (`dnsRecords`
+    with CAA/NS rows), so the tenant fixes the one record that is wrong rather than all of them.'
+  severity: recoverable
+  resolvedBy: Tenant, at their DNS provider
+- at: 2
+  condition: The hostname is already routed to another tenant when verification runs.
+  behaviour: '**Refused 409 `hostname-taken`; nothing is verified or issued.**'
+  severity: abandonsFlow
+  resolvedBy: Platform support (ADM-017, under a staff grant)
+- at: 3
+  condition: The certificate's periodic revalidation is due, or a record changed.
+  behaviour: '**Pending revalidation, still serving** (`revalidation` `pendingRevalidation`). The job re-checks;
+    the domain keeps working while it does, and CMS-017 shows the wait beside the status.'
+  severity: recoverable
+  resolvedBy: Automatic
+- at: 3
+  condition: The CNAME no longer points at TICVAI while the domain is active.
+  behaviour: '**Flagged by the scheduled check** (`cnameLost`): guests on that hostname no longer reach the
+    storefront, and the tenant is told which record to restore.'
+  severity: requiresStaff
+  resolvedBy: Tenant, at their DNS provider
+- at: 4
+  condition: It is the only active domain for a live app.
+  behaviour: '**Refused, naming what would break** (409). Releasing the hostname guests are using takes the
+    storefront down; another domain or the platform subdomain must be primary first.'
+  severity: recoverable
+  resolvedBy: setPrimaryDomain on another domain first
+- at: 4
+  condition: The tenant leaves the CNAME in place after releasing the domain.
+  behaviour: '**A takeover risk, flagged** (`cnameLost` on the released hostname) until the record is removed.'
+  severity: requiresStaff
+  resolvedBy: Tenant, at their DNS provider
 exitStates:
 - state: completed
-  description: The journey ran end to end.
-- state: refused
-  description: '**Stopped at a permission or a licence boundary**, with the reason named.'
+  description: The domain is verified, certified, routed and primary where the tenant chose.
+- state: abandoned
+  description: The claim timed out or the hostname was unavailable; the platform subdomain still serves.
+- state: escalated
+  description: Platform support acts for the tenant on ADM-017 under a staff grant.
 notes: '**No domain or certificate operation existed anywhere in 1,010 operations**, and `ADM-017 Domain
   & Certificate Management` declared 41 of them, none about a domain. **A white-label platform whose
-  tenants cannot use their own domain is white-label in name only.** Built 24 August.'
+  tenants cannot use their own domain is white-label in name only.** Built 24 August. **Rewritten 2 October
+  2026 (CHG-SOT-006, DEC-547)** as the tenant-side walk: subdomain per cell plus a CNAME through Front Door,
+  with the records list, the revalidation and timeout states, the takeover warning, the primary domain and
+  per-domain readiness.'
 openQuestions: null

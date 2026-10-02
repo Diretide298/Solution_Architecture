@@ -1,0 +1,35 @@
+id: CHG-EXP-006
+date: '2026-10-02'
+source: cr
+kind: process
+summary: The design batches are regenerated only after every answer is applied and the HLD/LLD is redone; not done on this branch.
+decision:
+  what: >-
+    After all the questions are answered and applied, redo the HLD/LLD (cookie scanner, residency, scrubbing, domains
+    and the other changes); then the design batches are regenerated with tools/export-design-batch.py --all for Claude
+    Design.
+  by: Chinmay
+  date: '2026-10-02'
+why: >-
+  Chinmay, batch 5 (DEC-563): "after ALL the questions are answered, redo the HLD/LLD ... then Claude Design
+  regenerates". The exporter now renders the decisions and correction status (CHG-EXP-001), so the regeneration is
+  what carries them to the design sessions.
+keys_touched:
+  files:
+  - handoff/design-batches
+  - handoff/hld-lld/TICVAI-HLD.md
+  - handoff/hld-lld/TICVAI-LLD.md
+root_class: 'new: open-question-decided'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-design-notes.py
+status: open
+notes: >-
+  Open: a sequencing step for the lead's release refresh (bash tools/refresh-safe.sh), after the HLD/LLD redo; the
+  apply brief forbids exporting batches into the repo from an apply branch. Close it on the refresh commit that
+  regenerates the batches.

@@ -1,0 +1,35 @@
+id: CHG-MOV-010
+date: '2026-10-02'
+source: cr
+kind: spec
+summary: 'DEC-168''s configuration packages are not bound on ADM-122: the three operations carry platform permissions, and
+  ADM-122 now lives in Venue Management.'
+decision:
+  what: No binding. exportConfigPackage (PLATFORM_RELEASE_MANAGE), diffConfigPackage (PLATFORM_RELEASE_VIEW) and applyConfigPackage
+    (PLATFORM_MIGRATION_APPLY) need a console surface; ADM-122 moved with the catalogue lifecycle screens (DEC-100) and keeps
+    its product import and export list.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October, batch 5 (ADM-122, workbook Q168; DEC-168): configuration moves between environments as a versioned
+  package with a diff, approval and an idempotent upsert; CHG-CSA-034 added the operations and named ADM-122. DEC-100 (batch
+  1) moved ADM-122 to Venue Management, where nobody holds a platform permission.'
+keys_touched:
+  screens:
+  - ADM-122
+  operations:
+  - exportConfigPackage
+  - diffConfigPackage
+  - applyConfigPackage
+root_class: 'new: open-question-undecided'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Question for Chinmay, recommended default: a new console screen "Configuration promotion" (P09, screens-p08-p09) binds
+  the three operations, and ADM-122 stays a venue screen for product import and export.'

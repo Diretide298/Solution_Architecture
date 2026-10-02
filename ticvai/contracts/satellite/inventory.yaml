@@ -387,10 +387,18 @@ paths:
   /products/bulk:
     post:
       operationId: bulkUpdateProducts
+      deprecated: true
+      x-ticvai-superseded-by: 'bulkUpdateCatalogueProducts'
       x-ticvai-consumed-by:
         - "P08 BO-007 Product Directory"
       summary: Change many products at once, with a preview
-      description: 'Board 2C. **Retire a season, reprice a category, change a tax class across two hundred
+      description: '**Deprecated on 2 October; retired at the next major version** (Chinmay, contract follow-ups:
+        "catalogue.bulkUpdateProducts is added; the inventory one is deprecated"; CHG-FUP-011). A bulk edit of
+        catalogue products is the catalogue''s act: new screens bind `catalogue.bulkUpdateCatalogueProducts`. Kept,
+        with its path and id, for clients built at r1; it forwards to the catalogue.
+
+
+        Board 2C. **Retire a season, reprice a category, change a tax class across two hundred
         SKUs.** One at a time is two hundred edits and a mistake somewhere in the middle.
 
         **Previewed by default, and the preview counts.** *Reprice all* and *reprice all in this category*
@@ -3372,7 +3380,7 @@ paths:
       operationId: getInventoryKitDefinition
       x-ticvai-consumed-by:
         - "P08 BO-081 Inventory Items"
-        - "P09 ADM-189 Component Inventory & Availability Matrix"
+        - "P08 ADM-189 Component Inventory & Availability Matrix"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (retrace 4.4.20); shape follows getInventoryItem'

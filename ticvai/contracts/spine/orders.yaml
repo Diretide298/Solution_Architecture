@@ -216,8 +216,8 @@ paths:
     get:
       operationId: listFraudRules
       x-ticvai-consumed-by:
-        - "P09 ADM-614 Refund Approval & Exception Workflow\t121"
-        - "P09 ADM-630 Payment Risk Rule & Decision Engine\t167"
+        - "P08 ADM-614 Refund Approval & Exception Workflow\t121"
+        - "P08 ADM-630 Payment Risk Rule & Decision Engine\t167"
       summary: The rules evaluated before a charge
       description: 'BL-118. **`orders.fraud_rule` existed with six columns and no operation read or wrote
         it** — found on 20 August by auditing which tables no operation names.
@@ -261,8 +261,8 @@ paths:
     put:
       operationId: setFraudRules
       x-ticvai-consumed-by:
-        - "P09 ADM-614 Refund Approval & Exception Workflow\t121"
-        - "P09 ADM-630 Payment Risk Rule & Decision Engine\t167"
+        - "P08 ADM-614 Refund Approval & Exception Workflow\t121"
+        - "P08 ADM-630 Payment Risk Rule & Decision Engine\t167"
       summary: Change what holds a transaction
       description: '**The whole set in one call**, because a rule set edited one rule at a time spends
         time in states nobody intended — a threshold lowered before its companion is raised.
@@ -628,7 +628,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-014 Pay for a Booking"
         - "P02 GST-009 Review & Payment"
-        - "P09 ADM-593 Payment Link Distribution & Customer Journey Manager\t74"
+        - "P08 ADM-593 Payment Link Distribution & Customer Journey Manager\t74"
       security:
       - guestAuth: []
       - {}
@@ -800,7 +800,7 @@ paths:
     post:
       operationId: resendPaymentLink
       x-ticvai-consumed-by:
-        - "P09 ADM-593 Payment Link Distribution & Customer Journey Manager\t74"
+        - "P08 ADM-593 Payment Link Distribution & Customer Journey Manager\t74"
       summary: Send it again, and retire the old one
       description: '**A resend supersedes.** Two live links against one order is two guests paying for
         one booking, and the second payment is a refund somebody has to make.
@@ -1388,7 +1388,7 @@ paths:
     get:
       operationId: getResaleFeePolicy
       x-ticvai-consumed-by:
-        - "P09 ADM-283 Resale Fees, Commission & Seller Proceeds"
+        - "P08 ADM-283 Resale Fees, Commission & Seller Proceeds"
       summary: The commission and price cap a resale listing is created under
       description: '**`orders.resale_listing` stored `sellerFeePercent`, `buyerFeePercent` and
         `priceCapPercent` on every listing and nothing produced them.** Two listings created a minute
@@ -1425,7 +1425,7 @@ paths:
     put:
       operationId: setResaleFeePolicy
       x-ticvai-consumed-by:
-        - "P09 ADM-283 Resale Fees, Commission & Seller Proceeds"
+        - "P08 ADM-283 Resale Fees, Commission & Seller Proceeds"
       summary: Set resale commission and the price ceiling
       description: '**`priceCapPercent` is regulated in several jurisdictions and the package has said
         so**: the resale backlog entry records that anti-scalping limits bind in some markets and that
@@ -1542,10 +1542,10 @@ paths:
     post:
       operationId: quoteUpgrade
       x-ticvai-consumed-by:
-        - "P09 ADM-652 Upgrade Price Difference & Value Proposition Manager"
-        - "P09 ADM-653 Ticket, Experience & Bundle Upgrade Manager"
-        - "P09 ADM-654 Membership & Pass Upgrade Engine"
-        - "P09 ADM-656 Post-Purchase & In-Journey Upgrade Manager"
+        - "P08 ADM-652 Upgrade Price Difference & Value Proposition Manager"
+        - "P08 ADM-653 Ticket, Experience & Bundle Upgrade Manager"
+        - "P08 ADM-654 Membership & Pass Upgrade Engine"
+        - "P08 ADM-656 Post-Purchase & In-Journey Upgrade Manager"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1854,9 +1854,9 @@ paths:
     get:
       operationId: listChargebacks
       x-ticvai-consumed-by:
-        - "P09 ADM-633 Fraud Alert, Investigation & Case Management\t170"
-        - "P09 ADM-634 Chargeback & Dispute Command Center\t172"
-        - "P09 ADM-635 Chargeback Evidence & Representment Workspace\t173"
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management\t170"
+        - "P08 ADM-634 Chargeback & Dispute Command Center\t172"
+        - "P08 ADM-635 Chargeback Evidence & Representment Workspace\t173"
       summary: Open disputes, by deadline
       description: '**Sorted by `evidenceDueBy`, not by date received.** A case received yesterday with
         two days left outranks one received last week with twelve.
@@ -1901,7 +1901,7 @@ paths:
     post:
       operationId: respondToChargeback
       x-ticvai-consumed-by:
-        - "P09 ADM-634 Chargeback & Dispute Command Center\t172"
+        - "P08 ADM-634 Chargeback & Dispute Command Center\t172"
       summary: Submit evidence, or accept the loss
       description: '**Accepting is a legitimate outcome and is recorded as a decision.** A 40 AED case
         with a 30 AED fee and two hours of work is one a venue should be able to concede deliberately
@@ -2176,7 +2176,7 @@ paths:
     post:
       operationId: createPaymentLink
       x-ticvai-consumed-by:
-        - "P09 ADM-592 Payment Link Builder & Configuration\t73"
+        - "P08 ADM-592 Payment Link Builder & Configuration\t73"
       summary: Send a guest a link to pay later
       description: 'BL-072. **A booking taken at POS cannot currently be paid later by the guest**, so
         a phone booking either takes a card over the phone or is not taken.
@@ -3518,7 +3518,7 @@ paths:
       operationId: voidPayment
       x-ticvai-consumed-by:
         - "P08 BO-319 Void, Reversal & Same-Day Correction Management"
-        - "P09 ADM-613 Void, Reversal & Cancellation Manager\t120"
+        - "P08 ADM-613 Void, Reversal & Cancellation Manager\t120"
       x-ticvai-audience:
       - staff
       summary: Release an authorisation before it is captured
@@ -4504,8 +4504,8 @@ paths:
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
         - "P08 BO-1147 Refund Routing & Credit Restoration Engine"
-        - "P09 ADM-609 Refund & Payment Adjustment Command Center\t116"
-        - "P09 ADM-616 Payment Adjustment & Financial Correction Manager\t123"
+        - "P08 ADM-609 Refund & Payment Adjustment Command Center\t116"
+        - "P08 ADM-616 Payment Adjustment & Financial Correction Manager\t123"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
@@ -4557,8 +4557,8 @@ paths:
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
         - "P08 BO-1147 Refund Routing & Credit Restoration Engine"
-        - "P09 ADM-610 Refund Request & Eligibility Workspace\t117"
-        - "P09 ADM-616 Payment Adjustment & Financial Correction Manager\t123"
+        - "P08 ADM-610 Refund Request & Eligibility Workspace\t117"
+        - "P08 ADM-616 Payment Adjustment & Financial Correction Manager\t123"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -4779,7 +4779,7 @@ paths:
       operationId: approveRefund
       x-ticvai-consumed-by:
         - "P08 BO-028 Refund Approval Queue"
-        - "P09 ADM-614 Refund Approval & Exception Workflow\t121"
+        - "P08 ADM-614 Refund Approval & Exception Workflow\t121"
       x-ticvai-audience:
       - staff
       summary: Approve a refund held for approval
@@ -5011,8 +5011,7 @@ paths:
         - "P08 BO-065 Venue Configuration"
         - "P08 BO-1146 Refund-to-Wallet Policy Configuration"
         - "P08 BO-318 Refund Policy & Refund Calculation Configuration"
-        - "P09 ADM-610 Refund Request & Eligibility Workspace\t117"
-        - "P09 ADM-611 Refund Policy & Rule Configuration\t118"
+        - "P08 ADM-610 Refund Request & Eligibility Workspace\t117"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -5045,7 +5044,6 @@ paths:
         - "P08 BO-065 Venue Configuration"
         - "P08 BO-1146 Refund-to-Wallet Policy Configuration"
         - "P08 BO-318 Refund Policy & Refund Calculation Configuration"
-        - "P09 ADM-611 Refund Policy & Rule Configuration\t118"
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: venue
@@ -5247,9 +5245,9 @@ paths:
         - "P05 KSK-008 Payment unresolved"
         - "P06 EMP-035 Payment on device"
         - "P08 BO-024 Payment Exceptions"
-        - "P09 ADM-595 Digital Payment Session & Transaction Monitor\t76"
-        - "P09 ADM-597 Digital Payment Exception, Recovery & Expiry Center\t79"
-        - "P09 ADM-615 Refund Processing, Provider Status & Recovery Center\t122"
+        - "P08 ADM-595 Digital Payment Session & Transaction Monitor\t76"
+        - "P08 ADM-597 Digital Payment Exception, Recovery & Expiry Center\t79"
+        - "P08 ADM-615 Refund Processing, Provider Status & Recovery Center\t122"
         - "P10 PTR-012 Checkout / Credit Purchase"
       x-ticvai-api-scope: ticketing.write
       security:
@@ -6934,7 +6932,7 @@ paths:
     get:
       operationId: listUpgradeConversion
       x-ticvai-consumed-by:
-        - "P09 ADM-308 Upgrade & Conversion Command Center"
+        - "P08 ADM-308 Upgrade & Conversion Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Upgrade, Exchange & Conversion_Reference.pdf p.3; MoM 1 Sep 4.9 (paths, eligibility, pro-rata, guest-app upgrades, group upgrades by request); shape fixed (3 filters to query parameters; 6 non-field properties removed)'
@@ -7028,7 +7026,7 @@ paths:
     put:
       operationId: setUpgradeConversionPath
       x-ticvai-consumed-by:
-        - "P09 ADM-309 Upgrade & Conversion Path Builder"
+        - "P08 ADM-309 Upgrade & Conversion Path Builder"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Upgrade, Exchange & Conversion_Reference.pdf p.5; MoM 1 Sep 4.9 (paths, eligibility, pro-rata, guest-app upgrades, group upgrades by request); shape fixed (rewritten from the pack page)'
@@ -7086,7 +7084,7 @@ paths:
     get:
       operationId: listUpgradeEligibilityQualification
       x-ticvai-consumed-by:
-        - "P09 ADM-310 Upgrade Eligibility & Qualification Rules"
+        - "P08 ADM-310 Upgrade Eligibility & Qualification Rules"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -7136,7 +7134,7 @@ paths:
     get:
       operationId: listUpgradeTimingUsage
       x-ticvai-consumed-by:
-        - "P09 ADM-311 Upgrade Timing, Usage & Ticket Status Rules"
+        - "P08 ADM-311 Upgrade Timing, Usage & Ticket Status Rules"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -7186,7 +7184,7 @@ paths:
     get:
       operationId: listUpgradeFinancialTreatment
       x-ticvai-consumed-by:
-        - "P09 ADM-312 Upgrade Financial Treatment & Price Difference Rules"
+        - "P08 ADM-312 Upgrade Financial Treatment & Price Difference Rules"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -7236,7 +7234,7 @@ paths:
     put:
       operationId: setProRataResidual
       x-ticvai-consumed-by:
-        - "P09 ADM-313 Pro-Rata, Residual Value & Entitlement Credit Configuration"
+        - "P08 ADM-313 Pro-Rata, Residual Value & Entitlement Credit Configuration"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Upgrade, Exchange & Conversion_Reference.pdf p.12; MoM 1 Sep 4.9 and Key Decisions (pro-rata credit for memberships and usage-based products); shape fixed (rewritten from the pack page)'
@@ -7293,7 +7291,7 @@ paths:
     get:
       operationId: listPersonTypeProduct
       x-ticvai-consumed-by:
-        - "P09 ADM-314 Person-Type, Product & Entitlement Conversion Rules"
+        - "P08 ADM-314 Person-Type, Product & Entitlement Conversion Rules"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -7343,7 +7341,7 @@ paths:
     get:
       operationId: listBulkGroupAssisted
       x-ticvai-consumed-by:
-        - "P09 ADM-315 Bulk, Group & Assisted Upgrade Operations"
+        - "P08 ADM-315 Bulk, Group & Assisted Upgrade Operations"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Upgrade, Exchange & Conversion_Reference.pdf p.16; MoM 1 Sep 4.9 (paths, eligibility, pro-rata, guest-app upgrades, group upgrades by request); shape fixed (8 filters to query parameters; 5 non-field properties removed; added bulkAction, selectedCount, eligibleCount, notEligibleCount, ineligibilityReasons, totalOriginalEligibleValue, totalTargetValue, totalUpgradeDifference, fees, taxes, finalCollectionOrRefund, partialProcessing)'
@@ -7443,7 +7441,7 @@ paths:
     post:
       operationId: createUpgradeCredentialRegeneration
       x-ticvai-consumed-by:
-        - "P09 ADM-316 Upgrade Execution, Credential Regeneration & Channel Controls"
+        - "P08 ADM-316 Upgrade Execution, Credential Regeneration & Channel Controls"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Upgrade, Exchange & Conversion_Reference.pdf p.18; MoM 1 Sep 4.9 (paths, eligibility, pro-rata, guest-app upgrades, group upgrades by request); shape fixed (3 non-field properties removed; enums credentialTreatment, availableChannels, generatedDocuments)'
@@ -7499,7 +7497,7 @@ paths:
     get:
       operationId: listUpgradeException
       x-ticvai-consumed-by:
-        - "P09 ADM-317 Upgrade History, Exception Management & Audit Explorer"
+        - "P08 ADM-317 Upgrade History, Exception Management & Audit Explorer"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Upgrade, Exchange & Conversion_Reference.pdf p.20; MoM 1 Sep 4.9 (paths, eligibility, pro-rata, guest-app upgrades, group upgrades by request); shape fixed (5 filters to query parameters; 5 non-field properties removed; enums exceptionType)'
@@ -9622,7 +9620,7 @@ paths:
       operationId: listVoidReversalSame
       x-ticvai-consumed-by:
         - "P08 BO-319 Void, Reversal & Same-Day Correction Management"
-        - "P09 ADM-613 Void, Reversal & Cancellation Manager\t120"
+        - "P08 ADM-613 Void, Reversal & Cancellation Manager\t120"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -9988,8 +9986,8 @@ paths:
       operationId: listOrderPaymentDetail
       x-ticvai-consumed-by:
         - "P08 BO-325 Order Payment Detail & Transaction Ledger"
-        - "P09 ADM-607 Mixed Tender Transaction Trace & Allocation Audit\t100"
-        - "P09 ADM-617 Refund Transaction Trace & Audit Investigation\t124"
+        - "P08 ADM-607 Mixed Tender Transaction Trace & Allocation Audit\t100"
+        - "P08 ADM-617 Refund Transaction Trace & Audit Investigation\t124"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -10034,7 +10032,7 @@ paths:
       operationId: setMultiPaymentSplit
       x-ticvai-consumed-by:
         - "P08 BO-326 Multi-Payment, Split Tender & Payment Allocation Configuration"
-        - "P09 ADM-601 Split Payment & Tender Allocation Manager\t94"
+        - "P08 ADM-601 Split Payment & Tender Allocation Manager\t94"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.43; MoM 1 Sep 4.11-4.12 (orders, holds, amendments, deposits); shape fixed (4 non-field properties removed; enums allocationLevel)'
@@ -10532,7 +10530,7 @@ paths:
     get:
       operationId: listResaleMarketplace
       x-ticvai-consumed-by:
-        - "P09 ADM-278 Resale Marketplace Command Center"
+        - "P08 ADM-278 Resale Marketplace Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.4; MoM 31 Aug 4.12 and MoM 1 Sep 4.14 (three access models, ID preserved through resale); shape fixed (2 filters to query parameters; 1 non-field properties removed)'
@@ -10637,7 +10635,7 @@ paths:
     put:
       operationId: setResaleEligibilityRule
       x-ticvai-consumed-by:
-        - "P09 ADM-279 Resale Eligibility Rule Configuration"
+        - "P08 ADM-279 Resale Eligibility Rule Configuration"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.5; MoM 31 Aug 4.12 (eligibility such as minimum time before validity, no expired tickets); MoM 1 Sep 4.14 (Board 1 resale rules); shape fixed (enums requiredConditions)'
@@ -10693,8 +10691,8 @@ paths:
     get:
       operationId: listResalePolicyMarketplace
       x-ticvai-consumed-by:
-        - "P09 ADM-278 Resale Marketplace Command Center"
-        - "P09 ADM-280 Resale Policy & Marketplace Settings"
+        - "P08 ADM-278 Resale Marketplace Command Center"
+        - "P08 ADM-280 Resale Policy & Marketplace Settings"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -10739,7 +10737,7 @@ paths:
     post:
       operationId: createListingSeller
       x-ticvai-consumed-by:
-        - "P09 ADM-281 Listing Creation & Seller Configuration"
+        - "P08 ADM-281 Listing Creation & Seller Configuration"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.9; MoM 31 Aug 4.12 and MoM 1 Sep 4.14 (three access models, ID preserved through resale); shape fixed (11 non-field properties removed; enums listingType)'
@@ -10795,7 +10793,7 @@ paths:
     get:
       operationId: listResalePricingPrice
       x-ticvai-consumed-by:
-        - "P09 ADM-282 Resale Pricing & Price Guardrails"
+        - "P08 ADM-282 Resale Pricing & Price Guardrails"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -10843,7 +10841,7 @@ paths:
     get:
       operationId: listResaleFeeCommission
       x-ticvai-consumed-by:
-        - "P09 ADM-283 Resale Fees, Commission & Seller Proceeds"
+        - "P08 ADM-283 Resale Fees, Commission & Seller Proceeds"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -10892,7 +10890,7 @@ paths:
     put:
       operationId: approveListingModeration
       x-ticvai-consumed-by:
-        - "P09 ADM-284 Listing Approval & Moderation"
+        - "P08 ADM-284 Listing Approval & Moderation"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.13; MoM 31 Aug 4.12 and MoM 1 Sep 4.14 (three access models, ID preserved through resale); shape fixed (1 non-field properties removed; enums reviewReasons; added decision)'
@@ -10951,7 +10949,7 @@ paths:
     get:
       operationId: listResaleInventoryAvailability
       x-ticvai-consumed-by:
-        - "P09 ADM-285 Resale Inventory & Availability Management"
+        - "P08 ADM-285 Resale Inventory & Availability Management"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -10995,7 +10993,7 @@ paths:
     get:
       operationId: listListingLifecycleExpiry
       x-ticvai-consumed-by:
-        - "P09 ADM-286 Listing Lifecycle, Expiry & Cancellation"
+        - "P08 ADM-286 Listing Lifecycle, Expiry & Cancellation"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11045,7 +11043,7 @@ paths:
     put:
       operationId: setResaleMarketplaceRecommendation
       x-ticvai-consumed-by:
-        - "P09 ADM-287 AI Resale Configuration & Marketplace Recommendations"
+        - "P08 ADM-287 AI Resale Configuration & Marketplace Recommendations"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.18; MoM 14 Aug (AI advisory in phase one); shape fixed (8 non-field properties removed; added decision)'
@@ -11099,8 +11097,8 @@ paths:
     get:
       operationId: listResale
       x-ticvai-consumed-by:
-        - "P09 ADM-288 Resale Operations Command Center"
-        - "P09 ADM-297 Resale Analytics & AI Intelligence"
+        - "P08 ADM-288 Resale Operations Command Center"
+        - "P08 ADM-297 Resale Analytics & AI Intelligence"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11148,7 +11146,7 @@ paths:
     get:
       operationId: listBuyerPurchaseResale
       x-ticvai-consumed-by:
-        - "P09 ADM-289 Buyer Purchase & Resale Order Management"
+        - "P08 ADM-289 Buyer Purchase & Resale Order Management"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11192,7 +11190,7 @@ paths:
     get:
       operationId: listTicketOwnershipTransfer
       x-ticvai-consumed-by:
-        - "P09 ADM-290 Ticket Ownership Transfer Management"
+        - "P08 ADM-290 Ticket Ownership Transfer Management"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11243,7 +11241,7 @@ paths:
     get:
       operationId: listCredentialRevocationRegeneration
       x-ticvai-consumed-by:
-        - "P09 ADM-291 Credential Revocation & Regeneration"
+        - "P08 ADM-291 Credential Revocation & Regeneration"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11290,7 +11288,7 @@ paths:
     get:
       operationId: listResaleFraudDuplicate
       x-ticvai-consumed-by:
-        - "P09 ADM-292 Resale Fraud & Duplicate Sale Protection"
+        - "P08 ADM-292 Resale Fraud & Duplicate Sale Protection"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11336,7 +11334,7 @@ paths:
     get:
       operationId: listCapacityInventoryReconciliation
       x-ticvai-consumed-by:
-        - "P09 ADM-293 Capacity & Inventory Reconciliation"
+        - "P08 ADM-293 Capacity & Inventory Reconciliation"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11384,7 +11382,7 @@ paths:
     get:
       operationId: listSellerSettlementPayout
       x-ticvai-consumed-by:
-        - "P09 ADM-294 Seller Settlement & Payout Management"
+        - "P08 ADM-294 Seller Settlement & Payout Management"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11428,7 +11426,7 @@ paths:
     get:
       operationId: listRefundDisputeResale
       x-ticvai-consumed-by:
-        - "P09 ADM-295 Refunds, Disputes & Resale Exceptions"
+        - "P08 ADM-295 Refunds, Disputes & Resale Exceptions"
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true
@@ -11485,7 +11483,7 @@ paths:
     get:
       operationId: listResaleOwnership
       x-ticvai-consumed-by:
-        - "P09 ADM-296 Resale Audit & Ownership History"
+        - "P08 ADM-296 Resale Audit & Ownership History"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.34; MoM 1 Sep 4.14 Decision (ownership change log against a stable ticket ID); shape fixed (10 filters to query parameters; 8 non-field properties removed)'
@@ -11601,8 +11599,8 @@ paths:
     get:
       operationId: listResale2
       x-ticvai-consumed-by:
-        - "P09 ADM-288 Resale Operations Command Center"
-        - "P09 ADM-297 Resale Analytics & AI Intelligence"
+        - "P08 ADM-288 Resale Operations Command Center"
+        - "P08 ADM-297 Resale Analytics & AI Intelligence"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.35; MoM 31 Aug 4.12 and MoM 1 Sep 4.14 (three access models, ID preserved through resale); shape fixed (11 non-field properties removed)'
@@ -11694,8 +11692,8 @@ paths:
     get:
       operationId: listTicketResaleMarketplace
       x-ticvai-consumed-by:
-        - "P09 ADM-278 Resale Marketplace Command Center"
-        - "P09 ADM-298 My Tickets & Resale Marketplace Entry"
+        - "P08 ADM-278 Resale Marketplace Command Center"
+        - "P08 ADM-298 My Tickets & Resale Marketplace Entry"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11741,7 +11739,7 @@ paths:
     get:
       operationId: listResaleEligibilityTicket
       x-ticvai-consumed-by:
-        - "P09 ADM-299 Resale Eligibility & Ticket Selection"
+        - "P08 ADM-299 Resale Eligibility & Ticket Selection"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11786,7 +11784,7 @@ paths:
     get:
       operationId: listCreateListingResale
       x-ticvai-consumed-by:
-        - "P09 ADM-300 Create Listing & Resale Price Selection"
+        - "P08 ADM-300 Create Listing & Resale Price Selection"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11832,8 +11830,8 @@ paths:
     get:
       operationId: listFeeSellerProceed
       x-ticvai-consumed-by:
-        - "P09 ADM-283 Resale Fees, Commission & Seller Proceeds"
-        - "P09 ADM-301 Fees, Seller Proceeds & Listing Confirmation"
+        - "P08 ADM-283 Resale Fees, Commission & Seller Proceeds"
+        - "P08 ADM-301 Fees, Seller Proceeds & Listing Confirmation"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11878,7 +11876,7 @@ paths:
     get:
       operationId: listResaleListingSeller
       x-ticvai-consumed-by:
-        - "P09 ADM-302 My Resale Listings & Seller Dashboard"
+        - "P08 ADM-302 My Resale Listings & Seller Dashboard"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11923,8 +11921,8 @@ paths:
     get:
       operationId: listOfficialResaleMarketplace
       x-ticvai-consumed-by:
-        - "P09 ADM-278 Resale Marketplace Command Center"
-        - "P09 ADM-303 Official Resale Marketplace & Buyer Discovery"
+        - "P08 ADM-278 Resale Marketplace Command Center"
+        - "P08 ADM-303 Official Resale Marketplace & Buyer Discovery"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11969,7 +11967,7 @@ paths:
     get:
       operationId: listResaleTicketDetail
       x-ticvai-consumed-by:
-        - "P09 ADM-304 Resale Ticket Detail, Seat Selection & Primary-vs-Resale Experience"
+        - "P08 ADM-304 Resale Ticket Detail, Seat Selection & Primary-vs-Resale Experience"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -12014,7 +12012,7 @@ paths:
     get:
       operationId: listBuyerCheckoutInventory
       x-ticvai-consumed-by:
-        - "P09 ADM-305 Buyer Checkout, Inventory Hold & Secure Payment"
+        - "P08 ADM-305 Buyer Checkout, Inventory Hold & Secure Payment"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -12059,8 +12057,8 @@ paths:
     get:
       operationId: listResaleConfirmationOwnership
       x-ticvai-consumed-by:
-        - "P09 ADM-296 Resale Audit & Ownership History"
-        - "P09 ADM-306 Resale Confirmation, Ownership Transfer & Ticket Delivery"
+        - "P08 ADM-296 Resale Audit & Ownership History"
+        - "P08 ADM-306 Resale Confirmation, Ownership Transfer & Ticket Delivery"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -12105,7 +12103,7 @@ paths:
     get:
       operationId: listWhiteLabelMarketplace
       x-ticvai-consumed-by:
-        - "P09 ADM-307 White-Label Marketplace Deployment & Experience Architecture"
+        - "P08 ADM-307 White-Label Marketplace Deployment & Experience Architecture"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -12382,7 +12380,7 @@ paths:
     get:
       operationId: listUpgrades
       x-ticvai-consumed-by:
-        - "P09 ADM-316 Upgrade Execution, Credential Regeneration & Channel Controls"
+        - "P08 ADM-316 Upgrade Execution, Credential Regeneration & Channel Controls"
       summary: Upgrade requests and their outcome
       description: >
         **`quoteUpgrade` priced an upgrade and nothing recorded that one happened.** The quote is
@@ -13300,12 +13298,12 @@ paths:
     get:
       operationId: getResaleMarketplaceConfig
       x-ticvai-consumed-by:
-        - "P09 ADM-278 Resale Marketplace Command Center"
-        - "P09 ADM-280 Resale Policy & Marketplace Settings"
-        - "P09 ADM-281 Listing Creation & Seller Configuration"
-        - "P09 ADM-282 Resale Pricing & Price Guardrails"
-        - "P09 ADM-284 Listing Approval & Moderation"
-        - "P09 ADM-287 AI Resale Configuration & Marketplace Recommendations"
+        - "P08 ADM-278 Resale Marketplace Command Center"
+        - "P08 ADM-280 Resale Policy & Marketplace Settings"
+        - "P08 ADM-281 Listing Creation & Seller Configuration"
+        - "P08 ADM-282 Resale Pricing & Price Guardrails"
+        - "P08 ADM-284 Listing Approval & Moderation"
+        - "P08 ADM-287 AI Resale Configuration & Marketplace Recommendations"
       summary: How the venue's resale marketplace runs
       description: '**The one row per venue in `orders.resale_marketplace_config`**: pricing mode and
         guardrails, moderation, listing lifecycle, checkout hold, seller settlement timing and the
@@ -13338,8 +13336,8 @@ paths:
     put:
       operationId: setResaleMarketplaceConfig
       x-ticvai-consumed-by:
-        - "P09 ADM-280 Resale Policy & Marketplace Settings"
-        - "P09 ADM-282 Resale Pricing & Price Guardrails"
+        - "P08 ADM-280 Resale Policy & Marketplace Settings"
+        - "P08 ADM-282 Resale Pricing & Price Guardrails"
       summary: Set how the venue's resale marketplace runs
       description: '**The writer `orders.resale_marketplace_config` lacked** (DM5 open item: nine
         screens showed the row and none wrote it). One row per venue, replaced whole, as
@@ -13405,8 +13403,8 @@ paths:
     post:
       operationId: holdResaleSettlement
       x-ticvai-consumed-by:
-        - "P09 ADM-294 Seller Settlement & Payout Management"
-        - "P09 ADM-295 Refunds, Disputes & Resale Exceptions"
+        - "P08 ADM-294 Seller Settlement & Payout Management"
+        - "P08 ADM-295 Refunds, Disputes & Resale Exceptions"
       summary: Put a seller's resale payout on manual hold
       description: '**A person stops a payout the job would otherwise make** (DM5 open item: the
         settlement job writes `orders.resale_settlement` and no operation could hold or release one).
@@ -13473,8 +13471,8 @@ paths:
     post:
       operationId: releaseResaleSettlementHold
       x-ticvai-consumed-by:
-        - "P09 ADM-294 Seller Settlement & Payout Management"
-        - "P09 ADM-295 Refunds, Disputes & Resale Exceptions"
+        - "P08 ADM-294 Seller Settlement & Payout Management"
+        - "P08 ADM-295 Refunds, Disputes & Resale Exceptions"
       summary: Release a manual or compliance hold on a seller's resale payout
       description: '**The release the settlement state model had no operation for** (DM5 open item).
         Moves an `onHold` settlement back to `scheduled` and clears `holdReason`; `expectedPayoutDate`
@@ -13794,7 +13792,7 @@ paths:
       operationId: listPaymentAllocationRules
       x-ticvai-consumed-by:
         - "P08 BO-326 Multi-Payment, Split Tender & Payment Allocation Configuration"
-        - "P09 ADM-601 Split Payment & Tender Allocation Manager\t94"
+        - "P08 ADM-601 Split Payment & Tender Allocation Manager\t94"
       summary: The venue's split-tender allocation rules
       description: '**The rows `setMultiPaymentSplit` writes** in `orders.payment_allocation_rule`: at
         what level a split-tender payment is allocated, per channel, terminal, product, order type and
@@ -13858,7 +13856,7 @@ paths:
       operationId: recordChargeback
       x-ticvai-consumed-by:
         - "P08 BO-025 Chargebacks & Disputes"
-        - "P09 ADM-634 Chargeback & Dispute Command Center\t172"
+        - "P08 ADM-634 Chargeback & Dispute Command Center\t172"
       x-ticvai-audience:
       - staff
       - service
@@ -13987,8 +13985,8 @@ paths:
       operationId: assignChargeback
       x-ticvai-consumed-by:
         - "P08 BO-025 Chargebacks & Disputes"
-        - "P09 ADM-633 Fraud Alert, Investigation & Case Management\t170"
-        - "P09 ADM-634 Chargeback & Dispute Command Center\t172"
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management\t170"
+        - "P08 ADM-634 Chargeback & Dispute Command Center\t172"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (retrace 5.7.92 investigation workflow); shape follows respondToChargeback'
@@ -14055,7 +14053,7 @@ paths:
       operationId: recordChargebackOutcome
       x-ticvai-consumed-by:
         - "P08 BO-025 Chargebacks & Disputes"
-        - "P09 ADM-634 Chargeback & Dispute Command Center\t172"
+        - "P08 ADM-634 Chargeback & Dispute Command Center\t172"
       x-ticvai-audience:
       - staff
       - service
@@ -14131,9 +14129,9 @@ paths:
       operationId: getChargebackAnalytics
       x-ticvai-consumed-by:
         - "P08 BO-025 Chargebacks & Disputes"
-        - "P09 ADM-633 Fraud Alert, Investigation & Case Management\t170"
-        - "P09 ADM-634 Chargeback & Dispute Command Center\t172"
-        - "P09 ADM-637 AI Fraud, Anomaly & Payment Intelligence Center"
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management\t170"
+        - "P08 ADM-634 Chargeback & Dispute Command Center\t172"
+        - "P08 ADM-637 AI Fraud, Anomaly & Payment Intelligence Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (retrace 4.2.21); shape follows getPaymentPerformance'

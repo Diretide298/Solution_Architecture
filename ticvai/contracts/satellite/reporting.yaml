@@ -456,6 +456,7 @@ paths:
         - "P08 BO-262 Access Reports, Scheduled Reporting & Data Export"
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
+        - "P16 ANL-023 Drag-and-Drop Dashboard Canvas"
         - "P16 ANL-031 Report Catalogue & Library"
       x-ticvai-api-scope: analytics.read
       x-ticvai-audience:
@@ -582,6 +583,7 @@ paths:
         - "P08 BO-060 Attendance & Footfall"
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
+        - "P16 ANL-023 Drag-and-Drop Dashboard Canvas"
       x-ticvai-api-scope: analytics.read
       x-ticvai-audience:
       - staff
@@ -2084,6 +2086,7 @@ paths:
         - "P16 ANL-057 Forecasting & Predictive Analytics Studio"
         - "P16 ANL-063 KPI Targets, Thresholds & Scorecards"
         - "P06 EMP-060 Reservation & Table Performance"
+        - "P16 ANL-072 Finance Dashboard"
       summary: Current values, against target, with movement
       description: 'BI boards 1 and 10.3. **The scorecard read.** Value, target, variance, direction and
         freshness in one call — a dashboard assembling those from four places will render three of them
@@ -2288,13 +2291,14 @@ paths:
         (ADR-0054): masked fields are masked before a value leaves the query, exports follow `export`, results are
         kept as `retention` says, sharing outside the tenant follows `sharing`, and the AI assistant and the public
         API reach analytics only as `aiAndApiAccess` allows. The whole policy is replaced. Gated by
-        `PERMISSION_MANAGE`, which writes the policies that decide what any role can see, until the decided
-        `REPORT_GOVERNANCE_MANAGE` can join the vocabulary (CHG-CSA-007).
+        `REPORT_GOVERNANCE_MANAGE` (joined the vocabulary 2 October, CHG-FUP-007): deciding what any report may
+        expose is a narrower right than `PERMISSION_MANAGE` and a different one from `REPORT_MANAGE`, which writes
+        reports.
 
         '
       tags:
       - reporting
-      x-ticvai-permission: PERMISSION_MANAGE
+      x-ticvai-permission: REPORT_GOVERNANCE_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-config-scope: tenant
       x-ticvai-singleton: true

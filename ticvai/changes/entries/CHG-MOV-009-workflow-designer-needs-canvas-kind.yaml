@@ -1,0 +1,30 @@
+id: CHG-MOV-009
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: ADM-241 Visual Workflow Designer needs a canvas, and the component library has no canvas kind.
+decision:
+  what: 'Logged, not drawn: a canvas (a node and edge editor for VisualWorkflowDesignerInput.definition and nodeTypes) is
+    a new component kind in screens/_components.yaml, which its owner adds; ADM-241 then declares it.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Design-notes correction platform-foundation ADM-241: "No canvas component is declared; only form fields. A visual designer
+  needs a canvas." screens/_components.yaml lists no canvas, diagram or flow-editor kind, and check-screens refuses an unknown
+  kind. Chinmay, 2 October (PHASE-B): log what cannot be applied.'
+keys_touched:
+  screens:
+  - ADM-241
+  files:
+  - screens/_components.yaml
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screens.py
+status: open
+notes: screens/_components.yaml belongs to screens-other (PHASE-B ownership).

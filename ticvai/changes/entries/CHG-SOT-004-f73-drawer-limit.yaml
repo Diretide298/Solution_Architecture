@@ -1,0 +1,46 @@
+id: CHG-SOT-004
+date: '2026-10-02'
+source: client-review
+kind: spec
+summary: 'F73 walks the drawer limit: a venue default with a till override, a warning and an offered cash lift when the drawer
+  goes over it, never a block.'
+decision:
+  what: Step 1 notes the till override (Workstation.cashDrawerLimit); step 3 describes VenueSettings.cashDrawerLimit, DepositBox.overDrawerLimit
+    and the offered lift; a branch at step 3 walks the lift on POS-018. Step 2 notes the till shift policy operations now
+    exist.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 6 #179 (BO-042, workbook Q179): "Add drawer limit setting (warn + offer cash lift)";
+  #178 "PIN on the same device" for the witness. Decision ledger DEC-179, DEC-178; contract CHG-CSP-016, CHG-CSP-020; DI-274.'
+keys_touched:
+  flows:
+  - F73
+  screens:
+  - POS-015
+  - POS-016
+  - POS-018
+  - POS-019
+  - BO-042
+  operations:
+  - configureWorkstation
+  - listDepositBoxes
+  - createCashMovement
+  - getTillShiftPolicy
+  - setTillShiftPolicy
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-015 (#17886)
+  - APP-POS-POS-016 (#17887)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-flows.py
+notes: 'Cross-file: getTillShiftPolicy and setTillShiftPolicy join F73 step 2 once POS-019 declares them (screens-pos-staff,
+  CHG-CSP-020). Batch SOT (screens-other, phase B), 2 October 2026; worktree D:/wt/screens-other, branch screens-other. Tickets:
+  none started (Block A starts Monday 5 October 2026).'
+status: closed
+closed_by_commit: b461f38e

@@ -1,0 +1,47 @@
+id: CHG-FUP-011
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: The catalogue gets its own bulk product edit, bulkUpdateCatalogueProducts; inventory's bulkUpdateProducts is
+  deprecated and retired at the next major version.
+decision:
+  what: 'catalogue.yaml: bulkUpdateCatalogueProducts (POST /products/bulk-update, PRODUCT_CONFIGURE; typed selection
+    by category, product kind, lifecycle state or up to 500 ids; typed changes: category, responsible department,
+    on-sale window, channels, segment tags, tax code (which also needs PRICE_CONFIGURE, 403
+    price-permission-required); preview by default; per-product failures) and BulkProductUpdateResult.
+    inventory.yaml bulkUpdateProducts: deprecated: true, x-ticvai-superseded-by bulkUpdateCatalogueProducts, kept
+    with its path and id for clients built at r1.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October, contract follow-ups (BO-007 bulk edit): "A new catalogue operation: catalogue.bulkUpdateProducts
+  is added; the inventory one is deprecated and retired at the next major version." The BO-007 correction is
+  CHG-WIR-027; CHG-CSP-054 and CHG-CSA-046 logged it open because moving the operation is breaking against r1.'
+keys_touched:
+  operations:
+  - bulkUpdateCatalogueProducts
+  - bulkUpdateProducts
+  schemas:
+  - BulkProductUpdateResult
+  screens:
+  - BO-007
+  files:
+  - contracts/spine/catalogue.yaml
+  - contracts/satellite/inventory.yaml
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - SVC-INVENTORY-INVENTORY-1
+  - APP-SETUP-BO-007
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: closed
+closed_by_commit: c481490c
+notes: 'Named bulkUpdateCatalogueProducts, not bulkUpdateProducts: operationIds are unique across the package
+  (check-package refuses a second declaration) and the inventory operation keeps its id until it is retired. BO-007
+  (P08, screens-p08-p09 or screens-move-adm049) rebinds from inventory.bulkUpdateProducts to this operation and adds
+  its consumed-by line. Batch FUP (apply-followup), 2 October 2026. Closed on its commit; the prevention exists and run-checks runs it.'

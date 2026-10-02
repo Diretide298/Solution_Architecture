@@ -1,0 +1,47 @@
+id: CHG-FUP-009
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: Each cookie scan finding records the consent state it was seen in and is kept; pre-consent violations are
+  flagged, counted on the run and raise the alert.
+decision:
+  what: 'marketing-crm.yaml: RecordCookieScanRequest.findings[] gains consentState (noDecision, rejectedAll,
+    acceptedAll), pageUrl, initiatorUrl, cookieDomain, sameSite, secure, suggestedCategory and classificationSource;
+    CookieScanRun.preConsentViolationCount; new CookieScanFinding (marketing.cookie_scan_finding) with
+    preConsentViolation; new listCookieScanFindings (GET /cookie-tracking-digital/scans/{scanRunId}/findings, paged,
+    GUEST_VIEW, filters consentState and preConsentOnly); recordCookieScan describes the rule.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October, contract follow-ups (cookie scan consent state): "Add now". The gap and the proposed shape
+  are CHG-CSA-024, from the research of 2 October (docs/active/research/cookie-scanner-and-domains-2-october.md, A9
+  item 1); proving nothing loads before consent is matrix 2.6.58. Buy-hybrid scanner decided in CHG-CSA-023 (DEC-019).'
+keys_touched:
+  operations:
+  - recordCookieScan
+  - listCookieScanFindings
+  schemas:
+  - RecordCookieScanRequest
+  - CookieScanRun
+  - CookieScanFinding
+  screens:
+  - CMS-025
+  tables:
+  - marketing.cookie_scan_finding
+  files:
+  - contracts/satellite/marketing-crm.yaml
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-CMS-025
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: closed
+closed_by_commit: c481490c
+notes: 'Additive: every new request field is optional. listCookieScanFindings has no consumer yet; CMS-025 (P13,
+  screens-guest) binds it and shows the violations list. The new table is derived at the refresh (derive-schema).
+  Batch FUP (apply-followup), 2 October 2026. Closed on its commit; the prevention exists and run-checks runs it.'

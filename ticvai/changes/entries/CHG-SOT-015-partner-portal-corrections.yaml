@@ -1,0 +1,69 @@
+id: CHG-SOT-015
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'The partner portal''s Block B screens lose their generated defects: id and status fields in forms, ids in tables,
+  free text drawn as drop-downs, choices drawn as buttons, step-up actions with no way to raise the challenge, and empty states
+  that promised a create action.'
+decision:
+  what: Forms on PTR-011/019/025/036/037/049 ask only what a person types; ids dropped from PTR-003/011/017/019/020 tables;
+    PTR-023/033/034/040 text and date fields; PTR-038 payment methods, PTR-039 allocation type and PTR-049 case type as choices;
+    PTR-029/030/035/036/040/048 raise the MFA step-up in place (createMfaChallenge, verifyMfaChallenge); seventeen empty states
+    rewritten.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Design-notes corrections platform-foundation PTR-003 to PTR-051 (Block B), process-agent findings of 1-2 October 2026;
+  step-up per check-step-up (audit R126). Chinmay, 2 October: apply the open corrections on Block B screens (phase B).'
+keys_touched:
+  screens:
+  - PTR-003
+  - PTR-011
+  - PTR-017
+  - PTR-019
+  - PTR-020
+  - PTR-022
+  - PTR-023
+  - PTR-024
+  - PTR-025
+  - PTR-028
+  - PTR-029
+  - PTR-030
+  - PTR-031
+  - PTR-032
+  - PTR-033
+  - PTR-034
+  - PTR-035
+  - PTR-036
+  - PTR-037
+  - PTR-038
+  - PTR-039
+  - PTR-040
+  - PTR-041
+  - PTR-042
+  - PTR-043
+  - PTR-044
+  - PTR-046
+  - PTR-047
+  - PTR-048
+  - PTR-049
+  - PTR-050
+  - PTR-051
+  operations:
+  - createMfaChallenge
+  - verifyMfaChallenge
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-step-up.py
+notes: 'check-step-up reported the six PTR screens on the parent commit and no longer does; check-screen-wiring S-STATE-BOILERPLATE
+  holds the empty states. The partner screens that call staff-only operations (PTR-026/029/035/036/037/039/047/048) are logged
+  in CHG-SOT-016 with a question for Chinmay. Batch SOT (screens-other, phase B), 2 October 2026; worktree D:/wt/screens-other,
+  branch screens-other. Tickets: none started (Block A starts Monday 5 October 2026).'
+status: closed
+closed_by_commit: b461f38e
