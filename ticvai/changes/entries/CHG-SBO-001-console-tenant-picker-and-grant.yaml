@@ -1,0 +1,336 @@
+id: CHG-SBO-001
+date: '2026-10-02'
+source: cr
+kind: spec
+summary: Every TICVAI Console screen that calls a tenant-permission operation carries the R098 tenant picker, the platform-staff
+  grant panel, Open access grant with step-up and a grantRequired state (the ADM-412 pattern).
+decision:
+  what: Add the tenant picker and the platform-staff grant to the ~66 Block A/B console screens and every other console screen
+    acting in a tenant (ADM-068 and ADM-619 included, the lead 2 October); a new gating check holds it.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, pre-apply round of 2 October 2026 ("Console R098 (about 66 screens): add a tenant picker and grant"; answers
+  log, cited copy docs/active/decisions/answers-2-october.md). Audit R098 (28 September): the Console runs outside every cell
+  and a platform token carries no tenant permission until a time-boxed grant is open, so these calls were refused 403 as drawn
+  (design-note corrections, platform-foundation and ai, "Calls tenant-permission operations with no tenant picker").'
+keys_touched:
+  screens:
+  - ADM-004
+  - ADM-006
+  - ADM-015
+  - ADM-020
+  - ADM-021
+  - ADM-026
+  - ADM-038
+  - ADM-039
+  - ADM-040
+  - ADM-041
+  - ADM-042
+  - ADM-043
+  - ADM-044
+  - ADM-045
+  - ADM-046
+  - ADM-047
+  - ADM-068
+  - ADM-319
+  - ADM-320
+  - ADM-322
+  - ADM-323
+  - ADM-324
+  - ADM-325
+  - ADM-326
+  - ADM-327
+  - ADM-328
+  - ADM-329
+  - ADM-330
+  - ADM-331
+  - ADM-332
+  - ADM-333
+  - ADM-334
+  - ADM-335
+  - ADM-336
+  - ADM-337
+  - ADM-338
+  - ADM-339
+  - ADM-340
+  - ADM-341
+  - ADM-342
+  - ADM-343
+  - ADM-345
+  - ADM-346
+  - ADM-347
+  - ADM-348
+  - ADM-349
+  - ADM-350
+  - ADM-351
+  - ADM-352
+  - ADM-353
+  - ADM-354
+  - ADM-355
+  - ADM-356
+  - ADM-357
+  - ADM-358
+  - ADM-359
+  - ADM-360
+  - ADM-361
+  - ADM-362
+  - ADM-363
+  - ADM-364
+  - ADM-365
+  - ADM-366
+  - ADM-367
+  - ADM-368
+  - ADM-411
+  - ADM-420
+  - ADM-425
+  - ADM-469
+  - ADM-470
+  - ADM-471
+  - ADM-472
+  - ADM-473
+  - ADM-474
+  - ADM-475
+  - ADM-476
+  - ADM-477
+  - ADM-478
+  - ADM-479
+  - ADM-480
+  - ADM-481
+  - ADM-482
+  - ADM-483
+  - ADM-484
+  - ADM-485
+  - ADM-486
+  - ADM-487
+  - ADM-488
+  - ADM-489
+  - ADM-490
+  - ADM-491
+  - ADM-492
+  - ADM-493
+  - ADM-494
+  - ADM-495
+  - ADM-496
+  - ADM-497
+  - ADM-498
+  - ADM-499
+  - ADM-500
+  - ADM-501
+  - ADM-502
+  - ADM-503
+  - ADM-504
+  - ADM-505
+  - ADM-506
+  - ADM-507
+  - ADM-508
+  - ADM-509
+  - ADM-510
+  - ADM-511
+  - ADM-512
+  - ADM-513
+  - ADM-514
+  - ADM-515
+  - ADM-516
+  - ADM-517
+  - ADM-518
+  - ADM-519
+  - ADM-520
+  - ADM-521
+  - ADM-522
+  - ADM-523
+  - ADM-524
+  - ADM-525
+  - ADM-526
+  - ADM-527
+  - ADM-528
+  - ADM-529
+  - ADM-530
+  - ADM-531
+  - ADM-532
+  - ADM-533
+  - ADM-534
+  - ADM-535
+  - ADM-536
+  - ADM-537
+  - ADM-538
+  - ADM-539
+  - ADM-540
+  - ADM-541
+  - ADM-542
+  - ADM-543
+  - ADM-544
+  - ADM-545
+  - ADM-546
+  - ADM-547
+  - ADM-548
+  - ADM-549
+  - ADM-550
+  - ADM-551
+  - ADM-552
+  - ADM-553
+  - ADM-554
+  - ADM-555
+  - ADM-556
+  - ADM-557
+  - ADM-558
+  - ADM-619
+  operations:
+  - listTenants
+  - openPlatformStaffGrant
+  - listOwnPlatformStaffGrants
+  files:
+  - tools/check-console-grant.py
+  - tools/run-checks.py
+  - tools/check-screen-wiring.py
+root_class: A23 AUTH-SCOPE
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ADM-342
+  - APP-SETUP-ADM-354
+  - APP-SETUP-ADM-508
+  - APP-SETUP-ADM-520
+  - APP-SETUP-ADM-523
+  - APP-SETUP-ADM-526
+  - APP-SETUP-ADM-527
+  - APP-SETUP-ADM-528
+  - APP-SETUP-ADM-536
+  - APP-SETUP-ADM-554
+  - APP-SETUP-ADM-556
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-console-grant.py
+status: open
+notes: 'New check tools/check-console-grant.py (C-GRANT, C-CORE), registered in run-checks.py: it fails on the parent commit
+  (283 findings on 266 console screens) and passes after. Prospect twins (P17 source.sameAs, ADM-379..417) are skipped by
+  C-GRANT: a prospect has no tenant to open a grant into. check-screen-wiring S-DUP-SCREEN leaves the grant frame out of the
+  duplicate signature (CONSOLE_FRAME). Corrections closed:
+
+  - ADM-020: Calls tenant-permission operations with no tenant picker and no platform-staff grant: listPrincipals (USER_MANAGE),
+  createPrincipal (USER_MANAGE), getPrincipal (USER_MANAGE), updatePrincipal (USER_MANAGE).
+
+  - ADM-021: Calls tenant-permission operations with no tenant picker and no platform-staff grant: listRoles (ROLE_MANAGE),
+  createRole (ROLE_MANAGE).
+
+  - ADM-319: Calls tenant-permission operations with no tenant picker and no platform-staff grant: listRuleWorkflow (APPROVAL_VIEW),
+  approveWorkflow (PRODUCT_CONFIGURE).
+
+  - ADM-320: Calls tenant-permission operations with no tenant picker and no platform-staff grant: setVisualWorkflow (APPROVAL_CONFIGURE).
+
+  - ADM-322: Calls tenant-permission operations with no tenant picker and no platform-staff grant: setVisualWorkflow (APPROVAL_CONFIGURE).
+
+  - ADM-323: Calls tenant-permission operations with no tenant picker and no platform-staff grant: setVisualBusinessRule (APPROVAL_CONFIGURE),
+  listConditionDecisionLogic (APPROVAL_VIEW).
+
+  - ADM-324: Calls tenant-permission operations with no tenant picker and no platform-staff grant: setVisualWorkflow (APPROVAL_CONFIGURE).
+
+  - ADM-325: Calls tenant-permission operations with no tenant picker and no platform-staff grant: setTriggerActionCross (APPROVAL_CONFIGURE).
+
+  - ADM-326: Calls tenant-permission operations with no tenant picker and no platform-staff grant: simulateWorkflowTestingImpact
+  (APPROVAL_CONFIGURE).
+
+  - ADM-327: Calls tenant-permission operations with no tenant picker and no platform-staff grant: listRuleWorkflow (APPROVAL_VIEW),
+  setVisualWorkflow (APPROVAL_CONFIGURE).
+
+  - ADM-329: Calls tenant-permission operations with no tenant picker and no platform-staff grant: listApprovalMatrices (APPROVAL_CONFIGURE).
+
+  - ADM-330: Calls tenant-permission operations with no tenant picker and no platform-staff grant: setApprovalMatrix (APPROVAL_CONFIGURE).
+
+  - ADM-331: Calls tenant-permission operations with no tenant picker and no platform-staff grant: setApprovalMatrix (APPROVAL_CONFIGURE).
+
+  - ADM-332: Calls tenant-permission operations with no tenant picker and no platform-staff grant: setApprovalMatrix (APPROVAL_CONFIGURE).
+
+  - ADM-333: Calls tenant-permission operations with no tenant picker and no platform-staff grant: setApprovalMatrix (APPROVAL_CONFIGURE).
+
+  - ADM-334: Calls tenant-permission operations with no tenant picker and no platform-staff grant: setApprovalMatrix (APPROVAL_CONFIGURE).
+
+  - ADM-335: Calls tenant-permission operations with no tenant picker and no platform-staff grant: setApprovalMatrix (APPROVAL_CONFIGURE).
+
+  - ADM-336: Calls tenant-permission operations with no tenant picker and no platform-staff grant: setApprovalControlPolicy
+  (APPROVAL_CONFIGURE).
+
+  - ADM-337: Calls tenant-permission operations with no tenant picker and no platform-staff grant: evaluateApprovalRequirement
+  (APPROVAL_VIEW), simulateWorkflowTestingImpact (APPROVAL_CONFIGURE).
+
+  - ADM-338: Calls tenant-permission operations with no tenant picker and no platform-staff grant: listApprovalMatrices (APPROVAL_CONFIGURE).
+
+  - ADM-339: Calls tenant-permission operations with no tenant picker and no platform-staff grant: listApprovalControlPolicies
+  (APPROVAL_VIEW), getApprovalAnalytics (APPROVAL_VIEW).
+
+  - ADM-340: Calls tenant-permission operations with no tenant picker and no platform-staff grant: setSegregationRules (ROLE_MANAGE).
+
+  - ADM-341: Calls tenant-permission operations with no tenant picker and no platform-staff grant: setApprovalControlPolicy
+  (APPROVAL_CONFIGURE), listApprovalControlPolicies (APPROVAL_VIEW).
+
+  - ADM-342: Calls tenant-permission operations with no tenant picker and no platform-staff grant: listStepUpPolicies (APPROVAL_CONFIGURE),
+  setStepUpPolicy (APPROVAL_CONFIGURE), setPasswordPolicy (TENANT_CONFIGURE), getGuestVerificationPolicy (TENANT_CONFIGURE),
+  setGuestVerificationPolicy (TENANT_CONFIGURE). | Tenant-config operations with no tenant picker or platform-staff grant.
+
+  - ADM-343: Calls tenant-permission operations with no tenant picker and no platform-staff grant: setStepUpPolicy (APPROVAL_CONFIGURE),
+  listStepUpPolicies (APPROVAL_CONFIGURE).
+
+  - ADM-345: Calls tenant-permission operations with no tenant picker and no platform-staff grant: getApprovalRecord (APPROVAL_VIEW).
+
+  - ADM-346: Calls tenant-permission operations with no tenant picker and no platform-staff grant: setApprovalRetentionPolicy
+  (APPROVAL_CONFIGURE), listDataRetentionSettings (TENANT_VIEW), setDataRetentionSetting (TENANT_CONFIGURE).
+
+  - ADM-347: Calls tenant-permission operations with no tenant picker and no platform-staff grant: createApprovalEvidencePackage
+  (APPROVAL_VIEW).
+
+  - ADM-348: Calls tenant-permission operations with no tenant picker and no platform-staff grant: getApprovalAnalytics (APPROVAL_VIEW).
+
+  - ADM-349: Calls tenant-permission operations with no tenant picker and no platform-staff grant: listCrossModuleOrchestration
+  (APPROVAL_VIEW), listApprovalExternalProviders (APPROVAL_VIEW), listApprovalExternalDispatches (APPROVAL_VIEW).
+
+  - ADM-350: Calls tenant-permission operations with no tenant picker and no platform-staff grant: listCrossModuleOrchestration
+  (APPROVAL_VIEW).
+
+  - ADM-352: Calls tenant-permission operations with no tenant picker and no platform-staff grant: setTriggerActionCross (APPROVAL_CONFIGURE),
+  listWebhookEventTypes (DEVELOPER_VIEW).
+
+  - ADM-353: Calls tenant-permission operations with no tenant picker and no platform-staff grant: createWebhookSubscription
+  (DEVELOPER_MANAGE), listWebhookEventTypes (DEVELOPER_VIEW), listWebhookSubscriptions (DEVELOPER_VIEW).
+
+  - ADM-355: Calls tenant-permission operations with no tenant picker and no platform-staff grant: setTriggerActionCross (APPROVAL_CONFIGURE).
+
+  - ADM-357: Calls tenant-permission operations with no tenant picker and no platform-staff grant: listWorkflowExceptionFailure
+  (APPROVAL_VIEW), listApprovalExternalDispatches (APPROVAL_VIEW).
+
+  - ADM-358: Calls tenant-permission operations with no tenant picker and no platform-staff grant: listWorkflowProcessPerformance
+  (REPORT_VIEW_VENUE).
+
+  - ADM-359: Calls tenant-permission operations with no tenant picker and no platform-staff grant: getApprovalAnalytics (APPROVAL_VIEW).
+
+  - ADM-360: Calls tenant-permission operations with no tenant picker and no platform-staff grant: getApprovalAnalytics (APPROVAL_VIEW).
+
+  - ADM-361: Calls tenant-permission operations with no tenant picker and no platform-staff grant: getApprovalAnalytics (APPROVAL_VIEW).
+
+  - ADM-362: Calls tenant-permission operations with no tenant picker and no platform-staff grant: listSlaEscalationBottleneck
+  (APPROVAL_VIEW).
+
+  - ADM-363: Calls tenant-permission operations with no tenant picker and no platform-staff grant: getApprovalAnalytics (APPROVAL_VIEW).
+
+  - ADM-364: Calls tenant-permission operations with no tenant picker and no platform-staff grant: getApprovalAnalytics (APPROVAL_VIEW).
+
+  - ADM-366: Calls tenant-permission operations with no tenant picker and no platform-staff grant: getApprovalAnalytics (APPROVAL_VIEW),
+  getApprovalRequestScore (APPROVAL_VIEW).
+
+  - ADM-367: Calls tenant-permission operations with no tenant picker and no platform-staff grant: simulateWorkflowTestingImpact
+  (APPROVAL_CONFIGURE).
+
+  - ADM-368: Calls tenant-permission operations with no tenant picker and no platform-staff grant: getApprovalAnalytics (APPROVAL_VIEW).
+
+  - ADM-520: The P09 governance screens (ADM-519..558) act on one tenant''s registry and policies but, unlike ADM-037, declare
+  no tenant picker and no platform-staff grant.
+
+  - ADM-534: Calls tenant-permission operations with no tenant picker and no platform-staff grant: getActionPlan (AI_USE),
+  listProposedActions (AI_USE), listApprovalDelegations (APPROVAL_VIEW), escalateApprovalRequest (APPROVAL_REQUEST), createApprovalDelegation
+  (APPROVAL_DECIDE), setApprovalSlaPolicy (APPROVAL_CONFIGURE).
+
+
+  Batch SBO (screens-p08-p09, phase B), 2 October 2026; worktree D:/wt/screens-p08-p09, branch screens-p08-p09. Tickets: none
+  started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched screen. Applied with
+  the screen files'' own dump settings (width 100).'

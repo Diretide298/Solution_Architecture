@@ -222,9 +222,11 @@ paths:
     get:
       operationId: listOrgUnits
       x-ticvai-consumed-by:
+        - "P08 BO-055 Rota & Scheduling"
         - "P08 BO-064 Zones & Areas"
         - "P08 BO-145 Venue & Park Access Structure"
         - "P09 ADM-006 Tenant Hierarchy Explorer"
+        - "P09 ADM-412 Payment Method & Settlement Setup"
         - "P13 CMS-016 Site Settings"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
@@ -975,12 +977,14 @@ paths:
     get:
       operationId: getVenueSettings
       x-ticvai-consumed-by:
+        - "P08 BO-042 Banking & Safe"
         - "P08 BO-063 Opening Hours & Calendar"
         - "P08 BO-065 Venue Configuration"
         - "P08 BO-100 Venue Home"
         - "P08 BO-101 Orders & Money"
         - "P08 BO-102 Sell"
         - "P08 BO-106 People & Access Rights"
+        - "P08 BO-187 Biometric Consent & Guardian Management"
         - "P08 BO-1063 Venue-Specific Configuration"
         - "P08 BO-107 Guests & Marketing"
         - "P08 BO-136 F&B Global Settings & Controls"
@@ -1024,6 +1028,7 @@ paths:
       operationId: setVenueSettings
       x-ticvai-consumed-by:
         - "P08 BO-065 Venue Configuration"
+        - "P08 BO-187 Biometric Consent & Guardian Management"
         - "P08 BO-1063 Venue-Specific Configuration"
         - "P08 BO-136 F&B Global Settings & Controls"
         - "P08 BO-600 Venue, Calendar & Operational Setup"
@@ -1344,10 +1349,13 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-036 Device Registry"
         - "P08 BO-037 Offline Package Status"
+        - "P08 BO-039 Shift Directory"
+        - "P08 BO-040 Variance Approval"
         - "P08 BO-116 Merchandising & Product Presentation"
         - "P08 BO-126 Deployment, Preview & Audit"
         - "P08 BO-128 Live Workstation Health Monitor"
         - "P08 BO-129 Software, Configuration & Version Management"
+        - "P08 BO-133 Offline Alerts, Limits & Audit"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List workstations
@@ -1492,10 +1500,12 @@ paths:
     get:
       operationId: listOutlets
       x-ticvai-consumed-by:
+        - "P08 BO-020 F&B Order Management"
         - "P08 BO-044 F&B Outlets"
+        - "P08 BO-045 Menu Management"
+        - "P08 BO-048 Retail Products"
         - "P08 BO-134 Kitchen & Preparation Stations"
         - "P08 BO-727 F&B Command Center"
-        - "P08 BO-728 Outlet Management"
         - "P08 BO-731 Operating Hours & Service Periods"
         - "P08 BO-732 POS & Device Assignment"
       x-ticvai-audience: [staff]
@@ -1535,7 +1545,6 @@ paths:
       operationId: createOutlet
       x-ticvai-consumed-by:
         - "P08 BO-044 F&B Outlets"
-        - "P08 BO-729 Create / Edit Outlet"
       x-ticvai-audience: [staff]
       summary: Create an outlet
       tags: [workstation]
@@ -1586,8 +1595,7 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getOutlet
-      x-ticvai-consumed-by:
-        - "P08 BO-729 Create / Edit Outlet"
+      x-ticvai-consumed-by: []
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read an outlet
@@ -1615,7 +1623,6 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-044 F&B Outlets"
         - "P08 BO-063 Opening Hours & Calendar"
-        - "P08 BO-729 Create / Edit Outlet"
         - "P08 BO-731 Operating Hours & Service Periods"
       x-ticvai-audience: [staff]
       summary: Amend an outlet
@@ -1682,6 +1689,7 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-025 Till Home"
+        - "P08 BO-109 Menu Builder & POS Layout Designer"
         - "P08 BO-116 Merchandising & Product Presentation"
         - "P08 BO-122 POS Experience Dashboard"
         - "P08 BO-123 POS Profile Management"
@@ -1823,7 +1831,7 @@ paths:
         - "P08 BO-124 Layout & Journey Builder"
         - "P08 BO-405 Reader Directory"
         - "P08 BO-732 POS & Device Assignment"
-        - "P08 ADM-580 Payment Terminal & Device Inventory\t49"
+        - "P08 ADM-580 Payment Terminal & Device Inventory"
         - "P16 ANL-003 Operational Performance"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
@@ -2049,6 +2057,7 @@ paths:
       operationId: enrolDevice
       x-ticvai-consumed-by:
         - "P08 ADM-581 Terminal Provisioning & Device Configuration"
+        - "P08 BO-196 Physical Device Registration & Provisioning"
       x-ticvai-conflict-policy: serverWins
       summary: Take a registered device through enrolment to activation
       description: '16.1.2, 16.1.3, 16.1.6. **`registerDevice` created a row; nothing turned it into a

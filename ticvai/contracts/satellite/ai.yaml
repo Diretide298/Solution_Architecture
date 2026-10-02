@@ -503,7 +503,6 @@ paths:
         - "P02 GST-054 AI Planner"
         - "P06 EMP-031 Queue monitor"
         - "P08 BO-005 Queue Monitor"
-        - "P08 BO-138 Production Execution & Batch Management"
         - "P08 BO-139 Wastage, Spoilage, Returns & Write-Off"
         - "P08 BO-772 A/B & AI Optimization"
         - "P08 BO-782 AI Journey Optimization"
@@ -2889,6 +2888,7 @@ paths:
         - "P09 ADM-520 AI Capability Registry & Ownership"
         - "P09 ADM-521 AI Risk Classification & Assessment"
         - "P09 ADM-522 AI Autonomy Level Configuration"
+        - "P09 ADM-536 Human Override & Manual Control Center"
         - "P16 ANL-060 AI Analytics Governance & Model Control"
       x-ticvai-agreed: '29 September: AI system design 2.3 governance, 3.1 Registry; our build plan, shape follows
         listAiProviders'
@@ -3707,6 +3707,7 @@ paths:
         - "P09 ADM-532 Conditional Approval & Approval Conditions"
         - "P09 ADM-534 Escalation, Delegation & Approval SLA Management"
         - "P09 ADM-535 Live AI Execution Oversight & Human Intervention"
+        - "P09 ADM-536 Human Override & Manual Control Center"
         - "P09 ADM-546 Execution & Business Outcome Trace"
         - "P16 ANL-009 AI Assistant & Action Center"
       x-ticvai-agreed: '29 September: AI system design 2.3 actions; our build plan, shape follows listProposedActions'
@@ -6631,7 +6632,7 @@ paths:
     get:
       operationId: getEntityRisk
       x-ticvai-consumed-by:
-        - "P08 ADM-633 Fraud Alert, Investigation & Case Management\t170"
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management"
         - "P08 ADM-637 AI Fraud, Anomaly & Payment Intelligence Center"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk; our build plan, shape follows getAiPolicy'
       summary: Current risk of an entity
@@ -6716,7 +6717,7 @@ paths:
     post:
       operationId: backtestRiskStrategy
       x-ticvai-consumed-by:
-        - "P08 ADM-638 Payment Executive Intelligence, Risk Simulator & AI Advisor\t176"
+        - "P08 ADM-638 Payment Executive Intelligence, Risk Simulator & AI Advisor"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk; our build plan, shape follows simulateRecommendationStrategy'
       summary: Backtest a draft strategy
       description: 'What the draft would have done over a past window at the same review rate: recall, precision
@@ -6770,7 +6771,7 @@ paths:
       operationId: listRiskAlerts
       x-ticvai-consumed-by:
         - "P08 BO-1160 Fraud Alert & Investigation Case Management"
-        - "P08 ADM-633 Fraud Alert, Investigation & Case Management\t170"
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management"
         - "P08 ADM-637 AI Fraud, Anomaly & Payment Intelligence Center"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk; our build plan, shape follows listProposedActions'
       summary: Risk alerts
@@ -6864,7 +6865,7 @@ paths:
       operationId: decideRiskAlert
       x-ticvai-consumed-by:
         - "P08 BO-1160 Fraud Alert & Investigation Case Management"
-        - "P08 ADM-633 Fraud Alert, Investigation & Case Management\t170"
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk; our build plan, shape follows decideProposedAction'
       summary: Dismiss, monitor, mark false positive, or escalate
       description: 'An analyst''s disposition. `falsePositive` is a label the next candidate model learns from (design
@@ -6932,7 +6933,7 @@ paths:
       operationId: createRiskCase
       x-ticvai-consumed-by:
         - "P08 BO-1160 Fraud Alert & Investigation Case Management"
-        - "P08 ADM-633 Fraud Alert, Investigation & Case Management\t170"
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk; our build plan, shape follows createAiConversation'
       summary: Open an investigation
       description: 'A case from one or more alerts or entities (AIP-150). The alerts'' assessments are attached
@@ -7021,7 +7022,7 @@ paths:
       operationId: getRiskCase
       x-ticvai-consumed-by:
         - "P08 BO-1160 Fraud Alert & Investigation Case Management"
-        - "P08 ADM-633 Fraud Alert, Investigation & Case Management\t170"
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk; our build plan, shape follows getAiPolicy'
       summary: A case with its evidence and actions
       description: 'The case, its evidence (each labelled source, derived or model-inferred), proposed actions and
@@ -7059,7 +7060,7 @@ paths:
     post:
       operationId: addRiskCaseEvidence
       x-ticvai-consumed-by:
-        - "P08 ADM-633 Fraud Alert, Investigation & Case Management\t170"
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk; our build plan, shape follows recordSuggestionOutcome'
       summary: Add evidence to a case
       description: 'Stored in `jsonb` and as an immutable Blob copy (AIP-155). Evidence is never edited; a correction
@@ -7108,7 +7109,7 @@ paths:
     get:
       operationId: expandRiskNetwork
       x-ticvai-consumed-by:
-        - "P08 ADM-633 Fraud Alert, Investigation & Case Management\t170"
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk, 2.4; our build plan, shape follows getAiPolicy'
       summary: Expand the relationship graph around an entity
       description: '**Bounded 1 to 3 hops** over shared devices, tokens and accounts (AIP-111). The result is capped
@@ -7177,7 +7178,7 @@ paths:
     post:
       operationId: proposeRiskAction
       x-ticvai-consumed-by:
-        - "P08 ADM-633 Fraud Alert, Investigation & Case Management\t170"
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk, 3.8; our build plan, shape follows generateConfiguration'
       summary: Propose a restrictive action from a case
       description: '**Restrictive actions go to the owning module through the action pipeline, never straight from
@@ -7257,7 +7258,7 @@ paths:
       operationId: closeRiskCase
       x-ticvai-consumed-by:
         - "P08 BO-1160 Fraud Alert & Investigation Case Management"
-        - "P08 ADM-633 Fraud Alert, Investigation & Case Management\t170"
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk, 3.2 events; our build plan, shape follows decideProposedAction'
       summary: Close a case with an outcome
       description: 'Confirmed fraud, not fraud, or inconclusive: **alert, case and confirmed fraud stay distinct**
@@ -8405,6 +8406,7 @@ paths:
       operationId: searchAiDecisions
       x-ticvai-consumed-by:
         - "P09 ADM-498 AI Configuration Audit & Governance"
+        - "P09 ADM-536 Human Override & Manual Control Center"
         - "P09 ADM-537 Approval & Intervention History / Decision Timeline"
         - "P09 ADM-539 AI Explainability & Audit Command Center"
         - "P09 ADM-540 AI Decision Explorer & Search"
@@ -9606,6 +9608,7 @@ paths:
     get:
       operationId: getAiVenueSettings
       x-ticvai-consumed-by:
+        - "P08 BO-927 AI Staffing Requirement Forecast"
         - "P09 ADM-489 AI Configuration Readiness Center"
         - "P16 ANL-071 AI Maturity & Learning"
       x-ticvai-agreed: '29 September: AI functions review (baseline then learn), packageFindings 7; shape follows getAiPolicy'
@@ -9641,6 +9644,7 @@ paths:
     put:
       operationId: setAiVenueSettings
       x-ticvai-consumed-by:
+        - "P08 BO-927 AI Staffing Requirement Forecast"
         - "P09 ADM-471 Venue & Business Model Discovery"
         - "P09 ADM-489 AI Configuration Readiness Center"
         - "P16 ANL-071 AI Maturity & Learning"

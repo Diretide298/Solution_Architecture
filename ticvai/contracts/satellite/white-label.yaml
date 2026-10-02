@@ -878,6 +878,7 @@ paths:
       operationId: getTenantConfig
       x-ticvai-consumed-by:
         - "P08 BO-834 Digital Experience Center"
+        - "P09 ADM-018 Interface Languages"
         - "P13 CMS-001 Tenant Workspace"
         - "P13 CMS-011 Translations"
         - "P13 CMS-012 RTL Preview"
@@ -2295,7 +2296,6 @@ paths:
     get:
       operationId: listFaqs
       x-ticvai-consumed-by:
-        - "P09 ADM-018 Localisation & Language Pack"
         - "P12 SUP-006 Knowledge Base Search"
       x-ticvai-audience:
       - staff
@@ -2336,8 +2336,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setFaqs
-      x-ticvai-consumed-by:
-        - "P09 ADM-018 Localisation & Language Pack"
+      x-ticvai-consumed-by: []
       x-ticvai-audience:
       - staff
       summary: Set FAQ categories and entries
@@ -2385,7 +2384,6 @@ paths:
       operationId: listPolicies
       x-ticvai-consumed-by:
         - "P08 BO-748 Consent Capture & Versions"
-        - "P09 ADM-018 Localisation & Language Pack"
         - "P13 CMS-018 Consent & Legal"
       x-ticvai-audience:
       - staff
@@ -2438,7 +2436,6 @@ paths:
     put:
       operationId: setPolicy
       x-ticvai-consumed-by:
-        - "P09 ADM-018 Localisation & Language Pack"
         - "P13 CMS-018 Consent & Legal"
       x-ticvai-audience:
       - staff

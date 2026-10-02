@@ -1796,6 +1796,8 @@ screens:
     - what: The theme and brand forms here omit surfaceStyle, buttonStyle, componentColours, logoVariant and the intro video, and send splashChangeScope.
       why: A stale copy of the tenant editors; platform staff would save a theme that silently drops the tenant's per-element colours.
       source: [screens/P13-white-label-cms.yaml#CMS-005, screens/P13-white-label-cms.yaml#CMS-004]
+      status: fixed
+      by: CHG-SBO-014
     - what: Purpose says "for this venue" and entry parameters bannerId, pageId and policyKind.
       why: Branding is per tenant; the parameters are left from the bulk attach.
       source: screens/P09-platform-admin-console.yaml#ADM-016
@@ -1804,6 +1806,8 @@ screens:
     - what: F102 hands over from the tenant's CMS-006 to this console screen as step 4.
       why: A tenant's journey never continues on the platform console.
       source: F102 step 3
+      status: logged
+      by: CHG-SBO-020
     decisions:
     - question: May platform staff publish a tenant's site, or only prepare the draft for the tenant to publish?
       decision: 'Hosted with TICVAI: platform staff may publish a tenant''s site under a grant. Self-hosted: the venue uses
@@ -1841,6 +1845,8 @@ screens:
     - what: openQuestions says "No contract — not specified".
       why: The domain operations exist since 24 August.
       source: contracts/satellite/white-label.yaml#claimCustomDomain
+      status: fixed
+      by: CHG-SBO-014
     - what: F103 "A tenant claims a domain" runs on this platform screen.
       why: The tenant claims on CMS-017; ADM-017 is the support path.
       source: [F103 step 1, screens/P13-white-label-cms.yaml#CMS-017]
@@ -1898,9 +1904,13 @@ screens:
     - what: The name says Localisation & Language Pack and the content is FAQs and policies.
       why: A platform language pack (adding a new interface language as configuration, DI-083) has no operation; FAQs and policies are tenant content that also live on CMS-018.
       source: [DI-083, screens/P13-white-label-cms.yaml#CMS-018]
+      status: fixed
+      by: CHG-SBO-014
     - what: formSetPolicy has no kind selector and the screen sends effectiveFrom, which setPolicy's body does not declare as required.
       why: setPolicy is keyed by the policyKind path parameter; the form must ask for the kind.
       source: contracts/satellite/white-label.yaml#setPolicy
+      status: fixed
+      by: CHG-SBO-014
     decisions:
     - question: Which screen adds a new interface language (UI strings) for the platform?
       decision: A tenant can add or select interface languages beyond English and Arabic.
@@ -2366,6 +2376,8 @@ screens:
     - what: tasks.csv schedules a Block A frontend task for BO-839 (Surendra, createContentBlock) while the screen says it is merged into CMS-008 and later.
       why: Either the task moves to CMS-008 (which then needs createContentBlock) or it is removed; today the content-block editor exists only on a merged id.
       source: [screens/P08-venue-back-office.yaml#BO-839, DI-996, MATRIX 22.10.18]
+      status: logged
+      by: CHG-SBO-020
     sampleData:
       routesTo: CMS-008
     openQuestions: []

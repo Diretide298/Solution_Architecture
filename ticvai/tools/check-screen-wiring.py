@@ -57,6 +57,9 @@ RULES = {
 # Partner (P10), accreditation-applicant (P11), developer (P14) and sign-up (P17) surfaces are not staff.
 STAFF_CODES = ("P04", "P06", "P07", "P08", "P09", "P12", "P13", "P15", "P16")
 STAFF_OK = {"staff", "public", "anonymous"}
+# The TICVAI Console's tenant picker and platform-staff grant (audit R098, CHG-SBO-001): the frame every console
+# screen acting in a tenant carries, left out of the duplicate-screen signature (S-DUP-SCREEN).
+CONSOLE_FRAME = {"listTenants", "openPlatformStaffGrant", "listOwnPlatformStaffGrants"}
 # **Generator purposes.** The 18 August generator wrote one of these when a screen had no purpose of its own,
 # and board imports pasted the board's title with its date. Each reads like a purpose and says nothing a
 # designer can act on; several were copied between screens (CHG-WIR-003).
@@ -156,8 +159,11 @@ def main() -> int:
         if needs_file and not any(re.search(r"(upload|presign|createMediaAsset|createAsset)", o, re.I) for o in op_ids):
             guard.add("S-UPLOAD", sid, f"{sid}: {needs_file[0]} takes a file reference and the screen uploads nothing")
         # --- R276 duplicate screens ------------------------------------------------------------
-        if len(op_ids) >= 2:
-            sigs.setdefault((plat, frozenset(op_ids)), []).append(sid)
+        # The console's grant frame is not the screen's job (CHG-SBO-001): it says nothing about whether two
+        # screens duplicate each other, so it is left out of the signature.
+        own_ops = op_ids - CONSOLE_FRAME
+        if len(own_ops) >= 2:
+            sigs.setdefault((plat, frozenset(own_ops)), []).append(sid)
         # --- R254 R042 the consumed-by mirror --------------------------------------------------
         for o in sorted(op_ids):
             f = ops.get(o)

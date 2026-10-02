@@ -6362,6 +6362,8 @@ screens:
         '
       why: Plumbing on a user's screen; the UI rule forbids ids and field names as labels.
       source: screens/P08-venue-back-office.yaml#BO-020 | R254
+      status: fixed
+      by: CHG-SBO-008
     - what: '"Save kitchen stations" (setKitchenStations) and the kitchen-station table (listKitchenStations) are on the
         order desk.
 
@@ -6394,9 +6396,13 @@ screens:
 
         '
       source: contracts/satellite/fnb.yaml#cancelFnbOrder | R125 | R222
+      status: fixed
+      by: CHG-SBO-008
     - what: The no-access state names the permission key ORDER_VIEW (the same pattern on every screen in this part).
       why: Permission keys are never user-facing; say "You don't have access to F&B orders — ask your venue manager".
       source: screens/P08-venue-back-office.yaml#BO-020 | designer default
+      status: fixed
+      by: CHG-SBO-008
     decisions:
     - question: Which outlets accept guest orders automatically, and where is that configured?
       decision: 'Drawn default stands (answer: "Default / recommended accepted"): Show Accept only on orders still in Ordered;
@@ -6497,9 +6503,13 @@ screens:
         '
       why: The frame mapping is wrong; the designer must not take RET-3A as this screen's layout.
       source: F81 step 1 | screens/P08-venue-back-office.yaml#BO-021
+      status: fixed
+      by: CHG-SBO-008
     - what: Navigation exits to POS-002 "Sell — Ticket Catalogue" carrying orderId (from F81).
       why: A back-office search does not open a till's sell screen on another device; follows from the wrong RET-3A mapping.
       source: F81 step 1 | R251
+      status: logged
+      by: CHG-SBO-020
     decisions:
     - question: Is Order Search F&B-only, or every order at the venue (tickets, retail, F&B — one cart, one receipt)?
       decision: 'Drawn default stands (answer: "Default / recommended accepted"): Draw it venue-wide with a module chip on
@@ -7212,6 +7222,8 @@ screens:
     - what: Text fields "Venue id" and "Kind"; columns id, venueId, stockLocationId, costCenterId.
       why: Plumbing; venue comes from the session, stock location and cost centre are names.
       source: screens/P08-venue-back-office.yaml#BO-044
+      status: fixed
+      by: CHG-SBO-008
     - what: 'The outlet has no type/service model or department link: OutletKind is restaurant/bar/cafe/kiosk/…, while DI-319
         types outlets (fine dining, quick service, coffee) to switch features and links each to department, sub-department,
         cost centre and status.
@@ -7219,13 +7231,19 @@ screens:
         '
       why: The "type switches panels" rule has no field to read; only the template (BO-730) carries a service model.
       source: DI-319 | contracts/spine/tenancy.yaml#/components/schemas/Outlet | contracts/satellite/fnb.yaml#setOutletTemplate
+      status: fixed
+      by: CHG-SBO-008
     - what: No-access state is keyed to PRODUCT_VIEW (getFnbDeliveryPolicy) although the list is listOutlets (SCOPE_VIEW).
       why: The state names the wrong gate and a permission key.
       source: screens/P08-venue-back-office.yaml#BO-044
+      status: fixed
+      by: CHG-SBO-008
     - what: BO-044 duplicates the client pack's BO-728 Outlet Management and BO-729 Create / Edit Outlet; R276 did not decide
         this pair.
       why: Two outlet registers will be built unless one is merged into the other.
       source: R276 | DI-319
+      status: fixed
+      by: CHG-SBO-021
     decisions:
     - question: Are outlet names bilingual (English and Arabic)?
       decision: 'Outlet names: English, plus the local language where the country requires it.'
@@ -7429,6 +7447,8 @@ screens:
       why: Nothing a user reads may be an id or a raw field; draw the outlet picker, the in-force control and the list described
         above.
       source: screens/P08-venue-back-office.yaml#BO-045 | R254
+      status: fixed
+      by: CHG-SBO-008
     - what: The "Last allergen verdict" panel says the contract exposes no read of the automatic verdict; getAllergenVerification
         now exists (it names BO-045 and BO-111) and is not declared on the screen.
       why: Without it the panel only ever shows a manual re-check, which undoes R241's automatic check.
@@ -7459,6 +7479,8 @@ screens:
         verdicts; frames fnb-2a, 2e, 2j, 2k); BO-109 is the arranging canvas opened from a menu ("Open in builder"), with
         no menu list of its own and one hub entry.
       source: DI-671 | DI-987 | DI-474 | screens/P08-venue-back-office.yaml#BO-109
+      status: fixed
+      by: CHG-SBO-008
     decisions:
     - question: Where is an F&B price owned? MenuItem.price says pricing and tax come from the catalogue variant ("a menu
         is a presentation of the catalogue"), yet applyMenuActions reprices menu items and FNB-2J shows price changes as menu
@@ -7750,6 +7772,8 @@ screens:
         '
       why: These leak plumbing. They must be pickers and plain labels.
       source: screens/P08-venue-back-office.yaml#BO-048 | R254
+      status: fixed
+      by: CHG-SBO-008
     - what: The primary button is "Lookup merchandise" (the shop-floor price check).
       why: 'On a back-office product list, search covers lookup. The primary act is adding an item. The price check belongs
         to the till and the handheld.
@@ -7779,6 +7803,8 @@ screens:
 
         '
       source: F17 step 3 | F17 step 5 | R251
+      status: logged
+      by: CHG-SBO-020
     decisions:
     - question: 'Should a merchandise item require a stock link? Sales are gated on system stock per venue, and an unlinked
         item cannot be gated.
@@ -8570,6 +8596,8 @@ screens:
       why: Venue configuration (variance threshold, F&B limits, refund policy) is needed by every tenant, including one
         without ticketing; it is core.
       source: screens/P08-venue-back-office.yaml#BO-065 | DI-505
+      status: fixed
+      by: CHG-SBO-003
     - what: 'The main list is "Every dining outlet" from listDiningOutlets (a guest read that returns only outlets open
         now) with an "Open now" toggle and an "Ordering method" text filter.
 
@@ -8584,6 +8612,8 @@ screens:
         '
       why: The configured limits, hours, biometrics, segregated access and alerting need real sections.
       source: screens/P08-venue-back-office.yaml#BO-065 | R094
+      status: fixed
+      by: CHG-SBO-008
     - what: 'The cash settings agreed for this screen have no field anywhere: opening-float entry mode (total or by denomination,
         per venue), cash-drawer ceiling, approval required on open/close, mandatory bag number and deposit-box allocation
         (which openShift says "the venue configures"), and the expected float approveShiftOpen compares against.
@@ -8591,6 +8621,8 @@ screens:
         '
       why: DI-306/307/274 and openShift's conditional rules have nowhere to be set.
       source: DI-306 | DI-307 | DI-274 | contracts/spine/shift.yaml#openShift | contracts/spine/shift.yaml#approveShiftOpen
+      status: fixed
+      by: CHG-SBO-008
     - what: Exit to BO-008 Product Detail & Variants; module "Orders & Money".
       why: Derived navigation with no meaning; venue configuration belongs with the venue settings, not orders.
       source: R251 | screens/P08-venue-back-office.yaml#BO-065
@@ -9257,9 +9289,13 @@ screens:
         '
       why: A second pack size (carton and case of the same item) cannot be expressed.
       source: DI-343 | contracts/satellite/inventory.yaml#/components/schemas/CreateInventoryItemRequest
+      status: logged
+      by: CHG-SBO-005
     - what: The item master has no "item type" and no status beyond active.
       why: The client listed category, item type, status and UOM as the item master's fields.
       source: DI-343 | contracts/satellite/inventory.yaml#/components/schemas/InventoryItem
+      status: logged
+      by: CHG-SBO-005
     - what: 'The update operation cannot change barcode, purchase unit, factor, perishable, shelf life or allow-negative-stock.
 
         '
@@ -9268,6 +9304,8 @@ screens:
 
         '
       source: contracts/satellite/inventory.yaml#updateInventoryItem
+      status: logged
+      by: CHG-SBO-005
     - what: 'Stock locations can be created but never renamed, moved in the tree or deactivated. "Transit" is offered as
         a kind a user can create.
 
@@ -9277,12 +9315,16 @@ screens:
 
         '
       source: DI-345 | contracts/satellite/inventory.yaml#createStockLocation | contracts/satellite/inventory.yaml#createStockTransfer
+      status: logged
+      by: CHG-SBO-005
     - what: 'The filters are text fields "Venue id" and "Category id". An "Every stock location" table with raw columns
         sits beside the item table.
 
         '
       why: The venue comes from the session. Locations belong on their own tab as a tree.
       source: screens/P08-venue-back-office.yaml#BO-081
+      status: fixed
+      by: CHG-SBO-008
     decisions:
     - question: Offer only weighted average and FIFO (agreed), or also standard cost and last purchase price (in the contract)?
       decision: 'Drawn default stands (answer: "Default / recommended accepted"): Two options.'
@@ -9397,6 +9439,8 @@ screens:
 
         '
       source: DI-363 | contracts/satellite/inventory.yaml#/components/schemas/CreateStockMovementRequest
+      status: logged
+      by: CHG-SBO-005
     - what: An "Every order" table (sales orders) and a "Create stock transfer" button sit on the ledger.
       why: 'Attached through F35 step 7 (sourcing orders from another store). On a ledger they are noise. Sourcing belongs
         with transfers and the order screens.
@@ -9411,9 +9455,13 @@ screens:
         '
       why: A manual movement after the return would count the same item twice.
       source: F34 step 8 | contracts/satellite/retail.yaml#createRetailReturn
+      status: logged
+      by: CHG-SBO-020
     - what: The item, location and kind filters are text fields ("Item id", "Location id", "Kind").
       why: These leak plumbing. Use pickers and a kind multi-select in words.
       source: screens/P08-venue-back-office.yaml#BO-082
+      status: fixed
+      by: CHG-SBO-008
   BO-083:
     summary: 'Suppliers is the tenant''s supplier master, read-only at venue level, together with what each supplier quoted,
       their contracts and their performance. The one thing to get right is ownership. Suppliers are created and edited at
@@ -9794,14 +9842,20 @@ screens:
         sale board" modal collecting id, code, venueId, kind and pages.
       why: The canvas is the input; nobody types a board's pages.
       source: screens/P08-venue-back-office.yaml#BO-109 | R254
+      status: fixed
+      by: CHG-SBO-008
     - what: Two sources of the till order. setMenuSections says its sequence is the sequence on the sale board, while updateSaleBoard
         stores its own pages and tiles (by catalogue variant, not menu item).
       why: The builder cannot tell which one the F&B till follows; one must govern (and a tile by variant cannot show menu-item
         availability or modifier prompts).
       source: contracts/satellite/fnb.yaml#setMenuSections | contracts/spine/tenancy.yaml#/components/schemas/SaleBoard
+      status: logged
+      by: CHG-SBO-005
     - what: The sale-board tile has no size or span, and a sale board is per venue, not per outlet.
       why: DI-326 (agreed) asks for configurable button sizes and a layout per outlet; FNB-2B draws Span.
       source: DI-326 | contracts/spine/tenancy.yaml#/components/schemas/SaleBoard | screens/P08-venue-back-office.yaml#BO-109
+      status: logged
+      by: CHG-SBO-005
     - what: emptyFirstRun says the screen offers no create action, yet createSaleBoard exists (on BO-124).
       why: An outlet with no board yet cannot start from the builder.
       source: contracts/spine/tenancy.yaml#createSaleBoard | screens/P08-venue-back-office.yaml#BO-124
@@ -9811,6 +9865,8 @@ screens:
         on seven screens).
       why: Consolidate - BO-109 as the canvas opened from BO-045, sharing one designer with BO-124/BO-125.
       source: DI-671 | DI-987 | DI-474 | DI-157
+      status: fixed
+      by: CHG-SBO-008
     - what: Purpose is a placeholder ("from the client design board, 20 August").
       why: Write the purpose - arrange one outlet's menu and till grid for the next publish.
       source: screens/P08-venue-back-office.yaml#BO-109
@@ -9915,20 +9971,30 @@ screens:
     - what: The "Save recipe" modal collects costPerPortion.
       why: Cost per portion is computed and read-only (R125 (9)); a cost sent is ignored.
       source: R125 | contracts/satellite/fnb.yaml#setRecipe
+      status: fixed
+      by: CHG-SBO-008
     - what: Plumbing - "Menu item id" text field and a table "Every recipe" with menuItemId and the ingredients array as
         columns; two search fields.
       why: Users find a dish by name; ingredients are lines, not a column.
       source: screens/P08-venue-back-office.yaml#BO-110 | R254
+      status: fixed
+      by: CHG-SBO-008
     - what: The client frame for this screen (fnb-2f, "Recipe & BOM Costing") is mapped to BO-137; BO-110 has no board frame.
       why: The designer would draw BO-110 from nothing and BO-137 from the wrong frame.
       source: screens/P08-venue-back-office.yaml#BO-110 | screens/P08-venue-back-office.yaml#BO-137
+      status: fixed
+      by: CHG-SBO-008
     - what: Recipe yield allows 0 (minimum 0) although cost is divided by yield; waste % per line and recipe versions (both
         on FNB-2F) have no field or read; there is no way to remove a recipe.
       why: A zero yield breaks the cost; DI-329 and the frame ask for waste-adjusted costing and version history.
       source: contracts/satellite/fnb.yaml#/components/schemas/Recipe | DI-329 | screens/P08-venue-back-office.yaml#BO-110
+      status: logged
+      by: CHG-SBO-005
     - what: BO-110 and BO-111 both save the recipe (setRecipe) as separate screens under Sell.
       why: One dish's recipe, substitutions and allergens are one editing job; merge as tabs (Recipe | Substitutions & allergens).
       source: DI-987 | DI-474 | screens/P08-venue-back-office.yaml#BO-111
+      status: fixed
+      by: CHG-SBO-021
     decisions:
     - question: How is a sub-recipe (Burger Sauce SUB-0071) modelled - as an inventory item produced by a production run and
         used as an ingredient line?
@@ -10027,10 +10093,14 @@ screens:
         strings); listIngredientSubstitutes is used by no screen.
       why: The same rule kept twice will disagree; keep one model and one operation pair.
       source: contracts/satellite/fnb.yaml#setSubstitutionRules | contracts/satellite/fnb.yaml#setIngredientSubstitutes
+      status: logged
+      by: CHG-SBO-005
     - what: '"Needs approval" default contradicts itself - setSubstitutionRules says it defaults true wherever the swap
         changes an allergen; SubstitutionRule.requiresApproval defaults false.'
       why: The default decides whether an allergen-changing swap can be used unapproved.
       source: contracts/satellite/fnb.yaml#/components/schemas/SubstitutionRule
+      status: logged
+      by: CHG-SBO-005
     - what: Recipe fields as raw text fields (menuItemId, yield, ingredients, costPerPortion) and a "Save menu" (updateMenu
         - name, service period, active) action.
       why: updateMenu has nothing to do with allergens (attached by name, R254); recipe editing belongs to BO-110; cost
@@ -10048,6 +10118,8 @@ screens:
         be declared although the verdict reports shared equipment.'
       why: The screen cannot do what its name says, and the cross-contact claim has nowhere to live.
       source: contracts/satellite/fnb.yaml#/components/schemas/Nutrition | contracts/satellite/fnb.yaml#/components/schemas/Allergen
+      status: logged
+      by: CHG-SBO-005
     - what: Pattern configEditor (form) and the transition to BO-045 labelled "The draft is scheduled for Monday rather
         than published now"; F31 step 3 cites updateMenu for the re-verification.
       why: It is a per-dish detail screen; the way back is "Back to the menu"; re-verification is automatic after the change
@@ -10154,6 +10226,8 @@ screens:
         screen is FnB Board 2 fnb-2m ("Production Planning & Sheets"), which is mapped to BO-136.
       why: The title match went to the wrong board; the designer would draw a retail assortment grid.
       source: screens/P08-venue-back-office.yaml#BO-112
+      status: fixed
+      by: CHG-SBO-008
     - what: buildProductionPlan and releaseProductionPlan are declared on BO-136, not here; F85 step 1 lands planning on
         BO-136.
       why: Planning is this screen's job (DI-329 scopes BO-112); move both operations here.
@@ -10163,10 +10237,14 @@ screens:
     - what: No read of plans exists (no list or get of production plans).
       why: A draft plan cannot be reopened, edited or released after the page is left.
       source: contracts/satellite/fnb.yaml#/components/schemas/ProductionPlan
+      status: logged
+      by: CHG-SBO-005
     - what: The form exposes id, recipeId, producingOutletId, forOutletIds, status, actualQuantity and varianceReason as
         text fields.
       why: Ids and status are server or client plumbing; actual quantity and variance belong to completing a run (BO-138).
       source: screens/P08-venue-back-office.yaml#BO-112 | R254
+      status: fixed
+      by: CHG-SBO-008
     - what: The transition to BO-009 (Pricing Rules) cites flow F78 step 3 to 4, but F78 has no BO-112 step.
       why: The navigation edge is invented; remove it.
       source: F78 step 3 | screens/P08-venue-back-office.yaml#BO-112
@@ -10177,6 +10255,8 @@ screens:
       why: Consolidate into one Production screen with tabs Plan | Commissary | Batches, consumption staying with stock
         (DI-987, DI-671).
       source: DI-987 | DI-671
+      status: fixed
+      by: CHG-SBO-021
     decisions:
     - question: Is the printed prep sheet a browser print of the station view, or does it need a print operation and template?
       decision: Prep sheets print from a print template, to kitchen printers and the browser.
@@ -12738,6 +12818,8 @@ screens:
 
         '
       source: contracts/spine/shift.yaml#setDenominations | contracts/spine/tenancy.yaml#updateRegionSettings | screens/P08-venue-back-office.yaml#BO-1065
+      status: fixed
+      by: CHG-SBO-003
     - what: No read of the region's settings is declared (getRegionSettings), while updateRegionSettings replaces the whole
         record.
       why: The form cannot show current values and a save would reset fields it never loaded (e.g. allowed AI residencies).
@@ -12750,12 +12832,18 @@ screens:
         '
       why: The name promises a function the screen cannot perform; sales-channel set-up is a separate, venue-level capability.
       source: screens/P08-venue-back-office.yaml#BO-1065 | TRACKER Workshops/Actions row 195
+      status: logged
+      by: CHG-SBO-005
     - what: The purpose asks for week start and daylight-saving behaviour; RegionSettings has neither field.
       why: Week start needs a field or comes out of the purpose; DST follows from the IANA zone.
       source: contracts/spine/tenancy.yaml#/components/schemas/RegionSettings
+      status: logged
+      by: CHG-SBO-005
     - what: The layout has no content region (only Save/Cancel) because the pack page gave no fields.
       why: The screen cannot be drawn from its definition; the fields above are the contract's.
       source: screens/P08-venue-back-office.yaml#BO-1065
+      status: fixed
+      by: CHG-SBO-008
     decisions:
     - question: Is a week-start setting needed (Saturday/Sunday/Monday) for reports and calendars?
       decision: 'Drawn default stands (answer: "Default / recommended accepted"): Not drawn.'

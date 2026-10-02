@@ -1,0 +1,138 @@
+id: CHG-SBO-023
+date: '2026-10-02'
+source: cr
+kind: spec
+summary: 'After the workshop-pack move: the console drops its exits to moved screens, BO-009 says "higher number wins", BO-441
+  is core, screen names lose the tab and pack page number (with a check-screens rule), ADM-241 declares the canvas, the F147/F165
+  edges are drawn, BO-1081 links to ANL-072, BO-043 runs F74 step 4, F85 calls the catalogue bulk edit and the P17 twins take
+  the empty-state and venue-type fixes.'
+decision:
+  what: Apply the lead's follow-ups of 2 October to P08 and P09 and keep the P17 twins identical.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'The lead, 2 October 2026, relaying Chinmay''s decisions: DEC-100 (CHG-MOV-001), DEC-101 (price-list priority), DEC-219
+  (CHG-SOT-008), CHG-MOV-004 (names), CHG-MOV-009/CHG-SOT-020 (canvas), CHG-SOT-021 (edges), CHG-SOT-001 (F74), CHG-FUP-011
+  (bulk edit), CHG-SOT-017 (twins).'
+keys_touched:
+  screens:
+  - ADM-002
+  - ADM-088
+  - ADM-241
+  - ADM-248
+  - ADM-319
+  - ADM-381
+  - ADM-559
+  - ADM-560
+  - ADM-561
+  - ADM-562
+  - ADM-563
+  - ADM-564
+  - ADM-565
+  - ADM-566
+  - ADM-567
+  - ADM-568
+  - ADM-569
+  - ADM-571
+  - ADM-572
+  - ADM-573
+  - ADM-574
+  - ADM-575
+  - ADM-576
+  - ADM-577
+  - ADM-578
+  - ADM-579
+  - ADM-580
+  - ADM-583
+  - ADM-585
+  - ADM-586
+  - ADM-588
+  - ADM-589
+  - ADM-590
+  - ADM-591
+  - ADM-592
+  - ADM-593
+  - ADM-594
+  - ADM-595
+  - ADM-596
+  - ADM-597
+  - ADM-598
+  - ADM-599
+  - ADM-600
+  - ADM-601
+  - ADM-602
+  - ADM-604
+  - ADM-605
+  - ADM-606
+  - ADM-607
+  - ADM-608
+  - ADM-609
+  - ADM-610
+  - ADM-611
+  - ADM-612
+  - ADM-613
+  - ADM-614
+  - ADM-615
+  - ADM-616
+  - ADM-617
+  - ADM-618
+  - ADM-619
+  - ADM-620
+  - ADM-621
+  - ADM-622
+  - ADM-623
+  - ADM-624
+  - ADM-625
+  - ADM-626
+  - ADM-627
+  - ADM-628
+  - ADM-629
+  - ADM-630
+  - ADM-631
+  - ADM-632
+  - ADM-633
+  - ADM-634
+  - ADM-635
+  - ADM-636
+  - ADM-638
+  - BO-007
+  - BO-009
+  - BO-043
+  - BO-1081
+  - BO-391
+  - BO-441
+  flows:
+  - F85
+  files:
+  - tools/check-screens.py
+  - screens/P17-ticvai-signup.yaml
+  other:
+  - 'P17 twins synced: SGN-001, SGN-003, SGN-004, SGN-006, SGN-007, SGN-008, SGN-009, SGN-010, SGN-011, SGN-012, SGN-013,
+    SGN-014, SGN-015, SGN-022'
+root_class: A25 PROSE-QUALITY
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-BO-007
+  - APP-SETUP-BO-009
+  - APP-SETUP-BO-441
+  - VM-BO-043
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screens.py
+status: open
+notes: 'check-screens gains the rule "a screen name carries no tab (real or escaped) and the pack page number after it" (closes
+  CHG-MOV-004; fails on the parent commit on 75 names, passes after). The consumed-by lines of the renamed screens lose the
+  same artefact (only the consumed-by lines are touched). The P17 twins are copied field by field from their P09 twins, keeping
+  their own emptyNoAccess, as tools/applied/apply-subscription-placement.py does.
+
+  - BO-1081: BO-1081: a link card to ANL-072 (DEC-219)
+
+  - SGN-003: SGN-003: venue types are a choice on ADM-381, copied to SGN-003
+
+
+  Batch SBO (screens-p08-p09, phase B), 2 October 2026; worktree D:/wt/screens-p08-p09, branch screens-p08-p09. Tickets: none
+  started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched screen. Applied with
+  the screen files'' own dump settings (width 100).'

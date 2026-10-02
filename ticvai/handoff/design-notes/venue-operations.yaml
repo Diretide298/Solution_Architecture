@@ -4150,6 +4150,8 @@ screens:
     - what: '"Venue id" text field filter'
       why: Venue comes from the session (VO-R09).
       source: ADR-0030
+      status: fixed
+      by: CHG-SBO-009
     - what: >-
         Many screens (BO-006, BO-031, BO-032, BO-033, BO-034, BO-035, BO-038) have inferred exits to this screen
       why: Leftover from when BO-001 was the back-office entry point; those edges should be removed.
@@ -4733,14 +4735,20 @@ screens:
     - what: Create and Save overlays list `id` (and `scopePath`) as required inputs
       why: The contract says id is server-assigned and ignored in the body; scopePath is the server's.
       source: contracts/spine/access.yaml#/components/schemas/AdmissionRules
+      status: fixed
+      by: CHG-SBO-009
     - what: Table and detail panel bind only the eleven old columns (and show id, scopePath)
       why: >-
         The profile now carries entryLimit, exitScan, re-entry, validity, crossover, reEntryVerification and ruleConditions
         (29 September close-out); the editor must cover them or BO-156/158/160 have nowhere to edit.
       source: contracts/spine/access.yaml#/components/schemas/AdmissionRules
+      status: fixed
+      by: CHG-SBO-009
     - what: Labels "Every admission rules", "Create admission rules", "Save admission rules"
       why: Generated placeholders; the business noun is "Admission profile" (New profile, Save profile).
       source: screens/P08-venue-back-office.yaml#BO-156 | DI-039
+      status: fixed
+      by: CHG-SBO-009
     decisions:
     - question: Should an edit to a profile already used by issued tickets be effective-dated (apply from a chosen date) rather
         than at the next package refresh?
@@ -4825,6 +4833,8 @@ screens:
     - what: Columns show addedByPrincipalId and scopePath
       why: Spec leakage; show the person's name.
       source: screens/P08-venue-back-office.yaml#BO-156 | DI-039
+      status: fixed
+      by: CHG-SBO-009
   BO-034:
     summary: >-
       The gate log for the venue: every scan with when, where, what was presented, the outcome and the reason, and
@@ -5083,9 +5093,13 @@ screens:
     - what: No calendar component; a table with date pickers
       why: Every calendar has day, week and month views (VO-R01).
       source: DI-907 | DI-919
+      status: fixed
+      by: CHG-SBO-009
     - what: Filters are principal and department id text fields; no navigation in or out (inferred, none)
       why: Pickers; the rota should be reachable from People & Access Rights and link to attendance (BO-056).
       source: screens/P08-venue-back-office.yaml#BO-055
+      status: fixed
+      by: CHG-SBO-009
   BO-056:
     summary: >-
       Attendance against the rota: who clocked in and out, where, late starts, no-shows and who covered, with supervisor
@@ -5212,9 +5226,13 @@ screens:
     - what: Filter text fields "Under" and "Level" for org units
       why: Ids and enum values typed by hand; draw a tree with a level filter.
       source: contracts/spine/tenancy.yaml#listOrgUnits
+      status: fixed
+      by: CHG-SBO-009
     - what: venueId is a required create field
       why: Comes from the session (VO-R03, VO-R09).
       source: contracts/spine/access.yaml#createAccessPoint
+      status: fixed
+      by: CHG-SBO-009
   BO-066:
     summary: >-
       Despite its name, this screen publishes staff announcements (operational, safety, emergency, HR, celebration)
@@ -5363,6 +5381,8 @@ screens:
     - what: Filters are id text fields (Venue id, Category id, Status)
       why: Category and status are pickers; venue comes from the session.
       source: ADR-0030 | screens/P08-venue-back-office.yaml#BO-156 | DI-039
+      status: fixed
+      by: CHG-SBO-009
     - what: Duplicate of BO-031
       why: See BO-031; keep this one.
       source: screens/P08-venue-back-office.yaml#BO-031
@@ -6787,9 +6807,13 @@ screens:
         The pack says the group calculates entries, exits, current occupancy, throughput and capacity; the read
         returns only name, members and parent.
       source: screens/P08-venue-back-office.yaml#BO-151 | contracts/spine/access.yaml#listAccessLocationGrouping
+      status: logged
+      by: CHG-SBO-005
     - what: Request body requires id and scopePath
       why: Server-owned (VO-R03).
       source: contracts/spine/access.yaml#setAccessPointGroup
+      status: logged
+      by: CHG-SBO-005
   BO-152:
     summary: >-
       The venue's access calendar: normal operating days, weekends, holidays, seasons, private events, free-entry
@@ -7275,6 +7299,8 @@ screens:
         ADR-0068 replaces free-text conditions with one closed JSON rule format evaluated identically online and
         offline; the screen cannot offer free text.
       source: ADR-0068 | contracts/spine/access.yaml#setVisualAccessRule
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         No read is bound, so the builder cannot open an existing rule; content region is empty (pack "gives nothing
         that can be drawn")
@@ -7288,6 +7314,8 @@ screens:
     - what: ruleId is required in the write
       why: A new rule has no id yet (VO-R03).
       source: contracts/spine/access.yaml#setVisualAccessRule
+      status: logged
+      by: CHG-SBO-005
     decisions:
     - question: Is the AI rule-drafting prompt in Block A scope, or drawn and disabled until the AI engine ships?
       decision: 'Drawn default accepted: Draw the prompt box enabled, with the drafted rule always requiring review.'
@@ -8181,10 +8209,14 @@ screens:
         The pack gives a closed set of conditions with AND / AND-OR; free strings cannot be evaluated the same on
         device and server.
       source: screens/P08-venue-back-office.yaml#BO-166 | ADR-0068
+      status: logged
+      by: CHG-SBO-005
     - what: Content region is an empty unbound table and the save button has no permission
       why: The read exists (listCredentialActivationDisplay); bind it, and gate Save on ACCESS_POINT_CONFIGURE.
       source: >-
         contracts/spine/access.yaml#listCredentialActivationDisplay | contracts/spine/access.yaml#setCredentialActivationDisplay
+      status: fixed
+      by: CHG-SBO-009
     decisions:
     - question: Beacon-first or app-generated dynamic QR (and GPS geofencing as well)?
       decision: 'Drawn default accepted: Offer both triggers with AND/OR as the pack shows.'
@@ -8277,14 +8309,20 @@ screens:
         profile (required, optional, off); a venue-wide policy cannot vary by profile.
       source: >-
         screens/P08-venue-back-office.yaml#BO-167 | contracts/spine/access.yaml#setDeviceBindingPolicy | contracts/spine/access.yaml#listDigitalCredentialSecurity
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         Table labelled "Every device binding session" and the detail panel headings taken from the pack's example
         sentences ("Credential active on Device A")
       why: Generated placeholders; title "Device bindings" (VO-R12).
       source: screens/P08-venue-back-office.yaml#BO-167
+      status: fixed
+      by: CHG-SBO-009
     - what: The contract still says "Deactivate binding (no operation yet)"
       why: releaseCredentialDevice is that operation; the description is stale.
       source: contracts/spine/access.yaml#listDeviceBindingSession
+      status: logged
+      by: CHG-SBO-005
     decisions:
     - question: Is the binding policy per venue or per credential profile (day tickets vs annual passes)?
       decision: 'Drawn default accepted: Draw the venue policy with a greyed "Per profile" option.'
@@ -8351,6 +8389,8 @@ screens:
         Name and id are text, threshold is a number, health is read-only; Venue/Attraction/Zone are level choices
         for the geofence, not actions.
       source: screens/P08-venue-back-office.yaml#BO-168 | contracts/spine/access.yaml#setBleBeaconGeofence
+      status: fixed
+      by: CHG-SBO-009
     - what: Write-only screen; no read of registered beacons or geofences
       why: Without a list read the registry cannot be shown or edited; a list operation is needed.
       source: contracts/spine/access.yaml#setBleBeaconGeofence
@@ -8361,6 +8401,8 @@ screens:
         write
       why: Placement should be ids from the topology; device-reported fields do not belong in a write.
       source: contracts/spine/access.yaml#/components/schemas/BleBeaconGeofenceConfigurationInput
+      status: logged
+      by: CHG-SBO-005
   BO-169:
     summary: >-
       Sets how a digital ticket may be transferred: whether allowed, how many times, the deadline, before first
@@ -9910,9 +9952,13 @@ screens:
     - what: The write has no product, membership or segment ids - only the kind (selectType)
       why: A "Ticket product" profile that does not name which product cannot be applied at a gate.
       source: contracts/spine/access.yaml#setBiometricVerificationProfile
+      status: logged
+      by: CHG-SBO-005
     - what: profileId is required and venueId is a required string
       why: A new row has no id; the venue is the session's (VO-R03).
       source: contracts/spine/access.yaml#setBiometricVerificationProfile
+      status: logged
+      by: CHG-SBO-005
   BO-186:
     summary: >-
       Configures persistent Face Pass enrolment: the channels (TICVAI app, ticket counter, annual pass counter,
@@ -9994,11 +10040,15 @@ screens:
       source: >-
         screens/P08-venue-back-office.yaml#BO-186 | contracts/spine/access.yaml#enrolFacePass | contracts/spine/access.yaml#setFacePassEnrollment
         | DI-641
+      status: fixed
+      by: CHG-SBO-009
     - what: >-
         A selectField labelled "→" (an arrow from the pack's journey) and booleans drawn as selectFields; Number
         of capture attempts as a textField
       why: Generated artefacts; toggles, a stepper and the journey strip.
       source: screens/P08-venue-back-office.yaml#BO-186
+      status: fixed
+      by: CHG-SBO-009
     - what: Write-only (no read of the current configuration)
       why: The form must open pre-filled (VO-R04).
       source: contracts/spine/access.yaml#setFacePassEnrollment
@@ -10161,11 +10211,15 @@ screens:
         Generated artefacts from the pack's arrow diagram; replace with the journey strip and the profile list from
         listFaceTagTemporary.
       source: screens/P08-venue-back-office.yaml#BO-188
+      status: fixed
+      by: CHG-SBO-009
     - what: Face Tag capture at the entry gate conflicts with enrolFacePass's "never at a gate" rule
       why: >-
         That rule is for Face Pass; make sure the Face Tag enrolment operation is separate and allows the gate,
         as the pack and MoM say.
       source: screens/P08-venue-back-office.yaml#BO-188 | contracts/spine/access.yaml#enrolFacePass | DI-641
+      status: fixed
+      by: CHG-SBO-009
     decisions:
     - question: What is the lawful maximum retention for Face Tags and failed captures?
       decision: Biometric capture and retention need the guest's consent first, on the venue's own consent form. Where TICVAI
@@ -10229,6 +10283,8 @@ screens:
         Booleans, numbers and a closed set need toggles, steppers and a select; the decision bands are the point
         of the screen.
       source: screens/P08-venue-back-office.yaml#BO-189 | contracts/spine/access.yaml#setFaceMatchingVerification
+      status: fixed
+      by: CHG-SBO-009
   BO-190:
     summary: >-
       Guards against a guest replacing the face on a credential with someone else's: a re-enrolment is compared
@@ -11407,14 +11463,20 @@ screens:
     - what: All six controls are selectFields (reason, emergency code, automatic notification)
       why: Booleans and a code need toggles and a masked text field.
       source: contracts/spine/access.yaml#/components/schemas/AccessGateModePolicy
+      status: fixed
+      by: CHG-SBO-009
     - what: Bulk activation across a gate group has no operation
       why: >-
         The pack's bulk command needs a group mode operation (or a defined batch of setTurnstileMode with one audit
         record).
       source: screens/P08-venue-back-office.yaml#BO-201
+      status: logged
+      by: CHG-SBO-005
     - what: Body requires id and scopePath
       why: Server-owned (VO-R03).
       source: contracts/spine/access.yaml#setGateModePolicy
+      status: logged
+      by: CHG-SBO-005
   BO-202:
     summary: >-
       The configuration package and guest-facing screen content for a group of gate devices, deployed remotely in
@@ -14116,16 +14178,24 @@ screens:
         becomes switchable or reversible gates are modelled as two access points.
       source: >-
         screens/P08-venue-back-office.yaml#BO-230 | R221 | DI-648 | contracts/spine/access.yaml#setTurnstileMode
+      status: fixed
+      by: CHG-SBO-009
     - what: No Change mode action is drawn; only Cancel gate mode change
       why: setTurnstileMode is bound but nothing triggers it.
       source: screens/P08-venue-back-office.yaml#BO-230
+      status: fixed
+      by: CHG-SBO-009
     - what: The bulk command has no operation (one call per gate)
       why: Five gates must change together with one audited command, as on BO-201.
       source: screens/P08-venue-back-office.yaml#BO-231 | contracts/spine/access.yaml#setTurnstileMode
+      status: logged
+      by: CHG-SBO-005
     - what: The pack's modes Group, Fast Pass, Re-entry and Crossover
       why: These are lane types or directions, not operating modes; the mode list is the six of R221.
       source: >-
         screens/P08-venue-back-office.yaml#BO-230 | contracts/spine/access.yaml#/components/schemas/AccessPointOperatingMode
+      status: fixed
+      by: CHG-SBO-009
     decisions:
     - question: Can a gate's direction be switched live (Entry to Exit), as the client asked on 2 Sep?
       decision: A gate's direction can be switched live (Entry to Exit) with a specific permission, and the switch is logged.
@@ -17070,9 +17140,13 @@ screens:
       why: >-
         Free strings cannot drive validation or be shown consistently; each model needs an agreed closed set.
       source: screens/P08-venue-back-office.yaml#BO-335 | contracts/spine/access.yaml#setVirtualTicketIdentity
+      status: logged
+      by: CHG-SBO-005
     - what: Write-only; no read of the current configuration
       why: The form cannot open with current values (VO-R04).
       source: contracts/spine/access.yaml#setVirtualTicketIdentity
+      status: logged
+      by: CHG-SBO-005
     decisions:
     - question: What are the allowed values of ticket classification, ownership model, holder assignment, consumption model
         and entitlement model?
@@ -20142,17 +20216,25 @@ screens:
         The pack lists a closed set of three values for a grid column; it is a chip column and a select in the editor,
         and the label is a sample value.
       source: screens/P08-venue-back-office.yaml#BO-396
+      status: fixed
+      by: CHG-SBO-009
     - what: Type, Reader type, Wallet enabled and Redemption have no contract field on Game
       why: >-
         Game carries code, name, zone, reader, creditCost, points and status only; no attractionTypeId, wallet or
         redemption flag, so four of the pack's columns and filters cannot be bound.
       source: contracts/satellite/games.yaml#/components/schemas/Game
+      status: logged
+      by: CHG-SBO-005
     - what: apisNote says cloneGame is "still owed by a contract change"
       why: cloneGame was added on 29 September and is in the contract; the note is stale.
       source: contracts/satellite/games.yaml#cloneGame | screens/P08-venue-back-office.yaml#BO-395
+      status: fixed
+      by: CHG-SBO-009
     - what: Activate/Deactivate from the pack actions is missing from the action bar
       why: It is updateGame on status and the pack lists it as a directory action.
       source: screens/P08-venue-back-office.yaml#BO-396
+      status: fixed
+      by: CHG-SBO-009
     decisions:
     - question: Is the directory venue-scoped only, or does a group operator need a cross-venue catalogue (all parks of Yas
         Leisure Group)?
@@ -36765,6 +36847,8 @@ screens:
       why: >-
         createResource, updateResource, setResourceLifecycleState and cloneResource are all bound; the note is stale.
       source: screens/P08-venue-back-office.yaml#BO-857
+      status: fixed
+      by: CHG-SBO-009
     - what: >-
         Most of the pack's profile (short name, image, barcode/QR, external reference, business unit, department,
         owner, responsible manager, cost centre, building, floor, zone, GPS, hourly and daily cost, replacement
@@ -36775,12 +36859,18 @@ screens:
         qualifications, deposit and status; the rest would have to be attribute definitions or new fields.
       source: >-
         screens/P08-venue-back-office.yaml#BO-857 | contracts/satellite/resources.yaml#/components/schemas/Resource
+      status: logged
+      by: CHG-SBO-005
     - what: createResource marks id as a required input
       why: Server-assigned (VO-R03).
       source: contracts/satellite/resources.yaml#createResource
+      status: logged
+      by: CHG-SBO-005
     - what: Cleaning window from/to are textFields; operational settings are selectFields
       why: Times need time pickers (HH:MM venue time); durations need number fields with units.
       source: screens/P08-venue-back-office.yaml#BO-857
+      status: fixed
+      by: CHG-SBO-009
     - what: >-
         Resource.status (available, booked, checkedOut, maintenance, retired) and the lifecycle state are two different
         machines with overlapping words
@@ -36789,6 +36879,8 @@ screens:
         read-only.
       source: >-
         contracts/satellite/resources.yaml#/components/schemas/Resource | contracts/satellite/resources.yaml#/components/schemas/ResourceLifecycleState
+      status: fixed
+      by: CHG-SBO-009
   BO-858:
     summary: >-
       Lets the tenant extend resource records with its own typed fields (skill level, languages, seating capacity,
@@ -37114,9 +37206,13 @@ screens:
     - what: Every field (package code, name, description, effective dates, internal cost) is a selectField
       why: Text, dates, money and a component table need their own controls.
       source: screens/P08-venue-back-office.yaml#BO-861
+      status: fixed
+      by: CHG-SBO-009
     - what: Write bodies carry id and scopePath
       why: Server-owned (VO-R03).
       source: contracts/satellite/resources.yaml#createResourcePackage
+      status: logged
+      by: CHG-SBO-005
   BO-862:
     summary: >-
       Where a resource may operate - its primary venue, any secondary venues, whether it is pooled and bookable
@@ -37527,15 +37623,21 @@ screens:
         Exceptions", "Inheritance")
       why: Headings and examples became fields; the schedule is a week grid with exceptions.
       source: screens/P08-venue-back-office.yaml#BO-866
+      status: fixed
+      by: CHG-SBO-009
     - what: A per-resource Time zone field
       why: >-
         The region owns the time zone and venues inherit it (ADR-0011 position 4); a resource cannot have its own.
       source: ADR-0011
+      status: fixed
+      by: CHG-SBO-009
     - what: Inheritance (tenant > venue > department > type > resource) has no operation or field
       why: >-
         The pack requires inherited availability with overrides; setResourceSchedule stores only the resource's
         own pattern.
       source: screens/P08-venue-back-office.yaml#BO-867 | contracts/satellite/resources.yaml#setResourceSchedule
+      status: logged
+      by: CHG-SBO-005
   BO-867:
     summary: >-
       How finely a resource's time can be cut and the limits on a booking of it - slot length, booking increment,
@@ -37843,9 +37945,13 @@ screens:
       why: Cleaning, inspection, travel, break, private use and custom cannot be recorded faithfully.
       source: >-
         screens/P08-venue-back-office.yaml#BO-870 | contracts/satellite/resources.yaml#/components/schemas/ResourceBlock
+      status: logged
+      by: CHG-SBO-005
     - what: Each block type is drawn as its own selectField
       why: Type is one choice per block.
       source: screens/P08-venue-back-office.yaml#BO-870
+      status: fixed
+      by: CHG-SBO-009
   BO-871:
     summary: >-
       Several events and experiences that run at the same time, compared side by side for the resources they all
@@ -38401,6 +38507,8 @@ screens:
     - what: Minimum / Preferred / Mandatory drawn as three action buttons; empty content region
       why: They are a strength attribute on each requirement row.
       source: screens/P08-venue-back-office.yaml#BO-877
+      status: fixed
+      by: CHG-SBO-009
     - what: setResourceQualifications (a person's certificates) bound on a rule screen
       why: Recording a person's qualifications is BO-098/BO-876; this screen defines requirements.
       source: contracts/satellite/resources.yaml#setResourceQualifications
@@ -38409,6 +38517,8 @@ screens:
     - what: No operation stores the expiry behaviour (warn, prevent, cancel, override)
       why: The pack requires it to be configurable.
       source: screens/P08-venue-back-office.yaml#BO-877
+      status: logged
+      by: CHG-SBO-005
   BO-878:
     summary: >-
       When an individual staff resource normally works - one or more working patterns (Peak season Mon-Fri 08:00-18:00,
@@ -41114,16 +41224,22 @@ screens:
         faulty, notReturned. Cleaning required, Maintenance required and Unsafe have no value.
       source: >-
         screens/P08-venue-back-office.yaml#BO-911 | contracts/satellite/maintenance.yaml#/components/schemas/InspectionOutcome
+      status: logged
+      by: CHG-SBO-005
     - what: Next inspection, frequency per resource, responsible person and compliance status have no source
       why: >-
         Frequency is on the template; nothing schedules an inspection per resource or names a responsible person.
         A plan whose task carries an inspection template could, if plans may target resources.
       source: >-
         contracts/satellite/maintenance.yaml#/components/schemas/InspectionTemplate | contracts/satellite/maintenance.yaml#/components/schemas/MaintenancePlan
+      status: logged
+      by: CHG-SBO-005
     - what: Result values used as action-bar buttons ("Passed with Observation", "Failed", "Evidence")
       why: >-
         Sample values from the pack used as labels; results are a choice inside the inspection, evidence is a section.
       source: screens/P08-venue-back-office.yaml#BO-911
+      status: fixed
+      by: CHG-SBO-009
     decisions:
     - question: Do resource inspections use the maintenance inspection model (asset register) for every bookable resource,
         which needs each resource to have an asset record?

@@ -1,0 +1,63 @@
+id: CHG-SBO-011
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: The open Block A design-note corrections of the platform foundation process on P08 and P09 are applied on the screens
+  (labels, controls, bindings, layouts, purposes), with the decisions of 2 October on the same screens.
+decision:
+  what: Apply every open Block A correction of handoff/design-notes/platform-foundation that a screen change can fix; log
+    the ones that need a contract or another owner.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Phase B brief (2 October 2026): apply the OPEN corrections of Block A and B screens, Block A first; design-note corrections
+  (platform-foundation), 1-2 October 2026. Decisions of 2 October recorded on the same screens are cited by their DEC ids
+  in each screen''s notes. Each item is a design-note correction on a screen; audit roots R250, R254 and R276; the notes were
+  recorded by CHG-NOTE-001..009.'
+keys_touched:
+  screens:
+  - ADM-005
+  - ADM-342
+  - ADM-354
+  - ADM-412
+  - BO-054
+  - BO-084
+  - BO-085
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ADM-005
+  - APP-SETUP-ADM-342
+  - APP-SETUP-ADM-354
+  - APP-SETUP-ADM-412
+  - APP-SETUP-BO-054
+  - VM-BO-084
+  - VM-BO-085
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: '- ADM-005: emptyFirstRun offers Add licence add on as the create action.
+
+  - ADM-342: getGuestVerificationPolicy and setGuestVerificationPolicy (guest identity-document checks) on a staff MFA screen.
+
+  - ADM-354: Eight selectFields with no binding (system name, direction, authentication, mappings, error handling, sync mode).
+
+  - ADM-412: Purpose is "Configure how TICVAI collects its fees", and the only write is the tenant''s setPaymentProvider (venue
+  scope). | The gaps entry says the screen declares no write. | setPaymentProvider is configured per venue, but the picker
+  chooses only a tenant.
+
+  - BO-054: entryState reads campaignId.
+
+  - BO-084: Table columns include rerouteOnNoApprover, outOfOfficeDelegateId, allowEmailApproval, reopenedFrom, subjectContract,
+  subjectType, scopePath. | Status and kind filters are free text fields.
+
+  - BO-085: Pattern approvalInbox with the full queue table and filters, the same layout as BO-084.
+
+
+  Batch SBO (screens-p08-p09, phase B), 2 October 2026; worktree D:/wt/screens-p08-p09, branch screens-p08-p09. Tickets: none
+  started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched screen. Applied with
+  the screen files'' own dump settings (width 100).'

@@ -1268,6 +1268,7 @@ paths:
       operationId: listEnvironments
       x-ticvai-consumed-by:
         - "P09 ADM-028 Environment Registry"
+        - "P09 ADM-700 Configuration Promotion"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica

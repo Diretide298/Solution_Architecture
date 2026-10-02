@@ -1,0 +1,61 @@
+id: CHG-SBO-012
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: The open Block A design-note corrections of the finance process on P08 and P09 are applied on the screens (labels,
+  controls, bindings, layouts, purposes), with the decisions of 2 October on the same screens.
+decision:
+  what: Apply every open Block A correction of handoff/design-notes/finance-insights that a screen change can fix; log the
+    ones that need a contract or another owner.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Phase B brief (2 October 2026): apply the OPEN corrections of Block A and B screens, Block A first; design-note corrections
+  (finance-insights), 1-2 October 2026. Decisions of 2 October recorded on the same screens are cited by their DEC ids in
+  each screen''s notes. Each item is a design-note correction on a screen; audit roots R250, R254 and R276; the notes were
+  recorded by CHG-NOTE-001..009.'
+keys_touched:
+  screens:
+  - ADM-031
+  - BO-029
+  - BO-074
+  - BO-075
+  - BO-077
+  - BO-133
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ADM-031
+  - APP-SETUP-BO-029
+  - APP-SETUP-BO-074
+  - APP-SETUP-BO-075
+  - APP-SETUP-BO-077
+  - APP-SETUP-BO-133
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: '- ADM-031: The purpose ("the screen this app sits on; everything else is entered from here") is the console home''s
+  purpose.
+
+  - BO-029: The no-access state names the venue report-view permission, and the screen loads a P&L. | A second report builder
+  in the back office.
+
+  - BO-074: Filters are typed ids ("Legal entity id") and a type text field.
+
+  - BO-075: The purpose says "which product or movement posts to which account". | The mapping set is drawn as tiles and a
+  table with a single "Save" that takes only the mappings. | The create-exemption form asks for an id.
+
+  - BO-077: The queue "Waiting for a decision" binds exchange rates. | The set-rate form offers server-owned fields (id, source,
+  set-by, provider reference, fetched at) and omits the note. | The screen is wave 2 while it is in the Block A set-up tickets.
+
+  - BO-133: The queue is the refused entries, but the decision button is "Decide approval request". | The workstation filter
+  is a typed id.
+
+
+  Batch SBO (screens-p08-p09, phase B), 2 October 2026; worktree D:/wt/screens-p08-p09, branch screens-p08-p09. Tickets: none
+  started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched screen. Applied with
+  the screen files'' own dump settings (width 100).'

@@ -1355,6 +1355,7 @@ paths:
     get:
       operationId: listDashboards
       x-ticvai-consumed-by:
+        - "P08 BO-1081 Finance Dashboard"
         - "P09 ADM-031 Security & Compliance Dashboard"
         - "P16 ANL-021 Dashboard Library"
         - "P16 ANL-068 Embedded BI, Workspace & Tenant Administration"

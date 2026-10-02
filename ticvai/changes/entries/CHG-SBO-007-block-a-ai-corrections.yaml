@@ -1,0 +1,73 @@
+id: CHG-SBO-007
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: The open Block A design-note corrections of the AI process on P08 and P09 are applied on the screens (labels, controls,
+  bindings, layouts, purposes), with the decisions of 2 October on the same screens.
+decision:
+  what: Apply every open Block A correction of handoff/design-notes/ai that a screen change can fix; log the ones that need
+    a contract or another owner.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Phase B brief (2 October 2026): apply the OPEN corrections of Block A and B screens, Block A first; design-note corrections
+  (ai), 1-2 October 2026. Decisions of 2 October recorded on the same screens are cited by their DEC ids in each screen''s
+  notes. Each item is a design-note correction on a screen; audit roots R250, R254 and R276; the notes were recorded by CHG-NOTE-001..009.'
+keys_touched:
+  screens:
+  - ADM-037
+  - ADM-508
+  - ADM-523
+  - ADM-526
+  - ADM-528
+  - ADM-554
+  - ADM-556
+  - BO-091
+  - BO-927
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ADM-037
+  - APP-SETUP-ADM-508
+  - APP-SETUP-ADM-523
+  - APP-SETUP-ADM-526
+  - APP-SETUP-ADM-528
+  - APP-SETUP-ADM-554
+  - APP-SETUP-ADM-556
+  - APP-SETUP-BO-091
+  - APP-SETUP-BO-927
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: '- ADM-037: emptyFirstRun says "Offers no create action - this screen declares no operation that makes one".
+
+  - ADM-508: The table and detail columns are lifted from a board image ("Saturday Walk-In", "4%", "MODEL REVIEW RECOMMENDED"),
+  bound to no operation. | module Analytics -> AI (forecasting is an AI capability); requiresModule stays core on the console
+  (check-console-grant C-CORE)
+
+  - ADM-523: The actionBar has buttons Analyze, Recommend, Generate, Prepare, Create, Modify, Delete, Publish, all unbound.
+
+  - ADM-526: Two dataTables, one unlabelled, both bound to getEffectiveAiPolicy with no columns; no exceptions list operation.
+
+  - ADM-528: The "Publish AI governance policy" button is bound to no operation (op None) though publishAiGovernancePolicy
+  is declared.
+
+  - ADM-554: Layout has an unbound table, an unlabelled primary button and a publishGate with no operation.
+
+  - ADM-556: Buttons labelled "Revalidate thresholds Fraud Team 15 Sep Pending" and "Run control test Governance 15 Sep Pending".
+
+  - BO-091: The main dataTable is "Every index failure" (listIndexFailures) with job id and stage filters. | The policy form
+  carries retainInteractionsDays. | The form exposes engine tuning (retrieveTopK, rerankTopK, semanticCacheThreshold, negativeCacheTtlSeconds,
+  chunking, quantisation, hnsw, cascade).
+
+  - BO-927: The layout has an unbound dataTable, a primaryButton with no label and an inline productivity textField; no operation
+  sets a standard here.
+
+
+  Batch SBO (screens-p08-p09, phase B), 2 October 2026; worktree D:/wt/screens-p08-p09, branch screens-p08-p09. Tickets: none
+  started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched screen. Applied with
+  the screen files'' own dump settings (width 100).'

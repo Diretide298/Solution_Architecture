@@ -1,0 +1,46 @@
+id: CHG-SBO-014
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: The open Block A design-note corrections of the white label process on P08 and P09 are applied on the screens (labels,
+  controls, bindings, layouts, purposes), with the decisions of 2 October on the same screens.
+decision:
+  what: Apply every open Block A correction of handoff/design-notes/white-label that a screen change can fix; log the ones
+    that need a contract or another owner.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Phase B brief (2 October 2026): apply the OPEN corrections of Block A and B screens, Block A first; design-note corrections
+  (white-label), 1-2 October 2026. Decisions of 2 October recorded on the same screens are cited by their DEC ids in each
+  screen''s notes. Each item is a design-note correction on a screen; audit roots R250, R254 and R276; the notes were recorded
+  by CHG-NOTE-001..009.'
+keys_touched:
+  screens:
+  - ADM-016
+  - ADM-017
+  - ADM-018
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-WL-ADM-016
+  - APP-WL-ADM-017
+  - APP-WL-ADM-018
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: '- ADM-016: The theme and brand forms here omit surfaceStyle, buttonStyle, componentColours, logoVariant and the intro
+  video, and send splashChangeScope.
+
+  - ADM-017: openQuestions says "No contract — not specified".
+
+  - ADM-018: The name says Localisation & Language Pack and the content is FAQs and policies. | moot: setPolicy left this
+  screen (policies are edited on CMS-018)
+
+
+  Batch SBO (screens-p08-p09, phase B), 2 October 2026; worktree D:/wt/screens-p08-p09, branch screens-p08-p09. Tickets: none
+  started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched screen. Applied with
+  the screen files'' own dump settings (width 100).'

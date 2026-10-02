@@ -461,8 +461,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1081 Finance Dashboard"
         - "P08 BO-1172 Finance Validation, Reporting & Audit Center"
-        - "P08 ADM-627 Reconciliation Audit, Trace & Evidence Center\t149"
-        - "P08 ADM-628 Reconciliation Simulator, Forecast & AI Operations Advisor\t150"
+        - "P08 ADM-627 Reconciliation Audit, Trace & Evidence Center"
+        - "P08 ADM-628 Reconciliation Simulator, Forecast & AI Operations Advisor"
         - "P16 ANL-072 Finance Dashboard"
       summary: Every money source against the ledger, in one view
       description: '4.2.19. **Reconciliation was per provider and the question is not per provider.**
@@ -524,7 +524,7 @@ paths:
     post:
       operationId: recordSettlement
       x-ticvai-consumed-by:
-        - "P08 ADM-626 Settlement Posting, Finance Handoff & Close Manager\t148"
+        - "P08 ADM-626 Settlement Posting, Finance Handoff & Close Manager"
       x-ticvai-audience:
       - staff
       summary: One entity paid another
@@ -2570,8 +2570,8 @@ paths:
         - "P08 BO-025 Chargebacks & Disputes"
         - "P08 BO-043 Daily Reconciliation"
         - "P08 BO-101 Orders & Money"
-        - "P09 ADM-619 Reconciliation & Settlement Command Center\t139"
-        - "P08 ADM-623 Settlement & Payout Manager\t144"
+        - "P09 ADM-619 Reconciliation & Settlement Command Center"
+        - "P08 ADM-623 Settlement & Payout Manager"
         - "P10 PTR-014 Settlement & Payment History"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
@@ -2623,7 +2623,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-025 Chargebacks & Disputes"
         - "P08 BO-043 Daily Reconciliation"
-        - "P08 ADM-620 Reconciliation Source & Import Manager\t141"
+        - "P08 ADM-620 Reconciliation Source & Import Manager"
         - "P10 PTR-014 Settlement & Payment History"
       x-ticvai-api-scope: partner.write
       x-ticvai-audience:
@@ -2772,7 +2772,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-025 Chargebacks & Disputes"
         - "P08 BO-043 Daily Reconciliation"
-        - "P08 ADM-622 Reconciliation Exception & Investigation Center\t143"
+        - "P08 ADM-622 Reconciliation Exception & Investigation Center"
         - "P10 PTR-014 Settlement & Payment History"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
@@ -2819,7 +2819,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-025 Chargebacks & Disputes"
         - "P08 BO-043 Daily Reconciliation"
-        - "P08 ADM-622 Reconciliation Exception & Investigation Center\t143"
+        - "P08 ADM-622 Reconciliation Exception & Investigation Center"
         - "P10 PTR-014 Settlement & Payment History"
       x-ticvai-api-scope: partner.write
       x-ticvai-audience:
@@ -3316,7 +3316,6 @@ paths:
       operationId: getFinancialReport
       x-ticvai-consumed-by:
         - "P04 POS-008 Reports"
-        - "P08 BO-029 Report Builder"
         - "P08 BO-058 Reporting Home"
         - "P08 BO-059 Sales Reports"
         - "P08 BO-060 Attendance & Footfall"

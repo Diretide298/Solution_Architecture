@@ -1,0 +1,33 @@
+id: CHG-SBO-026
+date: '2026-10-02'
+source: cr
+kind: design-input
+summary: BO-192 and BO-629 retention periods (faces, failed captures, documents) wait for the UAE/GCC research and counsel;
+  nothing is applied on the screens.
+decision:
+  what: Apply nothing until the research proposes defaults marked "pending counsel".
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, critical set 1 (DEC-240, DEC-459: needs-research); APPLY-BRIEF: a needs-research decision gets an open entry
+  and nothing applied. CHG-CSA-032, CHG-CSP-041.'
+keys_touched:
+  screens:
+  - BO-192
+  - BO-629
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-design-notes.py
+status: open
+notes: 'Open until the research lands.
+
+
+  Batch SBO (screens-p08-p09, phase B), 2 October 2026; worktree D:/wt/screens-p08-p09, branch screens-p08-p09. Tickets: none
+  started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched screen. Applied with
+  the screen files'' own dump settings (width 100).'

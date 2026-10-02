@@ -954,10 +954,14 @@ screens:
       why: Building and saving need the report-management permission; statutory statements are not part of a report
         builder.
       source: screens/P08-venue-back-office.yaml#BO-029 | contracts/satellite/reporting.yaml#createReport
+      status: fixed
+      by: CHG-SBO-012
     - what: A second report builder in the back office.
       why: The 8 September decision is one consolidated, permission-based reporting area, not duplicated screens
         in each module.
       source: DI-721 | DI-702
+      status: fixed
+      by: CHG-SBO-012
     decisions:
     - question: Do advanced users get SQL or scripting templates (12 August) or is it strictly no-code (8 September)?
       decision: 'Drawn default accepted: No-code only, as the later decision says.'
@@ -1370,6 +1374,8 @@ screens:
     - what: Filters are typed ids ("Legal entity id") and a type text field.
       why: 'Pick lists: the entity switcher and the five account types.'
       source: screens/P08-venue-back-office.yaml#BO-074
+      status: fixed
+      by: CHG-SBO-012
     decisions:
     - question: Must a client's chart be importable from a CSV file?
       decision: 'Drawn default accepted: Draw an "Import" entry point marked later; the contract has no import operation.'
@@ -1452,17 +1458,25 @@ screens:
       why: Mappings are per money event and venue, not per product; the 25 August decision says each product maps
         a GL account code, and the catalogue carries no such field.
       source: screens/P08-venue-back-office.yaml#BO-075 | DI-466 | contracts/spine/finance.yaml#/components/schemas/AccountMapping
+      status: fixed
+      by: CHG-SBO-012
     - what: The mapping set is drawn as tiles and a table with a single "Save" that takes only the mappings.
       why: The save replaces the region's whole set; the design needs the full editable set and a change preview.
       source: contracts/spine/finance.yaml#setAccountMappings
+      status: fixed
+      by: CHG-SBO-012
     - what: The create-exemption form asks for an id.
       why: The exemption id is server-owned; the client never sends it.
       source: contracts/spine/finance.yaml#/components/schemas/TaxExemption
+      status: fixed
+      by: CHG-SBO-012
     - what: Two switches decide whether tax is computed before or after discount.
       why: The catalogue tax profile carries the taxable base (discounted or pre-discount price, set per jurisdiction)
         and the finance tax calculation takes a separate venue-policy flag. One of them must be the source of truth.
       source: contracts/spine/catalogue.yaml#setTaxProfileJurisdiction | contracts/spine/finance.yaml#/components/schemas/CalculateTaxRequest
         | DI-598
+      status: fixed
+      by: CHG-FIN-004
     decisions:
     - question: Is a product-level GL code (DI-466) needed, or is event-type mapping enough?
       decision: 'Drawn default accepted: Event-type mapping as contracted; draw no product account picker.'
@@ -1611,14 +1625,20 @@ screens:
     - what: The queue "Waiting for a decision" binds exchange rates.
       why: Rates are not waiting for anyone; the queue is the price variances pending review.
       source: screens/P08-venue-back-office.yaml#BO-077
+      status: fixed
+      by: CHG-SBO-012
     - what: The set-rate form offers server-owned fields (id, source, set-by, provider reference, fetched at) and
         omits the note.
       why: Those are written by the server; the note is required for a manual rate and the call is refused without
         it.
       source: contracts/spine/finance.yaml#setFxRate | R127
+      status: fixed
+      by: CHG-SBO-012
     - what: The screen is wave 2 while it is in the Block A set-up tickets.
       why: Guest multi-currency (WEB-035, wave 1) needs a tender rate to show anything.
       source: screens/P08-venue-back-office.yaml#BO-077 | screens/P01-guest-web-storefront.yaml#WEB-035
+      status: fixed
+      by: CHG-SBO-012
     decisions:
     - question: Should the margin over market be stored, or only the resulting rate?
       decision: 'Drawn default accepted: Only the rate, with the margin stated in the note.'
@@ -1938,9 +1958,13 @@ screens:
       why: The operation that resolves a refused entry exists and is not declared; an approval decision does not
         resolve it.
       source: screens/P08-venue-back-office.yaml#BO-133 | contracts/spine/orders.yaml#resolveSyncRejection
+      status: fixed
+      by: CHG-SBO-012
     - what: The workstation filter is a typed id.
       why: A pick list of the venue's tills.
       source: screens/P08-venue-back-office.yaml#BO-133
+      status: fixed
+      by: CHG-SBO-012
   BO-141:
     summary: 'One queue for operational problems, including stock alerts that should become a requisition. From
       the reporting angle: each alert says what left its range, by how much, where, and since when, and is acknowledged
@@ -2452,6 +2476,8 @@ screens:
       why: DI-721 (agreed) says one permission-based dashboards area, not dashboard screens inside each module;
         DI-260's content stands, its location moves.
       source: DI-721 | DI-260 | screens/P16-venue-analytics.yaml#ANL-013
+      status: fixed
+      by: CHG-SBO-023
     decisions:
     - question: Is Gross sales shown excluding VAT, and are service fees inside it or a separate line?
       decision: 'Drawn default stands (answer: "Excluding VAT; fees on their own line with a footnote"): Draw excluding VAT,
@@ -2784,11 +2810,15 @@ screens:
       why: It was derived from the name; the security dashboard is entered from ADM-002 and is not the app's entry
         point.
       source: screens/P09-platform-admin-console.yaml#ADM-031
+      status: fixed
+      by: CHG-SBO-012
     - what: The operations are generic dashboard create/list/update, gated by a venue report permission, and none
         of the tiles has a metric source.
       why: The metric list has no security measures (second-factor coverage, failed sign-ins, grants, exports);
         the screen says "no contract — not specified".
       source: screens/P09-platform-admin-console.yaml#ADM-031 | contracts/satellite/reporting.yaml#/components/schemas/MetricSource
+      status: logged
+      by: CHG-SBO-005
     decisions:
     - question: Which security measures does the platform compute, and from which logs?
       decision: 'Drawn default accepted: Draw the tiles above as the intended set, marked "awaiting source".'

@@ -384,7 +384,7 @@ paths:
         - "P08 BO-1107 Consumption Priority Engine"
         - "P08 BO-1110 Split Tender & Multi-Credit Consumption"
         - "P08 BO-1112 Consumption Simulator, Validation & Rule Publication"
-        - "P08 ADM-604 Stored Value, Gift Card & Voucher Tender Controls\t97"
+        - "P08 ADM-604 Stored Value, Gift Card & Voucher Tender Controls"
       summary: Which credit is spent first
       tags:
       - wallet
@@ -1206,7 +1206,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1146 Refund-to-Wallet Policy Configuration"
         - "P08 BO-1147 Refund Routing & Credit Restoration Engine"
-        - "P08 ADM-612 Refund Allocation & Original Tender Manager\t119"
+        - "P08 ADM-612 Refund Allocation & Original Tender Manager"
       x-ticvai-conflict-policy: serverWins
       summary: What a refund puts back, and where
       description: 'Boards 7.4 and 7.5. **A refund to a wallet and a refund to a card are different

@@ -1,0 +1,124 @@
+id: CHG-SBO-009
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: The open Block A design-note corrections of the venue operations process on P08 and P09 are applied on the screens
+  (labels, controls, bindings, layouts, purposes), with the decisions of 2 October on the same screens.
+decision:
+  what: Apply every open Block A correction of handoff/design-notes/venue-operations that a screen change can fix; log the
+    ones that need a contract or another owner.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Phase B brief (2 October 2026): apply the OPEN corrections of Block A and B screens, Block A first; design-note corrections
+  (venue-operations), 1-2 October 2026. Decisions of 2 October recorded on the same screens are cited by their DEC ids in
+  each screen''s notes. Each item is a design-note correction on a screen; audit roots R250, R254 and R276; the notes were
+  recorded by CHG-NOTE-001..009.'
+keys_touched:
+  screens:
+  - BO-001
+  - BO-032
+  - BO-033
+  - BO-055
+  - BO-064
+  - BO-069
+  - BO-166
+  - BO-167
+  - BO-168
+  - BO-186
+  - BO-188
+  - BO-189
+  - BO-201
+  - BO-230
+  - BO-395
+  - BO-857
+  - BO-861
+  - BO-866
+  - BO-870
+  - BO-877
+  - BO-911
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-BO-001
+  - APP-SETUP-BO-032
+  - APP-SETUP-BO-033
+  - APP-SETUP-BO-064
+  - APP-SETUP-BO-166
+  - APP-SETUP-BO-168
+  - APP-SETUP-BO-188
+  - APP-SETUP-BO-189
+  - APP-SETUP-BO-201
+  - APP-SETUP-BO-861
+  - APP-SETUP-BO-866
+  - APP-SETUP-BO-870
+  - APP-SETUP-BO-877
+  - VM-BO-055
+  - VM-BO-069
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: '- BO-001: "Venue id" text field filter
+
+  - BO-032: Create and Save overlays list `id` (and `scopePath`) as required inputs | Table and detail panel bind only the
+  eleven old columns (and show id, scopePath) | Labels "Every admission rules", "Create admission rules", "Save admission
+  rules"
+
+  - BO-033: Columns show addedByPrincipalId and scopePath
+
+  - BO-055: No calendar component; a table with date pickers | Filters are principal and department id text fields; no navigation
+  in or out (inferred, none)
+
+  - BO-064: Filter text fields "Under" and "Level" for org units | venueId is a required create field
+
+  - BO-069: Filters are id text fields (Venue id, Category id, Status)
+
+  - BO-166: Content region is an empty unbound table and the save button has no permission
+
+  - BO-167: Table labelled "Every device binding session" and the detail panel headings taken from the pack''s example sentences
+  ("Credential active on Device A")
+
+  - BO-168: Every input is a selectField (Beacon Name, Beacon ID, Proximity threshold, Health) and the action bar has buttons
+  labelled Venue, Attraction, Zone
+
+  - BO-186: decided DEC-236: app, staffed counters and self-service kiosk with consent; not the turnstile (contract aligned
+  by CHG-CSP-021) | A selectField labelled "→" (an arrow from the pack''s journey) and booleans drawn as selectFields; Number
+  of capture attempts as a textField
+
+  - BO-188: A selectField labelled "→" and an empty table | Face Tag capture at the entry gate conflicts with enrolFacePass''s
+  "never at a gate" rule
+
+  - BO-189: Liveness, duplicate check, quality, timeout, retries and mask handling are all selectFields; the two thresholds
+  are missing from the form
+
+  - BO-201: All six controls are selectFields (reason, emergency code, automatic notification)
+
+  - BO-230: decided DEC-255: live direction switch with setAccessPointDirection (CHG-CSP-032) | No Change mode action is drawn;
+  only Cancel gate mode change | The pack''s modes Group, Fast Pass, Re-entry and Crossover
+
+  - BO-395: Redemption drawn as a text field "Redemption Earn / Spend / N/A" | apisNote says cloneGame is "still owed by a
+  contract change" | Activate/Deactivate from the pack actions is missing from the action bar
+
+  - BO-857: The gap note says the screen declares no write | Cleaning window from/to are textFields; operational settings
+  are selectFields | Resource.status (available, booked, checkedOut, maintenance, retired) and the lifecycle state are two
+  different machines with overlapping words
+
+  - BO-861: Every field (package code, name, description, effective dates, internal cost) is a selectField
+
+  - BO-866: Twenty-five selectFields named after the pack bullets (including Time zone and the group headings "Availability
+  Exceptions", "Inheritance") | A per-resource Time zone field
+
+  - BO-870: Each block type is drawn as its own selectField
+
+  - BO-877: Minimum / Preferred / Mandatory drawn as three action buttons; empty content region
+
+  - BO-911: Result values used as action-bar buttons ("Passed with Observation", "Failed", "Evidence")
+
+
+  Batch SBO (screens-p08-p09, phase B), 2 October 2026; worktree D:/wt/screens-p08-p09, branch screens-p08-p09. Tickets: none
+  started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched screen. Applied with
+  the screen files'' own dump settings (width 100).'

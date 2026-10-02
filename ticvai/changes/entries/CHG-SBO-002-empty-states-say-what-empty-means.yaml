@@ -1,0 +1,550 @@
+id: CHG-SBO-002
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: Empty states that promised a create action the screen does not have now say what empty means and offer the action
+  that exists, or none.
+decision:
+  what: Rewrite every Block A/B emptyFirstRun on P08 and P09 that "carries the create action" without a create operation;
+    the P17 twins take the same text.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Design-note corrections (platform-foundation and others), 1-2 October 2026: "emptyFirstRun says it carries the create
+  action, and the screen declares no operation that creates anything" (audit R250).'
+keys_touched:
+  screens:
+  - ADM-002
+  - ADM-009
+  - ADM-010
+  - ADM-013
+  - ADM-014
+  - ADM-024
+  - ADM-025
+  - ADM-026
+  - ADM-027
+  - ADM-029
+  - ADM-033
+  - ADM-034
+  - ADM-035
+  - ADM-036
+  - ADM-318
+  - ADM-319
+  - ADM-326
+  - ADM-329
+  - ADM-337
+  - ADM-338
+  - ADM-339
+  - ADM-344
+  - ADM-345
+  - ADM-348
+  - ADM-349
+  - ADM-350
+  - ADM-351
+  - ADM-356
+  - ADM-357
+  - ADM-358
+  - ADM-359
+  - ADM-360
+  - ADM-361
+  - ADM-362
+  - ADM-363
+  - ADM-364
+  - ADM-366
+  - ADM-367
+  - ADM-368
+  - ADM-369
+  - ADM-370
+  - ADM-371
+  - ADM-372
+  - ADM-373
+  - ADM-375
+  - ADM-376
+  - ADM-377
+  - ADM-378
+  - ADM-379
+  - ADM-381
+  - ADM-382
+  - ADM-384
+  - ADM-385
+  - ADM-386
+  - ADM-387
+  - ADM-388
+  - ADM-389
+  - ADM-397
+  - ADM-399
+  - ADM-400
+  - ADM-401
+  - ADM-402
+  - ADM-403
+  - ADM-406
+  - ADM-407
+  - ADM-414
+  - ADM-416
+  - ADM-418
+  - ADM-423
+  - ADM-424
+  - ADM-425
+  - ADM-426
+  - ADM-427
+  - ADM-449
+  - ADM-450
+  - ADM-451
+  - ADM-452
+  - ADM-454
+  - ADM-456
+  - ADM-457
+  - ADM-458
+  - ADM-459
+  - ADM-460
+  - ADM-465
+  - ADM-466
+  - ADM-468
+  - BO-057
+  - BO-068
+  - BO-084
+  - BO-085
+  - BO-088
+  - BO-122
+  - BO-126
+  - BO-284
+  - BO-293
+  - BO-294
+  - BO-296
+  - BO-297
+  - BO-299
+  - BO-300
+  - BO-302
+  - BO-303
+  - BO-364
+  - BO-365
+  - BO-366
+  - BO-367
+  - BO-368
+  - BO-369
+  - BO-370
+  - BO-371
+  - BO-372
+  - BO-373
+  - BO-375
+  - BO-376
+  - BO-377
+  - BO-378
+  - BO-379
+  - BO-380
+  - BO-381
+  - BO-382
+  - BO-383
+  - BO-384
+  - BO-391
+  - BO-392
+  - BO-393
+  - BO-483
+  - BO-594
+  - BO-595
+  - BO-596
+  - BO-603
+  - BO-604
+  - BO-605
+  - BO-606
+  - BO-607
+  - BO-608
+  - BO-609
+  - BO-610
+  - BO-611
+  - BO-612
+  - BO-613
+  - BO-614
+  - BO-641
+  - BO-691
+  - BO-727
+  - BO-728
+  - BO-732
+  - BO-739
+  - BO-873
+  - BO-940
+  - BO-949
+  - BO-1068
+  - BO-1069
+  - BO-1071
+  - BO-1075
+  - BO-1076
+  - BO-1077
+  - BO-1078
+  - SGN-001
+  - SGN-003
+  - SGN-004
+  - SGN-006
+  - SGN-007
+  - SGN-008
+  - SGN-009
+  - SGN-010
+  - SGN-011
+  - SGN-012
+  - SGN-013
+  - SGN-014
+  - SGN-015
+  - SGN-022
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - VM-BO-068
+  - VM-BO-084
+  - VM-BO-085
+  - VM-BO-122
+  - VM-BO-126
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'check-screen-wiring S-STATE-BOILERPLATE catches the text with no create operation.
+
+  - ADM-002: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-009: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-010: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-013: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-014: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-024: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-025: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-026: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-027: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-029: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-033: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-034: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-035: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-036: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-318: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-319: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-326: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-329: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-337: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-338: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-339: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-344: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-345: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-348: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-349: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-350: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-351: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-356: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-357: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-358: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-359: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-360: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-361: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-362: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-363: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-364: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-366: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-367: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-368: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-369: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-370: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-371: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-372: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-373: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-375: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-376: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-377: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-378: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-379: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-381: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-382: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-384: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-385: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-386: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-387: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-388: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-389: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-397: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-399: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-400: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-401: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-402: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-403: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-406: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-407: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-414: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-416: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-418: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-423: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-424: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-425: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-426: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-427: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-449: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-450: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-451: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-452: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-454: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-456: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-457: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-458: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-459: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-460: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-465: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-466: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - ADM-468: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-057: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-068: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-084: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-085: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-088: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-122: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-126: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-284: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-293: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-294: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-296: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-297: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-299: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-300: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-302: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-303: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-364: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-365: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-366: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-367: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-368: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-369: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-370: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-371: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-372: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-373: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-375: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-376: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-377: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-378: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-379: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-380: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-381: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-382: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-383: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-384: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-391: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-392: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-393: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-483: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-594: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-595: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-596: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-603: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-604: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-605: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-606: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-607: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-608: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-609: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-610: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-611: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-612: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-613: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-614: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-641: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-691: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-727: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-728: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-732: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-739: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-873: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-940: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-949: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-1068: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-1069: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-1071: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-1075: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-1076: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-1077: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - BO-1078: emptyFirstRun says it ''carries the create action'', and the screen declares no operation that creates anything.
+
+  - SGN-001: SGN-001: empty state fixed on its P09 twin ADM-379 and copied (CHG-SOT-017 notes)
+
+  - SGN-003: SGN-003: empty state fixed on its P09 twin ADM-381 and copied (CHG-SOT-017 notes)
+
+  - SGN-004: SGN-004: empty state fixed on its P09 twin ADM-382 and copied (CHG-SOT-017 notes)
+
+  - SGN-006: SGN-006: empty state fixed on its P09 twin ADM-384 and copied (CHG-SOT-017 notes)
+
+  - SGN-007: SGN-007: empty state fixed on its P09 twin ADM-385 and copied (CHG-SOT-017 notes)
+
+  - SGN-008: SGN-008: empty state fixed on its P09 twin ADM-386 and copied (CHG-SOT-017 notes)
+
+  - SGN-009: SGN-009: empty state fixed on its P09 twin ADM-387 and copied (CHG-SOT-017 notes)
+
+  - SGN-010: SGN-010: empty state fixed on its P09 twin ADM-388 and copied (CHG-SOT-017 notes)
+
+  - SGN-011: SGN-011: empty state fixed on its P09 twin ADM-399 and copied (CHG-SOT-017 notes)
+
+  - SGN-012: SGN-012: empty state fixed on its P09 twin ADM-400 and copied (CHG-SOT-017 notes)
+
+  - SGN-013: SGN-013: empty state fixed on its P09 twin ADM-401 and copied (CHG-SOT-017 notes)
+
+  - SGN-014: SGN-014: empty state fixed on its P09 twin ADM-402 and copied (CHG-SOT-017 notes)
+
+  - SGN-015: SGN-015: empty state fixed on its P09 twin ADM-403 and copied (CHG-SOT-017 notes)
+
+  - SGN-022: SGN-022: empty state fixed on its P09 twin ADM-414 and copied (CHG-SOT-017 notes)
+
+
+  Batch SBO (screens-p08-p09, phase B), 2 October 2026; worktree D:/wt/screens-p08-p09, branch screens-p08-p09. Tickets: none
+  started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched screen. Applied with
+  the screen files'' own dump settings (width 100).'

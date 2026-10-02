@@ -925,6 +925,7 @@ paths:
       operationId: listForms
       x-ticvai-consumed-by:
         - "P08 BO-618 Accreditation Form Builder"
+        - "P08 BO-747 Consent Policy Configuration"
       summary: Waivers, surveys and capture forms
       description: 'The builder''s list. **The latest version of each form**; older versions stay readable
         through `getForm` with `version`.
@@ -973,6 +974,7 @@ paths:
       operationId: createForm
       x-ticvai-consumed-by:
         - "P08 BO-618 Accreditation Form Builder"
+        - "P08 BO-747 Consent Policy Configuration"
         - "P08 BO-815 Survey Builder"
         - "P13 CMS-042 Waiver Template Library & Master Setup"
       summary: Define a waiver, survey or capture form
@@ -4669,7 +4671,6 @@ paths:
     post:
       operationId: previewSegment
       x-ticvai-consumed-by:
-        - "P08 BO-755 Dynamic Segment Builder"
         - "P08 BO-757 Behavioral Segmentation"
         - "P08 BO-758 Membership & Loyalty Segments"
         - "P08 BO-760 Revenue & Engagement Segments"
@@ -5278,7 +5279,6 @@ paths:
     get:
       operationId: listMessageTemplates
       x-ticvai-consumed-by:
-        - "P08 BO-677 Communication Template Library"
         - "P08 BO-768 Multichannel Composer"
         - "P08 BO-769 Schedule & Trigger Rules"
         - "P08 BO-785 Template Library"

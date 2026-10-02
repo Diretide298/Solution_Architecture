@@ -1,0 +1,570 @@
+id: CHG-SBO-005
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: Block A and B screen corrections on P08 and P09 that need a contract change (a missing read, a field, a permission,
+  a paged envelope, a closed set) are logged here; nothing is invented.
+decision:
+  what: Log each as a contract gap for the contract owners; the screens bind what exists.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Design-note corrections, 1-2 October 2026, marked status logged (README: a fix that needs a contract change is logged
+  as an open change entry). Phase B brief: "Don''t invent operations." Same root as CHG-WIR-024 (R254).'
+keys_touched:
+  screens:
+  - ADM-020
+  - ADM-031
+  - ADM-319
+  - ADM-345
+  - ADM-356
+  - ADM-362
+  - ADM-365
+  - ADM-370
+  - ADM-373
+  - ADM-375
+  - ADM-376
+  - ADM-377
+  - ADM-381
+  - ADM-397
+  - ADM-401
+  - ADM-402
+  - ADM-406
+  - ADM-407
+  - ADM-414
+  - ADM-415
+  - ADM-418
+  - ADM-453
+  - ADM-454
+  - ADM-458
+  - ADM-459
+  - ADM-463
+  - ADM-464
+  - ADM-536
+  - BO-007
+  - BO-008
+  - BO-009
+  - BO-011
+  - BO-012
+  - BO-013
+  - BO-016
+  - BO-017
+  - BO-037
+  - BO-081
+  - BO-082
+  - BO-087
+  - BO-091
+  - BO-092
+  - BO-094
+  - BO-109
+  - BO-110
+  - BO-111
+  - BO-112
+  - BO-136
+  - BO-151
+  - BO-155
+  - BO-161
+  - BO-166
+  - BO-167
+  - BO-168
+  - BO-185
+  - BO-201
+  - BO-230
+  - BO-284
+  - BO-285
+  - BO-286
+  - BO-287
+  - BO-288
+  - BO-289
+  - BO-290
+  - BO-291
+  - BO-292
+  - BO-293
+  - BO-294
+  - BO-295
+  - BO-296
+  - BO-297
+  - BO-299
+  - BO-300
+  - BO-302
+  - BO-303
+  - BO-335
+  - BO-346
+  - BO-364
+  - BO-365
+  - BO-370
+  - BO-376
+  - BO-392
+  - BO-395
+  - BO-403
+  - BO-432
+  - BO-443
+  - BO-458
+  - BO-483
+  - BO-484
+  - BO-518
+  - BO-587
+  - BO-594
+  - BO-595
+  - BO-596
+  - BO-603
+  - BO-604
+  - BO-605
+  - BO-606
+  - BO-607
+  - BO-608
+  - BO-609
+  - BO-610
+  - BO-611
+  - BO-612
+  - BO-613
+  - BO-614
+  - BO-637
+  - BO-646
+  - BO-681
+  - BO-691
+  - BO-695
+  - BO-696
+  - BO-700
+  - BO-702
+  - BO-708
+  - BO-709
+  - BO-721
+  - BO-722
+  - BO-725
+  - BO-731
+  - BO-732
+  - BO-755
+  - BO-761
+  - BO-765
+  - BO-766
+  - BO-770
+  - BO-785
+  - BO-835
+  - BO-840
+  - BO-857
+  - BO-861
+  - BO-866
+  - BO-870
+  - BO-877
+  - BO-911
+  - BO-915
+  - BO-927
+  - BO-942
+  - BO-949
+  - BO-981
+  - BO-1045
+  - BO-1049
+  - BO-1065
+  - BO-1068
+  - BO-1173
+  - BO-1185
+  - BO-1190
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ADM-031
+  - APP-SETUP-ADM-536
+  - APP-SETUP-BO-007
+  - APP-SETUP-BO-008
+  - APP-SETUP-BO-009
+  - APP-SETUP-BO-011
+  - APP-SETUP-BO-012
+  - APP-SETUP-BO-081
+  - APP-SETUP-BO-087
+  - APP-SETUP-BO-091
+  - APP-SETUP-BO-092
+  - APP-SETUP-BO-094
+  - APP-SETUP-BO-1045
+  - APP-SETUP-BO-1065
+  - APP-SETUP-BO-110
+  - APP-SETUP-BO-1185
+  - APP-SETUP-BO-136
+  - APP-SETUP-BO-151
+  - APP-SETUP-BO-155
+  - APP-SETUP-BO-161
+  - APP-SETUP-BO-166
+  - APP-SETUP-BO-168
+  - APP-SETUP-BO-201
+  - APP-SETUP-BO-335
+  - APP-SETUP-BO-346
+  - APP-SETUP-BO-696
+  - APP-SETUP-BO-755
+  - APP-SETUP-BO-766
+  - APP-SETUP-BO-785
+  - APP-SETUP-BO-861
+  - APP-SETUP-BO-866
+  - APP-SETUP-BO-870
+  - APP-SETUP-BO-877
+  - APP-SETUP-BO-927
+  - VM-BO-013
+  - VM-BO-016
+  - VM-BO-017
+  - VM-BO-037
+  - VM-BO-082
+  - VM-BO-109
+  - VM-BO-111
+  - VM-BO-112
+  - VM-BO-1190
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/audit-screenless-operations.py
+status: open
+notes: 'Open until the contract changes are decided. Per screen:
+
+  - ADM-020: ADM-020: the console manages TICVAI platform staff with the tenant identity operations (USER_MANAGE); platform-staff
+  operations are missing (or TICVAI is declared a tenant of its own)
+
+  - ADM-031: ADM-031: no metric source carries security measures (second-factor coverage, failed sign-ins, grants, exports);
+  the operations are generic dashboards
+
+  - ADM-319: ADM-319: approveWorkflow requires PRODUCT_CONFIGURE; approving a workflow is an approval-configuration act (R091)
+
+  - ADM-345: The table''s columns are the workshop pack''s labels with no bound response field (0 of 9 labels bound).
+
+  - ADM-356: ADM-356: authorisation policies are bound read-only; no write for integration access policies exists
+
+  - ADM-362: The table''s columns are the workshop pack''s labels with no bound response field (0 of 6 labels bound).
+
+  - ADM-365: List operation(s) listGovernanceRiskLaunch return a bare array, not the paged list envelope (items, nextCursor,
+  hasMore); rows of listGovernanceRiskLaunch carry no identifier.
+
+  - ADM-370: The table''s columns are the workshop pack''s labels with no bound response field (0 of 29 labels bound).
+
+  - ADM-373: The table''s columns are the workshop pack''s labels with no bound response field (0 of 5 labels bound).
+
+  - ADM-375: The table''s columns are the workshop pack''s labels with no bound response field (0 of 11 labels bound).
+
+  - ADM-376: The table''s columns are the workshop pack''s labels with no bound response field (0 of 6 labels bound).
+
+  - ADM-377: ADM-377: commercial package exceptions have no read; only simulateCommercialPackage
+
+  - ADM-381: The table''s columns are the workshop pack''s labels with no bound response field (0 of 12 labels bound).
+
+  - ADM-397: The table''s columns are the workshop pack''s labels with no bound response field (0 of 8 labels bound).
+
+  - ADM-401: The table''s columns are the workshop pack''s labels with no bound response field (0 of 9 labels bound).
+
+  - ADM-402: The table''s columns are the workshop pack''s labels with no bound response field (0 of 7 labels bound).
+
+  - ADM-406: The table''s columns are the workshop pack''s labels with no bound response field (0 of 10 labels bound).
+
+  - ADM-407: The table''s columns are the workshop pack''s labels with no bound response field (0 of 6 labels bound).
+
+  - ADM-414: The table''s columns are the workshop pack''s labels with no bound response field (0 of 5 labels bound).
+
+  - ADM-415: The table''s columns are the workshop pack''s labels with no bound response field (0 of 8 labels bound).
+
+  - ADM-418: The table''s columns are the workshop pack''s labels with no bound response field (0 of 14 labels bound).
+
+  - ADM-453: The table''s columns are the workshop pack''s labels with no bound response field (0 of 8 labels bound).
+
+  - ADM-454: The table''s columns are the workshop pack''s labels with no bound response field (0 of 2 labels bound).
+
+  - ADM-458: The table''s columns are the workshop pack''s labels with no bound response field (0 of 9 labels bound).
+
+  - ADM-459: The table''s columns are the workshop pack''s labels with no bound response field (0 of 9 labels bound).
+
+  - ADM-463: The table''s columns are the workshop pack''s labels with no bound response field (0 of 6 labels bound).
+
+  - ADM-464: The table''s columns are the workshop pack''s labels with no bound response field (0 of 10 labels bound).
+
+  - ADM-536: ADM-536: capability list and decision lookup bound; no operation lists action plans (only getActionPlan by id)
+
+  - BO-007: List operation(s) listAlternativeCodes return a bare array, not the paged list envelope (items, nextCursor, hasMore).
+
+  - BO-008: List operation(s) listProductVersions return a bare array, not the paged list envelope (items, nextCursor, hasMore).
+
+  - BO-009: List operation(s) listDynamicPriceRules return a bare array, not the paged list envelope (items, nextCursor, hasMore).
+  | BO-009: dynamic rule conditions and actions are free strings (type, ruleOperator, valueJson) and minPrice/maxPrice plain
+  numbers, not Money (ADR-0008)
+
+  - BO-011: List operation(s) listCatalogueBundles return a bare array, not the paged list envelope (items, nextCursor, hasMore).
+
+  - BO-012: List operation(s) listEntitlementTemplates, listAlternativeCodes return a bare array, not the paged list envelope
+  (items, nextCursor, hasMore).
+
+  - BO-013: List operation(s) listChannelListings return a bare array, not the paged list envelope (items, nextCursor, hasMore).
+  | BO-013: setChannelListing (OTA listings) sits in the subscription contract under PARTNER_MANAGE; a distribution listing
+  is a catalogue or partner concern
+
+  - BO-016: List operation(s) listPerformanceTemplates return a bare array, not the paged list envelope (items, nextCursor,
+  hasMore).
+
+  - BO-017: List operation(s) listWaitlistEntries return a bare array, not the paged list envelope (items, nextCursor, hasMore).
+
+  - BO-037: List operation(s) listCatalogueBundles return a bare array, not the paged list envelope (items, nextCursor, hasMore).
+
+  - BO-081: BO-081: one purchase unit and factor per item; several pack conversions (carton, case) cannot be expressed (DI-343)
+  | BO-081: the item master has no item type and no status beyond active (DI-343) | BO-081: updateInventoryItem cannot change
+  barcode, purchase unit, factor, perishable, shelf life or allow-negative-stock | BO-081: stock locations cannot be renamed,
+  moved or deactivated; "transit" is offered as a user-made kind (DI-345)
+
+  - BO-082: BO-082: the movement reason is free text; a configurable reason code list plus a note is needed (DI-363)
+
+  - BO-087: BO-087: createApprovalDelegation escalates to APPROVAL_DELEGATE with no value threshold defined (R197)
+
+  - BO-091: BO-091: getAiUsage groupBy has no audience (staff vs guest spend, CF-14)
+
+  - BO-092: List operation(s) listVenueMaps return a bare array, not the paged list envelope (items, nextCursor, hasMore).
+
+  - BO-094: List operation(s) listCatalogueBundles return a bare array, not the paged list envelope (items, nextCursor, hasMore).
+
+  - BO-109: BO-109: two sources of the till order (setMenuSections sequence vs SaleBoard pages by catalogue variant); one
+  must govern | BO-109: sale-board tiles have no size or span (DI-326); the per-outlet layout is decided (DEC-183, CHG-CSP-006)
+
+  - BO-110: BO-110: recipe yield allows 0; waste % per line, recipe versions and removing a recipe have no field or read (DI-329)
+
+  - BO-111: BO-111: two substitution models (setSubstitutionRules and setIngredientSubstitutes); keep one | BO-111: SubstitutionRule.requiresApproval
+  default contradicts setSubstitutionRules (true where an allergen changes) | BO-111: nothing writes nutrition; Allergen contains
+  / may-contain is referenced by nothing
+
+  - BO-112: BO-112: no read of production plans (no list or get); a draft plan cannot be reopened
+
+  - BO-136: BO-136: no setting holds the void, price change, refund, transfer and re-open approval bands (DI-324)
+
+  - BO-151: BO-151: listAccessLocationGrouping returns no roll-up (entries, exits, current occupancy, throughput, capacity)
+  per group; the groups are now bound | BO-151: setAccessPointGroup requires id and scopePath in the body (server-owned, VO-R03)
+
+  - BO-155: BO-155: setVisualAccessRule carries conditions and logic as free strings; ADR-0068 needs one closed JSON rule
+  format | BO-155: setVisualAccessRule requires ruleId for a new rule (VO-R03)
+
+  - BO-161: List operation(s) listGuestCompanionEligibility return a bare array, not the paged list envelope (items, nextCursor,
+  hasMore).
+
+  - BO-166: BO-166: activationTriggers is an array of free strings; the pack gives a closed set with AND / AND-OR (ADR-0068)
+
+  - BO-167: BO-167: setDeviceBindingPolicy is one per venue with no "binding required" switch; binding varies by credential
+  profile (required, optional, off) | BO-167: the access contract still says "Deactivate binding (no operation yet)"; releaseCredentialDevice
+  is that operation (stale contract text)
+
+  - BO-168: BO-168: placement fields are free strings (venue, zone, gate, park, attraction) and device-reported health and
+  lastDetected sit in the write
+
+  - BO-185: BO-185: setBiometricVerificationProfile names no product, membership or segment, only the kind (selectType) |
+  BO-185: profileId is required and venueId is a required string (VO-R03)
+
+  - BO-201: BO-201: no operation activates a mode across a gate group in one audited command | BO-201: setGateModePolicy requires
+  id and scopePath in the body (VO-R03)
+
+  - BO-230: BO-230: the bulk command (five gates together, one audited record) has no operation
+
+  - BO-284: A Venue Management screen calls operations gated by TICVAI-only permissions: listMembershipAnnualPass (PLATFORM_TENANT_VIEW),
+  approveMembershipProductValidation (PLATFORM_CELL_MANAGE).
+
+  - BO-285: A Venue Management screen calls operations gated by TICVAI-only permissions: setMembershipProductTier (PLATFORM_CELL_MANAGE).
+
+  - BO-286: A Venue Management screen calls operations gated by TICVAI-only permissions: setMembershipEligibilityQualification
+  (PLATFORM_CELL_MANAGE).
+
+  - BO-287: A Venue Management screen calls operations gated by TICVAI-only permissions: setValidityActivationExpiry (PLATFORM_CELL_MANAGE).
+
+  - BO-288: List operation(s) listEntitlementTemplates return a bare array, not the paged list envelope (items, nextCursor,
+  hasMore). | BO-288: setMembershipEntitlementAdmission requires PLATFORM_CELL_MANAGE on a venue screen; it should be PRODUCT_CONFIGURE
+
+  - BO-289: A Venue Management screen calls operations gated by TICVAI-only permissions: listMembershipUsageVisit (PLATFORM_TENANT_VIEW),
+  setMembershipUsagePolicy (PLATFORM_CELL_MANAGE).
+
+  - BO-290: A Venue Management screen calls operations gated by TICVAI-only permissions: setFamilyHouseholdDependent (PLATFORM_CELL_MANAGE).
+
+  - BO-291: BO-291: setMembershipCommercialConfig profiles are free strings and need PLATFORM_CELL_MANAGE
+
+  - BO-292: A Venue Management screen calls operations gated by TICVAI-only permissions: setRenewalAutoMembership (PLATFORM_CELL_MANAGE).
+
+  - BO-293: A Venue Management screen calls operations gated by TICVAI-only permissions: approveMembershipProductValidation
+  (PLATFORM_CELL_MANAGE).
+
+  - BO-294: A Venue Management screen calls operations gated by TICVAI-only permissions: listMember (PLATFORM_TENANT_VIEW).
+
+  - BO-295: A Venue Management screen calls operations gated by TICVAI-only permissions: setMemberMembershipAccount (PLATFORM_CELL_MANAGE).
+
+  - BO-296: A Venue Management screen calls operations gated by TICVAI-only permissions: listMembershipActivationCredential
+  (PLATFORM_TENANT_VIEW).
+
+  - BO-297: A Venue Management screen calls operations gated by TICVAI-only permissions: listVisitAdmissionEntitlement (PLATFORM_TENANT_VIEW).
+
+  - BO-299: A Venue Management screen calls operations gated by TICVAI-only permissions: listMembershipUpgradeDowngrade (PLATFORM_TENANT_VIEW).
+
+  - BO-300: A Venue Management screen calls operations gated by TICVAI-only permissions: listRenewalAuto (PLATFORM_TENANT_VIEW).
+
+  - BO-302: A Venue Management screen calls operations gated by TICVAI-only permissions: listMemberLifecycleCase (PLATFORM_TENANT_VIEW).
+
+  - BO-303: A Venue Management screen calls operations gated by TICVAI-only permissions: listMembershipRenewalRetention (PLATFORM_TENANT_VIEW).
+
+  - BO-335: BO-335: every Virtual Ticket model field is a free string in setVirtualTicketIdentity; each needs an agreed closed
+  set | BO-335: setVirtualTicketIdentity is write-only; no read of the current configuration (VO-R04)
+
+  - BO-346: BO-346: two models of a ticket template (orders.TicketTemplate and access setPdfPrintablePos with free-string
+  page size, margins, printer profile)
+
+  - BO-364: The table''s columns are the workshop pack''s labels with no bound response field (0 of 20 labels bound).
+
+  - BO-365: The table''s columns are the workshop pack''s labels with no bound response field (0 of 11 labels bound).
+
+  - BO-370: The table''s columns are the workshop pack''s labels with no bound response field (0 of 8 labels bound).
+
+  - BO-376: The table''s columns are the workshop pack''s labels with no bound response field (0 of 12 labels bound).
+
+  - BO-392: The table''s columns are the workshop pack''s labels with no bound response field (0 of 6 labels bound).
+
+  - BO-395: BO-395: Game has no attraction type, reader type, wallet-enabled or redemption field
+
+  - BO-403: BO-403: archive and restore have no contract path (retired is terminal); no dependency read for the impact warning
+
+  - BO-432: BO-432: GameplayAuthorisation has no read; GameplayTransaction carries no trace, remaining balance or plays |
+  BO-432: the pack''s seven-step authorisation example needs the trace read to draw it bound
+
+  - BO-443: List operation(s) listDynamicPriceRules return a bare array, not the paged list envelope (items, nextCursor, hasMore).
+
+  - BO-458: BO-458: the merged "View Card | View Wallet | Export" button is split; no staff read of a game card or wallet
+  and no export operation exist (getGameCard is guest-only)
+
+  - BO-483: The table''s columns are the workshop pack''s labels with no bound response field (0 of 6 labels bound).
+
+  - BO-484: BO-484: the eight self-service KPI tiles (top-ups, wallets viewed, failed sessions missing) have no source operation
+
+  - BO-518: List operation(s) listRealTimeAvailability return a bare array, not the paged list envelope (items, nextCursor,
+  hasMore).
+
+  - BO-587: BO-587: the health rating (Excellent, Good, Poor) has no rule; the lead confirms how it is derived
+
+  - BO-594: A Venue Management screen calls operations gated by TICVAI-only permissions: listTenants (PLATFORM_TENANT_VIEW).
+
+  - BO-595: A Venue Management screen calls operations gated by TICVAI-only permissions: getGoLiveReadiness (PLATFORM_TENANT_MANAGE).
+
+  - BO-596: A Venue Management screen calls operations gated by TICVAI-only permissions: getGoLiveReadiness (PLATFORM_TENANT_MANAGE).
+  | The table''s columns are the workshop pack''s labels with no bound response field (0 of 6 labels bound).
+
+  - BO-603: A Venue Management screen calls operations gated by TICVAI-only permissions: runGoLiveValidation (PLATFORM_TENANT_MANAGE).
+
+  - BO-604: A Venue Management screen calls operations gated by TICVAI-only permissions: getGoLiveReadiness (PLATFORM_TENANT_MANAGE).
+
+  - BO-605: A Venue Management screen calls operations gated by TICVAI-only permissions: getGoLiveReadiness (PLATFORM_TENANT_MANAGE).
+
+  - BO-606: A Venue Management screen calls operations gated by TICVAI-only permissions: runGoLiveValidation (PLATFORM_TENANT_MANAGE).
+
+  - BO-607: A Venue Management screen calls operations gated by TICVAI-only permissions: runGoLiveValidation (PLATFORM_TENANT_MANAGE).
+
+  - BO-608: A Venue Management screen calls operations gated by TICVAI-only permissions: runGoLiveValidation (PLATFORM_TENANT_MANAGE).
+
+  - BO-609: A Venue Management screen calls operations gated by TICVAI-only permissions: runGoLiveValidation (PLATFORM_TENANT_MANAGE).
+
+  - BO-610: A Venue Management screen calls operations gated by TICVAI-only permissions: runGoLiveValidation (PLATFORM_TENANT_MANAGE).
+
+  - BO-611: A Venue Management screen calls operations gated by TICVAI-only permissions: runGoLiveValidation (PLATFORM_TENANT_MANAGE).
+
+  - BO-612: A Venue Management screen calls operations gated by TICVAI-only permissions: runGoLiveValidation (PLATFORM_TENANT_MANAGE).
+
+  - BO-613: A Venue Management screen calls operations gated by TICVAI-only permissions: getGoLiveReadiness (PLATFORM_TENANT_MANAGE).
+
+  - BO-614: A Venue Management screen calls operations gated by TICVAI-only permissions: getGoLiveReadiness (PLATFORM_TENANT_MANAGE).
+
+  - BO-637: BO-637: the operation is named approveWorkflow but designs a workflow (rename in the contract)
+
+  - BO-646: BO-646: no media configuration schema (active per medium, identifier format, activation, replacement, expiry,
+  access integration)
+
+  - BO-681: BO-681: AccreditationImportResult has no batch id, file name, uploader, time or processing status
+
+  - BO-691: BO-691: no accreditation-specific API scopes or writes; only listApiClients
+
+  - BO-695: List operation(s) listEventTypes return a bare array, not the paged list envelope (items, nextCursor, hasMore).
+
+  - BO-696: BO-696: cloneEvent''s request body names no parts to copy or date shift
+
+  - BO-700: List operation(s) listSpaces return a bare array, not the paged list envelope (items, nextCursor, hasMore).
+
+  - BO-702: BO-702: setSpace accessRules is an untyped object
+
+  - BO-708: List operation(s) listAccessProfiles return a bare array, not the paged list envelope (items, nextCursor, hasMore).
+
+  - BO-709: BO-709: setEventRegistration admissionPolicy is an untyped object
+
+  - BO-721: List operation(s) listPerformanceTemplates return a bare array, not the paged list envelope (items, nextCursor,
+  hasMore).
+
+  - BO-722: List operation(s) listCreditTypes return a bare array, not the paged list envelope (items, nextCursor, hasMore).
+
+  - BO-725: List operation(s) listPerformanceTemplates return a bare array, not the paged list envelope (items, nextCursor,
+  hasMore).
+
+  - BO-731: BO-731: no service-period entity and no per-outlet recipe depletion mode (DI-320)
+
+  - BO-732: The table''s columns are the workshop pack''s labels with no bound response field (0 of 1 labels bound).
+
+  - BO-755: BO-755: CreateSegmentRequest is a flat criteria list; nested AND/OR/NOT groups, effective dates, refresh, owner,
+  tags and approval have no field
+
+  - BO-761: List operation(s) listAudienceDiscoveryTargeting return a bare array, not the paged list envelope (items, nextCursor,
+  hasMore); rows of listAudienceDiscoveryTargeting carry no identifier.
+
+  - BO-765: List operation(s) listCampaignCalendarTimeline return a bare array, not the paged list envelope (items, nextCursor,
+  hasMore).
+
+  - BO-766: BO-766: CreateCampaignRequest has no objective, success target, owner, brand, products, budget or offer reference
+  (DI-383)
+
+  - BO-770: BO-770: approveCampaignWorkflow thresholds and approval modes are strings
+
+  - BO-785: BO-785: no update, version or archive operation for message templates
+
+  - BO-835: BO-835: several digital properties per tenant (brand, venue, business unit sites) with environments are not modelled
+
+  - BO-840: BO-840: staged rollout of app content by app version is not modelled
+
+  - BO-857: BO-857: most of the pack''s resource profile (short name, image, codes, owner, cost centre, location, costs, tax,
+  integration ids, scheduling mode ...) has no field on Resource | BO-857: createResource marks id as a required input (VO-R03)
+
+  - BO-861: BO-861: createResourcePackage and updateResourcePackage bodies carry id and scopePath (VO-R03)
+
+  - BO-866: BO-866: inherited availability (tenant > venue > department > type > resource) has no operation or field; setResourceSchedule
+  stores only the resource''s own pattern
+
+  - BO-870: BO-870: ResourceBlock.reason (7 values) does not cover the pack''s 12 block types; recurrence, owner, priority,
+  override permission and approval are absent
+
+  - BO-877: BO-877: no operation stores the qualification-expiry behaviour (warn, prevent, cancel, override)
+
+  - BO-911: BO-911: the six-value inspection result does not exist (InspectionOutcome has three; cleaning required, maintenance
+  required and unsafe have no value) | BO-911: next inspection, frequency per resource, responsible person and compliance
+  status have no source
+
+  - BO-915: List operation(s) listSpaces return a bare array, not the paged list envelope (items, nextCursor, hasMore).
+
+  - BO-927: BO-927: AiVenueSettings.staffProductivity needs a ratio kind (per staff hour vs guests present at once)
+
+  - BO-942: BO-942: no record for mobile offline settings (per-function switches, maximum offline period, sync frequency)
+
+  - BO-949: A Venue Management screen calls operations gated by TICVAI-only permissions: listMemberExceptionOverride (PLATFORM_TENANT_VIEW).
+  | The table''s columns are the workshop pack''s labels with no bound response field (0 of 10 labels bound).
+
+  - BO-981: BO-981: no seating operation simulates a layout change over sold seats, holds, reservations, carts, products,
+  gates, capacity and revenue
+
+  - BO-1045: List operation(s) listSeatCategories return a bare array, not the paged list envelope (items, nextCursor, hasMore).
+  | BO-1045: listSeatCategories returns no described schema
+
+  - BO-1049: BO-1049: simulatePriceBreakdownCalculation carries a currency; it resolves from the region (ADR-0018)
+
+  - BO-1065: BO-1065: sales channels per venue (web, mobile, POS, box office, call centre, B2B, partner API, marketplace)
+  have no operation; RegionSettings has no channels | BO-1065: RegionSettings has no week start (daylight saving follows the
+  IANA zone)
+
+  - BO-1068: BO-1068: draft, test, staging and production contexts for tenant configuration are not modelled (one deploy operation);
+  configuration packages are platform-only
+
+  - BO-1173: The table''s columns are the workshop pack''s labels with no bound response field (0 of 14 labels bound).
+
+  - BO-1185: BO-1185: quoteTransportFare''s audience is guest, public and service; the staff preview needs staff added (or
+  its own preview)
+
+  - BO-1190: List operation(s) listDonationCampaigns return a bare array, not the paged list envelope (items, nextCursor,
+  hasMore).
+
+
+  Batch SBO (screens-p08-p09, phase B), 2 October 2026; worktree D:/wt/screens-p08-p09, branch screens-p08-p09. Tickets: none
+  started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched screen. Applied with
+  the screen files'' own dump settings (width 100).'

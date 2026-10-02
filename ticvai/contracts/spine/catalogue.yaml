@@ -11508,7 +11508,6 @@ paths:
       operationId: listDynamicPricingStrategy
       x-ticvai-consumed-by:
         - "P08 BO-1044 Dynamic Seat Pricing"
-        - "P08 BO-528 Dynamic Pricing & AI Recommendation"
         - "P08 ADM-088 Dynamic Pricing Strategy Command Center"
         - "P08 ADM-089 Dynamic Pricing Strategy Builder"
       x-ticvai-audience:
@@ -17167,7 +17166,7 @@ paths:
     post:
       operationId: transitionDynamicPricingStrategy
       x-ticvai-consumed-by:
-        - "P08 BO-528 Dynamic Pricing & AI Recommendation"
+        - "P08 ADM-088 Dynamic Pricing Strategy Command Center"
         - "P08 ADM-089 Dynamic Pricing Strategy Builder"
       summary: Activate, pause, resume or retire a dynamic pricing strategy
       description: '**The strategy''s status moves, as calls** (29 September, writers pass). Moves a

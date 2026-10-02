@@ -216,8 +216,8 @@ paths:
     get:
       operationId: listFraudRules
       x-ticvai-consumed-by:
-        - "P08 ADM-614 Refund Approval & Exception Workflow\t121"
-        - "P08 ADM-630 Payment Risk Rule & Decision Engine\t167"
+        - "P08 ADM-614 Refund Approval & Exception Workflow"
+        - "P08 ADM-630 Payment Risk Rule & Decision Engine"
       summary: The rules evaluated before a charge
       description: 'BL-118. **`orders.fraud_rule` existed with six columns and no operation read or wrote
         it** — found on 20 August by auditing which tables no operation names.
@@ -261,8 +261,8 @@ paths:
     put:
       operationId: setFraudRules
       x-ticvai-consumed-by:
-        - "P08 ADM-614 Refund Approval & Exception Workflow\t121"
-        - "P08 ADM-630 Payment Risk Rule & Decision Engine\t167"
+        - "P08 ADM-614 Refund Approval & Exception Workflow"
+        - "P08 ADM-630 Payment Risk Rule & Decision Engine"
       summary: Change what holds a transaction
       description: '**The whole set in one call**, because a rule set edited one rule at a time spends
         time in states nobody intended — a threshold lowered before its companion is raised.
@@ -628,7 +628,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-014 Pay for a Booking"
         - "P02 GST-009 Review & Payment"
-        - "P08 ADM-593 Payment Link Distribution & Customer Journey Manager\t74"
+        - "P08 ADM-593 Payment Link Distribution & Customer Journey Manager"
       security:
       - guestAuth: []
       - {}
@@ -800,7 +800,7 @@ paths:
     post:
       operationId: resendPaymentLink
       x-ticvai-consumed-by:
-        - "P08 ADM-593 Payment Link Distribution & Customer Journey Manager\t74"
+        - "P08 ADM-593 Payment Link Distribution & Customer Journey Manager"
       summary: Send it again, and retire the old one
       description: '**A resend supersedes.** Two live links against one order is two guests paying for
         one booking, and the second payment is a refund somebody has to make.
@@ -1854,9 +1854,9 @@ paths:
     get:
       operationId: listChargebacks
       x-ticvai-consumed-by:
-        - "P08 ADM-633 Fraud Alert, Investigation & Case Management\t170"
-        - "P08 ADM-634 Chargeback & Dispute Command Center\t172"
-        - "P08 ADM-635 Chargeback Evidence & Representment Workspace\t173"
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management"
+        - "P08 ADM-634 Chargeback & Dispute Command Center"
+        - "P08 ADM-635 Chargeback Evidence & Representment Workspace"
       summary: Open disputes, by deadline
       description: '**Sorted by `evidenceDueBy`, not by date received.** A case received yesterday with
         two days left outranks one received last week with twelve.
@@ -1901,7 +1901,7 @@ paths:
     post:
       operationId: respondToChargeback
       x-ticvai-consumed-by:
-        - "P08 ADM-634 Chargeback & Dispute Command Center\t172"
+        - "P08 ADM-634 Chargeback & Dispute Command Center"
       summary: Submit evidence, or accept the loss
       description: '**Accepting is a legitimate outcome and is recorded as a decision.** A 40 AED case
         with a 30 AED fee and two hours of work is one a venue should be able to concede deliberately
@@ -2176,7 +2176,7 @@ paths:
     post:
       operationId: createPaymentLink
       x-ticvai-consumed-by:
-        - "P08 ADM-592 Payment Link Builder & Configuration\t73"
+        - "P08 ADM-592 Payment Link Builder & Configuration"
       summary: Send a guest a link to pay later
       description: 'BL-072. **A booking taken at POS cannot currently be paid later by the guest**, so
         a phone booking either takes a card over the phone or is not taken.
@@ -3518,7 +3518,7 @@ paths:
       operationId: voidPayment
       x-ticvai-consumed-by:
         - "P08 BO-319 Void, Reversal & Same-Day Correction Management"
-        - "P08 ADM-613 Void, Reversal & Cancellation Manager\t120"
+        - "P08 ADM-613 Void, Reversal & Cancellation Manager"
       x-ticvai-audience:
       - staff
       summary: Release an authorisation before it is captured
@@ -4504,8 +4504,8 @@ paths:
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
         - "P08 BO-1147 Refund Routing & Credit Restoration Engine"
-        - "P08 ADM-609 Refund & Payment Adjustment Command Center\t116"
-        - "P08 ADM-616 Payment Adjustment & Financial Correction Manager\t123"
+        - "P08 ADM-609 Refund & Payment Adjustment Command Center"
+        - "P08 ADM-616 Payment Adjustment & Financial Correction Manager"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
@@ -4557,8 +4557,8 @@ paths:
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
         - "P08 BO-1147 Refund Routing & Credit Restoration Engine"
-        - "P08 ADM-610 Refund Request & Eligibility Workspace\t117"
-        - "P08 ADM-616 Payment Adjustment & Financial Correction Manager\t123"
+        - "P08 ADM-610 Refund Request & Eligibility Workspace"
+        - "P08 ADM-616 Payment Adjustment & Financial Correction Manager"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -4779,7 +4779,7 @@ paths:
       operationId: approveRefund
       x-ticvai-consumed-by:
         - "P08 BO-028 Refund Approval Queue"
-        - "P08 ADM-614 Refund Approval & Exception Workflow\t121"
+        - "P08 ADM-614 Refund Approval & Exception Workflow"
       x-ticvai-audience:
       - staff
       summary: Approve a refund held for approval
@@ -5011,7 +5011,7 @@ paths:
         - "P08 BO-065 Venue Configuration"
         - "P08 BO-1146 Refund-to-Wallet Policy Configuration"
         - "P08 BO-318 Refund Policy & Refund Calculation Configuration"
-        - "P08 ADM-610 Refund Request & Eligibility Workspace\t117"
+        - "P08 ADM-610 Refund Request & Eligibility Workspace"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -5245,9 +5245,9 @@ paths:
         - "P05 KSK-008 Payment unresolved"
         - "P06 EMP-035 Payment on device"
         - "P08 BO-024 Payment Exceptions"
-        - "P08 ADM-595 Digital Payment Session & Transaction Monitor\t76"
-        - "P08 ADM-597 Digital Payment Exception, Recovery & Expiry Center\t79"
-        - "P08 ADM-615 Refund Processing, Provider Status & Recovery Center\t122"
+        - "P08 ADM-595 Digital Payment Session & Transaction Monitor"
+        - "P08 ADM-597 Digital Payment Exception, Recovery & Expiry Center"
+        - "P08 ADM-615 Refund Processing, Provider Status & Recovery Center"
         - "P10 PTR-012 Checkout / Credit Purchase"
       x-ticvai-api-scope: ticketing.write
       security:
@@ -5698,6 +5698,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-038 Reconciliation Queue"
         - "P08 BO-130 Offline Policy & Rules Configuration"
+        - "P08 BO-133 Offline Alerts, Limits & Audit"
       x-ticvai-audience:
       - staff
       summary: Record what was done about a refused entry
@@ -9620,7 +9621,7 @@ paths:
       operationId: listVoidReversalSame
       x-ticvai-consumed-by:
         - "P08 BO-319 Void, Reversal & Same-Day Correction Management"
-        - "P08 ADM-613 Void, Reversal & Cancellation Manager\t120"
+        - "P08 ADM-613 Void, Reversal & Cancellation Manager"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -9986,8 +9987,8 @@ paths:
       operationId: listOrderPaymentDetail
       x-ticvai-consumed-by:
         - "P08 BO-325 Order Payment Detail & Transaction Ledger"
-        - "P08 ADM-607 Mixed Tender Transaction Trace & Allocation Audit\t100"
-        - "P08 ADM-617 Refund Transaction Trace & Audit Investigation\t124"
+        - "P08 ADM-607 Mixed Tender Transaction Trace & Allocation Audit"
+        - "P08 ADM-617 Refund Transaction Trace & Audit Investigation"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -10032,7 +10033,7 @@ paths:
       operationId: setMultiPaymentSplit
       x-ticvai-consumed-by:
         - "P08 BO-326 Multi-Payment, Split Tender & Payment Allocation Configuration"
-        - "P08 ADM-601 Split Payment & Tender Allocation Manager\t94"
+        - "P08 ADM-601 Split Payment & Tender Allocation Manager"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.43; MoM 1 Sep 4.11-4.12 (orders, holds, amendments, deposits); shape fixed (4 non-field properties removed; enums allocationLevel)'
@@ -13792,7 +13793,7 @@ paths:
       operationId: listPaymentAllocationRules
       x-ticvai-consumed-by:
         - "P08 BO-326 Multi-Payment, Split Tender & Payment Allocation Configuration"
-        - "P08 ADM-601 Split Payment & Tender Allocation Manager\t94"
+        - "P08 ADM-601 Split Payment & Tender Allocation Manager"
       summary: The venue's split-tender allocation rules
       description: '**The rows `setMultiPaymentSplit` writes** in `orders.payment_allocation_rule`: at
         what level a split-tender payment is allocated, per channel, terminal, product, order type and
@@ -13856,7 +13857,7 @@ paths:
       operationId: recordChargeback
       x-ticvai-consumed-by:
         - "P08 BO-025 Chargebacks & Disputes"
-        - "P08 ADM-634 Chargeback & Dispute Command Center\t172"
+        - "P08 ADM-634 Chargeback & Dispute Command Center"
       x-ticvai-audience:
       - staff
       - service
@@ -13985,8 +13986,8 @@ paths:
       operationId: assignChargeback
       x-ticvai-consumed-by:
         - "P08 BO-025 Chargebacks & Disputes"
-        - "P08 ADM-633 Fraud Alert, Investigation & Case Management\t170"
-        - "P08 ADM-634 Chargeback & Dispute Command Center\t172"
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management"
+        - "P08 ADM-634 Chargeback & Dispute Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (retrace 5.7.92 investigation workflow); shape follows respondToChargeback'
@@ -14053,7 +14054,7 @@ paths:
       operationId: recordChargebackOutcome
       x-ticvai-consumed-by:
         - "P08 BO-025 Chargebacks & Disputes"
-        - "P08 ADM-634 Chargeback & Dispute Command Center\t172"
+        - "P08 ADM-634 Chargeback & Dispute Command Center"
       x-ticvai-audience:
       - staff
       - service
@@ -14129,8 +14130,8 @@ paths:
       operationId: getChargebackAnalytics
       x-ticvai-consumed-by:
         - "P08 BO-025 Chargebacks & Disputes"
-        - "P08 ADM-633 Fraud Alert, Investigation & Case Management\t170"
-        - "P08 ADM-634 Chargeback & Dispute Command Center\t172"
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management"
+        - "P08 ADM-634 Chargeback & Dispute Command Center"
         - "P08 ADM-637 AI Fraud, Anomaly & Payment Intelligence Center"
       x-ticvai-audience:
       - staff

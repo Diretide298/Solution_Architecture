@@ -1022,16 +1022,22 @@ screens:
         The screen's purpose is policy and spend; index failures are a secondary health panel (the notes say they sit beside
         spend).
       source: screens/P08-venue-back-office.yaml#BO-091 (purpose, notes)
+      status: fixed
+      by: CHG-SBO-007
     - what: Staff and guest spend shown separately (notes, CF-14), but getAiUsage groupBy has no audience.
       why: >-
         Add groupBy audience (staff, guest) to getAiUsage, or define the split as the guest-concierge and planner agents against
         the rest.
       source: contracts/satellite/ai.yaml#getAiUsage | screens/P08-venue-back-office.yaml#BO-091 (notes)
+      status: logged
+      by: CHG-SBO-005
     - what: The policy form carries retainInteractionsDays.
       why: >-
         Deprecated on 29 September (AI-D05); retention is a tenant setting per data class in tenancy, not here. Do not draw
         it.
       source: contracts/satellite/ai.yaml#/components/schemas/AiPolicy (retainInteractionsDays) | ADR-0020 (AI-D05)
+      status: fixed
+      by: CHG-SBO-007
     - what: getAiByokEnablement is not declared, though its description says BO-091 reads it.
       why: Declare it so the screen can say whether the venue may bring its own key.
       source: contracts/satellite/ai.yaml#getAiByokEnablement
@@ -1044,6 +1050,8 @@ screens:
         These are platform tuning, not venue manager decisions; hide them behind an Advanced section visible to TICVAI staff
         only, or leave them to the console.
       source: contracts/satellite/ai.yaml#setAiPolicy | designer default
+      status: fixed
+      by: CHG-SBO-007
     decisions:
     - question: Is the ceiling expressed to the venue in AED or in tokens?
       decision: The AI spend ceiling is shown and set in the tenant's selected currency (default USD), with tokens shown alongside.
@@ -1140,11 +1148,15 @@ screens:
         Block A screen is a form with nothing to stand on.
       source: >-
         ADR-0059 (Block A slice: tasks.csv (APP-SETUP-BO-919)) | ADR-0059 (Block A slice: handoff/delivery-slice.json) | contracts/satellite/ai.yaml#createForecastScenario
+      status: logged
+      by: CHG-SBO-006
     - what: DI-280 (14 August) says data-dependent forecasting cannot be delivered in phase one for lack of history.
       why: >-
         Superseded by plan decision 10 and ADR-0051 (baseline first, from day one). Mark DI-280 superseded so it stops reaching
         the bundle.
       source: DI-280 | ADR-0051 | ADR-0051 (AI-D17)
+      status: logged
+      by: CHG-SBO-020
     decisions:
     - question: Which resource types does the event forecast cover in release 1 (staff, gates, F&B tills, rentable equipment)?
       decision: 'The event forecast covers every requirement kind (staff, pos, kiosk, gates, fnb, retail, stock, resource,
@@ -1242,6 +1254,8 @@ screens:
         A requirement cannot be decided if it cannot be listed. Add listOperationalRequirements (and getForecast for the basis)
         to the Block A slice.
       source: 'ADR-0059 (Block A slice: tasks.csv (APP-SETUP-BO-927)) | ADR-0059 (Block A slice: handoff/delivery-slice.json)'
+      status: logged
+      by: CHG-SBO-006
     - what: >-
         The form's example field "1 Lifeguard / 250 guests" is a concurrent ratio, while AiVenueSettings.staffProductivity
         is "units per staff hour".
@@ -1250,6 +1264,8 @@ screens:
         needs a ratio kind (per hour vs present at once), or lifeguard cover is wrong by the length of a visit.
       source: >-
         contracts/satellite/ai.yaml#/components/schemas/AiVenueSettings (staffProductivity) | screens/P08-venue-back-office.yaml#BO-927
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         The layout has an unbound dataTable, a primaryButton with no label and an inline productivity textField; no operation
         sets a standard here.
@@ -1257,6 +1273,8 @@ screens:
         Bind the table to listOperationalRequirements, the buttons to decideOperationalRequirement, and move standards to
         the venue AI profile (setAiVenueSettings).
       source: screens/P08-venue-back-office.yaml#BO-927 | contracts/satellite/ai.yaml#setAiVenueSettings
+      status: fixed
+      by: CHG-SBO-007
     decisions:
     - question: Does an accepted requirement create draft shifts in Workforce, or only a coverage target the rota manager
         works to?
@@ -1393,9 +1411,13 @@ screens:
       source: >-
         ADR-0059 (Block A slice: tasks.csv (APP-SETUP-ADM-037)) | ADR-0059 (Block A slice: handoff/delivery-slice.json) |
         screens/P09-platform-admin-console.yaml#ADM-037 (notes)
+      status: logged
+      by: CHG-SBO-006
     - what: emptyFirstRun says "Offers no create action - this screen declares no operation that makes one".
       why: setAiProvider creates a provider (id optional); the first-run state should offer Add provider.
       source: contracts/satellite/ai.yaml#setAiProvider
+      status: fixed
+      by: CHG-SBO-007
     decisions:
     - question: Who pays when a client picks its own provider or a costlier model?
       decision: 'With BYOK, the AI engine maps each AI task to the client provider''s equivalent model from TICVAI''s curated
@@ -1508,6 +1530,8 @@ screens:
         Bind the versions list to listForecastVersions and accuracy to getForecastAccuracy; the board's example values belong
         in sample data, not as columns.
       source: screens/P09-platform-admin-console.yaml#ADM-508
+      status: fixed
+      by: CHG-SBO-007
     - what: purpose ends mid-sentence ("Forecast vs Actual Example:").
       why: Truncated from the board.
       source: screens/P09-platform-admin-console.yaml#ADM-508
@@ -1519,11 +1543,15 @@ screens:
         (and getForecastAccuracy when accuracy exists) to the slice.
       source: >-
         ADR-0059 (Block A slice: tasks.csv (APP-SETUP-ADM-508)) | ADR-0059 (Block A slice: handoff/delivery-slice.json)
+      status: logged
+      by: CHG-SBO-006
     - what: module is Analytics and requiresModule analytics.
       why: >-
         Forecasting is an AI capability (requiresModule ai, family forecasting); a tenant with analytics but no AI would see
         a screen with nothing behind it.
       source: contracts/satellite/ai.yaml#/components/schemas/AiPolicy (enabledCapabilities forecasting)
+      status: fixed
+      by: CHG-SBO-007
     decisions:
     - question: Who approves forecast publication at a tenant - the console operator or the venue's own analyst?
       decision: Forecast publication is approved by whoever holds that module's AI publish permission; no default role. Uses
@@ -1622,6 +1650,8 @@ screens:
       source: >-
         screens/P09-platform-admin-console.yaml#ADM-520 | ADR-0059 (Block A slice: tasks.csv (APP-SETUP-ADM-520)) | ADR-0059
         (Block A slice: handoff/delivery-slice.json)
+      status: logged
+      by: CHG-SBO-006
     - what: >-
         The P09 governance screens (ADM-519..558) act on one tenant's registry and policies but, unlike ADM-037, declare no
         tenant picker and no platform-staff grant.
@@ -1631,6 +1661,8 @@ screens:
         screen, or these screens belong to the tenant's own administrators.
       source: >-
         screens/P09-platform-admin-console.yaml#ADM-037 (notes, R098) | contracts/satellite/ai.yaml#listAiCapabilities (scopePath)
+      status: fixed
+      by: CHG-SBO-001
     decisions:
     - question: Who runs the governance boards day to day - TICVAI staff on the console, or the tenant's own AI governance
         lead?
@@ -1734,6 +1766,8 @@ screens:
         These are the rule's action verbs (AiGovernanceRule.actions), not screen actions; draw them as a multi-select inside
         each rule.
       source: contracts/satellite/ai.yaml#/components/schemas/AiGovernanceRule
+      status: fixed
+      by: CHG-SBO-007
     - what: setAiTool (PLATFORM_AI_MANAGE) is declared on a tenant policy screen.
       why: >-
         Tools are platform facts replicated read-only into tenants; the tenant board should only read them (listAiTools).
@@ -1744,6 +1778,8 @@ screens:
       why: A saved draft cannot be found again without listAiGovernancePolicyVersions; add it to the slice.
       source: >-
         ADR-0059 (Block A slice: tasks.csv (APP-SETUP-ADM-523)) | ADR-0059 (Block A slice: handoff/delivery-slice.json)
+      status: logged
+      by: CHG-SBO-006
     decisions:
     - question: Are the action verbs the client's ten, or the five the minutes name (read, recommend, prepare, modify, execute)?
       decision: 'Drawn default stands (answer: "Default / recommended accepted"): The contract''s ten, grouped into the minutes''
@@ -1819,6 +1855,8 @@ screens:
       source: >-
         ADR-0059 (Block A slice: tasks.csv (APP-SETUP-ADM-526)) | ADR-0059 (Block A slice: handoff/delivery-slice.json) |
         MoM 18 Sep 4.1
+      status: logged
+      by: CHG-SBO-006
     - what: >-
         Two dataTables, one unlabelled, both bound to getEffectiveAiPolicy with no columns; no exceptions list operation.
       why: >-
@@ -1826,6 +1864,8 @@ screens:
         from getEffectiveAiPolicy.exceptions per capability.
       source: >-
         screens/P09-platform-admin-console.yaml#ADM-526 | contracts/satellite/ai.yaml#/components/schemas/AiEffectivePolicy
+      status: fixed
+      by: CHG-SBO-007
     decisions:
     - question: Maximum length of an exception?
       decision: 'Drawn default stands (answer: "Default / recommended accepted"): No cap in the contract; the form suggests
@@ -1910,6 +1950,8 @@ screens:
       why: A draft has to be chosen from a list; add listAiGovernancePolicyVersions to the Block A slice.
       source: >-
         ADR-0059 (Block A slice: tasks.csv (APP-SETUP-ADM-527)) | ADR-0059 (Block A slice: handoff/delivery-slice.json)
+      status: logged
+      by: CHG-SBO-006
   ADM-528:
     block: A
     summary: >-
@@ -1974,10 +2016,14 @@ screens:
         review what is being published.
       source: >-
         ADR-0059 (Block A slice: tasks.csv (APP-SETUP-ADM-528)) | ADR-0059 (Block A slice: handoff/delivery-slice.json)
+      status: logged
+      by: CHG-SBO-006
     - what: >-
         The "Publish AI governance policy" button is bound to no operation (op None) though publishAiGovernancePolicy is declared.
       why: Bind it.
       source: screens/P09-platform-admin-console.yaml#ADM-528
+      status: fixed
+      by: CHG-SBO-007
   ADM-536:
     block: A
     summary: >-
@@ -2050,9 +2096,13 @@ screens:
       source: >-
         ADR-0059 (Block A slice: tasks.csv (APP-SETUP-ADM-536)) | ADR-0059 (Block A slice: handoff/delivery-slice.json) |
         MoM 18 Sep 4.2
+      status: logged
+      by: CHG-SBO-006
     - what: The layout has only an unlabelled primary button and Cancel.
       why: Needs the capability list with status, the plan list and the decision lookup the operations act on.
       source: screens/P09-platform-admin-console.yaml#ADM-536
+      status: logged
+      by: CHG-SBO-005
   ADM-554:
     block: A
     summary: >-
@@ -2138,9 +2188,13 @@ screens:
       source: >-
         ADR-0059 (Block A slice: tasks.csv (APP-SETUP-ADM-554)) | ADR-0059 (Block A slice: handoff/delivery-slice.json) |
         ADR-0051 (AI-D16)
+      status: logged
+      by: CHG-SBO-006
     - what: Layout has an unbound table, an unlabelled primary button and a publishGate with no operation.
       why: Bind the table to releases/evaluations and the buttons to promote and roll back.
       source: screens/P09-platform-admin-console.yaml#ADM-554
+      status: fixed
+      by: CHG-SBO-007
     decisions:
     - question: Is promotion a tenant decision (tenant admin with AI_APPROVE) or TICVAI's?
       decision: 'Role builder: roles are preset permission configurations (All, Viewer, Mid-level and the like), not fixed
@@ -2222,12 +2276,16 @@ screens:
         Buttons labelled "Revalidate thresholds Fraud Team 15 Sep Pending" and "Run control test Governance 15 Sep Pending".
       why: These are corrective-action rows (action, owner, due, status) read off the board, not buttons.
       source: screens/P09-platform-admin-console.yaml#ADM-556
+      status: fixed
+      by: CHG-SBO-007
     - what: >-
         In Block A only containAiIncident is in the slice; openAiIncident, listAiIncidents and closeAiIncident are not.
       why: >-
         An incident must be opened and found before it can be contained; add openAiIncident and listAiIncidents to Block A.
       source: >-
         ADR-0059 (Block A slice: tasks.csv (APP-SETUP-ADM-556)) | ADR-0059 (Block A slice: handoff/delivery-slice.json)
+      status: logged
+      by: CHG-SBO-006
     - what: >-
         The post-incident fields (impact, control failure, lessons learned) are selectFields bound to nothing, and closeAiIncident
         takes only rootCause and remediation.

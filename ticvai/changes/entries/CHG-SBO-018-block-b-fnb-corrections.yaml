@@ -1,0 +1,42 @@
+id: CHG-SBO-018
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: The open Block B design-note corrections of the F&B and retail process on P08 and P09 are applied on the screens
+  (labels, controls, bindings, layouts, purposes), with the decisions of 2 October on the same screens.
+decision:
+  what: Apply every open Block B correction of handoff/design-notes/fnb-retail that a screen change can fix; log the ones
+    that need a contract or another owner.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Phase B brief (2 October 2026): apply the OPEN corrections of Block A and B screens, Block A first; design-note corrections
+  (fnb-retail), 1-2 October 2026. Decisions of 2 October recorded on the same screens are cited by their DEC ids in each screen''s
+  notes. Each item is a design-note correction on a screen; audit roots R250, R254 and R276; the notes were recorded by CHG-NOTE-001..009.'
+keys_touched:
+  screens:
+  - BO-135
+  - BO-136
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-BO-136
+  - VM-BO-135
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: '- BO-135: routing model now exists (CHG-CSA-015) and is bound on BO-135 (DEC-189)
+
+  - BO-136: Board frames fnb-2m (Production Planning & Sheets), fnb-2n (Central Kitchen & Commissary) and fnb-5d (Production
+  Execution & Batch) are attached to this settings screen; its own frame is FnB Board 1 fnb-1k ("F&B Global Settings & Controls").
+  | The whole VenueSettings record is shown and editable - id, currency scale, support hours, quiet hours, biometrics, segregated
+  access, alerting, cart and resale limits.
+
+
+  Batch SBO (screens-p08-p09, phase B), 2 October 2026; worktree D:/wt/screens-p08-p09, branch screens-p08-p09. Tickets: none
+  started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched screen. Applied with
+  the screen files'' own dump settings (width 100).'

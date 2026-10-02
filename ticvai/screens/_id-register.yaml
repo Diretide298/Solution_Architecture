@@ -25,10 +25,10 @@ prefixes:
     authored: 1-8
     fromClientPack: null
   ADM:
-    issued: 676
-    highWaterMark: 698
-    nextFree: 699
-    authored: 1-318
+    issued: 678
+    highWaterMark: 700
+    nextFree: 701
+    authored: 1-700
     fromClientPack: 38-698
   ANL:
     issued: 71

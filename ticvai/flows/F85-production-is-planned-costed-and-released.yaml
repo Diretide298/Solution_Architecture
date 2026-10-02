@@ -47,7 +47,7 @@ steps:
   screen: BO-007
   action: Product Directory.
   operations:
-  - bulkUpdateProducts
+  - bulkUpdateCatalogueProducts
   - createMerchandise
   - createProduct
   - getProduct

@@ -1,0 +1,74 @@
+id: CHG-SBO-021
+date: '2026-10-02'
+source: cr
+kind: spec
+summary: 'Duplicate screens are merged, one screen per job, the merged ids kept as anchors that route to the screen kept (M24-03
+  style): BO-728 and BO-729 into BO-044, BO-110 into BO-111, BO-113 and BO-138 into BO-112, BO-677 into BO-785, BO-389 and
+  BO-390 into BO-388, BO-528 into ADM-088.'
+decision:
+  what: Merge the duplicates the design notes proposed; content the kept screen lacks moves with a tab.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, pre-apply round of 2 October 2026: "Duplicate screens: merge as proposed" (answers log). Design-note corrections
+  fnb-retail BO-044, BO-110, BO-112, BO-729; customer-marketing BO-785; platform-foundation BO-389, BO-390, BO-728; the lead''s
+  follow-up for BO-528 (2 October). R276.'
+keys_touched:
+  screens:
+  - BO-044
+  - BO-728
+  - BO-729
+  - BO-110
+  - BO-111
+  - BO-112
+  - BO-113
+  - BO-138
+  - BO-677
+  - BO-785
+  - BO-388
+  - BO-389
+  - BO-390
+  - BO-528
+  - ADM-088
+root_class: A31 SCREEN-WRONG-OP
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-BO-044
+  - APP-SETUP-BO-110
+  - APP-SETUP-BO-785
+  - VM-BO-111
+  - VM-BO-112
+  - VM-BO-113
+  - VM-BO-138
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'BO-111 is kept rather than BO-110 because flows F31 and F93 run on it. Anchors keep their navigation so the board
+  flows (F243, F223, F127) still walk. check-screen-wiring S-DUP-SCREEN guards duplicates.
+
+  - BO-044: BO-044 duplicates the client pack''s BO-728 Outlet Management and BO-729 Create / Edit Outlet; R276 did not decide
+  this pair.
+
+  - BO-110: BO-110 and BO-111 both save the recipe (setRecipe) as separate screens under Sell.
+
+  - BO-112: Production is split over BO-112, BO-113, BO-136, BO-137 and BO-138 with the same operations repeated (planProductionRun
+  on three, completeProductionRun on two).
+
+  - BO-389: Shares setApprovalSlaPolicy with BO-388 and BO-390 and has no fields.
+
+  - BO-390: No fields; shares setApprovalSlaPolicy.
+
+  - BO-728: The table has no columns and there is no create or update operation.
+
+  - BO-729: The same form as BO-044''s Create/Save outlet.
+
+  - BO-785: BO-785 Template Library and BO-677 Communication Template Library both list message templates.
+
+
+  Batch SBO (screens-p08-p09, phase B), 2 October 2026; worktree D:/wt/screens-p08-p09, branch screens-p08-p09. Tickets: none
+  started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched screen. Applied with
+  the screen files'' own dump settings (width 100).'

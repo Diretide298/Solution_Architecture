@@ -1,0 +1,81 @@
+id: CHG-SBO-006
+date: '2026-10-02'
+source: audit
+kind: process
+summary: 'Block A AI setup screens can write but not read: the reads they need (listAiCapabilities, listAiGovernancePolicyVersions,
+  getEffectiveAiPolicy, listForecastVersions, listOperationalRequirements, getForecast, pauseAiCapability ...) are not in
+  the Block A slice.'
+decision:
+  what: Add the listed reads to the Block A slice (tools/derive-delivery-slice.py ALSO); the screens now bind them.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Design-note corrections (ai), 1-2 October 2026: "In Block A only ... is in the slice" (ADR-0059); TODO wave 2 "Block
+  A slice gap (AI agent)".'
+keys_touched:
+  screens:
+  - ADM-037
+  - ADM-508
+  - ADM-520
+  - ADM-523
+  - ADM-526
+  - ADM-527
+  - ADM-528
+  - ADM-536
+  - ADM-554
+  - ADM-556
+  - BO-919
+  - BO-927
+root_class: A10 TICKET-DRIFT
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ADM-037
+  - APP-SETUP-ADM-508
+  - APP-SETUP-ADM-520
+  - APP-SETUP-ADM-523
+  - APP-SETUP-ADM-526
+  - APP-SETUP-ADM-527
+  - APP-SETUP-ADM-528
+  - APP-SETUP-ADM-536
+  - APP-SETUP-ADM-554
+  - APP-SETUP-ADM-556
+  - APP-SETUP-BO-919
+  - APP-SETUP-BO-927
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/derive-delivery-slice.py::ALSO
+status: open
+notes: 'Open: the slice generator is not a screens file (owner: the lead or the slice tool owner).
+
+  - ADM-037: Block A slice lacks listAiProviders, testAiProvider, listOwnPlatformStaffGrants, getRegionSettings and getAiByokEnablement
+  (ADM-037 reads them)
+
+  - ADM-508: Block A slice lacks listForecastVersions and getForecastAccuracy (ADM-508)
+
+  - ADM-520: Block A slice lacks listAiCapabilities (ADM-520); the registry table is bound
+
+  - ADM-523: Block A slice lacks listAiGovernancePolicyVersions (ADM-523)
+
+  - ADM-526: Block A slice lacks getEffectiveAiPolicy, listAiGovernancePolicyVersions and revokeAiPolicyException (ADM-526)
+
+  - ADM-527: Block A slice lacks listAiGovernancePolicyVersions (ADM-527)
+
+  - ADM-528: Block A slice lacks listAiGovernancePolicyVersions and getEffectiveAiPolicy (ADM-528)
+
+  - ADM-536: Block A slice lacks pauseAiCapability and overrideAiDecision (ADM-536)
+
+  - ADM-554: Block A slice lacks listAiGovernanceAlerts, listAiEvaluations and listAiTrainingRuns (ADM-554)
+
+  - ADM-556: Block A slice lacks openAiIncident and listAiIncidents (ADM-556)
+
+  - BO-919: Block A slice lacks getForecast and listOperationalRequirements (BO-919); both are now bound on the screen
+
+  - BO-927: Block A slice lacks listOperationalRequirements and getForecast (BO-927)
+
+
+  Batch SBO (screens-p08-p09, phase B), 2 October 2026; worktree D:/wt/screens-p08-p09, branch screens-p08-p09. Tickets: none
+  started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched screen. Applied with
+  the screen files'' own dump settings (width 100).'

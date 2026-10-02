@@ -73,6 +73,9 @@ CHECKS = [
     # form with the second factor, the role prompt and (in a browser) SSO and no workstation, no form asks a
     # person for a token, and no door lands on a read gated by a right to act.
     "check-doors",
+    # 2 October (Chinmay, pre-apply round, CHG-SBO-001): every TICVAI Console screen acting in a tenant carries
+    # the R098 tenant picker and platform-staff grant, and every Console screen is core.
+    "check-console-grant",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.

@@ -484,6 +484,8 @@ screens:
       why: >-
         Venue is the session scope (PR-1); kind is a closed enum and needs a select; a toggle cannot express "either".
       source: screens/P08-venue-back-office.yaml#BO-007 | contracts/spine/catalogue.yaml#listProducts
+      status: fixed
+      by: CHG-SBO-010
     - what: bulkUpdateProducts, a catalogue act on products, is declared in the inventory contract.
       why: >-
         The directory calls one product write in inventory and the rest in catalogue; permissions and audit for
@@ -497,6 +499,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/spine/catalogue.yaml#listAlternativeCodes
+      status: logged
+      by: CHG-SBO-005
   BO-008:
     block: A
     summary: >-
@@ -639,12 +643,16 @@ screens:
     - what: The screen's module is "Orders & Money" while it is the product configuration.
       why: Navigation would file the product record under money; it belongs with Sell beside BO-007.
       source: screens/P08-venue-back-office.yaml#BO-008
+      status: fixed
+      by: CHG-SBO-003
     - what: >-
         List operation(s) listProductVersions return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/spine/catalogue.yaml#listProductVersions
+      status: logged
+      by: CHG-SBO-005
     decisions:
     - question: Which sections are visible for each product kind (for example no attributes on a gift card, no entitlement
         on retail)?
@@ -765,18 +773,24 @@ screens:
         scale (ADR-0008).
       source: >-
         contracts/spine/catalogue.yaml#/components/schemas/PricingDynamicPriceCondition | contracts/spine/catalogue.yaml#/components/schemas/PricingDynamicPriceAction
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         Price list priority has no stated direction (default 0), while promotions say "higher evaluates first" and
         the pack rule builders say "lower wins".
       why: The same word means opposite orders on adjacent screens; one direction must be fixed.
       source: >-
         contracts/spine/catalogue.yaml#createPriceList | contracts/satellite/promotions.yaml#createPromotion | contracts/spine/catalogue.yaml#setDemandOccupancyAvailability
+      status: fixed
+      by: CHG-SBO-010
     - what: >-
         List operation(s) listDynamicPriceRules return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/spine/catalogue.yaml#listDynamicPriceRules
+      status: logged
+      by: CHG-SBO-005
   BO-010:
     block: A
     summary: >-
@@ -890,6 +904,8 @@ screens:
         The client asked for consolidation, but a voucher batch (a liability) and a promotion (a price rule) are
         different records; draw them as tabs of one desk with separate lists, not one form.
       source: screens/P08-venue-back-office.yaml#BO-010 | DI-987
+      status: fixed
+      by: CHG-SBO-010
   BO-011:
     block: A
     summary: >-
@@ -988,6 +1004,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/spine/catalogue.yaml#listCatalogueBundles
+      status: logged
+      by: CHG-SBO-005
   BO-012:
     block: A
     summary: >-
@@ -1052,6 +1070,8 @@ screens:
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: >-
         contracts/spine/catalogue.yaml#listEntitlementTemplates | contracts/spine/catalogue.yaml#listAlternativeCodes
+      status: logged
+      by: CHG-SBO-005
   BO-013:
     block: B
     summary: >-
@@ -1111,12 +1131,16 @@ screens:
         A product's distribution listing is a catalogue or partner concern, not subscription; the screen mixes two
         permission families.
       source: contracts/satellite/subscription.yaml#setChannelListing
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         List operation(s) listChannelListings return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/subscription.yaml#listChannelListings
+      status: logged
+      by: CHG-SBO-005
   BO-014:
     block: B
     summary: >-
@@ -1257,6 +1281,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/spine/catalogue.yaml#listPerformanceTemplates
+      status: logged
+      by: CHG-SBO-005
   BO-017:
     block: B
     summary: >-
@@ -1299,6 +1325,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/spine/catalogue.yaml#listWaitlistEntries
+      status: logged
+      by: CHG-SBO-005
   BO-018:
     block: B
     summary: >-
@@ -1731,6 +1759,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/spine/catalogue.yaml#listCatalogueBundles
+      status: logged
+      by: CHG-SBO-005
   BO-047:
     block: C
     summary: >-
@@ -1834,11 +1864,15 @@ screens:
       why: >-
         The server assigns the id, sets status to draft and derives scope; the form must not show them.
       source: contracts/satellite/venue-map.yaml#createVenueMap
+      status: fixed
+      by: CHG-SBO-010
     - what: >-
         List operation(s) listVenueMaps return a bare array, not the paged list envelope (items, nextCursor, hasMore).
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/venue-map.yaml#listVenueMaps
+      status: logged
+      by: CHG-SBO-005
     decisions:
     - question: What image formats and sizes may tenants upload for the illustrated base map (benchmark an interactive 3D-style
         map)?
@@ -1984,6 +2018,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/spine/catalogue.yaml#listCatalogueBundles
+      status: logged
+      by: CHG-SBO-005
     decisions:
     - question: Do rental booths and stations appear on the live map as points, or does the map builder need a booth/station
         kind?
@@ -2346,12 +2382,16 @@ screens:
         are credential or entitlement types, not eligibility (R275 b), so the access list should not be drawn as
         editable eligibility.
       source: contracts/spine/access.yaml#listGuestCompanionEligibility | R275
+      status: fixed
+      by: CHG-SBO-010
     - what: >-
         List operation(s) listGuestCompanionEligibility return a bare array, not the paged list envelope (items,
         nextCursor, hasMore).
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/spine/access.yaml#listGuestCompanionEligibility
+      status: logged
+      by: CHG-SBO-005
   BO-264:
     block: C
     summary: >-
@@ -2844,6 +2884,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/spine/catalogue.yaml#listEntitlementTemplates
+      status: logged
+      by: CHG-SBO-005
   BO-291:
     block: B
     summary: >-
@@ -3672,6 +3714,8 @@ screens:
         The designer cannot tell which is saved; the print-layout properties should live on one template record.
       source: >-
         contracts/spine/access.yaml#setPdfPrintablePos | contracts/spine/orders.yaml#createTicketTemplate
+      status: logged
+      by: CHG-SBO-005
   BO-374:
     block: B
     summary: >-
@@ -4001,6 +4045,8 @@ screens:
         The screen's module is Games & Rides while the rule order governs every price at the venue.
       why: It belongs with pricing (Sell); filing it under Games hides it from the pricing team.
       source: screens/P08-venue-back-office.yaml#BO-441
+      status: fixed
+      by: CHG-SBO-003
   BO-443:
     block: B
     summary: >-
@@ -4041,6 +4087,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/spine/catalogue.yaml#listDynamicPriceRules
+      status: logged
+      by: CHG-SBO-005
   BO-444:
     block: B
     summary: >-
@@ -4162,6 +4210,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listRealTimeAvailability
+      status: logged
+      by: CHG-SBO-005
   BO-528:
     block: B
     summary: >-
@@ -4362,6 +4412,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/spine/catalogue.yaml#listEventTypes
+      status: logged
+      by: CHG-SBO-005
   BO-696:
     block: A
     summary: >-
@@ -4400,6 +4452,8 @@ screens:
     - what: cloneEvent's request body is not specified in the packet (only eventId comes back).
       why: The screen needs the parts-to-copy and date-shift inputs to exist in the contract.
       source: contracts/spine/catalogue.yaml#cloneEvent
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         No read operation: the screen declares only cloneEvent and nothing that returns the current configuration.
       why: >-
@@ -4549,6 +4603,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/spine/catalogue.yaml#listSpaces
+      status: logged
+      by: CHG-SBO-005
   BO-701:
     block: B
     summary: >-
@@ -4839,6 +4895,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/accreditation.yaml#listAccessProfiles
+      status: logged
+      by: CHG-SBO-005
   BO-709:
     block: B
     summary: >-
@@ -5235,6 +5293,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/spine/catalogue.yaml#listPerformanceTemplates
+      status: logged
+      by: CHG-SBO-005
   BO-722:
     block: B
     summary: >-
@@ -5273,6 +5333,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/wallet.yaml#listCreditTypes
+      status: logged
+      by: CHG-SBO-005
   BO-723:
     block: B
     summary: >-
@@ -5375,6 +5437,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/spine/catalogue.yaml#listPerformanceTemplates
+      status: logged
+      by: CHG-SBO-005
   BO-726:
     block: B
     summary: >-
@@ -5429,6 +5493,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listAudienceDiscoveryTargeting
+      status: logged
+      by: CHG-SBO-005
   BO-765:
     block: B
     summary: >-
@@ -5450,6 +5516,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listCampaignCalendarTimeline
+      status: logged
+      by: CHG-SBO-005
   BO-770:
     block: B
     summary: >-
@@ -5552,6 +5620,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/spine/catalogue.yaml#listSpaces
+      status: logged
+      by: CHG-SBO-005
   BO-920:
     block: B
     summary: >-
@@ -7387,15 +7457,21 @@ screens:
         overrides, which the pack asks for.
       source: >-
         contracts/satellite/seating.yaml#createSeatCategory | screens/P08-venue-back-office.yaml#BO-1045
+      status: fixed
+      by: CHG-SBO-010
     - what: listSeatCategories returns no described schema.
       why: The table cannot bind its columns.
       source: contracts/satellite/seating.yaml#listSeatCategories
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         List operation(s) listSeatCategories return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/seating.yaml#listSeatCategories
+      status: logged
+      by: CHG-SBO-005
   BO-1046:
     block: B
     summary: >-
@@ -9231,6 +9307,8 @@ screens:
         the permissions.
       source: >-
         contracts/spine/orders.yaml#setRefundPolicy | contracts/satellite/wallet.yaml#setWalletRefundPolicy
+      status: fixed
+      by: CHG-SBO-010
     - what: >-
         No read operation: the screen declares only setRefundPolicy, setWalletRefundPolicy and nothing that returns
         the current configuration.
@@ -9628,6 +9706,8 @@ screens:
         A venue user would edit the tenant's wallet configuration; show the tenant scope explicitly or restrict
         the screen to tenant administrators.
       source: contracts/satellite/wallet.yaml#publishWalletConfiguration
+      status: fixed
+      by: CHG-SBO-010
   BO-1163:
     block: C
     summary: >-
@@ -10135,6 +10215,8 @@ screens:
         The staff screen calls an operation that does not declare the staff audience; add staff or give the screen
         its own preview.
       source: contracts/satellite/transport.yaml#quoteTransportFare
+      status: logged
+      by: CHG-SBO-005
   BO-1186:
     block: A
     summary: >-
@@ -10330,6 +10412,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/spine/catalogue.yaml#listDonationCampaigns
+      status: logged
+      by: CHG-SBO-005
     decisions:
     - question: Are donations taxable, and may a tax or service fee be enabled on them?
       decision: 'Drawn default stands (answer: "No tax; optional fee switch"): No tax on donations; a switch for a tax or
@@ -16891,6 +16975,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listGovernanceRiskLaunch
+      status: logged
+      by: CHG-SBO-005
   ADM-383:
     block: B
     summary: >-

@@ -1783,6 +1783,8 @@ screens:
       - what: Two primary buttons, "Call next parties" (callNextParties) and "Call next" (no operation).
         why: The same act appears twice; keep one.
         source: screens/P08-venue-back-office.yaml#BO-005
+        status: fixed
+        by: CHG-SBO-013
 
   BO-618:
     summary: >-
@@ -1825,6 +1827,8 @@ screens:
       - what: Components are a text field labelled "Mandatory / Optional / Conditional / Hidden" and a select labelled "Key requirement - 12.1.2".
         why: The first is a per-field control; the second leaks a matrix reference into the UI (the bundle rule forbids it).
         source: screens/P08-venue-back-office.yaml#BO-618
+        status: fixed
+        by: CHG-SBO-013
 
   BO-755:
     summary: >-
@@ -1882,9 +1886,13 @@ screens:
       - what: previewSegment works only on a saved segment (POST /segments/{segmentId}/preview).
         why: The purpose asks for a live count while rules are edited. Add a preview that takes unsaved criteria, or save drafts automatically.
         source: contracts/satellite/marketing-crm.yaml#previewSegment
+        status: fixed
+        by: CHG-SBO-013
       - what: CreateSegmentRequest supports a flat list of criteria with match all or any; the purpose requires nested AND/OR/NOT groups, effective dates, refresh frequency, ownership, tags and approval.
         why: The contract cannot hold what the builder is specified to build. Either extend the request (rule groups, effective dates, owner, approval) or reduce the purpose.
         source: contracts/satellite/marketing-crm.yaml#createSegment; screens/P08-venue-back-office.yaml#BO-755
+        status: logged
+        by: CHG-SBO-005
       - what: The screen has list states but no list operation (listSegments is not declared here).
         why: Opening an existing segment to edit needs a read. Add listSegments (and a get).
         source: contracts/satellite/marketing-crm.yaml#listSegments
@@ -1973,6 +1981,8 @@ screens:
       - what: CreateCampaignRequest has no objective, success target, owner, brand, products or budget fields, and no offer reference.
         why: The purpose and DI-383 require them, and the offer must be a reference to a pre-configured offer. Add them or reduce the purpose.
         source: contracts/satellite/marketing-crm.yaml#/components/schemas/CreateCampaignRequest; DI-383; MoM 2026-08-20 4.6
+        status: logged
+        by: CHG-SBO-005
 
   BO-785:
     summary: >-
@@ -2018,9 +2028,13 @@ screens:
       - what: Only listMessageTemplates and createMessageTemplate are wired; the purpose requires edit, version, approval, clone, archive, compare and change history.
         why: No update, version or archive operation for message templates exists in the contract. Add them, or reduce the purpose to list and create.
         source: contracts/satellite/marketing-crm.yaml#createMessageTemplate; screens/P08-venue-back-office.yaml#BO-785
+        status: logged
+        by: CHG-SBO-005
       - what: BO-785 Template Library and BO-677 Communication Template Library both list message templates.
         why: They look like one screen in two places; decide whether BO-677 is the platform-wide view or merge them.
         source: contracts/satellite/marketing-crm.yaml#listMessageTemplates
+        status: fixed
+        by: CHG-SBO-021
 
   BO-825:
     summary: >-
@@ -2059,6 +2073,8 @@ screens:
       - what: No list or read operation for challenges exists (only createChallenge and the guest's getMyChallenges), but the screen has list states.
         why: A builder that cannot reopen a draft cannot govern "from objective through publication". Add listChallenges and getChallenge, and an activate step.
         source: contracts/satellite/marketing-crm.yaml#createChallenge
+        status: fixed
+        by: CHG-SBO-013
 
   BO-827:
     summary: >-
@@ -4942,6 +4958,8 @@ screens:
       - what: The primary action is "Create loyalty programme".
         why: Milestones and rewards are set for an existing programme; programme creation is elsewhere.
         source: screens/P08-venue-back-office.yaml#BO-828
+        status: fixed
+        by: CHG-SBO-013
 
   BO-829:
     summary: >-

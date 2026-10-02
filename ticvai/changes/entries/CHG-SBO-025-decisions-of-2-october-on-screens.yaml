@@ -1,0 +1,132 @@
+id: CHG-SBO-025
+date: '2026-10-02'
+source: cr
+kind: spec
+summary: 'Chinmay''s decisions of 2 October that land on P08 and P09 screens are drawn: shift close and review, outlets, kitchen,
+  access, biometrics, devices, AI, roles, finance, consent forms, white-label console, billing entity.'
+decision:
+  what: Bind the operations and fields the contract agents added (CHG-CSP, CHG-CSA, CHG-FUP) on the screens their keys_touched
+    name, and state each decision on the screen with its DEC id.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026 (answers log, batches 1-6, critical sets, door follow-ups, pre-apply round): DEC ids DEC-001,
+  DEC-002, DEC-003, DEC-007, DEC-008, DEC-009, DEC-031, DEC-034, DEC-059, DEC-064, DEC-070, DEC-101, DEC-128, DEC-136, DEC-144,
+  DEC-145, DEC-151, DEC-168, DEC-173, DEC-175, DEC-176, DEC-178, DEC-179, DEC-181, DEC-183, DEC-185, DEC-187, DEC-188, DEC-189,
+  DEC-192, DEC-194, DEC-195, DEC-196, DEC-197, DEC-209, DEC-210, DEC-215, DEC-219, DEC-220, DEC-227, DEC-228, DEC-229, DEC-230,
+  DEC-231, DEC-232, DEC-233, DEC-236, DEC-237, DEC-239, DEC-241, DEC-245, DEC-254, DEC-255, DEC-260, DEC-261, DEC-266, DEC-275,
+  DEC-368, DEC-397, DEC-426, DEC-457, DEC-461, DEC-547, DEC-549. The contract side is CHG-CSP-003..052, CHG-CSA-001..045 and
+  CHG-FUP-004..011.'
+keys_touched:
+  screens:
+  - ADM-016
+  - ADM-017
+  - ADM-018
+  - ADM-021
+  - ADM-037
+  - ADM-411
+  - ADM-508
+  - ADM-554
+  - ADM-700
+  - BO-008
+  - BO-009
+  - BO-039
+  - BO-040
+  - BO-042
+  - BO-043
+  - BO-044
+  - BO-045
+  - BO-054
+  - BO-091
+  - BO-104
+  - BO-1066
+  - BO-1081
+  - BO-109
+  - BO-112
+  - BO-1170
+  - BO-134
+  - BO-135
+  - BO-139
+  - BO-140
+  - BO-142
+  - BO-146
+  - BO-147
+  - BO-152
+  - BO-153
+  - BO-157
+  - BO-159
+  - BO-165
+  - BO-186
+  - BO-187
+  - BO-188
+  - BO-190
+  - BO-196
+  - BO-203
+  - BO-229
+  - BO-230
+  - BO-247
+  - BO-248
+  - BO-336
+  - BO-427
+  - BO-471
+  - BO-627
+  - BO-631
+  - BO-635
+  - BO-636
+  - BO-729
+  - BO-731
+  - BO-747
+  - BO-748
+  - BO-772
+  - BO-919
+root_class: A26 BUSINESS-RULES
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ADM-037
+  - APP-SETUP-ADM-508
+  - APP-SETUP-ADM-554
+  - APP-SETUP-BO-008
+  - APP-SETUP-BO-009
+  - APP-SETUP-BO-044
+  - APP-SETUP-BO-045
+  - APP-SETUP-BO-054
+  - APP-SETUP-BO-091
+  - APP-SETUP-BO-188
+  - APP-SETUP-BO-919
+  - APP-WL-ADM-016
+  - APP-WL-ADM-017
+  - APP-WL-ADM-018
+  - VM-BO-039
+  - VM-BO-040
+  - VM-BO-042
+  - VM-BO-043
+  - VM-BO-104
+  - VM-BO-109
+  - VM-BO-112
+  - VM-BO-134
+  - VM-BO-135
+  - VM-BO-139
+  - VM-BO-140
+  - VM-BO-142
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Per decision: DEC-001 ADM-037; DEC-002 ADM-037; DEC-003 ADM-508; DEC-007 ADM-021, ADM-554, BO-054, BO-1066; DEC-008
+  BO-091; DEC-009 BO-919; DEC-031 BO-044; DEC-034 BO-045; DEC-059 BO-039, BO-043; DEC-064 BO-044; DEC-070 BO-044; DEC-101
+  BO-009; DEC-128 BO-188; DEC-136 BO-165; DEC-144 ADM-016; DEC-145 ADM-018; DEC-151 BO-008; DEC-168 ADM-700; DEC-173 BO-040;
+  DEC-175 BO-040; DEC-176 BO-040; DEC-178 BO-042; DEC-179 BO-042; DEC-181 BO-104; DEC-183 BO-109; DEC-185 BO-112; DEC-187
+  BO-134; DEC-188 BO-112, BO-134; DEC-189 BO-135; DEC-192 BO-139; DEC-194 BO-140; DEC-195 BO-142; DEC-196 BO-044, BO-729;
+  DEC-197 BO-731; DEC-209 ADM-411; DEC-210 ADM-411; DEC-215 BO-043; DEC-219 BO-1081; DEC-220 BO-1170; DEC-227 BO-146; DEC-228
+  BO-147; DEC-229 BO-152; DEC-230 BO-153; DEC-231 BO-157; DEC-232 BO-159; DEC-233 BO-165; DEC-236 BO-186; DEC-237 BO-187;
+  DEC-239 BO-190; DEC-241 BO-196; DEC-245 BO-203; DEC-254 BO-229; DEC-255 BO-230; DEC-260 BO-247; DEC-261 BO-248; DEC-266
+  BO-336; DEC-275 BO-772; DEC-368 BO-635, BO-636; DEC-397 BO-427; DEC-426 BO-471; DEC-457 BO-627; DEC-461 BO-631; DEC-547
+  ADM-017; DEC-549 BO-747, BO-748
+
+
+  Batch SBO (screens-p08-p09, phase B), 2 October 2026; worktree D:/wt/screens-p08-p09, branch screens-p08-p09. Tickets: none
+  started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched screen. Applied with
+  the screen files'' own dump settings (width 100).'

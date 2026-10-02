@@ -109,7 +109,7 @@ screens:
     loading: The welcome start your configuration as saved.
     error: Could not load. Names which read failed and leaves the welcome start your untouched.
     emptyFirstRun: No welcome start your configured yet. Offers no create action — this screen declares
-      no operation that makes one and says what the platform does in the meantime.
+      no operation that makes one; distinct from a filter that matched nothing.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
       wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on
       2.1, which is where somebody without access to a saved setup would be sent; no minute has decided
@@ -260,24 +260,14 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: dataTable
-        label: Every venue type business
-        columns:
-        - Museum
-        - Attraction
-        - Theme Park
-        - Waterpark
-        - Stadium
-        - Theatre
-        - Exhibition / Event Venue
-        - Zoo / Aquarium
-        - Tour Operator
-        - Entertainment Center
-        - Multi-Venue Operator
-        - Other
+      - kind: multiSelect
+        label: Venue type
         bindsTo: null
         operation: null
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 23 §Visual cards
+        notes: The venue types the prospect chooses from (Museum, Attraction, Theme Park, Waterpark, Stadium,
+          Theatre, Exhibition / Event Venue, Zoo / Aquarium, Tour Operator, Entertainment Center, Multi-Venue
+          Operator, Other), a choice, not table columns (design-note correction SGN-003, CHG-SOT-017).
     - name: contextPanel
       slot: selection
       components:
@@ -302,8 +292,8 @@ screens:
   states:
     loading: The venue type business list.
     error: Could not load. Names which read failed and leaves the venue type business untouched.
-    emptyFirstRun: No venue type business yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: No venue type business yet. Offers no create action — this screen declares no operation
+      that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the venue type business are still there. Names the active
       filter and offers to clear it.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
@@ -394,8 +384,8 @@ screens:
   states:
     loading: The visitor capacity operational list.
     error: Could not load. Names which read failed and leaves the visitor capacity operational untouched.
-    emptyFirstRun: No visitor capacity operational yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No visitor capacity operational yet. Offers no create action — this screen declares
+      no operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the visitor capacity operational are still there. Names
       the active filter and offers to clear it.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
@@ -628,8 +618,8 @@ screens:
   states:
     loading: The ticketing product requirements configuration as saved.
     error: Could not load. Names which read failed and leaves the ticketing product requirements untouched.
-    emptyFirstRun: No ticketing product requirements configured yet. Carries the create action and says
-      what the platform does in the meantime.
+    emptyFirstRun: No ticketing product requirements configured yet. Offers no create action — this screen
+      declares no operation that makes one; distinct from a filter that matched nothing.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
       wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on
       2.1, which is where somebody without access to a saved setup would be sent; no minute has decided
@@ -706,8 +696,8 @@ screens:
   states:
     loading: The access queue visitor list.
     error: Could not load. Names which read failed and leaves the access queue visitor untouched.
-    emptyFirstRun: No access queue visitor yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: No access queue visitor yet. Offers no create action — this screen declares no operation
+      that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the access queue visitor are still there. Names the active
       filter and offers to clear it.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
@@ -800,8 +790,8 @@ screens:
   states:
     loading: The additional business module list.
     error: Could not load. Names which read failed and leaves the additional business module untouched.
-    emptyFirstRun: No additional business module yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No additional business module yet. Offers no create action — this screen declares no
+      operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the additional business module are still there. Names the
       active filter and offers to clear it.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
@@ -895,8 +885,8 @@ screens:
   states:
     loading: The integration payment technical list.
     error: Could not load. Names which read failed and leaves the integration payment technical untouched.
-    emptyFirstRun: No integration payment technical yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No integration payment technical yet. Offers no create action — this screen declares
+      no operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the integration payment technical are still there. Names
       the active filter and offers to clear it.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
@@ -985,8 +975,8 @@ screens:
   states:
     loading: The assessment summary handoff list.
     error: Could not load. Names which read failed and leaves the assessment summary handoff untouched.
-    emptyFirstRun: No assessment summary handoff yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No assessment summary handoff yet. Offers no create action — this screen declares no
+      operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the assessment summary handoff are still there. Names the
       active filter and offers to clear it.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
@@ -1076,8 +1066,8 @@ screens:
   states:
     loading: The recommended package overview list.
     error: Could not load. Names which read failed and leaves the recommended package overview untouched.
-    emptyFirstRun: No recommended package overview yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No recommended package overview yet. Offers no create action — this screen declares
+      no operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the recommended package overview are still there. Names
       the active filter and offers to clear it.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
@@ -1202,8 +1192,8 @@ screens:
   states:
     loading: The commercial model tier list.
     error: Could not load. Names which read failed and leaves the commercial model tier untouched.
-    emptyFirstRun: No commercial model tier yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: No commercial model tier yet. Offers no create action — this screen declares no operation
+      that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the commercial model tier are still there. Names the active
       filter and offers to clear it.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
@@ -1316,8 +1306,8 @@ screens:
   states:
     loading: The module marketplace list.
     error: Could not load. Names which read failed and leaves the module marketplace untouched.
-    emptyFirstRun: No module marketplace yet. Carries the create action; distinct from a filter that matched
-      nothing.
+    emptyFirstRun: No module marketplace yet. Offers no create action — this screen declares no operation
+      that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the module marketplace are still there. Names the active
       filter and offers to clear it.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
@@ -1425,8 +1415,8 @@ screens:
   states:
     loading: The module package recommendations list.
     error: Could not load. Names which read failed and leaves the module package recommendations untouched.
-    emptyFirstRun: No module package recommendations yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No module package recommendations yet. Offers no create action — this screen declares
+      no operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the module package recommendations are still there. Names
       the active filter and offers to clear it.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
@@ -1508,8 +1498,8 @@ screens:
   states:
     loading: The module detail commercial list.
     error: Could not load. Names which read failed and leaves the module detail commercial untouched.
-    emptyFirstRun: No module detail commercial yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No module detail commercial yet. Offers no create action — this screen declares no
+      operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the module detail commercial are still there. Names the
       active filter and offers to clear it.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
@@ -2225,8 +2215,8 @@ screens:
   states:
     loading: The order commercial pricing list.
     error: Could not load. Names which read failed and leaves the order commercial pricing untouched.
-    emptyFirstRun: No order commercial pricing yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No order commercial pricing yet. Offers no create action — this screen declares no
+      operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the order commercial pricing are still there. Names the
       active filter and offers to clear it.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator

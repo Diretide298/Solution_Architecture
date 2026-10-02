@@ -2155,6 +2155,7 @@ paths:
       operationId: updateAccessPoint
       x-ticvai-consumed-by:
         - "P08 BO-064 Zones & Areas"
+        - "P08 BO-147 Attraction Access Configuration"
         - "P08 BO-148 Access Point Directory"
       x-ticvai-audience:
       - staff
@@ -13135,6 +13136,7 @@ paths:
         - "P08 BO-206 Offline Validation Policy Builder"
         - "P08 BO-208 Offline Credential & Revocation Cache"
         - "P08 BO-210 Connectivity Failure & Degraded Mode Policy"
+        - "P08 BO-471 Offline, Synchronization & Recovery Monitor"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listOfflineCryptographicValidation, listOfflineCredentialRevocation
@@ -15226,6 +15228,7 @@ paths:
     post:
       operationId: lockIdentity
       x-ticvai-consumed-by:
+        - "P08 BO-229 Credential Disable, Blacklist & Whitelist Operations"
         - "P08 BO-244 Access Security & Fraud Command Center"
         - "P08 BO-247 Unified Identity & Credential Lock Manager"
       x-ticvai-audience:
@@ -15315,6 +15318,7 @@ paths:
     post:
       operationId: releaseIdentityLock
       x-ticvai-consumed-by:
+        - "P08 BO-229 Credential Disable, Blacklist & Whitelist Operations"
         - "P08 BO-247 Unified Identity & Credential Lock Manager"
       x-ticvai-audience:
       - staff

@@ -1,0 +1,68 @@
+id: CHG-SBO-020
+date: '2026-10-02'
+source: audit
+kind: process
+summary: Corrections on P08 and P09 screens whose fix lives in another owner's file (flows, design inputs, P13, P05, the task
+  plan) are recorded for those owners.
+decision:
+  what: Log them; the screens side is done where it can be.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Design-note corrections, 1-2 October 2026; Phase B brief: "Coordinate through your report, not by editing other files."
+  Each item is a design-note correction (CHG-NOTE-001..009).'
+keys_touched:
+  screens:
+  - ADM-016
+  - BO-021
+  - BO-048
+  - BO-082
+  - BO-484
+  - BO-834
+  - BO-839
+  - BO-843
+  - BO-919
+root_class: A29 JOURNEY-CONTRACT
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-BO-839
+  - APP-SETUP-BO-919
+  - APP-WL-ADM-016
+  - VM-BO-021
+  - VM-BO-048
+  - VM-BO-082
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-design-notes.py
+status: open
+notes: 'Open until each owner acts. Per screen:
+
+  - ADM-016: F102 step 3 hands over from the tenant''s CMS-006 to ADM-016 (flows owner removes the console step)
+
+  - BO-021: BO-021 exit to POS-002 carrying orderId comes from flow F81 step 1 (flows owner); the edge goes when F81 is repointed
+
+  - BO-048: BO-048: the GST-026 transition and the F17 shop-and-drop steps belong to the till and guest journey (flows owner
+  repoints F17 steps 3 and 5)
+
+  - BO-082: BO-082: F34 step 8 dispositions a returned item with a manual movement; the retail return already restocks (flows
+  owner trims F34 step 8)
+
+  - BO-484: BO-484: Board 10''s customer screens (BO-486..492) have no guest kiosk counterpart on P05 (guest screens owner)
+
+  - BO-834: BO-834: site health and storefront insights (getStorefrontInsights) lost their screen in the merge into P13 (P13
+  owner)
+
+  - BO-839: tasks.csv schedules a Block A task for the merged BO-839; the plan generator should move it to CMS-008 or drop
+  it (derived plan files)
+
+  - BO-843: BO-843: getStorefrontInsights is declared here and on no P13 screen (P13 owner)
+
+  - BO-919: DI-280 to be marked superseded by ADR-0051 in handoff/design-inputs/mom-design-inputs.yaml (design-inputs owner)
+
+
+  Batch SBO (screens-p08-p09, phase B), 2 October 2026; worktree D:/wt/screens-p08-p09, branch screens-p08-p09. Tickets: none
+  started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched screen. Applied with
+  the screen files'' own dump settings (width 100).'

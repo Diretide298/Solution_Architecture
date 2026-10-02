@@ -1,0 +1,163 @@
+id: CHG-SBO-015
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: The open Block B design-note corrections of the platform foundation process on P08 and P09 are applied on the screens
+  (labels, controls, bindings, layouts, purposes), with the decisions of 2 October on the same screens.
+decision:
+  what: Apply every open Block B correction of handoff/design-notes/platform-foundation that a screen change can fix; log
+    the ones that need a contract or another owner.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Phase B brief (2 October 2026): apply the OPEN corrections of Block A and B screens, Block A first; design-note corrections
+  (platform-foundation), 1-2 October 2026. Decisions of 2 October recorded on the same screens are cited by their DEC ids
+  in each screen''s notes. Each item is a design-note correction on a screen; audit roots R250, R254 and R276; the notes were
+  recorded by CHG-NOTE-001..009.'
+keys_touched:
+  screens:
+  - ADM-011
+  - ADM-030
+  - ADM-032
+  - ADM-033
+  - ADM-034
+  - ADM-320
+  - ADM-322
+  - ADM-332
+  - ADM-340
+  - ADM-345
+  - ADM-362
+  - ADM-379
+  - ADM-398
+  - ADM-399
+  - ADM-408
+  - ADM-418
+  - ADM-422
+  - ADM-454
+  - ADM-468
+  - BO-053
+  - BO-068
+  - BO-101
+  - BO-124
+  - BO-131
+  - BO-284
+  - BO-285
+  - BO-293
+  - BO-364
+  - BO-372
+  - BO-375
+  - BO-376
+  - BO-382
+  - BO-385
+  - BO-594
+  - BO-595
+  - BO-602
+  - BO-692
+  - BO-873
+  - BO-1076
+  - BO-1177
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-BO-053
+  - APP-SETUP-BO-124
+  - VM-BO-068
+  - VM-BO-101
+  - VM-BO-131
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: '- ADM-011: Duplicates ADM-007 and ADM-008 operations (add-ons, subscription change).
+
+  - ADM-030: Copied cell operations; "Save scaling policy" has no operation.
+
+  - ADM-032: "Save waf policy" on a screen named "View", plus copied cell actions.
+
+  - ADM-033: Copied cell actions (decommission, tier).
+
+  - ADM-034: Copied cell actions.
+
+  - ADM-320: Step headings ("Step 2 — Applicability") are rendered as fields. | Fields drawn as drop-downs that cannot be
+  choices: text field: Workflow Name, Business Process.
+
+  - ADM-322: The only field is "Stage Name - Finance Manager Approval".
+
+  - ADM-332: The only field is "→ IT Director".
+
+  - ADM-340: The only field is labelled "=R".
+
+  - ADM-345: Column labels contain status text and emoji ("Record Integrity - VERIFIED ✓").
+
+  - ADM-362: Approval kinds (Refund, Discount) are drawn as table columns.
+
+  - ADM-379: ADM-379 to ADM-388 repeat SGN-001 to SGN-010 (same names, same operations).
+
+  - ADM-398: Buttons labelled "Revised Board 3 — Critical Architecture" and "1. Operational Classification".
+
+  - ADM-399: ADM-399 to ADM-410 and ADM-414, ADM-415, ADM-417 repeat SGN-011 to SGN-024 by name and operation.
+
+  - ADM-408: A button labelled "Board 4 — Required Package Data Model".
+
+  - ADM-418: One button labelled "Retry / Investigate / Assign / Escalate" and one labelled "Revised Board 5 — Commercial
+  Model Behavior".
+
+  - ADM-422: Fields are check-marked status lines ("✓ Administrator Account Created").
+
+  - ADM-454: Column labels contain values ("Projected month-end billable tickets - 43,800").
+
+  - ADM-468: Button labelled "Revised Board 10 — Commercial Model Calculation".
+
+  - BO-053: The navigation has no entry or exit (entryFrom and exitTo empty), and entryState reads principalId from the session.
+  | Reaches resetPrincipalCredential (step-up mfa) and declares no way to raise the challenge.
+
+  - BO-068: Filters are free-text id fields (org unit id, principal id, workstation id, subject ref).
+
+  - BO-101: getVenueSettings is declared on an orders overview.
+
+  - BO-124: Create and Save sale board forms ask for `id`, and the deploy form for status, counts and timestamps.
+
+  - BO-131: id and scopePath are form fields. | 8 text fields are raw schema property names, not inputs: id, scopePath, failuresBeforeOffline,
+  probeIntervalSeconds, probeTimeoutMs, successesBeforeOnline, minimumStableSeconds, autoSwitch.
+
+  - BO-284: Membership types (Monthly, Fixed-Term, Corporate...) are drawn as buttons. | Reaches approveMembershipProductValidation
+  (step-up mfa) and declares no way to raise the challenge.
+
+  - BO-285: Fields drawn as drop-downs that cannot be choices: text field: Membership Name, Membership Code, Description,
+  Brand, Venue, Attraction, Market; date picker: Effective From.
+
+  - BO-293: Reaches approveMembershipProductValidation (step-up mfa) and declares no way to raise the challenge.
+
+  - BO-364: The KPIs are drawn as table columns of a dataTable.
+
+  - BO-372: Tile labels carry fixed values ("Within SLA — 92%").
+
+  - BO-375: Only listApprovalRequests; nothing reads the subject.
+
+  - BO-376: The timeline events are drawn as table columns.
+
+  - BO-382: One button labelled "Retry | Investigate | Escalate".
+
+  - BO-385: Fields are prefilled with sample names ("Delegator Ahmed Raza", "Delegate To Sara Khan").
+
+  - BO-594: Field labels are flow text ("Initial Configuration - 42%", "↓", "Board 6 — Zero-Touch Requirement").
+
+  - BO-595: The only component is a field labelled "42% Configuration Complete".
+
+  - BO-602: Field labels "6/12" and "10" are data rendered as fields.
+
+  - BO-692: "Key requirement: 12.1.53" is a field label.
+
+  - BO-873: Same listPrincipals as BO-053.
+
+  - BO-1076: Only listApiClients.
+
+  - BO-1177: Access model names (Read Only, Finance, Partner, High-Value Refund) are drawn as buttons.
+
+
+  Batch SBO (screens-p08-p09, phase B), 2 October 2026; worktree D:/wt/screens-p08-p09, branch screens-p08-p09. Tickets: none
+  started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched screen. Applied with
+  the screen files'' own dump settings (width 100).'

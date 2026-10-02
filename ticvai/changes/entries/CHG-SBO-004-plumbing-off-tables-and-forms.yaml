@@ -1,0 +1,228 @@
+id: CHG-SBO-004
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: Tables drop identifiers and partition keys, and forms stop asking for server-owned fields (id, status, published-at),
+  on the P08 and P09 screens the corrections name.
+decision:
+  what: Narrow the listed tables and rewrite the listed form overlays; an id is a client UUIDv7 generated silently.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Design-note corrections, 1-2 October 2026: "Tables show every schema field, plumbing included" and "form... asks the
+  person for id/status" (audit R254; CHG-NOTE-005).'
+keys_touched:
+  screens:
+  - ADM-002
+  - ADM-003
+  - ADM-005
+  - ADM-006
+  - ADM-007
+  - ADM-008
+  - ADM-010
+  - ADM-011
+  - ADM-012
+  - ADM-013
+  - ADM-014
+  - ADM-015
+  - ADM-019
+  - ADM-020
+  - ADM-021
+  - ADM-022
+  - ADM-023
+  - ADM-024
+  - ADM-026
+  - ADM-028
+  - ADM-029
+  - ADM-030
+  - ADM-032
+  - ADM-033
+  - ADM-034
+  - ADM-035
+  - ADM-036
+  - ADM-318
+  - BO-036
+  - BO-053
+  - BO-054
+  - BO-057
+  - BO-067
+  - BO-068
+  - BO-084
+  - BO-085
+  - BO-086
+  - BO-087
+  - BO-088
+  - BO-101
+  - BO-116
+  - BO-122
+  - BO-123
+  - BO-124
+  - BO-125
+  - BO-126
+  - BO-128
+  - BO-129
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ADM-005
+  - APP-SETUP-ADM-008
+  - APP-SETUP-BO-053
+  - APP-SETUP-BO-054
+  - APP-SETUP-BO-087
+  - APP-SETUP-BO-116
+  - APP-SETUP-BO-124
+  - VM-BO-036
+  - VM-BO-067
+  - VM-BO-068
+  - VM-BO-084
+  - VM-BO-085
+  - VM-BO-086
+  - VM-BO-101
+  - VM-BO-122
+  - VM-BO-123
+  - VM-BO-125
+  - VM-BO-126
+  - VM-BO-128
+  - VM-BO-129
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-design-notes.py
+status: open
+notes: '- ADM-002: Tables show every schema field, plumbing included: ''Every tenant'' drop id, planId, accountManagerPrincipalId;
+  ''Every cell'' drop id, clusterId, regionId.
+
+  - ADM-003: Tables show every schema field, plumbing included: ''Every cell job'' drop id.
+
+  - ADM-005: formSetSsoConfig asks the person for id. | Tables show every schema field, plumbing included: ''Every tenant''
+  drop id, planId, accountManagerPrincipalId; ''Every cell'' drop id, clusterId, regionId.
+
+  - ADM-006: Tables show every schema field, plumbing included: ''Every tenant'' drop id, planId, accountManagerPrincipalId;
+  ''Every cell'' drop id, clusterId, regionId; ''Every org unit'' drop id, parentId.
+
+  - ADM-007: Tables show every schema field, plumbing included: ''Every cell'' drop id, clusterId, regionId; ''Every tenant''
+  drop id, terminationRequestedByPrincipalId.
+
+  - ADM-008: Tables show every schema field, plumbing included: ''Every plan'' drop id; ''Every subscription invoice'' drop
+  id, lines, planVersionUsed; ''Every cell'' drop id, clusterId, regionId; ''Every tenant'' drop id, terminationRequestedByPrincipalId.
+
+  - ADM-010: Tables show every schema field, plumbing included: ''Every cell'' drop id, clusterId, regionId; ''Every tenant''
+  drop id, terminationRequestedByPrincipalId.
+
+  - ADM-011: Tables show every schema field, plumbing included: ''Every cell'' drop id, clusterId, regionId; ''Every tenant''
+  drop id, terminationRequestedByPrincipalId.
+
+  - ADM-012: Tables show every schema field, plumbing included: ''Every cell'' drop id, clusterId, regionId; ''Every tenant''
+  drop id, terminationRequestedByPrincipalId.
+
+  - ADM-013: Tables show every schema field, plumbing included: ''Every cell job'' drop id.
+
+  - ADM-014: Tables show every schema field, plumbing included: ''Every cell job'' drop id.
+
+  - ADM-015: Tables show every schema field, plumbing included: ''Every cell'' drop id, clusterId, regionId; ''Every tenant''
+  drop id, terminationRequestedByPrincipalId; ''Every API client'' drop id, developerId, clientId, allowedTenantIds; ''Production
+  access requests, pending first'' drop developerId, listingId, allowedTenantIds.
+
+  - ADM-019: Tables show every schema field, plumbing included: ''Every plan'' drop id.
+
+  - ADM-020: Tables show every schema field, plumbing included: ''Every principal'' drop id, primaryRoleId.
+
+  - ADM-021: Tables show every schema field, plumbing included: ''Every role'' drop id, inheritsFromRoleId.
+
+  - ADM-022: Tables show every schema field, plumbing included: ''Every release'' drop id, createdByPrincipalId.
+
+  - ADM-023: Tables show every schema field, plumbing included: ''Every release'' drop id, createdByPrincipalId.
+
+  - ADM-024: formPublishSupportNotice asks the person for publishedAt, id. | Tables show every schema field, plumbing included:
+  ''Every support notice'' drop id, affectedTenantIds, publishedByPrincipalId, scopePath; ''Every release'' drop id, createdByPrincipalId.
+
+  - ADM-026: formPublishSupportNotice asks the person for publishedAt, id. | Tables show every schema field, plumbing included:
+  ''Every support notice'' drop id, affectedTenantIds, publishedByPrincipalId, scopePath.
+
+  - ADM-028: formRegisterEnvironment asks the person for id. | Tables show every schema field, plumbing included: ''Every
+  environment'' drop id, cellIds.
+
+  - ADM-029: Tables show every schema field, plumbing included: ''Every cell job'' drop id; ''Every rollout'' drop id, releaseId,
+  startedByPrincipalId, approvedByPrincipalId.
+
+  - ADM-030: formSetScalingPolicy asks the person for id. | Tables show every schema field, plumbing included: ''Every cell
+  job'' drop id.
+
+  - ADM-032: formSetWafPolicy asks the person for id. | Tables show every schema field, plumbing included: ''Every cell job''
+  drop id; ''Every waf rule'' drop id.
+
+  - ADM-033: Tables show every schema field, plumbing included: ''Every cell job'' drop id; ''Every backup run'' drop id.
+
+  - ADM-034: Tables show every schema field, plumbing included: ''Every cell job'' drop id; ''Every archival job'' drop id.
+
+  - ADM-035: formPublishSupportNotice asks the person for publishedAt, id. | Tables show every schema field, plumbing included:
+  ''Every support notice'' drop id, affectedTenantIds, publishedByPrincipalId, scopePath.
+
+  - ADM-036: formPublishSupportNotice asks the person for publishedAt, id.
+
+  - ADM-318: Tables show every schema field, plumbing included: ''Every dead letter'' drop id, outboxId, scopePath; ''Outbox
+  republishes, newest first'' drop tenantId.
+
+  - BO-036: formRegisterDevice asks the person for id. | Tables show every schema field, plumbing included: ''Every registered
+  device'' drop id, driver, workstationId, pushToken, pushPlatform, pushFailureCount; ''Every workstation'' drop id, venueId,
+  regionId, departmentId, scopePath, accessPointId; ''Every alert'' drop id, ruleId, scopePath, workstationId, shiftId; ''Every
+  audit'' drop id, principalId, orgUnitId, workstationId.
+
+  - BO-053: Tables show every schema field, plumbing included: ''Every principal'' drop id, primaryRoleId.
+
+  - BO-054: Tables show every schema field, plumbing included: ''Every role'' drop id, inheritsFromRoleId.
+
+  - BO-057: Tables show every schema field, plumbing included: ''Every principal'' drop id, primaryRoleId.
+
+  - BO-067: formCreateWebhookSubscription asks the person for status, id. | Tables show every schema field, plumbing included:
+  ''Every API client'' drop id, developerId, clientId, allowedTenantIds.
+
+  - BO-068: Tables show every schema field, plumbing included: ''Every audit'' drop id, principalId, orgUnitId, workstationId,
+  platformStaffGrantId; ''Platform-staff grants'' drop operatorPrincipalId.
+
+  - BO-084: Tables show every schema field, plumbing included: ''Waiting for a decision'' drop id, outOfOfficeDelegateId,
+  reopenedFrom, subjectContract, subjectType, subjectId, scopePath.
+
+  - BO-085: Tables show every schema field, plumbing included: ''Waiting for a decision'' drop id, outOfOfficeDelegateId,
+  reopenedFrom, subjectContract, subjectType, subjectId, scopePath.
+
+  - BO-086: Tables show every schema field, plumbing included: ''Every approval matrix'' drop id, scopePath.
+
+  - BO-087: Tables show every schema field, plumbing included: ''Every approval delegation'' drop id, delegatorPrincipalId,
+  delegatePrincipalId, scopePath.
+
+  - BO-088: Tables show every schema field, plumbing included: ''Every index job'' drop id, sourceId.
+
+  - BO-101: Tables show every schema field, plumbing included: ''Every order'' drop id; ''Every settlement'' drop id.
+
+  - BO-116: formUpdateSaleBoard asks the person for id. | Tables show every schema field, plumbing included: ''Every merchandise''
+  drop id, outletId, categoryId, variantId, inventoryItemId.
+
+  - BO-122: Tables show every schema field, plumbing included: ''Every sale board'' drop id, venueId.
+
+  - BO-123: formSetConfigurationProfile asks the person for status, id. | Tables show every schema field, plumbing included:
+  ''Every sale board'' drop id, venueId.
+
+  - BO-124: formUpdateSaleBoard asks the person for id. | formCreateSaleBoard asks the person for id. | formDeployConfigurationProfile
+  asks the person for status, id. | Tables show every schema field, plumbing included: ''Every audit'' drop id, principalId,
+  orgUnitId, workstationId; ''Every registered device'' drop id, driver, workstationId, pushToken, pushPlatform, pushFailureCount.
+
+  - BO-125: formUpdateSaleBoard asks the person for id. | Tables show every schema field, plumbing included: ''Every product''
+  drop id, venueId, scopePath, createdByPrincipalId, approvedByPrincipalId, responsibleDepartmentId; ''Every alert'' drop
+  id, ruleId, scopePath, workstationId, shiftId.
+
+  - BO-126: formDeployConfigurationProfile asks the person for status, id. | formUpdateSaleBoard asks the person for id.
+
+  - BO-128: Tables show every schema field, plumbing included: ''Every workstation'' drop id, venueId, regionId, departmentId,
+  scopePath, accessPointId.
+
+  - BO-129: formSetConfigurationProfile asks the person for status, id. | formDeployConfigurationProfile asks the person for
+  status, id. | Tables show every schema field, plumbing included: ''Every workstation'' drop id, venueId, regionId, departmentId,
+  scopePath, accessPointId.
+
+
+  Batch SBO (screens-p08-p09, phase B), 2 October 2026; worktree D:/wt/screens-p08-p09, branch screens-p08-p09. Tickets: none
+  started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched screen. Applied with
+  the screen files'' own dump settings (width 100).'

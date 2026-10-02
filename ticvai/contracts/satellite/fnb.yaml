@@ -502,8 +502,8 @@ paths:
     get:
       operationId: getProductionRun
       x-ticvai-consumed-by:
+        - "P08 BO-112 Production Planning & Production Sheets"
         - "P08 BO-137 Recipe Consumption & Theoretical Inventory"
-        - "P08 BO-138 Production Execution & Batch Management"
       summary: One run — its plan, its output, and the gap
       description: 'Board 5D and 2M. **The prep sheet, the batch detail and the yield are three views
         of one run**, and the boards drew them as three panels.
@@ -3380,9 +3380,7 @@ paths:
       operationId: listProductionRuns
       x-ticvai-consumed-by:
         - "P08 BO-112 Production Planning & Production Sheets"
-        - "P08 BO-113 Central Kitchen & Commissary Management"
         - "P08 BO-137 Recipe Consumption & Theoretical Inventory"
-        - "P08 BO-138 Production Execution & Batch Management"
       summary: What is being made, and what was
       description: 'Board 5D, 24 August. **`planProductionRun` and `completeProductionRun` existed and
         nothing read one** — found by mapping the board panels rather than the operations, which is the
@@ -3450,8 +3448,6 @@ paths:
       operationId: planProductionRun
       x-ticvai-consumed-by:
         - "P08 BO-112 Production Planning & Production Sheets"
-        - "P08 BO-113 Central Kitchen & Commissary Management"
-        - "P08 BO-138 Production Execution & Batch Management"
       summary: Plan a batch, for one outlet or several
       description: 'BL-129. **Orders consumed stock and nothing produced any**, so a central kitchen making
         400 portions at 6am for four outlets had no representation.
@@ -3503,8 +3499,7 @@ paths:
     post:
       operationId: completeProductionRun
       x-ticvai-consumed-by:
-        - "P08 BO-113 Central Kitchen & Commissary Management"
-        - "P08 BO-138 Production Execution & Batch Management"
+        - "P08 BO-112 Production Planning & Production Sheets"
       summary: Record what was actually made
       description: 'BL-126. **Theoretical against actual, which is the whole reason to record a run.**
         A recipe says 400 portions from the ingredients issued; this says how many were made.
@@ -4949,7 +4944,6 @@ paths:
         - "P08 BO-007 Product Directory"
         - "P08 BO-011 Packages & Bundles"
         - "P08 BO-045 Menu Management"
-        - "P08 BO-109 Menu Builder & POS Layout Designer"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -5043,6 +5037,7 @@ paths:
       operationId: getMenu
       x-ticvai-consumed-by:
         - "P08 BO-045 Menu Management"
+        - "P08 BO-109 Menu Builder & POS Layout Designer"
         - "P08 BO-140 Product Availability, 86 & Operational Food Safety"
       x-ticvai-audience:
       - staff
@@ -6758,7 +6753,7 @@ paths:
     get:
       operationId: listRecipes
       x-ticvai-consumed-by:
-        - "P08 BO-110 Recipe & BOM Management"
+        - "P08 BO-111 Ingredient Substitution, Allergen & Nutrition"
         - "P08 BO-137 Recipe Consumption & Theoretical Inventory"
       x-ticvai-audience:
       - staff
@@ -6808,7 +6803,6 @@ paths:
     put:
       operationId: setRecipe
       x-ticvai-consumed-by:
-        - "P08 BO-110 Recipe & BOM Management"
         - "P08 BO-111 Ingredient Substitution, Allergen & Nutrition"
       x-ticvai-audience:
       - staff

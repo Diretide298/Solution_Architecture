@@ -1,0 +1,104 @@
+id: CHG-SBO-008
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: The open Block A design-note corrections of the F&B and retail process on P08 and P09 are applied on the screens
+  (labels, controls, bindings, layouts, purposes), with the decisions of 2 October on the same screens.
+decision:
+  what: Apply every open Block A correction of handoff/design-notes/fnb-retail that a screen change can fix; log the ones
+    that need a contract or another owner.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Phase B brief (2 October 2026): apply the OPEN corrections of Block A and B screens, Block A first; design-note corrections
+  (fnb-retail), 1-2 October 2026. Decisions of 2 October recorded on the same screens are cited by their DEC ids in each screen''s
+  notes. Each item is a design-note correction on a screen; audit roots R250, R254 and R276; the notes were recorded by CHG-NOTE-001..009.'
+keys_touched:
+  screens:
+  - BO-020
+  - BO-021
+  - BO-044
+  - BO-045
+  - BO-048
+  - BO-065
+  - BO-081
+  - BO-082
+  - BO-109
+  - BO-110
+  - BO-112
+  - BO-1065
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-BO-044
+  - APP-SETUP-BO-045
+  - APP-SETUP-BO-065
+  - APP-SETUP-BO-081
+  - APP-SETUP-BO-1065
+  - APP-SETUP-BO-110
+  - VM-BO-020
+  - VM-BO-021
+  - VM-BO-048
+  - VM-BO-082
+  - VM-BO-109
+  - VM-BO-112
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: '- BO-020: Filters are text fields for "Outlet id", "Table visit id" and "Status", and the three tables are titled
+  "Every F&B order", "Every kitchen station", "Every kitchen ticket" with raw schema columns (id, outletId, tableVisitId,
+  kitchenTicketId, menuItemIds, displayEndpoint, prioritisedByPrincipalId). | The cancel dialog says that once accepted "the
+  reason comes from the void reason list (guestChangedMind, enteredInError, itemUnavailable, qualityIssue, duplicate, other),
+  Other makes the note required". The contract''s cancelFnbOrder.reason is a different list (outletRefused, guestCancelled,
+  itemUnavailable, tooLong, error) with no "other". | The no-access state names the permission key ORDER_VIEW (the same pattern
+  on every screen in this part).
+
+  - BO-021: The board frame cited for BO-021 (Retail Board 3 RET-3A) and flow F81 step 1 are the "Retail Sales & POS Command
+  Center" — a cross-store sales dashboard (sales today, tills open, tender mix), not an order search.
+
+  - BO-044: Text fields "Venue id" and "Kind"; columns id, venueId, stockLocationId, costCenterId. | The outlet has no type/service
+  model or department link: OutletKind is restaurant/bar/cafe/kiosk/…, while DI-319 types outlets (fine dining, quick service,
+  coffee) to switch features and links each to department, sub-department, cost centre and status. | No-access state is keyed
+  to PRODUCT_VIEW (getFnbDeliveryPolicy) although the list is listOutlets (SCOPE_VIEW).
+
+  - BO-045: Plumbing on the screen - a text field "Outlet id", a date picker "Active at", a table "Every menu" with id, outletId,
+  availability object and sections array as columns, and a detail panel showing Menu.id. | BO-045 and BO-109 overlap. Both
+  list menus, both save menu sections, and both point at the same client frame fnb-2b; BO-045 sits under the F&B hub (BO-104)
+  and BO-109 under Sell (BO-102).
+
+  - BO-048: The filters are text fields "Outlet id" and "Category id". The table is "Every merchandise" with id, variantId,
+  inventoryItemId and outletId columns. The create modal collects variantId and inventoryItemId as raw fields.
+
+  - BO-065: Only guest two-step is laid out; the venue-settings modal lists 18 raw property names with "nothing required",
+  although they are the screen''s whole purpose. | The cash settings agreed for this screen have no field anywhere: opening-float
+  entry mode (total or by denomination, per venue), cash-drawer ceiling, approval required on open/close, mandatory bag number
+  and deposit-box allocation (which openShift says "the venue configures"), and the expected float approveShiftOpen compares
+  against.
+
+  - BO-081: The filters are text fields "Venue id" and "Category id". An "Every stock location" table with raw columns sits
+  beside the item table.
+
+  - BO-082: The item, location and kind filters are text fields ("Item id", "Location id", "Kind").
+
+  - BO-109: Plumbing - "Outlet id" text field, "Active at" date picker, "Every menu" table with raw columns, and a "Save sale
+  board" modal collecting id, code, venueId, kind and pages. | Overlap with BO-045 (shared frame fnb-2b, both set sections)
+  and with BO-124/BO-125 (the same sale-board update on seven screens).
+
+  - BO-110: The "Save recipe" modal collects costPerPortion. | Plumbing - "Menu item id" text field and a table "Every recipe"
+  with menuItemId and the ingredients array as columns; two search fields. | The client frame for this screen (fnb-2f, "Recipe
+  & BOM Costing") is mapped to BO-137; BO-110 has no board frame.
+
+  - BO-112: Board frame mapped to Retail Board 2 ret-2e ("Catalog Builder & Store Assortment"); the client''s frame for this
+  screen is FnB Board 2 fnb-2m ("Production Planning & Sheets"), which is mapped to BO-136. | The form exposes id, recipeId,
+  producingOutletId, forOutletIds, status, actualQuantity and varianceReason as text fields.
+
+  - BO-1065: The layout has no content region (only Save/Cancel) because the pack page gave no fields.
+
+
+  Batch SBO (screens-p08-p09, phase B), 2 October 2026; worktree D:/wt/screens-p08-p09, branch screens-p08-p09. Tickets: none
+  started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched screen. Applied with
+  the screen files'' own dump settings (width 100).'

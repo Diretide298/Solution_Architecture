@@ -199,7 +199,7 @@ paths:
         - "P08 BO-718 Event Change Request Configuration"
         - "P08 BO-771 Budget, Goals & Forecast"
         - "P08 BO-922 Event Resource Approval & Readiness Gate"
-        - "P08 ADM-567 Payment Policy, Governance & Approval Manager\t15"
+        - "P08 ADM-567 Payment Policy, Governance & Approval Manager"
       x-ticvai-audience:
       - staff
       summary: Raise a request
@@ -419,7 +419,6 @@ paths:
         - "P04 POS-020 Shift Exceptions & Alerts"
         - "P08 BO-084 Approval Inbox"
         - "P08 BO-085 Approval Request"
-        - "P08 BO-133 Offline Alerts, Limits & Audit"
         - "P08 BO-243 Policy Approval, Audit, Analytics & AI Optimization"
         - "P08 BO-367 Approval Request Detail"
         - "P08 BO-374 Approval Decision Workspace"

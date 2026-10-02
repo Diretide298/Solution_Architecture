@@ -1,0 +1,53 @@
+id: CHG-SBO-013
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: The open Block A design-note corrections of the marketing process on P08 and P09 are applied on the screens (labels,
+  controls, bindings, layouts, purposes), with the decisions of 2 October on the same screens.
+decision:
+  what: Apply every open Block A correction of handoff/design-notes/customer-marketing that a screen change can fix; log the
+    ones that need a contract or another owner.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Phase B brief (2 October 2026): apply the OPEN corrections of Block A and B screens, Block A first; design-note corrections
+  (customer-marketing), 1-2 October 2026. Decisions of 2 October recorded on the same screens are cited by their DEC ids in
+  each screen''s notes. Each item is a design-note correction on a screen; audit roots R250, R254 and R276; the notes were
+  recorded by CHG-NOTE-001..009.'
+keys_touched:
+  screens:
+  - BO-005
+  - BO-618
+  - BO-755
+  - BO-825
+  - BO-828
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-BO-005
+  - APP-SETUP-BO-618
+  - APP-SETUP-BO-755
+  - APP-SETUP-BO-825
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: '- BO-005: Two primary buttons, "Call next parties" (callNextParties) and "Call next" (no operation).
+
+  - BO-618: Components are a text field labelled "Mandatory / Optional / Conditional / Hidden" and a select labelled "Key
+  requirement - 12.1.2".
+
+  - BO-755: previewSegment works only on a saved segment (POST /segments/{segmentId}/preview).
+
+  - BO-825: No list or read operation for challenges exists (only createChallenge and the guest''s getMyChallenges), but the
+  screen has list states.
+
+  - BO-828: The primary action is "Create loyalty programme".
+
+
+  Batch SBO (screens-p08-p09, phase B), 2 October 2026; worktree D:/wt/screens-p08-p09, branch screens-p08-p09. Tickets: none
+  started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched screen. Applied with
+  the screen files'' own dump settings (width 100).'

@@ -1,0 +1,47 @@
+id: CHG-SBO-022
+date: '2026-10-02'
+source: cr
+kind: spec
+summary: 'New console screen ADM-699 My Account & Security: a platform operator''s own authentication methods, password and
+  sessions, with step-up to end a session or remove a method.'
+decision:
+  what: Add ADM-699 binding listOwnSessions, endOwnSession and the self-service MFA operations; the dashboard opens it.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, door follow-ups of 2 October 2026: "Add ''My account & security''" (a new console screen for a platform operator''s
+  own MFA methods and sessions); CHG-CSP-052 added the operations; CHG-DOOR-003 moved the methods off the doors.'
+keys_touched:
+  screens:
+  - ADM-699
+  - ADM-002
+  - ADM-001
+  operations:
+  - listOwnSessions
+  - endOwnSession
+  - listMfaMethods
+  - enrolMfaMethod
+  - verifyMfaEnrolment
+  - removeMfaMethod
+  - changeOwnCredential
+  - createMfaChallenge
+  - verifyMfaChallenge
+  files:
+  - screens/_id-register.yaml
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screens.py
+status: open
+notes: 'The id comes from screens/_id-register.yaml (regenerated with tools/derive-id-register.py --apply, as its note asks).
+  CHG-CSP-052 can close: the screen exists and binds its operations.
+
+
+  Batch SBO (screens-p08-p09, phase B), 2 October 2026; worktree D:/wt/screens-p08-p09, branch screens-p08-p09. Tickets: none
+  started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched screen. Applied with
+  the screen files'' own dump settings (width 100).'

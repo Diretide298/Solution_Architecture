@@ -123,6 +123,7 @@ paths:
         - "P08 BO-039 Shift Directory"
         - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
+        - "P08 BO-043 Daily Reconciliation"
         - "P08 BO-100 Venue Home"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary   # open-shift state gates workstation actions
@@ -1194,6 +1195,8 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-007 Close Shift"
         - "P06 EMP-009 End shift"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-043 Daily Reconciliation"
       x-ticvai-audience: [staff]
       summary: Accept an over/short beyond the threshold
       description: >
@@ -1645,6 +1648,7 @@ paths:
         - "P04 POS-017 Cash In / Cash Out Operations"
         - "P04 POS-018 Safe Drop & Cash Transfer Management"
         - "P08 BO-041 Cash Movements"
+        - "P08 BO-042 Banking & Safe"
       x-ticvai-audience: [staff]
       summary: Record a cash lift or add
       description: >

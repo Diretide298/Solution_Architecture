@@ -1088,6 +1088,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P08-venue-back-office.yaml#BO-053
+      status: fixed
+      by: CHG-SBO-004
   BO-054:
     block: A
     summary: >-
@@ -1168,6 +1170,8 @@ screens:
     - what: entryState reads campaignId.
       why: That belongs to the access-review items call, not to the screen's entry.
       source: screens/P08-venue-back-office.yaml#BO-054
+      status: fixed
+      by: CHG-SBO-011
     - what: >-
         setRolePermissions lives in tenancy.yaml with a tenant scope level while roles live in identity.yaml at
         venue.
@@ -1183,6 +1187,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P08-venue-back-office.yaml#BO-054
+      status: fixed
+      by: CHG-SBO-004
   BO-084:
     block: A
     summary: >-
@@ -1302,9 +1308,13 @@ screens:
       why: >-
         Routing configuration and plumbing; the approver needs what, how much, who, where and how long is left.
       source: screens/P08-venue-back-office.yaml#BO-084
+      status: fixed
+      by: CHG-SBO-011
     - what: Status and kind filters are free text fields.
       why: Both are enumerations; free text produces filters that match nothing.
       source: contracts/spine/approvals.yaml#listApprovalRequests
+      status: fixed
+      by: CHG-SBO-011
     - what: >-
         Tables show every schema field, plumbing included: 'Waiting for a decision' drop id, outOfOfficeDelegateId,
         reopenedFrom, subjectContract, subjectType, subjectId, scopePath.
@@ -1313,12 +1323,16 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P08-venue-back-office.yaml#BO-084
+      status: fixed
+      by: CHG-SBO-004
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-084; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-085:
     block: A
     summary: >-
@@ -1429,6 +1443,8 @@ screens:
         The purpose is one request; the entry is a requestId deep link. Draw a detail page; the list belongs to
         BO-084.
       source: screens/P08-venue-back-office.yaml#BO-085
+      status: fixed
+      by: CHG-SBO-011
     - what: '"Evaluate approval requirement" is a button for the approver.'
       why: >-
         evaluateApprovalRequirement answers "does this need approval and from whom" for the raising screen (till,
@@ -1444,12 +1460,16 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P08-venue-back-office.yaml#BO-085
+      status: fixed
+      by: CHG-SBO-004
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-085; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-087:
     block: A
     summary: >-
@@ -1537,6 +1557,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P08-venue-back-office.yaml#BO-087
+      status: fixed
+      by: CHG-SBO-004
   BO-116:
     block: A
     summary: >-
@@ -1630,6 +1652,8 @@ screens:
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P08-venue-back-office.yaml#BO-116
+      status: fixed
+      by: CHG-SBO-004
     - what: >-
         Tables show every schema field, plumbing included: 'Every merchandise' drop id, outletId, categoryId, variantId,
         inventoryItemId.
@@ -1638,6 +1662,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P08-venue-back-office.yaml#BO-116
+      status: fixed
+      by: CHG-SBO-004
   BO-124:
     block: A
     summary: >-
@@ -1741,16 +1767,22 @@ screens:
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P08-venue-back-office.yaml#BO-124
+      status: fixed
+      by: CHG-SBO-004
     - what: formCreateSaleBoard asks the person for id.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P08-venue-back-office.yaml#BO-124
+      status: fixed
+      by: CHG-SBO-004
     - what: formDeployConfigurationProfile asks the person for status, id.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P08-venue-back-office.yaml#BO-124
+      status: fixed
+      by: CHG-SBO-004
     - what: formRecordDeviceHeartbeat asks the person for status.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
@@ -1766,6 +1798,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P08-venue-back-office.yaml#BO-124
+      status: fixed
+      by: CHG-SBO-004
   CMS-010:
     block: A
     summary: >-
@@ -2058,12 +2092,16 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P09-platform-admin-console.yaml#ADM-003
+      status: fixed
+      by: CHG-SBO-004
     - what: requiresModule is 'membership' on a TICVAI Console screen.
       why: >-
         requiresModule ties a screen to what a tenant licensed; a platform operator's console does not depend on
         any tenant's modules (and 'membership' is the guest annual-pass module, not TICVAI's subscription). Should
         be core.
       source: screens/_schema.yaml#requiresModule; screens/P09-platform-admin-console.yaml#ADM-003
+      status: fixed
+      by: CHG-SBO-003
   ADM-005:
     block: A
     summary: >-
@@ -2189,14 +2227,20 @@ screens:
     - what: emptyFirstRun offers Add licence add on as the create action.
       why: With no tenants the action is Create tenant.
       source: screens/P09-platform-admin-console.yaml#ADM-005
+      status: fixed
+      by: CHG-SBO-011
     - what: requiresModule is 'membership'.
       why: Control-plane screen; core.
       source: screens/P09-platform-admin-console.yaml#ADM-005
+      status: fixed
+      by: CHG-SBO-003
     - what: formSetSsoConfig asks the person for id.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P09-platform-admin-console.yaml#ADM-005
+      status: fixed
+      by: CHG-SBO-004
     - what: >-
         Tables show every schema field, plumbing included: 'Every tenant' drop id, planId, accountManagerPrincipalId;
         'Every cell' drop id, clusterId, regionId.
@@ -2205,6 +2249,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P09-platform-admin-console.yaml#ADM-005
+      status: fixed
+      by: CHG-SBO-004
     decisions:
     - question: Is opening a grant needed for getSsoConfig/setSsoConfig only, or does TICVAI configure tenant SSO at all (versus
         the tenant's own admin in Venue Management)?
@@ -2324,6 +2370,8 @@ screens:
     - what: requiresModule is 'membership'.
       why: Guest membership module, unrelated to TICVAI's subscription.
       source: screens/P09-platform-admin-console.yaml#ADM-008
+      status: fixed
+      by: CHG-SBO-003
     - what: >-
         Calls tenant-permission operations with no tenant picker and no platform-staff grant: getSsoConfig (USER_MANAGE),
         listPartnerAgreements (PARTNER_MANAGE), createPartnerAgreement (PARTNER_MANAGE), updatePartnerAgreement
@@ -2345,6 +2393,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P09-platform-admin-console.yaml#ADM-008
+      status: fixed
+      by: CHG-SBO-004
   ADM-342:
     block: A
     summary: >-
@@ -2415,6 +2465,8 @@ screens:
         On the Console every tenant write needs the R098 pattern; otherwise the screen is the tenant's own and belongs
         in Venue Management.
       source: R098
+      status: fixed
+      by: CHG-SBO-001
     - what: >-
         getGuestVerificationPolicy and setGuestVerificationPolicy (guest identity-document checks) on a staff MFA
         screen.
@@ -2422,6 +2474,8 @@ screens:
         A guest verification workflow is a separate policy; it confuses the "staff factors only" rule the screen
         states.
       source: contracts/spine/identity.yaml#setGuestVerificationPolicy
+      status: fixed
+      by: CHG-SBO-011
     - what: >-
         Calls tenant-permission operations with no tenant picker and no platform-staff grant: listStepUpPolicies
         (APPROVAL_CONFIGURE), setStepUpPolicy (APPROVAL_CONFIGURE), setPasswordPolicy (TENANT_CONFIGURE), getGuestVerificationPolicy
@@ -2433,6 +2487,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
     decisions:
     - question: DI-729 says MFA for sensitive approvals is a business option (on/off); the contract makes it a floor the tenant
         can only raise. Which holds?
@@ -2495,6 +2551,8 @@ screens:
         mode).
       why: The provider schema defines these; without binding nobody knows the options.
       source: screens/P09-platform-admin-console.yaml#ADM-354
+      status: fixed
+      by: CHG-SBO-011
     - what: listApprovalExternalDispatches and recordExternalApprovalDecision exist and are not declared.
       why: DI-733 asks for retry handling; the dispatch list is how it is seen.
       source: DI-733
@@ -2595,12 +2653,18 @@ screens:
         setPaymentProvider configures how the tenant's venue collects from guests. TICVAI's own fee collection is
         subscription billing; the purpose or the operation is wrong.
       source: contracts/spine/orders.yaml#setPaymentProvider; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-011
     - what: The gaps entry says the screen declares no write.
       why: Stale; setPaymentProvider is declared.
       source: screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-011
     - what: setPaymentProvider is configured per venue, but the picker chooses only a tenant.
       why: After the tenant, a venue must be picked (the config scope is venue).
       source: contracts/spine/orders.yaml#setPaymentProvider; ADR-0018
+      status: fixed
+      by: CHG-SBO-011
   DEV-002:
     block: A
     summary: >-
@@ -3360,6 +3424,8 @@ screens:
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P08-venue-back-office.yaml#BO-036
+      status: fixed
+      by: CHG-SBO-004
     - what: formDeployConfigurationProfile asks the person for status, id.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
@@ -3384,6 +3450,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P08-venue-back-office.yaml#BO-036
+      status: fixed
+      by: CHG-SBO-004
     decisions:
     - question: Are BO-036 and BO-127 the same screen?
       decision: BO-127 is merged into BO-036 as one device register.
@@ -3427,12 +3495,16 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P08-venue-back-office.yaml#BO-057
+      status: fixed
+      by: CHG-SBO-004
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-057; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-067:
     block: B
     summary: >-
@@ -3503,6 +3575,8 @@ screens:
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P08-venue-back-office.yaml#BO-067
+      status: fixed
+      by: CHG-SBO-004
     - what: >-
         Tables show every schema field, plumbing included: 'Every API client' drop id, developerId, clientId, allowedTenantIds.
       why: >-
@@ -3510,6 +3584,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P08-venue-back-office.yaml#BO-067
+      status: fixed
+      by: CHG-SBO-004
   BO-068:
     block: B
     summary: >-
@@ -3573,12 +3649,16 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P08-venue-back-office.yaml#BO-068
+      status: fixed
+      by: CHG-SBO-004
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-068; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-086:
     block: B
     summary: >-
@@ -3647,6 +3727,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P08-venue-back-office.yaml#BO-086
+      status: fixed
+      by: CHG-SBO-004
   BO-088:
     block: B
     summary: >-
@@ -3695,12 +3777,16 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P08-venue-back-office.yaml#BO-088
+      status: fixed
+      by: CHG-SBO-004
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-088; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-101:
     block: B
     summary: >-
@@ -3745,6 +3831,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P08-venue-back-office.yaml#BO-101
+      status: fixed
+      by: CHG-SBO-004
   BO-122:
     block: B
     summary: >-
@@ -3785,12 +3873,16 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P08-venue-back-office.yaml#BO-122
+      status: fixed
+      by: CHG-SBO-004
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-122; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-123:
     block: B
     summary: >-
@@ -3847,12 +3939,16 @@ screens:
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P08-venue-back-office.yaml#BO-123
+      status: fixed
+      by: CHG-SBO-004
     - what: 'Tables show every schema field, plumbing included: ''Every sale board'' drop id, venueId.'
       why: >-
         Identifiers and partition keys mean nothing to the reader; show the name each id points at (principal name,
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P08-venue-back-office.yaml#BO-123
+      status: fixed
+      by: CHG-SBO-004
   BO-125:
     block: B
     summary: >-
@@ -3921,6 +4017,8 @@ screens:
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P08-venue-back-office.yaml#BO-125
+      status: fixed
+      by: CHG-SBO-004
     - what: formRecordDeviceHeartbeat asks the person for status.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
@@ -3944,6 +4042,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P08-venue-back-office.yaml#BO-125
+      status: fixed
+      by: CHG-SBO-004
   BO-126:
     block: B
     summary: >-
@@ -4008,17 +4108,23 @@ screens:
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P08-venue-back-office.yaml#BO-126
+      status: fixed
+      by: CHG-SBO-004
     - what: formUpdateSaleBoard asks the person for id.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P08-venue-back-office.yaml#BO-126
+      status: fixed
+      by: CHG-SBO-004
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-126; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-128:
     block: B
     summary: >-
@@ -4075,6 +4181,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P08-venue-back-office.yaml#BO-128
+      status: fixed
+      by: CHG-SBO-004
   BO-129:
     block: B
     summary: >-
@@ -4151,11 +4259,15 @@ screens:
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P08-venue-back-office.yaml#BO-129
+      status: fixed
+      by: CHG-SBO-004
     - what: formDeployConfigurationProfile asks the person for status, id.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P08-venue-back-office.yaml#BO-129
+      status: fixed
+      by: CHG-SBO-004
     - what: >-
         Tables show every schema field, plumbing included: 'Every workstation' drop id, venueId, regionId, departmentId,
         scopePath, accessPointId.
@@ -4164,6 +4276,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P08-venue-back-office.yaml#BO-129
+      status: fixed
+      by: CHG-SBO-004
   BO-131:
     block: B
     summary: >-
@@ -4403,12 +4517,16 @@ screens:
         would be refused 403 on every call. Either the permission is wrong (a tenant permission such as TENANT_CONFIGURE
         or the module's own) or the screen belongs in the TICVAI Console.
       source: R229; contracts/satellite/subscription.yaml#listMembershipAnnualPass
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-284; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-285:
     block: B
     summary: >-
@@ -4468,6 +4586,8 @@ screens:
         would be refused 403 on every call. Either the permission is wrong (a tenant permission such as TENANT_CONFIGURE
         or the module's own) or the screen belongs in the TICVAI Console.
       source: R229; contracts/satellite/subscription.yaml#setMembershipProductTier
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         Fields drawn as drop-downs that cannot be choices: text field: Membership Name, Membership Code, Description,
         Brand, Venue, Attraction, Market; date picker: Effective From.
@@ -4501,6 +4621,8 @@ screens:
         would be refused 403 on every call. Either the permission is wrong (a tenant permission such as TENANT_CONFIGURE
         or the module's own) or the screen belongs in the TICVAI Console.
       source: R229; contracts/satellite/subscription.yaml#setMembershipEligibilityQualification
+      status: logged
+      by: CHG-SBO-005
   BO-287:
     block: B
     summary: >-
@@ -4520,6 +4642,8 @@ screens:
         would be refused 403 on every call. Either the permission is wrong (a tenant permission such as TENANT_CONFIGURE
         or the module's own) or the screen belongs in the TICVAI Console.
       source: R229; contracts/satellite/subscription.yaml#setValidityActivationExpiry
+      status: logged
+      by: CHG-SBO-005
   BO-289:
     block: B
     summary: >-
@@ -4588,6 +4712,8 @@ screens:
         would be refused 403 on every call. Either the permission is wrong (a tenant permission such as TENANT_CONFIGURE
         or the module's own) or the screen belongs in the TICVAI Console.
       source: R229; contracts/satellite/subscription.yaml#listMembershipUsageVisit
+      status: logged
+      by: CHG-SBO-005
   BO-290:
     block: B
     summary: >-
@@ -4624,6 +4750,8 @@ screens:
         would be refused 403 on every call. Either the permission is wrong (a tenant permission such as TENANT_CONFIGURE
         or the module's own) or the screen belongs in the TICVAI Console.
       source: R229; contracts/satellite/subscription.yaml#setFamilyHouseholdDependent
+      status: logged
+      by: CHG-SBO-005
   BO-292:
     block: B
     summary: >-
@@ -4650,6 +4778,8 @@ screens:
         would be refused 403 on every call. Either the permission is wrong (a tenant permission such as TENANT_CONFIGURE
         or the module's own) or the screen belongs in the TICVAI Console.
       source: R229; contracts/satellite/subscription.yaml#setRenewalAutoMembership
+      status: logged
+      by: CHG-SBO-005
   BO-293:
     block: B
     summary: >-
@@ -4701,12 +4831,16 @@ screens:
         would be refused 403 on every call. Either the permission is wrong (a tenant permission such as TENANT_CONFIGURE
         or the module's own) or the screen belongs in the TICVAI Console.
       source: R229; contracts/satellite/subscription.yaml#approveMembershipProductValidation
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-293; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-294:
     block: B
     summary: >-
@@ -4739,12 +4873,16 @@ screens:
         would be refused 403 on every call. Either the permission is wrong (a tenant permission such as TENANT_CONFIGURE
         or the module's own) or the screen belongs in the TICVAI Console.
       source: R229; contracts/satellite/subscription.yaml#listMember
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-294; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-295:
     block: B
     summary: >-
@@ -4786,6 +4924,8 @@ screens:
         would be refused 403 on every call. Either the permission is wrong (a tenant permission such as TENANT_CONFIGURE
         or the module's own) or the screen belongs in the TICVAI Console.
       source: R229; contracts/satellite/subscription.yaml#setMemberMembershipAccount
+      status: logged
+      by: CHG-SBO-005
   BO-296:
     block: B
     summary: >-
@@ -4830,12 +4970,16 @@ screens:
         would be refused 403 on every call. Either the permission is wrong (a tenant permission such as TENANT_CONFIGURE
         or the module's own) or the screen belongs in the TICVAI Console.
       source: R229; contracts/satellite/subscription.yaml#listMembershipActivationCredential
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-296; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-297:
     block: B
     summary: 'How a member uses admission and benefits: visits, guest tickets, parking, no-shows.'
@@ -4859,12 +5003,16 @@ screens:
         would be refused 403 on every call. Either the permission is wrong (a tenant permission such as TENANT_CONFIGURE
         or the module's own) or the screen belongs in the TICVAI Console.
       source: R229; contracts/satellite/subscription.yaml#listVisitAdmissionEntitlement
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-297; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-299:
     block: B
     summary: >-
@@ -4908,12 +5056,16 @@ screens:
         would be refused 403 on every call. Either the permission is wrong (a tenant permission such as TENANT_CONFIGURE
         or the module's own) or the screen belongs in the TICVAI Console.
       source: R229; contracts/satellite/subscription.yaml#listMembershipUpgradeDowngrade
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-299; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-300:
     block: B
     summary: >-
@@ -4962,12 +5114,16 @@ screens:
         would be refused 403 on every call. Either the permission is wrong (a tenant permission such as TENANT_CONFIGURE
         or the module's own) or the screen belongs in the TICVAI Console.
       source: R229; contracts/satellite/subscription.yaml#listRenewalAuto
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-300; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-302:
     block: B
     summary: Everything that happened to a membership from purchase to expiry, as a timeline.
@@ -4990,12 +5146,16 @@ screens:
         would be refused 403 on every call. Either the permission is wrong (a tenant permission such as TENANT_CONFIGURE
         or the module's own) or the screen belongs in the TICVAI Console.
       source: R229; contracts/satellite/subscription.yaml#listMemberLifecycleCase
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-302; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-303:
     block: B
     summary: Membership retention and renewal analytics with AI churn signals and suggested offers.
@@ -5020,12 +5180,16 @@ screens:
         would be refused 403 on every call. Either the permission is wrong (a tenant permission such as TENANT_CONFIGURE
         or the module's own) or the screen belongs in the TICVAI Console.
       source: R229; contracts/satellite/subscription.yaml#listMembershipRenewalRetention
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-303; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-364:
     block: B
     summary: >-
@@ -5078,12 +5242,16 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-364; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 20 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P08-venue-back-office.yaml#BO-364
+      status: logged
+      by: CHG-SBO-005
   BO-365:
     block: B
     summary: The approver's personal queue from the approval board; the same queue as BO-084.
@@ -5139,12 +5307,16 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-365; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 11 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P08-venue-back-office.yaml#BO-365
+      status: logged
+      by: CHG-SBO-005
   BO-366:
     block: B
     summary: >-
@@ -5186,6 +5358,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-366; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-367:
     block: B
     summary: The single approval request page from the board; the same page as BO-085.
@@ -5256,6 +5430,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-367; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-368:
     block: B
     summary: >-
@@ -5301,6 +5477,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-368; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-369:
     block: B
     summary: >-
@@ -5327,6 +5505,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-369; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-370:
     block: B
     summary: >-
@@ -5383,12 +5563,16 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-370; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 8 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P08-venue-back-office.yaml#BO-370
+      status: logged
+      by: CHG-SBO-005
   BO-371:
     block: B
     summary: Searchable history of completed approvals with outcome, decider, comment and duration.
@@ -5421,6 +5605,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-371; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-372:
     block: B
     summary: 'SLA health of approvals: within SLA, at risk, breached and average time, by team and kind.'
@@ -5448,6 +5634,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-372; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-373:
     block: B
     summary: >-
@@ -5472,6 +5660,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-373; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-375:
     block: B
     summary: >-
@@ -5511,6 +5701,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-375; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-376:
     block: B
     summary: >-
@@ -5560,12 +5752,16 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-376; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 12 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P08-venue-back-office.yaml#BO-376
+      status: logged
+      by: CHG-SBO-005
   BO-377:
     block: B
     summary: >-
@@ -5630,6 +5826,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-377; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-378:
     block: B
     summary: >-
@@ -5687,6 +5885,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-378; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-379:
     block: B
     summary: >-
@@ -5715,6 +5915,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-379; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-380:
     block: B
     summary: >-
@@ -5750,6 +5952,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-380; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-381:
     block: B
     summary: >-
@@ -5779,6 +5983,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-381; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-382:
     block: B
     summary: >-
@@ -5827,6 +6033,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-382; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-383:
     block: B
     summary: >-
@@ -5858,6 +6066,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-383; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-384:
     block: B
     summary: >-
@@ -5905,6 +6115,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-384; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-385:
     block: B
     summary: An approver delegates authority to an eligible colleague for a period; the same function as BO-087.
@@ -6118,6 +6330,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-391; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-392:
     block: B
     summary: >-
@@ -6157,12 +6371,16 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-392; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 6 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P08-venue-back-office.yaml#BO-392
+      status: logged
+      by: CHG-SBO-005
   BO-393:
     block: B
     summary: >-
@@ -6199,6 +6417,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-393; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-483:
     block: B
     summary: >-
@@ -6243,12 +6463,16 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-483; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 6 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P08-venue-back-office.yaml#BO-483
+      status: logged
+      by: CHG-SBO-005
   BO-594:
     block: B
     summary: >-
@@ -6272,12 +6496,16 @@ screens:
         would be refused 403 on every call. Either the permission is wrong (a tenant permission such as TENANT_CONFIGURE
         or the module's own) or the screen belongs in the TICVAI Console.
       source: R229; contracts/satellite/subscription.yaml#listTenants
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-594; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-595:
     block: B
     summary: 'The tenant''s configuration status in one place: what is done, what remains, what AI can set up.'
@@ -6304,12 +6532,16 @@ screens:
         would be refused 403 on every call. Either the permission is wrong (a tenant permission such as TENANT_CONFIGURE
         or the module's own) or the screen belongs in the TICVAI Console.
       source: R229; contracts/satellite/subscription.yaml#getGoLiveReadiness
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-595; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-596:
     block: B
     summary: >-
@@ -6348,18 +6580,24 @@ screens:
         would be refused 403 on every call. Either the permission is wrong (a tenant permission such as TENANT_CONFIGURE
         or the module's own) or the screen belongs in the TICVAI Console.
       source: R229; contracts/satellite/subscription.yaml#getGoLiveReadiness
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-596; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 6 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P08-venue-back-office.yaml#BO-596
+      status: logged
+      by: CHG-SBO-005
   BO-600:
     block: B
     summary: >-
@@ -6457,12 +6695,16 @@ screens:
         would be refused 403 on every call. Either the permission is wrong (a tenant permission such as TENANT_CONFIGURE
         or the module's own) or the screen belongs in the TICVAI Console.
       source: R229; contracts/satellite/subscription.yaml#runGoLiveValidation
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-603; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-604:
     block: B
     summary: Confirm configuration is complete enough to start go-live validation.
@@ -6486,12 +6728,16 @@ screens:
         would be refused 403 on every call. Either the permission is wrong (a tenant permission such as TENANT_CONFIGURE
         or the module's own) or the screen belongs in the TICVAI Console.
       source: R229; contracts/satellite/subscription.yaml#getGoLiveReadiness
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-604; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-605:
     block: B
     summary: >-
@@ -6511,12 +6757,16 @@ screens:
         would be refused 403 on every call. Either the permission is wrong (a tenant permission such as TENANT_CONFIGURE
         or the module's own) or the screen belongs in the TICVAI Console.
       source: R229; contracts/satellite/subscription.yaml#getGoLiveReadiness
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-605; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-606:
     block: B
     summary: The validation plan generated from what the tenant bought and configured.
@@ -6535,12 +6785,16 @@ screens:
         would be refused 403 on every call. Either the permission is wrong (a tenant permission such as TENANT_CONFIGURE
         or the module's own) or the screen belongs in the TICVAI Console.
       source: R229; contracts/satellite/subscription.yaml#runGoLiveValidation
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-606; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-607:
     block: B
     summary: Validate that configured products can be sold and admitted.
@@ -6559,12 +6813,16 @@ screens:
         would be refused 403 on every call. Either the permission is wrong (a tenant permission such as TENANT_CONFIGURE
         or the module's own) or the screen belongs in the TICVAI Console.
       source: R229; contracts/satellite/subscription.yaml#runGoLiveValidation
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-607; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-608:
     block: B
     summary: Test a real transaction journey on each sales channel.
@@ -6581,12 +6839,16 @@ screens:
         would be refused 403 on every call. Either the permission is wrong (a tenant permission such as TENANT_CONFIGURE
         or the module's own) or the screen belongs in the TICVAI Console.
       source: R229; contracts/satellite/subscription.yaml#runGoLiveValidation
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-608; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-609:
     block: B
     summary: Validate payment, tax, refunds and settlement before taking real money.
@@ -6604,12 +6866,16 @@ screens:
         would be refused 403 on every call. Either the permission is wrong (a tenant permission such as TENANT_CONFIGURE
         or the module's own) or the screen belongs in the TICVAI Console.
       source: R229; contracts/satellite/subscription.yaml#runGoLiveValidation
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-609; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-610:
     block: B
     summary: Validate ticket creation to physical admission (QR, RFID, gates).
@@ -6626,12 +6892,16 @@ screens:
         would be refused 403 on every call. Either the permission is wrong (a tenant permission such as TENANT_CONFIGURE
         or the module's own) or the screen belongs in the TICVAI Console.
       source: R229; contracts/satellite/subscription.yaml#runGoLiveValidation
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-610; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-611:
     block: B
     summary: Validate users, roles, MFA for privileged staff and integrations before launch.
@@ -6652,12 +6922,16 @@ screens:
         would be refused 403 on every call. Either the permission is wrong (a tenant permission such as TENANT_CONFIGURE
         or the module's own) or the screen belongs in the TICVAI Console.
       source: R229; contracts/satellite/subscription.yaml#runGoLiveValidation
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-611; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-612:
     block: B
     summary: Validate the messages the guest receives through the booking journey.
@@ -6674,12 +6948,16 @@ screens:
         would be refused 403 on every call. Either the permission is wrong (a tenant permission such as TENANT_CONFIGURE
         or the module's own) or the screen belongs in the TICVAI Console.
       source: R229; contracts/satellite/subscription.yaml#runGoLiveValidation
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-612; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-613:
     block: B
     summary: >-
@@ -6701,12 +6979,16 @@ screens:
         would be refused 403 on every call. Either the permission is wrong (a tenant permission such as TENANT_CONFIGURE
         or the module's own) or the screen belongs in the TICVAI Console.
       source: R229; contracts/satellite/subscription.yaml#getGoLiveReadiness
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-613; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-614:
     block: B
     summary: >-
@@ -6731,12 +7013,16 @@ screens:
         would be refused 403 on every call. Either the permission is wrong (a tenant permission such as TENANT_CONFIGURE
         or the module's own) or the screen belongs in the TICVAI Console.
       source: R229; contracts/satellite/subscription.yaml#getGoLiveReadiness
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-614; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-638:
     block: B
     summary: >-
@@ -6814,6 +7100,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-641; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-691:
     block: B
     summary: Which external systems may call accreditation functions, with scopes.
@@ -6841,6 +7129,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-691; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-692:
     block: B
     summary: >-
@@ -6947,6 +7237,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-727; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-728:
     block: B
     summary: >-
@@ -6981,6 +7273,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-728; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-732:
     block: B
     summary: >-
@@ -7015,12 +7309,16 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-732; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 1 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P08-venue-back-office.yaml#BO-732
+      status: logged
+      by: CHG-SBO-005
   BO-739:
     block: B
     summary: >-
@@ -7062,6 +7360,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-739; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-771:
     block: B
     summary: Campaign budget, goals and forecast, sent for approval before the campaign runs.
@@ -7133,6 +7433,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-873; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-940:
     block: B
     summary: >-
@@ -7205,6 +7507,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-940; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-949:
     block: B
     summary: >-
@@ -7244,18 +7548,24 @@ screens:
         would be refused 403 on every call. Either the permission is wrong (a tenant permission such as TENANT_CONFIGURE
         or the module's own) or the screen belongs in the TICVAI Console.
       source: R229; contracts/satellite/subscription.yaml#listMemberExceptionOverride
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-949; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 10 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P08-venue-back-office.yaml#BO-949
+      status: logged
+      by: CHG-SBO-005
   BO-1010:
     block: B
     summary: Route seat hold requests to the right approvers with seats, value and expiry shown.
@@ -7364,6 +7674,8 @@ screens:
     - what: requiresModule 'seating' on the tenant and brand context.
       why: Tenant context is core.
       source: screens/P08-venue-back-office.yaml#BO-1062
+      status: fixed
+      by: CHG-SBO-003
   BO-1063:
     block: B
     summary: >-
@@ -7522,6 +7834,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-1068; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-1069:
     block: B
     summary: >-
@@ -7552,6 +7866,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-1069; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-1071:
     block: B
     summary: 'Monitor seat API and webhook consumers: volume, success, latency, failures.'
@@ -7576,6 +7892,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-1071; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-1073:
     block: B
     summary: Clients and scopes for seat services; production access through the certified route.
@@ -7651,6 +7969,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-1075; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-1076:
     block: B
     summary: Concurrency, idempotency and limit controls for seat writes.
@@ -7678,6 +7998,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-1076; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-1077:
     block: B
     summary: Map external partner fields and codes to TICVAI seat entities.
@@ -7694,6 +8016,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-1077; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-1078:
     block: B
     summary: Trace and retry API and webhook deliveries by correlation id.
@@ -7718,6 +8042,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P08-venue-back-office.yaml#BO-1078; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   BO-1080:
     block: B
     summary: Approval of an integration's production activation and compliance evidence.
@@ -7830,6 +8156,8 @@ screens:
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P08-venue-back-office.yaml#BO-1173
+      status: logged
+      by: CHG-SBO-005
   BO-1177:
     block: B
     summary: Which wallet operations each integration may call, with limits and network restrictions.
@@ -9376,18 +9704,24 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P09-platform-admin-console.yaml#ADM-002
+      status: fixed
+      by: CHG-SBO-004
     - what: requiresModule is 'membership' on a TICVAI Console screen.
       why: >-
         requiresModule ties a screen to what a tenant licensed; a platform operator's console does not depend on
         any tenant's modules (and 'membership' is the guest annual-pass module, not TICVAI's subscription). Should
         be core.
       source: screens/_schema.yaml#requiresModule; screens/P09-platform-admin-console.yaml#ADM-002
+      status: fixed
+      by: CHG-SBO-003
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-002; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-006:
     block: B
     summary: >-
@@ -9458,12 +9792,16 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P09-platform-admin-console.yaml#ADM-006
+      status: fixed
+      by: CHG-SBO-004
     - what: requiresModule is 'membership' on a TICVAI Console screen.
       why: >-
         requiresModule ties a screen to what a tenant licensed; a platform operator's console does not depend on
         any tenant's modules (and 'membership' is the guest annual-pass module, not TICVAI's subscription). Should
         be core.
       source: screens/_schema.yaml#requiresModule; screens/P09-platform-admin-console.yaml#ADM-006
+      status: fixed
+      by: CHG-SBO-003
   ADM-007:
     block: B
     summary: >-
@@ -9543,12 +9881,16 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P09-platform-admin-console.yaml#ADM-007
+      status: fixed
+      by: CHG-SBO-004
     - what: requiresModule is 'membership' on a TICVAI Console screen.
       why: >-
         requiresModule ties a screen to what a tenant licensed; a platform operator's console does not depend on
         any tenant's modules (and 'membership' is the guest annual-pass module, not TICVAI's subscription). Should
         be core.
       source: screens/_schema.yaml#requiresModule; screens/P09-platform-admin-console.yaml#ADM-007
+      status: fixed
+      by: CHG-SBO-003
   ADM-009:
     block: B
     summary: A tenant's subscription invoices and generating one for a period (dry run first).
@@ -9622,12 +9964,16 @@ screens:
         any tenant's modules (and 'membership' is the guest annual-pass module, not TICVAI's subscription). Should
         be core.
       source: screens/_schema.yaml#requiresModule; screens/P09-platform-admin-console.yaml#ADM-009
+      status: fixed
+      by: CHG-SBO-003
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-009; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-010:
     block: B
     summary: Metered usage per tenant and period against what the plan includes.
@@ -9666,18 +10012,24 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P09-platform-admin-console.yaml#ADM-010
+      status: fixed
+      by: CHG-SBO-004
     - what: requiresModule is 'membership' on a TICVAI Console screen.
       why: >-
         requiresModule ties a screen to what a tenant licensed; a platform operator's console does not depend on
         any tenant's modules (and 'membership' is the guest annual-pass module, not TICVAI's subscription). Should
         be core.
       source: screens/_schema.yaml#requiresModule; screens/P09-platform-admin-console.yaml#ADM-010
+      status: fixed
+      by: CHG-SBO-003
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-010; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-011:
     block: B
     summary: Licences and seats per tenant, with add-ons and plan changes previewed before saving.
@@ -9760,12 +10112,16 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P09-platform-admin-console.yaml#ADM-011
+      status: fixed
+      by: CHG-SBO-004
     - what: requiresModule is 'membership' on a TICVAI Console screen.
       why: >-
         requiresModule ties a screen to what a tenant licensed; a platform operator's console does not depend on
         any tenant's modules (and 'membership' is the guest annual-pass module, not TICVAI's subscription). Should
         be core.
       source: screens/_schema.yaml#requiresModule; screens/P09-platform-admin-console.yaml#ADM-011
+      status: fixed
+      by: CHG-SBO-003
   ADM-012:
     block: B
     summary: A tenant's cells and placement (shared or dedicated), and provisioning a cell in a new region.
@@ -9832,12 +10188,16 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P09-platform-admin-console.yaml#ADM-012
+      status: fixed
+      by: CHG-SBO-004
     - what: requiresModule is 'membership' on a TICVAI Console screen.
       why: >-
         requiresModule ties a screen to what a tenant licensed; a platform operator's console does not depend on
         any tenant's modules (and 'membership' is the guest annual-pass module, not TICVAI's subscription). Should
         be core.
       source: screens/_schema.yaml#requiresModule; screens/P09-platform-admin-console.yaml#ADM-012
+      status: fixed
+      by: CHG-SBO-003
   ADM-013:
     block: B
     summary: 'Performance of a tenant''s cells: health, capacity, jobs.'
@@ -9887,18 +10247,24 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P09-platform-admin-console.yaml#ADM-013
+      status: fixed
+      by: CHG-SBO-004
     - what: requiresModule is 'membership' on a TICVAI Console screen.
       why: >-
         requiresModule ties a screen to what a tenant licensed; a platform operator's console does not depend on
         any tenant's modules (and 'membership' is the guest annual-pass module, not TICVAI's subscription). Should
         be core.
       source: screens/_schema.yaml#requiresModule; screens/P09-platform-admin-console.yaml#ADM-013
+      status: fixed
+      by: CHG-SBO-003
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-013; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-014:
     block: B
     summary: Auto-scaling settings per cell and where each value came from.
@@ -9944,18 +10310,24 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P09-platform-admin-console.yaml#ADM-014
+      status: fixed
+      by: CHG-SBO-004
     - what: requiresModule is 'membership' on a TICVAI Console screen.
       why: >-
         requiresModule ties a screen to what a tenant licensed; a platform operator's console does not depend on
         any tenant's modules (and 'membership' is the guest annual-pass module, not TICVAI's subscription). Should
         be core.
       source: screens/_schema.yaml#requiresModule; screens/P09-platform-admin-console.yaml#ADM-014
+      status: fixed
+      by: CHG-SBO-003
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-014; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-015:
     block: B
     summary: >-
@@ -10039,12 +10411,16 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P09-platform-admin-console.yaml#ADM-015
+      status: fixed
+      by: CHG-SBO-004
     - what: requiresModule is 'membership' on a TICVAI Console screen.
       why: >-
         requiresModule ties a screen to what a tenant licensed; a platform operator's console does not depend on
         any tenant's modules (and 'membership' is the guest annual-pass module, not TICVAI's subscription). Should
         be core.
       source: screens/_schema.yaml#requiresModule; screens/P09-platform-admin-console.yaml#ADM-015
+      status: fixed
+      by: CHG-SBO-003
   ADM-019:
     block: B
     summary: >-
@@ -10135,12 +10511,16 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P09-platform-admin-console.yaml#ADM-019
+      status: fixed
+      by: CHG-SBO-004
     - what: requiresModule is 'membership' on a TICVAI Console screen.
       why: >-
         requiresModule ties a screen to what a tenant licensed; a platform operator's console does not depend on
         any tenant's modules (and 'membership' is the guest annual-pass module, not TICVAI's subscription). Should
         be core.
       source: screens/_schema.yaml#requiresModule; screens/P09-platform-admin-console.yaml#ADM-019
+      status: fixed
+      by: CHG-SBO-003
   ADM-020:
     block: B
     summary: >-
@@ -10183,12 +10563,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
     - what: 'Tables show every schema field, plumbing included: ''Every principal'' drop id, primaryRoleId.'
       why: >-
         Identifiers and partition keys mean nothing to the reader; show the name each id points at (principal name,
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P09-platform-admin-console.yaml#ADM-020
+      status: fixed
+      by: CHG-SBO-004
   ADM-021:
     block: B
     summary: >-
@@ -10227,12 +10611,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
     - what: 'Tables show every schema field, plumbing included: ''Every role'' drop id, inheritsFromRoleId.'
       why: >-
         Identifiers and partition keys mean nothing to the reader; show the name each id points at (principal name,
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P09-platform-admin-console.yaml#ADM-021
+      status: fixed
+      by: CHG-SBO-004
   ADM-022:
     block: B
     summary: >-
@@ -10312,6 +10700,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P09-platform-admin-console.yaml#ADM-022
+      status: fixed
+      by: CHG-SBO-004
   ADM-023:
     block: B
     summary: >-
@@ -10387,6 +10777,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P09-platform-admin-console.yaml#ADM-023
+      status: fixed
+      by: CHG-SBO-004
   ADM-024:
     block: B
     summary: >-
@@ -10423,6 +10815,8 @@ screens:
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P09-platform-admin-console.yaml#ADM-024
+      status: fixed
+      by: CHG-SBO-004
     - what: >-
         Tables show every schema field, plumbing included: 'Every support notice' drop id, affectedTenantIds, publishedByPrincipalId,
         scopePath; 'Every release' drop id, createdByPrincipalId.
@@ -10431,12 +10825,16 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P09-platform-admin-console.yaml#ADM-024
+      status: fixed
+      by: CHG-SBO-004
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-024; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-025:
     block: B
     summary: >-
@@ -10472,6 +10870,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-025; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-026:
     block: B
     summary: End-of-support notices for versions, and API version deprecation, with the tenants affected.
@@ -10507,6 +10907,8 @@ screens:
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P09-platform-admin-console.yaml#ADM-026
+      status: fixed
+      by: CHG-SBO-004
     - what: >-
         Tables show every schema field, plumbing included: 'Every support notice' drop id, affectedTenantIds, publishedByPrincipalId,
         scopePath.
@@ -10515,12 +10917,16 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P09-platform-admin-console.yaml#ADM-026
+      status: fixed
+      by: CHG-SBO-004
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-026; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-027:
     block: B
     summary: >-
@@ -10575,6 +10981,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-027; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-028:
     block: B
     summary: >-
@@ -10609,12 +11017,16 @@ screens:
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P09-platform-admin-console.yaml#ADM-028
+      status: fixed
+      by: CHG-SBO-004
     - what: 'Tables show every schema field, plumbing included: ''Every environment'' drop id, cellIds.'
       why: >-
         Identifiers and partition keys mean nothing to the reader; show the name each id points at (principal name,
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P09-platform-admin-console.yaml#ADM-028
+      status: fixed
+      by: CHG-SBO-004
   ADM-029:
     block: B
     summary: 'Release rollouts across cells: progress, failed cells, pause and rollback.'
@@ -10689,18 +11101,24 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P09-platform-admin-console.yaml#ADM-029
+      status: fixed
+      by: CHG-SBO-004
     - what: requiresModule is 'membership' on a TICVAI Console screen.
       why: >-
         requiresModule ties a screen to what a tenant licensed; a platform operator's console does not depend on
         any tenant's modules (and 'membership' is the guest annual-pass module, not TICVAI's subscription). Should
         be core.
       source: screens/_schema.yaml#requiresModule; screens/P09-platform-admin-console.yaml#ADM-029
+      status: fixed
+      by: CHG-SBO-003
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-029; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-030:
     block: B
     summary: Sizing and scaling policy for cells.
@@ -10751,18 +11169,24 @@ screens:
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P09-platform-admin-console.yaml#ADM-030
+      status: fixed
+      by: CHG-SBO-004
     - what: 'Tables show every schema field, plumbing included: ''Every cell job'' drop id.'
       why: >-
         Identifiers and partition keys mean nothing to the reader; show the name each id points at (principal name,
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P09-platform-admin-console.yaml#ADM-030
+      status: fixed
+      by: CHG-SBO-004
     - what: requiresModule is 'membership' on a TICVAI Console screen.
       why: >-
         requiresModule ties a screen to what a tenant licensed; a platform operator's console does not depend on
         any tenant's modules (and 'membership' is the guest annual-pass module, not TICVAI's subscription). Should
         be core.
       source: screens/_schema.yaml#requiresModule; screens/P09-platform-admin-console.yaml#ADM-030
+      status: fixed
+      by: CHG-SBO-003
   ADM-032:
     block: B
     summary: WAF rules and their hits per cell (read-only view).
@@ -10813,6 +11237,8 @@ screens:
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P09-platform-admin-console.yaml#ADM-032
+      status: fixed
+      by: CHG-SBO-004
     - what: >-
         Tables show every schema field, plumbing included: 'Every cell job' drop id; 'Every waf rule' drop id.
       why: >-
@@ -10820,12 +11246,16 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P09-platform-admin-console.yaml#ADM-032
+      status: fixed
+      by: CHG-SBO-004
     - what: requiresModule is 'membership' on a TICVAI Console screen.
       why: >-
         requiresModule ties a screen to what a tenant licensed; a platform operator's console does not depend on
         any tenant's modules (and 'membership' is the guest annual-pass module, not TICVAI's subscription). Should
         be core.
       source: screens/_schema.yaml#requiresModule; screens/P09-platform-admin-console.yaml#ADM-032
+      status: fixed
+      by: CHG-SBO-003
   ADM-033:
     block: B
     summary: Backup runs and restore drills per cell, with failures and last tested restore.
@@ -10874,18 +11304,24 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P09-platform-admin-console.yaml#ADM-033
+      status: fixed
+      by: CHG-SBO-004
     - what: requiresModule is 'membership' on a TICVAI Console screen.
       why: >-
         requiresModule ties a screen to what a tenant licensed; a platform operator's console does not depend on
         any tenant's modules (and 'membership' is the guest annual-pass module, not TICVAI's subscription). Should
         be core.
       source: screens/_schema.yaml#requiresModule; screens/P09-platform-admin-console.yaml#ADM-033
+      status: fixed
+      by: CHG-SBO-003
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-033; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-034:
     block: B
     summary: 'Archival jobs per cell: rows archived and purged under each retention policy.'
@@ -10930,18 +11366,24 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P09-platform-admin-console.yaml#ADM-034
+      status: fixed
+      by: CHG-SBO-004
     - what: requiresModule is 'membership' on a TICVAI Console screen.
       why: >-
         requiresModule ties a screen to what a tenant licensed; a platform operator's console does not depend on
         any tenant's modules (and 'membership' is the guest annual-pass module, not TICVAI's subscription). Should
         be core.
       source: screens/_schema.yaml#requiresModule; screens/P09-platform-admin-console.yaml#ADM-034
+      status: fixed
+      by: CHG-SBO-003
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-034; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-035:
     block: B
     summary: 'TICVAI support: notices and escalations raised to platform support.'
@@ -10977,6 +11419,8 @@ screens:
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P09-platform-admin-console.yaml#ADM-035
+      status: fixed
+      by: CHG-SBO-004
     - what: >-
         Tables show every schema field, plumbing included: 'Every support notice' drop id, affectedTenantIds, publishedByPrincipalId,
         scopePath.
@@ -10985,12 +11429,16 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P09-platform-admin-console.yaml#ADM-035
+      status: fixed
+      by: CHG-SBO-004
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-035; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-036:
     block: B
     summary: Broadcast a platform notice to tenants (maintenance, incidents) and see what was sent.
@@ -11033,6 +11481,8 @@ screens:
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P09-platform-admin-console.yaml#ADM-036
+      status: fixed
+      by: CHG-SBO-004
     - what: formPublishAnnouncement asks the person for publishedAt.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
@@ -11056,6 +11506,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-036; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-145:
     block: B
     summary: >-
@@ -11315,8 +11767,8 @@ screens:
     - what: No canvas component is declared; only form fields.
       why: A visual designer needs a canvas.
       source: screens/P08-venue-back-office.yaml#ADM-241
-      status: logged
-      by: CHG-MOV-009
+      status: fixed
+      by: CHG-SBO-023
     - what: >-
         Calls tenant-permission operations with no tenant picker and no platform-staff grant: setVisualWorkflow
         (APPROVAL_CONFIGURE).
@@ -12140,12 +12592,16 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P09-platform-admin-console.yaml#ADM-318
+      status: fixed
+      by: CHG-SBO-004
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-318; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-319:
     block: B
     summary: Every approval workflow configured in the tenant with status and version.
@@ -12180,12 +12636,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-319; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-320:
     block: B
     summary: >-
@@ -12221,6 +12681,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
     - what: 'Fields drawn as drop-downs that cannot be choices: text field: Workflow Name, Business Process.'
       why: >-
         Every board field was generated as a selectField. The request schema says these are free text, dates, numbers
@@ -12249,6 +12711,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
   ADM-323:
     block: B
     summary: When a particular approval path applies, in business terms rather than code.
@@ -12286,6 +12750,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
   ADM-324:
     block: B
     summary: Sequential and parallel routing structures for multi-level approval.
@@ -12302,6 +12768,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
   ADM-325:
     block: B
     summary: >-
@@ -12321,6 +12789,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
   ADM-326:
     block: B
     summary: Test a workflow with sample requests before production; nothing is executed.
@@ -12339,12 +12809,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-326; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-327:
     block: B
     summary: Publish a workflow version for a tenant or venue from a date, with an activation schedule.
@@ -12374,6 +12848,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
   ADM-329:
     block: B
     summary: >-
@@ -12399,12 +12875,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-329; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-330:
     block: B
     summary: Who can approve what up to which amount, as a grid of roles against approval kinds and limits.
@@ -12449,6 +12929,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
   ADM-331:
     block: B
     summary: Routing that follows the organisation hierarchy (department head, venue manager, regional director).
@@ -12487,6 +12969,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
   ADM-332:
     block: B
     summary: Department-specific approval authority structures.
@@ -12529,6 +13013,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
   ADM-333:
     block: B
     summary: >-
@@ -12569,6 +13055,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
   ADM-334:
     block: B
     summary: >-
@@ -12612,6 +13100,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
   ADM-335:
     block: B
     summary: Routing changed by the risk or context of a request.
@@ -12651,6 +13141,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
   ADM-336:
     block: B
     summary: Approval by a group (any one, majority, all) instead of one person.
@@ -12677,6 +13169,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
   ADM-337:
     block: B
     summary: >-
@@ -12705,12 +13199,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-337; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-338:
     block: B
     summary: AI analysis of approval behaviour with suggested matrix changes, as drafts for approval.
@@ -12735,12 +13233,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-338; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-339:
     block: B
     summary: >-
@@ -12767,12 +13269,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-339; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-340:
     block: B
     summary: >-
@@ -12809,6 +13315,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
   ADM-341:
     block: B
     summary: >-
@@ -12846,6 +13354,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
   ADM-343:
     block: B
     summary: >-
@@ -12888,6 +13398,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
   ADM-344:
     block: B
     summary: >-
@@ -12913,6 +13425,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-344; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-345:
     block: B
     summary: >-
@@ -12951,18 +13465,24 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-345; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 9 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P09-platform-admin-console.yaml#ADM-345
+      status: logged
+      by: CHG-SBO-005
   ADM-346:
     block: B
     summary: >-
@@ -13005,6 +13525,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
   ADM-347:
     block: B
     summary: Auditors receive a controlled evidence package of approvals for a period and scope.
@@ -13032,6 +13554,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
   ADM-348:
     block: B
     summary: AI flags unusual governance patterns for the compliance team; it never changes a policy itself.
@@ -13054,12 +13578,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-348; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-349:
     block: B
     summary: 'Systems connected to the approval engine: modules, external providers, dispatches, failures.'
@@ -13084,12 +13612,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-349; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-350:
     block: B
     summary: Which modules may start and consume approval workflows.
@@ -13116,12 +13648,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-350; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-351:
     block: B
     summary: 'The approval API as configured for external callers: endpoint, version, authentication, limits.'
@@ -13147,6 +13683,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-351; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-352:
     block: B
     summary: The business events the approval engine publishes, with their schemas.
@@ -13176,6 +13714,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
   ADM-353:
     block: B
     summary: >-
@@ -13213,6 +13753,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
   ADM-355:
     block: B
     summary: Map an external system's approval data to TICVAI's model.
@@ -13231,6 +13773,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
   ADM-356:
     block: B
     summary: Which applications and external systems may call the approval engine, under which policies.
@@ -13258,6 +13802,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-356; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-357:
     block: B
     summary: Integration failures in real time with retry.
@@ -13286,12 +13832,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-357; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-358:
     block: B
     summary: Integration performance analytics for the approval engine.
@@ -13324,12 +13874,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-358; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-359:
     block: B
     summary: 'Approval performance for executives: volumes, times, SLA, escalations, by venue and kind.'
@@ -13352,12 +13906,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-359; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-360:
     block: B
     summary: How many approvals are raised and their outcomes (approved, rejected, withdrawn, expired).
@@ -13380,12 +13938,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-360; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-361:
     block: B
     summary: How long approvals and individual stages take, median and 95th percentile.
@@ -13408,12 +13970,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-361; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-362:
     block: B
     summary: Where approvals are slow, as a heatmap of approval kinds against stages or venues.
@@ -13451,18 +14017,24 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-362; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 6 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P09-platform-admin-console.yaml#ADM-362
+      status: logged
+      by: CHG-SBO-005
   ADM-363:
     block: B
     summary: Approval performance over time and across venues.
@@ -13485,12 +14057,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-363; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-364:
     block: B
     summary: >-
@@ -13518,12 +14094,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-364; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-366:
     block: B
     summary: 'AI insights on approvals in one place: risk, priority, predicted breaches; context only.'
@@ -13546,12 +14126,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-366; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-367:
     block: B
     summary: Test a proposed governance change against history before adopting it.
@@ -13570,12 +14154,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-367; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-368:
     block: B
     summary: Prioritised recommendations for management on what in approvals needs attention.
@@ -13598,12 +14186,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-368; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-369:
     block: B
     summary: >-
@@ -13631,6 +14223,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-369; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-370:
     block: B
     summary: >-
@@ -13676,12 +14270,16 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-370; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 29 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P09-platform-admin-console.yaml#ADM-370
+      status: logged
+      by: CHG-SBO-005
   ADM-371:
     block: B
     summary: >-
@@ -13708,6 +14306,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-371; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-372:
     block: B
     summary: >-
@@ -13730,6 +14330,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-372; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-373:
     block: B
     summary: 'TICVAI revenue by commercial structure: guaranteed versus variable, shortfall protection.'
@@ -13775,12 +14377,16 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-373; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 5 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P09-platform-admin-console.yaml#ADM-373
+      status: logged
+      by: CHG-SBO-005
   ADM-374:
     block: B
     summary: 'Trials and their conversion to paid: setup completion, readiness, expiring trials.'
@@ -13874,12 +14480,16 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-375; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 11 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P09-platform-admin-console.yaml#ADM-375
+      status: logged
+      by: CHG-SBO-005
   ADM-376:
     block: B
     summary: Commercial optimisation and expansion opportunities with cost and revenue impact.
@@ -13930,12 +14540,16 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-376; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 6 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P09-platform-admin-console.yaml#ADM-376
+      status: logged
+      by: CHG-SBO-005
   ADM-377:
     block: B
     summary: Subscription, licensing, billing and metering exceptions in one list.
@@ -13956,6 +14570,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-377; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-378:
     block: B
     summary: >-
@@ -13985,6 +14601,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-378; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-379:
     block: B
     summary: Duplicate of SGN-001 on the Console.
@@ -14000,12 +14618,16 @@ screens:
         The prospect journey lives in P17; the Console copy should be TICVAI's view of a prospect's answers, or
         be removed.
       source: screens/P17-ticvai-signup.yaml#SGN-001
+      status: fixed
+      by: CHG-SBO-015
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-379; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-380:
     block: B
     summary: Duplicate of SGN-002.
@@ -14065,12 +14687,16 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-381; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 12 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P09-platform-admin-console.yaml#ADM-381
+      status: logged
+      by: CHG-SBO-005
   ADM-382:
     block: B
     summary: Duplicate of SGN-004.
@@ -14088,6 +14714,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-382; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-384:
     block: B
     summary: Duplicate of SGN-006.
@@ -14117,6 +14745,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-384; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-385:
     block: B
     summary: Duplicate of SGN-007.
@@ -14135,6 +14765,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-385; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-386:
     block: B
     summary: Duplicate of SGN-008.
@@ -14156,6 +14788,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-386; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-387:
     block: B
     summary: Duplicate of SGN-009.
@@ -14174,6 +14808,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-387; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-388:
     block: B
     summary: Duplicate of SGN-010.
@@ -14196,6 +14832,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-388; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-389:
     block: B
     summary: >-
@@ -14220,6 +14858,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-389; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-390:
     block: B
     summary: >-
@@ -14428,12 +15068,16 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-397; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 8 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P09-platform-admin-console.yaml#ADM-397
+      status: logged
+      by: CHG-SBO-005
   ADM-398:
     block: B
     summary: Versioning, approval and publication of commercial, VSI and licensing rules.
@@ -14467,12 +15111,16 @@ screens:
         Either they are TICVAI's assisted-sale view of the same journey (then say what the operator can do that
         the prospect cannot) or they are duplicates to remove.
       source: screens/P17-ticvai-signup.yaml#SGN-011
+      status: fixed
+      by: CHG-SBO-015
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-399; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-400:
     block: B
     summary: The commercial model and tier chosen for a customer, by TICVAI's commercial team (twin of SGN-012).
@@ -14505,6 +15153,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-400; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-401:
     block: B
     summary: Optional modules for a customer, by TICVAI's commercial team (twin of SGN-013).
@@ -14544,12 +15194,16 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-401; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 9 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P09-platform-admin-console.yaml#ADM-401
+      status: logged
+      by: CHG-SBO-005
   ADM-402:
     block: B
     summary: AI module recommendations for a customer (twin of SGN-014).
@@ -14594,12 +15248,16 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-402; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 7 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P09-platform-admin-console.yaml#ADM-402
+      status: logged
+      by: CHG-SBO-005
   ADM-403:
     block: B
     summary: One module's commercial treatment (twin of SGN-015).
@@ -14621,6 +15279,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-403; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-404:
     block: B
     summary: >-
@@ -14677,12 +15337,16 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-406; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 10 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P09-platform-admin-console.yaml#ADM-406
+      status: logged
+      by: CHG-SBO-005
   ADM-407:
     block: B
     summary: >-
@@ -14715,12 +15379,16 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-407; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 6 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P09-platform-admin-console.yaml#ADM-407
+      status: logged
+      by: CHG-SBO-005
   ADM-408:
     block: B
     summary: Final internal approval of a package and handoff to activation.
@@ -14833,12 +15501,16 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-414; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 5 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P09-platform-admin-console.yaml#ADM-414
+      status: logged
+      by: CHG-SBO-005
   ADM-415:
     block: B
     summary: The agreement and billable definition the customer accepts (twin of SGN-023).
@@ -14878,6 +15550,8 @@ screens:
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P09-platform-admin-console.yaml#ADM-415
+      status: logged
+      by: CHG-SBO-005
   ADM-416:
     block: B
     summary: Final checks (payment method, contract, commercial validity) before the subscription is created.
@@ -14893,6 +15567,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-416; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-417:
     block: B
     summary: Create the active subscription (twin of SGN-024).
@@ -14961,12 +15637,16 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-418; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 14 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P09-platform-admin-console.yaml#ADM-418
+      status: logged
+      by: CHG-SBO-005
   ADM-419:
     block: B
     summary: >-
@@ -15114,6 +15794,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-423; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-424:
     block: B
     summary: Activate purchased modules and check their dependencies.
@@ -15137,6 +15819,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-424; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-425:
     block: B
     summary: Apply a configuration template to a new venue based on its assessment.
@@ -15173,6 +15857,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-425; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-426:
     block: B
     summary: >-
@@ -15202,6 +15888,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-426; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-427:
     block: B
     summary: Validate the created environment before handing it to the customer, with exceptions to fix.
@@ -15224,6 +15912,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-427; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-449:
     block: B
     summary: Technical usage, commercial consumption and licence health per customer.
@@ -15239,6 +15929,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-449; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-450:
     block: B
     summary: What a customer is technically entitled to, independent of how they are charged.
@@ -15255,6 +15947,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-450; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-451:
     block: B
     summary: The billable events that drive variable charges, metered per period.
@@ -15271,6 +15965,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-451; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-452:
     block: B
     summary: Operational consumption against licensed capacity, with approaching, at and over limit states.
@@ -15290,6 +15986,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-452; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-453:
     block: B
     summary: >-
@@ -15339,6 +16037,8 @@ screens:
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P09-platform-admin-console.yaml#ADM-453
+      status: logged
+      by: CHG-SBO-005
   ADM-454:
     block: B
     summary: Consumption against the contractual minimum guarantee; it feeds billing but issues no invoice.
@@ -15360,12 +16060,16 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-454; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 2 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P09-platform-admin-console.yaml#ADM-454
+      status: logged
+      by: CHG-SBO-005
   ADM-455:
     block: B
     summary: Temporary capacity above entitlement for a venue, with commercial treatment and approval.
@@ -15399,6 +16103,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-456; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-457:
     block: B
     summary: AI forecast of consumption with recommended actions.
@@ -15412,6 +16118,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-457; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-458:
     block: B
     summary: >-
@@ -15457,12 +16165,16 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-458; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 9 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P09-platform-admin-console.yaml#ADM-458
+      status: logged
+      by: CHG-SBO-005
   ADM-459:
     block: B
     summary: >-
@@ -15519,12 +16231,16 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-459; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 9 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P09-platform-admin-console.yaml#ADM-459
+      status: logged
+      by: CHG-SBO-005
   ADM-460:
     block: B
     summary: What TICVAI charges for a period, broken down by fee type for the customer's commercial model.
@@ -15545,6 +16261,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-460; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-461:
     block: B
     summary: Finance reconciles metered consumption before invoicing, and settles AI usage.
@@ -15658,6 +16376,8 @@ screens:
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P09-platform-admin-console.yaml#ADM-463
+      status: logged
+      by: CHG-SBO-005
   ADM-464:
     block: B
     summary: The customer renewal pipeline with growth, usage, overage and payment history per customer.
@@ -15714,6 +16434,8 @@ screens:
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P09-platform-admin-console.yaml#ADM-464
+      status: logged
+      by: CHG-SBO-005
   ADM-465:
     block: B
     summary: AI recommendation of the right commercial structure, not the most expensive one.
@@ -15736,6 +16458,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-465; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-466:
     block: B
     summary: Model renewal or contract scenarios before making an offer.
@@ -15757,6 +16481,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-466; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-467:
     block: B
     summary: >-
@@ -15814,6 +16540,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P09-platform-admin-console.yaml#ADM-468; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   ADM-534:
     block: B
     summary: >-
@@ -15875,12 +16603,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-SBO-001
     - what: requiresModule is 'ai' on a TICVAI Console screen.
       why: >-
         requiresModule ties a screen to what a tenant licensed; a platform operator's console does not depend on
         any tenant's modules (and 'membership' is the guest annual-pass module, not TICVAI's subscription). Should
         be core.
       source: screens/_schema.yaml#requiresModule; screens/P09-platform-admin-console.yaml#ADM-534
+      status: fixed
+      by: CHG-SBO-003
   ADM-581:
     block: B
     summary: >-
@@ -17734,6 +18466,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P17-ticvai-signup.yaml#SGN-001; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
     decisions:
     - question: What session does a prospect have between "Start new setup" and activation (to save and continue)?
       decision: 'Drawn default stands (answer: "Email + one-time code"): A prospect sign-up session created by SGN-002 (email
@@ -17794,6 +18528,8 @@ screens:
     - what: Venue types are drawn as table columns.
       why: They are choices.
       source: screens/P17-ticvai-signup.yaml#SGN-003
+      status: fixed
+      by: CHG-SBO-023
     - what: 'A sign-up screen calls operations a prospect cannot call: scoreVsiAssessment (staff/guest).'
       why: >-
         A prospect buying TICVAI has no tenant, no cell and no staff session (P17 platform note); these are refused
@@ -17808,6 +18544,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P17-ticvai-signup.yaml#SGN-003; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 12 labels bound).
       why: >-
@@ -17837,6 +18575,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P17-ticvai-signup.yaml#SGN-004; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   SGN-006:
     block: B
     summary: What the venue intends to sell (admission types, passes, vouchers, bundles, events).
@@ -17871,6 +18611,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P17-ticvai-signup.yaml#SGN-006; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   SGN-007:
     block: B
     summary: Admission, queue and visitor-flow needs.
@@ -17895,6 +18637,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P17-ticvai-signup.yaml#SGN-007; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   SGN-008:
     block: B
     summary: Additional modules the business needs, suggested from earlier answers.
@@ -17923,6 +18667,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P17-ticvai-signup.yaml#SGN-008; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   SGN-009:
     block: B
     summary: External systems, payment providers and technical constraints affecting scope.
@@ -17945,6 +18691,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P17-ticvai-signup.yaml#SGN-009; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   SGN-010:
     block: B
     summary: The assessment summarised for the prospect before the recommendation; editable answers.
@@ -17972,6 +18720,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P17-ticvai-signup.yaml#SGN-010; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   SGN-011:
     block: B
     summary: The recommended package with the reasons for each module and tier.
@@ -17995,6 +18745,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P17-ticvai-signup.yaml#SGN-011; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   SGN-012:
     block: B
     summary: Choose the commercial model (subscription, per ticket, minimum guarantee, hybrid) and tier.
@@ -18033,6 +18785,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P17-ticvai-signup.yaml#SGN-012; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   SGN-013:
     block: B
     summary: Optional modules with description, price treatment, dependencies and trial availability.
@@ -18077,6 +18831,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P17-ticvai-signup.yaml#SGN-013; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 9 labels bound).
       why: >-
@@ -18134,6 +18890,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P17-ticvai-signup.yaml#SGN-014; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 7 labels bound).
       why: >-
@@ -18168,6 +18926,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P17-ticvai-signup.yaml#SGN-015; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
   SGN-016:
     block: B
     summary: >-
@@ -18305,6 +19065,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P17-ticvai-signup.yaml#SGN-022; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SBO-002
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 5 labels bound).
       why: >-

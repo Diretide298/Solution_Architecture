@@ -1,0 +1,131 @@
+id: CHG-SBO-003
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: Console screens are core (requiresModule), and the venue screens filed under the wrong module or licence move to
+  the right one (BO-008, BO-441 Sell; BO-065, BO-1062, BO-1066, BO-125, BO-1065, BO-441 core; BO-136 fnb; BO-942 Rentals;
+  BO-981 seat mapping).
+decision:
+  what: Set requiresModule core on every P09 screen and fix the module or licence the corrections name.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Design-note corrections, 1-2 October 2026: "requiresModule is membership on a TICVAI Console screen" (a platform operator''s
+  console does not depend on any tenant''s modules) and the module placements per screen (audit R254; CHG-NOTE-005).'
+keys_touched:
+  screens:
+  - ADM-002
+  - ADM-003
+  - ADM-005
+  - ADM-006
+  - ADM-007
+  - ADM-008
+  - ADM-009
+  - ADM-010
+  - ADM-011
+  - ADM-012
+  - ADM-013
+  - ADM-014
+  - ADM-015
+  - ADM-019
+  - ADM-029
+  - ADM-030
+  - ADM-032
+  - ADM-033
+  - ADM-034
+  - ADM-534
+  - BO-008
+  - BO-065
+  - BO-125
+  - BO-136
+  - BO-441
+  - BO-942
+  - BO-981
+  - BO-1062
+  - BO-1065
+  - BO-1066
+root_class: A31 SCREEN-WRONG-OP
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ADM-005
+  - APP-SETUP-ADM-008
+  - APP-SETUP-BO-008
+  - APP-SETUP-BO-065
+  - APP-SETUP-BO-1065
+  - APP-SETUP-BO-136
+  - APP-SETUP-BO-441
+  - VM-BO-125
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-console-grant.py
+status: open
+notes: 'check-console-grant C-CORE holds every console screen to core.
+
+  - ADM-002: requiresModule is ''membership'' on a TICVAI Console screen.
+
+  - ADM-003: requiresModule is ''membership'' on a TICVAI Console screen.
+
+  - ADM-005: requiresModule is ''membership''.
+
+  - ADM-006: requiresModule is ''membership'' on a TICVAI Console screen.
+
+  - ADM-007: requiresModule is ''membership'' on a TICVAI Console screen.
+
+  - ADM-008: requiresModule is ''membership''.
+
+  - ADM-009: requiresModule is ''membership'' on a TICVAI Console screen.
+
+  - ADM-010: requiresModule is ''membership'' on a TICVAI Console screen.
+
+  - ADM-011: requiresModule is ''membership'' on a TICVAI Console screen.
+
+  - ADM-012: requiresModule is ''membership'' on a TICVAI Console screen.
+
+  - ADM-013: requiresModule is ''membership'' on a TICVAI Console screen.
+
+  - ADM-014: requiresModule is ''membership'' on a TICVAI Console screen.
+
+  - ADM-015: requiresModule is ''membership'' on a TICVAI Console screen.
+
+  - ADM-019: requiresModule is ''membership'' on a TICVAI Console screen.
+
+  - ADM-029: requiresModule is ''membership'' on a TICVAI Console screen.
+
+  - ADM-030: requiresModule is ''membership'' on a TICVAI Console screen.
+
+  - ADM-032: requiresModule is ''membership'' on a TICVAI Console screen.
+
+  - ADM-033: requiresModule is ''membership'' on a TICVAI Console screen.
+
+  - ADM-034: requiresModule is ''membership'' on a TICVAI Console screen.
+
+  - ADM-534: requiresModule is ''ai'' on a TICVAI Console screen.
+
+  - BO-008: The screen''s module is "Orders & Money" while it is the product configuration.
+
+  - BO-065: requiresModule ticketing.
+
+  - BO-125: requiresModule ''ticketing'' while F&B and retail boards also have buttons.
+
+  - BO-136: requiresModule is "core" although the screen is F&B.
+
+  - BO-441: The screen''s module is Games & Rides while the rule order governs every price at the venue.
+
+  - BO-942: Filed under the Games & Rides process module while the screen is Rentals / resource management
+
+  - BO-981: Placed in process-module Admission & Access Control
+
+  - BO-1062: requiresModule ''seating'' on the tenant and brand context.
+
+  - BO-1065: Placement — the screen sits in the F&B process list, its module is "Access & Venue" with requiresModule seating
+  (from the seat-mapping pack, board 12), but every operation on it is region scope (REGION_CONFIGURE).
+
+  - BO-1066: requiresModule ''seating'' on the tenant''s access-policy screen.
+
+
+  Batch SBO (screens-p08-p09, phase B), 2 October 2026; worktree D:/wt/screens-p08-p09, branch screens-p08-p09. Tickets: none
+  started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched screen. Applied with
+  the screen files'' own dump settings (width 100).'
