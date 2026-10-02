@@ -40,6 +40,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-screen-wiring.py
-status: open
+status: closed
+closed_by_commit: 56035b56
 notes: 'check-screen-wiring S-FIELD-BINDING refuses a binding to a field the schema lacks (the new bindings resolve) and S-BUTTON-FORM
   a write button with nothing collecting its body. A canvas for ADM-241 needs a component kind the library lacks: CHG-MOV-009.'

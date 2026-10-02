@@ -512,7 +512,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-key-stability.py
-status: open
+status: closed
+closed_by_commit: 56035b56
 notes: 'Ids are kept so every pushed key keeps its ticket: the 25 APP-SETUP-ADM-* tickets stay in the plan under their keys
   (check-key-stability on a plan re-derived from this branch: no key of these screens renamed; the three renamed findings
   it shows, SVC-ACCESS-SYNC-1, SVC-VENUEOPS-FEED-1 and VM-ORDER-SYNC-1, appear identically when HEAD 2a05ef95 is re-derived,

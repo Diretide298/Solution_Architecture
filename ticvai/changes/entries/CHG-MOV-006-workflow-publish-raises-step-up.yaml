@@ -31,5 +31,6 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-step-up.py
-status: open
+status: closed
+closed_by_commit: 56035b56
 notes: check-step-up lists every screen calling a step-up operation with no way to present the challenge.

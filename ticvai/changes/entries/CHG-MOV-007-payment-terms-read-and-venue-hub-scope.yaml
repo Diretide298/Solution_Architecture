@@ -35,6 +35,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-screen-wiring.py
-status: open
+status: closed
+closed_by_commit: 56035b56
 notes: 'check-screen-wiring S-OP-UNREACHED (the new read is reached by its panel) and S-CONSUMED-MIRROR (the consumed-by lists
   agree with the screens). No other workshop-pack gap has its operation yet: CHG-MOV-008.'
