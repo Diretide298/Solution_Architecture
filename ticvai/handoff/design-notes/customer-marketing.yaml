@@ -229,6 +229,8 @@ screens:
           A guest cannot know a variant id. Saving belongs on the product and date cards (WEB-005/WEB-006/GST-004).
           Here the screen only lists, books and removes. Replace the modal with a "Browse" link when the list is empty.
         source: screens/P01-guest-web-storefront.yaml#WEB-009
+        status: fixed
+        by: CHG-SGU-017
     decisions:
     - question: Does a wishlist entry for a performance that has passed stay, or should the platform drop it, and should a
         guest be told when a saved date is about to sell out?
@@ -276,6 +278,8 @@ screens:
       - what: The "Add to wishlist" modal asks for variantId, performanceId and note.
         why: Same as WEB-009; adding belongs on the product cards, and a guest cannot type a variant id.
         source: screens/P02-guest-mobile-app.yaml#GST-020
+        status: fixed
+        by: CHG-SGU-017
 
   WEB-011:
     summary: >-
@@ -389,6 +393,8 @@ screens:
           They have nothing to do with a checkout details step. The 20 August review removed the same bulk attach
           from WEB-009/GST-020 and the prototype has no counterpart. Remove them from WEB-011.
         source: screens/P01-guest-web-storefront.yaml#WEB-011; screens/P02-guest-mobile-app.yaml#GST-020
+        status: fixed
+        by: CHG-SGU-017
       - what: The marketing opt-in is written with recordConsent from this screen.
         why: >-
           M18-15 (audit R-M18-15) records checkout opt-ins through checkoutCart marketingConsents[] and recordCheckoutConsents,
@@ -396,12 +402,18 @@ screens:
           buyer has none) and would record consent for an order that may never be paid. Keep recordConsent off
           this step and pass the ticks to checkout.
         source: M18-15 (audit R-M18-15); contracts/satellite/marketing-crm.yaml#recordCheckoutConsents
+        status: fixed
+        by: CHG-SGU-017
       - what: The "Upload guest document" control is offered, but uploadGuestDocument needs a storageRef that no operation issues yet.
         why: The upload cannot work end to end. Either name the document-store upload operation or hide the control until it exists.
         source: contracts/satellite/marketing-crm.yaml#uploadGuestDocument
+        status: fixed
+        by: CHG-SGU-017
       - what: The emptyFirstRun state offers "Add to wishlist" on a checkout step.
         why: Derived from the bulk-attached operations. The empty state of this step is "Nothing to fill in - continue to payment", and the step is normally skipped.
         source: F01 step 6
+        status: fixed
+        by: CHG-SGU-017
     decisions:
     - question: May a guest who checks out without an account be marketed to on the strength of the checkout opt-in (is it
         sufficient consent under PDPL)?
@@ -470,12 +482,18 @@ screens:
           device" is something the app does on install, never a button. Keep the reads the tiles need and drop
           the writes.
         source: screens/P01-guest-web-storefront.yaml#WEB-017; contracts/satellite/marketing-crm.yaml#registerGuestDevice
+        status: fixed
+        by: CHG-SGU-017
       - what: getMyChallenges has no response schema.
         why: The challenges tile has nothing to bind to; the contract needs the ChallengeProgress shape.
         source: contracts/satellite/marketing-crm.yaml#getMyChallenges
+        status: logged
+        by: CHG-SGU-024
       - what: Upcoming bookings, wallet and orders tiles have no operation on this screen.
         why: The prototype draws them, and the screen's own empty state talks about orders. Add the read operations (or state that the tiles link without figures).
         source: screens/P01-guest-web-storefront.yaml#WEB-017
+        status: fixed
+        by: CHG-SGU-017
 
   WEB-020:
     summary: >-
@@ -555,12 +573,18 @@ screens:
       - what: The profile is read with getGuestProfile (staff-and-guest, by subjectId) while getMyProfile, the guest's own read, is consumed by no screen.
         why: A guest screen should read its own record by session (getMyProfile), matching updateMyProfile. That way the read cannot be pointed at another subject.
         source: contracts/satellite/marketing-crm.yaml#getMyProfile; contracts/satellite/marketing-crm.yaml#updateMyProfile
+        status: fixed
+        by: CHG-SGU-017
       - what: The screen writes consent but has no getGuestConsents, so it cannot show the current position it is changing.
         why: The toggles need the current state, including "needs renewing". Add getGuestConsents (already used by WEB-024/GST-066).
         source: contracts/satellite/marketing-crm.yaml#getGuestConsents
+        status: fixed
+        by: CHG-SGU-017
       - what: Purpose text reads "Change how profile behaves here, and see which level the current value came from".
         why: This is a configuration-screen template that does not describe a guest profile page (the prototype noted it has no "level"). Reword it to "Correct your details, choose what we may send you, and record your needs".
         source: screens/P01-guest-web-storefront.yaml#WEB-020
+        status: fixed
+        by: CHG-SGU-017
 
   GST-039:
     summary: >-
@@ -607,9 +631,13 @@ screens:
           A guest never types these; source, notice version and time are system-set. The primary act of a
           profile screen is saving the profile. Replace them with the consent rows described above.
         source: screens/P02-guest-mobile-app.yaml#GST-039; contracts/satellite/marketing-crm.yaml#recordConsent
+        status: fixed
+        by: CHG-SGU-017
       - what: GST-039 declares no read operation; it cannot show the profile it edits or the current consents.
         why: Add getMyProfile and getGuestConsents.
         source: contracts/satellite/marketing-crm.yaml#getMyProfile; contracts/satellite/marketing-crm.yaml#getGuestConsents
+        status: fixed
+        by: CHG-SGU-017
       - what: The emptyNoAccess state names GUEST_VIEW, and emptyFirstRun says the first consent "saves the first profile".
         why: A guest holds no staff permission (ADR-0025), and a profile always exists for a signed-in guest. These states come from the configEditor pattern and do not apply.
         source: screens/P01-guest-web-storefront.yaml#WEB-020
@@ -663,9 +691,13 @@ screens:
           WhatsApp is a MessageChannel, a preferred-channel value on the profile, and the client's main
           channel (MoM 2026-08-31 4.6). A WhatsApp newsletter cannot be subscribed to or unsubscribed from.
         source: contracts/satellite/marketing-crm.yaml#setMarketingSubscription; contracts/satellite/marketing-crm.yaml#/components/schemas/MessageChannel
+        status: logged
+        by: CHG-SGU-024
       - what: getMarketingSubscription has no response schema, and setMarketingSubscription is marked "a proposal ... wants confirming".
         why: The screen's subscription section cannot be built against an empty response. Confirm the shape (one row per list and channel).
         source: contracts/satellite/marketing-crm.yaml#getMarketingSubscription
+        status: logged
+        by: CHG-SGU-024
       - what: No getGuestConsents on GST-065, and the emptyNoAccess state names GUEST_VIEW.
         why: The consent toggles need the current state. A guest holds no staff permission (ADR-0025).
         source: contracts/satellite/marketing-crm.yaml#getGuestConsents
@@ -674,6 +706,8 @@ screens:
       - what: The "Save marketing subscription" modal asks the guest for id, subjectId, channel, listName, isSubscribed and unsubscribeToken.
         why: These are system and row fields; the guest flips a toggle per list and channel.
         source: screens/P02-guest-mobile-app.yaml#GST-065
+        status: fixed
+        by: CHG-SGU-017
 
   WEB-027:
     summary: >-
@@ -714,9 +748,13 @@ screens:
           The contract itself says the screen "sat on the wishlist and consent operations, which is why it read
           as a duplicate". Remove them. The entry parameter that matters is the unsubscribe token from an email link.
         source: contracts/satellite/marketing-crm.yaml#getMarketingSubscription; screens/P01-guest-web-storefront.yaml#WEB-027
+        status: fixed
+        by: CHG-SGU-017
       - what: Purpose is "Record newsletter subscription for this venue"; there is no listConsentPurposes or getGuestConsents.
         why: The page needs the current consent per channel to show the two-part layout.
         source: contracts/satellite/marketing-crm.yaml#getGuestConsents
+        status: fixed
+        by: CHG-SGU-017
     decisions:
     - question: Should a signed-out visitor be able to sign up for a newsletter with just an email (footer sign-up)? No operation
         accepts an email without a guest subject.
@@ -790,6 +828,8 @@ screens:
       - what: Purpose still reads "See loyalty & rewards for this venue".
         why: Stale since the 31 August rename; the prototype review noted it. Reword it to "Your devices, security, cookie choices and data rights".
         source: screens/P01-guest-web-storefront.yaml#WEB-024
+        status: fixed
+        by: CHG-SGU-017
       - what: >-
           "Signed-in devices" with "Sign out this device" is bound to listGuestDevices / revokeGuestDevice, which are
           push-notification registrations.
@@ -798,14 +838,20 @@ screens:
           operation lists or ends other sessions (guestLogout ends only the current one). Either add a guest
           session list/revoke operation or relabel the control "Stop notifications on this device".
         source: contracts/satellite/marketing-crm.yaml#revokeGuestDevice; contracts/spine/identity.yaml#guestLogout; DI-1077
+        status: fixed
+        by: CHG-SGU-017
       - what: >-
           Action-bar buttons "Add to wishlist", "Register guest device", "Record consent" and "Grant delegation" sit
           on the security and privacy pane.
         why: Adding to the wishlist and registering a device are not acts a guest performs here, and consent changes belong on the consent rows. Granting delegation belongs to the family screen.
         source: screens/P01-guest-web-storefront.yaml#WEB-024
+        status: fixed
+        by: CHG-SGU-017
       - what: getWaiverStatus returns an inline response with no named schema.
         why: The waiver panel cannot bind until the contract names it (the screen's own component note says so).
         source: contracts/satellite/marketing-crm.yaml#getWaiverStatus
+        status: logged
+        by: CHG-SGU-024
 
   GST-066:
     summary: >-
@@ -863,15 +909,23 @@ screens:
       - what: The screen is a statusTracker, but no guest-callable operation reads a guest's own data requests (getDsarRequest is service-only).
         why: The page cannot show "where it has got to", which is its stated purpose. Add a guest read of their own requests (scoped to the caller, like listMyCases).
         source: contracts/spine/cross-region.yaml#getDsarRequest; screens/P02-guest-mobile-app.yaml#GST-066
+        status: logged
+        by: CHG-SGU-024
       - what: The screen reads consents (getGuestConsents) but cannot change them; recordConsent is not declared.
         why: A privacy page that shows consents without letting the guest withdraw them breaks "withdrawal as easy as granting". Add recordConsent.
         source: contracts/satellite/marketing-crm.yaml#recordConsent
+        status: fixed
+        by: CHG-SGU-017
       - what: '"Upload guest document" and "Save guest preferences" are action-bar buttons on the privacy page.'
         why: Documents belong where they are needed (attendee forms, waivers) and need a storageRef no operation issues. Preferences belong on GST-039. Neither is a data right.
         source: contracts/satellite/marketing-crm.yaml#uploadGuestDocument
+        status: fixed
+        by: CHG-SGU-017
       - what: '"Export subject data" and "Delete guest account" are the button labels, and emptyNoAccess names GUEST_VIEW_PII.'
         why: Spec wording on a guest surface. Use "Get a copy of my data" and "Delete my account". A guest holds no staff permission (ADR-0025).
         source: screens/P02-guest-mobile-app.yaml#GST-066
+        status: fixed
+        by: CHG-SGU-017
 
   WEB-025:
     summary: >-
@@ -928,9 +982,13 @@ screens:
           guest-callable until raiseMyCase, listMyCases and replyToMyCase were added. Use the /my operations,
           as WEB-034 and GST-034 do (R148 names WEB-025 among the guest case screens).
         source: contracts/satellite/marketing-crm.yaml#listMyCases; R148
+        status: fixed
+        by: CHG-SGU-017
       - what: The FAQ (the screen's first purpose) has no operation; listFaqs is declared on WEB-045 only.
         why: The two screens are one implementation (GAP-D3). Declare listFaqs here too, or record that WEB-045 supplies it.
         source: contracts/satellite/white-label.yaml#listFaqs; rev 3 GAP-D3
+        status: fixed
+        by: CHG-SGU-017
 
   GST-068:
     summary: >-
@@ -970,6 +1028,8 @@ screens:
       - what: GST-068 uses createCase and listCases, with staff filters as fields (Assigned to principal id, Breached SLA, Priority).
         why: Staff-permissioned operations and staff filters on a guest screen. Use raiseMyCase, listMyCases and replyToMyCase (R148 lists GST-068), and remove the filter fields.
         source: contracts/satellite/marketing-crm.yaml#listMyCases; R148
+        status: fixed
+        by: CHG-SGU-017
       - what: emptyNoAccess names CASE_VIEW.
         why: A guest holds no staff permission (ADR-0025).
         source: screens/P02-guest-mobile-app.yaml#GST-068
@@ -1022,12 +1082,18 @@ screens:
       - what: The form is eight text fields bound to SubmitReviewRequest (id, subjectId, venueId, relatedOrderId, rating, body, aspects, recordedAt).
         why: id, subjectId, venueId and recordedAt are system-set, relatedOrderId is picked from a visit, rating is stars, and aspects are chips. Rebuild as above.
         source: screens/P01-guest-web-storefront.yaml#WEB-026
+        status: fixed
+        by: CHG-SGU-017
       - what: Surveys (the screen's name and DI-391) have no operation; getForm and submitForm (kind survey, guest audience) are consumed by no screen.
         why: A triggered survey link (post-visit, post-scan, case closure) has nowhere to open. Wire getForm and submitForm here (and on GST-035).
         source: contracts/satellite/marketing-crm.yaml#submitForm; DI-391
+        status: fixed
+        by: CHG-SGU-017
       - what: WEB-026 lacks raiseMyCase, which GST-035 has.
         why: Cross-surface parity. A guest reporting a problem on the web has the same need.
         source: screens/P02-guest-mobile-app.yaml#GST-035
+        status: fixed
+        by: CHG-SGU-017
     decisions:
     - question: Should the government satisfaction service (the "happiness meter" seen on a reference site) be integrated,
         and does it replace or sit beside the venue's own rating?
@@ -1064,9 +1130,13 @@ screens:
       - what: The form is raw SubmitReviewRequest text fields, as on WEB-026.
         why: Same fix as WEB-026.
         source: screens/P02-guest-mobile-app.yaml#GST-035
+        status: fixed
+        by: CHG-SGU-017
       - what: No survey operation, as on WEB-026.
         why: Wire getForm and submitForm so triggered surveys open here.
         source: contracts/satellite/marketing-crm.yaml#getForm; DI-391
+        status: fixed
+        by: CHG-SGU-017
 
   WEB-034:
     summary: >-
@@ -1121,9 +1191,13 @@ screens:
           found item, which is "the whole capability". Either have the guest report also create a LostItem
           (recordLostItem with foundOrLost lost and caseId), or extend raiseMyCase with the item fields.
         source: contracts/satellite/marketing-crm.yaml#recordLostItem; contracts/satellite/marketing-crm.yaml#/components/schemas/LostItem; DI-208
+        status: fixed
+        by: CHG-SGU-017
       - what: The prototype has no lost-item form; it uses the generic case form.
         why: Record this as a prototype gap so the build does not copy it.
         source: screens/P01-guest-web-storefront.yaml#WEB-034
+        status: fixed
+        by: CHG-SGU-017
     decisions:
     - question: Which operation records a guest's lost-item report so it is matchable - recordLostItem alongside the case,
         or an extended raiseMyCase?
@@ -1156,9 +1230,13 @@ screens:
       - what: Entry parameter orderId is left from when the screen called getGuestOrderStatus (order tracking on a lost-property screen).
         why: The only entry the screen needs is an optional caseId; an order link is the optional orderRef inside the form.
         source: contracts/satellite/marketing-crm.yaml#listMyCases
+        status: fixed
+        by: CHG-SGU-017
       - what: Same LostItem gap as WEB-034.
         why: A report filed only as a case cannot be matched in BO-073.
         source: contracts/satellite/marketing-crm.yaml#recordLostItem
+        status: fixed
+        by: CHG-SGU-017
 
   WEB-046:
     summary: >-
@@ -1200,9 +1278,13 @@ screens:
       - what: The primary action is "Claim location session" (claimLocationSession, F&B delivery location) with Location code, Seat reference and Party size fields.
         why: That is the F&B ordering step (WEB-036 / GST-024) and has no place on a notifications feed. Remove it.
         source: contracts/satellite/fnb.yaml#claimLocationSession; screens/P01-guest-web-storefront.yaml#WEB-036
+        status: fixed
+        by: CHG-SGU-017
       - what: The prototype note still says the screen is deferred (R242).
         why: Superseded by GAP-C1 on 29 September; the note should say it is in the first release.
         source: rev 3 GAP-C1; DI-1075
+        status: fixed
+        by: CHG-SGU-017
 
   GST-030:
     summary: >-
@@ -1230,9 +1312,13 @@ screens:
       - what: Same claimLocationSession attach as WEB-046.
         why: Remove; it belongs to GST-024.
         source: contracts/satellite/fnb.yaml#claimLocationSession
+        status: fixed
+        by: CHG-SGU-017
       - what: The prototype note still says deferred (R242).
         why: Superseded by GAP-C1.
         source: rev 3 GAP-C1
+        status: fixed
+        by: CHG-SGU-017
 
   GST-036:
     summary: >-
@@ -1291,15 +1377,21 @@ screens:
       - what: GST-036 lacks redeemLoyaltyPoints and createReferral, which WEB-043 has.
         why: Cross-surface parity; the offline state already says "redeeming and referring need the connection", so the screen expects them.
         source: screens/P01-guest-web-storefront.yaml#WEB-043; screens/P02-guest-mobile-app.yaml#GST-036
+        status: fixed
+        by: CHG-SGU-017
       - what: listRewards, listCustomerBadges, listLeaderboard and setLeaderboardNickname are guest-audience operations consumed by no screen.
         why: The rewards catalogue and status badges (DI-392) belong on this screen; the leaderboard nickname belongs here or on BO-831's guest hub.
         source: contracts/satellite/marketing-crm.yaml#listRewards; contracts/satellite/marketing-crm.yaml#listCustomerBadges; contracts/satellite/marketing-crm.yaml#setLeaderboardNickname
+        status: fixed
+        by: CHG-SGU-017
       - what: >-
           getLoyaltyPosition returns an inline shape (tier, nextTier, pointsPending, expiringPoints, expiringAt)
           that differs from the LoyaltyPosition schema the staff reads return (tierName, tierCode,
           nextExpiryPoints, nextExpiryAt, lifetimePoints, no pending).
         why: One concept, two shapes, so the guest and the till show different fields for the same position. Make getLoyaltyPosition return LoyaltyPosition (with pending points added to it).
         source: contracts/satellite/marketing-crm.yaml#getLoyaltyPosition; contracts/satellite/marketing-crm.yaml#/components/schemas/LoyaltyPosition
+        status: logged
+        by: CHG-SGU-024
       - what: listLoyaltyProgrammes carries permission MARKETING_VIEW and the screen's emptyNoAccess names it.
         why: A guest holds no staff permission (ADR-0025). The guest needs "the programmes I am in", not every programme.
         source: contracts/satellite/marketing-crm.yaml#listLoyaltyProgrammes
@@ -1344,9 +1436,13 @@ screens:
       - what: The "Create referral" modal asks the guest for id, referrerSubjectId, code, status, qualifying action, reward ids and expiry.
         why: These are system-set; the guest taps one button. The modal should only show the code that comes back and Share.
         source: screens/P01-guest-web-storefront.yaml#WEB-043
+        status: fixed
+        by: CHG-SGU-017
       - what: Same shape and permission issues as GST-036 (getLoyaltyPosition shape, listLoyaltyProgrammes MARKETING_VIEW, rewards and badges unwired).
         why: See GST-036.
         source: contracts/satellite/marketing-crm.yaml#getLoyaltyPosition
+        status: logged
+        by: CHG-SGU-024
     decisions:
     - question: Same programme-configuration question as GST-036.
       decision: 'Drawn default stands (answer: "Default / recommended accepted"): Same sample tiers.'
@@ -1730,9 +1826,13 @@ screens:
       - what: recordConsent is declared guest-audience only, although its description says an agent may record consent on a guest's behalf with GUEST_MANAGE.
         why: A till (and BO-748) cannot record the consent a guest gives in person. Add the staff audience to recordConsent with the agent-recorded rule.
         source: contracts/satellite/marketing-crm.yaml#recordConsent
+        status: fixed
+        by: CHG-SPO-016
       - what: Open reservations are not shown on the prototype's guest card.
         why: The panel's purpose names them (visible before the sale, not after); add them to the build.
         source: screens/P04-point-of-sale.yaml#POS-027
+        status: fixed
+        by: CHG-SPO-016
     decisions:
     - question: What does the till do with a barred guest (refuse the sale, require a supervisor, or only warn)?
       decision: 'Drawn default stands (answer: "Default / recommended accepted"): Show the red banner and disable "Attach
@@ -2225,6 +2325,8 @@ screens:
       - what: The form is raw SeoMetadata fields, including id, entityKind, entityId, scopePath, isAutoGenerated and openGraph as text fields.
         why: Ids and scope are system fields, the entity is picked, and Open Graph is a small group of fields (title, description, image). Rebuild as above.
         source: screens/P13-white-label-cms.yaml#CMS-013
+        status: fixed
+        by: CHG-SGU-017
       - what: getSeoMetadata (the metadata in force for one page) is consumed by no screen.
         why: The editor must load what is in force before saving. Add getSeoMetadata.
         source: contracts/satellite/marketing-crm.yaml#getSeoMetadata
@@ -2291,9 +2393,13 @@ screens:
       - what: emptyFirstRun says the screen "offers no create action - this screen declares no operation that makes one".
         why: The screen declares setPolicy, setConsentPurposes and createConsentQuestion. The empty state should offer them.
         source: screens/P13-white-label-cms.yaml#CMS-018
+        status: fixed
+        by: CHG-SGU-017
       - what: Two permission families on one screen (policies need TENANT_CONFIGURE; purposes and questions need GUEST_MANAGE).
         why: A role with one and not the other must see the other section hidden or read-only (DI-387), not a broken page.
         source: DI-387; contracts/satellite/white-label.yaml#listPolicies
+        status: fixed
+        by: CHG-SGU-017
 
   CMS-025:
     summary: >-
@@ -2336,13 +2442,15 @@ screens:
       - what: The action bar holds "Analytics Tracker", "Embedded Service" and "Other tracking technology" as buttons.
         why: These are technology types (a filter or the type field), not actions. The action is Add technology (setTrackingTechnology).
         source: screens/P13-white-label-cms.yaml#CMS-025
+        status: fixed
+        by: CHG-SGU-017
     decisions:
     - question: Is the scanner bought or built (CF-127)?
       decision: 'Cookie scanner: buy a scanner API (hybrid). Our banner, runtime, registry and consent logs stay; a bought
         scanner API feeds recordCookieScan; the manual ''Upload scan report'' path stays.'
       decidedBy: Chinmay
       date: '2026-10-02'
-      source: DEC-019 | CHG-NOTE-002
+      source: DEC-019 | CHG-NOTE-002 | CHG-SGU-013
       questionSource: contracts/satellite/marketing-crm.yaml#recordCookieScan
 
   CMS-026:
@@ -2387,9 +2495,13 @@ screens:
       - what: Title, Description, Buttons, Links and Category descriptions are select fields.
         why: They are localised texts and lists; the "Buttons" are fixed by the posture (Accept all, Reject non-essential, Choose), not chosen.
         source: screens/P13-white-label-cms.yaml#CMS-026
+        status: fixed
+        by: CHG-SGU-017
       - what: The primary action is "Additional configured languages".
         why: The act is Save version; languages are tabs.
         source: screens/P13-white-label-cms.yaml#CMS-026
+        status: fixed
+        by: CHG-SGU-017
 
   BO-073:
     summary: >-
@@ -5368,7 +5480,7 @@ screens:
       decision: 'Children''s biometric data: as BO-187 (guardian consent, configurable).'
       decidedBy: Chinmay
       date: '2026-10-02'
-      source: DEC-283 | CHG-NOTE-002
+      source: DEC-283 | CHG-NOTE-002 | CHG-SGU-004
       questionSource: DI-1085; R205
 
   CMS-030:

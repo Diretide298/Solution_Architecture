@@ -1,0 +1,43 @@
+id: CHG-SGU-012
+date: '2026-10-02'
+source: cr
+kind: spec
+summary: The domain screen shows the tenant's platform subdomain, the full DNS record list, revalidation, the takeover
+  warning, the primary domain and per-domain readiness.
+decision:
+  what: CMS-017 binds getPlatformSubdomain, setPrimaryDomain and regenerateDomainToken, shows dnsRecords, revalidation,
+    cnameLost, isPrimary and readiness, explains the CNAME to Front Door with TXT _dnsauth, and warns on release.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October (batch 5): "Subdomain plus CNAME" (DEC-547 in handoff/decisions-2-october.json); DI-283; contract
+  side CHG-CSA-043 and CHG-CSP-010; the three white-label corrections on CMS-017.'
+keys_touched:
+  screens:
+  - CMS-017
+  operations:
+  - claimCustomDomain
+  - getPlatformSubdomain
+  - listCustomDomains
+  - regenerateDomainToken
+  - relinquishCustomDomain
+  - setPrimaryDomain
+  schemas:
+  - CustomDomain
+  - PlatformSubdomain
+  files:
+  - handoff/design-notes/white-label.yaml
+  - screens/P13-white-label-cms.yaml
+root_class: 'new: open-question-decided'
+tickets:
+  started: []
+  unstarted:
+  - APP-WL-CMS-017
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: d967f400
+notes: 'ADM-017 (P09) and F103 (flows) are other owners''. Batch SGU (screens-guest), 2 October 2026. Tickets: none started
+  (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys of the touched screens.'

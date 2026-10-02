@@ -1293,6 +1293,7 @@ paths:
         - "P06 EMP-019 AI assistant — home"
         - "P06 EMP-020 AI assistant — answer"
         - "P08 BO-932 Conversational AI Resource Copilot"
+        - "P02 GST-031 AI Concierge – Home"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1343,6 +1344,8 @@ paths:
         - "P08 BO-928 AI Conflict Resolution Assistant"
         - "P08 BO-932 Conversational AI Resource Copilot"
         - "P13 CMS-104 App Build & Store Publishing"
+        - "P02 GST-033 AI Concierge – Contextual Help"
+        - "P05 KSK-015 Assistant"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -4936,6 +4939,8 @@ paths:
         - "P02 GST-032 AI Concierge – Chat"
         - "P05 KSK-015 Assistant"
         - "P06 EMP-020 AI assistant — answer"
+        - "P02 GST-031 AI Concierge – Home"
+        - "P02 GST-033 AI Concierge – Contextual Help"
       security:
       - guestAuth: []
       - bearerAuth: []

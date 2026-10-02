@@ -1,0 +1,40 @@
+id: CHG-SGU-008
+date: '2026-10-02'
+source: cr
+kind: spec
+summary: The component preview renders the PDF ticket and the Apple and Google Wallet passes with the draft theme, in
+  Block A.
+decision:
+  what: CMS-006 binds previewProductTickets (orders, CHG-CSP-038) and createPreview outputs (pdfTicket, appleWalletPass,
+    googleWalletPass) with a productId (CHG-CSA-041).
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October (batch 4): "Yes: the PDF ticket and wallet pass preview in Block A" (DEC-151 in handoff/decisions-2-october.json);
+  TRACKER Actions row 129; CHG-CSP-038, CHG-CSA-041.'
+keys_touched:
+  screens:
+  - CMS-006
+  operations:
+  - createPreview
+  - previewProductTickets
+  schemas:
+  - Preview
+  - TicketProof
+  files:
+  - handoff/design-notes/white-label.yaml
+  - screens/P13-white-label-cms.yaml
+root_class: 'new: open-question-decided'
+tickets:
+  started: []
+  unstarted:
+  - APP-WL-CMS-006
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: d967f400
+notes: 'BO-008 binding the same preview is the P08 owner''s. CHG-CSP-038 can close once the slice carries the operation.
+  Batch SGU (screens-guest), 2 October 2026. Tickets: none started (Block A starts Monday 5 October 2026); unstarted
+  keys are the tasks.csv keys of the touched screens.'

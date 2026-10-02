@@ -428,9 +428,13 @@ screens:
       why: There is no invoice list, no request-invoice form and no download in the layout; the design must add
         them.
       source: screens/P02-guest-mobile-app.yaml#GST-019
+      status: fixed
+      by: CHG-SGU-017
     - what: The purpose still says "order history (wallet)".
       why: The screen was renamed on 31 August; the purpose was not updated.
       source: screens/P02-guest-mobile-app.yaml#GST-019
+      status: fixed
+      by: CHG-SGU-017
     decisions:
     - question: Which fields must a UAE tax invoice and a VAT receipt show, and may a receipt be replaced by a full invoice?
       decision: UAE tax invoice / VAT receipt fields from the law (researched).
@@ -579,25 +583,37 @@ screens:
       why: The screen's own notes say a till does not author reports (authoring was removed on 24 August); these
         are authoring too.
       source: screens/P04-point-of-sale.yaml#POS-008 | F74 step 2
+      status: fixed
+      by: CHG-SPO-015
     - what: The profit and loss / balance sheet / cash-flow report is loaded here.
       why: A terminal day view has no use for statutory statements, and they need ledger permissions a cashier does
         not hold.
       source: screens/P04-point-of-sale.yaml#POS-008 | contracts/spine/finance.yaml#getFinancialReport
+      status: fixed
+      by: CHG-SPO-015
     - what: The Export button has no operation behind it.
       why: Either wire it to the report export or remove it; the POS v2 decision also deferred CSV and Excel export
         at the till.
       source: screens/P04-point-of-sale.yaml#POS-008 | POSV2-1
+      status: fixed
+      by: CHG-SPO-015
     - what: The foreign-currency collections report is not wired.
       why: The MoMs require a per-cashier report of foreign-currency activity at the POS; the operation exists in
         finance.
       source: DI-213 | DI-282 | contracts/spine/finance.yaml#/components/schemas/ForeignTenderReport
+      status: logged
+      by: CHG-SPO-019
     - what: The no-access state names the venue-level report permission.
       why: A cashier's figures are their own or their terminal's; the right tiers are the own and workstation report
         permissions.
       source: screens/P04-point-of-sale.yaml#POS-008 | contracts/shared/permissions.yaml#/components/schemas/Permission
+      status: fixed
+      by: CHG-SPO-015
     - what: The approved prototype draws a cross-venue command dashboard.
       why: Broader than "from the terminal" and than what a cashier may see; do not copy its cross-outlet panels.
       source: screens/P04-point-of-sale.yaml#POS-008
+      status: fixed
+      by: CHG-SPO-015
     decisions:
     - question: May the POS show a cashier any running total (tickets sold, own sales), and which roles see revenue?
       decision: 'Drawn default accepted: Cashier sees own transactions count and own sales only; never expected cash.'
@@ -674,9 +690,13 @@ screens:
     - what: The raise-approval form asks for system fields (record ids, contract and subject type, scope path).
       why: A person at a till cannot know these; they come from the transaction the request is about.
       source: screens/P04-point-of-sale.yaml#POS-020
+      status: fixed
+      by: CHG-SPO-015
     - what: Workstation, shift and item filters are free-text id fields.
       why: Pick lists or defaults, never ids typed by hand.
       source: screens/P04-point-of-sale.yaml#POS-020
+      status: fixed
+      by: CHG-SPO-015
     - what: The shift summary report (expected against counted cash) has no role restriction on a shared till.
       why: Shown to a cashier it defeats the blind close; restrict to supervisors.
       source: MoM 2026-08-12 19. Cash/Shift and Till Management | DI-806
@@ -758,6 +778,8 @@ screens:
       why: Whether a VAT receipt is issued automatically is a template setting that defaults to off; the design
         must show both cases.
       source: contracts/spine/finance.yaml#/components/schemas/FinTaxInvoiceTemplate
+      status: logged
+      by: CHG-SPO-019
     decisions:
     - question: Must a reprinted VAT receipt be marked as a copy?
       decision: 'Drawn default accepted: Print "Copy" under the title.'
@@ -3567,11 +3589,15 @@ screens:
       why: The client pack frame for this screen (FNB-3K) is the performance and AI analysis drawn above; the rail
         and Bump belong to KIT-001.
       source: screens/P15-kitchen-display.yaml#KIT-010
+      status: fixed
+      by: CHG-SPO-017
     - what: The screen reads a generic dashboard, while the pack names kitchen performance, station performance,
         demand forecast and recommendation reads, and an "insufficient data" state.
       why: The tiles above have no declared source until those reads exist or a seeded dashboard is defined for
         them.
       source: screens/P15-kitchen-display.yaml#KIT-010
+      status: logged
+      by: CHG-SPO-019
     decisions:
     - question: Is this shown on the kitchen display device (no one signed in) or only to a signed-in kitchen manager?
       decision: 'Drawn default accepted: A signed-in manager; the assistant and recommendations need a person whose role scopes

@@ -1,0 +1,40 @@
+id: CHG-SPO-010
+date: '2026-10-02'
+source: client-review
+kind: spec
+summary: The staff app shows Reserved and Table closed on the floor (EMP-052), books tables with seating preference and occasion
+  (EMP-055), and reads the four restaurant measures from reporting (EMP-060).
+decision:
+  what: EMP-052 table states; EMP-055 binds createTableReservationForGuest with seating preference and occasion and drops
+    the raw id/status fields; EMP-060 binds getKpiValues (turn time, no-show rate, covers, wait accuracy).
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 6 set 6b: EMP-052 (Q201 default, Q202; DEC-201, DEC-202), EMP-055 (Q204; DEC-204; DI-791),
+  EMP-060 (Q205; DEC-205). Contract CHG-CSA-012, CHG-CSA-018, CHG-CSA-020, CHG-CSA-045.'
+keys_touched:
+  screens:
+  - EMP-052
+  - EMP-055
+  - EMP-060
+  operations:
+  - getTableMap
+  - createTableReservationForGuest
+  - getKpiValues
+  files:
+  - screens/P06-staff-app.yaml
+  - contracts/satellite/reporting.yaml (consumed-by lines only)
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: b137fa8a
+notes: 'Block C screens: decisions applied; their open design-note corrections stay open for their sprint. Staff amend and
+  cancel of a booking still has no operation (CHG-WIR-011). Applied in worktree screens-pos-staff (batch SPO, phase B, 2 October
+  2026). Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys of the touched
+  screens.'

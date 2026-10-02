@@ -3315,7 +3315,6 @@ paths:
     get:
       operationId: getFinancialReport
       x-ticvai-consumed-by:
-        - "P04 POS-008 Reports"
         - "P08 BO-058 Reporting Home"
         - "P08 BO-059 Sales Reports"
         - "P08 BO-060 Attendance & Footfall"
@@ -3728,11 +3727,11 @@ paths:
     post:
       operationId: issueTaxInvoice
       x-ticvai-consumed-by:
-        - "P01 WEB-019 Order History"
         - "P02 GST-019 Order History"
         - "P04 POS-026 Receipt & Reprint"
         - "P04 POS-030 Sales Journal"
         - "P08 BO-022 Order Detail"
+        - "P01 WEB-019 Order History"
       x-ticvai-audience:
       - staff
       - guest

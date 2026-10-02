@@ -1,0 +1,59 @@
+id: CHG-SGU-016
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: The guest concierge, contextual help, planner and kiosk assistant screens are conversations, not menus or forms,
+  and the add-on steps bind the engine's recommendation slot.
+decision:
+  what: 'Apply the open AI design-note corrections on WEB-044, GST-031, GST-033, GST-048, WEB-008, GST-054 and KSK-015:
+    the conversation is the content, earlier conversations as a short list, the conversation opened silently, suggestions
+    only from the conversation (waitTime, upsell), one-tap handover, feedback on web and app, decideRecommendations maxItems
+    3 instead of getUpsellSuggestions, listCatalogueBundles off the guest step, the sign-in edge after add-ons.'
+  by: Chinmay
+  date: '2026-10-02'
+why: Process-agent findings of 1 October in handoff/design-notes/ai.yaml (corrections on these screens), cited there
+  to ADR-0051, ADR-0052, DI-207, DI-959, DI-428, DI-1043 and R269.
+keys_touched:
+  screens:
+  - GST-031
+  - GST-033
+  - GST-048
+  - GST-054
+  - KSK-015
+  - WEB-008
+  - WEB-044
+  operations:
+  - createAiConversation
+  - decideRecommendations
+  - handoverToAgent
+  - listAiConversations
+  - listCatalogueBundles
+  - recordAnswerFeedback
+  - requestSuggestion
+  - sendAiMessage
+  - sendConversationMessage
+  files:
+  - handoff/design-notes/ai.yaml
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - screens/P05-guest-kiosk.yaml
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-MOB-GST-031
+  - APP-MOB-GST-033
+  - APP-MOB-GST-048
+  - APP-MOB-GST-054
+  - APP-WEB-WEB-008
+  - APP-WEB-WEB-044
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: d967f400
+notes: 'Two corrections are logged, not fixed (CHG-SGU-024, CHG-SGU-025). Batch SGU (screens-guest), 2 October 2026.
+  Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys of the touched
+  screens.'

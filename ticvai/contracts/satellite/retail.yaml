@@ -434,7 +434,6 @@ paths:
       operationId: lookupMerchandise
       x-ticvai-consumed-by:
         - "P01 WEB-033 Shop"
-        - "P01 WEB-042 Retail & Shop and Drop"
         - "P02 GST-026 Retail / Merchandise"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-023 Sell — Merchandise"

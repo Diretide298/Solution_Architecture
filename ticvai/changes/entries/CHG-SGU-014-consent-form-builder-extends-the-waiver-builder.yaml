@@ -1,0 +1,41 @@
+id: CHG-SGU-014
+date: '2026-10-02'
+source: cr
+kind: spec
+summary: 'The consent-form builder is the waiver builder extended: CMS-043 builds consentForm forms with their purposes,
+  CMS-023 and CMS-054 point at it, and Face Pass and Face Tag reference a form by id.'
+decision:
+  what: CMS-043 binds createForm and the FormDefinition kind and consentPurposes (CHG-CSA-026) with guardian consent
+    for minors; CMS-023 and CMS-054 say consents are captured on the venue's consent forms; BO-747 in Venue Management
+    is the same builder.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October (batch 4): "Consent form builder in Venue Management" (DEC-549 in handoff/decisions-2-october.json),
+  extending what exists rather than duplicating; contract side CHG-CSA-026 and CHG-CSP-018.'
+keys_touched:
+  screens:
+  - CMS-023
+  - CMS-043
+  - CMS-054
+  operations:
+  - createForm
+  - setDigitalWaiverForm
+  schemas:
+  - DigitalWaiverFormBuilderInput
+  - FormDefinition
+  files:
+  - screens/P13-white-label-cms.yaml
+root_class: 'new: open-question-decided'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-redundancy.py
+status: closed
+closed_by_commit: d967f400
+notes: 'Block D screens: their open corrections stay open. Whether CMS-043 merges into BO-747 as an anchor is the P08
+  owner''s call (reported). Batch SGU (screens-guest), 2 October 2026. Tickets: none started (Block A starts Monday 5
+  October 2026); unstarted keys are the tasks.csv keys of the touched screens.'

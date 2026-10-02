@@ -1,0 +1,73 @@
+id: CHG-SPO-015
+date: '2026-10-02'
+source: client-review
+kind: spec
+summary: 'Twenty-five open Block A design-note corrections on the till are fixed: typed ids and raw schema fields become pickers
+  or go, the till stops authoring reports, and the states say what is true offline.'
+decision:
+  what: POS-001 offline and no expected float; POS-002 one hold clock; POS-003 drawer step; POS-005, -006, -009, -014, -016,
+    -019, -020 plumbing fields; POS-008 drops deleteReport, saveNaturalLanguageQuery, getFinancialReport and Export and names
+    the own/workstation tiers; POS-013 sync is automatic; POS-014 reject path; POS-026 both receipt cases; POS-029 process
+    note.
+  by: Chinmay
+  date: '2026-10-02'
+why: Design-notes corrections (finance-insights, fnb-retail, platform-foundation, ticketing-guest, venue-operations) on Block
+  A screens, raised by the process design notes of 1 October; Phase B brief (apply the open A and B corrections). POSV2-1,
+  POSV2-3, POSV2-8, audit R080, R257.
+keys_touched:
+  screens:
+  - POS-001
+  - POS-002
+  - POS-003
+  - POS-005
+  - POS-006
+  - POS-008
+  - POS-009
+  - POS-013
+  - POS-014
+  - POS-016
+  - POS-019
+  - POS-020
+  - POS-026
+  - POS-029
+  operations:
+  - deleteReport
+  - saveNaturalLanguageQuery
+  - getFinancialReport
+  - listOrders
+  - syncOrders
+  - recordNoSale
+  - allocateDepositBox
+  files:
+  - screens/P04-point-of-sale.yaml
+  - contracts/satellite/reporting.yaml (consumed-by lines only)
+  - contracts/spine/finance.yaml (consumed-by lines only)
+  - handoff/design-notes/*.yaml
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-001
+  - APP-POS-POS-002
+  - APP-POS-POS-003
+  - APP-POS-POS-005
+  - APP-POS-POS-006
+  - APP-POS-POS-008
+  - APP-POS-POS-009
+  - APP-POS-POS-013
+  - APP-POS-POS-014
+  - APP-POS-POS-016
+  - APP-POS-POS-019
+  - APP-POS-POS-020
+  - APP-POS-POS-026
+  - APP-POS-POS-029
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-design-notes.py
+status: closed
+closed_by_commit: b137fa8a
+notes: 'check-design-notes requires every correction marked fixed to name an existing entry; the corrections are marked fixed
+  by CHG-SPO-015. Applied in worktree screens-pos-staff (batch SPO, phase B, 2 October 2026). Tickets: none started (Block
+  A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys of the touched screens.'

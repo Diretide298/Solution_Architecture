@@ -329,6 +329,8 @@ screens:
         requiresModule is 'ticketing' on the guest website's sign-in, while GST-042 (the same door) is 'core'.
       why: A tenant licensing F&B or retail without ticketing would lose web sign-in. The door is core.
       source: screens/P01-guest-web-storefront.yaml#WEB-016; screens/P02-guest-mobile-app.yaml#GST-042
+      status: fixed
+      by: CHG-SGU-019
     - what: >-
         Overlays formGuestSocialLogin, formGuestUaePassLogin and formRefreshToken collect idToken, code/redirectUri
         and refreshToken as if typed.
@@ -343,11 +345,15 @@ screens:
         The screen copy says six; a contract that accepts 4 lets a shorter code through and the copy becomes wrong.
         Align the contract (minLength/maxLength 6, digits) or the decision.
       source: contracts/spine/identity.yaml#verifyGuestOtp; DI-1034
+      status: logged
+      by: CHG-SGU-024
     - what: formRequestGuestOtp asks for `channel` as a field.
       why: >-
         The channel follows from the identifier and the tenant's configured delivery (WhatsApp/SMS/email); asking
         a guest to pick a channel is a question they cannot answer.
       source: contracts/spine/identity.yaml#requestGuestOtp; DI-209
+      status: fixed
+      by: CHG-SGU-019
     decisions:
     - question: DI-974 names the tabs "Log in" and "Register"; every other door in the package says Sign in. Which wording?
       decision: 'Drawn default accepted: Draw "Sign in" and "Create account" for consistency with every staff and guest door.'
@@ -424,6 +430,8 @@ screens:
     - what: Contract accepts a 4 to 10 character code; agreed rule is six digits.
       why: Same misalignment as WEB-016.
       source: contracts/spine/identity.yaml#verifyGuestOtp; DI-1034
+      status: logged
+      by: CHG-SGU-024
   GST-073:
     block: A
     summary: >-
@@ -537,12 +545,18 @@ screens:
         Push-token registration is done by the app silently at launch; a guest cannot type a push token. Remove
         the button and overlay.
       source: contracts/satellite/marketing-crm.yaml#registerGuestDevice
+      status: fixed
+      by: CHG-SGU-019
     - what: The offline state text speaks of "an erasure request", copied from a privacy screen.
       why: This screen has no erasure action; the text should speak of device sign-out and two-step changes.
       source: screens/P02-guest-mobile-app.yaml#GST-073
+      status: logged
+      by: CHG-SGU-025
     - what: getMyIdentityVerification and submitGuestIdentityDocument are declared but no component uses them.
       why: Either an ID-verification card belongs here (with its upload) or the declarations are residue.
       source: screens/P02-guest-mobile-app.yaml#GST-073
+      status: fixed
+      by: CHG-SGU-019
     - what: >-
         Tables show every schema field, plumbing included: 'Every guest device' drop id, subjectId, tokenFingerprint,
         tokenRef.
@@ -551,6 +565,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P02-guest-mobile-app.yaml#GST-073
+      status: fixed
+      by: CHG-SGU-019
   POS-000:
     block: A
     summary: >-
@@ -757,6 +773,8 @@ screens:
         Allocation needs a cashier, the float (total or denominations) and the workstation; the rest is computed
         or closing data. Replace with the allocation form.
       source: screens/P04-point-of-sale.yaml#POS-016; contracts/spine/shift.yaml#allocateDepositBox
+      status: fixed
+      by: CHG-SPO-015
     - what: '"Record device heartbeat" is a button with a form (status, recordedAt).'
       why: >-
         recordDeviceHeartbeat's audience is device only; the peripheral reports it. Show the last heartbeat read-only.
@@ -775,6 +793,8 @@ screens:
         They were generated from a response schema; ids, statuses and computed totals are not typed by anybody.
         Replace with the real form the write operation needs (or a read-only summary).
       source: screens/P04-point-of-sale.yaml#POS-016
+      status: fixed
+      by: CHG-SPO-015
     - what: formRecordDeviceHeartbeat asks the person for status.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
@@ -790,6 +810,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P04-point-of-sale.yaml#POS-016
+      status: fixed
+      by: CHG-SPO-015
     decisions:
     - question: Which terminal toggles (printer, offline continuity, screen prompts, key sounds, training mode) are workstation
         settings, and which are venue policy that the till only reads?
@@ -881,6 +903,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P04-point-of-sale.yaml#POS-019
+      status: fixed
+      by: CHG-SPO-015
     decisions:
     - question: Should the cashier ever see expected sales during or at close?
       decision: The cashier never sees expected sales during or at close (blind close).
@@ -956,6 +980,8 @@ screens:
         A home dashboard has nothing to create; the empty case is a till with no boards assigned, which should say
         who configures it.
       source: screens/P04-point-of-sale.yaml#POS-025
+      status: fixed
+      by: CHG-SPO-002
     - what: >-
         getCurrentShift requires SHIFT_OPEN; a supervisor covering the till without a shift of their own cannot
         load the home.
@@ -1919,9 +1945,13 @@ screens:
     - what: requiresModule is 'ticketing'.
       why: The asset library serves every guest surface; core.
       source: screens/P13-white-label-cms.yaml#CMS-010
+      status: fixed
+      by: CHG-SGU-019
     - what: Filters are free-text fields for kind, tag, collection id and venue id.
       why: Kind is an enumeration; tags, collections and venues are pickers.
       source: contracts/satellite/assets.yaml#searchMedia
+      status: fixed
+      by: CHG-SGU-019
     - what: formAppendEntitlementToMedia asks the person for id.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
@@ -1937,6 +1967,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P13-white-label-cms.yaml#CMS-010
+      status: fixed
+      by: CHG-SGU-019
   CMS-019:
     block: A
     summary: >-
@@ -1988,12 +2020,16 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P13-white-label-cms.yaml#CMS-019
+      status: fixed
+      by: CHG-SGU-019
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P13-white-label-cms.yaml#CMS-019; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SGU-019
   ADM-003:
     block: A
     summary: >-
@@ -2957,6 +2993,8 @@ screens:
     - what: selectRole is not declared though staff hold several roles.
       why: ADR-0003 multi-role prompt; F64 has the steward take a venue and a role.
       source: ADR-0003; F64 step 1
+      status: fixed
+      by: CHG-SPO-018
     - what: >-
         Tables show every schema field, plumbing included: 'Every MFA method' drop id; 'Every SSO provider' drop
         id, scopePath.
@@ -3011,6 +3049,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P06-staff-app.yaml#EMP-002; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SPO-018
   EMP-042:
     block: B
     summary: >-
@@ -3059,6 +3099,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P06-staff-app.yaml#EMP-042
+      status: fixed
+      by: CHG-SPO-018
   EMP-043:
     block: B
     summary: >-
@@ -3098,11 +3140,15 @@ screens:
     - what: requiresModule is 'marketing' on the handheld's device settings.
       why: Device settings are core.
       source: screens/P06-staff-app.yaml#EMP-043
+      status: fixed
+      by: CHG-SPO-018
     - what: formRegisterDevice asks the person for id.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P06-staff-app.yaml#EMP-043
+      status: fixed
+      by: CHG-SPO-018
     - what: >-
         Tables show every schema field, plumbing included: 'Every registered device' drop id, driver, workstationId,
         pushToken, pushPlatform, pushFailureCount.
@@ -3111,6 +3157,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P06-staff-app.yaml#EMP-043
+      status: fixed
+      by: CHG-SPO-018
   EMP-046:
     block: B
     summary: >-
@@ -3220,12 +3268,16 @@ screens:
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P07-staff-scanner.yaml#SCN-011
+      status: fixed
+      by: CHG-SPO-018
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P07-staff-scanner.yaml#SCN-011; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SPO-018
   SUP-001:
     block: B
     summary: >-
@@ -8312,18 +8364,24 @@ screens:
     - what: KPIs drawn as table columns.
       why: They are tiles.
       source: screens/P13-white-label-cms.yaml#CMS-061
+      status: fixed
+      by: CHG-SGU-023
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P13-white-label-cms.yaml#CMS-061; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SGU-023
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 8 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P13-white-label-cms.yaml#CMS-061
+      status: logged
+      by: CHG-SGU-024
   CMS-062:
     block: B
     summary: >-
@@ -8370,18 +8428,24 @@ screens:
     - what: '"File Size" and "Ticket Media" are drawn as buttons.'
       why: A sort and a filter; "Ticket Media" mixes wristband media into the asset library.
       source: screens/P13-white-label-cms.yaml#CMS-062
+      status: fixed
+      by: CHG-SGU-023
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P13-white-label-cms.yaml#CMS-062; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SGU-023
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 20 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P13-white-label-cms.yaml#CMS-062
+      status: logged
+      by: CHG-SGU-024
   CMS-063:
     block: B
     summary: >-
@@ -8473,6 +8537,8 @@ screens:
     - what: Metadata field names drawn as buttons.
       why: They are rows of the taxonomy.
       source: screens/P13-white-label-cms.yaml#CMS-065
+      status: fixed
+      by: CHG-SGU-023
   CMS-066:
     block: B
     summary: Free tags and keywords on top of the formal taxonomy.
@@ -8500,6 +8566,8 @@ screens:
     - what: Field labels hold sample values ("Venue - Dubai Park", "Campaign - Summer 2026").
       why: Values in labels.
       source: screens/P13-white-label-cms.yaml#CMS-066
+      status: fixed
+      by: CHG-SGU-023
   CMS-067:
     block: B
     summary: Find assets in a large library by type, format, venue, collection, owner and text.
@@ -8530,6 +8598,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P13-white-label-cms.yaml#CMS-067; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SGU-023
   CMS-068:
     block: B
     summary: 'One asset''s authoritative record: metadata, versions, rights, approvals and where it is distributed.'
@@ -8559,12 +8629,16 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P13-white-label-cms.yaml#CMS-068; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SGU-023
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 18 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P13-white-label-cms.yaml#CMS-068
+      status: logged
+      by: CHG-SGU-024
   CMS-069:
     block: B
     summary: Change many assets at once (tags, collection, rights, status) with a preview of how many change.
@@ -8591,6 +8665,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P13-white-label-cms.yaml#CMS-069; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SGU-023
   CMS-070:
     block: B
     summary: 'Library health: added, updated, unclassified, missing metadata, orphaned, storage used and growth.'
@@ -8624,12 +8700,16 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P13-white-label-cms.yaml#CMS-070; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SGU-023
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 7 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P13-white-label-cms.yaml#CMS-070
+      status: logged
+      by: CHG-SGU-024
   CMS-072:
     block: B
     summary: >-
@@ -8685,12 +8765,16 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P13-white-label-cms.yaml#CMS-073; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SGU-023
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 7 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P13-white-label-cms.yaml#CMS-073
+      status: logged
+      by: CHG-SGU-024
   CMS-074:
     block: B
     summary: Assets visually similar to the selected one.
@@ -8716,6 +8800,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P13-white-label-cms.yaml#CMS-074; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SGU-023
   CMS-075:
     block: B
     summary: >-
@@ -8761,6 +8847,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P13-white-label-cms.yaml#CMS-075; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SGU-023
   CMS-076:
     block: B
     summary: Versions of one logical asset; making a version current updates every usage.
@@ -8803,6 +8891,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P13-white-label-cms.yaml#CMS-076; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SGU-023
   CMS-077:
     block: B
     summary: Compare two versions and see what replacing the current one would change.
@@ -8833,6 +8923,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P13-white-label-cms.yaml#CMS-077; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SGU-023
   CMS-078:
     block: B
     summary: Channel renditions generated from a master asset (sizes, formats) by preset.
@@ -8867,6 +8959,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P13-white-label-cms.yaml#CMS-078; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SGU-023
   CMS-079:
     block: B
     summary: Rendition jobs and whether required formats are ready before distribution; retry failures.
@@ -8895,6 +8989,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P13-white-label-cms.yaml#CMS-079; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SGU-023
   CMS-080:
     block: B
     summary: Review AI results and content-quality issues with AI consumption and cost.
@@ -8937,12 +9033,16 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P13-white-label-cms.yaml#CMS-080; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SGU-023
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 9 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P13-white-label-cms.yaml#CMS-080
+      status: logged
+      by: CHG-SGU-024
   CMS-081:
     block: B
     summary: 'Asset governance overview: pending approval, restricted, expired, blocked, external shares, alerts.'
@@ -8987,12 +9087,16 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P13-white-label-cms.yaml#CMS-081; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SGU-023
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 8 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P13-white-label-cms.yaml#CMS-081
+      status: logged
+      by: CHG-SGU-024
   CMS-082:
     block: B
     summary: Business owner of each asset, separate from the uploader.
@@ -9035,6 +9139,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P13-white-label-cms.yaml#CMS-082; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SGU-023
   CMS-083:
     block: B
     summary: >-
@@ -9067,6 +9173,8 @@ screens:
     - what: '"Delegate" is a decision button.'
       why: Delegation is configured ahead of time.
       source: contracts/spine/approvals.yaml#createApprovalDelegation
+      status: fixed
+      by: CHG-SGU-023
   CMS-085:
     block: B
     summary: >-
@@ -9129,6 +9237,8 @@ screens:
     - what: Empty table and a generic policy create.
       why: Asset permissions need roles mapped to asset actions.
       source: screens/P13-white-label-cms.yaml#CMS-086
+      status: fixed
+      by: CHG-SGU-023
   CMS-087:
     block: B
     summary: >-
@@ -9189,12 +9299,16 @@ screens:
     - what: '"Example" and "DAM-IMG-008421" are table columns.'
       why: Sample values in the header.
       source: screens/P13-white-label-cms.yaml#CMS-088
+      status: fixed
+      by: CHG-SGU-023
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 6 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P13-white-label-cms.yaml#CMS-088
+      status: logged
+      by: CHG-SGU-024
   CMS-089:
     block: B
     summary: Every governance action on assets (approval, rights change, share, delete) with who and when.
@@ -9209,6 +9323,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P13-white-label-cms.yaml#CMS-089; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SGU-023
   CMS-090:
     block: B
     summary: Governance risks (no rights, expired in use, long-lived shares, missing evidence) with AI help.
@@ -9253,12 +9369,16 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P13-white-label-cms.yaml#CMS-090; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SGU-023
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 10 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P13-white-label-cms.yaml#CMS-090
+      status: logged
+      by: CHG-SGU-024
   CMS-091:
     block: B
     summary: >-
@@ -9304,12 +9424,16 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P13-white-label-cms.yaml#CMS-091; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SGU-023
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 24 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P13-white-label-cms.yaml#CMS-091
+      status: logged
+      by: CHG-SGU-024
   CMS-092:
     block: B
     summary: >-
@@ -9352,12 +9476,16 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P13-white-label-cms.yaml#CMS-092; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SGU-023
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 8 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P13-white-label-cms.yaml#CMS-092
+      status: logged
+      by: CHG-SGU-024
   CMS-093:
     block: B
     summary: >-
@@ -9441,6 +9569,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P13-white-label-cms.yaml#CMS-095; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SGU-023
   CMS-096:
     block: B
     summary: >-
@@ -9457,6 +9587,8 @@ screens:
     - what: The field label is a sample asset ("DAM-IMG-009211 — Default Dubai Park Hero").
       why: Value in a label.
       source: screens/P13-white-label-cms.yaml#CMS-096
+      status: fixed
+      by: CHG-SGU-023
   CMS-097:
     block: B
     summary: APIs and service accounts for modules and approved systems to consume DAM content.
@@ -9482,6 +9614,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P13-white-label-cms.yaml#CMS-097; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SGU-023
   CMS-098:
     block: B
     summary: Delivery availability, response time, CDN cache hit and failures.
@@ -9499,6 +9633,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P13-white-label-cms.yaml#CMS-098; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SGU-023
   CMS-099:
     block: B
     summary: 'How assets are consumed: impressions, requests, downloads, reuse.'
@@ -9526,12 +9662,16 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P13-white-label-cms.yaml#CMS-099; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SGU-023
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 3 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
       source: screens/P13-white-label-cms.yaml#CMS-099
+      status: logged
+      by: CHG-SGU-024
   CMS-100:
     block: B
     summary: AI recommendations across distribution, usage and replacement.
@@ -9558,6 +9698,8 @@ screens:
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P13-white-label-cms.yaml#CMS-100; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-SGU-023
   ANL-047:
     block: B
     summary: Who may see which reports and dashboards, by group, operating area and user.

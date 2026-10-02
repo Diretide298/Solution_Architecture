@@ -405,9 +405,13 @@ screens:
     - what: Table columns bind raw Entitlement fields (id, templateId, subjectId, scopePath, orderLineId)
       why: Spec leakage; a guest needs product, date, status, entries left and the code.
       source: designer default
+      status: fixed
+      by: CHG-SGU-021
     - what: getEntitlementCredential and getEntitlementHistory responses are inline (no named schema)
       why: The panels cannot bind; already recorded as a gap on the screen, raise as a contract change.
       source: screens/P01-guest-web-storefront.yaml#WEB-018
+      status: logged
+      by: CHG-SGU-024
     decisions:
     - question: Should the web show any code at all for a dynamic-QR event once it is activated in the app (e.g. for printing),
         or always redirect?
@@ -497,9 +501,13 @@ screens:
       why: >-
         The waitlist is a performance sold-out notification, a different concept; mixing them confuses guests.
       source: contracts/spine/catalogue.yaml#joinWaitlist | ADR-0012
+      status: fixed
+      by: CHG-SGU-021
     - what: Web and app waves of the virtual queue differ (open, client to choose)
       why: One guest journey must ship on one wave.
       source: screens/P01-guest-web-storefront.yaml#WEB-040
+      status: logged
+      by: CHG-SGU-025
     decisions:
     - question: Which wave ships the virtual queue on web and app (they currently differ)?
       decision: 'Drawn default accepted: Draw both identical; label nothing as wave-specific.'
@@ -660,9 +668,13 @@ screens:
     - what: Two "Every entitlement" tables (listMyEntitlements and listEntitlements) and raw field columns
       why: One list with tabs; Past uses listEntitlements. Raw ids are spec leakage.
       source: contracts/spine/access.yaml#listEntitlements
+      status: fixed
+      by: CHG-SGU-021
     - what: Navigation is inferred (exit to GST-002)
       why: The only meaningful exit is to GST-013 (and back to home); GST-002 has no relation stated.
       source: screens/P02-guest-mobile-app.yaml#GST-012
+      status: fixed
+      by: CHG-SGU-021
   GST-013:
     summary: >-
       One ticket in full: what it is, when and where it is valid, entries left, its linked media, and its history.
@@ -730,6 +742,8 @@ screens:
         For a ticket detail the primary is Show code; transfer is secondary (F50 step 5 says the credential is what
         matters here).
       source: F50 step 5
+      status: fixed
+      by: CHG-SGU-021
   GST-022:
     summary: >-
       The Waits view of At the Venue: every ride's current wait with where the number comes from and how old it
@@ -785,6 +799,8 @@ screens:
     - what: Navigation inferred, exit to GST-002
       why: Meaningful exits are GST-023 (join), GST-003 (attractions) and GST-059 (plan in progress).
       source: screens/P02-guest-mobile-app.yaml#GST-022
+      status: fixed
+      by: CHG-SGU-021
   GST-023:
     summary: >-
       The app's virtual queue: browse rides with their waits, join for the party, then hold a live status (place,
@@ -834,9 +850,13 @@ screens:
     - what: Purpose reads "Find the right one quickly, and act on it without opening it"
       why: Generic list purpose; the screen holds a place in a ride queue.
       source: screens/P02-guest-mobile-app.yaml#GST-023
+      status: fixed
+      by: CHG-SGU-021
     - what: Raw "Every queue" table (code, assetId, accessPointId, operatingWindows, loadBalanceWithQueueIds)
       why: Spec leakage; guests see rides with waits.
       source: screens/P08-venue-back-office.yaml#BO-156 | DI-039
+      status: fixed
+      by: CHG-SGU-021
   GST-051:
     summary: >-
       The Plan tab: six questions (party, children's heights, days, park per day in a multi-park tenant, pace, interests
@@ -893,9 +913,13 @@ screens:
       why: >-
         Its process is the guest visit planner; the only venue-operations link is wait times and ride rules (getWaitTimes).
       source: screens/P02-guest-mobile-app.yaml#GST-051
+      status: logged
+      by: CHG-SGU-025
     - what: Notes say the planner is out of the first release (R187, wave 4) yet it is in the Block A slice
       why: The notes and the slice disagree; the rev 3 decision should be stated plainly.
       source: screens/P02-guest-mobile-app.yaml#GST-051 | R187
+      status: fixed
+      by: CHG-SGU-021
   GST-055:
     summary: >-
       The full-screen scan code the guest holds up at the gate: maximum brightness, the code large and centred,
@@ -961,17 +985,21 @@ screens:
         The code screen shows the code; a transfer form here is a generated default from the only write the screen
         had.
       source: screens/P02-guest-mobile-app.yaml#GST-055
+      status: fixed
+      by: CHG-SGU-021
     - what: The rotation interval is stated four ways
       why: >-
         15-30 s (DI-064), 6-12 s (DI-632), 30 s (DI-1083), about 2 minutes for beacon codes (DI-630); the contract
         makes it the seed's timeStepSeconds, so it must be one venue setting with an agreed default.
       source: DI-064 | DI-632 | DI-1083 | DI-630 | contracts/spine/access.yaml#getEntitlementCredential
+      status: fixed
+      by: CHG-SGU-003
     decisions:
     - question: What is the default rotation step for the dynamic QR (6, 15 or 30 seconds)?
       decision: 'Dynamic QR rotation step: 30 seconds (the venue''s setting).'
       decidedBy: Chinmay
       date: '2026-10-02'
-      source: DEC-136 | CHG-NOTE-008
+      source: DEC-136 | CHG-NOTE-008 | CHG-SGU-003
       questionSource: DI-1083 | DI-632 | DI-064
     - question: How are B2B and reseller tickets handled at a fully-dynamic-QR event?
       decision: 'Drawn default accepted: Show a static QR with "Standard code" label for products the venue exempts (DI-633).'
@@ -1053,17 +1081,23 @@ screens:
         ADR-0063 (proposed) says TICVAI never stores a template; the vendor holds it and TICVAI keeps a reference.
         The enrolment contract and screen copy must follow whichever the DPO confirms.
       source: ADR-0063 | contracts/spine/access.yaml#enrolFacePass
+      status: logged
+      by: CHG-SGU-025
     - what: Enrolment channels disagree
       why: >-
         The contract allows app, ticket counter and annual pass counter only (never gate or kiosk); the 2 Sep MoM
         agreed web, POS, kiosk and at the turnstile on first use; the response enum also has entryGate.
       source: >-
         contracts/spine/access.yaml#enrolFacePass | DI-641 | contracts/spine/access.yaml#getFacePassEnrolment
+      status: fixed
+      by: CHG-SGU-021
     - what: Purpose field holds a review note (red flag text) instead of a purpose
       why: >-
         The screen's purpose should read "Register or remove my face for gate entry on my pass"; the note belongs
         in notes.
       source: screens/P02-guest-mobile-app.yaml#GST-069
+      status: fixed
+      by: CHG-SGU-021
     decisions:
     - question: May children be enrolled with guardian consent, or are under-18s excluded?
       decision: 'Superseded: children MAY be enrolled with guardian consent on the venue''s form; the minor age is per country
@@ -1071,7 +1105,7 @@ screens:
         no longer applies.'
       decidedBy: Chinmay
       date: '2026-10-02'
-      source: DEC-138 | CHG-NOTE-008
+      source: DEC-138 | CHG-NOTE-008 | CHG-SGU-004
       questionSource: DI-1085 | ADR-0063
     - question: Where are face templates held (vendor only, or TICVAI) and what is the legal retention floor?
       decision: 'Drawn default accepted: Copy says "held by our face recognition provider" and shows the venue''s configured
@@ -1166,6 +1200,8 @@ screens:
     - what: The screen sits in the venue-operations process (module Virtual Queue)
       why: It belongs to the F&B and retail process; refine there.
       source: screens/P04-point-of-sale.yaml#POS-029
+      status: fixed
+      by: CHG-SPO-015
   EMP-048:
     summary: >-
       On the Staff App, before the first guest arrives, a steward or technician works the opening checklist for
@@ -1436,6 +1472,8 @@ screens:
         Ids are never typed; status and priority are closed sets; the person's own queue is the default, not a filter
         (per VO-R12).
       source: screens/P06-staff-app.yaml#EMP-004 | contracts/satellite/maintenance.yaml#listWorkOrders
+      status: fixed
+      by: CHG-SPO-018
     - what: >-
         Fourteen lifecycle buttons (verify, close, cancel, complete, parts, time, save, start, pause...) on the
         list screen
@@ -1463,6 +1501,8 @@ screens:
         value and WorkOrder no acceptedAt, so the outlined/solid distinction cannot be drawn from the read.
       source: >-
         contracts/satellite/maintenance.yaml#/components/schemas/WorkOrderStatus | contracts/satellite/maintenance.yaml#acceptWorkOrder
+      status: logged
+      by: CHG-SPO-019
     - what: Navigation entry only from EMP-006 and inferred exits to Sign in and Select venue
       why: The task list is reached from the on-duty home (F08 step 5) and returns there.
       source: F08 step 5 | screens/P06-staff-app.yaml#EMP-004
@@ -1636,9 +1676,13 @@ screens:
         labour time, with one reason vocabulary.
       source: >-
         contracts/satellite/maintenance.yaml#pauseWorkOrder | contracts/satellite/maintenance.yaml#recordWorkOrderTime
+      status: logged
+      by: CHG-SPO-019
     - what: recordWorkOrderTime requires `id` in the body
       why: A time entry id is server-owned or a device idempotency key, never a field (per VO-R03).
       source: contracts/satellite/maintenance.yaml#recordWorkOrderTime
+      status: logged
+      by: CHG-SPO-019
     - what: >-
         Complete, Record parts and Record time need WORK_ORDER_MANAGE while Accept/Start/Pause need MAINTENANCE_EXECUTE
       why: >-
@@ -1646,6 +1690,8 @@ screens:
         their own job. Completing and recording parts and time are execution acts.
       source: >-
         contracts/satellite/maintenance.yaml#completeWorkOrder | contracts/satellite/maintenance.yaml#recordWorkOrderParts
+      status: logged
+      by: CHG-SPO-019
     - what: Verify, Close, Cancel and Save (reassign, reprioritise) on the technician's task screen
       why: Supervisor acts (verifier may not be the technician); they belong to BO-030 and BO-070.
       source: contracts/satellite/maintenance.yaml#verifyWorkOrder | F12 step 4
@@ -1658,6 +1704,8 @@ screens:
         job has nowhere to hold checklist answers.
       source: >-
         screens/P06-staff-app.yaml#EMP-005 | DI-911 | contracts/satellite/maintenance.yaml#/components/schemas/MaintenancePlan
+      status: logged
+      by: CHG-SPO-019
     decisions:
     - question: The pack's field actions include Acknowledge, Travelling and Arrived before Start. Are these needed, or is
         Accept then Start enough?
@@ -3172,23 +3220,31 @@ screens:
         Both writes need INCIDENT_MANAGE and are supervisor acts (EMP-027, BO-072); the reporter needs reportIncident
         only.
       source: contracts/satellite/maintenance.yaml#recordAuthorityNotification | F69 step 2
+      status: fixed
+      by: CHG-SPO-018
     - what: Near miss is both a kind and a severity
       why: >-
         IncidentKind and IncidentSeverity both contain nearMiss, so "Guest injured / Near miss" is possible and
         meaningless. The pack's severity scale is S1 Critical to S5 Observation with kind kept separate.
       source: >-
         screens/P06-staff-app.yaml#EMP-026 | contracts/satellite/maintenance.yaml#/components/schemas/IncidentSeverity
+      status: logged
+      by: CHG-SPO-019
     - what: No way to report a hazard (an unsafe condition before anything happened)
       why: >-
         The pack and the 17 September workshop keep hazards (exposed wiring by a queue) separate from near misses
         and incidents, with an initial risk level; IncidentKind has no hazard and the incident has no risk level.
       source: screens/P06-staff-app.yaml#EMP-026 | MoM 2026-09-17 4.5 | MATRIX 17.5.3
+      status: logged
+      by: CHG-SPO-019
     - what: Nothing sets isReportable or notificationDueAt
       why: >-
         The statutory clock BO-072 and EMP-027 count down is read from the incident, but neither reportIncident
         nor updateIncident writes it, and no rule derives it from kind and severity.
       source: >-
         contracts/satellite/maintenance.yaml#/components/schemas/Incident | contracts/satellite/maintenance.yaml#reportIncident
+      status: logged
+      by: CHG-SPO-019
     decisions:
     - question: Should the incident kinds follow the pack's categories (Guest, Employee, Contractor, Ride/attraction, Electrical,
         Slip/trip/fall, Mechanical...) rather than the contract's ten?
@@ -3791,6 +3847,8 @@ screens:
     - what: Customer photo on the result (DI-129) is still an open question
       why: The validation result has no photo; only accreditation verification returns one.
       source: DI-129 | contracts/spine/access.yaml#/components/schemas/ValidationResult
+      status: logged
+      by: CHG-SPO-019
     decisions:
     - question: Should the admitted state show the guest's photo for name-bound passes?
       decision: 'Drawn default accepted: Show name only; photo for accreditation credentials.'
@@ -44286,11 +44344,15 @@ screens:
     - what: KPIs drawn as seventeen columns of one data table with a detail panel
       why: They are KPI tiles and two charts (per VO-R02).
       source: screens/P13-white-label-cms.yaml#CMS-071
+      status: fixed
+      by: CHG-SGU-023
     - what: No operation returns AI processing counts, confidence bands or duplicate candidate counts
       why: >-
         getMediaUsageAnalytics returns storage, downloads, views, shares, never-used and unclassified counts only;
         the five pack actions have no operations.
       source: screens/P13-white-label-cms.yaml#CMS-071 | contracts/satellite/assets.yaml#getMediaUsageAnalytics
+      status: logged
+      by: CHG-SGU-024
     decisions:
     - question: Which process owner takes CMS-071 (DAM / media library) now that it leaves venue operations?
       decision: 'Drawn default accepted: Leave the screen''s design to the DAM chunk; keep only this note here.'

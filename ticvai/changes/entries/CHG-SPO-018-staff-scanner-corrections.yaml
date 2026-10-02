@@ -1,0 +1,54 @@
+id: CHG-SPO-018
+date: '2026-10-02'
+source: client-review
+kind: spec
+summary: 'The staff app''s and scanner''s Block A and B corrections are fixed: role selection at the door, no typed ids, the
+  reporter only reports, and the table acts use the client''s words.'
+decision:
+  what: EMP-001 binds selectRole; EMP-002, SCN-011 empty states; EMP-042, EMP-043, SCN-011 drop plumbing fields and form ids;
+    EMP-043 requires core; EMP-004 my queue with chips; EMP-026 drops recordAuthorityNotification and updateIncident; EMP-058
+    Change covers, Change server, Transfer table, no raw fields, notifyServer off; EMP-065 retitled Receiving.
+  by: Chinmay
+  date: '2026-10-02'
+why: Design-notes corrections platform-foundation EMP-001, -002, -042, -043, SCN-011 (Block B), venue-operations EMP-004,
+  EMP-026 and fnb-retail EMP-058, EMP-065 (Block A); ADR-0003; F64 step 1; F69 step 2; F29 step 4; DI-338, DI-346.
+keys_touched:
+  screens:
+  - EMP-001
+  - EMP-002
+  - EMP-004
+  - EMP-026
+  - EMP-042
+  - EMP-043
+  - EMP-058
+  - EMP-065
+  - SCN-011
+  operations:
+  - selectRole
+  - recordAuthorityNotification
+  - updateIncident
+  - notifyServer
+  - updateTableVisit
+  - transferTableVisit
+  - moveTableVisit
+  - registerDevice
+  - consumeCrossRegionEntitlement
+  files:
+  - screens/P06-staff-app.yaml
+  - screens/P07-staff-scanner.yaml
+  - contracts/spine/identity.yaml, satellite/maintenance.yaml, fnb.yaml, inventory.yaml (consumed-by lines only)
+  - handoff/design-notes/*.yaml
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-EMP-065
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-design-notes.py
+status: closed
+closed_by_commit: b137fa8a
+notes: 'Applied in worktree screens-pos-staff (batch SPO, phase B, 2 October 2026). Tickets: none started (Block A starts
+  Monday 5 October 2026); unstarted keys are the tasks.csv keys of the touched screens.'

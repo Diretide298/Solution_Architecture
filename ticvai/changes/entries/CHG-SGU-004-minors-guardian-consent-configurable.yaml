@@ -1,0 +1,47 @@
+id: CHG-SGU-004
+date: '2026-10-02'
+source: cr
+kind: spec
+summary: Face Pass enrolment, the minors privacy screens and the group consent screen say children enrol with guardian
+  consent on the venue's form, the minor age is per country and the venue can switch minors off.
+decision:
+  what: 'GST-069 (who is this for, the enrol form), CMS-029 and CMS-054 state the decided rule: guardian consent on the
+    venue''s consent form, RegionSettings.minorAgeThreshold per country, VenueSettings.biometrics.allowMinors, 422 minors-not-enrolled;
+    the batch-4 "not for under-18s" default is superseded.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October, critical set 1: "Guardian consent on the venue''s form; minor age per country; the venue can
+  switch minors off (supersedes the GST-069 default)" and "As BO-187" (DEC-237, DEC-138, DEC-283 in handoff/decisions-2-october.json);
+  R205, DI-1085; contract side CHG-CSP-018 and CHG-CSP-019.'
+keys_touched:
+  screens:
+  - CMS-029
+  - CMS-054
+  - GST-069
+  operations:
+  - enrolFacePass
+  - setMinorGuardianAge
+  schemas:
+  - FacePassEnrolment
+  - RegionSettings
+  - VenueSettings
+  files:
+  - handoff/design-notes/customer-marketing.yaml
+  - handoff/design-notes/venue-operations.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - screens/P13-white-label-cms.yaml
+root_class: 'new: open-question-decided'
+tickets:
+  started: []
+  unstarted:
+  - APP-MOB-GST-069
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-design-notes.py
+status: closed
+closed_by_commit: d967f400
+notes: 'CMS-029 and CMS-054 are Block D: their open corrections stay open; only the decision is recorded on them. BO-187
+  is the P08 owner''s. Batch SGU (screens-guest), 2 October 2026. Tickets: none started (Block A starts Monday 5 October
+  2026); unstarted keys are the tasks.csv keys of the touched screens.'

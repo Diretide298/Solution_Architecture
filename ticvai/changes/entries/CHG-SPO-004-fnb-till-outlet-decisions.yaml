@@ -1,0 +1,43 @@
+id: CHG-SPO-004
+date: '2026-10-02'
+source: client-review
+kind: spec
+summary: POS-021 follows the outlet's payment timing, shows daily counts that sell a dish out at zero, and prices dishes from
+  F&B's own catalogue.
+decision:
+  what: 'POS-021: the Pay/Send order follows Outlet.paymentTiming (send first default, pay first); the menu shows MenuItem.remainingCount
+    ("6 left") and a soldOutByCount state; prices are MenuItem.price (F&B catalogue). The v2 candidate note records that "kitchen
+    fires on payment" is right only on a pay-first outlet.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026: batch 1 POS-021 (Q64, "Two configurations: one takes the bill first, the other sends first
+  and charges after"; DEC-064, refining R261), BO-140 daily counts (Q194; DEC-194) and BO-045 corrected (Q34; DEC-034, F&B
+  owns its prices). Contract: CHG-CSP-004, CHG-CSA-010, CHG-CSA-017, CHG-CSA-009.'
+keys_touched:
+  screens:
+  - POS-021
+  operations:
+  - getGuestMenu
+  - createFnbOrder
+  - setMenuItemDailyCount
+  schemas:
+  - Outlet
+  - MenuItem
+  files:
+  - screens/P04-point-of-sale.yaml
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-021
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: b137fa8a
+notes: 'The till only reads these outlet settings; setting them is BO-044 and BO-140 (screens-p08-p09). CHG-DOC-009 asked
+  the screens owner for POS-021''s F&B price binding: it reads getGuestMenu (fnb), never the catalogue variant. Applied in
+  worktree screens-pos-staff (batch SPO, phase B, 2 October 2026). Tickets: none started (Block A starts Monday 5 October
+  2026); unstarted keys are the tasks.csv keys of the touched screens.'

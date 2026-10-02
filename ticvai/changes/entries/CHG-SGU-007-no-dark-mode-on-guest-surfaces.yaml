@@ -1,0 +1,43 @@
+id: CHG-SGU-007
+date: '2026-10-02'
+source: cr
+kind: spec
+summary: 'White label draws no dark or light mode: the theme editor drops darkMode, the preview drops the theme choice
+  and the guest app platform lists the light theme only.'
+decision:
+  what: CMS-005 removes Theme.darkMode from its panel and form; CMS-006 drops the createPreview theme option; P02 platform.themes
+    loses dark. Theme.darkMode stays in the contract, deprecated and ignored (CHG-CSA-035).
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October (batch 1): "No dark/light mode: the venue''s chosen theme applies"; pre-apply round: "Deprecate
+  it and ignore the field" (DEC-150 in handoff/decisions-2-october.json); CHG-CSA-035; the lead''s follow-up of 2 October
+  (P02 still listed dark).'
+keys_touched:
+  screens:
+  - CMS-005
+  - CMS-006
+  operations:
+  - createPreview
+  - setTheme
+  schemas:
+  - Preview
+  - Theme
+  files:
+  - handoff/design-notes/white-label.yaml
+  - screens/P13-white-label-cms.yaml
+root_class: 'new: open-question-decided'
+tickets:
+  started: []
+  unstarted:
+  - APP-WL-CMS-005
+  - APP-WL-CMS-006
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screens.py
+status: closed
+closed_by_commit: d967f400
+notes: 'The guest app has no Light/Dark switch screen to remove; the platform themes list was the only place it was offered.
+  Batch SGU (screens-guest), 2 October 2026. Tickets: none started (Block A starts Monday 5 October 2026); unstarted
+  keys are the tasks.csv keys of the touched screens.'

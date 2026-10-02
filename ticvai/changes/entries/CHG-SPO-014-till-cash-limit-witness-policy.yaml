@@ -1,0 +1,50 @@
+id: CHG-SPO-014
+date: '2026-10-02'
+source: client-review
+kind: spec
+summary: The till warns when a drawer passes its limit and offers a lift, the cashier countersigns a withdrawal with their
+  PIN, and POS-019 reads the venue's till shift policy.
+decision:
+  what: POS-017 drawer-limit banner and a real cash-movement form (kind, denominations, reason; no ids); POS-015 supervisor
+    banner of boxes over the limit (OVERSHORT_ACCEPT); POS-016 till overrides for the drawer limit and the sale board; POS-018
+    witness PIN; POS-019 binds getTillShiftPolicy.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 6 #178 and #179 (BO-042: "PIN on the same device"; "warn + offer cash lift"; DEC-178,
+  DEC-179; DI-274) and #183 (BO-109 "Per outlet, with a till override"; DEC-183). Contract CHG-CSP-015, CHG-CSP-016, CHG-CSP-006,
+  CHG-CSP-020. Design-notes corrections fnb-retail POS-015, POS-017.'
+keys_touched:
+  screens:
+  - POS-015
+  - POS-016
+  - POS-017
+  - POS-018
+  - POS-019
+  operations:
+  - createCashMovement
+  - listDepositBoxes
+  - configureWorkstation
+  - withdrawFromDepositBox
+  - getTillShiftPolicy
+  files:
+  - screens/P04-point-of-sale.yaml
+  - handoff/design-notes/fnb-retail.yaml
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-015
+  - APP-POS-POS-016
+  - APP-POS-POS-017
+  - APP-POS-POS-018
+  - APP-POS-POS-019
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-finance-rules.py
+status: closed
+closed_by_commit: b137fa8a
+notes: 'check-finance-rules keeps POS-015''s expected figures behind OVERSHORT_ACCEPT. Applied in worktree screens-pos-staff
+  (batch SPO, phase B, 2 October 2026). Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are the
+  tasks.csv keys of the touched screens.'

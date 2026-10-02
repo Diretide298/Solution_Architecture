@@ -680,7 +680,6 @@ paths:
     delete:
       operationId: deleteReport
       x-ticvai-consumed-by:
-        - "P04 POS-008 Reports"
         - "P08 BO-029 Report Builder"
         - "P08 BO-058 Reporting Home"
         - "P08 BO-059 Sales Reports"
@@ -1765,7 +1764,6 @@ paths:
     post:
       operationId: saveNaturalLanguageQuery
       x-ticvai-consumed-by:
-        - "P04 POS-008 Reports"
         - "P08 BO-029 Report Builder"
         - "P08 BO-058 Reporting Home"
         - "P08 BO-059 Sales Reports"
@@ -2088,6 +2086,7 @@ paths:
         - "P16 ANL-017 Customer, Membership & Loyalty Pulse"
         - "P16 ANL-057 Forecasting & Predictive Analytics Studio"
         - "P16 ANL-063 KPI Targets, Thresholds & Scorecards"
+        - "P06 EMP-060 Reservation & Table Performance"
         - "P16 ANL-072 Finance Dashboard"
       summary: Current values, against target, with movement
       description: 'BI boards 1 and 10.3. **The scorecard read.** Value, target, variance, direction and

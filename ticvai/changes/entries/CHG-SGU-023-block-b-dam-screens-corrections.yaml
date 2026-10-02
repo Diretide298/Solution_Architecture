@@ -1,0 +1,69 @@
+id: CHG-SGU-023
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: The Block B media-library screens say what an empty screen means, show KPIs as tiles, drop sample values and
+  button-shaped field names, and get the forms their buttons need.
+decision:
+  what: Apply the open platform-foundation Block B corrections on CMS-061 to CMS-100 and the venue-operations one on
+    CMS-071 that the screen can carry; columns that name no response field are logged in CHG-SGU-024.
+  by: Chinmay
+  date: '2026-10-02'
+why: Process-agent findings of 1 October in handoff/design-notes/platform-foundation.yaml and venue-operations.yaml (Block
+  B, CHG-WIR-003 class of generator boilerplate).
+keys_touched:
+  screens:
+  - CMS-061
+  - CMS-062
+  - CMS-065
+  - CMS-066
+  - CMS-067
+  - CMS-068
+  - CMS-069
+  - CMS-070
+  - CMS-071
+  - CMS-073
+  - CMS-074
+  - CMS-075
+  - CMS-076
+  - CMS-077
+  - CMS-078
+  - CMS-079
+  - CMS-080
+  - CMS-081
+  - CMS-082
+  - CMS-084
+  - CMS-086
+  - CMS-088
+  - CMS-089
+  - CMS-090
+  - CMS-091
+  - CMS-092
+  - CMS-095
+  - CMS-096
+  - CMS-097
+  - CMS-098
+  - CMS-099
+  - CMS-100
+  operations:
+  - createAuthorisationPolicy
+  - getMediaUsageAnalytics
+  - listAuthorisationPolicies
+  - setMediaTaxonomy
+  files:
+  - handoff/design-notes/platform-foundation.yaml
+  - handoff/design-notes/venue-operations.yaml
+  - screens/P13-white-label-cms.yaml
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: d967f400
+notes: 'Batch SGU (screens-guest), 2 October 2026. Tickets: none started (Block A starts Monday 5 October 2026); unstarted
+  keys are the tasks.csv keys of the touched screens.'

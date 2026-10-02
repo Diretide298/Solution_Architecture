@@ -1,0 +1,108 @@
+id: CHG-SGU-025
+date: '2026-10-02'
+source: audit
+kind: process
+summary: Corrections on the guest and CMS screens whose fix lies in another owner's file (flows, ADRs, the glossary,
+  design tokens, components) or needs Chinmay's answer.
+decision:
+  what: Log each such correction as status logged with this entry and hand it to its owner through the batch report;
+    questions for Chinmay carry a recommended default.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Each correction is a process-agent finding of 1 October in handoff/design-notes/*.yaml (PHASE-B ownership table:
+  flows are screens-other''s, ADRs and docs apply-docs'', the glossary and design tokens their owners'').'
+keys_touched:
+  screens:
+  - CMS-004
+  - CMS-005
+  - CMS-006
+  - CMS-007
+  - CMS-104
+  - GST-026
+  - GST-051
+  - GST-054
+  - GST-069
+  - GST-073
+  - KSK-017
+  - WEB-010
+  - WEB-012
+  - WEB-040
+  flows:
+  - F01
+  - F02
+  - F102
+  - F17
+  - F18
+  - F22
+  - F50
+  - F51
+  - F53
+  - F55
+  files:
+  - handoff/design-notes/ai.yaml
+  - handoff/design-notes/fnb-retail.yaml
+  - handoff/design-notes/platform-foundation.yaml
+  - handoff/design-notes/ticketing-guest.yaml
+  - handoff/design-notes/venue-operations.yaml
+  - handoff/design-notes/white-label.yaml
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - screens/P05-guest-kiosk.yaml
+  - screens/P13-white-label-cms.yaml
+root_class: A35 ONE-OFFS
+tickets:
+  started: []
+  unstarted:
+  - APP-MOB-GST-026
+  - APP-MOB-GST-051
+  - APP-MOB-GST-054
+  - APP-MOB-GST-069
+  - APP-MOB-GST-073
+  - APP-WEB-WEB-010
+  - APP-WEB-WEB-012
+  - APP-WEB-WEB-040
+  - APP-WL-CMS-004
+  - APP-WL-CMS-005
+  - APP-WL-CMS-006
+  - APP-WL-CMS-007
+  - APP-WL-CMS-104
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-design-notes.py
+status: open
+notes: 'Open until each owner acts. Items: CMS-004: Two sources for the browser tab icon: BrandIdentity.faviconAssetRef
+  on CMS-004 and the web icons derived from the app icon (AppIcons.derived 16/32/48); the package must say which wins
+  (question for Chinmay; recommended default: an uploaded favicon wins, else the derived one) | CMS-005: screens/_design-tokens.yaml
+  whiteLabel.overridable lists three tenant-overridable tokens while the contract lets the tenant set five colours, six
+  component colours, radius, surface and button style (CFG-2, CFG-3, M17-11); the tokens file has no owner in this split
+  | CMS-006: Flow F102 step 3 to 4 jumps from CMS-006 to ADM-016 (the platform console); the next step is CMS-012 or
+  CMS-014 (flows owner) | CMS-007: screens/_components.yaml has an appHeader region and no footer region, and no guest
+  screen reads HeaderConfig or FooterConfig; the guest shell needs both bound to the published configuration (components
+  owner, screens-other) | CMS-104: ADR-0006 says TICVAI builds, signs and submits apps and tenants do not self-publish;
+  M24-08 lets the client download and upload the build and CMS-104 offers native builds to every tenant: the ADR needs
+  amending (ADR owner) | GST-026: Flow F17 step 4 ("Guest tracks it in the app") should point at GST-062 with lookupShopAndDrop,
+  not GST-026 with listMerchandise: the flows owner (screens-other) | GST-051: GST-051 is filed under Virtual Queue in
+  the venue-operations process split; its process is the guest visit planner (the design-notes process owner re-files
+  it) | GST-054: The AI functions review (30 September, section 8, finding 3) is a document outside the screen files;
+  its owner closes the finding (the screen is wave 1, Block A). | GST-069: enrolFacePass sends the face template to TICVAI
+  while ADR-0063 (proposed) says TICVAI never stores a template and keeps a vendor reference; the contract and the screen
+  copy follow whichever the DPO confirms (ADR-0063 owner) | GST-073: GST-073 shares the offline text of the guest privacy-security-devices
+  group (screens/_guest-pairs.yaml, enforced by check-screens), which speaks of an erasure request; the group text is
+  changed there (its owner), not on one screen | KSK-017: Flow F51 step 4 uses KSK-017 with listMerchandise and reserveMerchandise
+  to "collect from a kiosk"; neither collects a drop and collectShopAndDrop is staff-only: rewrite or remove the step
+  (flows owner) | WEB-010: The glossary (docs/glossary.md) bans "Basket" as a synonym of Order and has no term for the
+  unpaid cart, while guest screens and the client say basket: record Basket as the guest-facing word (recommended) or
+  pick Cart. The design uses Basket until decided (glossary owner) | WEB-012: DI-1035 (29 September) keeps a match prompt
+  after the code ("Use this profile" / "Not me") while R120 b (28 September) removed it and the W1 rule goes straight
+  to the terms; contradictory decisions for Chinmay (recommended default: the automatic match, R120 b) | WEB-040: The
+  virtual queue ships in wave 2 on the web (WEB-040) and wave 3 in the app (GST-023); one guest journey must ship on
+  one wave, and the choice was left to the client (question for Chinmay; recommended default: wave 2 on both) | Flows
+  F01 and F02 (step: getGuestProfile on WEB-011), F53 (addToWishlist on WEB-024), F55 (getGuestProfile, recordConsent
+  on WEB-011) F18 (getGameCard on GST-026), F102 step 1 (getTenantConfig on CMS-001), F22 step 4 (getTenantConfig on
+  CMS-012) and F50 step 6 (transferOrderTickets on GST-055, where the step is the rotating code: getEntitlementCredential)
+  name operations the corrected screens no longer declare; check-flows fails on them until the flows owner updates the
+  steps (WEB-011 reads getMyProfile; checkout opt-ins go by recordCheckoutConsents; the arcade card balance is the games
+  screen''s). Batch SGU (screens-guest), 2 October 2026. Tickets: none started (Block A starts Monday 5 October 2026);
+  unstarted keys are the tasks.csv keys of the touched screens.'

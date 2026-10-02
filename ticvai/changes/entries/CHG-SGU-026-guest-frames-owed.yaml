@@ -1,0 +1,87 @@
+id: CHG-SGU-026
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'Guest screens that need a wireframe or prototype frame before build, or a state drawn: logged for the design
+  work, which a screen file cannot carry.'
+decision:
+  what: Log each frame or state the corrections ask for as status logged with this entry; the design batch draws them
+    before the screen's build.
+  by: Chinmay
+  date: '2026-10-02'
+why: Each correction is a process-agent finding of 1 October in handoff/design-notes/ticketing-guest.yaml (frames owed
+  on Block A guest screens).
+keys_touched:
+  screens:
+  - GST-002
+  - GST-005
+  - GST-009
+  - GST-010
+  - GST-011
+  - GST-015
+  - GST-021
+  - GST-046
+  - GST-050
+  - GST-052
+  - GST-056
+  - GST-059
+  - GST-075
+  - WEB-014
+  - WEB-015
+  - WEB-030
+  - WEB-033
+  - WEB-039
+  - WEB-048
+  - WEB-050
+  files:
+  - handoff/design-notes/ticketing-guest.yaml
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+root_class: A33 WIREFRAMES
+tickets:
+  started: []
+  unstarted:
+  - APP-MOB-GST-002
+  - APP-MOB-GST-005
+  - APP-MOB-GST-009
+  - APP-MOB-GST-010
+  - APP-MOB-GST-011
+  - APP-MOB-GST-015
+  - APP-MOB-GST-021
+  - APP-MOB-GST-046
+  - APP-MOB-GST-050
+  - APP-MOB-GST-052
+  - APP-MOB-GST-056
+  - APP-MOB-GST-059
+  - APP-MOB-GST-075
+  - APP-WEB-WEB-014
+  - APP-WEB-WEB-015
+  - APP-WEB-WEB-030
+  - APP-WEB-WEB-033
+  - APP-WEB-WEB-039
+  - APP-WEB-WEB-048
+  - APP-WEB-WEB-050
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-wireframe-coverage.py
+status: open
+notes: 'Open until the frames are drawn. Items: GST-002: GST-002 has no wireframe frame although the v4 prototype draws
+  Explore | GST-005: GST-005 points at the 28 September Mobile v2 board; the v4 app has no What''s On screen and the
+  frame should be redrawn in the v4 structure | GST-009: GST-009 has no prototype frame (match none); the v4 build''s
+  pay step should be linked as its frame | GST-010: GST-010 points at the 28 September Mobile v2 board; redraw in the
+  v4 structure | GST-011: GST-011 has no prototype frame (match none) | GST-015: GST-015 has no frame; the v4 build has
+  membership statements to link | GST-021: The 3D-unavailable and weak-GPS states of GST-021 are not drawn | GST-046:
+  GST-046 points at the 28 September Mobile v2 board; redraw in the v4 structure with the venue theme | GST-050: GST-050
+  has no prototype frame; the v4 build draws cabanas on the map only | GST-052: GST-052 has no prototype frame | GST-056:
+  GST-056 has no prototype frame; the v4 build draws the meal combo | GST-059: GST-059 has no prototype frame | GST-075:
+  GST-075 has no prototype frame; the v4 build has Meeting rooms | WEB-014: WEB-014 has no prototype frame (match none);
+  it needs one before build, reusing the WEB-012 payment component | WEB-015: The prototype''s waiting room is unreachable
+  from the Config drawer; reviewers need a reachable frame | WEB-030: WEB-030 is not on the wireframe board; it needs
+  a frame before build | WEB-033: WEB-033 has no browsable shop frame before arrival and is not on the wireframe board;
+  the At the venue shop is the nearest reference | WEB-039: The map3dUnavailable and weak-GPS states of WEB-039 are not
+  drawn | WEB-048: WEB-048 has no wireframe frame (status notStarted), though the prototype covers it | WEB-050: The
+  Visit Planner prototype is single-park (no park-per-day step, no shops, no preferenceNotAtVenue); the 30 September
+  requirements are specified but not drawn Batch SGU (screens-guest), 2 October 2026. Tickets: none started (Block A
+  starts Monday 5 October 2026); unstarted keys are the tasks.csv keys of the touched screens.'

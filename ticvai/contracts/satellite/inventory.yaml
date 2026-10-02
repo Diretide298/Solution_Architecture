@@ -167,7 +167,7 @@ paths:
       operationId: getStockTransfer
       x-ticvai-consumed-by:
         - "P06 EMP-064 Store-to-Store & Warehouse Transfers"
-        - "P06 EMP-065 Receiving & Store Put-Away"
+        - "P06 EMP-065 Receiving"
         - "P08 BO-080 Stock Transfers"
       summary: One transfer, its manifest and where it is
       description: 'Retail board 4E. **`createStockTransfer`, `receiveStockTransfer` and `closeTransferShort`
@@ -1768,7 +1768,7 @@ paths:
       operationId: receiveStockTransfer
       x-ticvai-consumed-by:
         - "P06 EMP-064 Store-to-Store & Warehouse Transfers"
-        - "P06 EMP-065 Receiving & Store Put-Away"
+        - "P06 EMP-065 Receiving"
         - "P08 BO-080 Stock Transfers"
         - "P08 BO-511 Inventory Transfer Management"
       x-ticvai-audience:
@@ -2389,7 +2389,7 @@ paths:
     get:
       operationId: listPurchaseOrders
       x-ticvai-consumed-by:
-        - "P06 EMP-065 Receiving & Store Put-Away"
+        - "P06 EMP-065 Receiving"
         - "P08 BO-051 Purchase Orders"
         - "P08 BO-052 Goods Receipt"
       x-ticvai-audience:
@@ -2821,7 +2821,7 @@ paths:
     post:
       operationId: createGoodsReceipt
       x-ticvai-consumed-by:
-        - "P06 EMP-065 Receiving & Store Put-Away"
+        - "P06 EMP-065 Receiving"
         - "P08 BO-052 Goods Receipt"
       x-ticvai-audience:
       - staff
@@ -2880,7 +2880,7 @@ paths:
     post:
       operationId: rejectReceivedGoods
       x-ticvai-consumed-by:
-        - "P06 EMP-065 Receiving & Store Put-Away"
+        - "P06 EMP-065 Receiving"
         - "P08 BO-052 Goods Receipt"
       x-ticvai-audience:
       - staff

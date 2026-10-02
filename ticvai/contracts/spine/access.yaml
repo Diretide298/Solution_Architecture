@@ -229,6 +229,7 @@ paths:
         - "P02 GST-012 My Tickets"
         - "P02 GST-055 Dynamic QR Ticket"
         - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P01 WEB-017 My Account Dashboard"
       security:
       - guestAuth: []
       - bearerAuth: []

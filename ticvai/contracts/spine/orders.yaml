@@ -162,6 +162,9 @@ paths:
         - "P01 WEB-030 Ticket Transfer"
         - "P02 GST-014 Ticket Transfer"
         - "P02 GST-019 Order History"
+        - "P01 WEB-017 My Account Dashboard"
+        - "P01 WEB-026 Survey & Feedback"
+        - "P02 GST-035 Feedback & Ratings"
       security:
       - guestAuth: []
       x-ticvai-self-scoped: subject
@@ -3200,9 +3203,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
         - "P01 WEB-033 Shop"
-        - "P01 WEB-042 Retail & Shop and Drop"
         - "P02 GST-009 Review & Payment"
-        - "P02 GST-026 Retail / Merchandise"
         - "P02 GST-032 AI Concierge – Chat"
         - "P02 GST-041 Checkout Entry"
         - "P05 KSK-006 Review"
@@ -5094,9 +5095,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-012 Checkout — Payment"
         - "P01 WEB-033 Shop"
-        - "P01 WEB-042 Retail & Shop and Drop"
         - "P02 GST-009 Review & Payment"
-        - "P02 GST-026 Retail / Merchandise"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-004 Sell — Seat Map"
         - "P04 POS-005 Payment"
@@ -6263,7 +6262,6 @@ paths:
         - "P02 GST-013 Ticket Details"
         - "P02 GST-014 Ticket Transfer"
         - "P02 GST-045 Ticket Delivery & Sharing"
-        - "P02 GST-055 Dynamic QR Ticket"
       x-ticvai-audience:
       - guest
       summary: Transfer tickets to another guest

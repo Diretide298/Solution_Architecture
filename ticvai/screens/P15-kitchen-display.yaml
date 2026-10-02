@@ -135,7 +135,12 @@ screens:
     title against screen name, constrained to this board’s platforms.** These packs label by board position
     (`GM-6C`) rather than naming the screen, so the title is the only join — *Kitchen Operations Command
     Center* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85
-    against a partner-portal screen, which is how a mapping goes wrong quietly.'
+    against a partner-portal screen, which is how a mapping goes wrong quietly.
+
+
+    **DI-077 is superseded** (19 September: the kitchen display is TICVAI''s own, not an integration point;
+    design-notes correction fnb-retail KIT-001; CHG-SPO-017). The design-input index entry is the design-inputs
+    owner''s to mark.'
   density: touchLarge
   densityReason: '**Bumped by somebody with flour on their hands, read from two metres, in a room where
     nobody is sitting down.** A kitchen display is not a back office at a different width.'
@@ -169,20 +174,8 @@ screens:
         operation: listFnbOrders
         permission: ORDER_VIEW
         provenance: contract fnb.yaml GET /fnb-orders
-      - kind: numberField
-        label: Course
-        operation: listKitchenTickets
-        notes: 'Sends `?course=` to `listKitchenTickets`; only that course''s lines come back. **No station
-          picker**: the display''s station comes from its assignment (`KitchenStation.displayWorkstationIds`,
-          set in station setup) and the display sends no `stationId` (decided 28 September, audit R277).'
-        provenance: contract fnb.yaml GET /kitchen/tickets
-      - kind: textField
-        label: Status
-        operation: listKitchenTickets
-        notes: Sends `?status=` to `listKitchenTickets`.
-        provenance: contract fnb.yaml GET /kitchen/tickets
       - kind: dataTable
-        label: Every kitchen ticket
+        label: Every station, at a glance
         bindsTo: KitchenTicket
         columns:
         - KitchenTicket.id
@@ -200,6 +193,10 @@ screens:
         operation: listKitchenTickets
         permission: ORDER_VIEW
         provenance: contract fnb.yaml GET /kitchen/tickets
+        notes: 'The command centre spans every station (DI-332): load per station, late tickets and the
+          oldest wait. No bump here: the rail is KIT-002. **The server''s order, never re-sorted on the
+          device** (`listKitchenTickets` orders by priority weights; design-notes correction fnb-retail):
+          no "oldest first" and no "promise time" sort of its own.'
       - kind: cardList
         bindsTo: KitchenTicket[]
         notes: '**One ticket per card, ordered by promise time not arrival.** A ticket due in two minutes
@@ -210,22 +207,15 @@ screens:
           is a number they will not read. The station-load tile is not in the first release (decided 28
           September, audit R277).
         provenance: carried from the previous definition
-      - kind: primaryButton
-        label: Bump
-        provenance: carried from the previous definition
   states:
-    loading: The rail, oldest ticket first. **The count renders before the tickets** — a kitchen wants
-      to know how deep it is before it reads anything.
+    loading: Every station's load, then the tickets, in the server's order.
     error: Could not reach the platform. **The rail is still live from cache** and every bump is queued.
     emptyFirstRun: '**No tickets. The kitchen is clear**, and that is worth saying plainly rather than
       showing a blank rail — a screen that looks broken and a screen that means nothing to do are the
       same picture otherwise.'
-    emptyNoResults: Nothing matches this station or course filter. **The rail is not empty** — the filter
-      is narrow, and on a kitchen screen that distinction is the difference between calm and panic.
-    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** — a
-      kitchen screen does not choose what it shows. **A principal without `ORDER_VIEW` gets this state
-      naming `ORDER_VIEW`**, the screen's `permission` and the one its read enforces; a button whose own
-      `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission.
+    emptyNoResults: Nothing matches the station chips; the kitchen is not empty.
+    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, the screen's permission, and names it. The
+      command centre is not tied to one station, so it never says "not assigned to a station".
     offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
       blanks mid-service is worse than one that says it is behind, and every bump journals locally and
       syncs when the network returns.'
@@ -351,17 +341,13 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: numberField
+      - kind: multiSelect
         label: Course
         operation: listKitchenTickets
-        notes: 'Sends `?course=` to `listKitchenTickets`; only that course''s lines come back. **No station
-          picker**: the display''s station comes from its assignment (`KitchenStation.displayWorkstationIds`,
-          set in station setup) and the display sends no `stationId` (decided 28 September, audit R277).'
-        provenance: contract fnb.yaml GET /kitchen/tickets
-      - kind: textField
-        label: Status
-        operation: listKitchenTickets
-        notes: Sends `?status=` to `listKitchenTickets`.
+        notes: 'Course chips, not a typed number (design-notes correction fnb-retail KIT-002). Sends `?course=`
+          to `listKitchenTickets`; only that course''s lines come back. **No station picker**: the display''s
+          station comes from its assignment (`KitchenStation.displayWorkstationIds`, set in station setup)
+          and the display sends no `stationId` (decided 28 September, audit R277).'
         provenance: contract fnb.yaml GET /kitchen/tickets
       - kind: dataTable
         label: Every kitchen ticket
@@ -382,6 +368,9 @@ screens:
         operation: listKitchenTickets
         permission: ORDER_VIEW
         provenance: contract fnb.yaml GET /kitchen/tickets
+        notes: '**The server''s order, never re-sorted on the device** (`listKitchenTickets` orders by
+          priority weights; design-notes correction fnb-retail): no "oldest first" and no "promise time"
+          sort of its own.'
       - kind: cardList
         bindsTo: KitchenTicket[]
         notes: '**One ticket per card, ordered by promise time not arrival.** A ticket due in two minutes
@@ -433,11 +422,17 @@ screens:
         operation: fireCourse
         permission: ORDER_MODIFY
         provenance: contract fnb.yaml POST /kitchen-tickets/{ticketId}/fire
+        notes: '**The pass fires and holds courses** (DI-407; design-notes correction fnb-retail KIT-002):
+          this control leaves the station display once flow F88 step 2 calls it from the pass (KIT-003)
+          instead (open entry CHG-SPO-020). Not drawn on a station display meanwhile.'
       - kind: secondaryButton
         label: Hold course
         operation: holdCourse
         permission: ORDER_MODIFY
         provenance: contract fnb.yaml POST /kitchen-tickets/{ticketId}/hold
+        notes: '**The pass fires and holds courses** (DI-407; design-notes correction fnb-retail KIT-002):
+          this control leaves the station display once flow F88 step 2 calls it from the pass (KIT-003)
+          instead (open entry CHG-SPO-020). Not drawn on a station display meanwhile.'
       - kind: secondaryButton
         label: Refire item
         operation: refireItem
@@ -454,8 +449,9 @@ screens:
         permission: ORDER_MODIFY
         provenance: contract fnb.yaml POST /table-visits/{visitId}/notify-server
   states:
-    loading: The rail, oldest ticket first. **The count renders before the tickets** — a kitchen wants
-      to know how deep it is before it reads anything.
+    loading: 'The rail. **The count renders before the tickets.** **The server''s order, never re-sorted
+      on the device** (`listKitchenTickets` orders by priority weights; design-notes correction fnb-retail):
+      no "oldest first" and no "promise time" sort of its own.'
     error: Could not reach the platform. **The rail is still live from cache** and every bump is queued.
     emptyFirstRun: '**No tickets. The kitchen is clear**, and that is worth saying plainly rather than
       showing a blank rail — a screen that looks broken and a screen that means nothing to do are the
@@ -546,8 +542,8 @@ screens:
   - id: formSetKitchenTicketStatus
     component: modal
     trigger: Save kitchen ticket status
-    body: '**Collects what `setKitchenTicketStatus` sends before it is called.** Required: `status`, `recordedAt`.
-      Optional: `lineIds`, `stationId`. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**A gesture on the card** (bump, start, ready); no form, no line ids typed and no time entered:
+      the time is the device''s (design-notes correction fnb-retail KIT-002).'
     confirm:
       label: Save kitchen ticket status
       operation: setKitchenTicketStatus
@@ -923,20 +919,8 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: numberField
-        label: Course
-        operation: listKitchenTickets
-        notes: 'Sends `?course=` to `listKitchenTickets`; only that course''s lines come back. **No station
-          picker**: the display''s station comes from its assignment (`KitchenStation.displayWorkstationIds`,
-          set in station setup) and the display sends no `stationId` (decided 28 September, audit R277).'
-        provenance: contract fnb.yaml GET /kitchen/tickets
-      - kind: textField
-        label: Status
-        operation: listKitchenTickets
-        notes: Sends `?status=` to `listKitchenTickets`.
-        provenance: contract fnb.yaml GET /kitchen/tickets
       - kind: dataTable
-        label: Every kitchen ticket
+        label: This order's tickets, station by station
         bindsTo: KitchenTicket
         columns:
         - KitchenTicket.id
@@ -954,6 +938,8 @@ screens:
         operation: listKitchenTickets
         permission: ORDER_VIEW
         provenance: contract fnb.yaml GET /kitchen/tickets
+        notes: One order's journey from the till to the pass and out; it has no actions of its own (design-notes
+          correction fnb-retail KIT-004).
       - kind: cardList
         bindsTo: KitchenTicket[]
         notes: '**One ticket per card, ordered by promise time not arrival.** A ticket due in two minutes
@@ -963,9 +949,6 @@ screens:
         notes: Depth and oldest ticket age. **Two numbers, glanceable** — anything a chef has to read
           is a number they will not read. The station-load tile is not in the first release (decided 28
           September, audit R277).
-        provenance: carried from the previous definition
-      - kind: primaryButton
-        label: Bump
         provenance: carried from the previous definition
     - name: contextPanel
       slot: selection
@@ -1013,18 +996,14 @@ screens:
         operation: getFnbOrder
         provenance: contract fnb.yaml GET /fnb-orders/{orderId}
   states:
-    loading: The rail, oldest ticket first. **The count renders before the tickets** — a kitchen wants
-      to know how deep it is before it reads anything.
+    loading: The order, then its tickets at each station.
     error: Could not reach the platform. **The rail is still live from cache** and every bump is queued.
     emptyFirstRun: '**No tickets. The kitchen is clear**, and that is worth saying plainly rather than
       showing a blank rail — a screen that looks broken and a screen that means nothing to do are the
       same picture otherwise.'
     emptyNoResults: Nothing matches this station or course filter. **The rail is not empty** — the filter
       is narrow, and on a kitchen screen that distinction is the difference between calm and panic.
-    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** — a
-      kitchen screen does not choose what it shows. **A principal without `ORDER_VIEW` gets this state
-      naming `ORDER_VIEW`**, the screen's `permission` and the one its read enforces; a button whose own
-      `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission.
+    emptyNoAccess: Shown when the caller lacks ORDER_VIEW for this outlet, and names it.
     offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
       blanks mid-service is worse than one that says it is behind, and every bump journals locally and
       syncs when the network returns.'
@@ -1306,20 +1285,8 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: numberField
-        label: Course
-        operation: listKitchenTickets
-        notes: 'Sends `?course=` to `listKitchenTickets`; only that course''s lines come back. **No station
-          picker**: the display''s station comes from its assignment (`KitchenStation.displayWorkstationIds`,
-          set in station setup) and the display sends no `stationId` (decided 28 September, audit R277).'
-        provenance: contract fnb.yaml GET /kitchen/tickets
-      - kind: textField
-        label: Status
-        operation: listKitchenTickets
-        notes: Sends `?status=` to `listKitchenTickets`.
-        provenance: contract fnb.yaml GET /kitchen/tickets
       - kind: dataTable
-        label: Every kitchen ticket
+        label: Whole orders, ready to assemble
         bindsTo: KitchenTicket
         columns:
         - KitchenTicket.id
@@ -1337,6 +1304,10 @@ screens:
         operation: listKitchenTickets
         permission: ORDER_VIEW
         provenance: contract fnb.yaml GET /kitchen/tickets
+        notes: 'The pass works whole orders across stations, not one station''s tickets (design-notes
+          correction fnb-retail KIT-006). **The server''s order, never re-sorted on the device** (`listKitchenTickets`
+          orders by priority weights; design-notes correction fnb-retail): no "oldest first" and no "promise
+          time" sort of its own.'
       - kind: cardList
         bindsTo: KitchenTicket[]
         notes: '**One ticket per card, ordered by promise time not arrival.** A ticket due in two minutes
@@ -1346,9 +1317,6 @@ screens:
         notes: Depth and oldest ticket age. **Two numbers, glanceable** — anything a chef has to read
           is a number they will not read. The station-load tile is not in the first release (decided 28
           September, audit R277).
-        provenance: carried from the previous definition
-      - kind: primaryButton
-        label: Bump
         provenance: carried from the previous definition
     - name: contextPanel
       slot: selection
@@ -1403,8 +1371,7 @@ screens:
         operation: recordOrderHandover
         provenance: contract fnb.yaml POST /guest-orders/{orderId}/delivery; wiring fix, 2 October 2026
   states:
-    loading: The rail, oldest ticket first. **The count renders before the tickets** — a kitchen wants
-      to know how deep it is before it reads anything.
+    loading: Whole orders, in the server's order.
     error: Could not reach the platform. **The rail is still live from cache** and every bump is queued.
     emptyFirstRun: '**No tickets. The kitchen is clear**, and that is worth saying plainly rather than
       showing a blank rail — a screen that looks broken and a screen that means nothing to do are the
@@ -1576,7 +1543,13 @@ screens:
     customer-facing order status board is this screen''s** (decided 1 October 2026, POS v2 decision POSV2-7,
     docs/registers/pos-v2-decisions.md): the board the guests read, order numbers only under Preparing
     and Ready for pickup, never a name. The till''s Order Queue (POS-029) shows a mirror of it, not a
-    board of its own.'
+    board of its own.
+
+
+    **The guest board is an unattended customer display** (POSV2-7; design-notes correction fnb-retail
+    KIT-007; CHG-SPO-017): order numbers only, under Preparing and Ready for pickup, never a name and
+    no staff control. Handover is recorded at the pass (KIT-006). The buzzer number is on the ticket,
+    but nothing writes it from the till or dispatches to a pager yet (open entry CHG-SPO-019).'
   density: touchLarge
   densityReason: '**Bumped by somebody with flour on their hands, read from two metres, in a room where
     nobody is sitting down.** A kitchen display is not a back office at a different width.'
@@ -1592,37 +1565,6 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: numberField
-        label: Course
-        operation: listKitchenTickets
-        notes: 'Sends `?course=` to `listKitchenTickets`; only that course''s lines come back. **No station
-          picker**: the display''s station comes from its assignment (`KitchenStation.displayWorkstationIds`,
-          set in station setup) and the display sends no `stationId` (decided 28 September, audit R277).'
-        provenance: contract fnb.yaml GET /kitchen/tickets
-      - kind: textField
-        label: Status
-        operation: listKitchenTickets
-        notes: Sends `?status=` to `listKitchenTickets`.
-        provenance: contract fnb.yaml GET /kitchen/tickets
-      - kind: dataTable
-        label: Every kitchen ticket
-        bindsTo: KitchenTicket
-        columns:
-        - KitchenTicket.id
-        - KitchenTicket.orderId
-        - KitchenTicket.orderNumber
-        - KitchenTicket.outletId
-        - KitchenTicket.tableLabel
-        - KitchenTicket.serviceMode
-        - KitchenTicket.coursing
-        - KitchenTicket.buzzerCode
-        - KitchenTicket.status
-        - KitchenTicket.priority
-        - KitchenTicket.prioritisedByPrincipalId
-        - KitchenTicket.prioritiseReason
-        operation: listKitchenTickets
-        permission: ORDER_VIEW
-        provenance: contract fnb.yaml GET /kitchen/tickets
       - kind: cardList
         bindsTo: KitchenTicket[]
         notes: '**One ticket per card, ordered by promise time not arrival.** A ticket due in two minutes
@@ -1641,34 +1583,9 @@ screens:
           is a number they will not read. The station-load tile is not in the first release (decided 28
           September, audit R277).
         provenance: carried from the previous definition
-      - kind: primaryButton
-        label: Bump
-        provenance: carried from the previous definition
     - name: contextPanel
       slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected kitchen ticket
-        bindsTo: KitchenTicket
-        columns:
-        - KitchenTicket.id
-        - KitchenTicket.orderId
-        - KitchenTicket.orderNumber
-        - KitchenTicket.outletId
-        - KitchenTicket.tableLabel
-        - KitchenTicket.serviceMode
-        - KitchenTicket.coursing
-        - KitchenTicket.buzzerCode
-        - KitchenTicket.status
-        - KitchenTicket.priority
-        - KitchenTicket.prioritisedByPrincipalId
-        - KitchenTicket.prioritiseReason
-        - KitchenTicket.lines
-        - KitchenTicket.targetReadyAt
-        - KitchenTicket.elapsedSeconds
-        operation: listKitchenTickets
-        permission: ORDER_VIEW
-        provenance: contract fnb.yaml GET /kitchen/tickets
+      components: []
     - name: actionBar
       slot: rowActions
       components:
@@ -1678,18 +1595,12 @@ screens:
         permission: ORDER_MODIFY
         provenance: contract fnb.yaml POST /guest-orders/{orderId}/delivery
   states:
-    loading: The rail, oldest ticket first. **The count renders before the tickets** — a kitchen wants
-      to know how deep it is before it reads anything.
+    loading: Order numbers under Preparing and Ready for pickup.
     error: Could not reach the platform. **The rail is still live from cache** and every bump is queued.
-    emptyFirstRun: '**No tickets. The kitchen is clear**, and that is worth saying plainly rather than
-      showing a blank rail — a screen that looks broken and a screen that means nothing to do are the
-      same picture otherwise.'
+    emptyFirstRun: 'Nothing preparing or ready: the board shows the venue''s idle message.'
     emptyNoResults: Nothing matches this station or course filter. **The rail is not empty** — the filter
       is narrow, and on a kitchen screen that distinction is the difference between calm and panic.
-    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** — a
-      kitchen screen does not choose what it shows. **A principal without `ORDER_VIEW` gets this state
-      naming `ORDER_VIEW`**, the screen's `permission` and the one its read enforces; a button whose own
-      `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission.
+    emptyNoAccess: 'Never shown on the board: it is an unattended guest display and carries no staff state.'
     offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
       blanks mid-service is worse than one that says it is behind, and every bump journals locally and
       syncs when the network returns.'
@@ -2063,6 +1974,19 @@ screens:
       - kind: primaryButton
         label: Bump
         provenance: carried from the previous definition
+      - kind: detailPanel
+        label: Targets set now
+        bindsTo: KitchenSla
+        operation: getKitchenSla
+        notes: How long a ticket may sit before it is late, per station; edited with Save. Prioritising
+          a single ticket is a live act on the pass (KIT-003), not a rule here (design-notes correction
+          fnb-retail KIT-009).
+        provenance: contract fnb.yaml GET /outlets/{outletId}/kitchen-sla
+      - kind: detailPanel
+        label: Course rules
+        bindsTo: CourseRules
+        operation: getCourseRules
+        provenance: contract fnb.yaml GET /outlets/{outletId}/course-rules
   states:
     loading: The rail, oldest ticket first. **The count renders before the tickets** — a kitchen wants
       to know how deep it is before it reads anything.
@@ -2084,6 +2008,14 @@ screens:
     purpose: The outlet's kitchen service-time targets
     trigger: onAction
     provenance: decided 29 September, VM close-out (venue management and configuration)
+  - operationId: getKitchenSla
+    contract: fnb
+    purpose: The targets set now, so the rules editor loads what it changes (CHG-CSA-045)
+    trigger: onLoad
+  - operationId: getCourseRules
+    contract: fnb
+    purpose: How this outlet courses by default, shown beside the targets (CHG-CSA-045)
+    trigger: onLoad
   entryState:
     params:
     - name: venueId
@@ -2158,7 +2090,13 @@ screens:
     is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
     and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so
     both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance
-    is worth more than the wrong pointer.'
+    is worth more than the wrong pointer.
+
+
+    **This is the performance and AI analysis (pack frame FNB-3K), not the rail** (design-notes correction
+    finance-insights KIT-010; CHG-SPO-017): kitchen performance, station performance, demand forecast
+    and the recommendations. The rail and Bump are KIT-002. The named reads behind those tiles do not
+    exist yet (open entry CHG-SPO-019).'
   density: touchLarge
   densityReason: '**Bumped by somebody with flour on their hands, read from two metres, in a room where
     nobody is sitting down.** A kitchen display is not a back office at a different width.'
@@ -2192,9 +2130,6 @@ screens:
           is a number they will not read. The station-load tile is not in the first release (decided 28
           September, audit R277).
         provenance: carried from the previous definition
-      - kind: primaryButton
-        label: Bump
-        provenance: carried from the previous definition
     - name: actionBar
       slot: rowActions
       components:
@@ -2204,19 +2139,11 @@ screens:
         permission: REPORT_VIEW_VENUE
         provenance: contract reporting.yaml POST /reports/ask
   states:
-    loading: The rail, oldest ticket first. **The count renders before the tickets** — a kitchen wants
-      to know how deep it is before it reads anything.
-    error: Could not reach the platform. **The rail is still live from cache** and every bump is queued.
-    emptyFirstRun: '**No tickets. The kitchen is clear**, and that is worth saying plainly rather than
-      showing a blank rail — a screen that looks broken and a screen that means nothing to do are the
-      same picture otherwise.'
-    emptyNoResults: Nothing matches this station or course filter. **The rail is not empty** — the filter
-      is narrow, and on a kitchen screen that distinction is the difference between calm and panic.
-    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** — a
-      kitchen screen does not choose what it shows. **A principal without `REPORT_VIEW_VENUE` gets this
-      state naming `REPORT_VIEW_VENUE`**, the screen's `permission` and the one its read enforces; a button
-      whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's
-      permission.
+    loading: Kitchen and station performance for the period, then the AI analysis.
+    error: Could not load the performance figures. Names which read failed.
+    emptyFirstRun: '**Insufficient data**: fewer service days than the analysis needs; says how many more.'
+    emptyNoResults: No service in the chosen period.
+    emptyNoAccess: Shown when the caller lacks REPORT_VIEW_VENUE, and names it.
     offline: '**Not available offline.** `getDashboard` is an analytical read (ADR-0016) and there is
       nothing local to serve. The rail on KIT-001 is what survives a network loss. **Corrected 24 August**:
       the earlier wording described the kitchen rather than this screen, and a checker cannot tell those

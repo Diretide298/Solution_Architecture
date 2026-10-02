@@ -1,0 +1,37 @@
+id: CHG-SGU-003
+date: '2026-10-02'
+source: cr
+kind: spec
+summary: The guest QR screen rotates the code every 30 seconds by default, the venue's setting, matching BO-165.
+decision:
+  what: 'GST-055 becomes a credential view: the code with its countdown, refreshIntervalSeconds 30 by default (15, 30,
+    45, 60 or custom, 5 s minimum), and the transfer form taken off.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October (batch 1): "30 seconds" (DEC-136 in handoff/decisions-2-october.json); DI-1083, DI-632, DI-064,
+  DI-630; contract default CHG-CSP-024. Also the venue-operations corrections on GST-055.'
+keys_touched:
+  screens:
+  - GST-055
+  operations:
+  - getEntitlementCredential
+  - transferOrderTickets
+  schemas:
+  - DynamicQrSecurityProfileBuilderInput
+  files:
+  - handoff/design-notes/venue-operations.yaml
+  - screens/P02-guest-mobile-app.yaml
+root_class: 'new: open-question-decided'
+tickets:
+  started: []
+  unstarted:
+  - APP-MOB-GST-055
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-design-notes.py
+status: closed
+closed_by_commit: d967f400
+notes: 'Batch SGU (screens-guest), 2 October 2026. Tickets: none started (Block A starts Monday 5 October 2026); unstarted
+  keys are the tasks.csv keys of the touched screens.'
