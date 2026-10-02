@@ -1,0 +1,49 @@
+id: CHG-FUP-003
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: The 20 permissions decided on 2 October join the Permission enum and their module groups; the proposed list
+  is replaced by the module-to-AI-publish map.
+decision:
+  what: 'permissions.yaml: 17 <MODULE>_AI_PUBLISH (core, ticketing, access, fnb, retail, inventory, seating, membership,
+    marketing, resources, queue, transport, games, maintenance, accreditation, partner, analytics), BIOMETRIC_IMAGE_VIEW,
+    ACCESS_DIRECTION_SET and REPORT_GOVERNANCE_MANAGE added to the enum (204 values) and to x-ticvai-permission-modules
+    (new groups ticketing, fnb, retail, seating, games); x-ticvai-proposed-permissions replaced by
+    x-ticvai-module-ai-publish; the info text defines x-ticvai-permission-by-module; the presets viewer and midLevel
+    tick none of the twenty.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Decisions of 2 October: workbook Q3 and Q7 (DEC-003, DEC-007: per-module "Publish AI model", no default role),
+  Q239 (DEC-239, BO-190), Q255 (DEC-255, BO-230, R221 amended), Q225 (DEC-225, ANL-070); recorded as proposed in
+  CHG-CSA-007 until the compat rule of CHG-FUP-001 (contract follow-ups: "count as additive").'
+keys_touched:
+  schemas:
+  - Permission
+  screens:
+  - ADM-508
+  - ADM-554
+  - ADM-021
+  - BO-054
+  - BO-1066
+  - BO-190
+  - BO-230
+  - ANL-070
+  files:
+  - contracts/shared/permissions.yaml
+root_class: A23 AUTH-SCOPE
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ADM-554
+  - APP-SETUP-BO-054
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: closed
+closed_by_commit: a7895ea6
+notes: 'check-contract-compat now fails a Permission value outside the module groups or a preset ticking another
+  module''s value (vocabulary_problems, CHG-FUP-001), and check-package already fails an operation permission outside
+  the enum. With CHG-FUP-004 to CHG-FUP-007 it completes CHG-CSA-007. Batch FUP (apply-followup), 2 October 2026. Closed on its commit; the prevention exists and run-checks runs it.'

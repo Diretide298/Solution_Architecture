@@ -41,8 +41,9 @@ decision_owner: Chinmay
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: a7895ea6
 notes: 'Open: needs the lead to approve either the 20 values as a logged breaking change in docs/active/breaking-changes.yaml,
   or a compat rule that a new Permission value is additive (as security_widened was). Then: move them into the enum
   and their module groups, and switch the two AI operations to the module permission. Batch CSA (apply-contracts-satellite),
-  2 October 2026; tickets: none started (Block A starts Monday 5 October).'
+  2 October 2026; tickets: none started (Block A starts Monday 5 October). Closed by CHG-FUP-001 (a new Permission value is additive, Chinmay, contract follow-ups) and CHG-FUP-003 to CHG-FUP-007: the 20 values are in the enum and their module groups, and the operations use them (publishForecastVersion and promoteAiRelease through BC-006 and BC-007). Batch FUP, 2 October 2026.'

@@ -2051,10 +2051,10 @@ paths:
         by editing the access point in the back office (audit R221).
 
 
-        **The permission** is `ACCESS_POINT_CONFIGURE`, the right that already sets direction in the back office,
-        not the podium''s `TURNSTILE_MODE_SET`: a steward who may switch a lane to free flow may not turn it round.
-        A dedicated gate-direction permission, if the client wants one, belongs in `contracts/shared/permissions.yaml`
-        (recorded in CHG-CSP-032). **Logged** twice: one `access.gate_mode_change` row (from and to direction,
+        **The permission** is `ACCESS_DIRECTION_SET`, the dedicated gate-direction permission (joined the vocabulary
+        2 October, CHG-FUP-006), not the podium''s `TURNSTILE_MODE_SET`: a steward who may switch a lane to free flow
+        may not turn it round, and the live switch is a narrower right than `ACCESS_POINT_CONFIGURE`, which edits the
+        access point itself. **Logged** twice: one `access.gate_mode_change` row (from and to direction,
         operator, reason, effective time), which Live Gate Mode & Lane Control and the shift handover read, and one
         `access.configuration_change` row. Takes effect at once, or at a future `effectiveAt` (then `202`,
         cancelled with `cancelGateModeChange`). Devices pick it up from the next push; an offline device keeps its
@@ -2063,7 +2063,7 @@ paths:
         '
       tags:
       - accessPoint
-      x-ticvai-permission: ACCESS_POINT_CONFIGURE
+      x-ticvai-permission: ACCESS_DIRECTION_SET
       x-ticvai-scope-level: venue
       x-ticvai-config-change-log: Also appends one access.configuration_change row (subjectType, subjectId, before and
         after) in the same transaction; see "Configuration change log" in the contract header (CHG-CSP-032)
@@ -15502,14 +15502,14 @@ paths:
         and the reviewer compares against the score and the references.
 
 
-        **The permission**: `GUEST_VIEW_PII` with an MFA step-up stands in for the dedicated biometric-image
-        permission the decision asks for, which belongs in `contracts/shared/permissions.yaml` (a dependency
-        recorded in CHG-CSP-023); `GUEST_MANAGE` alone, which reviews, does not open the images.
+        **The permission**: `BIOMETRIC_IMAGE_VIEW`, the dedicated permission the decision asks for (joined the
+        vocabulary 2 October, CHG-FUP-005), with an MFA step-up. Neither `GUEST_VIEW_PII` nor `GUEST_MANAGE`, which
+        reviews, opens the images; no preset but a module''s `all` ticks it.
 
         '
       tags:
       - access
-      x-ticvai-permission: GUEST_VIEW_PII
+      x-ticvai-permission: BIOMETRIC_IMAGE_VIEW
       x-ticvai-step-up: mfa
       x-ticvai-step-up-reason: Opens a guest's face images, special-category data under PDPL; every look is logged (DEC-239).
       x-ticvai-scope-level: venue

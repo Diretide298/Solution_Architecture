@@ -16725,8 +16725,18 @@ paths:
         scanner API is called on each channel's schedule by a TICVAI adapter, which posts its results here with
         a service credential and `source` `boughtScanner` (`scannerRef` naming the vendor and its scan id). The
         manual "Upload scan report" path stays, as `manualUpload`. The vendor is a procurement choice and its
-        egress is in the HLD and LLD; nothing downstream of this operation depends on which vendor. Recording
-        the consent state a finding was seen in is an open gap (CHG-CSA-024).
+        egress is in the HLD and LLD; nothing downstream of this operation depends on which vendor.
+
+
+        **Each finding records the consent state it was seen in** (Chinmay, 2 October, contract follow-ups: "add
+        now"; CHG-FUP-009). A scanner loads each page with no decision, after reject-all and after accept-all
+        (`findings[].consentState`), and says where the technology was set (`pageUrl`, `initiatorUrl`), its cookie
+        attributes and the category it suggests and from where (`suggestedCategory`, `classificationSource`; the
+        platform catalogue of known technologies, `listTrackingTechnologyCatalogue`, is one source, CHG-FUP-010).
+        Every finding is kept (`listCookieScanFindings`). **A finding seen with no decision or after reject-all whose
+        category is not `strictlyNecessary` is a pre-consent violation**: it is flagged on the finding, counted in
+        `CookieScanRun.preConsentViolationCount` and raises the administrator alert whether or not the technology is
+        new. That is what proves nothing loads before consent (2.6.58).
       tags:
       - consent
       x-ticvai-permission: GUEST_MANAGE
@@ -16800,6 +16810,192 @@ paths:
                         $ref: '#/components/schemas/CookieScanRun'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /cookie-tracking-digital/scans/{scanRunId}/findings:
+    parameters:
+    - name: scanRunId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: listCookieScanFindings
+      x-ticvai-requires-module: core   # cookie consent is the law on every storefront, licensed marketing or not
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: Chinmay, contract follow-ups (cookie scan consent state, "add now"); research A9
+        item 1; shape follows listCookieScans'
+      summary: What one scan saw, in each consent state
+      description: >
+        **The findings of one scan run** (Chinmay, 2 October, contract follow-ups; CHG-FUP-009): each technology in
+        the consent state it was seen in, where it was set and by what, and whether it is a pre-consent violation.
+        `preConsentOnly` returns only the violations, the list an administrator acts on. Ordered by `name` then
+        `id`; keyset cursor.
+      tags:
+      - consent
+      x-ticvai-permission: GUEST_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: consentState
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - noDecision
+          - rejectedAll
+          - acceptedAll
+      - name: preConsentOnly
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Findings
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/CookieScanFinding'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /cookie-tracking-digital/platform-catalogue:
+    get:
+      operationId: listTrackingTechnologyCatalogue
+      x-ticvai-requires-module: core   # cookie consent is the law on every storefront, licensed marketing or not
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: Chinmay, contract follow-ups (a platform-wide catalogue of known cookies); research
+        A9 item 2; shape follows listCookieScans'
+      summary: The platform's catalogue of known cookies and trackers
+      description: >
+        **What TICVAI already knows about a technology** (Chinmay, 2 October, contract follow-ups; CHG-FUP-010): the
+        platform catalogue, read from the cell's replicated copy. A venue's administrator reads it when classifying a
+        `detected` technology; a scan uses it to suggest a category. `search` matches `namePattern` and `provider`.
+        Ordered by `provider` then `namePattern`; keyset cursor.
+      tags:
+      - consent
+      x-ticvai-permission: GUEST_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: search
+        in: query
+        required: false
+        description: Matches the start of `namePattern` or of `provider`, ignoring case (`_ga`, `Google`).
+        schema:
+          type: string
+          maxLength: 200
+      - name: category
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/CookieCategory'
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Catalogue entries
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/TrackingTechnologyCatalogueEntry'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /cookie-tracking-digital/platform-catalogue/{entryKey}:
+    parameters:
+    - name: entryKey
+      in: path
+      required: true
+      description: The entry's stable key, `TrackingTechnologyCatalogueEntry.entryKey`.
+      schema:
+        type: string
+        pattern: ^[a-z0-9][a-z0-9-]{1,119}$
+    put:
+      operationId: setTrackingTechnologyCatalogueEntry
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: Chinmay, contract follow-ups (a platform-wide catalogue of known cookies); research
+        A9 item 2; shape follows setAiModel (a platform catalogue row replicated into every cell)'
+      summary: Add or correct a catalogue entry (platform staff)
+      description: >
+        **Platform staff curate the catalogue** (Chinmay, 2 October, contract follow-ups; CHG-FUP-010). The body is
+        one whole entry, addressed by `entryKey`: an existing key is replaced (200), a new one is added (201);
+        `isActive: false` retires it. Written in the control plane and replicated read-only into every cell;
+        no tenant writes it. A change suggests differently from the next scan on and never reclassifies a venue's
+        approved registry entry.
+      tags:
+      - consent
+      x-ticvai-permission: PLATFORM_PLAN_MANAGE
+      x-ticvai-permission-note: 'The platform''s own catalogues (the module catalogue, licensing models) are curated
+        under PLATFORM_PLAN_MANAGE, read from the platform token; a dedicated privacy-owner permission is a question for
+        the lead (CHG-FUP-010).'
+      x-ticvai-scope-level: platform
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrackingTechnologyCatalogueEntry'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+          description: Replaced
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackingTechnologyCatalogueEntry'
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+          description: Added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackingTechnologyCatalogueEntry'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /cookie-scan-policy:
@@ -17308,6 +17504,55 @@ components:
                 type: string
                 maxLength: 255
                 nullable: true
+              consentState:
+                type: string
+                enum:
+                - noDecision
+                - rejectedAll
+                - acceptedAll
+                description: The consent state the page was loaded in when the technology was seen (CHG-FUP-009).
+                  Absent from a scanner that tests one state only; such a finding proves nothing about consent.
+              pageUrl:
+                type: string
+                format: uri
+                maxLength: 2000
+                nullable: true
+                description: The page the technology was seen on.
+              initiatorUrl:
+                type: string
+                format: uri
+                maxLength: 2000
+                nullable: true
+                description: The script or frame that set it, so a violation names its cause (a tag manager, an embed).
+              cookieDomain:
+                type: string
+                maxLength: 255
+                nullable: true
+              sameSite:
+                type: string
+                enum:
+                - strict
+                - lax
+                - none
+                nullable: true
+              secure:
+                type: boolean
+                nullable: true
+              suggestedCategory:
+                allOf:
+                - $ref: '#/components/schemas/CookieCategory'
+                nullable: true
+                description: The category the scanner or the catalogue suggests. A suggestion only; the venue's
+                  administrator classifies it with `setTrackingTechnology`.
+              classificationSource:
+                type: string
+                enum:
+                - openCookieDatabase
+                - vendor
+                - platformCatalogue
+                - none
+                nullable: true
+                description: Where `suggestedCategory` came from (CHG-FUP-009, CHG-FUP-010).
     CookieScanRun:
       type: object
       x-ticvai-persistence: marketing.cookie_scan_run
@@ -17353,6 +17598,11 @@ components:
           type: integer
           minimum: 0
           description: Registry entries for this channel the scan did not see.
+        preConsentViolationCount:
+          type: integer
+          minimum: 0
+          description: Findings seen with no decision or after reject-all whose category is not `strictlyNecessary`
+            (CHG-FUP-009). Above zero, the administrator alert is raised.
         alertedAt:
           type: string
           format: date-time
@@ -17361,6 +17611,176 @@ components:
           type: string
           readOnly: true
           description: '**The partition key** (ADR-0005).'
+    CookieScanFinding:
+      type: object
+      x-ticvai-persistence: marketing.cookie_scan_finding
+      description: '**One technology one scan saw, in one consent state** (Chinmay, 2 October, contract follow-ups;
+        CHG-FUP-009). Written by `recordCookieScan` from `findings[]`, never edited; read by `listCookieScanFindings`.
+        Kept with its run, so an audit can show what loaded before consent on a given day.'
+      required:
+      - scanRunId
+      - name
+      - provider
+      - technologyType
+      - isThirdParty
+      - preConsentViolation
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        scanRunId:
+          type: string
+          format: uuid
+          x-ticvai-references: marketing.cookie_scan_run
+        technologyId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The registry entry the finding matched or created (`name` + `provider` + `domainApplication`).
+        name:
+          type: string
+          maxLength: 200
+        provider:
+          type: string
+          maxLength: 150
+        technologyType:
+          type: string
+          maxLength: 40
+          description: As `RecordCookieScanRequest.findings[].technologyType`.
+        isThirdParty:
+          type: boolean
+        durationDays:
+          type: integer
+          minimum: 0
+          nullable: true
+        domainApplication:
+          type: string
+          maxLength: 255
+          nullable: true
+        consentState:
+          type: string
+          enum:
+          - noDecision
+          - rejectedAll
+          - acceptedAll
+          nullable: true
+        pageUrl:
+          type: string
+          maxLength: 2000
+          nullable: true
+        initiatorUrl:
+          type: string
+          maxLength: 2000
+          nullable: true
+        cookieDomain:
+          type: string
+          maxLength: 255
+          nullable: true
+        sameSite:
+          type: string
+          enum:
+          - strict
+          - lax
+          - none
+          nullable: true
+        secure:
+          type: boolean
+          nullable: true
+        suggestedCategory:
+          allOf:
+          - $ref: '#/components/schemas/CookieCategory'
+          nullable: true
+        classificationSource:
+          type: string
+          enum:
+          - openCookieDatabase
+          - vendor
+          - platformCatalogue
+          - none
+          nullable: true
+        preConsentViolation:
+          type: boolean
+          description: Seen with no decision or after reject-all, and its category (the registry's, else the
+            suggested one) is not `strictlyNecessary`. An unclassified technology counts as a violation, as
+            `detected` is treated as blocked.
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005).'
+    TrackingTechnologyCatalogueEntry:
+      type: object
+      x-ticvai-persistence: marketing.tracking_technology_catalogue
+      description: '**The platform''s catalogue of known cookies and trackers** (Chinmay, 2 October, contract
+        follow-ups: "a platform-wide catalogue of known cookies"; CHG-FUP-010). One row per known technology,
+        matched on `namePattern` + `provider`, with the category TICVAI''s privacy owner approved. Seeded from the Open
+        Cookie Database (Apache-2.0) and curated by platform staff; mastered in the control plane and replicated
+        read-only into every cell with the platform root as `scopePath`, as the platform model catalogue is. **It
+        suggests, it does not decide**: a scan finding that matches takes `suggestedCategory` from it with
+        `classificationSource` `platformCatalogue`, and each venue still approves its own registry entry
+        (`setTrackingTechnology`), so `_ga` is suggested once for every tenant rather than researched by each.'
+      required:
+      - namePattern
+      - provider
+      - category
+      - technologyType
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        entryKey:
+          type: string
+          readOnly: true
+          pattern: ^[a-z0-9][a-z0-9-]{1,119}$
+          description: The stable key the entry is written under (`setTrackingTechnologyCatalogueEntry`), such as
+            `google-analytics-ga`; taken from the path.
+        namePattern:
+          type: string
+          maxLength: 200
+          description: The cookie or key name, with `*` as a wildcard (`_ga_*`).
+        provider:
+          type: string
+          maxLength: 150
+        category:
+          $ref: '#/components/schemas/CookieCategory'
+        technologyType:
+          type: string
+          maxLength: 40
+          description: As `RecordCookieScanRequest.findings[].technologyType`.
+        purpose:
+          type: string
+          maxLength: 1000
+          nullable: true
+        typicalDurationDays:
+          type: integer
+          minimum: 0
+          nullable: true
+        isThirdParty:
+          type: boolean
+          nullable: true
+        privacyInformationUrl:
+          type: string
+          maxLength: 2000
+          nullable: true
+        source:
+          type: string
+          enum:
+          - openCookieDatabase
+          - platformCuration
+          description: Imported, or added or corrected by platform staff.
+        isActive:
+          type: boolean
+          default: true
+          description: A retired entry stops suggesting; it is kept for the findings that cited it.
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005): the platform root on every replicated row.'
     CookieScanPolicy:
       type: object
       x-ticvai-persistence: marketing.cookie_scan_policy

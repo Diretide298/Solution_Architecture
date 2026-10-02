@@ -1122,6 +1122,14 @@ paths:
         once; what is stored is a `credentialRef`, and every read of this provider thereafter returns
         the reference rather than the value.
 
+        **Stored correctly, whatever the provider** (Chinmay, 2 October, contract follow-ups; CHG-FUP-008). The key
+        becomes one secret per tenant and provider in the cell''s Azure Key Vault (the tenant''s own secret, never
+        shared between tenants), encrypted at rest under the vault''s HSM-backed key; only the AI gateway''s workload
+        identity may read it. It is write-only: never returned, never shown again, never logged, never in an audit
+        record or an `ai.interaction`; a reader sees `credentialHint` (the last four characters) and
+        `credentialRotatedAt`. A new key resets `AiProvider.compatibility` to `notTested`; an active provider keeps
+        serving on the previous key through the grace window while `testAiProvider` re-runs.
+
         **No surface ever holds a provider key.** A kiosk, an app and a browser all call TICVAI, and TICVAI
         calls the provider — because a token that reaches a client is a token that bills the tenant from
         somebody else''s machine.
@@ -1209,6 +1217,12 @@ paths:
       summary: Check the key works before anyone relies on it
       description: 'A minimal call against the provider, using the stored credential.
 
+        **And the compatibility test before activation** (Chinmay, 2 October, contract follow-ups; CHG-FUP-008). For a
+        tenant-managed provider the call also runs the probes of `AiProviderCompatibility` for each task it would
+        serve (or the `taskKeys` sent), against the vendor''s equivalent model the curated task-to-tier map picks,
+        and stores the result on `AiProvider.compatibility`. `setAiProvider` activates a tenant-managed provider only
+        after a pass. A TICVAI-managed provider runs the minimal call only.
+
         **Run before activating and on a schedule after.** A key that lapses silently takes the assistant
         down with no error anyone reads — the failure surfaces as an assistant that stopped answering,
         which is diagnosed slowly.
@@ -1225,6 +1239,18 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                taskKeys:
+                  type: array
+                  items:
+                    type: string
+                  description: The tasks to test; absent, every task the provider would serve.
       responses:
         '200':
           headers:
@@ -1255,6 +1281,8 @@ paths:
                   verifiedAt:
                     type: string
                     format: date-time
+                  compatibility:
+                    $ref: '#/components/schemas/AiProviderCompatibility'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /conversations:
@@ -2282,6 +2310,17 @@ paths:
         `AiByokEnablement.taskModelMap`). Usage is billed to the tenant''s own key. Platform-owned models
         (embeddings, reranking, moderation, PII detection, OCR, speech) are never BYOK.
 
+        **Any provider, as long as there is an API key** (Chinmay, 2 October, contract follow-ups: "As long as we get
+        an API key it can be any model; we just need to store it correctly"; CHG-FUP-008). A tenant-managed provider
+        names its company in `vendor` (any provider: `mistral`, `cohere`, `deepseek` ...) and is reached through a
+        native adapter (`kind` `openai`, `gemini`, `anthropic` or `azureOpenai`) or, for every other vendor, through
+        `openaiCompatible` with the vendor''s `endpoint`. A vendor that offers neither is refused
+        `422 provider-protocol-unsupported`. The key goes in through `setAiCredential` only (a per-tenant Key Vault
+        secret, write-only). The curated task-to-tier map then picks that vendor''s equivalent model per task
+        (`AiModel.vendor`, `AiModel.curatedRange`), and **a tenant-managed provider is activated only after a
+        compatibility test passes** (`testAiProvider`, `AiProvider.compatibility`): `isActive: true` before then is
+        refused `409 compatibility-test-required`. A task whose test fails stays on the TICVAI-managed model.
+
         **Residency class** (Chinmay, 2 October: the AI residency decision; CHG-CSA-002). A provider whose
         `residencyClasses` does not include the tenant''s class is refused `409 residency-class-refused`; BYOK fits
         the `globalAllowed` class only, because a tenant key outside OpenAI UAE is a cross-border transfer
@@ -2334,11 +2373,24 @@ paths:
           description: The provider's `residency` is not in the tenant's region's `allowedAiResidencies`
             (`residency-refused`, audit R203), or it is tenant-managed (`managedBy` is `tenant`) and bring-your-own-key is not
             enabled for the tenant (`byok-not-enabled`, decided 29 September), or its `residencyClasses` does not
-            include the tenant's AI residency class (`residency-class-refused`, CHG-CSA-002).
+            include the tenant's AI residency class (`residency-class-refused`, CHG-CSA-002), or it is tenant-managed,
+            `isActive` is true and its compatibility test has not passed (`compatibility-test-required`, CHG-FUP-008).
           x-ticvai-problem-types:
           - residency-refused
           - byok-not-enabled
           - residency-class-refused
+          - compatibility-test-required
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: The `modelId` is outside TICVAI's curated range for a task in `taskKeys` (`model-not-curated`,
+            CHG-CSA-001), or a tenant-managed provider's `kind` is neither a native adapter nor `openaiCompatible` with
+            an `endpoint` (`provider-protocol-unsupported`, CHG-FUP-008).
+          x-ticvai-problem-types:
+          - model-not-curated
+          - provider-protocol-unsupported
           content:
             application/problem+json:
               schema:
@@ -5847,15 +5899,19 @@ paths:
         version is superseded; operational requirements are derived from the new one. Emits `ai.forecastPublished`.
 
         **Who publishes: the holder of the module''s AI publish permission, no default role** (Chinmay, 2 October,
-        workbook Q3 and Q7). The vocabulary now has one `<MODULE>_AI_PUBLISH` per module (CHG-CSA-006). Moving
-        this operation''s `x-ticvai-permission` from `AI_APPROVE` to the forecast''s module permission changes what
-        it means for a client built at r1, so it waits for the breaking change to be approved (CHG-CSA-007);
-        until then `AI_APPROVE` gates it.
+        workbook Q3 and Q7; contract follow-ups: "replacing AI_APPROVE for model publishing"). The caller needs
+        `AI_USE`, which reads forecasts, and the `<MODULE>_AI_PUBLISH` of the version''s `module`
+        (`x-ticvai-permission-by-module`; `contracts/shared/permissions.yaml` `x-ticvai-module-ai-publish`), held at
+        the version''s scope. Without it the call is refused `403 module-ai-publish-required`. `AI_APPROVE` no longer
+        publishes a forecast; the switch is a logged breaking change against r1 (BC-006, CHG-FUP-004).
 
         '
       tags:
       - forecast
-      x-ticvai-permission: AI_APPROVE
+      x-ticvai-permission: AI_USE
+      x-ticvai-permission-by-module:
+        moduleOf: AiForecastVersion.module
+        permissions: ../shared/permissions.yaml#/x-ticvai-module-ai-publish
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
@@ -5886,12 +5942,23 @@ paths:
                 $ref: '#/components/schemas/AiForecastVersion'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '403':
+          description: The caller does not hold the AI publish permission of the version's module at its scope
+            (`module-ai-publish-required`, CHG-FUP-004).
+          x-ticvai-problem-types:
+          - module-ai-publish-required
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
-          description: 'Not publishable: a quality gate failed (`quality-gate-failed`) or the version is not the
-            latest draft (`version-not-current`).'
+          description: 'Not publishable: a quality gate failed (`quality-gate-failed`), the version is not the
+            latest draft (`version-not-current`), or its definition names no module and none follows from its
+            `subject` (`module-required`, CHG-FUP-004).'
           x-ticvai-problem-types:
           - quality-gate-failed
           - version-not-current
+          - module-required
           content:
             application/problem+json:
               schema:
@@ -8192,16 +8259,22 @@ paths:
       description: '**A trained model goes live only when a person promotes it** (design 3.12, decided 29 September).
         When a shadow run passes its gate the platform raises a `promotionReady` governance alert; nothing switches
         by itself. This moves the release one stage (shadow to canary, canary to production). A tenant release needs
-        `AI_APPROVE`; a platform release needs `PLATFORM_AI_MANAGE`. **Decided 2 October** (Chinmay, workbook Q7):
-        promotion goes to whoever holds the module''s AI publish permission (`<MODULE>_AI_PUBLISH`, CHG-CSA-006); the
-        switch of the declared permission is a breaking change awaiting approval (CHG-CSA-007). **Refused to a service caller.** Where the
+        the module''s AI publish permission; a platform release needs `PLATFORM_AI_MANAGE`. **Decided 2 October**
+        (Chinmay, workbook Q7; contract follow-ups: "replacing AI_APPROVE for model publishing"): promotion goes to
+        whoever holds the `<MODULE>_AI_PUBLISH` of the release''s `module` (`x-ticvai-permission-by-module`;
+        `contracts/shared/permissions.yaml` `x-ticvai-module-ai-publish`), on top of `AI_USE`; there is no default
+        role. `AI_APPROVE` no longer promotes; the switch is a logged breaking change against r1 (BC-007,
+        CHG-FUP-004). **Refused to a service caller.** Where the
         capability answers a `requestSuggestion` kind, production rewrites that kind''s assignment in `AiPolicy.suggestionProviders`,
         the only writer besides `setSuggestionProvider`. Resolves the `promotionReady` alert.
 
         '
       tags:
       - models
-      x-ticvai-permission: AI_APPROVE
+      x-ticvai-permission: AI_USE
+      x-ticvai-permission-by-module:
+        moduleOf: AiRelease.module
+        permissions: ../shared/permissions.yaml#/x-ticvai-module-ai-publish
       x-ticvai-permission-escalated: PLATFORM_AI_MANAGE
       x-ticvai-audience:
       - staff
@@ -8243,13 +8316,25 @@ paths:
                 $ref: '#/components/schemas/AiRelease'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '403':
+          description: A tenant release, and the caller does not hold the AI publish permission of its module
+            (`module-ai-publish-required`, CHG-FUP-004); or a platform release, and the caller lacks
+            `PLATFORM_AI_MANAGE`.
+          x-ticvai-problem-types:
+          - module-ai-publish-required
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           description: 'Not promotable: the gate has not passed (`gate-not-passed`), an isolation case failed (`isolation-cases-failed`),
-            or the stage cannot follow the current one (`stage-out-of-order`).'
+            the stage cannot follow the current one (`stage-out-of-order`), or a tenant release names no module
+            (`module-required`, CHG-FUP-004).'
           x-ticvai-problem-types:
           - gate-not-passed
           - isolation-cases-failed
           - stage-out-of-order
+          - module-required
           content:
             application/problem+json:
               schema:
@@ -10968,6 +11053,14 @@ components:
           allOf:
           - $ref: '#/components/schemas/AiProviderKind'
           nullable: true
+        vendor:
+          type: string
+          nullable: true
+          pattern: ^[a-z0-9][a-z0-9-]{1,49}$
+          description: '**Whose model this is** (CHG-FUP-008): the provider company as `AiProvider.vendor` names it.
+            Bring-your-own-key accepts any vendor, so the curated range carries each vendor''s models with the tier
+            they serve; the task-to-tier map (`AiByokEnablement.taskModelMap`) picks the row whose `vendor` matches
+            the tenant''s provider. TICVAI adds a new vendor''s models after evaluating them (`runAiEvaluation`).'
         producerType:
           type: string
           enum:
@@ -12432,6 +12525,18 @@ components:
           - cashCollection
           - membershipRenewals
           - churn
+        module:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/ModuleKey
+          description: '**Whose AI this forecast is, and so who publishes it** (Chinmay, 2 October, workbook Q3:
+            "the permission holder for that module''s AI"; CHG-FUP-004). `publishForecastVersion` requires the
+            permission `contracts/shared/permissions.yaml` `x-ticvai-module-ai-publish` names for this module.
+            Absent on a write, the server takes it from `subject`: ticketing for `attendance`, `arrivalPattern`,
+            `productDemand`, `timeslotDemand`, `channelPace`, `occupancy` and `refunds`; access for `entryFlow` and
+            `attractionUtilisation`; queue for `queue`; fnb for `fnbDemand`; retail for `retailDemand`; inventory
+            for `stockDemand`; resources for `resourceDemand`; membership for `membershipRenewals` and `churn`; core
+            for `revenue`, `staffing`, `posDemand` and `cashCollection`. Proposed, client to correct; a venue may
+            name the module itself. Always present on a read.'
         grain:
           type: string
           enum:
@@ -12579,6 +12684,13 @@ components:
         versionNumber:
           type: integer
           minimum: 1
+        module:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/ModuleKey
+          readOnly: true
+          description: The module of the version's definition (`AiForecastDefinition.module`), copied when the
+            version is produced; the module whose AI publish permission `publishForecastVersion` requires
+            (CHG-FUP-004).
         status:
           type: string
           enum:
@@ -14919,6 +15031,16 @@ components:
           enum:
           - platform
           - tenant
+        module:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/ModuleKey
+          nullable: true
+          description: '**Whose AI this release is, and so who promotes it** (Chinmay, 2 October, workbook Q7: "AI
+            release promotion goes to whoever holds it"; CHG-FUP-004). For a tenant release, `promoteAiRelease`
+            requires the permission `contracts/shared/permissions.yaml` `x-ticvai-module-ai-publish` names for this
+            module; a tenant release with no module cannot be promoted (`409 module-required`). Set when the
+            release is registered, from the capability''s module. Null on a platform release, which
+            `PLATFORM_AI_MANAGE` promotes.'
         suggestionKind:
           allOf:
           - $ref: '#/components/schemas/SuggestionKind'
@@ -15031,6 +15153,11 @@ components:
                 format: uuid
                 nullable: true
                 x-ticvai-references: ai.model
+              compatibilityPassed:
+                type: boolean
+                nullable: true
+                description: Whether the provider's compatibility test passed for this task (`AiProviderCompatibility`,
+                  CHG-FUP-008); a task that has not passed stays on the TICVAI-managed model.
         reason:
           type: string
           maxLength: 1000
@@ -16249,6 +16376,60 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths`
             (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1).'
+    AiProviderCompatibility:
+      type: object
+      x-ticvai-persistence-kind: valueObject
+      x-ticvai-persistence-column: jsonb
+      description: '**Whether a provider can serve the tasks it would take, before it takes them** (Chinmay, 2 October,
+        contract follow-ups: BYOK accepts any provider, with a compatibility test before activation; CHG-FUP-008). For
+        each task the provider would serve, the gateway calls the vendor''s equivalent model at the task''s tier (the
+        curated task-to-tier map) with TICVAI''s probes: tool calling, structured output against a JSON schema,
+        Arabic, the context window the task needs, the latency band and the residency of the endpoint. A task passes
+        when every probe passes; the provider''s `status` is `passed` when at least one task passes, and only the
+        passing tasks are routed to it.'
+      required:
+      - status
+      properties:
+        status:
+          type: string
+          enum:
+          - notTested
+          - passed
+          - failed
+        testedAt:
+          type: string
+          format: date-time
+          nullable: true
+        tasks:
+          type: array
+          items:
+            type: object
+            required:
+            - taskKey
+            - passed
+            properties:
+              taskKey:
+                type: string
+              tier:
+                type: string
+              modelName:
+                type: string
+                nullable: true
+                description: The vendor's model the curated map picked for this task and tier; null where the vendor
+                  has no curated equivalent, and the task stays on the TICVAI-managed model.
+              passed:
+                type: boolean
+              failedProbes:
+                type: array
+                items:
+                  type: string
+                  enum:
+                  - toolCalling
+                  - structuredOutput
+                  - arabic
+                  - contextWindow
+                  - latency
+                  - residency
     AiProviderKind:
       type: string
       enum:
@@ -16267,8 +16448,12 @@ components:
         UAE and then the in-cell open-weights model as the fallback chain. OpenAI UAE is `openai` with a UAE
         `endpoint`; the in-cell model is `localLlm`.
 
-        **There is no `mistral` kind.** A Mistral key (BYOK) would go through `openaiCompatible` if its API is
-        compatible, which is unconfirmed; adding a kind is open (CHG-CSA-008).
+        **A kind is a protocol, not a vendor** (Chinmay, 2 October, contract follow-ups: BYOK accepts any provider;
+        CHG-FUP-008). Any vendor is accepted, named in `AiProvider.vendor`: Mistral, Cohere or any other is reached
+        through `openaiCompatible` where its API speaks it, which the compatibility test confirms before activation
+        (`AiProviderCompatibility`). A new native adapter is a new value here, a breaking change for a client built
+        earlier that goes out with an approval (`docs/active/breaking-changes.yaml`); until then a vendor without
+        either protocol is refused `422 provider-protocol-unsupported`.
 
         '
     SuggestionKind:
@@ -16578,6 +16763,15 @@ components:
             to create one.
         kind:
           $ref: '#/components/schemas/AiProviderKind'
+        vendor:
+          type: string
+          nullable: true
+          pattern: ^[a-z0-9][a-z0-9-]{1,49}$
+          description: '**The provider company, any provider** (Chinmay, 2 October, contract follow-ups: "As long as
+            we get an API key it can be any model"; CHG-FUP-008), as a lower-case slug: `mistral`, `cohere`,
+            `core42`, `openai`. `kind` says how it is reached (a native adapter, or `openaiCompatible` for every
+            other vendor); `vendor` says whose models the curated task-to-tier map picks from (`AiModel.vendor`).
+            Required for a tenant-managed provider; null on an older row, where `kind` names the vendor.'
         capability:
           $ref: '#/components/schemas/AiCapability'
         model:
@@ -16639,6 +16833,13 @@ components:
           description: 'A key-vault reference, never the key. A key typed into a form ends up in a screenshot.
 
             '
+        credentialHint:
+          type: string
+          nullable: true
+          readOnly: true
+          maxLength: 4
+          description: The last four characters of the stored key, so an operator can tell two keys apart. The key
+            itself is never shown again after `setAiCredential` (CHG-FUP-008).
         credentialRotatedAt:
           type: string
           format: date-time
@@ -16659,6 +16860,12 @@ components:
           nullable: true
           readOnly: true
           description: When `testAiProvider` last confirmed the key works.
+        compatibility:
+          allOf:
+          - $ref: '#/components/schemas/AiProviderCompatibility'
+          readOnly: true
+          description: The last compatibility test of this provider (`testAiProvider`). A tenant-managed provider is
+            activated only once its `status` is `passed` (CHG-FUP-008).
         endpoint:
           type: string
           nullable: true

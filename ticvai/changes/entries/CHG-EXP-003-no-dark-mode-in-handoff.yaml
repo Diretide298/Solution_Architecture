@@ -1,0 +1,42 @@
+id: CHG-EXP-003
+date: '2026-10-02'
+source: cr
+kind: design-input
+summary: The design handoff draws no dark mode on guest screens and never draws a deprecated field (Theme.darkMode).
+decision:
+  what: >-
+    flatten() in tools/design_spec.py leaves out every field the contract marks deprecated (forms, outputs and the
+    white-label map); a control bound to one says "do not draw". A guest screen's header row reads "the venue's theme"
+    whatever its platform file lists, and the white-label map drops the darkMode effect and lists "no dark or light
+    mode" as decided and as never configurable.
+  by: Chinmay
+  date: '2026-10-02'
+why: >-
+  Chinmay, 2 October, workbook Q150 (DEC-150, CMS-005) and the pre-apply round: "Theme.darkMode: deprecate it and
+  ignore the field ... kept for compatibility, marked deprecated, never used or drawn". The contract was changed by
+  CHG-CSA-035, but the white-label map still offered four darkMode elements on CMS-005 and P02 bundles still said
+  "light, dark theme".
+keys_touched:
+  schemas:
+  - Theme
+  screens:
+  - CMS-005
+  files:
+  - tools/design_spec.py
+  - tools/build-white-label-map.py
+root_class: 'new: package-contradicts-decision'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: generator-rule
+  ref: tools/design_spec.py::deprecated
+status: closed
+closed_by_commit: 5ded35eb
+notes: >-
+  The same rule drops the other deprecated fields from the bundles too (e.g. party[].confidentSwimmer on WEB-006,
+  superseded by the consent record). screens/P02-guest-mobile-app.yaml still lists `dark` in platform.themes, and the
+  CMS-005 setTheme overlay body in screens/P13-white-label-cms.yaml still names `darkMode`: both belong to the
+  screens-guest agent (SGU).
