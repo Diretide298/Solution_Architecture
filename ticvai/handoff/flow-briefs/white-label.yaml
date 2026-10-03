@@ -1,0 +1,342 @@
+# Flow design briefs: White Label & CMS (Block A). Input to Claude Design storyboards and wireframes.
+# Brief: audit/ticvai/apply/FLOW-BRIEF-BRIEF.md. Written 3 October 2026 by the white-label brief agent.
+# Read with handoff/design-notes/white-label.yaml (screen detail) and contracts/satellite/white-label.yaml.
+process: white-label
+title: White Label & CMS
+written: '2026-10-03'
+scope:
+  rule: >-
+    Block A flows whose trigger belongs to white-label (the trigger screen's process in handoff/design-notes, read
+    together with the flow's trigger description). Block A = builds under BLOCK-A in handoff/service-docs/op-release.json.
+  covered:
+  - {flow: F102, why: 'Trigger CMS-001 (white-label); all 4 steps on Block A screens.'}
+  - {flow: F22, why: 'Trigger CMS-002 (white-label); all 7 steps on Block A screens.'}
+  - {flow: F103, why: 'Trigger CMS-017 (white-label); all 4 steps on Block A screens.'}
+  skipped:
+  - {flow: F01, why: 'Step 1 is WEB-001 (white-label home) but the trigger is a guest buying a ticket (primaryContract catalogue); belongs to ticketing-guest. Lead: confirm the ticketing-guest brief covers it.'}
+  - {flow: F07, why: 'Kiosk purchase; trigger KSK-001 is ticketing-guest; KSK-002 (white-label) is Later, no Block A screen.'}
+  - {flow: F75, why: 'Kiosk purchase; trigger KSK-001 is ticketing-guest; no Block A screen.'}
+  - {flow: F213, why: 'Trigger BO-594 is platform-foundation; no Block A screen or operation.'}
+  - {flow: F254, why: 'Trigger BO-834 is white-label but Later; no Block A screen or operation.'}
+  - {flow: F54, why: 'Step 1 is GST-040 (white-label help hub) but the trigger is a guest with a problem (cases, marketing-crm); covered in customer-marketing.yaml.'}
+  - {flow: F96, why: 'Tenant provisioning; trigger ADM-005 is platform-foundation.'}
+  folded_in:
+  - topic: 'Hosted vs self-hosted publish'
+    where: 'F102 steps 4-6 and F22 step 5 (CMS-014 Generate site package; ADM-016 platform-staff publish under a grant).'
+  - topic: 'Powered by TICVAI toggle'
+    where: 'F22 step 1b (CMS-002 / CMS-104, BrandIdentity.showPoweredBy).'
+  - topic: 'Consent forms and legal texts'
+    where: 'F22 step 4 and F102 step 4 (validateTenantConfig policyVersionMissing; footer legal links; analytics gated by cookie consent). The consent-form builder itself is customer-marketing and not Block A (see open).'
+
+flows:
+  # ---------------------------------------------------------------------------------------------------------------
+  F102:
+    title: A brand is set, previewed, published and rolled back
+    process: white-label
+    trigger: >-
+      A tenant changes its look (fonts, theme, logo) and it must reach every guest surface (P01 web, P02 app, P05 kiosk)
+      at once, through one draft and one publish.
+    actors:
+    - {role: 'Venue manager / tenant admin with TENANT_CONFIGURE (edits the draft)', app: 'P13 Venue CMS (section of Venue Management)'}
+    - {role: 'Tenant publisher with TENANT_PUBLISH (simulates and publishes)', app: P13}
+    - {role: 'Optional reviewer (when the venue switches the publish review on)', app: 'P13 (approval request)'}
+    - {role: 'TICVAI platform staff, only for a site hosted with TICVAI, under a time-boxed grant', app: 'P09 Console ADM-016'}
+    - {role: 'Guest (sees the result)', app: 'P01, P02, P05'}
+    inputs:
+    - name: Module and feature switches
+      formats: [boolean per ModuleKey, boolean per featureKey]
+      limits: 'A module with isLicensed false cannot be switched on. Wallet/payment features carry changeScope buildTime.'
+      validation:
+      - {rule: 'Unlicensed module', message: '"Not in your licence" (switch locked, no request sent)'}
+      - {rule: 'Module still used by navigation or a homepage section (400)', message: 'Lists referencedBy with links to CMS-009 and CMS-007: "Remove it from navigation and the homepage first."'}
+      source: 'Tenant admin, CMS-001 (Site Builder step 1)'
+    - name: Font pairs
+      formats: ['Bundled face name (runtime): Archivo/IBM Plex Sans, Oswald/Barlow, Playfair Display/Karla, Fredoka/Nunito, Baloo 2/Nunito Sans, Instrument Serif/Public Sans, Manrope, plus Tajawal and Baloo Bhaijaan 2 (Arabic)', 'Uploaded font file WOFF2, TTF or OTF (buildTime on the app)']
+      limits: 'primary pair required; secondary optional. Upload through the media library (createUpload/completeUpload); size limit per the assets contract.'
+      validation:
+      - {rule: 'ar enabled and primaryArabic not set (400)', message: '"Arabic is enabled: choose an Arabic face." Publish later blocked by arabicFontMissing.'}
+      - {rule: 'secondaryLatin set without secondaryArabic (400)', message: '"Add an Arabic face for the secondary font."'}
+      - {rule: 'Uploaded file', message: 'Tag "Needs an app update" (build-time); warning about heavy/display weights overflowing buttons.'}
+      source: 'Tenant admin, CMS-003'
+    - name: Preview request
+      formats: ['platform web | ios | android', 'language (enabled languages)', 'outputs: app, pdfTicket, appleWalletPass, googleWalletPass', 'productId optional', 'expiresInHours 1-168']
+      limits: 'Link expiry 1-168 h, default 24 h. theme is deprecated and ignored (one venue theme, no dark mode).'
+      validation:
+      - {rule: 'Expired link opened', message: '"This preview has expired." Never falls back to the live site.'}
+      source: 'Publisher, CMS-006 (also reachable from CMS-014)'
+    - name: Publish note and schedule
+      formats: ['note: plain text', 'scheduledFor: date-time in the tenant time zone (GST)']
+      limits: 'note 3-500 characters, required. scheduledFor optional, must be in the future.'
+      validation:
+      - {rule: 'note missing or < 3 chars', message: '"Add a note: say what changed (3 to 500 characters)."'}
+      - {rule: 'scheduledFor in the past', message: '"Pick a time in the future."'}
+      - {rule: 'No change since the live version', message: 'Publish disabled: "No changes since version 14".'}
+      source: 'Publisher, CMS-014'
+    - name: Publish review policy
+      formats: ['enabled: boolean', 'reviewerMustDifferFromAuthor: boolean', 'appliesTo: [tenantConfig, contentBlock] (empty = both)']
+      limits: 'One row per tenant, off by default.'
+      validation: ["user without TENANT_PUBLISH -> the diff and findings stay visible; Publish is replaced by \"Ask someone with publish rights\" (CMS-014) (derived)"]
+      source: 'Publisher (TENANT_PUBLISH), CMS-014 settings panel'
+    - name: Site package request (self-hosted only)
+      formats: ['version: a published version (current one where absent)']
+      limits: 'Only from a published version; the working draft never leaves. Download link short-lived (expiresAt).'
+      validation:
+      - {rule: 'Nothing published yet (409 nothing-published)', message: '"Publish a version first; a package is made from a published version."'}
+      source: 'Publisher, CMS-014 "Generate site package"; or platform staff, ADM-016 under a grant'
+    processing:
+    - {does: 'Reads live vs draft state and recent changes', ops: ['white-label#getTenantAppStatus', 'white-label#getModuleEnablement']}
+    - {does: 'Writes fonts to the working draft (validate-only on change for the live specimen)', ops: ['white-label#getFonts', 'white-label#setFonts']}
+    - {does: 'Renders the working draft as a short-lived preview link, plus the PDF ticket and Apple/Google Wallet passes (Block A, DEC-151)', ops: ['white-label#createPreview']}
+    - {does: 'Runs the publish checks: missingTranslation, navigationTargetsDisabledModule, homepageReferencesMissingContent, contrastFailure, missingRequiredAsset, policyVersionMissing, noVisibleNavigationItems, unlicensedModuleEnabled, arabicFontMissing, bookingFlowInvalid, bookingFlowMissing', ops: ['white-label#validateTenantConfig']}
+    - {does: 'Field-level diff of the live version against the draft, grouped by area', ops: ['white-label#diffConfigVersion']}
+    - {does: 'Validates, snapshots, versions and activates atomically (201); or snapshots with reviewStatus pending and raises an approval request when the review policy is on (202); or schedules activation by a job', ops: ['white-label#publishTenantConfig', 'white-label#getPublishReviewPolicy', 'white-label#setPublishReviewPolicy']}
+    - {does: 'Self-hosted: builds a downloadable package (storefront build, configuration snapshot, hosting instructions) as a job; polled until ready', ops: ['white-label#exportSitePackage', 'white-label#getSitePackage']}
+    - {does: 'Rollback: copies an earlier snapshot into the draft (never publishes), then the normal publish', ops: ['white-label#listConfigVersions', 'white-label#restoreConfigVersion', 'white-label#diffConfigVersion', 'white-label#publishTenantConfig']}
+    outputs:
+    - name: Status header (CMS-001)
+      states: {loading: 'getTenantAppStatus in flight', ready: 'Badges Published vN / Draft "Unpublished changes" / Live now (Maintenance, Sold out today, Closed)', emptyFirstRun: '"Never published", Site Builder card primary', emptyNoAccess: 'Names TENANT_CONFIGURE', error: 'Names which read failed'}
+      failure_branches:
+      - {what: 'Caller lacks the permission at this scope', user_sees: 'Refused at step 1 with the permission named (ADR-0002), not at publish', recover: 'Ask an admin (resolvePermissions)'}
+    - name: Preview link and output previews
+      states: {loading: 'Rendering', ready: 'URL + expiry + copy + QR; PDF ticket and Wallet pass thumbnails', expired: 'Guest-side "preview expired" page', error: 'Render failed; retry'}
+      failure_branches:
+      - {what: 'Link opened after expiry', user_sees: '"This preview has expired"', recover: 'Create a new preview'}
+    - name: Validation report
+      states: {passed: 'Green "Ready to publish"', warnings: 'Publish enabled, warnings listed', blocked: 'errorCount > 0, Publish disabled with the count; each finding links to its fixing screen'}
+      failure_branches:
+      - {what: 'bookingFlowInvalid at one venue', user_sees: 'Finding names venue and flow', recover: 'Link to CMS-103 with the flow open'}
+      - {what: 'policyVersionMissing (terms/privacy without a current version)', user_sees: 'Blocking finding', recover: 'Link to CMS-018 to publish the policy version'}
+    - name: Publish result
+      states: {published: '201: "Version 15 is live. Web guests see it on next load; app guests on next launch." plus build-time items not shipped', submittedForReview: '202: "Sent for review"; version reviewStatus pending', scheduled: '"Scheduled for <date GST>"', refused: '409: every finding listed', noPermission: 'Publish replaced by "Ask someone with publish rights"'}
+      failure_branches:
+      - {what: '409 validation failed at publish (draft changed since the check)', user_sees: 'Findings list', recover: 'Fix, re-run checks, publish'}
+      - {what: 'Guest mid-checkout during publish', user_sees: 'Nothing changes for that guest; they keep the version they started with', recover: 'Automatic'}
+      - {what: 'Draft contains build-time changes (icons, splash, uploaded fonts, wallet/payment)', user_sees: '"Needs an app update" list with link to CMS-104', recover: 'Request a store build on CMS-104'}
+    - name: Site package (self-hosted)
+      states: {building: 'Job running', ready: 'Download link with expiry', failed: 'Reason; retry', nothingPublished: '409 message'}
+      failure_branches:
+      - {what: 'Download link expired', user_sees: '"Link expired"', recover: 'getSitePackage / generate again'}
+    - name: Version history and restore
+      states: {ready: 'Newest first; version, published at (GST), by, note, Current badge, Scheduled, Needs an app update chips', emptyFirstRun: 'No versions yet', restored: 'Banner "Draft restored from version 12" on CMS-014'}
+      failure_branches:
+      - {what: 'Restore while the draft has unpublished changes', user_sees: 'Confirmation lists the changes that will be overwritten', recover: 'Cancel or confirm'}
+      - {what: 'Restored version has an older app icon', user_sees: '"The icon still needs an app update"', recover: 'CMS-104'}
+    steps:
+    - {frame: 1, screen: CMS-001, sees: 'Tenant Workspace: Published v14 / Draft "Unpublished changes" / Live now badges, recent changes, workspace tiles', does: 'Checks what is live before changing the brand', op: 'white-label#getTenantAppStatus, white-label#getModuleEnablement', result: 'Live state known for later comparison'}
+    - {frame: 2, screen: CMS-003, sees: 'Typography: font pair presets, Latin/Arabic specimen side by side and mirrored (AED 249.00, 09:00 - 17:00 stay LTR)', does: 'Picks Playfair Display / Karla with Tajawal for Arabic, saves', op: 'white-label#getFonts, white-label#setFonts', result: 'Draft updated; "Unpublished changes"'}
+    - {frame: 3, screen: CMS-006, sees: 'Component gallery from the draft (web / iPhone / Android, LTR/RTL), PDF ticket and Wallet pass previews', does: 'Creates a preview link (24 h), scans the QR on a phone', op: 'white-label#createPreview', result: 'Shareable draft link; nothing published (simulate step, DEC-156)'}
+    - {frame: 4, screen: CMS-014, sees: 'Publishing Workflow: What changes (diff by area), Blocking findings, Needs an app update, note field, Publish now / Schedule', does: 'Runs checks, reads the diff, writes the note "Summer fonts", Publish now', op: 'white-label#validateTenantConfig, white-label#diffConfigVersion, white-label#publishTenantConfig', result: '201 version 15 live (or 202 sent for review when the venue review policy is on)'}
+    - {frame: 5, screen: CMS-014, variant: 'self-hosted tenant', sees: '"Generate site package" confirmation (confirmExportSitePackage) naming the published version', does: 'Generates the package', op: 'white-label#exportSitePackage, white-label#getSitePackage', result: 'Package building, then ready with a short-lived download link'}
+    - {frame: 6, screen: ADM-016, variant: 'hosted with TICVAI, platform staff on request', sees: 'Tenant picker, grant form (reason, ticket, expiry <= 8 h, step-up), caution-coloured grant bar with countdown; tenant brand only inside preview frames', does: 'Opens a grant with TENANT_PUBLISH, reviews diff, publishes with a note', op: 'openPlatformStaffGrant, white-label#diffConfigVersion, white-label#publishTenantConfig', result: 'Version records the platform operator as publisher; tenant sees it in its audit log'}
+    - {frame: 7, screen: CMS-015, sees: 'Version History with Compare', does: 'Selects v14, compares, Restore into draft', op: 'white-label#listConfigVersions, white-label#diffConfigVersion, white-label#restoreConfigVersion', result: 'Draft = v14; guests still see v15'}
+    - {frame: 8, screen: CMS-014, sees: 'Banner "Draft restored from version 14", diff live v15 vs draft', does: 'Publishes the restored draft with a note', op: 'white-label#publishTenantConfig', result: 'v16 (= v14 content) live; rollback through the same gate'}
+    motion:
+    - {what: 'Font specimen re-renders on pick (Latin and Arabic side by side)', how: 'Cross-fade 150 ms (default)'}
+    - {what: 'Publish gate', how: 'Findings list animates in errors first; Publish button disabled with count; after 201 a success toast with version number'}
+    - {what: 'Site package job', how: 'Progress state Building -> Ready (poll getSitePackage, default every 3 s); download button appears'}
+    - {what: 'Grant bar (ADM-016)', how: 'Live countdown to expiry; at expiry the screen returns to grantRequired, unsaved edits kept'}
+    - {what: 'Preview frame platform switch', how: 'Device frame morphs web -> iPhone -> Android; direction toggle mirrors the layout'}
+    decisions: [DEC-156 (simulate then single publish; optional review), DEC-144 (hosted publish under grant; self-hosted site package), DEC-151 (PDF ticket and Wallet pass preview in Block A), DEC-146 (module switches save to draft; approval at publish), DEC-147 (bundled fonts), DEC-150/PRE-3 (no dark mode; darkMode deprecated), DEC-158 (no staging env; preview link is staging), CHG-CSA-038, CHG-CSA-041, CHG-CSA-042, CHG-WIR-015, CHG-CLN-005, 'answers-2-oct-batch1.md lines 13, 15, 16']
+    sources: [flows/F102, 'handoff/design-notes/white-label.yaml#CMS-001,CMS-003,CMS-006,CMS-014,CMS-015,ADM-016', contracts/satellite/white-label.yaml, R098, R139, R163, ADR-0002, ADR-0006, MATRIX 19.1.24, DI-296]
+    open:
+    - {q: 'What a self-hosted site package contains (static export vs app + API endpoints) and how it receives updates (DEC-144 note)', default: 'Draw it as a zip of the storefront build + config snapshot + hosting instructions for one published version; each new publish needs a new package.'}
+    - {q: 'Approval UI for a 202 publish (where the reviewer approves)', default: 'Reviewer approves in the approvals inbox; CMS-014 shows "Waiting for review" with the request id.'}
+    - {q: 'Poll interval and debounce timings', default: 'Package poll 3 s; validate-only debounce 300 ms.'}
+
+  # ---------------------------------------------------------------------------------------------------------------
+  F22:
+    title: A tenant rebrands their app
+    process: white-label
+    trigger: 'A venue changes its logo, colours and homepage, and it must reach the website and the app without a release.'
+    actors:
+    - {role: 'Venue manager / tenant admin (TENANT_CONFIGURE)', app: 'P13 Venue CMS'}
+    - {role: 'Publisher (TENANT_PUBLISH)', app: P13}
+    - {role: 'Guest', app: 'P01 Guest Web, P02 Guest App'}
+    - {role: 'Client store owner (Apple/Google accounts) for build-time parts', app: 'P13 CMS-104'}
+    inputs:
+    - name: Logo, dark logo, favicon
+      formats: [PNG, SVG]
+      limits: 'At most 2 MB each (R270), checked in the browser before upload and again by the server. Alt text asked once at upload.'
+      validation:
+      - {rule: 'Not PNG/SVG, or > 2 MB (400)', message: '"Use a PNG or SVG up to 2 MB." Nothing replaces the current logo.'}
+      - {rule: 'SVG with embedded raster or scripts', message: 'Refused before upload with the reason.'}
+      - {rule: 'No dark logo', message: 'Dark variant previews the primary logo on dark and says it falls back.'}
+      source: 'Tenant admin, CMS-002 Brand Kit (one drop zone each)'
+    - name: Logo variant
+      formats: ['Light | Dark | Duotone (thumbnails of the nav bar)']
+      limits: 'Default Light'
+      validation: ["no dark logo uploaded -> the Dark variant previews the primary logo on dark and says it falls back (CMS-002 edge case) (derived)"]
+      source: CMS-002
+    - name: Powered by TICVAI toggle
+      formats: ['BrandIdentity.showPoweredBy: boolean, default true']
+      limits: 'false accepted only when the licence carries poweredByRemoval (LicencePosition.poweredByRemovable).'
+      validation:
+      - {rule: 'Switching off without the add-on (403 powered-by-locked)', message: '"Your licence keeps Powered by TICVAI on. Ask about the removal add-on." Toggle shown locked.'}
+      source: 'Tenant admin, CMS-104 (Powered by element) and CMS-002 brand form (both declare setBrandIdentity)'
+    - name: Theme colours
+      formats: ['primary, secondary, background, text (required), accent (optional): hex #RRGGBB only (no 3-digit, no rgba)', 'componentColours {primaryCta, payButton, addToCart, buyTicketsButton, link, badge}: optional background + text pairs ("Follows theme" when empty)', 'cornerRadius slider 0-22 px (contract allows 32)', 'surfaceStyle Glass|Solid', 'buttonStyle Solid|Outline|Pill', 'palette presets (fill the five fields; not stored)']
+      limits: 'WCAG 2.2 AA (CHG-RUL-007, 3 Oct): text on background 4.5:1; large text (24 px, or 18.66 px bold+) 3:1; primary, secondary and accent against background 3:1 (UI components, 1.4.11); each component colour: its text on its background 4.5:1 and its background against the page 3:1. darkMode deprecated, never drawn.'
+      validation:
+      - {rule: 'Any failing pair (live, via setTheme Prefer validate-only on every change)', message: 'Inline per pair: "white text on primary button 3.2:1, needs 4.5:1", with a suggested passing shade (e.g. #1F2937)'}
+      - {rule: 'Save with a failing pair (400 ContrastProblem, failures[] foreground/background/ratio/required/usage)', message: 'Colours stay as entered; each failure listed; nothing saved ("Refused, not warned", R139)'}
+      - {rule: 'Invalid hex', message: '"Use a six-digit hex colour, e.g. #0E7C86."'}
+      source: 'Tenant admin, CMS-005 Theme Editor'
+    - name: Homepage sections
+      formats: ['ordered sections[] {kind, sortOrder, isVisible, title per language, maxItems, heroStyle Carousel|Video|Poster|Split, contentPageId, scroll animation Rise|Scale|Slide|Blur|None}', 'header layout Logo left|centre|with menu', 'footer columns + locked legal links (terms and privacy required; accessibility, cookie policy optional)']
+      limits: 'Fixed section kinds only; tenant arranges and fills, never invents components.'
+      validation:
+      - {rule: 'Section for a disabled module or missing content block (400)', message: '"This section needs the <module> module, which is off." / "The content page no longer exists."'}
+      - {rule: 'Edit a published content page (409 published-page-locked)', message: '"Published pages can only be archived. Archive it and create a new page."'}
+      source: 'Tenant admin, CMS-007 Page Builder (drag and drop)'
+    - name: RTL preview request
+      formats: ['language ar (or any enabled RTL language)', 'platform web|ios|android']
+      limits: 'ar must be enabled (CMS-011)'
+      validation:
+      - {rule: 'ar not enabled', message: '"Arabic is not enabled." Offers CMS-011; no preview.'}
+      source: 'Publisher, CMS-012'
+    - name: Publish note / schedule
+      formats: ['note 3-500 chars', 'scheduledFor optional future date-time GST']
+      limits: as F102
+      validation: [{rule: as F102, message: as F102}]
+      source: CMS-014
+    processing:
+    - {does: 'Upload in two halves invisible to the user (one progress bar), then attach to the brand', ops: ['assets#createUpload', 'assets#completeUpload', 'white-label#setBrandIdentity']}
+    - {does: 'Live contrast check on every change, save to draft', ops: ['white-label#getTheme', 'white-label#setTheme']}
+    - {does: 'Reorder homepage sections', ops: ['white-label#getHomepageLayout', 'white-label#setHomepageLayout']}
+    - {does: 'Arabic mirrored preview and the blocking checks (missingTranslation, arabicFontMissing first; policyVersionMissing for terms/privacy/cookie policies the consent banner and checkout need)', ops: ['white-label#createPreview', 'white-label#validateTenantConfig']}
+    - {does: 'Publish (or 202 to review), and report pendingBuildTimeChanges', ops: ['white-label#publishTenantConfig', 'white-label#getTenantAppStatus']}
+    - {does: 'Self-hosted tenant: package the published version', ops: ['white-label#exportSitePackage', 'white-label#getSitePackage']}
+    - {does: 'Rollback: restore into draft, diff, publish', ops: ['white-label#listConfigVersions', 'white-label#restoreConfigVersion', 'white-label#diffConfigVersion', 'white-label#publishTenantConfig']}
+    - {does: 'Guest surfaces read the published config (analytics tags load only after the visitor grants the provider consentCategory)', ops: ['white-label#getPublishedTenantConfig']}
+    outputs:
+    - name: Brand preview strip (CMS-002)
+      states: {loading: 'getBrandIdentity', emptyFirstRun: 'No brand kit yet; offers upload', uploading: 'One progress bar per drop zone', ready: 'Guest header + powered-by strip, EN and AR side by side', error: 'Upload refused with reason; old logo kept'}
+      failure_branches:
+      - {what: 'Wide logo breaks the mirrored (Arabic) header', user_sees: 'Visible in the strip and in CMS-012', recover: 'Upload a different lockup or change logoVariant'}
+    - name: Live component sheet (CMS-005)
+      states: {loading: 'getTheme', emptyFirstRun: 'getTheme 404 not-configured: pre-filled from preset, Save creates it', checking: 'Pair ratios recalculating', passing: 'All pairs green', failing: 'Failing pairs marked with ratio and required', saved: 'Draft written', refused: '400 ContrastProblem list'}
+      failure_branches:
+      - {what: 'Brand yellow #FFC845 with white text (1.5:1)', user_sees: 'Marked live; suggestion #1F2937', recover: 'Pick suggested shade'}
+    - name: Homepage split preview (CMS-007)
+      states: {ready: 'Web Home and app Home side by side, updated on every drag', refused: '400 section for disabled module'}
+      failure_branches:
+      - {what: 'Content exists only in English', user_sees: 'Published anyway; gap listed per locale', recover: 'Add copy later (DI-975: English shown inside the Arabic layout, highlighted)'}
+    - name: Mirrored preview and findings (CMS-012)
+      states: {loading: 'Rendering Arabic draft', ready: 'Home, a booking step with cart, seat map, checkout in Arabic; untranslated strings highlighted', blocked: 'Findings listed, each linking to its screen', emptyFirstRun: 'ar not enabled'}
+      failure_branches: []
+    - name: Publish result (CMS-014)
+      states: {published: 'Live on web immediately; app on next launch', submittedForReview: '202', refused: '409 findings', buildTimePending: '"Needs an app update" list: icon, splash, uploaded fonts, wallet/payment'}
+      failure_branches:
+      - {what: 'App store build older than the config (shell change)', user_sees: 'Build-time changes do not publish to the app; link to CMS-104', recover: 'Request a build on CMS-104 under the client''s own store accounts'}
+      - {what: 'Guest mid-checkout', user_sees: 'Keeps the version they started with', recover: Automatic}
+    - name: Rollback (CMS-015 -> CMS-014)
+      states: {restored: 'Draft = old version', published: 'Old brand live'}
+      failure_branches:
+      - {what: 'Rollback after guests saw the new brand', user_sees: '"Web and homepage roll back on next load; the app icon cached on devices needs an app update"', recover: 'CMS-104'}
+    - name: Guest web and app with the new brand
+      states: {ready: 'New logo, theme, homepage order; Powered by TICVAI in the web footer, app launch screen and Account unless switched off', maintenance: 'Unaffected by publish (independent)'}
+      failure_branches: []
+    steps:
+    - {frame: 1, screen: CMS-002, sees: 'Brand Kit: three drop zones (logo, dark logo, favicon), variant thumbnails, theme/fonts swatches, EN/AR brand strip', does: 'Drops coastal-aqua-logo.svg (148 KB), types alt text, picks Duotone, Save brand', op: 'assets#createUpload, assets#completeUpload, white-label#setBrandIdentity', result: 'Draft brand updated'}
+    - {frame: 1b, screen: CMS-104, added: 'per DEC-160/PRE-7, not a step in flows/F22', sees: 'Powered by TICVAI toggle (on), locked with a licence note unless poweredByRemovable', does: 'Tries to switch it off', op: 'white-label#setBrandIdentity (showPoweredBy)', result: '200 off (licence allows) or 403 powered-by-locked'}
+    - {frame: 2, screen: CMS-005, sees: 'Theme Editor: five colour pickers + presets, component colours, radius, surface and button style, live component sheet LTR/RTL', does: 'Sets primary #FFC845 with white text, sees 1.5:1 fail, takes suggested #1F2937 text, Save theme', op: 'white-label#getTheme, white-label#setTheme (validate-only on change, then save)', result: 'Draft theme saved once all pairs pass'}
+    - {frame: 3, screen: CMS-007, sees: 'Page Builder: section cards, split web/app preview', does: 'Drags Dining above Attractions, sets hero style Video, scroll animation Rise', op: 'white-label#getHomepageLayout, white-label#setHomepageLayout', result: 'Draft order saved'}
+    - {frame: 4, screen: CMS-012, sees: 'RTL Preview: mirrored home, cart, checkout; findings missingTranslation and arabicFontMissing first; policyVersionMissing if the privacy or cookie policy has no current version', does: 'Toggles direction, platform; runs "Check what blocks a publish"', op: 'white-label#createPreview, white-label#validateTenantConfig', result: 'Findings fixed or accepted as warnings'}
+    - {frame: 5, screen: CMS-014, sees: 'Diff by area (Brand, Theme, Homepage), findings, Needs an app update (none), note, Publish now / Schedule; "Generate site package" for a self-hosted tenant', does: 'Note "Summer rebrand", Publish now', op: 'white-label#publishTenantConfig, white-label#getTenantAppStatus', result: 'Live on web immediately; app on next launch'}
+    - {frame: 6, screen: CMS-015, sees: 'Version list, Compare', does: 'Restore into draft the previous version (something is wrong)', op: 'white-label#listConfigVersions, white-label#restoreConfigVersion, white-label#diffConfigVersion', result: 'Draft restored; guests still see the new brand'}
+    - {frame: 7, screen: CMS-014, sees: 'Banner "Draft restored from version N"', does: 'Publishes the restored draft', op: 'white-label#publishTenantConfig', result: 'Previous brand live again'}
+    motion:
+    - {what: 'Upload', how: 'Single progress bar per drop zone; preview strip swaps logo with a 200 ms fade'}
+    - {what: 'Live contrast check', how: 'Component sheet recolours instantly as the picker moves; pair badges flip green/red with the ratio counting to its value; validate-only debounced (default 300 ms)'}
+    - {what: 'Homepage reorder', how: 'Drag and drop with lift shadow and placeholder gap; split preview reflows on drop (250 ms)'}
+    - {what: 'Scroll animations preview (DEC-153)', how: 'Selected effect plays on the section in the preview: Rise, Scale, Slide, Blur or None'}
+    - {what: 'LTR <-> RTL toggle', how: 'Layout mirrors with a horizontal flip transition; numbers, prices, times and logos do not flip'}
+    - {what: 'Publish', how: 'Success toast with version number; Draft badge clears on CMS-001'}
+    decisions: [DEC-150/PRE-3 (no dark mode), DEC-149 (secondaryColour usage, confirm), DEC-152, DEC-153, DEC-156, DEC-144, DEC-160/PRE-7 (Powered by toggle, default on), CHG-RUL-007 (WCAG AA pairs), CHG-CSA-035, CHG-CSA-036, R139 (refused not warned; restore not one click), R270 (PNG/SVG 2 MB), R163, 'answers-2-oct-batch1.md lines 13, 15, 16, 109, 351, 382']
+    sources: [flows/F22, 'handoff/design-notes/white-label.yaml#CMS-002,CMS-005,CMS-007,CMS-012,CMS-014,CMS-015,CMS-104', contracts/satellite/white-label.yaml#setTheme, ADR-0006, DI-297, DI-250, DI-975, DI-1068, 'sources/designs/guest-rev3-30-september (Engine Controls Manual)']
+    open:
+    - {q: 'Where the Powered by toggle is drawn: design notes put it on CMS-104 but the field lives on BrandIdentity (CMS-002 also binds setBrandIdentity)', default: 'Draw the toggle on CMS-104 and show its state read-only on the CMS-002 brand strip.'}
+    - {q: 'Powered by credit recolouring on the tenant background', default: 'Recolour only as far as it stays legible (same 4.5:1 rule).'}
+    - {q: 'Consent forms: the consent-form builder (DEC-549) is customer-marketing and not in Block A', default: 'The rebrand flow only surfaces policyVersionMissing and the footer legal links; no builder frame here.'}
+    - {q: 'secondaryColour usage (DEC-149, copied answer)', default: 'Secondary buttons, selected-tab underline, footer background.'}
+
+  # ---------------------------------------------------------------------------------------------------------------
+  F103:
+    title: A tenant claims a domain and gets a certificate
+    process: white-label
+    trigger: >-
+      A tenant wants their storefront on their own hostname (tickets.venue.com) rather than the platform subdomain every
+      tenant already has (venue.<cell>.ticvai.app). Also covers the guest web app (CMS-017 coverage check, answers line 87).
+    actors:
+    - {role: 'Tenant admin (TENANT_CONFIGURE)', app: 'P13 CMS-017'}
+    - {role: 'Tenant IT at their DNS provider (outside TICVAI)', app: 'their DNS console'}
+    - {role: 'Platform job (verification, certificate issuance and revalidation)', app: 'background'}
+    - {role: 'Platform support under a staff grant', app: 'P09 ADM-017'}
+    inputs:
+    - name: Hostname
+      formats: ['fully qualified host, lowercase, no scheme, no path (tickets.coastalaqua.ae)']
+      limits: 'One primary per kind; apex only on request; no path proxy'
+      validation:
+      - {rule: 'Scheme, path, uppercase or not a FQDN', message: '"Enter a hostname like tickets.venue.com, without https:// or a path."'}
+      - {rule: 'Already held by another tenant (409)', message: '"This domain is not available." (never says who)'}
+      - {rule: 'Not permitted at this scope', message: 'Refused at step 1, permission named'}
+      source: 'Tenant admin, CMS-017 formClaimCustomDomain'
+    - name: Kind
+      formats: ['guestWeb | guestApp (app links) | partnerPortal | developerPortal']
+      limits: ["one of the four kinds (CMS-017 design note) (derived)"]
+      validation: ["hostname already routed to another tenant at verify -> 409 hostname-taken: \"This domain is in use elsewhere. Contact support.\" (CMS-017 edge case) (derived)"]
+      source: CMS-017
+    - name: Routing / verification method
+      formats: ['routing: cname (default, CNAME to Front Door, validated by TXT _dnsauth, managed certificate) | delegatedSubdomain (NS) | apex (on request)', 'verificationMethod enum dnsTxt (default) | cname | httpFile']
+      limits: 'A validation window; on timeout the token must be regenerated'
+      validation:
+      - {rule: 'Records not published within the window (revalidation timedOut)', message: '"We could not see your records in time. Get a new record and publish it again."'}
+      source: CMS-017
+    - name: DNS records published by the tenant
+      formats: ['TXT _dnsauth.<host> = token', 'CNAME <host> -> Front Door endpoint', 'CAA / NS where they apply']
+      limits: 'DNS propagation can take hours'
+      validation:
+      - {rule: 'Record missing or wrong (dnsRecords[].status missing|wrong)', message: 'Row shows expected value vs observed value: "Expected X, found Y."'}
+      - {rule: 'CAA forbids the certificate authority', message: 'CAA row flagged with the value to add'}
+      source: 'Tenant IT, at their DNS provider'
+    processing:
+    - {does: 'Show the always-live platform subdomain and the claimed domains', ops: ['white-label#getPlatformSubdomain', 'white-label#listCustomDomains']}
+    - {does: 'Claim: returns verificationRecord and every dnsRecord to publish', ops: ['white-label#claimCustomDomain']}
+    - {does: 'Verify by a retrying job (button only triggers an early check); routes the hostname (tenancy#setTenantDomainMapping) and Front Door issues the managed certificate', ops: ['white-label#verifyCustomDomain']}
+    - {does: 'Make primary per kind; others and the platform subdomain redirect to it', ops: ['white-label#setPrimaryDomain']}
+    - {does: 'New token after time-out or revalidation', ops: ['white-label#regenerateDomainToken']}
+    - {does: 'Release; unroutes at once; takeover warning', ops: ['white-label#relinquishCustomDomain']}
+    outputs:
+    - name: Default address panel
+      states: {ready: '"Your site is at aquaventure.ae.ticvai.app" (wildcard certificate), Primary while no custom domain is'}
+      failure_branches: []
+    - name: Domain row and records table
+      states: {emptyFirstRun: 'No custom domain yet + Claim custom domain', pending: 'Records to publish with copy buttons', verifying: 'Last checked <time>; "DNS can take hours"', verified: 'Records ok', issuing: 'Issuing certificate', active: 'Active; certificate expiry date, amber within 30 days', failed: 'failureReason', expired: 'Expired', revoked: 'Revoked', pendingRevalidation: 'Still serving; waiting shown beside status', timedOut: 'Get a new record', cnameLost: 'Takeover/lost-routing warning naming the record to restore or remove'}
+      failure_branches:
+      - {what: 'Hostname routed to another tenant at verify (409 hostname-taken)', user_sees: '"This domain is in use elsewhere. Contact support."', recover: 'Platform support on ADM-017 under a grant'}
+      - {what: 'Certificate renewal fails (e.g. weekend)', user_sees: 'Failed with reason and expiry countdown', recover: 'Job retries; fix the named record'}
+      - {what: 'CNAME no longer points at TICVAI while active', user_sees: 'cnameLost flag: guests on that host no longer reach the storefront', recover: 'Restore the record'}
+    - name: Readiness checklist per domain
+      states: {ready: 'UAE Pass redirect registered / Apple Pay merchant domain verified / app links served (AASA, assetlinks) each ok or pending'}
+      failure_branches:
+      - {what: 'Readiness item pending', user_sees: 'Item pending with what it blocks (sign-in with UAE Pass, Apple Pay, app links)', recover: 'Wait for the job or contact support'}
+    - name: Release confirmation
+      states: {confirm: 'Takeover warning: "Remove the CNAME and the TXT record from your DNS"', refused: '409 only active domain for a live app, naming what would break', released: '204, unrouted'}
+      failure_branches:
+      - {what: 'CNAME left in place after release', user_sees: 'cnameLost on the released host until removed', recover: 'Remove the record'}
+    steps:
+    - {frame: 1, screen: CMS-017, sees: 'Default address panel; empty custom-domain list; Claim custom domain', does: 'Claims tickets.coastalaqua.ae, kind Guest website, routing CNAME', op: 'white-label#getPlatformSubdomain, white-label#listCustomDomains, white-label#claimCustomDomain', result: '201 with records: TXT _dnsauth and CNAME to Front Door, each with copy buttons'}
+    - {frame: 2, screen: CMS-017, sees: 'Records table expected vs observed, status Verifying, last checked', does: 'Publishes the records at the DNS provider; optionally Check now', op: 'white-label#verifyCustomDomain, white-label#listCustomDomains', result: 'Verified -> Issuing certificate -> Active (job-driven)'}
+    - {frame: 3, screen: CMS-017, sees: 'Active domain with certificate expiry, readiness checklist (UAE Pass, Apple Pay, app links), Make primary', does: 'Makes it primary (confirmSetPrimaryDomain)', op: 'white-label#setPrimaryDomain, white-label#listCustomDomains', result: 'Primary; the platform subdomain redirects to it'}
+    - {frame: 3b, screen: CMS-017, variant: 'timed out', sees: 'revalidation timedOut, the record never observed highlighted', does: 'Get a new record (confirmRegenerateDomainToken)', op: 'white-label#regenerateDomainToken', result: 'New token, window restarts; old token stops validating'}
+    - {frame: 4, screen: CMS-017, sees: 'Release confirmation with the takeover warning', does: 'Releases a domain no longer used', op: 'white-label#relinquishCustomDomain', result: '204 released, or 409 naming what would break'}
+    motion:
+    - {what: 'Status progression', how: 'Stepper Pending -> Verifying -> Verified -> Issuing -> Active advances as the job reports; spinner on the current step with "last checked" relative time ticking'}
+    - {what: 'Record rows', how: 'Row status chip flips missing -> ok when observed; copy button confirms with a check for 1.5 s'}
+    - {what: 'Certificate expiry', how: 'Amber countdown within 30 days'}
+    decisions: [DEC-547 (subdomain plus CNAME, TXT _dnsauth, Front Door managed certificate, delegated subdomain option, apex on request, no path proxy, DNS records list, revalidation, takeover warning, readiness), CHG-CSA-043, CHG-SOT-006, CHG-WIR-015, 'answers-2-oct-batch1.md lines 64, 87, 135']
+    sources: [flows/F103, 'handoff/design-notes/white-label.yaml#CMS-017,ADM-017', 'contracts/satellite/white-label.yaml#/components/schemas/CustomDomain', SD-021, DI-283, R096, ADR-0002]
+    open:
+    - {q: 'verificationMethod (dnsTxt|cname|httpFile) vs routing (cname|delegatedSubdomain|apex): the design note shows a method picker, DEC-547 makes TXT _dnsauth + CNAME the default', default: 'Show routing as the choice (CNAME default, delegated subdomain option, apex "on request"); hide verificationMethod behind Advanced.'}
+    - {q: 'Validation window length and job retry interval', default: '7 days window; re-check every 15 min for the first hour, then hourly.'}
+    - {q: 'How apex "on request" is requested', default: 'A link "Need the bare domain? Contact support" (no self-serve).'}
