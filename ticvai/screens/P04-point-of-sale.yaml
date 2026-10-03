@@ -701,9 +701,11 @@ screens:
       has been decided; it offers no create action, because creating work is not what it needs.'
     emptyNoResults: 'Never shown: nothing on this screen filters its list, so an empty list is always
       the first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `SHIFT_OPEN`, which `getCurrentShift` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `SHIFT_OPEN`, which `getCurrentShift` requires to show
+      this screen, and names that permission (the screen''s other reads need `DEVICE_VIEW` and say so
+      in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question. A caller who can see the screen but lacks what an action needs
+      sees that action disabled, naming its permission: `SHIFT_APPROVE_OPEN` for `approveShiftOpen`.'
     offline: '**Cannot open offline.** `openShift` is online only (F32; audit R257): an opening float
       declared offline is one nobody can reconcile against the safe. Says so and keeps the count on screen
       until the link returns (design-notes correction fnb-retail POS-001).'
@@ -1819,9 +1821,14 @@ screens:
       filter that matched nothing.
     emptyNoResults: Nothing matches the filter on venueId, kind, isSellable and the sell ticket catalogue
       are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires to show
+      this screen, and names that permission (the screen''s other reads need `ORDER_VIEW`, `PRICE_VIEW`,
+      `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `APPROVAL_REQUEST`
+      for `createApprovalRequest`; `APPROVAL_VIEW` for `evaluateApprovalRequirement`; `GUEST_VIEW` for
+      `getGuestLoyalty`, `identifyGuest`; `LOYALTY_REDEEM` for `redeemLoyaltyPoints`; `ORDER_CREATE` for
+      `createOrder`, `createPayment`, `issueGameCard`, `createRetailSale`; `ORDER_DISCOUNT` for `applyManualDiscount`.'
     offline: Served from the local catalogue bundle (ADR-0013). One read path, always local — the terminal
       does not know whether it has a network.
     denied: The catalogue reads normally and **Charge is refused** without `payment.take`. The cart is
@@ -2260,9 +2267,10 @@ screens:
       that makes one — and says so rather than showing an empty table.
     emptyNoResults: 'Never shown: `listProductVariants` takes no filter, so an empty list is always the
       first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `getAvailability` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `getAvailability` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no data*
+      and sends somebody to support with the wrong question. A caller who can see the screen but lacks
+      what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `acquireInventoryHold`.'
     offline: '**Availability is never served from the bundle.** A lease is acquired against the server;
       without one the terminal sells only from its allocated lease and refuses beyond it (ADR-0013)'
     denied: Session and date selection are readable; adding to a sale needs `payment.take` to complete.
@@ -2560,9 +2568,12 @@ screens:
     loading: The sell seat map, read by `getSeatAvailability`.
     error: Could not load. Names which read failed and leaves the sell seat map untouched.
     emptyFirstRun: No sell seat map yet. Offers Create seat hold (`createSeatHold`).
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `getSeatAvailability` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `getSeatAvailability` requires to
+      show this screen, and names that permission (the screen''s other reads need `ORDER_VIEW` and say
+      so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question. A caller who can see the screen but lacks what an action needs
+      sees that action disabled, naming its permission: `ORDER_CREATE` for `createSeatHold`, `relinquishSeatHold`,
+      `createOrder`, `createPayment`.'
     offline: '**Not available offline.** Seat holds require the primary; two terminals selling the same
       seat is unrecoverable'
     denied: Seats can be viewed but not held without `payment.take` — an unchargeable hold takes capacity
@@ -3041,9 +3052,13 @@ screens:
     emptyFirstRun: No payment yet. Offers Create payment (`createPayment`); distinct from a filter that
       matched nothing.
     emptyNoResults: 'Never shown: the payment screen completes one sale and has no list filter.'
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `getRetailSale` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `listRetailSales` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no data*
+      and sends somebody to support with the wrong question. A caller who can see the screen but lacks
+      what an action needs sees that action disabled, naming its permission: `GUEST_MANAGE` for `enrolFaceTag`;
+      `LOYALTY_REDEEM` for `redeemLoyaltyPoints`; `ORDER_CREATE` for `createPayment`, `inquirePaymentStatus`,
+      `capturePayment`, `createRetailSale` and 2 more; `ORDER_MODIFY` for `addTip`; `ORDER_REPRINT` for
+      `reprintReceipt`.'
     offline: Cash completes locally and journals. **Card does not** — an offline card approval the acquirer
       never saw is a sale that vanishes at settlement
   apis:
@@ -3703,9 +3718,13 @@ screens:
       matched nothing.
     emptyNoResults: Nothing on this terminal matches the search; the holds are still there. Clear the
       search.
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that
-      permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support
-      with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this
+      screen, and names that permission. **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createOrder`;
+      `ORDER_DISCOUNT` for `applyManualDiscount`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_MODIFY`
+      for `resumeOrder`, `holdOrder`, `modifyOrder`; `ORDER_REFUND` for `createRefund`; `ORDER_REPRINT`
+      for `reprintOrder`.'
     offline: Orders held at this terminal are listed. Those held elsewhere are not — resuming another
       till's sale needs the server
     denied: Held sales are listed and cannot be recalled without `sale.resume`. **The list is still shown**,
@@ -4150,9 +4169,12 @@ screens:
       has been decided; it offers no create action, because creating work is not what it needs.'
     emptyNoResults: 'Never shown: `listCashMovements` takes no filter, so an empty list is always the
       first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `SHIFT_OPEN`, which `getCurrentShift` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `SHIFT_OPEN`, which `getCurrentShift` requires to show
+      this screen, and names that permission (the screen''s other reads need `REPORT_VIEW_WORKSTATION`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `OVERSHORT_ACCEPT` for `acceptShiftVariance`,
+      `rejectShiftVariance`; `SHIFT_CLOSE` for `submitShiftCount`, `closeShift`.'
     offline: Cannot close. Closing requires the server total, and a locally computed variance is not a
       variance
     denied: '`acceptShiftVariance` was refused: the caller lacks OVERSHORT_ACCEPT at this venue, or is
@@ -4720,9 +4742,11 @@ screens:
       has been decided; it offers no create action, because creating work is not what it needs.'
     emptyNoResults: Nothing matches the filter on workstationId, status, openedFrom, openedTo and the
       staff roster are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires
+      to show this screen, and names that permission (the screen''s other reads need `WORKFORCE_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `ATTENDANCE_RECORD` for `recordAttendance`.'
     offline: Last known roster, with its age shown
   apis:
   - operationId: listShifts
@@ -4998,9 +5022,11 @@ screens:
     error: Could not load. Names which read failed and leaves the add existing ticket untouched.
     emptyFirstRun: No add existing ticket yet. **Offers no create action** — this screen declares no operation
       that makes one — and says so rather than showing an empty table.
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ASSET_LIBRARY_VIEW`, which `getMediaAsset` requires to
+      show this screen, and names that permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE`
+      for `appendEntitlementToMedia`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_VIEW` for `getMediaEntitlements`.'
     offline: '**Not available.** The entitlement set must be read live; appending to a stale picture double-sells
       a locker'
   apis:
@@ -5259,9 +5285,12 @@ screens:
       a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on includeInactive and the returns refunds exchanges are
       still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `getReturnPolicy` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `listSerialisedItems` requires to
+      show this screen, and names that permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_POST` for
+      `issueCreditMemo`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_REFUND` for `createRefund`,
+      `createRetailReturn`; `ORDER_VIEW` for `getReturnPolicy`, `lookupRetailSale`.'
     offline: '**Refunds and returns are refused offline** (F58 step 8; design-notes correction fnb-retail
       POS-011). The till keeps selling from the local journal; a refund needs the original sale and its
       payment, which only the server holds. Says so and offers to try again when the link returns.'
@@ -5603,9 +5632,12 @@ screens:
     emptyNoResults: Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom,
       createdTo and the omnichannel order fulfilment are still there. Names the active filter and offers
       to clear it.
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that
-      permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support
-      with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this
+      screen, and names that permission (the screen''s other reads need `SHIFT_OPEN` and say so in their
+      own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support
+      with the wrong question. A caller who can see the screen but lacks what an action needs sees that
+      action disabled, naming its permission: `ORDER_CREATE` for `reserveMerchandise`; `ORDER_MODIFY`
+      for `recordOrderHandover`, `collectShopAndDrop`.'
     offline: '**Working from the local journal.** The till keeps taking money; this reconciles on sync.'
   apis:
   - operationId: listOrders
@@ -5922,9 +5954,11 @@ screens:
     emptyFirstRun: No mobile pos event yet. Offers Create order (`createOrder`).
     emptyNoResults: 'Never shown: nothing on this screen filters its list, so an empty list is always
       the first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no data*
+      and sends somebody to support with the wrong question. A caller who can see the screen but lacks
+      what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `syncOrders`,
+      `createOrder`.'
     offline: '**Working from the local journal.** The till keeps taking money; this reconciles on sync.'
     denied: The sync queue is readable by anyone on shift. Resolving a conflict changes stock and needs
       `inventory.conflict.resolve`; a supervisor PIN unlocks it in place.
@@ -6464,9 +6498,11 @@ screens:
     error: Could not load. Names which read failed and leaves the till untouched.
     emptyFirstRun: No till configured. The form opens empty and `allocateDepositBox` saves the first one;
       it says what the platform does in the meantime.
-    emptyNoAccess: Shown when the caller lacks `DEVICE_VIEW`, which `listDevices` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `DEVICE_VIEW`, which `listDevices` requires to show this
+      screen, and names that permission. **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `DEVICE_MANAGE` for `setDeviceAssignment`;
+      `SHIFT_OPEN` for `allocateDepositBox`; `WORKSTATION_CONFIGURE` for `configureWorkstation`.'
     offline: '**Working from the local journal.** The till keeps taking money; this reconciles on sync.'
   apis:
   - operationId: allocateDepositBox
@@ -6811,9 +6847,11 @@ screens:
       from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on scopePath, isActive and the safe drop cash are still
       there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `SHIFT_OPEN`, which `listDepositBoxes` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `SHIFT_OPEN`, which `listDepositBoxes` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no data*
+      and sends somebody to support with the wrong question. A caller who can see the screen but lacks
+      what an action needs sees that action disabled, naming its permission: `CASH_LIFT` for `createCashMovement`,
+      `withdrawFromDepositBox`.'
     offline: '**Working from the local journal.** The till keeps taking money; this reconciles on sync.'
   apis:
   - operationId: createCashMovement
@@ -7008,9 +7046,11 @@ screens:
       no operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: Nothing matches the filter on workstationId, status, openedFrom, openedTo and the
       shift templates policies are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires
+      to show this screen, and names that permission (the screen''s other reads need `SCOPE_VIEW` and
+      say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question. A caller who can see the screen but lacks what an action
+      needs sees that action disabled, naming its permission: `WORKSTATION_CONFIGURE` for `setTillShiftPolicy`.'
     offline: '**Working from the local journal.** The till keeps taking money; this reconciles on sync.'
   apis:
   - operationId: listShifts
@@ -7238,9 +7278,11 @@ screens:
       has been decided; it offers no create action, because creating work is not what it needs.'
     emptyNoResults: Nothing matches the filter on status, severity, workstationId, shiftId, itemId and
       the shift exceptions alerts are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listAlerts` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listAlerts` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no data*
+      and sends somebody to support with the wrong question. A caller who can see the screen but lacks
+      what an action needs sees that action disabled, naming its permission: `APPROVAL_DECIDE` for `decideApprovalRequest`;
+      `APPROVAL_REQUEST` for `createApprovalRequest`; `CASH_NO_SALE` for `recordNoSale`.'
     offline: '**The till keeps taking money; this screen does not keep showing alerts.** `listAlerts`
       reads the analytical replica (ADR-0016) and there is nothing local to read — the offline trading
       happens on POS-002 and POS-013, and this monitor goes quiet until the network returns. **Corrected
@@ -7799,9 +7841,11 @@ screens:
       that matched nothing.
     emptyNoResults: Nothing matches the filter on stationId, status and the send kitchen are still there.
       Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `listKitchenTickets` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `listKitchenTickets` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no data*
+      and sends somebody to support with the wrong question. A caller who can see the screen but lacks
+      what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createFnbOrder`;
+      `ORDER_MODIFY` for `setKitchenTicketStatus`, `markOrderCollected`, `cancelFnbOrder`.'
     offline: '**Queued locally and sent on reconnect.** The kitchen display is on the same LAN, so a venue-wide
       outage stops both and a device outage stops neither.'
     denied: The rail is readable and **Send to kitchen is refused** without `payment.take`. Tickets already
@@ -9616,8 +9660,12 @@ screens:
       are made.'
     emptyNoResults: Nothing matches the filter on terminal, day, customer, payment method or status, and
       the till's sales are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that
-      permission. **Never an empty table** — that reads as *there is no data*.
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this
+      screen, and names that permission. **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `GUEST_VIEW` for `searchGuests`;
+      `LEDGER_POST` for `issueTaxInvoice`; `LEDGER_VIEW` for `getTaxDocumentRendition`; `ORDER_REPRINT`
+      for `reprintReceipt`, `reprintOrder`.'
     denied: Another terminal's or another cashier's sales need `ORDER_VIEW_OTHER`. **This terminal's own
       sales are still listed**; the filter names what is withheld.
     offline: '**Orders taken on this terminal are listed from the local journal**; other terminals, the
@@ -9926,8 +9974,12 @@ screens:
     emptyFirstRun: '**No reservations held and no groups due today.** Offers New reservation (`createReservation`).'
     emptyNoResults: Nothing matches the status or expiry filter, and the reservations are still there.
       Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `listReservations` requires, and names
-      that permission. **Never an empty table**.
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `listReservations` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no data*
+      and sends somebody to support with the wrong question. A caller who can see the screen but lacks
+      what an action needs sees that action disabled, naming its permission: `ORDER_CANCEL` for `cancelReservation`;
+      `ORDER_CREATE` for `createReservation`, `extendReservation`, `convertReservation`; `ORDER_MODIFY`
+      for `recordGroupCheckIn`.'
     denied: Reservations are listed; New reservation, Take payment and Extend need `ORDER_CREATE`, Cancel
       needs `ORDER_CANCEL` and the check-in `ORDER_MODIFY`. **The list is still shown**, so the cashier
       can fetch a supervisor to the right reservation.

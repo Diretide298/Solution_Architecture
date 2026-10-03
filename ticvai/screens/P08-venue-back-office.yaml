@@ -752,9 +752,11 @@ screens:
       nothing.
     emptyNoResults: Nothing matches the filter on status and the queue are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `QUEUE_VIEW`, which `getQueue` requires, and names that
-      permission. **Never an empty table** — that reads as *there is no data* and sends somebody to
-      support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `QUEUE_VIEW`, which `getQueue` requires to show this
+      screen, and names that permission. **Never an empty table** — that reads as *there is no data*
+      and sends somebody to support with the wrong question. A caller who can see the screen but lacks
+      what an action needs sees that action disabled, naming its permission: `QUEUE_MANAGE` for `createQueue`,
+      `updateQueue`, `callNextParties`, `setQueueStatus` and 1 more.'
   apis:
   - operationId: createQueue
     contract: queue
@@ -1244,9 +1246,11 @@ screens:
       has been decided; it offers no create action, because creating work is not what it needs.'
     emptyNoResults: Nothing matches the filter on venueId, openOnly and the manual wait time are still
       there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `QUEUE_VIEW`, which `listQueues` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `QUEUE_VIEW`, which `listQueues` requires to show this
+      screen, and names that permission. **Never an empty table** — that reads as *there is no data*
+      and sends somebody to support with the wrong question. A caller who can see the screen but lacks
+      what an action needs sees that action disabled, naming its permission: `QUEUE_MANAGE` for `setWaitTime`,
+      `callNextParties`.'
   apis:
   - operationId: setWaitTime
     contract: queue
@@ -1641,9 +1645,12 @@ screens:
       nothing.
     emptyNoResults: Nothing matches the filter on status and the queue are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `QUEUE_VIEW`, which `listQueueEntries` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getKpiValues` requires to
+      show this screen, and names that permission (the screen''s other reads need `QUEUE_VIEW` and say
+      so in their own panels). **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question. A caller who can see the screen but lacks what an
+      action needs sees that action disabled, naming its permission: `AI_USE` for `requestSuggestion`;
+      `QUEUE_MANAGE` for `callNextParties`, `createQueue`, `setQueueStatus`, `setWaitTime` and 1 more.'
   apis:
   - operationId: getKpiValues
     contract: reporting
@@ -2162,9 +2169,12 @@ screens:
       matched nothing.
     emptyNoResults: Nothing matches the filter on venueId, kind, isSellable and the product are still
       there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question. A caller who can see the screen but
+      lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE`
+      for `createProduct`, `setAlternativeCodes`, `setProductAttributes`, `transitionProductLifecycle`
+      and 3 more; `TENANT_CONFIGURE` for `listBookingFlows`.'
   apis:
   - operationId: listBookingFlows
     contract: white-label
@@ -2610,9 +2620,13 @@ screens:
       that makes one — and says so rather than showing an empty table.
     emptyNoResults: 'Never shown: `listProductVariants` takes no filter, so an empty list is always
       the first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `getProduct` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `getProduct` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question. A caller who can see the screen but
+      lacks what an action needs sees that action disabled, naming its permission: `ASSET_LIBRARY_VIEW`
+      for `searchMedia`; `GUEST_VIEW` for `listConsentQuestions`; `PRODUCT_CONFIGURE` for `setProductAttributes`,
+      `updateProduct`, `updateProductVariant`, `restoreProductVersion` and 2 more; `TENANT_CONFIGURE`
+      for `listBookingFlows`.'
   apis:
   - operationId: listBookingFlows
     contract: white-label
@@ -2926,9 +2940,12 @@ screens:
       a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on channel and the pricing rules are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PRICE_VIEW`, which `listPriceLists` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRICE_VIEW`, which `listPriceLists` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question. A caller who can see the screen but
+      lacks what an action needs sees that action disabled, naming its permission: `PRICE_CONFIGURE`
+      for `createPriceList`, `copyPriceList`, `setPrices`, `updatePriceList` and 1 more; `PRODUCT_CONFIGURE`
+      for `bulkChangePrices`.'
   apis:
   - operationId: listPriceLists
     contract: catalogue
@@ -3574,9 +3591,12 @@ screens:
       distinct from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on venueId, status, activeAt and the promotions coupons
       are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PRICE_VIEW`, which `listPromotions` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRICE_VIEW`, which `listPromotions` requires to show
+      this screen, and names that permission (the screen''s other reads need `REPORT_VIEW_VENUE` and
+      say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question. A caller who can see the screen but lacks what an
+      action needs sees that action disabled, naming its permission: `PRICE_CONFIGURE` for `createCouponCampaign`,
+      `createPromotion`, `endPromotion`, `generateCouponCodes` and 9 more.'
   apis:
   - operationId: listPromotions
     contract: promotions
@@ -3970,9 +3990,13 @@ screens:
     emptyFirstRun: No packages bundles yet. Offers Create bundle (`createBundle`).
     emptyNoResults: 'Never shown: `listCatalogueBundles` takes no filter, so an empty list is always
       the first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `getGroupPackageDefinition` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `listCatalogueBundles` requires
+      to show this screen, and names that permission (the screen''s other reads need `PRICE_VIEW` and
+      say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question. A caller who can see the screen but lacks what an
+      action needs sees that action disabled, naming its permission: `PRICE_CONFIGURE` for `setPackagePricingDefinition`;
+      `PRODUCT_CONFIGURE` for `setGroupPackageDefinition`, `createBundle`, `createCombo`, `setComboSlots`
+      and 1 more.'
   apis:
   - operationId: listMenus
     contract: fnb
@@ -4325,9 +4349,12 @@ screens:
       distinct from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on venueId, kind, isSellable and the membership products
       are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question. A caller who can see the screen but
+      lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE`
+      for `createEntitlementTemplate`, `createProduct`, `setAlternativeCodes`, `setProductAttributes`
+      and 2 more.'
   apis:
   - operationId: listProducts
     contract: catalogue
@@ -4708,9 +4735,13 @@ screens:
       distinct from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on performanceId and the channel distribution are still
       there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `getChannelAllocations` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `listChannelCapacities` requires
+      to show this screen, and names that permission (the screen''s other reads need `PARTNER_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `CAPACITY_CONFIGURE` for `setChannelAllocations`,
+      `createChannelCapacity`, `relinquishChannelAllocation`, `updateChannelCapacity`; `PARTNER_MANAGE`
+      for `setChannelListing`; `PRODUCT_CONFIGURE` for `publishBundle`.'
   apis:
   - operationId: getChannelAllocations
     contract: catalogue
@@ -5042,9 +5073,12 @@ screens:
       a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on venueId, kind, isSellable and the catalogue publishing
       are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires to show
+      this screen, and names that permission (the screen''s other reads need `PRICE_VIEW` and say so
+      in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question. A caller who can see the screen but lacks what an action needs
+      sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `transitionProductLifecycle`,
+      `publishBundle`.'
   apis:
   - operationId: listProducts
     contract: catalogue
@@ -5495,9 +5529,12 @@ screens:
       from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on from, to and the session calendar are still there.
       Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listPerformances` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `getPerformance` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question. A caller who can see the screen but
+      lacks what an action needs sees that action disabled, naming its permission: `EVENT_CONFIGURE`
+      for `createEvent`, `updateEvent`; `PERFORMANCE_CONFIGURE` for `createPerformances`, `cancelPerformance`,
+      `updatePerformance`.'
   apis:
   - operationId: listPerformances
     contract: catalogue
@@ -5841,9 +5878,12 @@ screens:
       from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on performanceId and the capacity are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listChannelCapacities` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `listChannelCapacities` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `CAPACITY_CONFIGURE`
+      for `createChannelCapacity`, `relinquishChannelAllocation`, `setChannelAllocations`, `updateChannelCapacity`;
+      `PRODUCT_CONFIGURE` for `offerWaitlistCapacity`.'
   apis:
   - operationId: listChannelCapacities
     contract: catalogue
@@ -6097,9 +6137,11 @@ screens:
       that makes one — and says so rather than showing an empty table.
     emptyNoResults: Nothing matches the filter on channelCapacityId, holderWorkstationId, status and
       the allocation holds are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listInventoryHolds` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `listInventoryHolds` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `CAPACITY_CONFIGURE`
+      for `forceReleaseInventoryHold`.'
   apis:
   - operationId: listInventoryHolds
     contract: catalogue
@@ -6448,9 +6490,12 @@ screens:
       that matched nothing.
     emptyNoResults: Nothing matches the filter on from, to and the closures blackouts are still there.
       Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listPerformances` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `getPerformance` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question. A caller who can see the screen but
+      lacks what an action needs sees that action disabled, naming its permission: `EVENT_CONFIGURE`
+      for `createEvent`, `updateEvent`; `PERFORMANCE_CONFIGURE` for `cancelPerformance`, `createPerformances`,
+      `updatePerformance`; `VENUE_MAP_MANAGE` for `setPathClosure`.'
   apis:
   - operationId: listPerformances
     contract: catalogue
@@ -6933,9 +6978,11 @@ screens:
     loading: The order search, read by `listFnbOrders`.
     error: Could not load. Names which read failed and leaves the order search untouched.
     emptyFirstRun: No order search yet. Offers Record order handover (`recordOrderHandover`).
-    emptyNoAccess: Shown when the caller lacks `ORDER_MODIFY`, which `recordOrderHandover` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `listFnbOrders` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question. A caller who can see the screen but
+      lacks what an action needs sees that action disabled, naming its permission: `ORDER_MODIFY` for
+      `recordOrderHandover`.'
   apis:
   - operationId: recordOrderHandover
     contract: fnb
@@ -7376,9 +7423,14 @@ screens:
       nothing.
     emptyNoResults: Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom,
       createdTo and the order are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this
+      screen, and names that permission (the screen''s other reads need `LEDGER_VIEW` and say so in
+      their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question. A caller who can see the screen but lacks what an action needs
+      sees that action disabled, naming its permission: `LEDGER_POST` for `issueTaxInvoice`, `issueCreditMemo`;
+      `ORDER_CREATE` for `createOrder`; `ORDER_DISCOUNT` for `applyManualDiscount`; `ORDER_EXCHANGE`
+      for `exchangeOrderLines`; `ORDER_MODIFY` for `holdOrder`, `modifyOrder`, `resumeOrder`; `ORDER_REFUND`
+      for `createRefund`.'
   apis:
   - operationId: listOrders
     contract: orders
@@ -7834,9 +7886,13 @@ screens:
     emptyFirstRun: No refunds exchanges yet. Offers Create refund (`createRefund`).
     emptyNoResults: 'Never shown: `listOrderRefunds` takes no filter, so an empty list is always the
       first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `listOrderRefunds` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this
+      screen, and names that permission (the screen''s other reads need `LEDGER_VIEW` and say so in
+      their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question. A caller who can see the screen but lacks what an action needs
+      sees that action disabled, naming its permission: `LEDGER_POST` for `issueCreditMemo`; `ORDER_DISCOUNT`
+      for `applyManualDiscount`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_MODIFY` for `modifyOrder`;
+      `ORDER_REFUND` for `createRefund`; `ORDER_REFUND_BULK` for `createBulkRefund`.'
   apis:
   - operationId: listOrderRefunds
     contract: orders
@@ -8121,9 +8177,12 @@ screens:
     error: Could not load. Names which read failed and leaves the payment exceptions untouched.
     emptyFirstRun: No payment exceptions configured. The form opens empty; it says what the platform
       does in the meantime.
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `listPaymentReconciliationException`
-      requires, and names that permission. **Never an empty table** — that reads as *there is no data*
-      and sends somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `listPaymentReconciliationException`
+      requires to show this screen, and names that permission. **Never an empty table** — that reads
+      as *there is no data* and sends somebody to support with the wrong question. A caller who can
+      see the screen but lacks what an action needs sees that action disabled, naming its permission:
+      `LEDGER_POST` for `settleDeposit`; `ORDER_CREATE` for `capturePayment`, `inquirePaymentStatus`;
+      `SHIFT_CLOSE` for `closeDepositBoxes`.'
   apis:
   - operationId: capturePayment
     contract: orders
@@ -8311,9 +8370,12 @@ screens:
       operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: 'Never shown: `listSettlementExceptions` takes no filter, so an empty list is always
       the first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `SETTLEMENT_VIEW`, which `listSettlementExceptions` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `SETTLEMENT_VIEW`, which `listSettlements` requires
+      to show this screen, and names that permission (the screen''s other reads need `ORDER_REFUND_APPROVE`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `SETTLEMENT_RECONCILE` for `resolveSettlementException`,
+      `ingestSettlementFile`.'
   apis:
   - operationId: listSettlementExceptions
     contract: finance
@@ -8883,9 +8945,13 @@ screens:
     emptyNoResults: Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom,
       createdTo and the group bookings are still there. Names the active filter and offers to clear
       it.
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `getGroupBooking` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this
+      screen, and names that permission. **Never an empty table** — that reads as *there is no data*
+      and sends somebody to support with the wrong question. A caller who can see the screen but lacks
+      what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createGroupBooking`,
+      `createOrder`; `ORDER_DISCOUNT` for `applyManualDiscount`; `ORDER_EXCHANGE` for `exchangeOrderLines`;
+      `ORDER_MODIFY` for `updateGroupBooking`, `holdOrder`, `modifyOrder`, `resumeOrder`; `ORDER_REFUND`
+      for `createRefund`; `ORDER_REPRINT` for `reprintOrder`.'
   apis:
   - operationId: createGroupBooking
     contract: orders
@@ -9108,9 +9174,12 @@ screens:
       no operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: The ticket reissue or credential replacement history for this media has nothing
       matching; the media itself is still shown. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires
+      to show this screen, and names that permission (the screen''s other reads need `SCOPE_VIEW` and
+      say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question. A caller who can see the screen but lacks what an
+      action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `appendEntitlementToMedia`;
+      `ORDER_EXCHANGE` for `replaceCredential`.'
   apis:
   - operationId: getMediaEntitlements
     contract: orders
@@ -9760,9 +9829,11 @@ screens:
     emptyNoResults: Nothing matches the filter on assignedToPrincipalId, status, priority, assetId,
       overdueOnly and the work order verification are still there. Names the active filter and offers
       to clear it.
-    emptyNoAccess: Shown when the caller lacks `WORK_ORDER_VIEW`, which `getWorkOrder` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `WORK_ORDER_VIEW`, which `listWorkOrders` requires to
+      show this screen, and names that permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `WORK_ORDER_VERIFY`
+      for `verifyWorkOrder`.'
   apis:
   - operationId: verifyWorkOrder
     contract: maintenance
@@ -9993,9 +10064,11 @@ screens:
     emptyFirstRun: No admission profiles yet. Offers New profile (`createAdmissionRules`).
     emptyNoResults: 'Never shown: `listAdmissionRules` takes no filter, so an empty list is always the
       first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `SCOPE_VIEW`, which `listAdmissionRules` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `SCOPE_VIEW`, which `listAdmissionRules` requires to
+      show this screen, and names that permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `ACCESS_POINT_CONFIGURE`
+      for `createAdmissionRules`, `updateAdmissionRules`, `setEntryRulePoints`.'
   apis:
   - operationId: listAdmissionRules
     contract: access
@@ -10225,9 +10298,11 @@ screens:
     emptyFirstRun: No blacklist yet. Offers Add blacklist entry (`addBlacklistEntry`).
     emptyNoResults: 'Never shown: `listBlacklist` takes no filter, so an empty list is always the first-run
       state above.'
-    emptyNoAccess: Shown when the caller lacks `SCOPE_VIEW`, which `listBlacklist` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `SCOPE_VIEW`, which `listBlacklist` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question. A caller who can see the screen but
+      lacks what an action needs sees that action disabled, naming its permission: `ACCESS_POINT_CONFIGURE`
+      for `addBlacklistEntry`, `removeBlacklistEntry`.'
   apis:
   - operationId: listBlacklist
     contract: access
@@ -10374,9 +10449,11 @@ screens:
       that makes one — and says so rather than showing an empty table.
     emptyNoResults: Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo
       and the scan activity are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question. A caller who can see the screen but
+      lacks what an action needs sees that action disabled, naming its permission: `TICKET_LOOKUP` for
+      `lookupTicket`.'
   apis:
   - operationId: listScans
     contract: access
@@ -10556,9 +10633,11 @@ screens:
       that makes one — and says so rather than showing an empty table.
     emptyNoResults: Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo
       and the override audit are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires to show
+      this screen, and names that permission (the screen''s other reads need `AUDIT_VIEW` and say so
+      in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question. A caller who can see the screen but lacks what an action needs
+      sees that action disabled, naming its permission: `TICKET_LOOKUP` for `lookupTicket`.'
   apis:
   - operationId: listScans
     contract: access
@@ -10871,9 +10950,13 @@ screens:
       a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on workstationId, kind and the device registry are still
       there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `DEVICE_VIEW`, which `listDevices` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `DEVICE_VIEW`, which `listDevices` requires to show
+      this screen, and names that permission (the screen''s other reads need `REPORT_VIEW_VENUE`, `SCOPE_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `DEVICE_CONFIGURE` for `registerDevice`;
+      `DEVICE_MANAGE` for `issueDeviceCredential`, `revokeDeviceCredential`; `WORKSTATION_CONFIGURE`
+      for `configureWorkstation`.'
   apis:
   - operationId: listDevices
     contract: tenancy
@@ -11122,9 +11205,12 @@ screens:
       no operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: 'Never shown: `listCatalogueBundles` takes no filter, so an empty list is always
       the first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listCatalogueBundles` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `listCatalogueBundles` requires
+      to show this screen, and names that permission (the screen''s other reads need `ORDER_VIEW`, `SCOPE_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `syncOrders`;
+      `PRODUCT_CONFIGURE` for `publishBundle`; `TENANT_CONFIGURE` for `setOfflinePolicy`.'
   apis:
   - operationId: listCatalogueBundles
     contract: catalogue
@@ -11319,9 +11405,11 @@ screens:
       that makes one; distinct from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on venueId, openOnly and the reconciliation queue are
       still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires to
+      show this screen, and names that permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `ORDER_MODIFY`
+      for `resolveSyncRejection`.'
   apis:
   - operationId: listSyncRejections
     contract: orders
@@ -11824,9 +11912,12 @@ screens:
       has been decided; it offers no create action, because creating work is not what it needs.'
     emptyNoResults: Nothing matches the filter on workstationId, status, openedFrom, openedTo and the
       variance approval are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires
+      to show this screen, and names that permission (the screen''s other reads need `SCOPE_VIEW` and
+      say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question. A caller who can see the screen but lacks what an
+      action needs sees that action disabled, naming its permission: `OVERSHORT_ACCEPT` for `acceptShiftVariance`,
+      `rejectShiftVariance`; `SHIFT_CLOSE` for `closeShift`.'
   apis:
   - operationId: listShifts
     contract: shift
@@ -12112,9 +12203,11 @@ screens:
       has been decided; it offers no create action, because creating work is not what it needs.'
     emptyNoResults: 'Never shown: `listCashMovements` takes no filter, so an empty list is always the
       first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listCashMovements`
-      requires, and names that permission. **Never an empty table** — that reads as *there is no data*
-      and sends somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listCashMovements`
+      requires to show this screen, and names that permission. **Never an empty table** — that reads
+      as *there is no data* and sends somebody to support with the wrong question. A caller who can
+      see the screen but lacks what an action needs sees that action disabled, naming its permission:
+      `CASH_LIFT` for `createCashMovement`.'
   apis:
   - operationId: listCashMovements
     contract: shift
@@ -12275,9 +12368,11 @@ screens:
       has been decided; it offers no create action, because creating work is not what it needs.'
     emptyNoResults: 'Never shown: nothing on this screen filters its list, so an empty list is always
       the first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `SHIFT_OPEN`, which `listDepositBoxes` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `SHIFT_OPEN`, which `listDepositBoxes` requires to show
+      this screen, and names that permission (the screen''s other reads need `TENANT_VIEW` and say so
+      in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question. A caller who can see the screen but lacks what an action needs
+      sees that action disabled, naming its permission: `CASH_LIFT` for `withdrawFromDepositBox`, `createCashMovement`.'
   apis:
   - operationId: listDepositBoxes
     contract: shift
@@ -12518,9 +12613,13 @@ screens:
       operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: Nothing matches the filter on providerName, status and the daily reconciliation
       are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `LEDGER_VIEW`, which `getTrialBalance` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `LEDGER_VIEW`, which `getTrialBalance` requires to show
+      this screen, and names that permission (the screen''s other reads need `REPORT_VIEW_WORKSTATION`,
+      `SETTLEMENT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `OVERSHORT_ACCEPT`
+      for `acceptShiftVariance`, `rejectShiftVariance`; `SETTLEMENT_RECONCILE` for `ingestSettlementFile`,
+      `resolveSettlementException`; `SHIFT_CLOSE` for `closeShift`.'
   apis:
   - operationId: getTrialBalance
     contract: finance
@@ -13392,9 +13491,12 @@ screens:
       nothing.
     emptyNoResults: Nothing matches the filter on outletId, activeAt and the menu are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listMenus` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `listMenus` requires to show this
+      screen, and names that permission (the screen''s other reads need `SCOPE_VIEW` and say so in their
+      own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to
+      support with the wrong question. A caller who can see the screen but lacks what an action needs
+      sees that action disabled, naming its permission: `APPROVAL_REQUEST` for `createApprovalRequest`;
+      `PRODUCT_CONFIGURE` for `createMenu`, `setMenuSections`, `updateMenu`, `publishMenu` and 5 more.'
   apis:
   - operationId: listMenus
     contract: fnb
@@ -13738,9 +13840,11 @@ screens:
       that makes one — and says so rather than showing an empty table.
     emptyNoResults: Nothing matches the filter on stationId, status and the kitchen display are still
       there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `listKitchenTickets` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `listKitchenTickets` requires to
+      show this screen, and names that permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `ORDER_MODIFY`
+      for `setKitchenTicketStatus`, `prioritiseKitchenTicket`.'
   apis:
   - operationId: listKitchenTickets
     contract: fnb
@@ -14190,9 +14294,13 @@ screens:
       nothing.
     emptyNoResults: Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom,
       createdTo and the order are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this
+      screen, and names that permission. **Never an empty table** — that reads as *there is no data*
+      and sends somebody to support with the wrong question. A caller who can see the screen but lacks
+      what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createOrder`;
+      `ORDER_DISCOUNT` for `applyManualDiscount`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_MODIFY`
+      for `holdOrder`, `modifyOrder`, `resumeOrder`; `ORDER_REFUND` for `createRefund`; `ORDER_REPRINT`
+      for `reprintOrder`.'
   apis:
   - operationId: listOrders
     contract: orders
@@ -14409,9 +14517,12 @@ screens:
       from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on outletId, categoryId, inStockOnly, search and the
       retail products are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listMerchandise` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `listMerchandise` requires to
+      show this screen, and names that permission (the screen''s other reads need `SCOPE_VIEW` and say
+      so in their own panels). **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question. A caller who can see the screen but lacks what an
+      action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `createMerchandise`,
+      `updateMerchandise`.'
   apis:
   - operationId: listMerchandise
     contract: retail
@@ -14653,9 +14764,12 @@ screens:
     emptyFirstRun: No stock levels yet. Offers Create stock transfer (`createStockTransfer`).
     emptyNoResults: 'Never shown: `listStockLocations` takes no filter, so an empty list is always the
       first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `getStockPositions` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `getStockPositions` requires to
+      show this screen, and names that permission (the screen''s other reads need `LEDGER_VIEW` and
+      say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question. A caller who can see the screen but lacks what an
+      action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `createStockTransfer`,
+      `createStockMovement`.'
   apis:
   - operationId: getStockPositions
     contract: inventory
@@ -15024,9 +15138,12 @@ screens:
       from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on status and supplierId, and the purchase orders are
       still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PROCUREMENT_VIEW`, which `listPurchaseOrders` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PROCUREMENT_VIEW`, which `listPurchaseOrders` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PROCUREMENT_MANAGE`
+      for `createPurchaseOrder`, `sendPurchaseOrder`, `acknowledgePurchaseOrder`, `cancelPurchaseOrder`
+      and 1 more.'
   apis:
   - operationId: listPurchaseOrders
     contract: inventory
@@ -15262,9 +15379,11 @@ screens:
       from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on status, supplierId and the goods receipt are still
       there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PROCUREMENT_VIEW`, which `listPurchaseOrders` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PROCUREMENT_VIEW`, which `listPurchaseOrders` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PROCUREMENT_RECEIVE`
+      for `createGoodsReceipt`, `rejectReceivedGoods`.'
   apis:
   - operationId: createGoodsReceipt
     contract: inventory
@@ -15511,9 +15630,12 @@ screens:
       that matched nothing.
     emptyNoResults: Nothing matches the filter on scopePath, isActive and the staff are still there.
       Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `USER_MANAGE`, which `listPrincipals` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `USER_MANAGE`, which `listPrincipals` requires to show
+      this screen, and names that permission (the screen''s other reads need `SESSION_FORCE_LOGOUT`,
+      `WORKFORCE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PERMISSION_VIEW`
+      for `suggestRoleAssignment`; `WORKFORCE_MANAGE` for `setJobTitle`, `setWorkAssignment`.'
   apis:
   - operationId: resetPrincipalCredential
     contract: identity
@@ -15793,9 +15915,11 @@ screens:
     emptyFirstRun: No role assignment yet. Offers Create role (`createRole`).
     emptyNoResults: 'Never shown: `listRoles` takes no filter, so an empty list is always the first-run
       state above.'
-    emptyNoAccess: Shown when the caller lacks `ROLE_MANAGE`, which `listRoles` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ROLE_MANAGE`, which `listRoles` requires to show this
+      screen, and names that permission (the screen''s other reads need `PERMISSION_VIEW` and say so
+      in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question. A caller who can see the screen but lacks what an action needs
+      sees that action disabled, naming its permission: `USER_MANAGE` for `updatePrincipal`.'
   apis:
   - operationId: listRoles
     contract: identity
@@ -16049,9 +16173,12 @@ screens:
       from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on from, to, principalId, departmentId and the rota scheduling
       are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `WORKFORCE_VIEW`, which `listRotaAssignments` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `WORKFORCE_VIEW`, which `listRotaAssignments` requires
+      to show this screen, and names that permission (the screen''s other reads need `SCOPE_VIEW` and
+      say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question. A caller who can see the screen but lacks what an
+      action needs sees that action disabled, naming its permission: `WORKFORCE_MANAGE` for `createRotaAssignment`,
+      `updateRotaAssignment`.'
   apis:
   - operationId: listRotaAssignments
     contract: workforce
@@ -16279,9 +16406,11 @@ screens:
       a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on date, principalId, exceptionsOnly and the time attendance
       are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `WORKFORCE_VIEW`, which `listAttendance` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `WORKFORCE_VIEW`, which `listAttendance` requires to
+      show this screen, and names that permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `ATTENDANCE_RECORD`
+      for `recordAttendance`; `WORKFORCE_MANAGE` for `amendAttendance`.'
   apis:
   - operationId: listAttendance
     contract: workforce
@@ -16757,9 +16886,12 @@ screens:
       that matched nothing.
     emptyNoResults: Nothing matches the filter on category, search and the reporting home are still
       there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listReports` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listReports` requires to
+      show this screen, and names that permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `REPORT_MANAGE`
+      for `createReport`, `deleteReport`, `saveNaturalLanguageQuery`, `updateReport`; `REPORT_SCHEDULE`
+      for `createReportSchedule`.'
   apis:
   - operationId: listReports
     contract: reporting
@@ -17091,9 +17223,11 @@ screens:
       that matched nothing.
     emptyNoResults: Nothing matches the filter on category, search and the sales reports are still there.
       Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getFinancialReport` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getFinancialReport` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `REPORT_MANAGE`
+      for `createReport`, `deleteReport`, `saveNaturalLanguageQuery`, `updateReport`.'
   apis:
   - operationId: getFinancialReport
     contract: finance
@@ -17553,9 +17687,13 @@ screens:
       a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo
       and the attendance footfall are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires to show
+      this screen, and names that permission (the screen''s other reads need `ACCESS_VALIDATE` and say
+      so in their own panels). **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question. A caller who can see the screen but lacks what an
+      action needs sees that action disabled, naming its permission: `ACCESS_OVERRIDE` for `overrideAccess`;
+      `REPORT_MANAGE` for `createReport`, `deleteReport`, `saveNaturalLanguageQuery`, `updateReport`;
+      `TICKET_LOOKUP` for `lookupTicket`.'
   apis:
   - operationId: runReport
     contract: reporting
@@ -17806,9 +17944,11 @@ screens:
     emptyFirstRun: No report schedules yet. Offers Create report schedule (`createReportSchedule`).
     emptyNoResults: 'Never shown: `listReportSchedules` takes no filter here, so an empty list is always
       the first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listReportSchedules` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listReportSchedules` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `REPORT_SCHEDULE`
+      for `createReportSchedule`, `updateReportSchedule`, `deleteReportSchedule`.'
   apis:
   - operationId: listReportSchedules
     contract: reporting
@@ -17922,9 +18062,11 @@ screens:
       that makes one — and says so rather than showing an empty table.
     emptyNoResults: Nothing matches the filter on openNow, orderingMethod and the venue profile are
       still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `getRefundPolicy` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `getRefundPolicy` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question. A caller who can see the screen but
+      lacks what an action needs sees that action disabled, naming its permission: `REGION_CONFIGURE`
+      for `setRefundPolicy`.'
   apis:
   - operationId: getRefundPolicy
     contract: orders
@@ -18102,9 +18244,11 @@ screens:
       operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on from, to and the opening hours calendar are still
       there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `TENANT_VIEW`, which `getVenueSettings` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `TENANT_VIEW`, which `getVenueSettings` requires to
+      show this screen, and names that permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `REGION_CONFIGURE`
+      for `updateOutlet`.'
   apis:
   - operationId: getVenueSettings
     contract: tenancy
@@ -18344,9 +18488,12 @@ screens:
       a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on under, level, includeInactive and the zones areas
       are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `SCOPE_VIEW`, which `listOrgUnits` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `SCOPE_VIEW`, which `listOrgUnits` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question. A caller who can see the screen but
+      lacks what an action needs sees that action disabled, naming its permission: `ACCESS_POINT_CONFIGURE`
+      for `createAccessPoint`, `setAccessPointGeofence`, `updateAccessPoint`; `SCOPE_MANAGE` for `createOrgUnit`,
+      `updateOrgUnit`.'
   apis:
   - operationId: listOrgUnits
     contract: tenancy
@@ -18607,9 +18754,13 @@ screens:
       makes one — and says so rather than showing an empty table.
     emptyNoResults: Nothing matches the filter on openNow, orderingMethod and the venue are still there.
       Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `getRefundPolicy` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `getRefundPolicy` requires to show
+      this screen, and names that permission (the screen''s other reads need `SCOPE_VIEW`, `TENANT_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setDeliveryLocationOutletMapping`,
+      `createDeliveryLocation`, `updateDeliveryLocation`; `REGION_CONFIGURE` for `setRefundPolicy`;
+      `TENANT_CONFIGURE` for `setVenueSettings`; `WORKSTATION_CONFIGURE` for `setTillShiftPolicy`.'
   apis:
   - operationId: getRefundPolicy
     contract: orders
@@ -18870,9 +19021,11 @@ screens:
       no operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: Nothing matches the filter on unacknowledgedOnly and the notification settings are
       still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `WORKFORCE_VIEW`, which `listAnnouncements` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `WORKFORCE_VIEW`, which `listAnnouncements` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `ANNOUNCEMENT_PUBLISH`
+      for `publishAnnouncement`.'
   apis:
   - operationId: listAnnouncements
     contract: workforce
@@ -19021,9 +19174,11 @@ screens:
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
     emptyNoResults: 'Never shown: `listApiClients` takes no filter, so an empty list is always the first-run
       state above.'
-    emptyNoAccess: Shown when the caller lacks `DEVELOPER_VIEW`, which `listApiClients` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `DEVELOPER_VIEW`, which `listApiClients` requires to
+      show this screen, and names that permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `DEVELOPER_MANAGE`
+      for `createWebhookSubscription`.'
   apis:
   - operationId: listApiClients
     contract: public-api
@@ -19404,9 +19559,11 @@ screens:
       that matched nothing.
     emptyNoResults: Nothing matches the filter on venueId, categoryId, status, maintenanceDue and the
       asset register are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `ASSET_VIEW`, which `listAssets` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ASSET_VIEW`, which `listAssets` requires to show this
+      screen, and names that permission. **Never an empty table** — that reads as *there is no data*
+      and sends somebody to support with the wrong question. A caller who can see the screen but lacks
+      what an action needs sees that action disabled, naming its permission: `ASSET_MANAGE` for `createAsset`,
+      `setAssetStatus`, `updateAsset`.'
   apis:
   - operationId: listAssets
     contract: maintenance
@@ -19789,9 +19946,13 @@ screens:
       filter that matched nothing.
     emptyNoResults: Nothing matches the filter on status, priority, assignedToPrincipalId, assetId and
       overdueOnly; the work orders are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `WORK_ORDER_VIEW`, which `listWorkOrders` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `WORK_ORDER_VIEW`, which `listWorkOrders` requires to
+      show this screen, and names that permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `MAINTENANCE_APPROVE`
+      for `closeWorkOrder`; `MAINTENANCE_EXECUTE` for `pauseWorkOrder`, `rejectWorkOrder`; `WORK_ORDER_MANAGE`
+      for `createVendorServiceRequest`, `updateVendorServiceRequest`, `createWorkOrder`, `updateWorkOrder`
+      and 2 more.'
   apis:
   - operationId: suggestWorkOrderAssignee
     contract: maintenance
@@ -20099,9 +20260,11 @@ screens:
     emptyFirstRun: No planned maintenance yet. Offers Create maintenance plan (`createMaintenancePlan`).
     emptyNoResults: 'Never shown: `listMaintenancePlans` takes no filter, so an empty list is always
       the first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `ASSET_VIEW`, which `listMaintenancePlans` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ASSET_VIEW`, which `listMaintenancePlans` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `ASSET_MANAGE`
+      for `createMaintenancePlan`, `updateMaintenancePlan`.'
   apis:
   - operationId: listMaintenancePlans
     contract: maintenance
@@ -20300,9 +20463,11 @@ screens:
       distinct from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on severity, status, isReportable and the incident log
       are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `INCIDENT_VIEW`, which `listIncidents` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `INCIDENT_VIEW`, which `listIncidents` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question. A caller who can see the screen but
+      lacks what an action needs sees that action disabled, naming its permission: `INCIDENT_MANAGE`
+      for `recordAuthorityNotification`, `updateIncident`; `INCIDENT_REPORT` for `reportIncident`.'
   apis:
   - operationId: listIncidents
     contract: maintenance
@@ -20500,9 +20665,11 @@ screens:
       operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: 'Never shown: `listLostItems` takes no filter, so an empty list is always the first-run
       state above.'
-    emptyNoAccess: Shown when the caller lacks `CASE_VIEW`, which `listLostItems` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `CASE_VIEW`, which `listLostItems` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question. A caller who can see the screen but
+      lacks what an action needs sees that action disabled, naming its permission: `CASE_MANAGE` for
+      `matchLostItem`, `recordLostItem`.'
   apis:
   - operationId: listLostItems
     contract: marketing-crm
@@ -20704,9 +20871,11 @@ screens:
       that matched nothing.
     emptyNoResults: Nothing matches the filter on legalEntityId, type, isPostable and the chart accounts
       are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `LEDGER_VIEW`, which `listAccounts` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `LEDGER_VIEW`, which `listAccounts` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question. A caller who can see the screen but
+      lacks what an action needs sees that action disabled, naming its permission: `ACCOUNT_CONFIGURE`
+      for `createAccount`, `updateAccount`, `createCostCenter`, `createLegalEntity`.'
   apis:
   - operationId: listAccounts
     contract: finance
@@ -20982,9 +21151,12 @@ screens:
     emptyFirstRun: No account mapping yet. Offers Create tax code (`createTaxCode`).
     emptyNoResults: 'Never shown: `listAccountMappings` takes no filter, so an empty list is always
       the first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `LEDGER_VIEW`, which `listAccountMappings` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `LEDGER_VIEW`, which `listAccountMappings` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `ACCOUNT_CONFIGURE`
+      for `setAccountMappings`; `TAX_CONFIGURE` for `createTaxCode`, `updateTaxCode`, `createTaxExemption`,
+      `verifyTaxExemption`.'
   apis:
   - operationId: listAccountMappings
     contract: finance
@@ -21228,9 +21400,11 @@ screens:
     emptyFirstRun: No revenue recognition yet. Offers Create recognition schedule (`createRecognitionSchedule`).
     emptyNoResults: 'Never shown: `listRecognitionSchedules` takes no filter, so an empty list is always
       the first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `LEDGER_VIEW`, which `getDeferredRevenue` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `LEDGER_VIEW`, which `getDeferredRevenue` requires to
+      show this screen, and names that permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `ACCOUNT_CONFIGURE`
+      for `createRecognitionSchedule`; `LEDGER_POST` for `runRecognition`.'
   apis:
   - operationId: getDeferredRevenue
     contract: finance
@@ -21441,9 +21615,11 @@ screens:
       has been decided; it offers no create action, because creating work is not what it needs.'
     emptyNoResults: Nothing matches the filter on asAt, purpose and the rates variances are still there.
       Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `LEDGER_VIEW`, which `listFxRates` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `LEDGER_VIEW`, which `listFxRates` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question. A caller who can see the screen but
+      lacks what an action needs sees that action disabled, naming its permission: `LEDGER_APPROVE`
+      for `setFxRate`, `reviewPriceVariance`, `ingestFxRates`.'
   apis:
   - operationId: listFxRates
     contract: finance
@@ -21803,9 +21979,13 @@ screens:
       has been decided; it offers no create action, because creating work is not what it needs.'
     emptyNoResults: Nothing matches the filter on status, raisedByPrincipalId and the requisitions are
       still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PROCUREMENT_VIEW`, which `listRequisitions` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PROCUREMENT_VIEW`, which `listRequisitions` requires
+      to show this screen, and names that permission (the screen''s other reads need `PRODUCT_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `APPROVAL_ACT` for `approveRequisition`,
+      `rejectRequisition`, `returnRequisition`; `PROCUREMENT_REQUEST` for `createRequisition`, `cancelRequisition`,
+      `updateRequisitionLines`.'
   apis:
   - operationId: listRequisitions
     contract: inventory
@@ -22172,9 +22352,12 @@ screens:
       that matched nothing.
     emptyNoResults: Nothing matches the filter on locationId, status and the stock count are still there.
       Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listStockCounts` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `listStockCounts` requires to
+      show this screen, and names that permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_APPROVE`
+      for `recountStockCount`; `LEDGER_POST` for `postStockCount`; `PRODUCT_CONFIGURE` for `startStockCount`,
+      `cancelStockCount`, `submitCountLines`, `enterCountLine` and 1 more.'
   apis:
   - operationId: listStockCounts
     contract: inventory
@@ -22426,9 +22609,11 @@ screens:
       from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on status and the stock transfers are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listStockTransfers` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `listStockTransfers` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_APPROVE`
+      for `closeTransferShort`; `PRODUCT_CONFIGURE` for `createStockTransfer`, `receiveStockTransfer`.'
   apis:
   - operationId: listStockTransfers
     contract: inventory
@@ -22621,9 +22806,11 @@ screens:
       from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on venueId, categoryId, belowReorderPoint, search and
       the inventory items are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listInventoryItems` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `listInventoryItems` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE`
+      for `createInventoryItem`, `updateInventoryItem`, `createStockLocation`, `setInventoryKitDefinition`.'
   apis:
   - operationId: listInventoryItems
     contract: inventory
@@ -22902,9 +23089,11 @@ screens:
       from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on itemId, locationId, kind, recordedFrom, recordedTo
       and the stock movements are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listStockMovements` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `listStockMovements` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE`
+      for `createStockMovement`.'
   apis:
   - operationId: listStockMovements
     contract: inventory
@@ -23093,9 +23282,12 @@ screens:
       scope says suppliers are set up by the tenant (audit R183).
     emptyNoResults: 'Never shown: `listSuppliers` takes no filter, so an empty list is always the first-run
       state above.'
-    emptyNoAccess: Shown when the caller lacks `PROCUREMENT_VIEW`, which `listSuppliers` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PROCUREMENT_VIEW`, which `listSuppliers` requires to
+      show this screen, and names that permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PROCUREMENT_MANAGE`
+      for `createSupplier`, `recordQuotation`, `updateSupplier`, `createSupplierContract` and 1 more;
+      `REPORT_VIEW_VENUE` for `getSupplierPerformance`.'
   apis:
   - operationId: listSuppliers
     contract: inventory
@@ -23364,9 +23556,11 @@ screens:
       has been decided; it offers no create action, because creating work is not what it needs.'
     emptyNoResults: Nothing matches the filter on assignedToMe, raisedByMe, status, kind, breachingWithinMinutes
       and the approval are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `APPROVAL_VIEW`, which `listApprovalRequests` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `APPROVAL_VIEW`, which `listApprovalRequests` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `APPROVAL_DECIDE`
+      for `decideApprovalRequest`; `APPROVAL_REQUEST` for `escalateApprovalRequest`.'
   apis:
   - operationId: listApprovalRequests
     contract: approvals
@@ -23579,9 +23773,11 @@ screens:
     emptyFirstRun: '**Nothing is waiting, which is the good outcome.** An empty queue means every item
       has been decided; it offers no create action, because creating work is not what it needs.'
     emptyNoResults: 'Never shown: the screen opens one request.'
-    emptyNoAccess: Shown when the caller lacks `APPROVAL_VIEW`, which `listApprovalRequests` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `APPROVAL_VIEW`, which `listApprovalRequests` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `APPROVAL_DECIDE`
+      for `decideApprovalRequest`; `APPROVAL_REQUEST` for `resubmitApprovalRequest`, `withdrawApprovalRequest`.'
   apis:
   - operationId: listApprovalRequests
     contract: approvals
@@ -23899,9 +24095,11 @@ screens:
     emptyFirstRun: No approval delegations yet. Offers Create approval delegation (`createApprovalDelegation`).
     emptyNoResults: 'Never shown: `listApprovalDelegations` takes no filter, so an empty list is always
       the first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `APPROVAL_VIEW`, which `listApprovalDelegations` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `APPROVAL_VIEW`, which `listApprovalDelegations` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `APPROVAL_DECIDE`
+      for `createApprovalDelegation`, `revokeApprovalDelegation`.'
   apis:
   - operationId: listApprovalDelegations
     contract: approvals
@@ -24206,9 +24404,11 @@ screens:
       has been decided; it offers no create action, because creating work is not what it needs.'
     emptyNoResults: Nothing matches the filter on fiscalPeriodId, status, source and the journal entries
       are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `LEDGER_VIEW`, which `listJournalEntries` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `LEDGER_VIEW`, which `listJournalEntries` requires to
+      show this screen, and names that permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_APPROVE`
+      for `approveJournalEntry`, `rejectJournal`, `reverseJournalEntry`; `LEDGER_POST` for `createJournalEntry`.'
   apis:
   - operationId: listJournalEntries
     contract: finance
@@ -24423,9 +24623,11 @@ screens:
       that makes one — and says so rather than showing an empty table.
     emptyNoResults: Nothing matches the filter on legalEntityId, status and the period close are still
       there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `LEDGER_VIEW`, which `listFiscalPeriods` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `LEDGER_VIEW`, which `listFiscalPeriods` requires to
+      show this screen, and names that permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_APPROVE`
+      for `beginPeriodClose`, `closeFiscalPeriod`, `abandonPeriodClose`, `reopenPeriod`.'
   apis:
   - operationId: listFiscalPeriods
     contract: finance
@@ -24815,9 +25017,11 @@ screens:
     emptyFirstRun: No venue maps yet. Offers Create venue map (`createVenueMap`).
     emptyNoResults: 'Never shown: `listVenueMaps` takes no filter, so an empty list is always the first-run
       state above.'
-    emptyNoAccess: Shown when the caller lacks `VENUE_MAP_VIEW`, which `listVenueMaps` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `VENUE_MAP_VIEW`, which `listVenueMaps` requires to
+      show this screen, and names that permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `VENUE_MAP_MANAGE`
+      for `createVenueMap`.'
   apis:
   - operationId: listVenueMaps
     contract: venue-map
@@ -25268,9 +25472,13 @@ screens:
     error: Could not load. Names which read failed and leaves the map editor publish untouched.
     emptyFirstRun: No map editor publish yet. **Offers no create action** — this screen declares no
       operation that makes one — and says so rather than showing an empty table.
-    emptyNoAccess: Shown when the caller lacks `VENUE_MAP_VIEW`, which `getVenueMap` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `VENUE_MAP_VIEW`, which `getVenueMap` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question. A caller who can see the screen but
+      lacks what an action needs sees that action disabled, naming its permission: `ASSET_LIBRARY_VIEW`
+      for `searchMedia`; `PRODUCT_VIEW` for `listProducts`, `listCatalogueBundles`; `VENUE_MAP_MANAGE`
+      for `setVenuePoint`, `validateVenueMapGraph`, `setPathClosure`, `setPlacedResource`; `VENUE_MAP_PUBLISH`
+      for `publishVenueMap`.'
   apis:
   - operationId: searchMedia
     contract: assets
@@ -25553,7 +25761,9 @@ screens:
       object here and it becomes something a guest can be handed and can return.
     emptyNoResults: No resource matches this kind or window. Widen the window rather than the kind —
       availability moves, definitions do not.
-    emptyNoAccess: You do not have RESOURCE_VIEW. The list is not empty.
+    emptyNoAccess: 'You do not have `RESOURCE_VIEW`. The list is not empty. A caller who can see the
+      screen but lacks what an action needs sees that action disabled, naming its permission: `RESOURCE_MANAGE`
+      for `createResource`.'
   apis:
   - operationId: listResources
     contract: resources
@@ -25688,7 +25898,8 @@ screens:
       nobody knows exists.
     emptyNoResults: No availability in this window. The response says why — booked, setup, teardown,
       maintenance or closed — because **wait and look elsewhere are different answers**.
-    emptyNoAccess: You do not have RESOURCE_VIEW.
+    emptyNoAccess: 'You do not have `RESOURCE_VIEW`. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `RESOURCE_BOOK` for `bookResource`.'
   apis:
   - operationId: getResourceAvailability
     contract: resources
@@ -25835,7 +26046,8 @@ screens:
       sync.
     emptyFirstRun: Nothing is out. **The list a poolside attendant checks at close** — anything still
       here at the end of the day is a conversation.
-    emptyNoAccess: You do not have RESOURCE_BOOK.
+    emptyNoAccess: Without `RENTAL_VIEW`, which `getRentalBooking` requires, the screen does not load
+      and this state names that permission. You do not have `RESOURCE_BOOK`.
     offline: Queued locally. The deposit is authorised on sync, and **the condition note taken now is
       the only defence against a dispute later**.
   apis:
@@ -26021,7 +26233,8 @@ screens:
     error: Could not load.
     emptyFirstRun: No qualifications recorded. **A role is not a skill** — 1.2.36 requires the check
       before assignment, not after.
-    emptyNoAccess: You do not have RESOURCE_MANAGE.
+    emptyNoAccess: Without `RESOURCE_VIEW`, which `getResourceQualifications` requires, the screen does
+      not load and this state names that permission. You do not have `RESOURCE_MANAGE`.
   apis:
   - operationId: setResourceQualifications
     contract: resources
@@ -26126,7 +26339,8 @@ screens:
     error: Could not load the manifest.
     emptyFirstRun: Nobody booked into this performance yet.
     emptyNoResults: No participants match.
-    emptyNoAccess: You do not have RESOURCE_VIEW.
+    emptyNoAccess: 'You do not have `RESOURCE_VIEW`. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `RESOURCE_BOOK` for `reorderPerformanceManifest`.'
     offline: The cached manifest. **An instructor at the water edge needs this more than anyone**, and
       that is where the signal is worst.
   apis:
@@ -29213,9 +29427,12 @@ screens:
     emptyFirstRun: 'The picked menu has no sections yet: the canvas opens empty and Save menu sections
       (`setMenuSections`) saves the first arrangement; a new outlet layout starts with New sale board.'
     emptyNoResults: 'Never shown: the canvas does not filter.'
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listMenus` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `getMenu` requires to show this
+      screen, and names that permission (the screen''s other reads need `SCOPE_VIEW` and say so in their
+      own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to
+      support with the wrong question. A caller who can see the screen but lacks what an action needs
+      sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setMenuSections`; `WORKSTATION_CONFIGURE`
+      for `updateSaleBoard`, `createSaleBoard`.'
   apis:
   - operationId: setMenuSections
     contract: fnb
@@ -29536,9 +29753,11 @@ screens:
     error: Could not load. Names which read failed and leaves the ingredient substitution allergen untouched.
     emptyFirstRun: No ingredient substitution allergen configured. The form opens empty and `setRecipe`
       saves the first one; it says what the platform does in the meantime.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_CONFIGURE`, which `setRecipe` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `getAllergenVerification` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE`
+      for `setRecipe`, `setSubstitutionRules`, `setIngredientSubstitutes`.'
   apis:
   - operationId: setRecipe
     contract: fnb
@@ -29754,9 +29973,12 @@ screens:
     error: Could not load. Names which read failed and leaves the production planning production untouched.
     emptyFirstRun: No production planning production configured. The form opens empty and `planProductionRun`
       saves the first one; it says what the platform does in the meantime.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_CONFIGURE`, which `planProductionRun` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `listProductionRuns` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE`
+      for `planProductionRun`, `buildProductionPlan`, `releaseProductionPlan`, `completeProductionRun`
+      and 1 more.'
   apis:
   - operationId: planProductionRun
     contract: fnb
@@ -30202,9 +30424,11 @@ screens:
       no operation that makes one.
     emptyNoResults: 'Never shown: `listProductCategories` takes no filter, so an empty list is always
       the first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listProductCategories` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `listProductCategories` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE`
+      for `setProductCategories`; `TENANT_CONFIGURE` for `listBookingFlows`.'
   apis:
   - operationId: listBookingFlows
     contract: white-label
@@ -30403,9 +30627,12 @@ screens:
     emptyNoResults: Nothing matches the filter on outletId, categoryId, inStockOnly, search and the
       merchandising product presentation are still there. Names the active filter and offers to clear
       it.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listMerchandise` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `listMerchandise` requires to
+      show this screen, and names that permission (the screen''s other reads need `SCOPE_VIEW` and say
+      so in their own panels). **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question. A caller who can see the screen but lacks what an
+      action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `updateMerchandise`;
+      `WORKSTATION_CONFIGURE` for `updateSaleBoard`.'
   apis:
   - operationId: listMerchandise
     contract: retail
@@ -30780,9 +31007,11 @@ screens:
       a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on status and the campaign audience are still there.
       Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `MARKETING_VIEW`, which `listCampaigns` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `MARKETING_VIEW`, which `listCampaigns` requires to
+      show this screen, and names that permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE`
+      for `createCampaign`; `REPORT_VIEW_VENUE` for `runReport`.'
   apis:
   - operationId: listCampaigns
     contract: marketing-crm
@@ -30967,9 +31196,11 @@ screens:
     error: Could not load. Names which read failed and leaves the cross-sell upsell recommendation untouched.
     emptyFirstRun: No cross-sell upsell recommendation yet. **Offers no create action** — this screen
       declares no operation that makes one — and says so rather than showing an empty table.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `getRecommendations` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `listUpsellRules` requires to
+      show this screen, and names that permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for
+      `decideRecommendations`; `PRODUCT_CONFIGURE` for `createUpsellRule`, `deleteUpsellRule`.'
   apis:
   - operationId: createUpsellRule
     contract: promotions
@@ -31101,9 +31332,11 @@ screens:
     emptyFirstRun: No omnichannel commerce journey yet. Offers Create journey (`createJourney`).
     emptyNoResults: 'Never shown: `listJourneys` takes no filter, so an empty list is always the first-run
       state above.'
-    emptyNoAccess: Shown when the caller lacks `MARKETING_VIEW`, which `listJourneys` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `MARKETING_VIEW`, which `listJourneys` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question. A caller who can see the screen but
+      lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE`
+      for `createJourney`.'
   apis:
   - operationId: listJourneys
     contract: marketing-crm
@@ -31252,9 +31485,11 @@ screens:
       from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on search and the personalized offers guest are still
       there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `MARKETING_VIEW`, which `listSegments` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `MARKETING_VIEW`, which `listSegments` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question. A caller who can see the screen but
+      lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE`
+      for `createCampaign`.'
   apis:
   - operationId: listSegments
     contract: marketing-crm
@@ -31536,9 +31771,11 @@ screens:
       that makes one — and says so rather than showing an empty table.
     emptyNoResults: Nothing matches the filter on venueId, kind and the pos profile are still there.
       Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `SCOPE_VIEW`, which `listSaleBoards` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `SCOPE_VIEW`, which `listSaleBoards` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question. A caller who can see the screen but
+      lacks what an action needs sees that action disabled, naming its permission: `TENANT_CONFIGURE`
+      for `setConfigurationProfile`.'
   apis:
   - operationId: setConfigurationProfile
     contract: tenancy
@@ -31705,9 +31942,12 @@ screens:
       a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on orgUnitId, principalId, workstationId, action, subjectRef,
       from and the layout journey are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `DEVICE_VIEW`, which `listDevices` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `DEVICE_VIEW`, which `listDevices` requires to show
+      this screen, and names that permission (the screen''s other reads need `SCOPE_VIEW` and say so
+      in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question. A caller who can see the screen but lacks what an action needs
+      sees that action disabled, naming its permission: `TENANT_CONFIGURE` for `deployConfigurationProfile`;
+      `WORKSTATION_CONFIGURE` for `updateSaleBoard`, `createSaleBoard`.'
   apis:
   - operationId: updateSaleBoard
     contract: tenancy
@@ -31950,9 +32190,11 @@ screens:
       operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on venueId, kind, isSellable and the product category
       button are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question. A caller who can see the screen but
+      lacks what an action needs sees that action disabled, naming its permission: `WORKSTATION_CONFIGURE`
+      for `updateSaleBoard`.'
   apis:
   - operationId: updateSaleBoard
     contract: tenancy
@@ -32108,9 +32350,12 @@ screens:
     error: Could not load. Names which read failed and leaves the deployment preview audit untouched.
     emptyFirstRun: '**Nothing to show yet**: the figures fill as activity is recorded. Offers no create
       action — a monitor creates nothing — and says so rather than showing empty tiles.'
-    emptyNoAccess: Shown when the caller lacks `AUDIT_VIEW`, which `listAuditRecords` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `AUDIT_VIEW`, which `listAuditRecords` requires to show
+      this screen, and names that permission (the screen''s other reads need `SCOPE_VIEW` and say so
+      in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question. A caller who can see the screen but lacks what an action needs
+      sees that action disabled, naming its permission: `TENANT_CONFIGURE` for `deployConfigurationProfile`;
+      `WORKSTATION_CONFIGURE` for `updateSaleBoard`.'
   apis:
   - operationId: deployConfigurationProfile
     contract: tenancy
@@ -32332,9 +32577,11 @@ screens:
       no operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: Nothing matches the filter on venueId, saleBoardKind and the live workstation health
       are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `DEVICE_VIEW`, which `getWorkstationHealth` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `SCOPE_VIEW`, which `listWorkstations` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question. A caller who can see the screen but
+      lacks what an action needs sees that action disabled, naming its permission: `DEVICE_VIEW` for
+      `getWorkstationHealth`.'
   apis:
   - operationId: getWorkstationHealth
     contract: tenancy
@@ -32510,9 +32757,13 @@ screens:
       that makes one — and says so rather than showing an empty table.
     emptyNoResults: Nothing matches the filter on venueId, saleBoardKind and the software version are
       still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `DEVICE_VIEW`, which `getWorkstationHealth` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `SCOPE_VIEW`, which `listWorkstations` requires to show
+      this screen, and names that permission (the screen''s other reads need `DEVICE_VIEW` and say so
+      in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question. A caller who can see the screen but lacks what an action needs
+      sees that action disabled, naming its permission: `DEVICE_MANAGE` for `startDeviceFirmwareRollout`,
+      `rollbackDeviceFirmware`, `createDeviceFirmware`, `setDeviceFirmwareStatus`; `TENANT_CONFIGURE`
+      for `setConfigurationProfile`, `deployConfigurationProfile`.'
   apis:
   - operationId: setConfigurationProfile
     contract: tenancy
@@ -32768,9 +33019,11 @@ screens:
       that makes one; distinct from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on workstationId, kind, resolved and the offline policy
       rules are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires to
+      show this screen, and names that permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `ORDER_MODIFY`
+      for `resolveSyncRejection`; `TENANT_CONFIGURE` for `setOfflinePolicy`.'
   apis:
   - operationId: setOfflinePolicy
     contract: tenancy
@@ -33071,9 +33324,11 @@ screens:
       no operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: Nothing matches the filter on workstationId, kind, resolved and the offline transaction
       sync are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires to
+      show this screen, and names that permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE`
+      for `syncOrders`.'
   apis:
   - operationId: listSyncRejections
     contract: orders
@@ -33269,9 +33524,12 @@ screens:
       has been decided; it offers no create action, because creating work is not what it needs.'
     emptyNoResults: Nothing matches the filter on workstationId, kind, resolved and the offline alerts
       limits are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires to
+      show this screen, and names that permission (the screen''s other reads need `AUDIT_VIEW`, `REPORT_VIEW_VENUE`,
+      `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `ORDER_MODIFY`
+      for `resolveSyncRejection`; `REPORT_MANAGE` for `setAlertRule`.'
   apis:
   - operationId: listSyncRejections
     contract: orders
@@ -33515,9 +33773,12 @@ screens:
       no operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: Nothing matches the filter on outletId and the kitchen preparation stations are
       still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listKitchenStations` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `listKitchenStations` requires
+      to show this screen, and names that permission (the screen''s other reads need `SCOPE_VIEW` and
+      say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question. A caller who can see the screen but lacks what an
+      action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setKitchenStations`,
+      `setKitchenSla`.'
   apis:
   - operationId: listKitchenStations
     contract: fnb
@@ -33815,9 +34076,11 @@ screens:
       no operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: Nothing matches the filter on status, locationKind, from and the global settings
       controls are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `getVenueSettings` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `TENANT_VIEW`, which `getVenueSettings` requires to
+      show this screen, and names that permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE`
+      for `setCourseRules`; `TENANT_CONFIGURE` for `setVenueSettings`.'
   apis:
   - operationId: getVenueSettings
     contract: tenancy
@@ -34249,9 +34512,11 @@ screens:
     error: Could not load. Names which read failed and leaves the wastage spoilage returns untouched.
     emptyFirstRun: No wastage spoilage returns configured. The form opens empty and `recordWaste` saves
       the first one; it says what the platform does in the meantime.
-    emptyNoAccess: Shown when the caller lacks `ORDER_MODIFY`, which `recordWaste` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `getWasteApprovalPolicy` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for
+      `requestSuggestion`; `ORDER_MODIFY` for `recordWaste`; `PRODUCT_CONFIGURE` for `setWasteApprovalPolicy`.'
   apis:
   - operationId: recordWaste
     contract: fnb
@@ -34394,9 +34659,12 @@ screens:
       declares no operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: Nothing matches the filter on withinDays and the product availability operational
       are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `getMenu` requires, and names that
-      permission. **Never an empty table** — that reads as *there is no data* and sends somebody to
-      support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `getMenu` requires to show this
+      screen, and names that permission (the screen''s other reads need `INCIDENT_VIEW` and say so in
+      their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question. A caller who can see the screen but lacks what an action needs
+      sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setItemAvailability`,
+      `setTemperatureCheckpoint`, `setMenuItemDailyCount`.'
   apis:
   - operationId: setItemAvailability
     contract: fnb
@@ -34630,9 +34898,11 @@ screens:
     emptyNoResults: Nothing matches the filter on status, severity, workstationId, shiftId, itemId and
       the operational alerts replenishment are still there. Names the active filter and offers to clear
       it.
-    emptyNoAccess: Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listAlerts` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listAlerts` requires to
+      show this screen, and names that permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PROCUREMENT_REQUEST`
+      for `createRequisition`.'
   apis:
   - operationId: listAlerts
     contract: reporting
@@ -34781,9 +35051,11 @@ screens:
       operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: 'Never shown: nothing on this screen filters its list, so an empty list is always
       the first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listStoreRules` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `listStoreRules` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question. A caller who can see the screen but
+      lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE`
+      for `setStoreRules`.'
   apis:
   - operationId: listStoreRules
     contract: retail
@@ -34921,9 +35193,11 @@ screens:
     error: Could not load. Names which read failed and leaves the retail global settings untouched.
     emptyFirstRun: No retail global settings yet. **Offers no create action** — this screen declares
       no operation that makes one — and says so rather than showing an empty table.
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `getReturnPolicy` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `getReturnPolicy` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question. A caller who can see the screen but
+      lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE`
+      for `disposeShopAndDrop`; `REGION_CONFIGURE` for `setReturnPolicy`.'
   apis:
   - operationId: lookupShopAndDrop
     contract: retail
@@ -45652,9 +45926,9 @@ screens:
     error: Could not load. Names which read failed and leaves the manual override supervisor untouched.
     emptyFirstRun: No manual override supervisor configured yet. Carries the create action and says
       what the platform does in the meantime.
-    emptyNoAccess: 'Names the missing permission, **ACCESS_OVERRIDE** (was ACCESS_POINT_CONFIGURE until
-      29 September, K1: recording an admission against a failed validation is an override, not gate
-      configuration). Never an empty table.'
+    emptyNoAccess: 'Names the missing permission, **`ACCESS_OVERRIDE`** (was ACCESS_POINT_CONFIGURE
+      until 29 September, K1: recording an admission against a failed validation is an override, not
+      gate configuration). Never an empty table.'
   apis:
   - operationId: overrideAccess
     contract: access
@@ -46170,9 +46444,9 @@ screens:
       filter that matched nothing.
     emptyNoResults: The filter narrowed it and the operational incident exception are still there. The
       pack's own statuses are Open → Investigating → Resolved → Closed — the state names which is selected.
-    emptyNoAccess: 'Names the missing permission, **INCIDENT_MANAGE** (was ACCESS_POINT_CONFIGURE until
-      29 September, K1: investigating, assigning and closing an incident is incident management, as
-      for F&B and maintenance incidents). Never an empty table.'
+    emptyNoAccess: 'Names the missing permission, **`INCIDENT_MANAGE`** (was ACCESS_POINT_CONFIGURE
+      until 29 September, K1: investigating, assigning and closing an incident is incident management,
+      as for F&B and maintenance incidents). Never an empty table.'
   apis:
   - operationId: setOperationalIncidentException
     contract: access
@@ -156672,8 +156946,9 @@ screens:
       stations, routes and timetables (BO-1189).'
     emptyNoResults: The status or station filter matched nothing and the routes are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `TRANSPORT_VIEW`, which `listTransportTimetables` and
-      the setup screens require, and names that permission. **Never an empty table**.
+    emptyNoAccess: Shown when the caller lacks `TRANSPORT_MANAGE`, which `createTransportRoute` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question.
     validation: '`422` on fewer than two stops, a station repeated, a station inactive or not at this
       venue, or offsets that do not start at 0 and strictly increase, each marked on the stop row; `409`
       on a code already used; `409` on a stop change under a published timetable; `409` on a status
@@ -156886,8 +157161,9 @@ screens:
       for that route.
     emptyFirstRun: '**This route has no fares yet, so it cannot be activated or sold.** The form opens
       empty with the fare models explained.'
-    emptyNoAccess: Shown when the caller lacks `TRANSPORT_PRICE`, which `setTransportFareTable` requires,
-      and names that permission; a `TRANSPORT_VIEW` holder sees the table read-only.
+    emptyNoAccess: Shown when the caller lacks `TRANSPORT_PRICE`, which `setTransportFareTable` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question.
     validation: '`422` on a matrix missing a station pair, a passenger type code repeated, no default
       type or a multiplier outside 0 to 1, each marked on its row.'
   apis:
@@ -157061,8 +157337,11 @@ screens:
       Import stations, routes and timetables (BO-1189).'
     emptyNoResults: The status filter matched nothing and the route's other timetables are still there.
       Names the filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `TRANSPORT_VIEW`, which `listTransportTimetables` requires,
-      and names that permission. **Never an empty table**.
+    emptyNoAccess: 'Shown when the caller lacks `TRANSPORT_VIEW`, which `listTransportTimetables` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `TRANSPORT_MANAGE`
+      for `createTransportTimetable`, `updateTransportTimetable`, `publishTransportTimetable`, `withdrawTransportTimetable`.'
     validation: '`400` on a missing name, start date, capacity or run, or a run time out of order, marked
       on the field; `409` on editing a published timetable, on publishing against an inactive route
       or one with no fare table, and on withdrawing with sold seats, each naming the cause.'
@@ -157270,8 +157549,11 @@ screens:
       (BO-1186).'
     emptyNoResults: The date range or status matched nothing and the route's other departures are still
       there. Names the filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `TRANSPORT_VIEW`, which `listTransportRouteDepartures`
-      requires, and names that permission. **Never an empty table**.
+    emptyNoAccess: 'Shown when the caller lacks `TRANSPORT_VIEW`, which `listTransportRouteDepartures`
+      requires to show this screen, and names that permission. **Never an empty table** — that reads
+      as *there is no data* and sends somebody to support with the wrong question. A caller who can
+      see the screen but lacks what an action needs sees that action disabled, naming its permission:
+      `PERFORMANCE_CONFIGURE` for `cancelPerformance`; `TRANSPORT_MANAGE` for `updateTransportDeparture`.'
     validation: '`422` on a capacity below the seats sold, naming the count; a cancellation follows
       the performance cancel rules (reason required, supervisor step-up for a real run).'
   apis:
@@ -216526,8 +216808,11 @@ screens:
     error: Could not load. Names which read failed and leaves the territory market distribution untouched.
     emptyFirstRun: No territory market distribution configured yet. Carries the create action and says
       what the platform does in the meantime.
-    emptyNoAccess: Names the missing permission (the write's PARTNER_MANAGE, CREDIT_MANAGE or SETTLEMENT_RECONCILE).
-      **Never an empty table** that reads as there is no data.
+    emptyNoAccess: 'Shown when the caller lacks `PARTNER_VIEW`, which `listTerritoryMarketDistribution`
+      requires to show this screen, and names that permission. **Never an empty table** — that reads
+      as *there is no data* and sends somebody to support with the wrong question. A caller who can
+      see the screen but lacks what an action needs sees that action disabled, naming its permission:
+      `PARTNER_MANAGE` for `setPartnerDistributionRights`.'
   apis:
   - operationId: listTerritoryMarketDistribution
     contract: subscription
@@ -216730,8 +217015,11 @@ screens:
     error: Could not load. Names which read failed and leaves the partner access roles untouched.
     emptyFirstRun: No partner access roles configured yet. Carries the create action and says what the
       platform does in the meantime.
-    emptyNoAccess: Names the missing permission (the write's PARTNER_MANAGE, CREDIT_MANAGE or SETTLEMENT_RECONCILE).
-      **Never an empty table** that reads as there is no data.
+    emptyNoAccess: 'Shown when the caller lacks `PARTNER_VIEW`, which `listPartnerAccessRole` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PARTNER_MANAGE`
+      for `setPartnerCapabilityGrants`.'
   apis:
   - operationId: listPartnerAccessRole
     contract: subscription
@@ -216882,8 +217170,11 @@ screens:
       that matched nothing.
     emptyNoResults: The filter narrowed it and the commission margin incentive are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission (the write's PARTNER_MANAGE, CREDIT_MANAGE or SETTLEMENT_RECONCILE).
-      **Never an empty table** that reads as there is no data.
+    emptyNoAccess: 'Shown when the caller lacks `PARTNER_VIEW`, which `listCommissionMarginIncentive`
+      requires to show this screen, and names that permission. **Never an empty table** — that reads
+      as *there is no data* and sends somebody to support with the wrong question. A caller who can
+      see the screen but lacks what an action needs sees that action disabled, naming its permission:
+      `PARTNER_MANAGE` for `setPartnerCommissionRules`.'
   apis:
   - operationId: listCommissionMarginIncentive
     contract: subscription
@@ -217058,8 +217349,11 @@ screens:
     error: Could not load. Names which read failed and leaves the credit limit exposure untouched.
     emptyFirstRun: No credit limit exposure configured yet. Carries the create action and says what
       the platform does in the meantime.
-    emptyNoAccess: Names the missing permission (the write's PARTNER_MANAGE, CREDIT_MANAGE or SETTLEMENT_RECONCILE).
-      **Never an empty table** that reads as there is no data.
+    emptyNoAccess: 'Shown when the caller lacks `PARTNER_VIEW`, which `listCreditLimitExposure` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `CREDIT_MANAGE`
+      for `setPartnerCreditProfile`.'
   apis:
   - operationId: listCreditLimitExposure
     contract: subscription
@@ -217229,8 +217523,11 @@ screens:
       that matched nothing.
     emptyNoResults: The filter narrowed it and the deposit guarantee financial are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission (the write's PARTNER_MANAGE, CREDIT_MANAGE or SETTLEMENT_RECONCILE).
-      **Never an empty table** that reads as there is no data.
+    emptyNoAccess: 'Shown when the caller lacks `PARTNER_VIEW`, which `listDepositGuaranteeFinancial`
+      requires to show this screen, and names that permission. **Never an empty table** — that reads
+      as *there is no data* and sends somebody to support with the wrong question. A caller who can
+      see the screen but lacks what an action needs sees that action disabled, naming its permission:
+      `CREDIT_MANAGE` for `setPartnerSecurity`.'
   apis:
   - operationId: listDepositGuaranteeFinancial
     contract: subscription
@@ -217388,8 +217685,11 @@ screens:
       that matched nothing.
     emptyNoResults: The filter narrowed it and the commercial allocation quota are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission (the write's PARTNER_MANAGE, CREDIT_MANAGE or SETTLEMENT_RECONCILE).
-      **Never an empty table** that reads as there is no data.
+    emptyNoAccess: 'Shown when the caller lacks `PARTNER_VIEW`, which `listCommercialAllocationQuota`
+      requires to show this screen, and names that permission. **Never an empty table** — that reads
+      as *there is no data* and sends somebody to support with the wrong question. A caller who can
+      see the screen but lacks what an action needs sees that action disabled, naming its permission:
+      `PARTNER_MANAGE` for `setPartnerAllocations`.'
   apis:
   - operationId: listCommercialAllocationQuota
     contract: subscription
@@ -217564,8 +217864,11 @@ screens:
       create action.'
     emptyNoResults: The filter narrowed it and the partner reconciliation exception are still there.
       Names the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission (the write's PARTNER_MANAGE, CREDIT_MANAGE or SETTLEMENT_RECONCILE).
-      **Never an empty table** that reads as there is no data.
+    emptyNoAccess: 'Shown when the caller lacks `PARTNER_VIEW`, which `listPartnerReconciliationException`
+      requires to show this screen, and names that permission. **Never an empty table** — that reads
+      as *there is no data* and sends somebody to support with the wrong question. A caller who can
+      see the screen but lacks what an action needs sees that action disabled, naming its permission:
+      `SETTLEMENT_RECONCILE` for `actOnPartnerReconciliationException`.'
   apis:
   - operationId: listPartnerReconciliationException
     contract: subscription
@@ -217765,8 +218068,11 @@ screens:
       Offers no create action.'
     emptyNoResults: The filter narrowed it and the commission calculation settlement are still there.
       Names the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission (the write's PARTNER_MANAGE, CREDIT_MANAGE or SETTLEMENT_RECONCILE).
-      **Never an empty table** that reads as there is no data.
+    emptyNoAccess: 'Shown when the caller lacks `PARTNER_VIEW`, which `listCommissionCalculationSettlement`
+      requires to show this screen, and names that permission. **Never an empty table** — that reads
+      as *there is no data* and sends somebody to support with the wrong question. A caller who can
+      see the screen but lacks what an action needs sees that action disabled, naming its permission:
+      `SETTLEMENT_RECONCILE` for `actOnPartnerCommissionLine`, `actOnPartnerSettlementBatch`.'
   apis:
   - operationId: listCommissionCalculationSettlement
     contract: subscription

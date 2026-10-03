@@ -3475,8 +3475,9 @@ screens:
       ask panel stays available.'
     emptyNoResults: Nothing matches the kind, priority or status filter, and the insights are still there.
       Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `AI_USE`, which `listAiInsights` requires, and names that
-      permission. **Never an empty list.**
+    emptyNoAccess: 'Shown when the caller lacks `AI_USE`, which `listAiInsights` requires, and names that
+      permission. **Never an empty list.** A caller who can see the screen but lacks what an action needs
+      sees that action disabled, naming its permission: `REPORT_VIEW_VENUE` for `askReportingQuestion`.'
   apis:
   - operationId: askReportingQuestion
     contract: reporting
@@ -4258,15 +4259,16 @@ screens:
     emptyFirstRun: A new dashboard with no tiles yet. The gallery is open and says "Drag a visual onto
       the grid"; nothing is created until Save dashboard.
     emptyNoResults: The report search matched nothing. Names the search and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `REPORT_MANAGE`, which saving requires; the dashboard opens
-      read-only and names that permission.
+    emptyNoAccess: Without `REPORT_VIEW_VENUE`, which `listReports` requires, the screen does not load
+      and this state names that permission. Shown when the caller lacks `REPORT_MANAGE`, which saving
+      requires; the dashboard opens read-only and names that permission.
   apis:
   - operationId: updateDashboard
     contract: reporting
     purpose: Lay it out
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id001
+    invalidates:
     - getDashboard
     - listDashboards
   - operationId: getDashboard
@@ -4568,8 +4570,9 @@ screens:
     error: Could not load. Names which read failed and leaves the form untouched.
     emptyFirstRun: Only the seeded KPIs exist (takings, admissions and the finance measures). Offers Create
       KPI (`createKpi`) for the tenant's first own KPI.
-    emptyNoAccess: Shown when the caller lacks `REPORT_MANAGE`, which `createKpi` requires; the KPI list
-      stays readable and the form names that permission.
+    emptyNoAccess: Without `REPORT_VIEW_TENANT`, which `listKpis` requires, the screen does not load and
+      this state names that permission. Shown when the caller lacks `REPORT_MANAGE`, which `createKpi`
+      requires; the KPI list stays readable and the form names that permission.
   apis:
   - operationId: listKpis
     contract: reporting
@@ -4581,7 +4584,7 @@ screens:
     purpose: Define one, for everywhere
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id006
+    invalidates:
     - listKpis
     - getKpiValues
   wireframe:
@@ -4863,7 +4866,9 @@ screens:
     purpose: Save the filters
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id001
+    invalidates:
+    - getDashboard
+    - listDashboards
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-027
@@ -4961,7 +4966,9 @@ screens:
     purpose: Drill-down behaviour
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id001
+    invalidates:
+    - getDashboard
+    - listDashboards
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-028
@@ -5062,7 +5069,9 @@ screens:
     purpose: Publish and version
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id001
+    invalidates:
+    - getDashboard
+    - listDashboards
   entryState:
     preloaded:
     - Version Number
@@ -7227,8 +7236,12 @@ screens:
       operating area or user; distinct from a filter that matched nothing.'
     emptyNoResults: Nothing matches the status filter, and the access policies are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PERMISSION_VIEW`, which `listAuthorisationPolicies` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data*.
+    emptyNoAccess: 'Shown when the caller lacks `PERMISSION_VIEW`, which `listAuthorisationPolicies` requires
+      to show this screen, and names that permission (the screen''s other reads need `REPORT_VIEW_TENANT`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `PERMISSION_MANAGE` for `createAuthorisationPolicy`,
+      `updateAuthorisationPolicy`.'
   apis:
   - operationId: listAuthorisationPolicies
     contract: identity
@@ -9175,7 +9188,9 @@ screens:
     purpose: Add a KPI
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id006
+    invalidates:
+    - listKpis
+    - getKpiValues
   entryState:
     preloaded:
     - Executive
@@ -9647,8 +9662,11 @@ screens:
     emptyFirstRun: No model published yet. Offers Publish model (`setSemanticModel`); until then reports
       read the seeded catalogue.
     emptyNoResults: Nothing in the model matches the search. Names it and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `REPORT_VIEW_TENANT`, which `getSemanticModel` requires,
-      and names that permission.
+    emptyNoAccess: 'Shown when the caller lacks `REPORT_VIEW_TENANT`, which `getSemanticModel` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `REPORT_MANAGE`
+      for `setSemanticModel`.'
   apis:
   - operationId: getSemanticModel
     contract: reporting

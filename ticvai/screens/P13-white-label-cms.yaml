@@ -1075,9 +1075,10 @@ screens:
     emptyFirstRun: No component preview yet. Offers Create preview (`createPreview`).
     emptyNoResults: 'Never shown: nothing on this screen filters its list, so an empty list is always
       the first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `getTheme` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `TENANT_CONFIGURE`, which `getTheme` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no data*
+      and sends somebody to support with the wrong question. A caller who can see the screen but lacks
+      what an action needs sees that action disabled, naming its permission: `PRODUCT_VIEW` for `previewProductTickets`.'
   apis:
   - operationId: createPreview
     contract: white-label
@@ -1319,9 +1320,11 @@ screens:
     loading: The record, read by `getHomepageLayout`.
     error: Could not load. Names which read failed and leaves the record untouched.
     emptyFirstRun: No record yet. Offers Create content page (`createContentPage`).
-    emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `listContentPages` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `TENANT_CONFIGURE`, which `listContentPages` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `proposeMarketingContent`,
+      `decideProposedAction`; `TENANT_PUBLISH` for `publishContentBlock`.'
   apis:
   - operationId: listContentPages
     contract: white-label
@@ -1613,9 +1616,11 @@ screens:
     emptyFirstRun: No content blocks yet. Offers Create banner (`createBanner`).
     emptyNoResults: 'Never shown: `listPromoBlocks` takes no filter, so an empty list is always the first-run
       state above.'
-    emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `listPromoBlocks` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `TENANT_CONFIGURE`, which `listPromoBlocks` requires to
+      show this screen, and names that permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `proposeMarketingContent`,
+      `decideProposedAction`.'
   apis:
   - operationId: createBanner
     contract: white-label
@@ -2390,9 +2395,12 @@ screens:
       that matched nothing.
     emptyNoResults: Nothing matches the filter on kind, tag, collectionId, venueId, search, unusedOnly
       and the media are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `ASSET_LIBRARY_VIEW`, which `searchMedia` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ASSET_LIBRARY_VIEW`, which `searchMedia` requires to
+      show this screen, and names that permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `semanticSearch`;
+      `ASSET_LIBRARY_MANAGE` for `completeUpload`, `createCollection`, `createUpload`, `deleteMediaAsset`
+      and 2 more.'
   apis:
   - operationId: searchMedia
     contract: assets
@@ -2599,9 +2607,11 @@ screens:
     error: Could not load
     emptyFirstRun: 'No metadata saved for this page yet: the generated title and description are shown
       with the "Generated" badge.'
-    emptyNoAccess: Shown when the caller lacks `MARKETING_MANAGE`, which `setSeoMetadata` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `MARKETING_VIEW`, which `getSeoMetadata` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no data*
+      and sends somebody to support with the wrong question. A caller who can see the screen but lacks
+      what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `setSeoMetadata`,
+      `createUrlRedirect`.'
   apis:
   - operationId: setSeoMetadata
     contract: marketing-crm
@@ -3010,9 +3020,11 @@ screens:
     error: Could not load. Names which read failed and leaves the publishing workflow untouched.
     emptyFirstRun: No publishing workflow yet. **Offers no create action** — this screen declares no operation
       that makes one — and says so rather than showing an empty table.
-    emptyNoAccess: Shown when the caller lacks `TENANT_PUBLISH`, which `publishTenantConfig` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `TENANT_CONFIGURE`, which `listBookingFlows` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `TENANT_PUBLISH`
+      for `publishTenantConfig`, `setPublishReviewPolicy`, `exportSitePackage`, `getSitePackage`.'
   apis:
   - operationId: publishTenantConfig
     contract: white-label
@@ -3796,9 +3808,12 @@ screens:
     emptyNoResults: '`listPolicies` takes no filter. The consent questions (kind, status) and the consent
       records (order, guest, question) do: an empty result names the active filter and offers to clear
       it.'
-    emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `listPolicies` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `TENANT_CONFIGURE`, which `listPolicies` requires to show
+      this screen, and names that permission (the screen''s other reads need `GUEST_VIEW` and say so in
+      their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question. A caller who can see the screen but lacks what an action needs
+      sees that action disabled, naming its permission: `GUEST_MANAGE` for `setConsentPurposes`, `createConsentQuestion`,
+      `updateConsentQuestion`.'
   apis:
   - operationId: listPolicies
     contract: white-label
@@ -14574,9 +14589,12 @@ screens:
       that once the venue''s products are uploaded the assistant proposes set-ups here as drafts for review.'
     emptyNoResults: The source or status filter matched nothing and the venue's other set-ups are still
       there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `listGuidedChoices` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `TENANT_CONFIGURE`, which `listGuidedChoices` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `suggestGuidedChoice`,
+      `getGuidedChoiceSuggestion`; `PRODUCT_VIEW` for `listProducts`, `listProductCategories`, `listEvents`;
+      `TENANT_PUBLISH` for `publishGuidedChoice`, `unpublishGuidedChoice`.'
   apis:
   - operationId: listGuidedChoices
     contract: white-label
@@ -15219,8 +15237,13 @@ screens:
       step.'
     emptyNoResults: The flow-type filter matched nothing and the venue's other flows are still there.
       Names the filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `listBookingFlows` requires,
-      and names that permission. **Never an empty table** — that reads as *there are no flows*.
+    emptyNoAccess: 'Shown when the caller lacks `TENANT_CONFIGURE`, which `listBookingFlows` requires
+      to show this screen, and names that permission (the screen''s other reads need `GUEST_VIEW` and
+      say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question. A caller who can see the screen but lacks what an action
+      needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `updateProduct`,
+      `setProductCategories`; `PRODUCT_VIEW` for `listProducts`, `listProductCategories`; `TENANT_PUBLISH`
+      for `publishTenantConfig`.'
   apis:
   - operationId: listBookingFlows
     contract: white-label
@@ -15497,8 +15520,11 @@ screens:
     emptyFirstRun: '**No build yet.** Shows the checklist first: nothing can be built until the client''s
       store account for the platform is recorded and a version is published.'
     emptyNoResults: No build for the platform picked. Names it and offers the other.
-    emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `listAppBuilds` requires, and
-      names that permission.
+    emptyNoAccess: 'Shown when the caller lacks `TENANT_CONFIGURE`, which `getStoreAccounts` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `createAiConversation`,
+      `sendAiMessage`; `TENANT_PUBLISH` for `requestAppBuild`.'
   apis:
   - operationId: getStoreAccounts
     contract: white-label

@@ -427,10 +427,13 @@ screens:
       same picture otherwise.'
     emptyNoResults: Nothing matches this station or course filter. **The rail is not empty** — the filter
       is narrow, and on a kitchen screen that distinction is the difference between calm and panic.
-    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** — a
+    emptyNoAccess: 'This display is not assigned to a station. **Assignment is a back-office act** — a
       kitchen screen does not choose what it shows. **A principal without `ORDER_VIEW` gets this state
-      naming `ORDER_VIEW`**, the screen's `permission` and the one its read enforces; a button whose own
-      `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission.
+      naming `ORDER_VIEW`**, the screen''s `permission` and the one its read enforces; a button whose
+      own `permission` the principal lacks is hidden, and a 403 from an action names that operation''s
+      permission. A caller who can see the screen but lacks what an action needs sees that action disabled,
+      naming its permission: `ORDER_MODIFY` for `setKitchenTicketStatus`, `refireItem`, `recallKitchenTicket`,
+      `notifyServer`.'
     offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
       blanks mid-service is worse than one that says it is behind, and every bump journals locally and
       syncs when the network returns.'
@@ -687,11 +690,12 @@ screens:
       same picture otherwise.'
     emptyNoResults: Nothing matches this course filter. **The rail is not empty** — the filter is narrow,
       and on a kitchen screen that distinction is the difference between calm and panic (audit R277).
-    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** — a
-      kitchen screen does not choose what it shows. **A principal without `ORDER_MODIFY` gets this state
-      naming `ORDER_MODIFY`**, the screen's `permission` and the one its fire, hold, status and prioritise
-      actions need (the screen has no read); a button whose own `permission` the principal lacks is hidden,
-      and a 403 from an action names that operation's permission.
+    emptyNoAccess: Without `ORDER_VIEW`, which `listKitchenTickets` requires, the screen does not load
+      and this state names that permission. This display is not assigned to a station. **Assignment is
+      a back-office act** — a kitchen screen does not choose what it shows. **A principal without `ORDER_MODIFY`
+      gets this state naming `ORDER_MODIFY`**, the screen's `permission` and the one its fire, hold, status
+      and prioritise actions need (the screen has no read); a button whose own `permission` the principal
+      lacks is hidden, and a 403 from an action names that operation's permission.
     offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
       blanks mid-service is worse than one that says it is behind, and every bump journals locally and
       syncs when the network returns.'
@@ -1075,11 +1079,12 @@ screens:
       same picture otherwise.'
     emptyNoResults: Nothing matches this station or course filter. **The rail is not empty** — the filter
       is narrow, and on a kitchen screen that distinction is the difference between calm and panic.
-    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** — a
+    emptyNoAccess: 'This display is not assigned to a station. **Assignment is a back-office act** — a
       kitchen screen does not choose what it shows. **A principal without `PRODUCT_VIEW` gets this state
-      naming `PRODUCT_VIEW`**, the screen's `permission` and the one its read enforces; a button whose
-      own `permission` the principal lacks is hidden, and a 403 from an action names that operation's
-      permission.
+      naming `PRODUCT_VIEW`**, the screen''s `permission` and the one its read enforces; a button whose
+      own `permission` the principal lacks is hidden, and a 403 from an action names that operation''s
+      permission. A caller who can see the screen but lacks what an action needs sees that action disabled,
+      naming its permission: `PRODUCT_CONFIGURE` for `rebalanceStationLoad`.'
     offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
       blanks mid-service is worse than one that says it is behind, and every bump journals locally and
       syncs when the network returns.'
@@ -1273,10 +1278,13 @@ screens:
       same picture otherwise.'
     emptyNoResults: Nothing matches this station or course filter. **The rail is not empty** — the filter
       is narrow, and on a kitchen screen that distinction is the difference between calm and panic.
-    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** — a
+    emptyNoAccess: 'This display is not assigned to a station. **Assignment is a back-office act** — a
       kitchen screen does not choose what it shows. **A principal without `ORDER_VIEW` gets this state
-      naming `ORDER_VIEW`**, the screen's `permission` and the one its read enforces; a button whose own
-      `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission.
+      naming `ORDER_VIEW`**, the screen''s `permission` and the one its read enforces; a button whose
+      own `permission` the principal lacks is hidden, and a 403 from an action names that operation''s
+      permission. A caller who can see the screen but lacks what an action needs sees that action disabled,
+      naming its permission: `ORDER_MODIFY` for `setKitchenTicketStatus`, `chaseStation`, `markOrderCollected`,
+      `recordOrderHandover`.'
     offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
       blanks mid-service is worse than one that says it is behind, and every bump journals locally and
       syncs when the network returns.'
@@ -1700,12 +1708,14 @@ screens:
       same picture otherwise.'
     emptyNoResults: Nothing matches this station or course filter. **The rail is not empty** — the filter
       is narrow, and on a kitchen screen that distinction is the difference between calm and panic.
-    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** — a
+    emptyNoAccess: 'This display is not assigned to a station. **Assignment is a back-office act** — a
       kitchen screen does not choose what it shows. **A principal without `PRODUCT_VIEW` gets this state
-      naming `PRODUCT_VIEW`**, the screen's `permission` and the one `list86Events`, the population it
+      naming `PRODUCT_VIEW`**, the screen''s `permission` and the one `list86Events`, the population it
       reads, enforces (`getHaccpStatus` needs `INCIDENT_VIEW` and reaches no component yet, see `gaps`);
       a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that
-      operation's permission.
+      operation''s permission. A caller who can see the screen but lacks what an action needs sees that
+      action disabled, naming its permission: `INCIDENT_REPORT` for `logKitchenException`; `PRODUCT_CONFIGURE`
+      for `setItemAvailability`.'
     offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
       blanks mid-service is worse than one that says it is behind, and every bump journals locally and
       syncs when the network returns.'
@@ -1889,11 +1899,12 @@ screens:
     emptyFirstRun: '**No tickets. The kitchen is clear**, and that is worth saying plainly rather than
       showing a blank rail — a screen that looks broken and a screen that means nothing to do are the
       same picture otherwise.'
-    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** — a
-      kitchen screen does not choose what it shows. **A principal without `ORDER_MODIFY` gets this state
-      naming `ORDER_MODIFY`**, the screen's `permission` and the one prioritising needs (the screen has
-      no read); a button whose own `permission` the principal lacks is hidden, and a 403 from an action
-      names that operation's permission.
+    emptyNoAccess: 'This display is not assigned to a station. **Assignment is a back-office act** — a
+      kitchen screen does not choose what it shows. Shown when the caller lacks `PRODUCT_VIEW`, which
+      `getKitchenSla` requires to show this screen, and names that permission. **Never an empty table**
+      — that reads as *there is no data* and sends somebody to support with the wrong question. A caller
+      who can see the screen but lacks what an action needs sees that action disabled, naming its permission:
+      `PRODUCT_CONFIGURE` for `setKitchenSla`.'
     offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
       blanks mid-service is worse than one that says it is behind, and every bump journals locally and
       syncs when the network returns.'

@@ -761,7 +761,8 @@ screens:
 
       '
     emptyNoResults: No sandbox matches.
-    emptyNoAccess: You do not have DEVELOPER_MANAGE.
+    emptyNoAccess: Without `DEVELOPER_VIEW`, which `listSandboxes` requires, the screen does not load
+      and this state names that permission. You do not have `DEVELOPER_MANAGE`.
   apis:
   - operationId: listSandboxes
     contract: public-api
@@ -945,7 +946,9 @@ screens:
 
       '
     emptyNoResults: No delivery matches this window or status.
-    emptyNoAccess: You do not have DEVELOPER_VIEW.
+    emptyNoAccess: 'You do not have `DEVELOPER_VIEW`. A caller who can see the screen but lacks what an
+      action needs sees that action disabled, naming its permission: `DEVELOPER_MANAGE` for `createWebhookSubscription`,
+      `replayEvents`.'
   apis:
   - operationId: listWebhookSubscriptions
     contract: public-api
@@ -1228,7 +1231,8 @@ screens:
       minutes, M17-06): build and test in the sandbox, submit here, and once certified request production
       access. A private integration is certified without appearing in the marketplace.'
     emptyNoResults: No listing matches this category or status.
-    emptyNoAccess: You do not have DEVELOPER_MANAGE.
+    emptyNoAccess: Without `DEVELOPER_VIEW`, which `listIntegrationListings` requires, the screen does
+      not load and this state names that permission. You do not have `DEVELOPER_MANAGE`.
   apis:
   - operationId: listIntegrationListings
     contract: public-api

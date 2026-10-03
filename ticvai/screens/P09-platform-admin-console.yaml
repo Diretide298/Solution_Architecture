@@ -1054,9 +1054,11 @@ screens:
       operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: 'Never shown: `listCellJobs` takes no filter, so an empty list is always the first-run
       state above.'
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellHealth` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellHealth` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_CELL_MANAGE`
+      for `cancelDecommission`, `decommissionCell`, `updateCellTier`.'
   apis:
   - operationId: getCellHealth
     contract: subscription
@@ -1309,9 +1311,12 @@ screens:
       operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: Nothing matches the filter on principalId, outcome, from and the platform audit
       log are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `AI_AUDIT_VIEW`, which `listAiInteractions` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `AI_AUDIT_VIEW`, which `listAiInteractions` requires
+      to show this screen, and names that permission (the screen''s other reads need `AUDIT_VIEW`, `PLATFORM_TENANT_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for
+      `listOwnPlatformStaffGrants`, `openPlatformStaffGrant`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
       (`openPlatformStaffGrant`: reason, permissions `AI_AUDIT_VIEW`, `AUDIT_VIEW`, expiry). The same
@@ -1778,9 +1783,14 @@ screens:
       a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on status, planId and the tenant are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires
+      to show this screen, and names that permission (the screen''s other reads need `PLATFORM_CELL_VIEW`,
+      `USER_MANAGE` and say so in their own panels). **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_CELL_MANAGE`
+      for `provisionCell`; `PLATFORM_TENANT_ACCESS` for `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`;
+      `PLATFORM_TENANT_MANAGE` for `addLicenceAddOn`, `createTenant`, `reactivateTenant`, `removeLicenceAddOn`
+      and 2 more; `PLATFORM_TENANT_TERMINATE` for `terminateTenant`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
       (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant
@@ -2111,9 +2121,13 @@ screens:
       a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on status, planId and the tenant hierarchy are still
       there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires
+      to show this screen, and names that permission (the screen''s other reads need `PLATFORM_CELL_VIEW`,
+      `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS`
+      for `listOwnPlatformStaffGrants`, `openPlatformStaffGrant`; `PLATFORM_TENANT_MANAGE` for `updateTenant`;
+      `SCOPE_MANAGE` for `createOrgUnit`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
       (`openPlatformStaffGrant`: reason, permissions `SCOPE_MANAGE`, `SCOPE_VIEW`, expiry). The same
@@ -2468,9 +2482,12 @@ screens:
     emptyFirstRun: No module feature entitlement yet. Offers Add licence add on (`addLicenceAddOn`).
     emptyNoResults: 'Never shown: `listTenantCells` takes no filter, so an empty list is always the
       first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getTenantLicences` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getTenantLicences` requires
+      to show this screen, and names that permission (the screen''s other reads need `PLATFORM_CELL_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_MANAGE` for
+      `addLicenceAddOn`, `removeLicenceAddOn`.'
   apis:
   - operationId: getTenantLicences
     contract: subscription
@@ -2745,9 +2762,13 @@ screens:
     emptyFirstRun: No subscription plan yet. Offers Create plan (`createPlan`).
     emptyNoResults: 'Never shown: `listPlans` takes no filter, so an empty list is always the first-run
       state above.'
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listPlans` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listPlans` requires to
+      show this screen, and names that permission (the screen''s other reads need `PLATFORM_BILLING_VIEW`,
+      `PLATFORM_CELL_VIEW` and say so in their own panels). **Never an empty table** — that reads as
+      *there is no data* and sends somebody to support with the wrong question. A caller who can see
+      the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_BILLING_MANAGE`
+      for `generateInvoice`; `PLATFORM_PLAN_MANAGE` for `createPlan`, `createPlanVersion`; `PLATFORM_TENANT_MANAGE`
+      for `setSubscription`.'
   apis:
   - operationId: listPlans
     contract: subscription
@@ -3133,9 +3154,12 @@ screens:
       from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on status and the tenant billing invoicing are still
       there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_BILLING_VIEW`, which `listSubscriptionInvoices`
-      requires, and names that permission. **Never an empty table** — that reads as *there is no data*
-      and sends somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_BILLING_VIEW`, which `listSubscriptionInvoices`
+      requires to show this screen, and names that permission (the screen''s other reads need `PLATFORM_TENANT_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `PLATFORM_BILLING_MANAGE` for
+      `generateInvoice`.'
   apis:
   - operationId: listSubscriptionInvoices
     contract: subscription
@@ -3654,9 +3678,12 @@ screens:
     emptyFirstRun: No licence seat yet. Offers Add licence add on (`addLicenceAddOn`).
     emptyNoResults: 'Never shown: `listTenantCells` takes no filter, so an empty list is always the
       first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getEntitlementUsage` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getEntitlementUsage`
+      requires to show this screen, and names that permission (the screen''s other reads need `PLATFORM_CELL_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_MANAGE` for
+      `addLicenceAddOn`, `removeLicenceAddOn`.'
   apis:
   - operationId: getEntitlementUsage
     contract: subscription
@@ -3902,9 +3929,11 @@ screens:
       no operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: 'Never shown: `listTenantCells` takes no filter, so an empty list is always the
       first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getEntitlementUsage` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getEntitlementUsage`
+      requires to show this screen, and names that permission (the screen''s other reads need `PLATFORM_CELL_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `PLATFORM_CELL_MANAGE` for `provisionCell`.'
   apis:
   - operationId: provisionCell
     contract: subscription
@@ -4632,9 +4661,13 @@ screens:
       that makes one — and says so rather than showing an empty table.
     emptyNoResults: 'Never shown: nothing on this screen filters its list, so an empty list is always
       the first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getTenantLicences` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getTenantLicences` requires
+      to show this screen, and names that permission (the screen''s other reads need `DEVELOPER_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `DEVELOPER_ADMIN` for `setApiQuota`,
+      `decideProductionAccess`, `setApiAnomalyRule`; `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants`,
+      `openPlatformStaffGrant`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
       (`openPlatformStaffGrant`: reason, permissions `DEVELOPER_ADMIN`, `DEVELOPER_VIEW`, expiry). The
@@ -5034,9 +5067,12 @@ screens:
     emptyFirstRun: No white-label branding yet. Offers Create preview (`createPreview`).
     emptyNoResults: 'Never shown: `listConfigVersions` takes no filter, so an empty list is always the
       first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `getAppIcons` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires
+      to show this screen, and names that permission (the screen''s other reads need `TENANT_CONFIGURE`,
+      `TENANT_PUBLISH` and say so in their own panels). **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS`
+      for `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
       (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant
@@ -5448,9 +5484,12 @@ screens:
       operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: 'Never shown: `listCustomDomains` takes no filter, so an empty list is always the
       first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `listCustomDomains` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires
+      to show this screen, and names that permission (the screen''s other reads need `TENANT_CONFIGURE`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for
+      `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
       (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant
@@ -5676,9 +5715,12 @@ screens:
       no operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: 'Never shown: `listFaqs` takes no filter, so an empty list is always the first-run
       state above.'
-    emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `listFaqs` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires
+      to show this screen, and names that permission (the screen''s other reads need `TENANT_CONFIGURE`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for
+      `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
       (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant
@@ -5912,9 +5954,12 @@ screens:
     emptyFirstRun: No global defaults yet. Offers Open access grant (`openPlatformStaffGrant`).
     emptyNoResults: 'Never shown: nothing on this screen filters its list, so an empty list is always
       the first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `TENANT_VIEW`, which `getVenueSettingsDefaults` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `TENANT_VIEW`, which `getVenueSettingsDefaults` requires
+      to show this screen, and names that permission (the screen''s other reads need `PLATFORM_TENANT_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for
+      `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`; `TENANT_CONFIGURE` for `setVenueSettingsDefaults`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
       (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant
@@ -6182,9 +6227,12 @@ screens:
       a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on scopePath, isActive and the platform user are still
       there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `USER_MANAGE`, which `listPrincipals` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `USER_MANAGE`, which `listPrincipals` requires to show
+      this screen, and names that permission (the screen''s other reads need `PLATFORM_TENANT_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for
+      `listOwnPlatformStaffGrants`, `openPlatformStaffGrant`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
       (`openPlatformStaffGrant`: reason, permissions `USER_MANAGE`, expiry). The same state returns
@@ -6440,9 +6488,12 @@ screens:
     emptyFirstRun: No platform role yet. Offers Create role (`createRole`).
     emptyNoResults: 'Never shown: `listRoles` takes no filter, so an empty list is always the first-run
       state above.'
-    emptyNoAccess: Shown when the caller lacks `ROLE_MANAGE`, which `listRoles` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ROLE_MANAGE`, which `listRoles` requires to show this
+      screen, and names that permission (the screen''s other reads need `PLATFORM_TENANT_VIEW` and say
+      so in their own panels). **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question. A caller who can see the screen but lacks what an
+      action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants`,
+      `openPlatformStaffGrant`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
       (`openPlatformStaffGrant`: reason, permissions `ROLE_MANAGE`, expiry). The same state returns
@@ -6988,9 +7039,11 @@ screens:
       filter that matched nothing.
     emptyNoResults: Nothing matches the filter on status, environment and the release version are still
       there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listReleases` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listReleases` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_RELEASE_MANAGE`
+      for `createRelease`, `withdrawRelease`; `PLATFORM_RELEASE_PROMOTE` for `promoteRelease`, `rejectRelease`.'
   apis:
   - operationId: listReleases
     contract: platform-ops
@@ -7220,9 +7273,11 @@ screens:
       no operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on status, environment and the staging promotion approval
       are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `getReleaseReadiness`
-      requires, and names that permission. **Never an empty table** — that reads as *there is no data*
-      and sends somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listReleases` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_RELEASE_PROMOTE`
+      for `promoteRelease`, `rejectRelease`.'
   apis:
   - operationId: promoteRelease
     contract: platform-ops
@@ -7406,9 +7461,11 @@ screens:
       no operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: 'Never shown: `listSupportNotices` takes no filter, so an empty list is always the
       first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices`
+      requires to show this screen, and names that permission. **Never an empty table** — that reads
+      as *there is no data* and sends somebody to support with the wrong question. A caller who can
+      see the screen but lacks what an action needs sees that action disabled, naming its permission:
+      `PLATFORM_RELEASE_MANAGE` for `publishSupportNotice`.'
   apis:
   - operationId: publishSupportNotice
     contract: platform-ops
@@ -7547,9 +7604,11 @@ screens:
       operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: 'Never shown: `listUpgradeSchedules` takes no filter, so an empty list is always
       the first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listUpgradeSchedules`
-      requires, and names that permission. **Never an empty table** — that reads as *there is no data*
-      and sends somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listUpgradeSchedules`
+      requires to show this screen, and names that permission. **Never an empty table** — that reads
+      as *there is no data* and sends somebody to support with the wrong question. A caller who can
+      see the screen but lacks what an action needs sees that action disabled, naming its permission:
+      `PLATFORM_RELEASE_MANAGE` for `scheduleTenantUpgrade`.'
   apis:
   - operationId: listUpgradeSchedules
     contract: platform-ops
@@ -7739,9 +7798,13 @@ screens:
       that makes one; distinct from a filter that matched nothing.
     emptyNoResults: 'Never shown: `listSupportNotices` takes no filter, so an empty list is always the
       first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices`
+      requires to show this screen, and names that permission (the screen''s other reads need `PLATFORM_TENANT_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `DEVELOPER_ADMIN` for `deprecateApiVersion`;
+      `PLATFORM_RELEASE_MANAGE` for `publishSupportNotice`; `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants`,
+      `openPlatformStaffGrant`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
       (`openPlatformStaffGrant`: reason, permissions `DEVELOPER_ADMIN`, expiry). The same state returns
@@ -7995,9 +8058,11 @@ screens:
       no operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on appliedTo, pendingOnly and the database migration
       console are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_MIGRATION_VIEW`, which `listMigrations` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_MIGRATION_VIEW`, which `listMigrations` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_MIGRATION_APPLY`
+      for `applyMigration`, `rollbackMigrationRun`.'
   apis:
   - operationId: listMigrations
     contract: platform-ops
@@ -8187,9 +8252,11 @@ screens:
     emptyFirstRun: No environment registry yet. Offers Register environment (`registerEnvironment`).
     emptyNoResults: 'Never shown: `listEnvironments` takes no filter, so an empty list is always the
       first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listEnvironments` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listEnvironments` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_RELEASE_MANAGE`
+      for `registerEnvironment`.'
   apis:
   - operationId: listEnvironments
     contract: platform-ops
@@ -8680,9 +8747,12 @@ screens:
       that matched nothing.
     emptyNoResults: 'Never shown: `listCellJobs` takes no filter, so an empty list is always the first-run
       state above.'
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listCellJobs` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listCellJobs` requires
+      to show this screen, and names that permission (the screen''s other reads need `PLATFORM_RELEASE_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `PLATFORM_RELEASE_PROMOTE` for
+      `pauseRollout`, `rollbackRollout`, `startRollout`.'
     rolloutPendingApproval: '**Requested, not moved.** `startRollout` answered 202: the rollout shows
       the stage it has reached, the stage requested and that a `releasePromotion` approval is pending
       with the platform release manager. The requester sees no approve action for their own request
@@ -8885,9 +8955,11 @@ screens:
       no operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: 'Never shown: `listCellJobs` takes no filter, so an empty list is always the first-run
       state above.'
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellCapacity` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellCapacity` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_CELL_MANAGE`
+      for `setScalingPolicy`.'
   apis:
   - operationId: getCellCapacity
     contract: subscription
@@ -9112,9 +9184,13 @@ screens:
       from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on module, includeArchived and the security compliance
       are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listDashboards` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires
+      to show this screen, and names that permission (the screen''s other reads need `REPORT_VIEW_VENUE`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for
+      `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`; `REPORT_MANAGE` for `createDashboard`,
+      `updateDashboard`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
       (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant
@@ -9348,9 +9424,11 @@ screens:
       operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: 'Never shown: `listCellJobs` takes no filter, so an empty list is always the first-run
       state above.'
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellHealth` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listWafRules` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_CELL_MANAGE`
+      for `setWafPolicy`.'
   apis:
   - operationId: listWafRules
     contract: platform-ops
@@ -9830,9 +9908,11 @@ screens:
       no operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: 'Never shown: `listSupportNotices` takes no filter, so an empty list is always the
       first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices`
+      requires to show this screen, and names that permission. **Never an empty table** — that reads
+      as *there is no data* and sends somebody to support with the wrong question. A caller who can
+      see the screen but lacks what an action needs sees that action disabled, naming its permission:
+      `PLATFORM_RELEASE_MANAGE` for `publishSupportNotice`.'
   apis:
   - operationId: listSupportNotices
     contract: platform-ops
@@ -9986,9 +10066,11 @@ screens:
       no operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: 'Never shown: `listSupportNotices` takes no filter, so an empty list is always the
       first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices`
+      requires to show this screen, and names that permission. **Never an empty table** — that reads
+      as *there is no data* and sends somebody to support with the wrong question. A caller who can
+      see the screen but lacks what an action needs sees that action disabled, naming its permission:
+      `PLATFORM_RELEASE_MANAGE` for `publishSupportNotice`.'
   apis:
   - operationId: publishSupportNotice
     contract: platform-ops
@@ -10288,9 +10370,13 @@ screens:
       nothing.
     emptyNoResults: 'Never shown: `listAiProviders` takes no filter, so an empty list is always the
       first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `AI_CONFIGURE`, which `listAiProviders` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `AI_CONFIGURE`, which `listAiProviders` requires to
+      show this screen, and names that permission (the screen''s other reads need `AI_USE`, `PLATFORM_TENANT_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `AI_APPROVE` for `publishPromptTemplate`;
+      `PLATFORM_AI_MANAGE` for `setAiModel`, `setAiByokEnablement`; `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants`,
+      `openPlatformStaffGrant`; `PLATFORM_TENANT_MANAGE` for `setAiProvider`; `SCOPE_VIEW` for `getRegionSettings`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so the provider list and every action are disabled and the screen offers **Open
       access grant** (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns
@@ -11070,9 +11156,11 @@ screens:
       that makes one; distinct from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on consumer, since and the dead letters are still there.
       Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listDeadLetters` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listDeadLetters` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_CELL_MANAGE`
+      for `replayDeadLetter`, `republishOutbox`, `cancelOutboxRepublish`.'
   apis:
   - operationId: listDeadLetters
     contract: platform-ops

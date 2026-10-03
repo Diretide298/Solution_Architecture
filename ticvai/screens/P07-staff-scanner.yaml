@@ -345,9 +345,11 @@ screens:
       operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: Nothing matches the filter on venueId and the access point direction are still there.
       Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `SCOPE_VIEW`, which `listAccessPoints` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `SCOPE_VIEW`, which `listAccessPoints` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no data*
+      and sends somebody to support with the wrong question. A caller who can see the screen but lacks
+      what an action needs sees that action disabled, naming its permission: `TURNSTILE_MODE_SET` for
+      `startPodiumShift`, `endPodiumShift`.'
     offline: Fully offline. The access point list is in the bundle
   apis:
   - operationId: listAccessPoints
@@ -824,9 +826,11 @@ screens:
       that makes one — and says so rather than showing an empty table.
     emptyNoResults: Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo
       and the group admission are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `TICKET_LOOKUP`
+      for `lookupTicket`.'
     offline: Fully offline. Admits what is valid and states the shortfall
   apis:
   - operationId: validateGroupAccess
@@ -998,9 +1002,11 @@ screens:
       that makes one — and says so rather than showing an empty table.
     emptyNoResults: Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo
       and the manual entry are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `TICKET_LOOKUP`
+      for `lookupTicket`.'
     offline: Searches the bundle only. A reference issued after the last sync will not be found, and the
       screen says so rather than denying
   apis:
@@ -1196,9 +1202,11 @@ screens:
       that makes one — and says so rather than showing an empty table.
     emptyNoResults: Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo
       and the ticket lookup are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires
+      to show this screen, and names that permission (the screen''s other reads need `REPORT_VIEW_VENUE`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `TICKET_LOOKUP` for `lookupTicket`.'
     offline: Bundle only, and the bundle age is shown beside the results
   apis:
   - operationId: lookupTicket
@@ -1327,9 +1335,11 @@ screens:
     error: Could not load. Names which read failed and leaves the delegated right untouched.
     emptyFirstRun: 'Never a create action: a delegated right arrives by scan. With nothing scanned the
       screen says "Scan the ticket from the other venue".'
-    emptyNoAccess: Shown when the caller lacks `TICKET_LOOKUP`, which `getCrossRegionEntitlement` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `TICKET_LOOKUP`, which `getCrossRegionEntitlement` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `ACCESS_VALIDATE`
+      for `consumeCrossRegionEntitlement`.'
     offline: '**Not available offline.** A delegated right issued in another region cannot be verified
       from a local bundle, and admitting on trust is how a pass gets used twice in two countries'
   apis:
@@ -1544,9 +1554,11 @@ screens:
       that makes one — and says so rather than showing an empty table.
     emptyNoResults: Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo
       and the offline journal are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `ACCESS_OVERRIDE`
+      for `overrideAccess`; `TICKET_LOOKUP` for `lookupTicket`.'
     offline: The journal is the offline record. It is why an offline admit is recoverable
   apis:
   - operationId: getOfflinePackage
@@ -1821,9 +1833,12 @@ screens:
       that makes one — and says so rather than showing an empty table.
     emptyNoResults: Nothing matches the filter on workstationId, kind, resolved and the sync reconciliation
       are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires to show
+      this screen, and names that permission (the screen''s other reads need `ACCESS_VALIDATE`, `REPORT_VIEW_VENUE`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `ACCESS_OVERRIDE` for `overrideAccess`;
+      `TICKET_LOOKUP` for `lookupTicket`.'
     offline: Not applicable. This screen exists to end the offline period
   apis:
   - operationId: syncScans
@@ -1973,9 +1988,11 @@ screens:
       that makes one — and says so rather than showing an empty table.
     emptyNoResults: Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo
       and the offline package are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `TICKET_LOOKUP`
+      for `lookupTicket`.'
     offline: Cannot refresh. The existing bundle continues to be used and its age is shown
   apis:
   - operationId: getOfflinePackage
@@ -2148,9 +2165,11 @@ screens:
       makes one — and says so rather than showing an empty table.
     emptyNoResults: Nothing matches the filter on venueId and the gate mode are still there. Names the
       active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `SCOPE_VIEW`, which `getAccessPoint` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `SCOPE_VIEW`, which `listAccessPoints` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no data*
+      and sends somebody to support with the wrong question. A caller who can see the screen but lacks
+      what an action needs sees that action disabled, naming its permission: `ACCESS_DIRECTION_SET` for
+      `setAccessPointDirection`; `TURNSTILE_MODE_SET` for `setTurnstileMode`, `cancelGateModeChange`.'
     offline: '**Requests only.** Hardware control is out of contract and the vendor SDK is outstanding
       (CF-33)'
   apis:

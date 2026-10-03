@@ -535,9 +535,11 @@ screens:
       for a contact that arrives outside the queue; distinct from a filter that matched nothing.'
     emptyNoResults: Nothing matches the status, assignee, priority or SLA filter, and the cases are still
       there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `CASE_VIEW`, which `listCases` requires, and names that
-      permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support
-      with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `CASE_VIEW`, which `listCases` requires to show this screen,
+      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question. A caller who can see the screen but lacks what an action
+      needs sees that action disabled, naming its permission: `CASE_MANAGE` for `addCaseMessage`, `createCase`,
+      `escalateCase`, `reopenCase` and 2 more.'
   apis:
   - operationId: listCases
     contract: marketing-crm
@@ -885,9 +887,11 @@ screens:
       that makes one; distinct from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on status, assignedToPrincipalId, breachedSla, priority
       and the conversation queue are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `CASE_VIEW`, which `listConversations` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `CASE_VIEW`, which `listConversations` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no data*
+      and sends somebody to support with the wrong question. A caller who can see the screen but lacks
+      what an action needs sees that action disabled, naming its permission: `CASE_MANAGE` for `claimConversation`,
+      `transferConversation`.'
   apis:
   - operationId: listConversations
     contract: marketing-crm
@@ -1277,9 +1281,11 @@ screens:
       that matched nothing.
     emptyNoResults: Nothing matches the filter on status, assignedToPrincipalId, breachedSla, priority
       and the live chat are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `CASE_VIEW`, which `getCase` requires, and names that permission.
-      **Never an empty table** — that reads as *there is no data* and sends somebody to support with the
-      wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `CASE_VIEW`, which `getCase` requires to show this screen,
+      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question. A caller who can see the screen but lacks what an action
+      needs sees that action disabled, naming its permission: `CASE_MANAGE` for `addCaseMessage`, `updateCase`,
+      `escalateCase`, `createCase` and 4 more.'
   apis:
   - operationId: addCaseMessage
     contract: marketing-crm
@@ -1567,9 +1573,11 @@ screens:
       from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on channel and the canned response are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `MARKETING_VIEW`, which `listMessageTemplates` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `MARKETING_VIEW`, which `listMessageTemplates` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE`
+      for `createMessageTemplate`.'
   apis:
   - operationId: listMessageTemplates
     contract: marketing-crm
@@ -1862,9 +1870,12 @@ screens:
       a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on category, search and the agent performance sla are still
       there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getFinancialReport` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getFinancialReport` requires
+      to show this screen, and names that permission (the screen''s other reads need `CASE_VIEW` and say
+      so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question. A caller who can see the screen but lacks what an action needs
+      sees that action disabled, naming its permission: `REPORT_MANAGE` for `createReport`, `deleteReport`,
+      `saveNaturalLanguageQuery`, `updateReport`.'
   apis:
   - operationId: runReport
     contract: reporting
