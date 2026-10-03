@@ -870,8 +870,8 @@ prevention:
   ref: tools/check-screen-patterns.py
 status: closed
 closed_by_commit: 95e18a36
-notes: 'Batch SPF (spec-screens), 3 October 2026. Counts: 784 -> 53, each exempted in the check with its reason:
-  6 on Block A are questions for the lead (WEB-014, WEB-038, WEB-039, GST-005, POS-010, KIT-010), 47 are workshop-pack
+notes: 'Batch SPF (spec-screens), 3 October 2026. Counts: 784 -> 60, each exempted in the check with its reason:
+  6 on Block A are questions for the lead (WEB-014, WEB-038, WEB-039, GST-005, POS-010, KIT-010), 54 are workshop-pack
   spokes outside Block A whose hub holds no record (a Block B design decision). The check fails on the commit before
-  the fix (bf90f1ce''s parent, 4e2c56c1: P5 findings) and passes after it. Tickets: none started (Block A starts
+  the fix (bf90f1ce''s parent, 4e2c56c1: P5 findings) and passes after it. Follow-up 0848c05d: derive-carries now counts a row id by its schema''s last word (RentalBooking.id is bookingId), the rule this fix holds edges to. Tickets: none started (Block A starts
   Monday 5 October).'
