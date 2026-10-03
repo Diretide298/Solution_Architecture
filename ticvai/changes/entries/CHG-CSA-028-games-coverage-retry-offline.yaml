@@ -34,7 +34,7 @@ release_tag: pending
 decision_owner: Chinmay
 prevention:
   type: template-field
-  ref: contracts/satellite/games.yaml::coversGamesAddedLater
+  ref: contracts/satellite/games.yaml::includesGamesAddedLater  # renamed by CHG-GTRB-005
 status: closed
 closed_by_commit: 9bc4ce04
 notes: 'Dependency on the spine agent: the venue''s maximum offline duration is access AccessOfflinePolicy (setGateOfflinePolicy),

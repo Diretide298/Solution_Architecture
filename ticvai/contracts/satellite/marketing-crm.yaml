@@ -17904,7 +17904,7 @@ components:
       - provider
       - technologyType
       - isThirdParty
-      - preConsentViolation
+      - isPreConsentViolation
       properties:
         id:
           type: string
@@ -17980,7 +17980,7 @@ components:
           - platformCatalogue
           - none
           nullable: true
-        preConsentViolation:
+        isPreConsentViolation:
           type: boolean
           description: Seen with no decision or after reject-all, and its category (the registry's, else the
             suggested one) is not `strictlyNecessary`. An unclassified technology counts as a violation, as

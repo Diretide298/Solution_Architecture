@@ -1,0 +1,32 @@
+id: CHG-GTRB-006
+date: '2026-10-03'
+source: audit
+kind: process
+summary: check-ddl-conventions reads require_ as an assertion (as it reads allow_ and requires_) and strips _ref from a key's stem.
+decision:
+  what: 'tools/check-ddl-conventions.py: BOOL_OK takes `require_` beside `requires_`, as it already takes `allow_` beside
+    `allows_` and `enable_` beside `enabled`; the R082 foreign-key stem strips `_ref`/`_refs` as it strips `_id`/`_ids`,
+    since `*Ref` is the package''s name for a key to an asset (imageAssetRef, sourceRef). Ten baselined D-NAMING and two
+    D-FK-TARGET-NAME entries go with them.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'The r1 merge refresh (64f0035e) failed check-ddl-conventions on orders.till_shift_policy.require_open_approval and
+  require_close_approval (CHG-CSP-020) and on maintenance.incident_media.asset_ref references assets.media_asset
+  (R082). All three name what they are; the rule (3c05cbb1) had the gaps.'
+keys_touched:
+  tables:
+  - orders.till_shift_policy
+  - maintenance.incident_media
+  files:
+  - tools/check-ddl-conventions.py
+root_class: A24 GLOSSARY
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py
+status: open

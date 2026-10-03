@@ -1,0 +1,30 @@
+id: CHG-GTRB-004
+date: '2026-10-03'
+source: audit
+kind: process
+summary: derive-lineage gives a new write operation whose body is not a record the tables of the record it returns.
+decision:
+  what: 'tools/derive-lineage.py: for a non-GET operation whose request body derives no table, writes are the tables behind
+    its 2xx response schemas, the reading CHG-R1S-005 gave the stored entries by hand. setVenueMapArtwork (body baseAssetId
+    and alignment points, returns the VenueMap) now derives writes [venuemap.map].'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'check-write-lineage (W-NOTABLE, CHG-R1S-005) failed the r1 merge refresh (64f0035e) on setVenueMapArtwork, added by
+  the contracts branch (988babab) while the check came from the specs branch (7abd44b3). The one-off
+  tools/applied/lineage-writes-3-october.py fixed the stored entries but no generator rule covered a new one.'
+keys_touched:
+  operations:
+  - setVenueMapArtwork
+  files:
+  - tools/derive-lineage.py
+root_class: A22 LINEAGE
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-lineage.py
+status: open

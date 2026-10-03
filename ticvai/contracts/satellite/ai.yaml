@@ -16872,7 +16872,7 @@ components:
       - priority
       - isActive
       properties:
-        statelessOnly:
+        isStatelessOnly:
           type: boolean
           readOnly: true
           description: '**True for every endpoint outside the UAE** (3 October 2026, CHG-R1S-016; the legal research

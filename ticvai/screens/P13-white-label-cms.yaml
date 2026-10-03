@@ -3671,14 +3671,14 @@ screens:
         - CustomDomain.verificationRecord
         - CustomDomain.status
         - CustomDomain.revalidation
-        - CustomDomain.cnameLost
+        - CustomDomain.isCnameLost
         - CustomDomain.readiness
         - CustomDomain.failureReason
         operation: listCustomDomains
         provenance: corrected 2 October 2026 (CHG-SGU-012, decided by Chinmay 2 October 2026, DEC-547)
         notes: '**The records to publish** (`dnsRecords`: TXT `_dnsauth`, CNAME to the Front Door endpoint,
           CAA or NS, each with its observed value and status, with copy buttons); pending revalidation
-          and timed-out states; a takeover warning when the CNAME no longer points at TICVAI (`cnameLost`);
+          and timed-out states; a takeover warning when the CNAME no longer points at TICVAI (`isCnameLost`);
           per-domain readiness (UAE Pass redirect, Apple Pay domain, app links) (decided by Chinmay, 2
           October 2026; DEC-547; CHG-CSA-043) (CHG-SGU-012).'
     - name: actionBar

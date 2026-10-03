@@ -1,0 +1,54 @@
+id: CHG-GTRB-005
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: Six boolean fields whose columns the merged generator now derives are renamed to read as assertions.
+decision:
+  what: 'ai AiProvider.statelessOnly -> isStatelessOnly; games GameEntitlement.coversGamesAddedLater -> includesGamesAddedLater;
+    games ReaderOfflineQueue.refusingOfflineTaps -> isRefusingOfflineTaps; marketing-crm CookieScanFinding.preConsentViolation
+    -> isPreConsentViolation; white-label CustomDomain.cnameLost -> isCnameLost; white-label PublishReviewPolicy
+    .reviewerMustDifferFromAuthor -> requiresReviewerOtherThanAuthor. Every mention follows: BO-427 notes, the CMS-017 binding
+    and notes, F103, the white-label flow brief and the AI system design. The derived DDL columns follow on the next
+    refresh (is_stateless_only, includes_games_added_later, ...).'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'check-ddl-conventions (D-NAMING, R093 R119) failed the r1 merge refresh (64f0035e) on eight boolean columns that
+  the merged contracts and generator now persist (the committed DDL at 64f0035e predates them). Six do not read as an
+  assertion; the other two (require_open_approval, require_close_approval) are the rule''s gap, CHG-GTRB-006.
+  statelessOnly is new on 3 October (CHG-R1S-016); the others date from CHG-CSA-028, CHG-FUP-009, CHG-CSA-043 and
+  CHG-SGU-012. No r1 tag exists yet, so no released contract changes.'
+keys_touched:
+  schemas:
+  - AiProvider
+  - GameEntitlement
+  - ReaderOfflineQueue
+  - CookieScanFinding
+  - CustomDomain
+  - PublishReviewPolicy
+  screens:
+  - BO-427
+  - CMS-017
+  flows:
+  - F103
+  files:
+  - contracts/satellite/ai.yaml
+  - contracts/satellite/games.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/white-label.yaml
+  - screens/P08-venue-back-office.yaml
+  - screens/P13-white-label-cms.yaml
+  - flows/F103-a-tenant-claims-a-domain-and-gets-a-certificate.yaml
+  - handoff/flow-briefs/white-label.yaml
+  - docs/architecture/ai-system-design.md
+  - changes/entries/CHG-CSA-028-games-coverage-retry-offline.yaml
+root_class: A24 GLOSSARY
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py
+status: open

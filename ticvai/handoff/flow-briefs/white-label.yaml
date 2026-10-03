@@ -73,7 +73,7 @@ flows:
       - {rule: 'No change since the live version', message: 'Publish disabled: "No changes since version 14".'}
       source: 'Publisher, CMS-014'
     - name: Publish review policy
-      formats: ['enabled: boolean', 'reviewerMustDifferFromAuthor: boolean', 'appliesTo: [tenantConfig, contentBlock] (empty = both)']
+      formats: ['enabled: boolean', 'requiresReviewerOtherThanAuthor: boolean', 'appliesTo: [tenantConfig, contentBlock] (empty = both)']
       limits: 'One row per tenant, off by default.'
       validation: ["user without TENANT_PUBLISH -> the diff and findings stay visible; Publish is replaced by \"Ask someone with publish rights\" (CMS-014) (derived)"]
       source: 'Publisher (TENANT_PUBLISH), CMS-014 settings panel'
@@ -311,11 +311,11 @@ flows:
       states: {ready: '"Your site is at aquaventure.ae.ticvai.app" (wildcard certificate), Primary while no custom domain is'}
       failure_branches: []
     - name: Domain row and records table
-      states: {emptyFirstRun: 'No custom domain yet + Claim custom domain', pending: 'Records to publish with copy buttons', verifying: 'Last checked <time>; "DNS can take hours"', verified: 'Records ok', issuing: 'Issuing certificate', active: 'Active; certificate expiry date, amber within 30 days', failed: 'failureReason', expired: 'Expired', revoked: 'Revoked', pendingRevalidation: 'Still serving; waiting shown beside status', timedOut: 'Get a new record', cnameLost: 'Takeover/lost-routing warning naming the record to restore or remove'}
+      states: {emptyFirstRun: 'No custom domain yet + Claim custom domain', pending: 'Records to publish with copy buttons', verifying: 'Last checked <time>; "DNS can take hours"', verified: 'Records ok', issuing: 'Issuing certificate', active: 'Active; certificate expiry date, amber within 30 days', failed: 'failureReason', expired: 'Expired', revoked: 'Revoked', pendingRevalidation: 'Still serving; waiting shown beside status', timedOut: 'Get a new record', isCnameLost: 'Takeover/lost-routing warning naming the record to restore or remove'}
       failure_branches:
       - {what: 'Hostname routed to another tenant at verify (409 hostname-taken)', user_sees: '"This domain is in use elsewhere. Contact support."', recover: 'Platform support on ADM-017 under a grant'}
       - {what: 'Certificate renewal fails (e.g. weekend)', user_sees: 'Failed with reason and expiry countdown', recover: 'Job retries; fix the named record'}
-      - {what: 'CNAME no longer points at TICVAI while active', user_sees: 'cnameLost flag: guests on that host no longer reach the storefront', recover: 'Restore the record'}
+      - {what: 'CNAME no longer points at TICVAI while active', user_sees: 'isCnameLost flag: guests on that host no longer reach the storefront', recover: 'Restore the record'}
     - name: Readiness checklist per domain
       states: {ready: 'UAE Pass redirect registered / Apple Pay merchant domain verified / app links served (AASA, assetlinks) each ok or pending'}
       failure_branches:
@@ -323,7 +323,7 @@ flows:
     - name: Release confirmation
       states: {confirm: 'Takeover warning: "Remove the CNAME and the TXT record from your DNS"', refused: '409 only active domain for a live app, naming what would break', released: '204, unrouted'}
       failure_branches:
-      - {what: 'CNAME left in place after release', user_sees: 'cnameLost on the released host until removed', recover: 'Remove the record'}
+      - {what: 'CNAME left in place after release', user_sees: 'isCnameLost on the released host until removed', recover: 'Remove the record'}
     steps:
     - {frame: 1, screen: CMS-017, sees: 'Default address panel; empty custom-domain list; Claim custom domain', does: 'Claims tickets.coastalaqua.ae, kind Guest website, routing CNAME', op: 'white-label#getPlatformSubdomain, white-label#listCustomDomains, white-label#claimCustomDomain', result: '201 with records: TXT _dnsauth and CNAME to Front Door, each with copy buttons'}
     - {frame: 2, screen: CMS-017, sees: 'Records table expected vs observed, status Verifying, last checked', does: 'Publishes the records at the DNS provider; optionally Check now', op: 'white-label#verifyCustomDomain, white-label#listCustomDomains', result: 'Verified -> Issuing certificate -> Active (job-driven)'}

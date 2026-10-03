@@ -556,6 +556,7 @@ paths:
             `navigationFileRef` (`navigationFileMissing`), a `sourceRef` whose asset kind does not
             fit the format (`formatMismatch`: a GLB sent as `pdfPlan`, a PDF as `glbModel`), or a GLB
             over 40 MB (`modelTooLarge`, ADR-0069 section 6). The reason names the file.
+          x-ticvai-problem-types: [navigation-file-missing, format-mismatch, model-too-large]
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/VenueMapImportProblem' }

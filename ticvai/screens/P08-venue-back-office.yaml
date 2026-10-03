@@ -27829,6 +27829,7 @@ screens:
     - BO-1111
     - BO-1146
     - BO-1162
+    - BO-1179
     transitions:
     - to: BO-008
       trigger: Product Detail & Variants
@@ -27968,6 +27969,10 @@ screens:
         3 October 2026); its command centre is not in Block A'
     - to: BO-1162
       trigger: Opens Security Governance, Audit & Rule Publication
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-1179
+      trigger: Opens Integration Monitoring & Exception Workbench
       provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
         3 October 2026); its command centre is not in Block A'
   notes: Section landing. **28 screens reach the entry point through here** — before 20 August they reached
@@ -72146,7 +72151,7 @@ screens:
       a game entitlement.'
     source: contracts/satellite/games.yaml#createGameEntitlement
   notes: '**An all-games pass covers games added after sale unless the venue says not; type-based passes
-    cover new games by default (decided 2 October 2026 by Chinmay, DEC-397; CHG-CSA-028, `coversGamesAddedLater`).**'
+    cover new games by default (decided 2 October 2026 by Chinmay, DEC-397; CHG-CSA-028, `includesGamesAddedLater`).**'
 - id: BO-428
   name: Specific Game/Ride Unlimited Entitlement
   module: Games & Rides
@@ -157968,6 +157973,7 @@ screens:
   navigation:
     entryFrom:
     - BO-1173
+    - BO-101
     exitTo:
     - BO-1173
     transitions:

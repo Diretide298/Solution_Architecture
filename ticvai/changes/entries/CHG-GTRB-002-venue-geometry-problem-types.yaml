@@ -1,0 +1,30 @@
+id: CHG-GTRB-002
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: importVenueGeometry's 422 names its problem types (navigation-file-missing, format-mismatch, model-too-large).
+decision:
+  what: 'venue-map: the 422 of importVenueGeometry, added by the r1 additions (CHG-RONEC-001..005, 988babab) with the
+    refusals navigationFileMissing, formatMismatch and modelTooLarge, gets x-ticvai-problem-types [navigation-file-missing,
+    format-mismatch, model-too-large], one per refusedReason of VenueMapImportProblem.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'check-problem-types (CHG-R1S-021, a falling ceiling of 707) failed the r1 merge refresh (64f0035e) at 708: the
+  contracts branch added the 422 and the specs branch added the ceiling, so each passed alone. A developer cannot
+  contract-test an error whose type nobody named.'
+keys_touched:
+  operations:
+  - importVenueGeometry
+  files:
+  - contracts/satellite/venue-map.yaml
+root_class: 'new: problem-type-missing'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-problem-types.py
+status: open

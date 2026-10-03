@@ -1,0 +1,34 @@
+id: CHG-GTRB-001
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: The guest projection's new variant id is qualified - retail GuestMerchandiseItem.variantId -> productVariantId.
+decision:
+  what: 'retail: GuestMerchandiseItem.variantId -> productVariantId, with x-ticvai-references catalogue.ProductVariant and
+    a description saying addCartLine takes it as its variantId. A qualified compound names the entity (a Product variant),
+    which is how the glossary check reads a compound; the bare word Variant stays banned (the glossary says Attribute).
+    The 17 older variantId fields stay in the baseline as before.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'check-glossary-terms (G-BANNED-NAME, R131, A24 GLOSSARY) failed the r1 merge refresh (64f0035e) on
+  GuestMerchandiseItem.variantId, added on 3 October by CHG-R1S-004 (7abd44b3) so WEB-033 can add to the cart from the
+  guest projection. The same fix as CHG-GTB-008: a new field named with a bare banned word is qualified.'
+keys_touched:
+  schemas:
+  - GuestMerchandiseItem
+  operations:
+  - listMerchandise
+  files:
+  - contracts/satellite/retail.yaml
+root_class: A24 GLOSSARY
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-glossary-terms.py
+status: open
+notes: Additive against the last release - the field did not exist before CHG-R1S-004 and no screen binds it.

@@ -2422,7 +2422,7 @@ components:
           items:
             type: string
             format: uuid
-        coversGamesAddedLater:
+        includesGamesAddedLater:
           type: boolean
           default: true
           description: '**Whether a pass sold today covers a game added tomorrow** (Chinmay, 2 October, workbook Q397:
@@ -3034,7 +3034,7 @@ components:
           nullable: true
           readOnly: true
           description: When the reader lost its connection; null while online.
-        refusingOfflineTaps:
+        isRefusingOfflineTaps:
           type: boolean
           readOnly: true
           description: '**True once the reader has been offline longer than the venue''s maximum offline duration**

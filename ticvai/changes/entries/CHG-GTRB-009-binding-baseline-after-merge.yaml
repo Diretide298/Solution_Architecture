@@ -1,0 +1,29 @@
+id: CHG-GTRB-009
+date: '2026-10-03'
+source: audit
+kind: process
+summary: The binding ratchet baseline is re-recorded on the merge, where the plan moved screens into Block A.
+decision:
+  what: 'checks/baseline.json re-recorded with --update-baseline on the refreshed merge (64f0035e plus this batch):
+    venue-management A 198 -> 201 and venue-staff-mobile A 20 -> 21 because the merged plan moved screens into Block A
+    with their existing unbound controls (BO-101 to BO-108, BO-1187, ANL-001, EMP-066); C and D fell by the same, and
+    the total unbound controls fell 5471 -> 5469, fully resolved screens rose 1406 -> 1408.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'check-binding-ratchet failed the r1 merge refresh (64f0035e) on two app|block counts. The baseline was recorded at
+  6905acd4, before CHG-RONEP-007 (92bb83fa) pulled the section homes into Block A. The same re-record as CHG-GTR-005
+  (b23001f6) after a plan move.'
+keys_touched:
+  files:
+  - checks/baseline.json
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-binding-ratchet.py
+status: open

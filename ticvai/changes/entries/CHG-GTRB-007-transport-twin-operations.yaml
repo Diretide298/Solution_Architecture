@@ -1,0 +1,35 @@
+id: CHG-GTRB-007
+date: '2026-10-03'
+source: audit
+kind: spec
+summary: The transport guest pair sanctions its different operations; the navigation baseline drops the 60 entries gone.
+decision:
+  what: 'screens/_guest-pairs.yaml, group transport: `sanctioned.operations` - GST-077 is a screen of its own, opened on
+    one departure, so it reloads it (getTransportDeparture, CHG-R1S-004); WEB-049 draws the departures beside the route
+    from searchTransportDepartures and never opens one by id. handoff/audit-baseline.json: check-navigation re-recorded
+    with --update-baseline, which only removes the 60 entries no longer found (0 new).'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'check-navigation (N-TWIN-OPS, R281) failed the r1 merge refresh (64f0035e) on the transport group: the specs
+  branch (7abd44b3, CHG-R1S-004 "screens read what they show") gave GST-077 the departure read its web twin does not
+  need.'
+keys_touched:
+  screens:
+  - GST-077
+  - WEB-049
+  operations:
+  - getTransportDeparture
+  files:
+  - screens/_guest-pairs.yaml
+  - handoff/audit-baseline.json
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-navigation.py
+status: open

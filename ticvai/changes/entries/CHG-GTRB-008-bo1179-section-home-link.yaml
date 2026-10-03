@@ -1,0 +1,31 @@
+id: CHG-GTRB-008
+date: '2026-10-03'
+source: audit
+kind: spec
+summary: BO-101 links to BO-1179, which the merged plan puts in Block A1 behind a command centre outside it.
+decision:
+  what: 'screens/P08: BO-101 (its section home) exits to BO-1179 with a transition, and BO-1179 lists BO-101 in entryFrom,
+    written by the CHG-RONEP-007 linker (tools/applied/nav-homes-r1-plan-3-october.py), whose second run on the merged
+    plan found exactly this one link.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'check-plan-closure (C-REACH, CHG-RONEP-006) failed the r1 merge refresh (64f0035e): BO-1179 (Integration
+  Monitoring & Exception Workbench) is in Block A1 on the merged plan and was reached only through BO-1173, outside it
+  (BO-100 > BO-1173 > BO-1179). The plan branch ran the linker before the specs and contracts branches met it.'
+keys_touched:
+  screens:
+  - BO-101
+  - BO-1179
+  files:
+  - screens/P08-venue-back-office.yaml
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py
+status: open

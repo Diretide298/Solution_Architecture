@@ -89,8 +89,16 @@ def main() -> int:
                                               "block-a-extra-tasks.json `operations` / `builds`")
 
     hosted = re.compile(r"gpt-oss|Qwen3Guard|vLLM|GPU (?:node )?pool|in-cell (?:open )?model|self-hosted (?:guard|LLM|model)|BGE-M3|Qwen3-(?:Embedding|Reranker)|(?:embeddings?|reranking)[^.;]{0,30}self-hosted", re.I)
+    # A negated mention is the decision itself, not a plan: "no in-cell model: we host none" (CHG-R1S-002 in
+    # AI-ENGINE-GATEWAY) failed the r1 merge refresh until this (CHG-GTRB-003).
+    negated = re.compile(r"\b(?:no|not|never|without|nor)\s+(?:an?\s+|any\s+)?$", re.I)
+
+    def plans_hosting(text):
+        return next((m for m in hosted.finditer(text) if not negated.search(text[max(0, m.start() - 20):m.start()])),
+                    None)
+
     for k, r in sorted(rows.items()):
-        m = hosted.search(r.get("description") or "") if r["type"] == "Task" else None
+        m = plans_hosting(r.get("description") or "") if r["type"] == "Task" else None
         if m:
             guard.add("B-HOSTED-MODEL", k, f"{k} plans '{m.group(0)}': the AI goes through providers (Core42 Compass, "
                                            "OpenAI UAE, BYOK) and the guard is the provider's safety service")

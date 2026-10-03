@@ -1,0 +1,28 @@
+id: CHG-GTRB-003
+date: '2026-10-03'
+source: audit
+kind: process
+summary: check-ticket-builds B-HOSTED-MODEL no longer reads a negated mention ("no in-cell model") as a plan to host one.
+decision:
+  what: 'tools/check-ticket-builds.py: a B-HOSTED-MODEL match preceded within 20 characters by no, not, never, without or
+    nor (optionally "a", "an" or "any") is the decision itself and is skipped. The task text stays as it is: it says what
+    was decided.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'The r1 merge refresh (64f0035e) failed check-ticket-builds on AI-ENGINE-GATEWAY, whose detail (CHG-R1S-002, 7abd44b3)
+  says "no in-cell model: we host none unless a client asks". The rule (CHG-RONEP-008, 92bb83fa) matched "in-cell model"
+  and misread the negation; the text is right and the rule was wrong.'
+keys_touched:
+  files:
+  - tools/check-ticket-builds.py
+root_class: 'new: hosting-decision'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-ticket-builds.py
+status: open

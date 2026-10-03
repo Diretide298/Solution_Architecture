@@ -290,7 +290,7 @@ paths:
 
         **The takeover warning** (CHG-CSA-043): the confirmation tells the tenant to remove the CNAME (and the TXT
         record) from its DNS, because a record left pointing at TICVAI could be claimed by somebody else; a
-        scheduled check flags any that remain (`CustomDomain.cnameLost`).
+        scheduled check flags any that remain (`CustomDomain.isCnameLost`).
 
         '
       x-ticvai-calls:
@@ -721,7 +721,7 @@ paths:
       summary: Switch the publish review step on or off
       description: '**An optional review step the venue can switch on** (Chinmay, 2 October, workbook Q156;
         CHG-CSA-042). When on, `publishTenantConfig` and `publishContentBlock` raise an approval request instead of
-        publishing, and the version or block goes live when approved; `reviewerMustDifferFromAuthor` keeps the
+        publishing, and the version or block goes live when approved; `requiresReviewerOtherThanAuthor` keeps the
         products'' rule. When off, a permission holder simulates (`createPreview`) and publishes in one step.
 
         '
@@ -6553,7 +6553,7 @@ components:
             changed); it keeps serving while the job re-checks. `timedOut`: a claim whose records were not published
             within the validation window; `regenerateDomainToken` starts it again. Kept beside `status`, not inside it,
             because a new status value would break a client built at r1 (CHG-CSA-043 notes).'
-        cnameLost:
+        isCnameLost:
           type: boolean
           readOnly: true
           description: '**Takeover warning** (CHG-CSA-043). True when a scheduled check finds that an `active` or
@@ -6717,7 +6717,7 @@ components:
         enabled:
           type: boolean
           default: false
-        reviewerMustDifferFromAuthor:
+        requiresReviewerOtherThanAuthor:
           type: boolean
           default: true
         appliesTo:
