@@ -34,6 +34,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-ticket-text.py
-status: open
+status: closed
+closed_by_commit: b23001f6
 notes: op-release.py still refuses a bundle in which a task pointer has no done-when (CHG-REL-003); this makes the plan
   row carry it too.

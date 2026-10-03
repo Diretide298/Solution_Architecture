@@ -43,7 +43,8 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/op-release.py::ARCHIVED_PROJECT
-status: open
+status: closed
+closed_by_commit: b23001f6
 notes: 'Before the r1 push: create the new project, then build the bundle with tools/op-release.py --release r1 --project
   <new id>. push-openproject.py and the other per-release op-* tools still default to PROJECT = 153; they are superseded
   by op-release.py/.rb but should not be run against the new project without changing it.'

@@ -25,4 +25,5 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-package.py
-status: open
+status: closed
+closed_by_commit: b23001f6

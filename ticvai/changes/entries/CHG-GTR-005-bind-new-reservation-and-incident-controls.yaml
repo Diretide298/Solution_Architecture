@@ -27,7 +27,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-binding-ratchet.py
-status: open
+status: closed
+closed_by_commit: b23001f6
 notes: 'The refresh with the fresh start (CHG-GTR-001) then failed the ratchet again on venue-management|-| 4129 -> 4173
   and venue-management|A| 131 -> 133. That rise is an artefact of regeneration: with pms-map.json empty the sprint plan
   re-places Venue Management screens between blocks (B 60 -> 35, C 16 -> 4, D 488 -> 479), and every total is the
