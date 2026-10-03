@@ -33,5 +33,6 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/sprint_plan.py::tasksPerDevDayBlockA
-status: open
+status: closed
+closed_by_commit: 68326467
 notes: At 7 tasks a day the scenario run gave the same result as 6 (the remaining overtime is AI engine work sized in days).

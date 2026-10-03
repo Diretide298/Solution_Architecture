@@ -41,5 +41,6 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/build-service-docs.py::AM-AI-ENGINE-A2
-status: open
+status: closed
+closed_by_commit: f27b8fec
 notes: Its own commit, so it can be reverted cleanly (the screens' Later tags with it). check-plan-closure passes with it.
