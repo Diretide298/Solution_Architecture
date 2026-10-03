@@ -1330,6 +1330,9 @@ screens:
       from: session
     - name: ticketId
       from: KIT-002
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listKitchenTickets`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: orderId
       from: session
     coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the kitchen
@@ -1752,8 +1755,15 @@ screens:
       from: session
     - name: itemId
       from: KIT-002
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `setItemAvailability`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: ticketId
       from: KIT-002
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listKitchenTickets`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: outletId
       from: session
     coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the kitchen

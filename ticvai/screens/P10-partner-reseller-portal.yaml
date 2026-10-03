@@ -1175,6 +1175,9 @@ screens:
     params:
     - name: messageId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `sendTransactionalMessage`;
+        a link or an edge that holds one opens it instead.'
     coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
       forwarded link between partners must not open another partner''s record. If the target is gone the
       screen says so and offers the partner''s own list. Arrives with `messageId`.'
@@ -1467,8 +1470,14 @@ screens:
     params:
     - name: channelCapacityId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listChannelCapacities`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: orderId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listOrders`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
       it was refunded or the performance passed, says which and offers the order list rather than an error.'
     preloaded:
@@ -1738,8 +1747,14 @@ screens:
     params:
     - name: priceListId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPriceLists`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: productId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listProducts`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A shared product link after the product retired.** Shows what replaced it where a successor
       exists, and the catalogue where none does.'
     preloaded:
@@ -2388,6 +2403,9 @@ screens:
     params:
     - name: blockId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listSeatBlocks`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
       forwarded link between partners must not open another partner''s record. If the target is gone the
       screen says so and offers the partner''s own list. Arrives with `blockId`.'
@@ -2740,8 +2758,14 @@ screens:
       from: session
     - name: lineId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `addCartLine`;
+        a link or an edge that holds one opens it instead.'
     - name: promotionId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPromotions`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
       forwarded link between partners must not open another partner''s record. If the target is gone the
       screen says so and offers the partner''s own list. Arrives with `lineId`, `promotionId`.'
@@ -2906,6 +2930,9 @@ screens:
     params:
     - name: agreementId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPartnerAgreements`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
       forwarded link between partners must not open another partner''s record. If the target is gone the
       screen says so and offers the partner''s own list. Arrives with `agreementId`.'
@@ -3065,6 +3092,9 @@ screens:
     params:
     - name: paymentId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createPayment`;
+        a link or an edge that holds one opens it instead.'
     coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
       forwarded link between partners must not open another partner''s record. If the target is gone the
       screen says so and offers the partner''s own list. Arrives with `paymentId`.'
@@ -3337,6 +3367,9 @@ screens:
     params:
     - name: settlementId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listSettlements`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
       forwarded link between partners must not open another partner''s record. If the target is gone the
       screen says so and offers the partner''s own list. Arrives with `settlementId`.'
@@ -3765,6 +3798,9 @@ screens:
     params:
     - name: orderId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listOrders`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
       it was refunded or the performance passed, says which and offers the order list rather than an error.'
     preloaded:
@@ -4158,6 +4194,9 @@ screens:
     params:
     - name: agreementId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPartnerAgreements`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
       forwarded link between partners must not open another partner''s record. If the target is gone the
       screen says so and offers the partner''s own list. Arrives with `agreementId`.'
@@ -4455,8 +4494,14 @@ screens:
     params:
     - name: conversationId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `askReportingQuestion`;
+        a link or an edge that holds one opens it instead.'
     - name: reportId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listReports`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
       and by whom.
     preloaded:
@@ -4702,6 +4747,9 @@ screens:
     params:
     - name: clientId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listApiClients`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**Rotation and revocation act on one client**, which arrives from the row the partner
       chose. Opened cold the screen lists clients rather than offering an action with no subject — revoking
       the wrong key is not recoverable by the person who did it.'
@@ -4871,6 +4919,9 @@ screens:
     params:
     - name: delegatedAccessId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listDelegatedAccess`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
       forwarded link between partners must not open another partner''s record. If the target is gone the
       screen says so and offers the partner''s own list. Arrives with `delegatedAccessId`.'
@@ -5039,6 +5090,9 @@ screens:
     params:
     - name: caseId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listCases`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
       forwarded link between partners must not open another partner''s record. If the target is gone the
       screen says so and offers the partner''s own list. Arrives with `caseId`.'
@@ -6212,6 +6266,9 @@ screens:
     params:
     - name: challengeId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createMfaChallenge`;
+        a link or an edge that holds one opens it instead.'
 - id: PTR-031
   name: Partner 360° Profile, Readiness & AI Review
   module: Partners
@@ -7048,6 +7105,9 @@ screens:
     params:
     - name: challengeId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createMfaChallenge`;
+        a link or an edge that holds one opens it instead.'
 - id: PTR-041
   name: Commercial Agreement 360°, Health & AI Review
   module: Partners
@@ -8052,6 +8112,9 @@ screens:
     params:
     - name: caseId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPartnerDisputeCase`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
   wireframe:
     status: notStarted
     provenance: generated

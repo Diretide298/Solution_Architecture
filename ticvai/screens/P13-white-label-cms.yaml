@@ -1398,10 +1398,20 @@ screens:
     params:
     - name: pageId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listContentPages`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: actionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `decideProposedAction`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: blockId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createContentBlock`;
+        a link or an edge that holds one opens it instead.'
   overlays:
   - id: formCreateContentPage
     component: modal
@@ -1689,10 +1699,20 @@ screens:
     params:
     - name: bannerId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listBanners`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: promoBlockId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPromoBlocks`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: actionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `decideProposedAction`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -2463,8 +2483,14 @@ screens:
     params:
     - name: mediaId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `searchMedia`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: uploadId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createUpload`;
+        a link or an edge that holds one opens it instead.'
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -3119,6 +3145,9 @@ screens:
       from: navigation
     - name: packageId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getSitePackage` takes
+        the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
 - id: CMS-015
   name: Version History
   module: White Label
@@ -3692,6 +3721,9 @@ screens:
     params:
     - name: domainId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listCustomDomains`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**Verification and release act on one domain**, taken from the row. A release issued against
       a domain nobody can see is a site going dark with no record of who asked.'
     preloaded:
@@ -4002,8 +4034,14 @@ screens:
     params:
     - name: policyKind
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPolicies`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: questionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listConsentQuestions`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     preloaded:
     - Policy.kind
     - Policy.title
@@ -5032,6 +5070,9 @@ screens:
     params:
     - name: scanRunId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listCookieScans`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -10228,8 +10269,14 @@ screens:
     params:
     - name: assetId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createUpload`;
+        a link or an edge that holds one opens it instead.'
     - name: uploadId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createUpload`;
+        a link or an edge that holds one opens it instead.'
 - id: CMS-064
   name: Folder, Collection & Workspace Management
   module: Media Library
@@ -10536,6 +10583,10 @@ screens:
     params:
     - name: assetId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `setMediaAssetTags`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
 - id: CMS-067
   name: Advanced Search & Discovery
   module: Media Library
@@ -10760,8 +10811,14 @@ screens:
     params:
     - name: assetId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getMediaDistribution`;
+        an edge that holds one may still carry it to open on that record.'
     - name: mediaId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getMediaAsset` takes
+        the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-068
@@ -11329,6 +11386,10 @@ screens:
     params:
     - name: assetId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `analyseMediaAsset`,
+        `setMediaAssetTags` take the id from the record the user acts on, and an edge or link that holds
+        one only pre-selects it.'
 - id: CMS-073
   name: Semantic & Natural-Language Asset Search
   module: Media Library
@@ -11701,6 +11762,10 @@ screens:
     params:
     - name: mediaId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `deleteMediaAsset`,
+        `updateMediaAsset` take the id from the record the user acts on, and an edge or link that holds
+        one only pre-selects it.'
 - id: CMS-076
   name: Asset Version Control & Revision History
   module: Media Library
@@ -11798,8 +11863,16 @@ screens:
     params:
     - name: assetId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `listMediaAssetVersions`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: mediaId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `replaceMediaAsset`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
 - id: CMS-077
   name: Version Comparison & Replacement Impact
   module: Media Library
@@ -11879,6 +11952,10 @@ screens:
     params:
     - name: assetId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `listMediaAssetVersions`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
 - id: CMS-078
   name: Transformation & Rendition Management
   module: Media Library
@@ -11967,6 +12044,10 @@ screens:
     params:
     - name: assetId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `listMediaRenditions`,
+        `requestMediaRendition` take the id from the record the user acts on, and an edge or link that
+        holds one only pre-selects it.'
 - id: CMS-079
   name: Rendition Processing & Delivery Readiness
   module: Media Library
@@ -12069,6 +12150,10 @@ screens:
     params:
     - name: assetId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `listMediaRenditions`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
 - id: CMS-080
   name: AI Quality, Intelligence Review & Recommendations
   module: Media Library
@@ -12497,6 +12582,10 @@ screens:
     params:
     - name: mediaId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `updateMediaAsset`,
+        `getMediaAsset` take the id from the record the user acts on, and an edge or link that holds one
+        only pre-selects it.'
 - id: CMS-083
   name: Rights, License & Usage Policy Management
   module: Media Library
@@ -13949,6 +14038,10 @@ screens:
     params:
     - name: mediaId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `replaceMediaAsset`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
 - id: CMS-096
   name: Fallback, Expiry & Distribution Continuity
   module: Media Library
@@ -14663,8 +14756,15 @@ screens:
       from: session
     - name: guidedChoiceId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listGuidedChoices`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: suggestionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getGuidedChoiceSuggestion`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     coldEntry: Resolves the venue from the session and opens on the suggestions awaiting review, or on
       the list when there are none.
   wireframe:
@@ -15321,6 +15421,9 @@ screens:
       optional: true
     - name: productId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listProducts`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: Resolves the venue from the session and opens on the flow list, or on the flow named in
       the link.
   wireframe:
@@ -15573,6 +15676,9 @@ screens:
       optional: true
     - name: conversationId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createAiConversation`;
+        a link or an edge that holds one opens it instead.'
     coldEntry: Resolves the tenant from the session and opens on the checklist and the newest build.
   wireframe:
     status: notStarted

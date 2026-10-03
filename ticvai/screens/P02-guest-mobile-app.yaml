@@ -1196,7 +1196,9 @@ screens:
       trigger: Book (a fixture with one on-sale performance opens straight on the seat map)
       carries:
       - performanceId
-      provenance: decided 29 September, rev 3 23SEP-16 and REV3-4
+      - eventId
+      provenance: 'authored 3 October 2026 (CHG-SPF-004): GST-004 holds eventId and GST-049 cannot load
+        without it, so the edge carries it; was: decided 29 September, rev 3 23SEP-16 and REV3-4'
     - to: GST-074
       trigger: Book (a cabana, lounger or other spot on the venue map)
       carries:
@@ -1462,6 +1464,7 @@ screens:
     - GST-001
     - GST-002
     - GST-003
+    - GST-006
     transitions:
     - to: GST-001
       trigger: Home – Default
@@ -1474,6 +1477,12 @@ screens:
       - eventId
       provenance: derived — GST-003 declares entryState.params eventId and GST-005 holds eventId, so an
         edge into it carries them
+    - to: GST-006
+      trigger: Item Detail – Event / Exhibition
+      carries:
+      - performanceId
+      provenance: 'authored 3 October 2026 (CHG-SPF-004): GST-005 lists them, and GST-006 cannot load
+        without the one the user picks'
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Drawn 31 August**
     — `Guest Mobile Board 1.dc.html` frame `gm-1b`. **Matched on frame title against screen name, constrained
@@ -1755,7 +1764,10 @@ screens:
       trigger: Picks a time on a seated event (inline step)
       carries:
       - performanceId
-      provenance: decided 29 September, rev 3 REV3-4 (`seatEventDateMode` `inlineStep`) and REV3-7
+      - eventId
+      provenance: 'authored 3 October 2026 (CHG-SPF-004): GST-007 holds eventId and GST-049 cannot load
+        without it, so the edge carries it; was: decided 29 September, rev 3 REV3-4 (`seatEventDateMode`
+        `inlineStep`) and REV3-7'
     - to: GST-008
       trigger: Picks a date and time after choosing the workshop (product-first flow)
       carries:
@@ -3693,12 +3705,21 @@ screens:
     params:
     - name: guestLinkId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): no operation on the screen takes it; a link that
+        carries it only pre-selects the record.'
     - name: subjectId
       from: session
     - name: caseId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listMyPaymentIssues`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: statementId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listBillingStatements`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
       three weeks late all land here, and the person holding the link did nothing wrong. **The screen
@@ -3895,6 +3916,9 @@ screens:
       from: session
     - name: reservationId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listReservations`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
       three weeks late all land here, and the person holding the link did nothing wrong. **The screen
@@ -4379,7 +4403,7 @@ screens:
   - operationId: getTaxDocumentRendition
     contract: finance
     purpose: Download the invoice / credit memo PDF
-    trigger: onLoad
+    trigger: onAction
     provenance: build, 29 September 2026
   entryState:
     params:
@@ -4389,8 +4413,15 @@ screens:
       from: deepLink
     - name: documentId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getTaxDocumentRendition`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: invoiceId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listTaxInvoices`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
       it was refunded or the performance passed, says which and offers the order list rather than an error.'
     preloaded:
@@ -4540,6 +4571,9 @@ screens:
     params:
     - name: itemId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getWishlist`;
+        an edge that holds one may still carry it to open on that record.'
     - name: subjectId
       from: session
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
@@ -4994,6 +5028,9 @@ screens:
       from: session
     - name: entryId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened from Home, the guest joins a queue here with
+        `joinQueue` and the screen follows that place; a link to a place opens it directly.'
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
       three weeks late all land here, and the person holding the link did nothing wrong. **The screen
@@ -5055,6 +5092,7 @@ screens:
     - GST-002
     - GST-009
     - GST-025
+    - GST-061
     fromFlows: true
     transitions:
     - to: GST-001
@@ -5073,6 +5111,12 @@ screens:
       provenance: flow F48 step 4→5
       carries:
       - orderId
+    - to: GST-061
+      trigger: Menu Item Detail
+      carries:
+      - outletId
+      provenance: 'authored 3 October 2026 (CHG-SPF-004): GST-024 lists them, and GST-061 cannot load
+        without the one the user picks'
   notes: 'The inventory cited `GET /menu`, which never existed. Now getGuestMenu. Ordering to a cabana
     or a seat uses the same claimLocationSession as a table (4.6.26). States derived from the screen pattern
     on 17 August, not individually considered. **Cross-surface parity, 31 August**: added claimTableSession,
@@ -6343,8 +6387,14 @@ screens:
     params:
     - name: conversationId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAiConversations`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: outletId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getGuestMenu` takes
+        the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
     - name: messageId
       from: navigation
       optional: true
@@ -7474,8 +7524,14 @@ screens:
     params:
     - name: promotionId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPromotions`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: code
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPromotions`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
       three weeks late all land here, and the person holding the link did nothing wrong. **The screen
@@ -8334,6 +8390,10 @@ screens:
       from: session
     - name: lineId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `removeCartLine`, `updateCartLine`
+        take the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: productId
       from: navigation
     - name: performanceId
@@ -8719,6 +8779,9 @@ screens:
       from: session
     - name: challengeId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createMfaChallenge`;
+        a link or an edge that holds one opens it instead.'
     - name: subjectId
       from: navigation
     coldEntry: '**Needs nothing.** A guest arriving cold signs in and goes Home; one sent from the cart
@@ -9608,6 +9671,9 @@ screens:
       from: GST-007
     - name: holdId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createSeatHold`;
+        a link or an edge that holds one opens it instead.'
     coldEntry: '**A link to a performance that has happened.** Offers the next performance of the same
       event.'
   wireframe:
@@ -11490,6 +11556,9 @@ screens:
       from: deepLink
     - name: menuItemId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getGuestMenu`;
+        an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
       three weeks late all land here, and the person holding the link did nothing wrong. **The screen
@@ -12299,6 +12368,9 @@ screens:
       from: session
     - name: caseId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listMyCases`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**Resolves from the session.** A guest arriving cold is asked to sign in and returned
       here afterwards — never a 404, and never a screen that silently shows somebody else''s data (ADR-0030).'
     preloaded:
@@ -12508,6 +12580,9 @@ screens:
     params:
     - name: enrolmentId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `enrolFacePass`;
+        a link or an edge that holds one opens it instead.'
     - name: subjectId
       from: session
     coldEntry: '**Resolves from the session.** A guest arriving cold is asked to sign in and returned
@@ -12657,8 +12732,15 @@ screens:
     params:
     - name: entryId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `leaveRestaurantWaitlist`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: reservationId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createTableReservation`;
+        a link or an edge that holds one opens it instead.'
     - name: subjectId
       from: session
     - name: cartId
@@ -12898,8 +12980,15 @@ screens:
       from: session
     - name: walletId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `transferWalletBalance`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: cardCode
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getGiftCard` takes
+        the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
     coldEntry: '**Resolves from the session.** A guest arriving cold is asked to sign in and returned
       here afterwards — never a 404, and never a screen that silently shows somebody else''s data (ADR-0030).'
     preloaded:
@@ -13106,8 +13195,15 @@ screens:
     params:
     - name: entitlementId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `shareEntitlement`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: groupBookingId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `requestGroupBooking`;
+        a link or an edge that holds one opens it instead.'
     - name: subjectId
       from: session
     - name: token
@@ -13367,8 +13463,14 @@ screens:
       from: session
     - name: challengeId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createMfaChallenge`;
+        a link or an edge that holds one opens it instead.'
     - name: methodId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listMfaMethods`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**Resolves from the session.** A guest arriving cold is asked to sign in and returned
       here afterwards — never a 404, and never a screen that silently shows somebody else''s data (ADR-0030).'
   wireframe:
@@ -13640,6 +13742,9 @@ screens:
       from: session
     - name: holdId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createResourceHold`;
+        a link or an edge that holds one opens it instead.'
     coldEntry: '**A link to a map that is no longer published, or a day that has passed,** says which
       and offers today on the current map. Nothing is held on arrival.'
   wireframe:

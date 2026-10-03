@@ -1931,8 +1931,14 @@ screens:
     params:
     - name: conversationId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listConversations`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: reportId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listReports`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
       and by whom.
     preloaded:
@@ -2718,6 +2724,9 @@ screens:
       from: navigation
     - name: uploadId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createUpload`;
+        a link or an edge that holds one opens it instead.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -3391,6 +3400,9 @@ screens:
     params:
     - name: profileKey
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAssistantProfiles`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
 - id: SUP-019
   name: Contact Center Operations Command Center
   module: Support
@@ -4151,6 +4163,9 @@ screens:
     params:
     - name: caseId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `updateCase` takes
+        the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
   wireframe:
     status: notStarted
     provenance: generated

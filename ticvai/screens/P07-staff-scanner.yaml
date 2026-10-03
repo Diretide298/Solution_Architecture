@@ -209,6 +209,9 @@ screens:
     params:
     - name: challengeId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createMfaChallenge`;
+        a link or an edge that holds one opens it instead.'
     coldEntry: '**The only screen of the scanner that needs nothing.** The scanner''s `workstationId`
       travels in the sign-in request from the device itself (CHG-DOOR-001).'
   apisNote: 'Declared by hand on 2 October 2026 (CHG-DOOR-003): sign-in by PIN or badge, the second factor,

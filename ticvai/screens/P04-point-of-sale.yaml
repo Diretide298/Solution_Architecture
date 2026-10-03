@@ -107,6 +107,9 @@ screens:
     params:
     - name: challengeId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createMfaChallenge`;
+        a link or an edge that holds one opens it instead.'
     coldEntry: '**The only screen in venue-pos that needs nothing.** That is what makes it the door. `workstationId`
       travels in the login request and comes from the terminal itself, not from a session -- the contract
       says it identifies the device and is *NOT a permission source*.'
@@ -1999,6 +2002,9 @@ screens:
       from: session
     - name: cardCode
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `issueGameCard`;
+        a link or an edge that holds one opens it instead.'
     - name: cartId
       from: session
     - name: orderId
@@ -2314,6 +2320,9 @@ screens:
     params:
     - name: inventoryHoldId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listInventoryHolds`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: productId
       from: POS-002
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
@@ -2613,6 +2622,9 @@ screens:
     params:
     - name: holdId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createSeatHold`;
+        a link or an edge that holds one opens it instead.'
     - name: performanceId
       from: deepLink
     coldEntry: '**A link to a performance that has happened.** Offers the next performance of the same
@@ -3139,6 +3151,9 @@ screens:
       from: deepLink
     - name: saleId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listRetailSales`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -4548,8 +4563,14 @@ screens:
     params:
     - name: conversationId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `askReportingQuestion`;
+        a link or an edge that holds one opens it instead.'
     - name: reportId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listReports`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
       and by whom.
     preloaded:
@@ -5054,6 +5075,10 @@ screens:
     params:
     - name: mediaCode
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getMediaEntitlements`,
+        `appendEntitlementToMedia` take the id from the record the user acts on, and an edge or link that
+        holds one only pre-selects it.'
     - name: mediaId
       from: deepLink
     - name: cartId
@@ -6203,6 +6228,10 @@ screens:
       from: session
     - name: orderId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `voidOrder`, `applyManualDiscount`
+        take the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: shiftId
       from: deepLink
     coldEntry: '**Resolves from the session, which carries the workstation** — a till is signed into,
@@ -6530,6 +6559,9 @@ screens:
       from: session
     - name: deviceId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listDevices`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**Resolves from the session, which carries the workstation** — a till is signed into,
       not navigated to.'
   wireframe:
@@ -7324,8 +7356,14 @@ screens:
       from: deepLink
     - name: reportId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `runReport` takes the
+        id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
     - name: requestId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createApprovalRequest`;
+        a link or an edge that holds one opens it instead.'
     coldEntry: '**Resolves from the session, which carries the workstation** — a till is signed into,
       not navigated to. An approval request opened from the queue.'
     preloaded:
@@ -7601,6 +7639,10 @@ screens:
       from: session
     - name: itemId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `setItemAvailability`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     coldEntry: '**Resolves from the session, which carries the workstation and its outlet.** A till is
       signed into, not navigated to — and the outlet is a property of where the till is bolted down, not
       something a cashier picks.'
@@ -8364,6 +8406,10 @@ screens:
       from: session
     - name: itemId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `setItemAvailability`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     coldEntry: '**Resolves from the session, which carries the workstation and its outlet.** A till is
       signed into, not navigated to — and the outlet is a property of where the till is bolted down, not
       something a cashier picks.'
@@ -8772,7 +8818,7 @@ screens:
   - operationId: getTaxDocumentRendition
     contract: finance
     purpose: Download the invoice / credit memo PDF
-    trigger: onLoad
+    trigger: onAction
     provenance: build, 29 September 2026
   entryState:
     params:
@@ -8786,8 +8832,15 @@ screens:
       from: navigation
     - name: documentId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getTaxDocumentRendition`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: invoiceId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `issueTaxInvoice`;
+        a link or an edge that holds one opens it instead.'
     coldEntry: '**Resolves from the session, which carries the workstation** — a till is signed into,
       not navigated to.'
   requiresModule: ticketing
@@ -8913,6 +8966,9 @@ screens:
       from: session
     - name: subjectId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `searchGuests`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**Resolves from the session, which carries the workstation** — a till is signed into,
       not navigated to.'
   requiresModule: core
@@ -9144,10 +9200,19 @@ screens:
       from: session
     - name: tableId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getTableVisit`;
+        an edge that holds one may still carry it to open on that record.'
     - name: visitId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getTableMap`;
+        an edge that holds one may still carry it to open on that record.'
     - name: reservationId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listTableReservations`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**Resolves from the session, which carries the workstation** — a till is signed into,
       not navigated to.'
   requiresModule: fnb
@@ -9716,8 +9781,15 @@ screens:
       optional: true
     - name: documentId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getTaxDocumentRendition`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: saleId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `reprintReceipt` takes
+        the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
     coldEntry: '**Resolves from the session, which carries the workstation** — the journal opens on this
       terminal''s sales today.'
   wireframe:
@@ -10046,6 +10118,10 @@ screens:
       optional: true
     - name: groupBookingId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getGroupBooking`,
+        `recordGroupCheckIn` take the id from the record the user acts on, and an edge or link that holds
+        one only pre-selects it.'
     coldEntry: '**Resolves from the session, which carries the workstation and its venue** — the screen
       opens on the venue''s held reservations and today''s groups.'
   wireframe:

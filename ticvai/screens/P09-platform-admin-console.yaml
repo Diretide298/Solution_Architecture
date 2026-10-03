@@ -1362,6 +1362,10 @@ screens:
     params:
     - name: decisionRecordId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listAiInteractions` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -4743,6 +4747,10 @@ screens:
       from: ADM-002
     - name: requestId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listProductionAccessRequests` and the user picks one; an edge that holds one may still carry
+        it to open on that record.'
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
     preloaded:
     - Cell.id
@@ -5174,8 +5182,15 @@ screens:
       optional: true
     - name: packageId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): `getSitePackage` follows a package only after
+        this screen has generated one; the screen opens without it.'
     - name: version
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listConfigVersions` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -5752,12 +5767,24 @@ screens:
     params:
     - name: bannerId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): no operation on the screen takes it; a link that
+        carries it only pre-selects the record.'
     - name: pageId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): no operation on the screen takes it; a link that
+        carries it only pre-selects the record.'
     - name: policyKind
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): no operation on the screen takes it; a link that
+        carries it only pre-selects the record.'
     - name: version
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getTenantConfig`;
+        an edge that holds one may still carry it to open on that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -6826,8 +6853,15 @@ screens:
     params:
     - name: challengeId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createMfaChallenge`;
+        a link or an edge that holds one opens it instead.'
     - name: methodId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listMfaMethods` and the user picks one; an edge that holds one may still carry it to open on
+        that record.'
     - name: sessionId
       from: session
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
@@ -7085,6 +7119,10 @@ screens:
     params:
     - name: releaseId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listReleases` and the user picks one; an edge that holds one may still carry it to open on
+        that record.'
     coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
       does not hold that tenant.** A link is not authorisation. If the target is gone the screen says
       so and returns to the directory — **an admin console that silently shows the wrong tenant is worse
@@ -7305,6 +7343,10 @@ screens:
     params:
     - name: releaseId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listReleases` and the user picks one; an edge that holds one may still carry it to open on
+        that record.'
     coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
       does not hold that tenant.** A link is not authorisation. If the target is gone the screen says
       so and returns to the directory — **an admin console that silently shows the wrong tenant is worse
@@ -7846,6 +7888,10 @@ screens:
     params:
     - name: version
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listSupportNotices` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -8522,6 +8568,9 @@ screens:
       optional: true
     - name: challengeId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createMfaChallenge`;
+        a link or an edge that holds one opens it instead.'
     coldEntry: Opened cold, it starts at Export package; with a package id it opens that package.
   wireframe:
     status: notStarted
@@ -9238,6 +9287,10 @@ screens:
     params:
     - name: dashboardId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listDashboards` and the user picks one; an edge that holds one may still carry it to open on
+        that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -9442,6 +9495,10 @@ screens:
     params:
     - name: cellId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listWafRules` and the user picks one; an edge that holds one may still carry it to open on
+        that record.'
     coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
       does not hold that tenant.** A link is not authorisation. If the target is gone the screen says
       so and returns to the directory — **an admin console that silently shows the wrong tenant is worse
@@ -9759,6 +9816,10 @@ screens:
     params:
     - name: cellId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listArchivalJobs` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
     coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
       does not hold that tenant.** A link is not authorisation. If the target is gone the screen says
       so and returns to the directory — **an admin console that silently shows the wrong tenant is worse
@@ -10459,13 +10520,25 @@ screens:
     params:
     - name: providerId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listAiProviders` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
     - name: regionId
       from: navigation
       optional: true
     - name: modelId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listAiProviders` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
     - name: templateKey
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listPromptTemplates` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
     - name: tenantId
       from: session
     coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
@@ -11197,8 +11270,16 @@ screens:
     params:
     - name: deadLetterId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listDeadLetters` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
     - name: republishId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listOutboxRepublishes` and the user picks one; an edge that holds one may still carry it to
+        open on that record.'
     coldEntry: '**The ordinary path is a row on this screen**, and `replayDeadLetter` takes the id from
       the row the operator chose. A deep link is how an alert reaches one directly; if that id is already
       replayed or gone the screen says so and shows the list, because a replay issued against a row
@@ -12692,6 +12773,9 @@ screens:
     params:
     - name: challengeId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `startProspectSignup`;
+        a link or an edge that holds one opens it instead.'
 - id: ADM-381
   name: Venue Type & Business Profile
   module: Tenants & Licensing
@@ -14450,6 +14534,10 @@ screens:
     params:
     - name: planId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `createPlanVersion`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
 - id: ADM-399
   name: Recommended Package Overview
   module: Tenants & Licensing
@@ -19460,6 +19548,10 @@ screens:
     params:
     - name: invoiceId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listSubscriptionInvoices` and the user picks one; an edge that holds one may still carry it
+        to open on that record.'
     - name: tenantId
       from: session
 - id: ADM-463
@@ -20003,6 +20095,10 @@ screens:
     params:
     - name: invoiceId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listCreditNotes` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
     - name: tenantId
       from: session
 - id: ADM-468
@@ -20835,7 +20931,9 @@ screens:
     - name: sessionId
       from: session
     - name: venueId
-      from: navigation
+      from: session
+      notes: 'From the session (3 October 2026, CHG-SPF-004): a staff screen works in the venue its
+        sign-in or device is scoped to; nothing navigates to it (the venue-scope rule).'
     - name: tenantId
       from: navigation
       optional: true
@@ -21733,6 +21831,9 @@ screens:
     params:
     - name: decisionKey
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getConfigurationBlueprint`;
+        an edge that holds one may still carry it to open on that record.'
     - name: sessionId
       from: session
     - name: tenantId
@@ -21922,6 +22023,9 @@ screens:
     params:
     - name: decisionKey
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getConfigurationBlueprint`;
+        an edge that holds one may still carry it to open on that record.'
     - name: sessionId
       from: session
     - name: tenantId
@@ -24758,6 +24862,9 @@ screens:
     params:
     - name: decisionKey
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getConfigurationBlueprint`;
+        an edge that holds one may still carry it to open on that record.'
     - name: sessionId
       from: session
     - name: tenantId
@@ -24947,6 +25054,10 @@ screens:
     params:
     - name: actionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listProposedActions` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
     - name: planId
       from: navigation
     - name: tenantId
@@ -26256,6 +26367,10 @@ screens:
     params:
     - name: decisionRecordId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `searchAiDecisions` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -26968,6 +27083,10 @@ screens:
       from: navigation
     - name: signalKey
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listForecastSignals` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -27152,6 +27271,10 @@ screens:
     params:
     - name: detectorKey
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `configureAnomalyDetector`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: tenantId
       from: navigation
       optional: true
@@ -28868,6 +28991,10 @@ screens:
     params:
     - name: detectorKey
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `configureAnomalyDetector`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: tenantId
       from: navigation
       optional: true
@@ -30323,6 +30450,10 @@ screens:
     params:
     - name: requirementId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listOperationalRequirements` and the user picks one; an edge that holds one may still carry
+        it to open on that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -30595,6 +30726,10 @@ screens:
       from: navigation
     - name: releaseId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listAiGovernanceAlerts` and the user picks one; an edge that holds one may still carry it to
+        open on that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -31608,6 +31743,10 @@ screens:
     params:
     - name: dataClass
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listDataRetentionSettings` and the user picks one; an edge that holds one may still carry it
+        to open on that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -31999,6 +32138,9 @@ screens:
     params:
     - name: exceptionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createAiPolicyException`;
+        a link or an edge that holds one opens it instead.'
     - name: tenantId
       from: navigation
       optional: true
@@ -32215,6 +32357,10 @@ screens:
     params:
     - name: versionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listAiGovernancePolicyVersions` and the user picks one; an edge that holds one may still carry
+        it to open on that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -32454,6 +32600,10 @@ screens:
     params:
     - name: versionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listAiGovernancePolicyVersions` and the user picks one; an edge that holds one may still carry
+        it to open on that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -33132,6 +33282,10 @@ screens:
     params:
     - name: actionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `decideProposedAction`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: planId
       from: navigation
     - name: tenantId
@@ -33335,6 +33489,10 @@ screens:
     params:
     - name: actionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `decideProposedAction`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: planId
       from: navigation
     - name: tenantId
@@ -33534,6 +33692,9 @@ screens:
     params:
     - name: conversationId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getAiDecisionTrace`;
+        an edge that holds one may still carry it to open on that record.'
     - name: decisionRecordId
       from: navigation
     - name: tenantId
@@ -34263,8 +34424,16 @@ screens:
     params:
     - name: capabilityKey
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listAiCapabilities` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
     - name: decisionRecordId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `searchAiDecisions` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
     - name: planId
       from: navigation
     - name: tenantId
@@ -34499,6 +34668,10 @@ screens:
     params:
     - name: decisionRecordId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `searchAiDecisions` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -34689,6 +34862,10 @@ screens:
       from: navigation
     - name: versionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `simulateAiGovernancePolicy`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: tenantId
       from: navigation
       optional: true
@@ -34758,35 +34935,53 @@ screens:
       - tenantId
     - to: ADM-541
       trigger: AI Decision Explanation Workspace
-      provenance: structural — pack board 3 wiring, 19 September 2026
+      provenance: 'authored 3 October 2026 (CHG-SPF-004): ADM-539 holds decisionRecordId and ADM-541
+        cannot load without it, so the edge carries it; was: structural — pack board 3 wiring, 19 September
+        2026'
       carries:
       - tenantId
+      - decisionRecordId
     - to: ADM-542
       trigger: Data, Feature & Evidence Provenance
-      provenance: structural — pack board 3 wiring, 19 September 2026
+      provenance: 'authored 3 October 2026 (CHG-SPF-004): ADM-539 holds decisionRecordId and ADM-542
+        cannot load without it, so the edge carries it; was: structural — pack board 3 wiring, 19 September
+        2026'
       carries:
       - tenantId
+      - decisionRecordId
     - to: ADM-543
       trigger: Candidate, Rule & Decision Path Trace
-      provenance: structural — pack board 3 wiring, 19 September 2026
+      provenance: 'authored 3 October 2026 (CHG-SPF-004): ADM-539 holds decisionRecordId and ADM-543
+        cannot load without it, so the edge carries it; was: structural — pack board 3 wiring, 19 September
+        2026'
       carries:
       - tenantId
+      - decisionRecordId
     - to: ADM-544
       trigger: Model, Provider & AI Runtime Trace
-      provenance: structural — pack board 3 wiring, 19 September 2026
+      provenance: 'authored 3 October 2026 (CHG-SPF-004): ADM-539 holds decisionRecordId and ADM-544
+        cannot load without it, so the edge carries it; was: structural — pack board 3 wiring, 19 September
+        2026'
       carries:
       - tenantId
+      - decisionRecordId
     - to: ADM-545
       trigger: Governance, Approval & Human Decision Trace
-      provenance: structural — pack board 3 wiring, 19 September 2026
+      provenance: 'authored 3 October 2026 (CHG-SPF-004): ADM-539 holds decisionRecordId and ADM-545
+        cannot load without it, so the edge carries it; was: structural — pack board 3 wiring, 19 September
+        2026'
       carries:
       - tenantId
+      - decisionRecordId
     - to: ADM-546
       trigger: Execution & Business Outcome Trace
-      provenance: structural — pack board 3 wiring, 19 September 2026
+      provenance: 'authored 3 October 2026 (CHG-SPF-004): ADM-539 holds decisionRecordId and ADM-546
+        cannot load without it, so the edge carries it; was: structural — pack board 3 wiring, 19 September
+        2026'
       carries:
       - planId
       - tenantId
+      - decisionRecordId
     - to: ADM-547
       trigger: AI Audit Record & Evidence Package
       provenance: structural — pack board 3 wiring, 19 September 2026
@@ -34794,9 +34989,12 @@ screens:
       - tenantId
     - to: ADM-548
       trigger: AI Trace Investigation & Replay Simulator
-      provenance: structural — pack board 3 wiring, 19 September 2026
+      provenance: 'authored 3 October 2026 (CHG-SPF-004): ADM-539 holds decisionRecordId and ADM-548
+        cannot load without it, so the edge carries it; was: structural — pack board 3 wiring, 19 September
+        2026'
       carries:
       - tenantId
+      - decisionRecordId
   density: compact
   pattern: commandCentre
   patternReason: the pack gives this screen a metric directory (§Header KPIs) and no per-row directory
@@ -35136,6 +35334,10 @@ screens:
     params:
     - name: decisionRecordId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `searchAiDecisions` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -35650,6 +35852,10 @@ screens:
     params:
     - name: decisionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `explainRecommendationDecision`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: decisionRecordId
       from: navigation
     - name: tenantId
@@ -37109,6 +37315,10 @@ screens:
     params:
     - name: entryId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listAiRiskRegister` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -37287,6 +37497,10 @@ screens:
     params:
     - name: controlKey
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listAiControls` and the user picks one; an edge that holds one may still carry it to open on
+        that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -37499,6 +37713,10 @@ screens:
     params:
     - name: alertId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listAiGovernanceAlerts` and the user picks one; an edge that holds one may still carry it to
+        open on that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -37736,6 +37954,10 @@ screens:
     params:
     - name: alertId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listAiGovernanceAlerts` and the user picks one; an edge that holds one may still carry it to
+        open on that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -38215,6 +38437,10 @@ screens:
     params:
     - name: alertId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listAiGovernanceAlerts` and the user picks one; an edge that holds one may still carry it to
+        open on that record.'
     - name: tenantId
       from: navigation
       optional: true

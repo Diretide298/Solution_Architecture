@@ -719,6 +719,9 @@ screens:
       optional: true
     - name: credentialId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listMyAccreditationCredentials`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: holderId
       from: navigation
     preloaded:
@@ -861,6 +864,9 @@ screens:
       from: session
     - name: applicationId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAccreditationApplications`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     preloaded: []
     coldEntry: Opens on the reviewer's own programmes, due-first.
   navigation:

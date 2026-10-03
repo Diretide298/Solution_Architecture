@@ -521,6 +521,10 @@ screens:
     params:
     - name: cartId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `addCartLine` takes
+        the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
 - id: KSK-006
   name: Review
   module: Sell
@@ -1535,8 +1539,14 @@ screens:
     params:
     - name: conversationId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createAiConversation`;
+        a link or an edge that holds one opens it instead.'
     - name: messageId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `sendAiMessage`;
+        a link or an edge that holds one opens it instead.'
     coldEntry: 'None: a kiosk has no notification cold entry. The assistant opens from KSK-004 at the
       point of confusion and closes when the guest returns or the session times out.'
     preloaded: []

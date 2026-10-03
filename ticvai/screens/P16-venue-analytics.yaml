@@ -1622,6 +1622,9 @@ screens:
       from: deepLink
     - name: segmentId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listSegments`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A bookmarked dashboard is the normal way in** — a manager opens the same view every
       Monday. The domain and the window come from the link where it carries them, and from the last view
       where it does not. A segment opened from the list.'
@@ -2079,8 +2082,14 @@ screens:
       from: deepLink
     - name: actionId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listProposedActions`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: planId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listProposedActions`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A bookmarked dashboard is the normal way in** — a manager opens the same view every
       Monday. The domain and the window come from the link where it carries them, and from the last view
       where it does not. A proposed action opened from the queue or an alert.'
@@ -3511,6 +3520,9 @@ screens:
     params:
     - name: insightId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAiInsights`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
   overlays:
   - id: formDecideAiInsight
     component: modal
@@ -4310,6 +4322,9 @@ screens:
       from: navigation
     - name: reportId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listReports`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
   notes: '**The nine new marks bind** (decided 2 October 2026, Chinmay; CHG-FIN-007). The canvas offers
     all twenty marks of `DashboardTile.visualisation` and, for each, field wells filled from the report''s
     columns (`ReportColumn.role`, `encoding`, `axis`, `seriesType`, `hierarchyLevel`, `unitLabel`): combo
@@ -4712,7 +4727,7 @@ screens:
     purpose: Targets and thresholds
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id007
+    invalidates:
     - getKpiValues
   - operationId: listKpis
     contract: reporting
@@ -4730,6 +4745,9 @@ screens:
     params:
     - name: kpiId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listKpis`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-026
@@ -5763,7 +5781,7 @@ screens:
     purpose: Filters and parameters
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id002
+    invalidates:
     - getReport
     - listReports
   wireframe:
@@ -5778,6 +5796,9 @@ screens:
     params:
     - name: reportId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `updateReport` takes
+        the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
 - id: ANL-036
   name: Grouping, Aggregation & Calculation Builder
   module: Analytics
@@ -5875,7 +5896,9 @@ screens:
     purpose: Grouping and calculations
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id002
+    invalidates:
+    - getReport
+    - listReports
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-036
@@ -5888,6 +5911,9 @@ screens:
     params:
     - name: reportId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `updateReport` takes
+        the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
 - id: ANL-037
   name: Cross-Domain Report Composer
   module: Analytics
@@ -5973,7 +5999,9 @@ screens:
     purpose: Compose across them
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id002
+    invalidates:
+    - getReport
+    - listReports
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-037
@@ -5986,6 +6014,9 @@ screens:
     params:
     - name: reportId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `updateReport` takes
+        the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
 - id: ANL-038
   name: Report Layout & Formatting Designer
   module: Analytics
@@ -6078,7 +6109,9 @@ screens:
     purpose: Layout and formatting
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id002
+    invalidates:
+    - getReport
+    - listReports
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-038
@@ -6091,6 +6124,9 @@ screens:
     params:
     - name: reportId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `updateReport` takes
+        the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
 - id: ANL-039
   name: Report Preview, Test & Validation
   module: Analytics
@@ -6202,8 +6238,14 @@ screens:
     params:
     - name: executionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `runReport`;
+        a link or an edge that holds one opens it instead.'
     - name: reportId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getReportExecution`;
+        an edge that holds one may still carry it to open on that record.'
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-039
@@ -6351,8 +6393,14 @@ screens:
     params:
     - name: executionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `runReport`;
+        a link or an edge that holds one opens it instead.'
     - name: reportId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `runReport` takes the
+        id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
 - id: ANL-041
   name: Reporting Governance Command Center
   module: Analytics
@@ -7004,8 +7052,14 @@ screens:
     params:
     - name: executionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getReportExport`;
+        an edge that holds one may still carry it to open on that record.'
     - name: exportId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getReportExport` takes
+        the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-045
@@ -7334,6 +7388,9 @@ screens:
     params:
     - name: policyId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAuthorisationPolicies`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
 - id: ANL-048
   name: Delivery Monitoring & Failure Management
   module: Analytics
@@ -7723,6 +7780,9 @@ screens:
     params:
     - name: dataClass
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listDataRetentionSettings`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
   gaps:
   - operation: setApprovalRetentionPolicy
     removed: true
@@ -7985,6 +8045,9 @@ screens:
     params:
     - name: conversationId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `askReportingQuestion`;
+        a link or an edge that holds one opens it instead.'
 - id: ANL-053
   name: AI-Generated Dashboard Studio
   module: Analytics
@@ -8300,6 +8363,9 @@ screens:
     params:
     - name: detectorKey
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAnomalyDetectors`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-055
@@ -8557,6 +8623,9 @@ screens:
     params:
     - name: versionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getForecast`;
+        an edge that holds one may still carry it to open on that record.'
   notes: '**Measure names, not "Revenue"** (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761).
     Takings (money taken less money paid back, a cash-control figure), Gross sales (before discounts,
     excluding VAT), Net revenue (gross sales less discounts and refunds), Recognised revenue and Deferred
@@ -8749,6 +8818,9 @@ screens:
     params:
     - name: insightId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAiInsights`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
 - id: ANL-060
   name: AI Analytics Governance & Model Control
   module: Analytics
@@ -8904,8 +8976,14 @@ screens:
     params:
     - name: capabilityKey
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAiCapabilities`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: templateKey
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPromptTemplates`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-060
@@ -9288,7 +9366,8 @@ screens:
     purpose: Targets and scorecards
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id007
+    invalidates:
+    - getKpiValues
   - operationId: getKpiValues
     contract: reporting
     purpose: Where they stand
@@ -9306,6 +9385,9 @@ screens:
     params:
     - name: kpiId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getKpiValues`;
+        an edge that holds one may still carry it to open on that record.'
 - id: ANL-064
   name: Benchmark & Comparative Analytics Configuration
   module: Analytics

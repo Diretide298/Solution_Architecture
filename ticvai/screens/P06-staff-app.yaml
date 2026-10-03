@@ -257,6 +257,9 @@ screens:
     params:
     - name: challengeId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createMfaChallenge`;
+        a link or an edge that holds one opens it instead.'
     - name: providerId
       from: deepLink
       optional: true
@@ -1862,6 +1865,9 @@ screens:
     params:
     - name: orderId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listOrders`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
       it was refunded or the performance passed, says which and offers the order list rather than an error.'
     preloaded:
@@ -2623,6 +2629,9 @@ screens:
     params:
     - name: version
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listCatalogueBundles`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A version link is expected to point at something superseded — that is what versions
       are for.** The screen opens the requested version read-only, says it is not current, and links to
       the one that is. **An old version is history, not an error.** Arrives with `version`.'
@@ -3328,6 +3337,9 @@ screens:
       from: deepLink
     - name: stockReservationId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listStockReservations`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -3854,6 +3866,9 @@ screens:
     params:
     - name: workOrderId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listWorkOrders`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -4322,6 +4337,9 @@ screens:
     params:
     - name: conversationId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAiConversations`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
       and by whom.
     preloaded:
@@ -4518,6 +4536,9 @@ screens:
       from: deepLink
     - name: messageId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `sendAiMessage`;
+        a link or an edge that holds one opens it instead.'
     coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
       and by whom.
     preloaded:
@@ -4768,6 +4789,9 @@ screens:
     params:
     - name: queueId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listQueues`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -5137,6 +5161,9 @@ screens:
     params:
     - name: channelCapacityId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listChannelCapacities`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -5720,8 +5747,14 @@ screens:
     params:
     - name: orderId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listOrders`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: productId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listProducts`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
       it was refunded or the performance passed, says which and offers the order list rather than an error.
       **A shared product link after the product retired.** Shows what replaced it where a successor exists,
@@ -6242,8 +6275,14 @@ screens:
     params:
     - name: announcementId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAnnouncements`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: conversationId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listStaffConversations`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -6389,6 +6428,9 @@ screens:
     params:
     - name: announcementId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAnnouncements`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -6544,6 +6586,9 @@ screens:
     params:
     - name: announcementId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAnnouncements`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -6912,6 +6957,9 @@ screens:
     params:
     - name: assignmentId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listRotaAssignments`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -7451,6 +7499,9 @@ screens:
     params:
     - name: recordId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAttendance`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -8280,6 +8331,9 @@ screens:
     params:
     - name: caseId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listCases`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -8640,6 +8694,9 @@ screens:
     params:
     - name: caseId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listCases`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: incidentId
       from: deepLink
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
@@ -9114,6 +9171,9 @@ screens:
     params:
     - name: announcementId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAnnouncements`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -9561,6 +9621,9 @@ screens:
       from: session
     - name: methodId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listMfaMethods`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
     preloaded:
     - MfaMethod.id
@@ -10296,6 +10359,9 @@ screens:
       from: session
     - name: outletId
       from: EMP-003
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listTableReservations`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**Resolves from the session and the shift.** A handheld is signed into at the start of
       a shift, not navigated to.'
     preloaded:
@@ -10398,7 +10464,9 @@ screens:
     - name: venueId
       from: session
     - name: outletId
-      from: EMP-003
+      from: session
+      notes: 'From the session (3 October 2026, CHG-SPF-004): a staff screen works in the outlet its sign-in
+        or device is scoped to; nothing navigates to it (the venue-scope rule).'
     coldEntry: '**Resolves from the session and the shift.** A handheld is signed into at the start of
       a shift, not navigated to.'
   wireframe:
@@ -10533,7 +10601,9 @@ screens:
     - name: venueId
       from: session
     - name: outletId
-      from: EMP-003
+      from: session
+      notes: 'From the session (3 October 2026, CHG-SPF-004): a staff screen works in the outlet its sign-in
+        or device is scoped to; nothing navigates to it (the venue-scope rule).'
     coldEntry: '**Resolves from the session and the shift.** A handheld is signed into at the start of
       a shift, not navigated to.'
   wireframe:
@@ -10882,9 +10952,14 @@ screens:
       from: session
     - name: reservationId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createTableReservationForGuest`;
+        a link or an edge that holds one opens it instead.'
     - name: outletId
       from: navigation
-      notes: The outlet the reservation is for, picked on the way in (CHG-CLN-016).
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getFnbReservationPolicy`;
+        an edge that holds one may still carry it to open on that record.'
+      optional: true
     coldEntry: '**Resolves from the session and the shift.** A handheld is signed into at the start of
       a shift, not navigated to.'
   wireframe:
@@ -11073,6 +11148,10 @@ screens:
       from: session
     - name: entryId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `leaveRestaurantWaitlist`,
+        `quoteWaitTime`, `notifyWaitlistParty` take the id from the record the user acts on, and an edge
+        or link that holds one only pre-selects it.'
     coldEntry: '**Resolves from the session and the shift.** A handheld is signed into at the start of
       a shift, not navigated to.'
   wireframe:
@@ -11714,6 +11793,10 @@ screens:
       from: EMP-003
     - name: reservationId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `seatTableReservation`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: outletId
       from: session
       optional: true
@@ -12360,6 +12443,9 @@ screens:
       from: session
     - name: alertId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAlerts`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: dashboardId
       from: navigation
     coldEntry: '**Resolves from the session and the shift.** A handheld is signed into at the start of
@@ -12514,7 +12600,9 @@ screens:
     - name: venueId
       from: session
     - name: outletId
-      from: navigation
+      from: session
+      notes: 'From the session (3 October 2026, CHG-SPF-004): a staff screen works in the outlet its sign-in
+        or device is scoped to; nothing navigates to it (the venue-scope rule).'
     coldEntry: '**Resolves from the session and the shift.** A handheld is signed into at the start of
       a shift, not navigated to.'
   wireframe:
@@ -12664,6 +12752,9 @@ screens:
       from: session
     - name: requisitionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listRequisitions`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**Resolves from the session and the shift.** A handheld is signed into at the start of
       a shift, not navigated to.'
     preloaded:
@@ -12850,6 +12941,9 @@ screens:
       from: session
     - name: transferId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listStockTransfers`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**Resolves from the session and the shift.** A handheld is signed into at the start of
       a shift, not navigated to.'
     preloaded:
@@ -13114,6 +13208,9 @@ screens:
       from: session
     - name: receiptId
       from: EMP-003
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createGoodsReceipt`;
+        a link or an edge that holds one opens it instead.'
     - name: transferId
       from: deepLink
       optional: true
@@ -13683,9 +13780,15 @@ screens:
     - name: venueId
       from: session
     - name: outletId
-      from: EMP-003
+      from: session
+      notes: 'From the session (3 October 2026, CHG-SPF-004): a staff screen works in the outlet its sign-in
+        or device is scoped to; nothing navigates to it (the venue-scope rule).'
     - name: reservationId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `collectMerchandiseReservation`,
+        `cancelMerchandiseReservation` take the id from the record the user acts on, and an edge or link
+        that holds one only pre-selects it.'
     coldEntry: '**Resolves from the session and the shift.** A handheld is signed into at the start of
       a shift, not navigated to.'
   wireframe:
@@ -13999,6 +14102,9 @@ screens:
       from: session
     - name: alertId
       from: EMP-003
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAlerts`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**Resolves from the session and the shift.** A handheld is signed into at the start of
       a shift, not navigated to.'
     preloaded:
@@ -14299,6 +14405,10 @@ screens:
     params:
     - from: navigation
       name: bookingId
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getRentalBooking`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
 - id: EMP-073
   name: Checkout Readiness Validation
   module: Rentals
@@ -14382,6 +14492,10 @@ screens:
     params:
     - from: navigation
       name: bookingId
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getRentalBooking`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
 - id: EMP-074
   name: Equipment Assignment Workspace
   module: Rentals
@@ -14482,6 +14596,10 @@ screens:
     params:
     - from: navigation
       name: bookingId
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `assignRentalEquipment`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
 - id: EMP-075
   name: Equipment Scan & Validation
   module: Rentals
@@ -14583,6 +14701,10 @@ screens:
     params:
     - from: navigation
       name: bookingId
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `assignRentalEquipment`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
 - id: EMP-076
   name: Pre-Rental Condition Inspection
   module: Rentals
@@ -14679,6 +14801,10 @@ screens:
     params:
     - from: navigation
       name: bookingId
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `recordRentalInspection`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
 - id: EMP-077
   name: Safety & Handover Checklist
   module: Rentals
@@ -14775,6 +14901,9 @@ screens:
     params:
     - from: navigation
       name: bookingId
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `checkOutRental` takes
+        the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
 - id: EMP-078
   name: Deposit & Financial Handover Validation
   module: Rentals
@@ -14875,6 +15004,9 @@ screens:
     params:
     - from: navigation
       name: bookingId
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `checkOutRental` takes
+        the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
 - id: EMP-079
   name: Group & Multi-Item Checkout
   module: Rentals
@@ -14967,6 +15099,10 @@ screens:
     params:
     - from: navigation
       name: bookingId
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `assignRentalEquipment`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
 - id: EMP-080
   name: Checkout Confirmation & Rental Activation
   module: Rentals
@@ -15045,6 +15181,9 @@ screens:
     params:
     - from: navigation
       name: bookingId
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `checkOutRental` takes
+        the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
 - id: EMP-081
   name: Active Rental Operations Command Center
   module: Rentals
@@ -15295,6 +15434,10 @@ screens:
     params:
     - from: navigation
       name: bookingId
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getRentalBooking`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
 - id: EMP-083
   name: Rental Extension Request
   module: Rentals
@@ -15514,6 +15657,9 @@ screens:
     params:
     - from: navigation
       name: bookingId
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `extendRental` takes
+        the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
 - id: EMP-085
   name: Equipment Swap / Replacement
   module: Rentals
@@ -15605,6 +15751,10 @@ screens:
     params:
     - from: navigation
       name: bookingId
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `swapRentalEquipment`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
 - id: EMP-086
   name: Rental Incident & Operational Exception
   module: Rentals
@@ -15947,6 +16097,10 @@ screens:
     params:
     - from: navigation
       name: bookingId
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getRentalBooking`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
 - id: EMP-090
   name: Active Rental Intelligence & Operational Alerts
   module: Rentals
@@ -16302,6 +16456,10 @@ screens:
     params:
     - from: navigation
       name: bookingId
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getRentalBooking`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
 - id: EMP-093
   name: Return Summary & Actual Return Time
   module: Rentals
@@ -16395,6 +16553,9 @@ screens:
     params:
     - from: navigation
       name: bookingId
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `returnRental` takes
+        the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
 - id: EMP-094
   name: Post-Rental Condition Inspection
   module: Rentals
@@ -16485,6 +16646,10 @@ screens:
     params:
     - from: navigation
       name: bookingId
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `recordRentalInspection`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
 - id: EMP-095
   name: Before vs After Condition Comparison
   module: Rentals
@@ -16579,6 +16744,10 @@ screens:
     params:
     - from: navigation
       name: bookingId
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `recordRentalInspection`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
 - id: EMP-096
   name: Damage Assessment & Charge Workflow
   module: Rentals
@@ -16670,6 +16839,10 @@ screens:
     params:
     - from: navigation
       name: bookingId
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `assessRentalDamage`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
 - id: EMP-097
   name: Partial Return & Missing Equipment
   module: Rentals
@@ -16764,6 +16937,9 @@ screens:
     params:
     - from: navigation
       name: bookingId
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `returnRental` takes
+        the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
 - id: EMP-098
   name: Late Fees, Damage Fees & Final Settlement
   module: Rentals
@@ -16864,6 +17040,9 @@ screens:
     params:
     - from: navigation
       name: bookingId
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `returnRental` takes
+        the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
 - id: EMP-099
   name: Deposit Release, Capture & Customer Confirmation
   module: Rentals
@@ -16969,6 +17148,9 @@ screens:
     params:
     - from: navigation
       name: bookingId
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `returnRental` takes
+        the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
     - name: depositId
       from: navigation
 - id: EMP-100
@@ -17075,3 +17257,6 @@ screens:
     params:
     - from: navigation
       name: bookingId
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `returnRental` takes
+        the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
