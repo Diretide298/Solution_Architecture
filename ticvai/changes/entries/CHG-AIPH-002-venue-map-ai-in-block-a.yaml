@@ -51,7 +51,8 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/build-service-docs.py::ai_unit_text
-status: open
+status: closed
+closed_by_commit: 8c83a80a
 notes: 'Scoped derive only (build-service-docs, derive-block-a-schedule, op-descriptions, build-ticket-links,
   derive-mirrors). Every task after build order #99 moves down one build-order number (the new row); the Block D epic''s
   first sprint reads 7 again, as on main.'
