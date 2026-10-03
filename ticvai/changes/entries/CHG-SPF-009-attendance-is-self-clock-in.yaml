@@ -1,0 +1,35 @@
+id: CHG-SPF-009
+date: '2026-10-03'
+source: audit
+kind: spec
+summary: 'BO-056 no longer records attendance: staff clock in themselves on the staff app and supervisors correct
+  with amendAttendance.'
+decision:
+  what: 'Remove recordAttendance, Record attendance and its form from BO-056 (Chinmay: not the recommendation).'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Chinmay''s answers of 3 October to the Block A audit (CHG-AUD-001), section ''Block A audit business rules:
+  attendance.'').'
+keys_touched:
+  screens:
+  - BO-056
+  operations:
+  - recordAttendance
+  - amendAttendance
+  files:
+  - tools/applied/screen-decisions-3-october.py
+  - tools/check-screen-patterns.py
+root_class: A26 BUSINESS-RULES
+tickets:
+  started: []
+  unstarted:
+  - VM-BO-056
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-patterns.py
+status: closed
+closed_by_commit: 1303d854
+notes: Batch SPF (spec-screens), 3 October 2026. check-screen-patterns (DEC) fails if the screen drifts back.
