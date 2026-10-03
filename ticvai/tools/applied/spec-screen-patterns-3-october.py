@@ -31,6 +31,7 @@ dump width), so a hand edit elsewhere is untouched. A second run says there is n
 from __future__ import annotations
 
 import argparse
+import copy
 import importlib.util
 import re
 import sys
@@ -645,6 +646,17 @@ def main() -> int:
             hit |= fix_p8(s, block_a, log)
         if hit:
             F.dirty.add(sid)
+    # **A staff-app twin and its back-office screen stay one layout** (`source.sameAs`, which
+    # check-screens holds and apply-rental-staff-app.py copies from P08 to P06): the phone's
+    # narrower columns are the ones both keep, so the next copy changes nothing (CHG-SPF-002).
+    if "P2" in only:
+        for sid, s in F.screens.items():
+            twin = (s.get("source") or {}).get("sameAs")
+            if twin in F.screens and pk.small(sid) and not pk.small(twin) and \
+                    s.get("layout") != F.screens[twin].get("layout"):
+                F.screens[twin]["layout"] = copy.deepcopy(s["layout"])
+                F.dirty.add(twin)
+                log.append(f"P2 {twin}: layout follows its staff-app twin {sid}")
     c = Counter(x.split(" ", 1)[0] for x in log)
     if a.verbose:
         print("\n".join(log))

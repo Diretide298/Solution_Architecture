@@ -85767,41 +85767,36 @@ screens:
       response shape exists.'
     source: pack Rental_Management.pdf, page 87 §Display
   layout:
-    template: split
     regions:
-    - name: contentBody
-      slot: collection
-      components:
-      - kind: dataTable
-        label: Every active rental intelligence
+    - components:
+      - bindsTo: null
         columns:
         - Rentals due next hour
         - Predicted late returns
         - Future reservation conflicts
         - Extension demand
-        - Equipment incident trends
-        - Location return pressure
-        - Expected inventory shortage
-        bindsTo: null
+        kind: dataTable
+        label: Every active rental intelligence
         operation: null
         provenance: pack Rental_Management.pdf, page 87 §Display
-    - name: contextPanel
-      slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected active rental intelligence
-        bindsTo: null
+      name: contentBody
+      slot: collection
+    - components:
+      - bindsTo: null
         columns:
         - Rentals due next hour
         - Predicted late returns
         - Future reservation conflicts
         - Extension demand
         - Equipment incident trends
-        - Location return pressure
-        - Expected inventory shortage
+        kind: detailPanel
+        label: The selected active rental intelligence
         notes: 'The pack groups this record''s detail under its own headings: “RNT-10482”, “Confirmed”,
           “Ready for Checkout”, “Active”, “Incident”, “Overdue”.'
         provenance: pack Rental_Management.pdf, page 87 §Display
+      name: contextPanel
+      slot: selection
+    template: split
   states:
     loading: The active rental intelligence list.
     error: Could not load. Names which read failed and leaves the active rental intelligence untouched.
