@@ -58,6 +58,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-audience-match.py
-status: open
+status: closed
+closed_by_commit: b1b78a37
 notes: Batch GCF (spec-guest). Applied by tools/applied/guest-scoping-3-october.py. listCustomerBadges is here rather than
   in group 1 (see CHG-GCF-001).

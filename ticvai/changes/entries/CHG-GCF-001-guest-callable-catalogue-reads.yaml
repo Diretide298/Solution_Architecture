@@ -66,7 +66,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-audience-match.py
-status: open
+status: closed
+closed_by_commit: b1b78a37
 notes: 'Batch GCF (spec-guest). Applied by tools/applied/guest-scoping-3-october.py (one flag and one appended description
   paragraph per operation). ''Badges'' in the answer''s group 1 is read as the programme catalogue: listCustomerBadges returns
   one customer''s badges, so it is self-scoped under CHG-GCF-002 instead (a guest-callable read by customerId would show anyone''s
