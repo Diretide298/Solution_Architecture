@@ -1472,11 +1472,6 @@ paths:
         `503 scrubber-unavailable`, never sent raw; a message or reply the guard blocks is refused
         `422 guard-refused`.
 
-        **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-004;
-        `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own
-        assistant conversations; another guest''s conversation is refused exactly as one that does not exist,
-        never returned. `AI_USE` is what a staff caller must hold to act for any guest (ADR-0025).
-
         '
       tags:
       - assist

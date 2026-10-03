@@ -22,8 +22,8 @@ permission is what a staff caller must hold). Each group is a change entry:
   CHG-GCF-005  `listAnalyticsProviders` stays a staff read; a guest reads the providers from the
                published tenant config (the PublishedTenantConfig field is written by hand).
 
-Only flags and one appended description paragraph per operation are written, at the operation's own
-lines, so nothing else in a file moves and edits other branches made to the same operations merge.
+Only flags and one appended description paragraph per operation are written (`sendAiMessage`: the flag
+only, see FLAG_ONLY), at the operation's own lines, so nothing else in a file moves and edits other branches made to the same operations merge.
 Every edit finds its target and does nothing when it is already done: a second run says there is
 nothing to do.
 
@@ -127,6 +127,11 @@ DEVICE_NOTE = ("**A kiosk reprints as a registered device** ({src}; CHG-GCF-004)
                "this with its device credential (`apiKeyAuth`, audience `device`) and holds no permission; "
                "it reprints only an order the guest at it has identified (KSK-012 booking found, KSK-009 "
                "ticket issued, KSK-010 print failure), and each reprint is recorded against the device.")
+
+
+# Flag only, no paragraph: the business-rules branch (CHG-RUL-002, streamed answers) appends to the end of
+# sendAiMessage's description on the same day, and two appends at one place do not merge. The flag says it.
+FLAG_ONLY = {"sendAiMessage"}
 
 
 def g1_text(perm, what):
@@ -319,7 +324,8 @@ def main():
                 if o.get("x-ticvai-self-scoped"):
                     continue
                 set_flag(lines, Op(lines, op_id), "x-ticvai-self-scoped", "subject")
-                append_description(lines, Op(lines, op_id), g2_text(perm_of(ops, op_id), *arg))
+                if op_id not in FLAG_ONLY:
+                    append_description(lines, Op(lines, op_id), g2_text(perm_of(ops, op_id), *arg))
             elif action == "g3":
                 if o.get("x-ticvai-guest-callable"):
                     continue
