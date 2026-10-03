@@ -27,3 +27,4 @@
 
 ## Block A pace and AI scope (Chinmay, 3 Oct evening)
 - Block A pace: 6 tasks a day per developer in Sprints 1 to 4 instead of overtime; the ramp after it unchanged (from 5 tasks a day to 2x by Block D). Applied by CHG-RONEP-009.
+- No AI-engineer overtime: AI scope moves from A1 to A2 until Kalpita's and the second AI engineer's A1 work fits before 24 November (about 14 engineer-days), the lowest-impact work first; the gateway, the scrubber and the guard path, the concierge, BYOK and residency, and anything an A1 screen needs stay in A1. A control on an A1 screen whose AI moved is tagged 'Later'. Moved (CHG-RONEP-010): AI-ENGINE-PLANNER, the planner agent on top of the rules planner (8 engineer-days, Kalpita; GST-054's refinement in chat is Later, the rules plan still answers) and AI-ENGINE-SUGGESTIONS, the day-one suggestions (8 engineer-days, the second AI engineer; the suggestions on BO-005, GST-031 and WEB-044 are Later).

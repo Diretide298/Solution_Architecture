@@ -6372,8 +6372,10 @@ screens:
     trigger: onAction
   - operationId: requestSuggestion
     contract: ai
-    purpose: From the conversation only, kinds waitTime and upsell (prepPlan is the kitchen's production
-      plan; an itinerary is asked on the Plan tab); never a kind picker
+    purpose: 'From the conversation only, kinds waitTime and upsell (prepPlan is the kitchen''s production
+      plan; an itinerary is asked on the Plan tab); never a kind picker. Later (CHG-RONEP-010): the wait-time
+      and upsell suggestions of the day-one suggestions (AI-ENGINE-SUGGESTIONS) ships in Block A2 (Chinmay,
+      3 October); until then the control shows ''Later''.'
     trigger: background
   - operationId: listAiConversations
     contract: ai
@@ -10698,7 +10700,9 @@ screens:
   - operationId: requestSuggestion
     contract: ai
     purpose: 'A suggestion of kind `itinerary` (guest-allowed since 29 September): the planner agent''s
-      proposal for the plan, applied through `updateVisitPlan`'
+      proposal for the plan, applied through `updateVisitPlan`. Later (CHG-RONEP-010): the planner agent''s
+      refinement in chat (AI-ENGINE-PLANNER); the rules plan still answers in A1 ships in Block A2 (Chinmay,
+      3 October); until then the control shows ''Later''.'
     trigger: onAction
     provenance: decided 29 September 2026, MOB-6
   entryState:

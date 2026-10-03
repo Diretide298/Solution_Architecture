@@ -2381,9 +2381,16 @@ def main() -> int:
            name="AI engine · Block A: gateway and guest AI (concierge, Help me choose, translations, planner)")
     add_am("AI & Intelligence", "AI", None, 1, key="AM-AI-ENGINE-A-BASELINE", block="A", order=(0, 10, 0, 0, 0),
            name="AI engine · Block A: baseline layer, day-one suggestions, Qdrant tenancy, evaluation")
-    ai_part = {}
+    ai_part, ai_drop = {}, {}
     if EXTRA.exists():
         ai_part = {e["key"]: e.get("appModule") for e in json.loads(EXTRA.read_text(encoding="utf-8")).get("tasks") or []}
+        # **AI engine work moved to A2** (Chinmay, 3 October, CHG-RONEP-010): a Block A AI engine task marked `drop: A2`
+        # is built in "AI engine · Block A2", so the two AI engineers end their A1 work before 24 November
+        ai_drop = {e["key"]: e.get("drop") for e in json.loads(EXTRA.read_text(encoding="utf-8")).get("tasks") or []}
+    if "A2" in ai_drop.values():
+        add_am("AI & Intelligence", "AI", None, 1, key="AM-AI-ENGINE-A2", block="A2", order=(0, 11, 0, 0, 0),
+               name="AI engine · Block A2: the AI work moved out of A1 (" + ", ".join(
+                   sorted(k.replace("AI-ENGINE-", "").lower() for k, v in ai_drop.items() if v == "A2")) + ")")
 
     def foundation_am(k):
         if k.startswith("SETUP-"):
@@ -2393,6 +2400,8 @@ def main() -> int:
         if k.startswith(("OFFLINE-", "POS-KDS")):
             return "AM-FOUNDATION-OFFLINE"
         if k.startswith("AI-ENGINE-"):
+            if ai_drop.get(k) == "A2":
+                return "AM-AI-ENGINE-A2"
             return "AM-AI-ENGINE-A-BASELINE" if ai_part.get(k) == "baseline" else "AM-AI-ENGINE-A"
         if k.startswith(("PLATFORM-", "KERNEL-", "ARCH-", "OBS-", "EDGE-")):
             return "AM-FOUNDATION-PLATFORM"
@@ -2732,6 +2741,8 @@ def main() -> int:
     for t_ in leaf:
         am_tasks[am_of[t_["key"]]].append(t_)
 
+    # AM-AI-ENGINE-A2 (CHG-RONEP-010) is AI engine work like a later capability: accepted on its own module test, it
+    # does not hold Block A2 open
     A_AI = {"AM-AI-ENGINE-A", "AM-AI-ENGINE-A-BASELINE"}
 
     def is_ai_engine(k):
@@ -2810,12 +2821,26 @@ def main() -> int:
             block_tests[tk] = b
             leaf.append(t_)
 
+    # **An AI engine task another AI engine task of its block waits on goes first in its engineer's queue** (CHG-RONEP-010):
+    # the second AI engineer built the 15-day baseline before Qdrant tenancy, so the concierge waited until day 31 and
+    # the A1 AI work ran past 24 November.
+    ai_waiters = Counter()
+    for t_ in leaf:
+        if t_["track"] == "AI" and am_of.get(t_["key"]):
+            for d in t_["dependsOn"].split():
+                if d in by_key and by_key[d]["track"] == "AI" and am_of.get(d)                         and am_info[am_of[d]]["block"] == am_info[am_of[t_["key"]]]["block"]:
+                    ai_waiters[d] += 1
+
     def block_first(t_):
         if t_["key"] in block_tests:
-            return (BRANK[block_tests[t_["key"]]], (9, 99, 99, 9, 99), 9, 9, 999, 7, t_["key"])
+            return (BRANK[block_tests[t_["key"]]], (9, 99, 99, 9, 99), (9, 0), 9, 999, 7, t_["key"])
         a_ = am_info[am_of[t_["key"]]]
-        return (BRANK[a_["block"]], a_["order"], t_["tier"], int(t_["wave"] or 9), step[t_["key"]],
-                TRACK_ORDER[t_["track"]], t_["key"])
+        if t_["track"] == "Test" and t_.get("pool") == "ai":
+            # an AI engine module test is placed after every AI engine task of its block, so the peer engineer
+            # finishes their own block's work (the evaluation harness) before testing the other's (CHG-RONEP-010)
+            return (BRANK[a_["block"]], (8, 99, 99, 9, 99), (9, 0), 9, step[t_["key"]], 6, t_["key"])
+        return (BRANK[a_["block"]], a_["order"], (t_["tier"], -ai_waiters.get(t_["key"], 0)), int(t_["wave"] or 9),
+                step[t_["key"]], TRACK_ORDER[t_["track"]], t_["key"])
 
     # **Pass 2: each block on a sprint boundary, its test in the last three days.** Scheduled block first, with each
     # block's test window frozen. An app-module of B or C that still finishes after its block's target window opens,

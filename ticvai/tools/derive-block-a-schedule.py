@@ -113,8 +113,10 @@ def main():
             b_end[block[k]] = max(b_end[block[k]], v["end"])
     blocks = {}
     for b in sp.BLOCKS:
-        if b not in b_end:
+        if b not in b_end and b not in b_ai:
             continue
+        if b not in b_end:            # a block of AI engine work only (A2 since CHG-RONEP-010): it ends on its target
+            b_end[b] = float(sp.window_of(settings["targets"][b])[0])
         t = settings["targets"][b]
         w = freeze.get(b)
         # the block's final sprint: the one its test window is in (build-service-docs.py placed it after the work)

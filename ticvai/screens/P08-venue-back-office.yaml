@@ -1705,7 +1705,9 @@ screens:
     - listQueueEntries
   - operationId: requestSuggestion
     contract: ai
-    purpose: 'Queue-balancing suggestion (kind queueBalancing): return-slot allocation and redirection'
+    purpose: 'Queue-balancing suggestion (kind queueBalancing): return-slot allocation and redirection.
+      Later (CHG-RONEP-010): the queue-balancing suggestion of the day-one suggestions (AI-ENGINE-SUGGESTIONS)
+      ships in Block A2 (Chinmay, 3 October); until then the control shows ''Later''.'
     trigger: onAction
     provenance: build, 29 September 2026
   entryState:

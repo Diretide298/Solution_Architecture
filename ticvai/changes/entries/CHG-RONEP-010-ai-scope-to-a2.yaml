@@ -1,0 +1,45 @@
+id: CHG-RONEP-010
+date: '2026-10-03'
+source: plan
+kind: plan
+summary: The planner agent and the day-one suggestions move from A1 to Block A2, so the two AI engineers end their A1 work
+  before 24 November with no overtime.
+decision:
+  what: 'block-a-extra-tasks.json `drop: A2` on AI-ENGINE-PLANNER (the planner agent on top of the rules planner, 8
+    engineer-days, Kalpita) and AI-ENGINE-SUGGESTIONS (day-one suggestions, 8 engineer-days, the second AI engineer):
+    tools/build-service-docs.py builds them in "AI engine · Block A2", accepted on its own module test like a later AI
+    capability. The AI engineers'' queue puts the task another AI task of its block waits on first (Qdrant tenancy before
+    the baseline layer) and their module tests after their block''s AI work. Kept in A1: the gateway (with setAiProvider
+    and setAiCredential), the scrubber and the guard path, the concierge, Qdrant tenancy, the baseline layer, the
+    evaluation harness, Help me choose and CMS translation. requestSuggestion is still built in A1 (SVC-AI-AI-1), so the
+    completeness rule holds; the A1 controls whose AI moved say Later (tools/applied/ai-later-r1-plan-3-october.py):
+    BO-005''s queue-balancing suggestion, GST-031''s and WEB-044''s wait-time and upsell suggestions, GST-054''s refinement
+    in chat (the rules plan still answers). Result: AI engineers'' A1 overtime 0 h (was 109 h; Kalpita 58, the second
+    AI engineer 50); developers'' 4 h. A1 ends 27 November (last work 25 November); A2, the moved AI work only, ends with
+    Sprint 5 on 11 December (AI work to 9 December); B 25 December (last work 14 December), C 22 January, D 19 February
+    2027.'
+  by: Chinmay
+  date: '2026-10-03'
+proposed: '2026-10-03'
+why: 'Chinmay, 3 October (docs/active/decisions/answers-3-october-r1-plan.md, "Block A pace and AI scope"): no AI-engineer
+  overtime; cut AI scope from A1 to A2, lowest impact first, keeping the gateway, scrubber and guard path, concierge,
+  BYOK and residency and anything an A1 screen needs. After CHG-RONEP-009 the AI engineers still had 109 h of A1 work after
+  24 November.'
+keys_touched:
+  tickets: [AI-ENGINE-PLANNER, AI-ENGINE-SUGGESTIONS]
+  screens: [BO-005, GST-031, WEB-044, GST-054]
+  files: [docs/active/block-a-extra-tasks.json, tools/build-service-docs.py, tools/derive-block-a-schedule.py,
+    tools/applied/ai-later-r1-plan-3-october.py, tools/applied/README.md, docs/active/decisions/answers-3-october-r1-plan.md,
+    screens/P01-guest-web-storefront.yaml, screens/P02-guest-mobile-app.yaml, screens/P08-venue-back-office.yaml]
+root_class: 'new: block-scope-incomplete'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py::AM-AI-ENGINE-A2
+status: open
+notes: Its own commit, so it can be reverted cleanly (the screens' Later tags with it). check-plan-closure passes with it.

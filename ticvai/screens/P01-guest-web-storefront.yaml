@@ -9519,8 +9519,10 @@ screens:
     trigger: onAction
   - operationId: requestSuggestion
     contract: ai
-    purpose: From the conversation only, kinds waitTime and upsell (prepPlan is the kitchen's production
-      plan; an itinerary is asked on the Plan tab); never a kind picker
+    purpose: 'From the conversation only, kinds waitTime and upsell (prepPlan is the kitchen''s production
+      plan; an itinerary is asked on the Plan tab); never a kind picker. Later (CHG-RONEP-010): the wait-time
+      and upsell suggestions of the day-one suggestions (AI-ENGINE-SUGGESTIONS) ships in Block A2 (Chinmay,
+      3 October); until then the control shows ''Later''.'
     trigger: background
   - operationId: getGuestMenu
     contract: fnb
