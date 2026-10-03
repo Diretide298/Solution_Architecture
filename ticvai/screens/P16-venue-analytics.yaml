@@ -7359,8 +7359,9 @@ screens:
     body: '**Collects what `createAuthorisationPolicy` sends.** Required: `code`, `name`, `effect` (permit
       or deny; deny wins). Optional: `description`, `permissions` (the reporting permissions it speaks
       to), `conditions`, `combining`, `priority`, `scopePath` (the operating area), `appliesToRoleIds`
-      (the groups), `effectiveFrom`, `effectiveTo`. Never `id`, `status` or `version`: the server sets
-      them. Dismissing sends nothing.'
+      (the groups), `effectiveFrom`, `effectiveTo`. Never or: the server sets them. Dismissing sends nothing.
+      Not asked, because the server sets them (readOnly in the contract): `id`, `status`, `version` (3
+      October 2026, CHG-SPF-001).'
     bindsTo: AuthorisationPolicy
     confirm:
       label: Create access policy

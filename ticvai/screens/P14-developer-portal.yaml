@@ -1499,8 +1499,9 @@ screens:
     component: modal
     trigger: Save API licensing
     body: '**Collects what `setApiLicensing` sends before it is called.** Required: `licensedModules`.
-      Optional: `id`, `callAllowancePerMonth`, `overageRatePerThousand`, `revenueSharePercent`, `effectiveFrom`,
-      `effectiveTo`. Dismissing sends nothing; the screen behind is unchanged.'
+      Optional: `callAllowancePerMonth`, `overageRatePerThousand`, `revenueSharePercent`, `effectiveFrom`,
+      `effectiveTo`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the
+      server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).'
     bindsTo: ApiLicence
     confirm:
       label: Save API licensing
@@ -1509,7 +1510,6 @@ screens:
       label: Cancel
       discards:
       - licensedModules
-      - id
       - callAllowancePerMonth
       - overageRatePerThousand
       - revenueSharePercent

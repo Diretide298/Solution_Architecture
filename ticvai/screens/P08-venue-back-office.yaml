@@ -394,8 +394,9 @@ screens:
     component: modal
     trigger: Configure queue feed
     body: '**Collects what `configureQueueFeed` sends before it is called.** Required: `id`, `queueId`,
-      `adaptor`, `isEnabled`. Optional: `adaptorName`, `credentialsRef`, `expectedIntervalSeconds`,
-      `health`. Dismissing sends nothing; the screen behind is unchanged.'
+      `adaptor`, `isEnabled`. Optional: `adaptorName`, `credentialsRef`, `expectedIntervalSeconds`.
+      Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it
+      (readOnly in the contract): `health` (3 October 2026, CHG-SPF-001).'
     bindsTo: QueueFeed
     confirm:
       label: Configure queue feed
@@ -410,7 +411,6 @@ screens:
       - adaptorName
       - credentialsRef
       - expectedIntervalSeconds
-      - health
     provenance: contract queue.yaml PUT /queue-feeds
   - id: formCreateQueue
     component: modal
@@ -1105,8 +1105,9 @@ screens:
     component: modal
     trigger: Configure queue feed
     body: '**Collects what `configureQueueFeed` sends before it is called.** Required: `id`, `queueId`,
-      `adaptor`, `isEnabled`. Optional: `adaptorName`, `credentialsRef`, `expectedIntervalSeconds`,
-      `health`. Dismissing sends nothing; the screen behind is unchanged.'
+      `adaptor`, `isEnabled`. Optional: `adaptorName`, `credentialsRef`, `expectedIntervalSeconds`.
+      Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it
+      (readOnly in the contract): `health` (3 October 2026, CHG-SPF-001).'
     bindsTo: QueueFeed
     confirm:
       label: Configure queue feed
@@ -1121,7 +1122,6 @@ screens:
       - adaptorName
       - credentialsRef
       - expectedIntervalSeconds
-      - health
     provenance: contract queue.yaml PUT /queue-feeds
 - id: BO-004
   name: Manual Wait Time Entry
@@ -1992,9 +1992,10 @@ screens:
     component: modal
     trigger: Save parking facility
     body: '**Collects what `setParkingFacility` sends before it is called.** Required: `name`, `venueId`,
-      `mode`. Optional: `id`, `capacity`, `takesPayment`, `vendorSwapTargetDays`, `vendorName`, `endpoint`,
-      `credentialRef`, `pushLeadMinutes`, `accessPointIds`, `isActive`. Dismissing sends nothing; the
-      screen behind is unchanged.'
+      `mode`. Optional: `id`, `capacity`, `vendorName`, `endpoint`, `credentialRef`, `pushLeadMinutes`,
+      `accessPointIds`, `isActive`. Dismissing sends nothing; the screen behind is unchanged. Not asked,
+      because the server sets them (readOnly in the contract): `takesPayment`, `vendorSwapTargetDays`
+      (3 October 2026, CHG-SPF-001).'
     bindsTo: ParkingFacility
     confirm:
       label: Save parking facility
@@ -2007,8 +2008,6 @@ screens:
       - mode
       - id
       - capacity
-      - takesPayment
-      - vendorSwapTargetDays
       - vendorName
       - endpoint
       - credentialRef
@@ -4235,9 +4234,10 @@ screens:
     component: modal
     trigger: Save group package definition
     body: '**Collects what `setGroupPackageDefinition` sends before it is called.** Required: `kind`,
-      `maxParticipants`, `durationMinutes`. Optional: `id`, `productId`, `hostCount`, `pricingBasis`,
-      `freeLeaderRatio`, `paymentMode`, `includes`, `scopePath`. Dismissing sends nothing; the screen
-      behind is unchanged.'
+      `maxParticipants`, `durationMinutes`. Optional: `hostCount`, `pricingBasis`, `freeLeaderRatio`,
+      `paymentMode`, `includes`. Dismissing sends nothing; the screen behind is unchanged. Not asked,
+      because the server sets them (readOnly in the contract): `id`, `productId`, `scopePath` (3 October
+      2026, CHG-SPF-001).'
     bindsTo: GroupPackageDefinition
     confirm:
       label: Save group package definition
@@ -4248,14 +4248,11 @@ screens:
       - kind
       - maxParticipants
       - durationMinutes
-      - id
-      - productId
       - hostCount
       - pricingBasis
       - freeLeaderRatio
       - paymentMode
       - includes
-      - scopePath
     provenance: contract catalogue.yaml PUT /products/{productId}/group-package
   - id: formCreateBundle
     component: modal
@@ -4285,10 +4282,11 @@ screens:
   - id: formSetPackagePricingDefinition
     component: modal
     trigger: Save package pricing definition
-    body: '**Collects what `setPackagePricingDefinition` sends before it is called.** Required: `id`,
-      `scopePath`, `productId`, `recordKind`, `pricingModel`, `status`. Optional: `name`, `priceListId`,
-      `addOnType`, `packagePrice`, `components`, `componentPriceVisibility`. Dismissing sends nothing;
-      the screen behind is unchanged.'
+    body: '**Collects what `setPackagePricingDefinition` sends before it is called.** Required: `productId`,
+      `recordKind`, `pricingModel`, `status`. Optional: `name`, `priceListId`, `addOnType`, `packagePrice`,
+      `components`, `componentPriceVisibility`. Dismissing sends nothing; the screen behind is unchanged.
+      Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October
+      2026, CHG-SPF-001).'
     bindsTo: PackagePricing
     confirm:
       label: Save package pricing definition
@@ -4296,8 +4294,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - scopePath
       - productId
       - recordKind
       - pricingModel
@@ -4606,11 +4602,12 @@ screens:
   - id: formCreateEntitlementTemplate
     component: modal
     trigger: Create entitlement template
-    body: '**Collects what `createEntitlementTemplate` sends before it is called.** Required: `id`,
-      `code`, `name`, `validityKind`. Optional: `description`, `validFromOffsetDays`, `validForDays`,
-      `daysOfWeek`, `expiryAnchor`, `expiryDate`, `carriesStoredValue`, `includedValue`, `validTimeWindows`,
-      `blackoutDates`, `fastTrackTier`, `entriesAllowed` and 15 more. Dismissing sends nothing; the
-      screen behind is unchanged.'
+    body: '**Collects what `createEntitlementTemplate` sends before it is called.** Required: `code`,
+      `name`, `validityKind`. Optional: `description`, `validFromOffsetDays`, `validForDays`, `daysOfWeek`,
+      `expiryAnchor`, `expiryDate`, `carriesStoredValue`, `includedValue`, `validTimeWindows`, `blackoutDates`,
+      `fastTrackTier`, `entriesAllowed` and 15 more. Dismissing sends nothing; the screen behind is
+      unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026,
+      CHG-SPF-001).'
     bindsTo: EntitlementTemplate
     confirm:
       label: Create entitlement template
@@ -4618,7 +4615,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - code
       - name
       - validityKind
@@ -10466,11 +10462,12 @@ screens:
     body: '**Collects what `createAdmissionRules` sends before it is called.** Required: `code`, `name`,
       `openMinutesBefore`, `closeMinutesAfter`. Optional: `perProductRules`, `maxDurationMinutes`, `requiresExitBeforeReentry`,
       `maxReentries`, `entryLimit`, `exitScan`, `maxExits`, `reEntryWindowMinutes`, `sameDayOnly`, `designatedAccessPointIds`,
-      `validity`, `crossover`, `allowedAccessPointIds`, `reEntryVerification`, `ruleConditions`. `id`
-      and `scopePath` are the server''s and never asked (VO-R03). Entry limit, exit scan, re-entry window
+      `validity`, `crossover`, `allowedAccessPointIds`, `reEntryVerification`, `ruleConditions`. and
+      `scopePath` are the server''s and never asked (VO-R03). Entry limit, exit scan, re-entry window
       and verification, validity, crossover and the rule conditions are blocks of the profile (29 September
       close-out), edited here so BO-156, BO-158 and BO-160 have a home. Dismissing sends nothing; the
-      screen behind is unchanged.'
+      screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract):
+      `id` (3 October 2026, CHG-SPF-001).'
     confirm:
       label: New profile
       operation: createAdmissionRules
@@ -10503,11 +10500,12 @@ screens:
     body: '**Collects what `updateAdmissionRules` sends before it is called.** Required: `code`, `name`,
       `openMinutesBefore`, `closeMinutesAfter`. Optional: `perProductRules`, `maxDurationMinutes`, `requiresExitBeforeReentry`,
       `maxReentries`, `entryLimit`, `exitScan`, `maxExits`, `reEntryWindowMinutes`, `sameDayOnly`, `designatedAccessPointIds`,
-      `validity`, `crossover`, `allowedAccessPointIds`, `reEntryVerification`, `ruleConditions`. `id`
-      and `scopePath` are the server''s and never asked (VO-R03). Entry limit, exit scan, re-entry window
+      `validity`, `crossover`, `allowedAccessPointIds`, `reEntryVerification`, `ruleConditions`. and
+      `scopePath` are the server''s and never asked (VO-R03). Entry limit, exit scan, re-entry window
       and verification, validity, crossover and the rule conditions are blocks of the profile (29 September
       close-out), edited here so BO-156, BO-158 and BO-160 have a home. Dismissing sends nothing; the
-      screen behind is unchanged.'
+      screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract):
+      `id` (3 October 2026, CHG-SPF-001).'
     confirm:
       label: Save profile
       operation: updateAdmissionRules
@@ -11277,10 +11275,12 @@ screens:
     component: modal
     trigger: Register device
     body: '**Collects what `registerDevice` sends before it is called.** Required: `kind`, `driver`,
-      `workstationId`. Optional: `identifier`, `model`, `pushToken`, `pushPlatform`, `pushFailureCount`,
-      `offlineScope`, `firmwareVersion`, `isRequired`, `status`, `batteryPercent`, `lastCheckedAt`,
-      `health` and 5 more. **Not asked:** `id` is a client UUIDv7 generated silently (design-note correction,
-      2 October 2026). Dismissing sends nothing; the screen behind is unchanged.'
+      `workstationId`. Optional: `identifier`, `model`, `pushToken`, `pushPlatform`, `offlineScope`,
+      `isRequired` and 5 more. **Not asked:** is a client UUIDv7 generated silently (design-note correction,
+      2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because
+      the server sets them (readOnly in the contract): `batteryPercent`, `capabilities`, `firmwareVersion`,
+      `health`, `id`, `lastCheckedAt`, `lastHeartbeatAt`, `pushFailureCount`, `status` (3 October 2026,
+      CHG-SPF-001).'
     bindsTo: RegisteredDevice
     confirm:
       label: Register device
@@ -11295,24 +11295,17 @@ screens:
       - model
       - pushToken
       - pushPlatform
-      - pushFailureCount
       - offlineScope
-      - firmwareVersion
       - isRequired
-      - status
-      - batteryPercent
-      - lastCheckedAt
-      - health
-      - lastHeartbeatAt
-      - capabilities
     provenance: contract tenancy.yaml POST /devices
   - id: formConfigureWorkstation
     component: modal
     trigger: Configure workstation
     body: '**Collects what `configureWorkstation` sends before it is called.** Required: `name`, `saleBoardId`.
-      Optional: `cashierInputMode`, `guestDisplayContent`, `loadedMediaStockId`, `mediaStockRemaining`,
-      `departmentId`, `accessPointId`, `devices`, `deploymentProfile`, `edgeNodeId`, `isActive`. Dismissing
-      sends nothing; the screen behind is unchanged.'
+      Optional: `cashierInputMode`, `guestDisplayContent`, `loadedMediaStockId`, `departmentId`, `accessPointId`,
+      `devices`, `deploymentProfile`, `edgeNodeId`, `isActive`. Dismissing sends nothing; the screen
+      behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `mediaStockRemaining`
+      (3 October 2026, CHG-SPF-001).'
     bindsTo: ConfigureWorkstationRequest
     confirm:
       label: Configure workstation
@@ -11325,7 +11318,6 @@ screens:
       - cashierInputMode
       - guestDisplayContent
       - loadedMediaStockId
-      - mediaStockRemaining
       - departmentId
       - accessPointId
       - devices
@@ -11712,8 +11704,9 @@ screens:
     component: modal
     trigger: Save offline policy
     body: '**Collects what `setOfflinePolicy` sends before it is called.** Required: `scopePath`. Optional:
-      `id`, `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`,
-      `onCeilingBreach`, `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged.'
+      `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`, `onCeilingBreach`,
+      `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged. Not asked,
+      because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).'
     bindsTo: OfflinePolicy
     confirm:
       label: Save offline policy
@@ -11722,7 +11715,6 @@ screens:
       label: Cancel
       discards:
       - scopePath
-      - id
       - maxOfflineHours
       - allowedOffline
       - offlineValueCeiling
@@ -13635,9 +13627,11 @@ screens:
     component: modal
     trigger: Save F&B delivery policy
     body: '**Collects what `setFnbDeliveryPolicy` sends before it is called.** Required: `outletId`.
-      Optional: `id`, `collectionEnabled`, `deliveryEnabled`, `collectionPoint`, `collectionHoldMinutes`,
+      Optional: `collectionEnabled`, `deliveryEnabled`, `collectionPoint`, `collectionHoldMinutes`,
       `asapCollectionMinutes`, `asapDeliveryMinutes`, `slotMinutes`, `minimumOrder`, `deliveryFee`,
-      `freeDeliveryAbove`, `radiusKm` and 3 more. Dismissing sends nothing; the screen behind is unchanged.'
+      `freeDeliveryAbove`, `radiusKm` and 3 more. Dismissing sends nothing; the screen behind is unchanged.
+      Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October
+      2026, CHG-SPF-001).'
     bindsTo: FnbDeliveryPolicy
     confirm:
       label: Save F&B delivery policy
@@ -13646,7 +13640,6 @@ screens:
       label: Cancel
       discards:
       - outletId
-      - id
       - collectionEnabled
       - deliveryEnabled
       - collectionPoint
@@ -13660,15 +13653,15 @@ screens:
       - radiusKm
       - emiratesServed
       - cutleryOptIn
-      - scopePath
     provenance: contract fnb.yaml PUT /fnb-delivery-policy
   - id: formSetReturnPolicy
     component: modal
     trigger: Save return policy
     body: '**Collects what `setReturnPolicy` sends before it is called.** Required: `outletId`, `defaultWindowDays`,
-      `requiresReceipt`. Optional: `id`, `allowCashRefundOnCardSale`, `selfAuthoriseLimit`, `requiresSecondUserAbove`,
+      `requiresReceipt`. Optional: `allowCashRefundOnCardSale`, `selfAuthoriseLimit`, `requiresSecondUserAbove`,
       `requiresApprovalAbove`, `restockableConditions`, `nonReturnableCategoryIds`. Dismissing sends
-      nothing; the screen behind is unchanged.'
+      nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the
+      contract): `id` (3 October 2026, CHG-SPF-001).'
     bindsTo: ReturnPolicy
     confirm:
       label: Save return policy
@@ -13679,7 +13672,6 @@ screens:
       - outletId
       - defaultWindowDays
       - requiresReceipt
-      - id
       - allowCashRefundOnCardSale
       - selfAuthoriseLimit
       - requiresSecondUserAbove
@@ -16789,10 +16781,10 @@ screens:
     component: modal
     trigger: Create rota assignment
     body: '**Collects what `createRotaAssignment` sends before it is called.** Required: `principalId`,
-      `venueId`, `position`, `startsAt`, `endsAt`. Optional: `overtimeMinutes`, `restPeriodBefore`,
-      `breachesWorkingHourLimit`, `labourCost`, `id`, `displayName`, `departmentId`, `requiredRoleId`,
-      `workstationId`, `status`, `breakMinutes`, `note`. Dismissing sends nothing; the screen behind
-      is unchanged.'
+      `venueId`, `position`, `startsAt`, `endsAt`. Optional: `restPeriodBefore`, `labourCost`, `departmentId`,
+      `requiredRoleId`, `workstationId`, `status`, `breakMinutes`, `note`. Dismissing sends nothing;
+      the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract):
+      `breachesWorkingHourLimit`, `displayName`, `id`, `overtimeMinutes` (3 October 2026, CHG-SPF-001).'
     bindsTo: RotaAssignment
     confirm:
       label: Create rota assignment
@@ -16805,12 +16797,8 @@ screens:
       - position
       - startsAt
       - endsAt
-      - overtimeMinutes
       - restPeriodBefore
-      - breachesWorkingHourLimit
       - labourCost
-      - id
-      - displayName
       - departmentId
       - requiredRoleId
       - workstationId
@@ -16822,10 +16810,10 @@ screens:
     component: modal
     trigger: Save rota assignment
     body: '**Collects what `updateRotaAssignment` sends before it is called.** Required: `principalId`,
-      `venueId`, `position`, `startsAt`, `endsAt`. Optional: `overtimeMinutes`, `restPeriodBefore`,
-      `breachesWorkingHourLimit`, `labourCost`, `id`, `displayName`, `departmentId`, `requiredRoleId`,
-      `workstationId`, `status`, `breakMinutes`, `note`. Dismissing sends nothing; the screen behind
-      is unchanged.'
+      `venueId`, `position`, `startsAt`, `endsAt`. Optional: `restPeriodBefore`, `labourCost`, `departmentId`,
+      `requiredRoleId`, `workstationId`, `status`, `breakMinutes`, `note`. Dismissing sends nothing;
+      the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract):
+      `breachesWorkingHourLimit`, `displayName`, `id`, `overtimeMinutes` (3 October 2026, CHG-SPF-001).'
     bindsTo: RotaAssignment
     confirm:
       label: Save rota assignment
@@ -16838,12 +16826,8 @@ screens:
       - position
       - startsAt
       - endsAt
-      - overtimeMinutes
       - restPeriodBefore
-      - breachesWorkingHourLimit
       - labourCost
-      - id
-      - displayName
       - departmentId
       - requiredRoleId
       - workstationId
@@ -18736,9 +18720,10 @@ screens:
   - id: formSetRefundPolicy
     component: modal
     trigger: Save refund policy
-    body: '**Collects what `setRefundPolicy` sends before it is called.** Required: `venueId`, `selfAuthoriseLimit`,
-      `requiresApprovalAbove`. Optional: `id`, `requiresSecondUserAbove`, `timeBands`, `allowPartial`,
-      `refundWindowDays`, `varianceThreshold`. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setRefundPolicy` sends before it is called.** Required: `selfAuthoriseLimit`,
+      `requiresApprovalAbove`. Optional: `requiresSecondUserAbove`, `timeBands`, `allowPartial`, `refundWindowDays`,
+      `varianceThreshold`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because
+      the server sets them (readOnly in the contract): `id`, `venueId` (3 October 2026, CHG-SPF-001).'
     bindsTo: RefundPolicy
     confirm:
       label: Save refund policy
@@ -18746,10 +18731,8 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - venueId
       - selfAuthoriseLimit
       - requiresApprovalAbove
-      - id
       - requiresSecondUserAbove
       - timeBands
       - allowPartial
@@ -19474,9 +19457,10 @@ screens:
   - id: formSetRefundPolicy
     component: modal
     trigger: Save refund policy
-    body: '**Collects what `setRefundPolicy` sends before it is called.** Required: `venueId`, `selfAuthoriseLimit`,
-      `requiresApprovalAbove`. Optional: `id`, `requiresSecondUserAbove`, `timeBands`, `allowPartial`,
-      `refundWindowDays`, `varianceThreshold`. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setRefundPolicy` sends before it is called.** Required: `selfAuthoriseLimit`,
+      `requiresApprovalAbove`. Optional: `requiresSecondUserAbove`, `timeBands`, `allowPartial`, `refundWindowDays`,
+      `varianceThreshold`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because
+      the server sets them (readOnly in the contract): `id`, `venueId` (3 October 2026, CHG-SPF-001).'
     bindsTo: RefundPolicy
     confirm:
       label: Save refund policy
@@ -19484,10 +19468,8 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - venueId
       - selfAuthoriseLimit
       - requiresApprovalAbove
-      - id
       - requiresSecondUserAbove
       - timeBands
       - allowPartial
@@ -19504,7 +19486,9 @@ screens:
       cart lease, extensions, resale, exchange and reschedule cut-offs. **F&B limits**: recall window,
       comp escalation, table reserved lead, food-safety lead. **Biometrics** (master switch, consent
       form, minors) and **segregated access**. **Alerting**: channel, acknowledgement, escalation. Currency
-      code and scale are read-only (ADR-0008). Dismissing sends nothing; the screen behind is unchanged.'
+      code and scale are read-only (ADR-0008). Dismissing sends nothing; the screen behind is unchanged.
+      Not asked, because the server sets them (readOnly in the contract): `currencyCode`, `currencyScale`,
+      `id`, `venueId` (3 October 2026, CHG-SPF-001).'
     bindsTo: VenueSettings
     confirm:
       label: Save venue settings
@@ -19512,10 +19496,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - venueId
-      - currencyCode
-      - currencyScale
       - supportHours
       - quietHours
       - biometrics
@@ -19721,9 +19701,10 @@ screens:
     component: modal
     trigger: Publish announcement
     body: '**Collects what `publishAnnouncement` sends before it is called.** Required: `title`, `body`,
-      `kind`, `publishedAt`. Optional: `id`, `venueIds`, `departmentIds`, `roleIds`, `requiresAcknowledgement`,
-      `expiresAt`, `publishedByPrincipalId`, `locale`. Dismissing sends nothing; the screen behind is
-      unchanged.'
+      `kind`, `publishedAt`. Optional: `venueIds`, `departmentIds`, `roleIds`, `requiresAcknowledgement`,
+      `expiresAt`, `locale`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because
+      the server sets them (readOnly in the contract): `id`, `publishedByPrincipalId` (3 October 2026,
+      CHG-SPF-001).'
     bindsTo: Announcement
     confirm:
       label: Publish announcement
@@ -19735,13 +19716,11 @@ screens:
       - body
       - kind
       - publishedAt
-      - id
       - venueIds
       - departmentIds
       - roleIds
       - requiresAcknowledgement
       - expiresAt
-      - publishedByPrincipalId
       - locale
     provenance: contract workforce.yaml POST /announcements
   gaps:
@@ -19873,9 +19852,10 @@ screens:
     component: modal
     trigger: Create webhook subscription
     body: '**Collects what `createWebhookSubscription` sends before it is called.** Required: `clientId`,
-      `endpointUrl`, `eventTypes`. Optional: `filters`, `signingSecret`, `consecutiveFailures`, `disabledReason`.
-      **Not asked:** `id` is a client UUIDv7 generated silently; `status` is set by the server (design-note
-      correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.'
+      `endpointUrl`, `eventTypes`. Optional: `filters`, `signingSecret`. **Not asked:** is a client
+      UUIDv7 generated silently; is set by the server (design-note correction, 2 October 2026). Dismissing
+      sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly
+      in the contract): `consecutiveFailures`, `disabledReason`, `id`, `status` (3 October 2026, CHG-SPF-001).'
     bindsTo: WebhookSubscription
     confirm:
       label: Create webhook subscription
@@ -19888,8 +19868,6 @@ screens:
       - eventTypes
       - filters
       - signingSecret
-      - consecutiveFailures
-      - disabledReason
     provenance: contract public-api.yaml POST /webhook-subscriptions
   gaps:
   - operation: createApiClient
@@ -21731,9 +21709,10 @@ screens:
   - id: formCreateLegalEntity
     component: modal
     trigger: Create legal entity
-    body: '**Collects what `createLegalEntity` sends before it is called.** Required: `id`, `code`,
-      `name`, `countryCode`, `currency`, `currencyScale`, `fiscalYearStartMonth`. Optional: `taxRegistrationNumber`,
-      `regionIds`, `isActive`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `createLegalEntity` sends before it is called.** Required: `code`, `name`,
+      `countryCode`, `currency`, `currencyScale`, `fiscalYearStartMonth`. Optional: `taxRegistrationNumber`,
+      `regionIds`, `isActive`. Dismissing sends nothing; the screen behind is unchanged. Not asked,
+      because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).'
     bindsTo: LegalEntity
     confirm:
       label: Create legal entity
@@ -21741,7 +21720,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - code
       - name
       - countryCode
@@ -21751,7 +21729,6 @@ screens:
       - taxRegistrationNumber
       - regionIds
       - isActive
-      - scopePath
     provenance: contract finance.yaml POST /legal-entities
 - id: BO-075
   name: Account Mapping
@@ -22196,10 +22173,11 @@ screens:
   - id: formCreateRecognitionSchedule
     component: modal
     trigger: Create recognition schedule
-    body: '**Collects what `createRecognitionSchedule` sends before it is called.** Required: `id`,
-      `name`, `method`, `productKinds`. Optional: `priority`, `recognitionSite`, `frequency`, `revalidateOnValidityChange`,
+    body: '**Collects what `createRecognitionSchedule` sends before it is called.** Required: `name`,
+      `method`, `productKinds`. Optional: `priority`, `recognitionSite`, `frequency`, `revalidateOnValidityChange`,
       `deferredAccountId`, `recognisedAccountId`, `breakageAccountId`, `noShowTrigger`, `noShowAccountId`,
-      `breakageAfterDays`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.'
+      `breakageAfterDays`, `isActive`. Dismissing sends nothing; the screen behind is unchanged. Not
+      asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).'
     bindsTo: RecognitionSchedule
     confirm:
       label: Create recognition schedule
@@ -22207,7 +22185,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - name
       - method
       - productKinds
@@ -22444,8 +22421,9 @@ screens:
     trigger: Save FX rate
     body: '**Collects what `setFxRate` sends before it is called.** Required: `fromCurrency`, `toCurrency`,
       `rate`, `purpose`, `effectiveFrom`. Optional: `effectiveTo`, `note`. **The note is required for
-      a manual rate** and the call is refused without it (R127); `source`, set-by, provider reference
-      and fetched-at are the server''s. Dismissing sends nothing; the screen behind is unchanged.'
+      a manual rate** and the call is refused without it (R127); set-by, provider reference and fetched-at
+      are the server''s. Dismissing sends nothing; the screen behind is unchanged. Not asked, because
+      the server sets it (readOnly in the contract): `source` (3 October 2026, CHG-SPF-001).'
     confirm:
       label: Save FX rate
       operation: setFxRate
@@ -24765,8 +24743,8 @@ screens:
     component: modal
     trigger: Save approval matrix
     body: '**Collects what `setApprovalMatrix` sends before it is called.** Required: `kind`, `scopeLevel`,
-      `rules`. Optional: `id`, `scopePath`, `isActive`. Dismissing sends nothing; the screen behind
-      is unchanged.'
+      `rules`. Optional: `isActive`. Dismissing sends nothing; the screen behind is unchanged. Not asked,
+      because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).'
     bindsTo: ApprovalMatrix
     confirm:
       label: Save approval matrix
@@ -24777,8 +24755,6 @@ screens:
       - kind
       - scopeLevel
       - rules
-      - id
-      - scopePath
       - isActive
     provenance: contract approvals.yaml PUT /approval-matrices
 - id: BO-087
@@ -24876,8 +24852,9 @@ screens:
     component: modal
     trigger: Create approval delegation
     body: '**Collects what `createApprovalDelegation` sends before it is called.** Required: `delegatorPrincipalId`,
-      `delegatePrincipalId`, `from`, `to`. Optional: `id`, `kinds`, `maxAmount`, `reason`, `isActive`,
-      `scopePath`. Dismissing sends nothing; the screen behind is unchanged.'
+      `delegatePrincipalId`, `from`, `to`. Optional: `kinds`, `maxAmount`, `reason`, `scopePath`. Dismissing
+      sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly
+      in the contract): `id`, `isActive` (3 October 2026, CHG-SPF-001).'
     bindsTo: ApprovalDelegation
     confirm:
       label: Create approval delegation
@@ -24889,11 +24866,9 @@ screens:
       - delegatePrincipalId
       - from
       - to
-      - id
       - kinds
       - maxAmount
       - reason
-      - isActive
       - scopePath
     provenance: contract approvals.yaml POST /delegations
   states:
@@ -25706,7 +25681,8 @@ screens:
       is a tenant setting per data class) and the engine tuning (`retrieveTopK`, `rerankTopK`, `semanticCacheThreshold`,
       `negativeCacheTtlSeconds`, chunking, quantisation, hnsw, cascade), which is platform tuning left
       to the console, not a venue manager''s decision. The money ceiling is set with Save spend ceiling.
-      Dismissing sends nothing; the screen behind is unchanged.'
+      Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it
+      (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).'
     bindsTo: AiPolicy
     confirm:
       label: Save AI policy
@@ -25717,7 +25693,6 @@ screens:
       - scopeLevel
       - scopePath
       - enabledCapabilities
-      - id
       - allowedRoleIds
       - maskedFields
       - requiresApprovalFor
@@ -25881,9 +25856,10 @@ screens:
     component: modal
     trigger: Create venue map
     body: '**Collects what `createVenueMap` sends before it is called.** Required: `name`, `venueId`.
-      Optional: `kind`, `floorLevel`, `baseAssetId`, `baseImageAlignment`, `boundsGeoJson`. `id`, `status`
-      (draft) and scope are the server''s; the form asks only for the map''s own fields. Dismissing
-      sends nothing; the screen behind is unchanged.'
+      Optional: `kind`, `floorLevel`, `baseAssetId`, `baseImageAlignment`, `boundsGeoJson`. and scope
+      are the server''s; the form asks only for the map''s own fields. Dismissing sends nothing; the
+      screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract):
+      `id`, `status` (3 October 2026, CHG-SPF-001).'
     confirm:
       label: Create venue map
       operation: createVenueMap
@@ -26371,12 +26347,13 @@ screens:
   - id: formSetVenuePoint
     component: modal
     trigger: Save venue point
-    body: '**Collects what `setVenuePoint` sends before it is called.** Required: `id`, `mapId`, `kind`,
-      `name`, `position`. Optional: `nameLocalised`, `outletId`, `productId`, `accessPointId`, `isStepFree`,
-      `openingHours`, `iconRef`, `isActive`, `isNavigable`, `isDestination`, `pointId`; and the item
-      details decided 29 September (MOB-4, MOB-6): `description`, `media`, `featuredOffer` (a product
-      or a bundle, on any kind of point), `typicalDurationMinutes`, `interestTags`, `cuisineTags`; and
-      `retailTags` (30 September, MoM 4.7). Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setVenuePoint` sends before it is called.** Required: `kind`, `name`, `position`.
+      Optional: `nameLocalised`, `outletId`, `productId`, `accessPointId`, `isStepFree`, `openingHours`,
+      `iconRef`, `isActive`, `isNavigable`, `isDestination`, `pointId`; and the item details decided
+      29 September (MOB-4, MOB-6): `description`, `media`, `featuredOffer` (a product or a bundle, on
+      any kind of point), `typicalDurationMinutes`, `interestTags`, `cuisineTags`; and `retailTags`
+      (30 September, MoM 4.7). Dismissing sends nothing; the screen behind is unchanged. Not asked,
+      because the server sets them (readOnly in the contract): `id`, `mapId` (3 October 2026, CHG-SPF-001).'
     bindsTo: SetVenuePointRequest
     confirm:
       label: Save venue point
@@ -26384,8 +26361,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - mapId
       - kind
       - name
       - position
@@ -31641,9 +31616,10 @@ screens:
     component: modal
     trigger: Save sale board
     body: '**Collects what `updateSaleBoard` sends before it is called.** Required: `code`, `name`,
-      `venueId`, `kind`, `pages`. Optional: `isActive`. **Not asked:** `id` is a client UUIDv7 generated
+      `venueId`, `kind`, `pages`. Optional: `isActive`. **Not asked:** is a client UUIDv7 generated
       silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind
-      is unchanged.'
+      is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October
+      2026, CHG-SPF-001).'
     bindsTo: SaleBoard
     confirm:
       label: Save sale board
@@ -32316,9 +32292,10 @@ screens:
   - id: formCreateJourney
     component: modal
     trigger: Create journey
-    body: '**Collects what `createJourney` sends before it is called.** Required: `id`, `name`, `entryEvent`,
-      `steps`, `status`. Optional: `templateKind`, `entryConditions`, `maxDurationDays`, `reentryPolicy`,
-      `scopePath`. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `createJourney` sends before it is called.** Required: `name`, `entryEvent`,
+      `steps`. Optional: `templateKind`, `entryConditions`, `maxDurationDays`, `reentryPolicy`. Dismissing
+      sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly
+      in the contract): `id`, `scopePath`, `status` (3 October 2026, CHG-SPF-001).'
     bindsTo: Journey
     confirm:
       label: Create journey
@@ -32326,16 +32303,13 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - name
       - entryEvent
       - steps
-      - status
       - templateKind
       - entryConditions
       - maxDurationDays
       - reentryPolicy
-      - scopePath
     provenance: contract marketing-crm.yaml POST /journeys
 - id: BO-121
   name: Personalized Offers & Guest Engagement
@@ -32754,9 +32728,10 @@ screens:
     component: modal
     trigger: Save configuration profile
     body: '**Collects what `setConfigurationProfile` sends before it is called.** Required: `name`,
-      `venueKindScope`. Optional: `scopePath`, `settings`, `deployedCount`, `publishedAt`. **Not asked:**
-      `id` is a client UUIDv7 generated silently; `status` is set by the server (design-note correction,
-      2 October 2026). Dismissing sends nothing; the screen behind is unchanged.'
+      `venueKindScope`. Optional: `scopePath`, `settings`. **Not asked:** `id` is a client UUIDv7 generated
+      silently; `status` is set by the server (design-note correction, 2 October 2026). Dismissing sends
+      nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in
+      the contract): `deployedCount`, `publishedAt` (3 October 2026, CHG-SPF-001).'
     bindsTo: ConfigurationProfile
     confirm:
       label: Save configuration profile
@@ -32768,8 +32743,6 @@ screens:
       - venueKindScope
       - scopePath
       - settings
-      - deployedCount
-      - publishedAt
     provenance: contract tenancy.yaml PUT /configuration-profiles
   purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the pasted board placeholder
     "POS Profile Management — from the client design board, 20 August"; the screen defines the profiles
@@ -32940,9 +32913,10 @@ screens:
     component: modal
     trigger: Save sale board
     body: '**Collects what `updateSaleBoard` sends before it is called.** Required: `code`, `name`,
-      `venueId`, `kind`, `pages`. Optional: `isActive`. **Not asked:** `id` is a client UUIDv7 generated
+      `venueId`, `kind`, `pages`. Optional: `isActive`. **Not asked:** is a client UUIDv7 generated
       silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind
-      is unchanged.'
+      is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October
+      2026, CHG-SPF-001).'
     bindsTo: SaleBoard
     confirm:
       label: Save sale board
@@ -32961,9 +32935,10 @@ screens:
     component: modal
     trigger: Create sale board
     body: '**Collects what `createSaleBoard` sends before it is called.** Required: `code`, `name`,
-      `venueId`, `kind`, `pages`. Optional: `isActive`. **Not asked:** `id` is a client UUIDv7 generated
+      `venueId`, `kind`, `pages`. Optional: `isActive`. **Not asked:** is a client UUIDv7 generated
       silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind
-      is unchanged.'
+      is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October
+      2026, CHG-SPF-001).'
     bindsTo: SaleBoard
     confirm:
       label: Create sale board
@@ -33169,9 +33144,10 @@ screens:
     component: modal
     trigger: Save sale board
     body: '**Collects what `updateSaleBoard` sends before it is called.** Required: `code`, `name`,
-      `venueId`, `kind`, `pages`. Optional: `isActive`. **Not asked:** `id` is a client UUIDv7 generated
+      `venueId`, `kind`, `pages`. Optional: `isActive`. **Not asked:** is a client UUIDv7 generated
       silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind
-      is unchanged.'
+      is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October
+      2026, CHG-SPF-001).'
     bindsTo: SaleBoard
     confirm:
       label: Save sale board
@@ -33340,11 +33316,12 @@ screens:
   - id: formDeployConfigurationProfile
     component: modal
     trigger: Deploy configuration profile
-    body: '**Collects what `deployConfigurationProfile` sends before it is called.** Required: `profileId`.
-      Optional: `targetWorkstationIds`, `targetFilter`, `strategy`, `succeededCount`, `failedCount`,
-      `failureReasons`, `startedAt`, `completedAt`. **Not asked:** `id` is a client UUIDv7 generated
-      silently; `status` is set by the server (design-note correction, 2 October 2026). Dismissing sends
-      nothing; the screen behind is unchanged.'
+    body: '**Collects what `deployConfigurationProfile` sends before it is called.** Nothing in the
+      body is required. Optional: `targetWorkstationIds`, `targetFilter`, `strategy`. **Not asked:**
+      is a client UUIDv7 generated silently; is set by the server (design-note correction, 2 October
+      2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server
+      sets them (readOnly in the contract): `completedAt`, `failedCount`, `failureReasons`, `id`, `profileId`,
+      `startedAt`, `status`, `succeededCount` (3 October 2026, CHG-SPF-001).'
     bindsTo: ProfileDeployment
     confirm:
       label: Deploy configuration profile
@@ -33352,23 +33329,18 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - profileId
       - targetWorkstationIds
       - targetFilter
       - strategy
-      - succeededCount
-      - failedCount
-      - failureReasons
-      - startedAt
-      - completedAt
     provenance: contract tenancy.yaml POST /configuration-profiles/{profileId}/deploy
   - id: formUpdateSaleBoard
     component: modal
     trigger: Save sale board
     body: '**Collects what `updateSaleBoard` sends before it is called.** Required: `code`, `name`,
-      `venueId`, `kind`, `pages`. Optional: `isActive`. **Not asked:** `id` is a client UUIDv7 generated
+      `venueId`, `kind`, `pages`. Optional: `isActive`. **Not asked:** is a client UUIDv7 generated
       silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind
-      is unchanged.'
+      is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October
+      2026, CHG-SPF-001).'
     bindsTo: SaleBoard
     confirm:
       label: Save sale board
@@ -33785,9 +33757,10 @@ screens:
     component: modal
     trigger: Save configuration profile
     body: '**Collects what `setConfigurationProfile` sends before it is called.** Required: `name`,
-      `venueKindScope`. Optional: `scopePath`, `settings`, `deployedCount`, `publishedAt`. **Not asked:**
-      `id` is a client UUIDv7 generated silently; `status` is set by the server (design-note correction,
-      2 October 2026). Dismissing sends nothing; the screen behind is unchanged.'
+      `venueKindScope`. Optional: `scopePath`, `settings`. **Not asked:** `id` is a client UUIDv7 generated
+      silently; `status` is set by the server (design-note correction, 2 October 2026). Dismissing sends
+      nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in
+      the contract): `deployedCount`, `publishedAt` (3 October 2026, CHG-SPF-001).'
     bindsTo: ConfigurationProfile
     confirm:
       label: Save configuration profile
@@ -33799,17 +33772,16 @@ screens:
       - venueKindScope
       - scopePath
       - settings
-      - deployedCount
-      - publishedAt
     provenance: contract tenancy.yaml PUT /configuration-profiles
   - id: formDeployConfigurationProfile
     component: modal
     trigger: Deploy configuration profile
-    body: '**Collects what `deployConfigurationProfile` sends before it is called.** Required: `profileId`.
-      Optional: `targetWorkstationIds`, `targetFilter`, `strategy`, `succeededCount`, `failedCount`,
-      `failureReasons`, `startedAt`, `completedAt`. **Not asked:** `id` is a client UUIDv7 generated
-      silently; `status` is set by the server (design-note correction, 2 October 2026). Dismissing sends
-      nothing; the screen behind is unchanged.'
+    body: '**Collects what `deployConfigurationProfile` sends before it is called.** Nothing in the
+      body is required. Optional: `targetWorkstationIds`, `targetFilter`, `strategy`. **Not asked:**
+      is a client UUIDv7 generated silently; is set by the server (design-note correction, 2 October
+      2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server
+      sets them (readOnly in the contract): `completedAt`, `failedCount`, `failureReasons`, `id`, `profileId`,
+      `startedAt`, `status`, `succeededCount` (3 October 2026, CHG-SPF-001).'
     bindsTo: ProfileDeployment
     confirm:
       label: Deploy configuration profile
@@ -33817,15 +33789,9 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - profileId
       - targetWorkstationIds
       - targetFilter
       - strategy
-      - succeededCount
-      - failedCount
-      - failureReasons
-      - startedAt
-      - completedAt
     provenance: contract tenancy.yaml POST /configuration-profiles/{profileId}/deploy
   purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the pasted board placeholder
     "Software, Configuration & Version Management — from the client design board, 20 August".'
@@ -34010,8 +33976,9 @@ screens:
     component: modal
     trigger: Save offline policy
     body: '**Collects what `setOfflinePolicy` sends before it is called.** Required: `scopePath`. Optional:
-      `id`, `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`,
-      `onCeilingBreach`, `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged.'
+      `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`, `onCeilingBreach`,
+      `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged. Not asked,
+      because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).'
     bindsTo: OfflinePolicy
     confirm:
       label: Save offline policy
@@ -34020,7 +33987,6 @@ screens:
       label: Cancel
       discards:
       - scopePath
-      - id
       - maxOfflineHours
       - allowedOffline
       - offlineValueCeiling
@@ -87565,7 +87531,7 @@ screens:
     purpose: Schedule a job
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id040
+    invalidates:
     - listWorkOrders
     - getDueMaintenance
   - operationId: listWorkOrders
@@ -111092,9 +111058,10 @@ screens:
   - id: formSetServiceQueueDefinition
     component: modal
     trigger: Save service queue definition
-    body: '**Collects what `setServiceQueueDefinition` sends before it is called.** Required: `id`,
-      `code`, `name`, `isActive`. Optional: `overflowWaitSeconds`, `scopePath`. Dismissing sends nothing;
-      the screen behind is unchanged.'
+    body: '**Collects what `setServiceQueueDefinition` sends before it is called.** Required: `code`,
+      `name`, `isActive`. Optional: `overflowWaitSeconds`. Dismissing sends nothing; the screen behind
+      is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath`
+      (3 October 2026, CHG-SPF-001).'
     bindsTo: ServiceQueue
     confirm:
       label: Save service queue definition
@@ -111102,12 +111069,10 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - code
       - name
       - isActive
       - overflowWaitSeconds
-      - scopePath
     provenance: contract marketing-crm.yaml PUT /service-queues
 - id: BO-801
   name: Sales & Service Actions
@@ -111888,9 +111853,10 @@ screens:
   - id: formSetCaseCategoryDefinition
     component: modal
     trigger: Save case category definition
-    body: '**Collects what `setCaseCategoryDefinition` sends before it is called.** Required: `id`,
-      `code`, `name`, `isActive`. Optional: `parentCategoryId`, `defaultPriority`, `scopePath`. Dismissing
-      sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setCaseCategoryDefinition` sends before it is called.** Required: `code`,
+      `name`, `isActive`. Optional: `parentCategoryId`, `defaultPriority`. Dismissing sends nothing;
+      the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract):
+      `id`, `scopePath` (3 October 2026, CHG-SPF-001).'
     bindsTo: CaseCategory
     confirm:
       label: Save case category definition
@@ -111898,13 +111864,11 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - code
       - name
       - isActive
       - parentCategoryId
       - defaultPriority
-      - scopePath
     provenance: contract marketing-crm.yaml PUT /case-categories
 - id: BO-808
   name: Assignment & Workload
@@ -121722,9 +121686,10 @@ screens:
   - id: formSetLabourBudget
     component: modal
     trigger: Save labour budget
-    body: '**Collects what `setLabourBudget` sends before it is called.** Required: `id`, `venueId`,
-      `periodStart`, `periodEnd`, `budgetAmount`. Optional: `departmentId`, `scopePath`. Dismissing
-      sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setLabourBudget` sends before it is called.** Required: `venueId`, `periodStart`,
+      `periodEnd`, `budgetAmount`. Optional: `departmentId`, `scopePath`. Dismissing sends nothing;
+      the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract):
+      `id` (3 October 2026, CHG-SPF-001).'
     bindsTo: LabourBudget
     confirm:
       label: Save labour budget
@@ -121732,7 +121697,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - venueId
       - periodStart
       - periodEnd
@@ -124093,7 +124057,9 @@ screens:
     purpose: Raise the repair
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id040
+    invalidates:
+    - listWorkOrders
+    - getDueMaintenance
   - operationId: getDueMaintenance
     contract: maintenance
     purpose: What is due
@@ -124124,9 +124090,10 @@ screens:
   - id: formCreateResourceCost
     component: modal
     trigger: Create resource cost
-    body: '**Collects what `createResourceCost` sends before it is called.** Required: `id`, `resourceId`,
-      `kind`, `amount`, `incurredOn`. Optional: `fromVenueId`, `toVenueId`, `note`, `scopePath`. Dismissing
-      sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `createResourceCost` sends before it is called.** Required: `resourceId`,
+      `kind`, `amount`, `incurredOn`. Optional: `fromVenueId`, `toVenueId`, `note`. Dismissing sends
+      nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in
+      the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).'
     bindsTo: ResourceCostEntry
     confirm:
       label: Create resource cost
@@ -124134,7 +124101,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - resourceId
       - kind
       - amount
@@ -124142,7 +124108,6 @@ screens:
       - fromVenueId
       - toVenueId
       - note
-      - scopePath
     provenance: contract resources.yaml POST /resource-costs
   entryState:
     params:
@@ -124505,9 +124470,10 @@ screens:
   - id: formCreateResourceCost
     component: modal
     trigger: Create resource cost
-    body: '**Collects what `createResourceCost` sends before it is called.** Required: `id`, `resourceId`,
-      `kind`, `amount`, `incurredOn`. Optional: `fromVenueId`, `toVenueId`, `note`, `scopePath`. Dismissing
-      sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `createResourceCost` sends before it is called.** Required: `resourceId`,
+      `kind`, `amount`, `incurredOn`. Optional: `fromVenueId`, `toVenueId`, `note`. Dismissing sends
+      nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in
+      the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).'
     bindsTo: ResourceCostEntry
     confirm:
       label: Create resource cost
@@ -124515,7 +124481,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - resourceId
       - kind
       - amount
@@ -124523,7 +124488,6 @@ screens:
       - fromVenueId
       - toVenueId
       - note
-      - scopePath
     provenance: contract resources.yaml POST /resource-costs
 - id: BO-913
   name: Event Resource Planning Command Center
@@ -128577,9 +128541,10 @@ screens:
   - id: formCreateResourceCost
     component: modal
     trigger: Create resource cost
-    body: '**Collects what `createResourceCost` sends before it is called.** Required: `id`, `resourceId`,
-      `kind`, `amount`, `incurredOn`. Optional: `fromVenueId`, `toVenueId`, `note`, `scopePath`. Dismissing
-      sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `createResourceCost` sends before it is called.** Required: `resourceId`,
+      `kind`, `amount`, `incurredOn`. Optional: `fromVenueId`, `toVenueId`, `note`. Dismissing sends
+      nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in
+      the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).'
     bindsTo: ResourceCostEntry
     confirm:
       label: Create resource cost
@@ -128587,7 +128552,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - resourceId
       - kind
       - amount
@@ -128595,7 +128559,6 @@ screens:
       - fromVenueId
       - toVenueId
       - note
-      - scopePath
     provenance: contract resources.yaml POST /resource-costs
   - id: confirmDeleteResourceCost
     component: confirmDialog
@@ -159807,10 +159770,11 @@ screens:
   - id: formSetPriceCategoryRateType
     component: modal
     trigger: Save price category rate type
-    body: '**Collects what `setPriceCategoryRateType` sends before it is called.** Required: `id`, `scopePath`,
-      `entryKind`, `code`, `name`, `isActive`. Optional: `description`, `categoryFamily`, `displayName`,
-      `localizedDisplayNames`, `iconLabel`, `parentId`, `isStandard`, `sortOrder`. Dismissing sends
-      nothing; the screen behind is unchanged.'
+    body: '**Collects what `setPriceCategoryRateType` sends before it is called.** Required: `entryKind`,
+      `code`, `name`, `isActive`. Optional: `description`, `categoryFamily`, `displayName`, `localizedDisplayNames`,
+      `iconLabel`, `parentId`, `isStandard`, `sortOrder`. Dismissing sends nothing; the screen behind
+      is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath`
+      (3 October 2026, CHG-SPF-001).'
     bindsTo: PriceCategory
     confirm:
       label: Save price category rate type
@@ -159818,8 +159782,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - scopePath
       - entryKind
       - code
       - name
@@ -160252,10 +160214,11 @@ screens:
   - id: formSetPackagePricingDefinition
     component: modal
     trigger: Save package pricing definition
-    body: '**Collects what `setPackagePricingDefinition` sends before it is called.** Required: `id`,
-      `scopePath`, `productId`, `recordKind`, `pricingModel`, `status`. Optional: `name`, `priceListId`,
-      `addOnType`, `packagePrice`, `components`, `componentPriceVisibility`. Dismissing sends nothing;
-      the screen behind is unchanged.'
+    body: '**Collects what `setPackagePricingDefinition` sends before it is called.** Required: `productId`,
+      `recordKind`, `pricingModel`, `status`. Optional: `name`, `priceListId`, `addOnType`, `packagePrice`,
+      `components`, `componentPriceVisibility`. Dismissing sends nothing; the screen behind is unchanged.
+      Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October
+      2026, CHG-SPF-001).'
     bindsTo: PackagePricing
     confirm:
       label: Save package pricing definition
@@ -160263,8 +160226,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - scopePath
       - productId
       - recordKind
       - pricingModel
@@ -160384,10 +160345,11 @@ screens:
   - id: formSetMarketPricingConfiguration
     component: modal
     trigger: Save market pricing configuration
-    body: '**Collects what `setMarketPricingConfiguration` sends before it is called.** Required: `id`,
-      `scopePath`, `hierarchyLevel`. Optional: `parentId`, `countryCode`, `marketCode`, `region`, `venueId`,
-      `brand`, `legalEntityId`, `baseCurrency`, `sellingCurrency`, `roundingProfileId`, `displayFormat`,
-      `priceListId` and 2 more. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setMarketPricingConfiguration` sends before it is called.** Required: `hierarchyLevel`.
+      Optional: `parentId`, `countryCode`, `marketCode`, `region`, `venueId`, `brand`, `legalEntityId`,
+      `baseCurrency`, `sellingCurrency`, `roundingProfileId`, `displayFormat`, `priceListId` and 2 more.
+      Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them
+      (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).'
     bindsTo: PricingMarket
     confirm:
       label: Save market pricing configuration
@@ -160395,8 +160357,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - scopePath
       - hierarchyLevel
       - parentId
       - countryCode
@@ -160643,10 +160603,11 @@ screens:
   - id: formSetConfigurationTemplate
     component: modal
     trigger: Save configuration template
-    body: '**Collects what `setConfigurationTemplate` sends before it is called.** Required: `id`, `scopePath`,
-      `subject`, `name`, `status`. Optional: `description`, `templateKind`, `productKind`, `venueId`,
-      `sourceProductId`, `sourcePriceListId`, `includedComponents`, `reviewFields`, `isAiDrafted`, `ownerPrincipalId`.
-      Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setConfigurationTemplate` sends before it is called.** Required: `subject`,
+      `name`, `status`. Optional: `description`, `templateKind`, `productKind`, `venueId`, `sourceProductId`,
+      `sourcePriceListId`, `includedComponents`, `reviewFields`, `isAiDrafted`, `ownerPrincipalId`.
+      Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them
+      (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).'
     bindsTo: ConfigurationTemplate
     confirm:
       label: Save configuration template
@@ -160654,8 +160615,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - scopePath
       - subject
       - name
       - status
@@ -162459,10 +162418,11 @@ screens:
   - id: formSetFeeDefinition
     component: modal
     trigger: Save fee definition
-    body: '**Collects what `setFeeDefinition` sends before it is called.** Required: `id`, `scopePath`,
-      `code`, `name`, `feeType`, `valueType`, `chargeBasis`, `status`. Optional: `description`, `amount`,
-      `percentage`, `tiers`, `taxTreatment`, `refundability`, `visibility`, `effectiveFrom`, `effectiveTo`.
-      Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setFeeDefinition` sends before it is called.** Required: `code`, `name`,
+      `feeType`, `valueType`, `chargeBasis`, `status`. Optional: `description`, `amount`, `percentage`,
+      `tiers`, `taxTreatment`, `refundability`, `visibility`, `effectiveFrom`, `effectiveTo`. Dismissing
+      sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly
+      in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).'
     bindsTo: PricingFee
     confirm:
       label: Save fee definition
@@ -162470,8 +162430,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - scopePath
       - code
       - name
       - feeType
@@ -162882,9 +162840,10 @@ screens:
   - id: formSetPriceCalculationPolicy
     component: modal
     trigger: Save price calculation policy
-    body: '**Collects what `setPriceCalculationPolicy` sends before it is called.** Required: `id`,
-      `scopePath`, `code`, `name`, `status`. Optional: `isDefault`, `effectiveFrom`, `effectiveTo`,
-      `steps`. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setPriceCalculationPolicy` sends before it is called.** Required: `code`,
+      `name`, `status`. Optional: `isDefault`, `effectiveFrom`, `effectiveTo`, `steps`. Dismissing sends
+      nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in
+      the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).'
     bindsTo: CalculationProfile
     confirm:
       label: Save price calculation policy
@@ -162892,8 +162851,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - scopePath
       - code
       - name
       - status
@@ -163021,10 +162978,11 @@ screens:
   - id: formSetCurrencyRoundingRule
     component: modal
     trigger: Save currency rounding rule
-    body: '**Collects what `setCurrencyRoundingRule` sends before it is called.** Required: `id`, `scopePath`,
-      `currency`, `decimalPlaces`, `roundingMethod`, `roundingStage`, `status`. Optional: `code`, `name`,
-      `minimumMonetaryUnit`, `displayPrecision`, `calculationPrecision`, `cashRoundingIncrement`. Dismissing
-      sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setCurrencyRoundingRule` sends before it is called.** Required: `currency`,
+      `decimalPlaces`, `roundingMethod`, `roundingStage`, `status`. Optional: `code`, `name`, `minimumMonetaryUnit`,
+      `displayPrecision`, `calculationPrecision`, `cashRoundingIncrement`. Dismissing sends nothing;
+      the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract):
+      `id`, `scopePath` (3 October 2026, CHG-SPF-001).'
     bindsTo: RoundingProfile
     confirm:
       label: Save currency rounding rule
@@ -163032,8 +162990,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - scopePath
       - currency
       - decimalPlaces
       - roundingMethod
@@ -164570,11 +164526,12 @@ screens:
   - id: formRequestPricingRollback
     component: modal
     trigger: Request pricing rollback
-    body: '**Collects what `requestPricingRollback` sends before it is called.** Required: `id`, `scopePath`,
-      `subject`, `actionType`, `reason`, `status`, `requestedByPrincipalId`, `requestedAt`. Optional:
-      `productId`, `priceListId`, `fromVersion`, `toVersion`, `productScope`, `rollbackTarget`, `rollbackScope`,
-      `scopeIds`, `dependencies`, `executionMode`, `isEmergency`, `scheduledAt` and 6 more. Dismissing
-      sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `requestPricingRollback` sends before it is called.** Required: `subject`,
+      `actionType`, `reason`, `status`. Optional: `productId`, `priceListId`, `fromVersion`, `toVersion`,
+      `productScope`, `rollbackTarget`, `rollbackScope`, `scopeIds`, `dependencies`, `executionMode`,
+      `isEmergency`, `scheduledAt` and 6 more. Dismissing sends nothing; the screen behind is unchanged.
+      Not asked, because the server sets them (readOnly in the contract): `id`, `requestedAt`, `requestedByPrincipalId`,
+      `scopePath` (3 October 2026, CHG-SPF-001).'
     bindsTo: CatalogueRollbackAction
     confirm:
       label: Request pricing rollback
@@ -164582,14 +164539,10 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - scopePath
       - subject
       - actionType
       - reason
       - status
-      - requestedByPrincipalId
-      - requestedAt
       - productId
       - priceListId
       - fromVersion
@@ -165561,10 +165514,11 @@ screens:
   - id: formSetDemandSignalConfiguration
     component: modal
     trigger: Save demand signal configuration
-    body: '**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `id`,
-      `scopePath`, `signalKind`, `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`,
-      `marketCode`, `periodStart`, `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and
-      11 more. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `signalKind`,
+      `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`, `marketCode`, `periodStart`,
+      `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and 11 more. Dismissing sends
+      nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in
+      the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).'
     bindsTo: DemandSignal
     confirm:
       label: Save demand signal configuration
@@ -165572,8 +165526,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - scopePath
       - signalKind
       - source
       - signalType
@@ -165809,11 +165761,12 @@ screens:
   - id: formSetPriceLadderMatrix
     component: modal
     trigger: Save price ladder matrix
-    body: '**Collects what `setPriceLadderMatrix` sends before it is called.** Required: `id`, `scopePath`,
-      `dynamicPricingStrategyId`, `adjustmentModel`. Optional: `basePriceSource`, `bands`, `baseBandCode`,
-      `stepAmount`, `minimumPrice`, `basePrice`, `maximumPrice`, `allowUpward`, `allowDownward`, `maxIncreasePercentPerAdjustment`,
+    body: '**Collects what `setPriceLadderMatrix` sends before it is called.** Required: `dynamicPricingStrategyId`,
+      `adjustmentModel`. Optional: `basePriceSource`, `bands`, `baseBandCode`, `stepAmount`, `minimumPrice`,
+      `basePrice`, `maximumPrice`, `allowUpward`, `allowDownward`, `maxIncreasePercentPerAdjustment`,
       `maxDecreasePercentPerAdjustment`, `maximumBandsPerMovement` and 4 more. Dismissing sends nothing;
-      the screen behind is unchanged.'
+      the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract):
+      `id`, `scopePath` (3 October 2026, CHG-SPF-001).'
     bindsTo: PriceLadder
     confirm:
       label: Save price ladder matrix
@@ -165821,8 +165774,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - scopePath
       - dynamicPricingStrategyId
       - adjustmentModel
       - basePriceSource
@@ -165973,11 +165924,12 @@ screens:
     component: modal
     trigger: Save dynamic pricing guardrail policy
     body: '**Collects what `setDynamicPricingGuardrailPolicy` sends before it is called.** Required:
-      `id`, `scopePath`, `scopeLevel`, `automationLevel`. Optional: `scopeId`, `absoluteMinimumPrice`,
-      `absoluteMaximumPrice`, `minimumMarginPercent`, `maximumUpliftPercent`, `maximumReductionPercent`,
-      `maximumSingleChangePercent`, `maximumDailyChangePercent`, `maximumWeeklyChangePercent`, `minimumChangeIntervalMinutes`,
-      `maximumChangesPerDay`, `minimumInventory` and 21 more. Dismissing sends nothing; the screen behind
-      is unchanged.'
+      `scopeLevel`, `automationLevel`. Optional: `scopeId`, `absoluteMinimumPrice`, `absoluteMaximumPrice`,
+      `minimumMarginPercent`, `maximumUpliftPercent`, `maximumReductionPercent`, `maximumSingleChangePercent`,
+      `maximumDailyChangePercent`, `maximumWeeklyChangePercent`, `minimumChangeIntervalMinutes`, `maximumChangesPerDay`,
+      `minimumInventory` and 21 more. Dismissing sends nothing; the screen behind is unchanged. Not
+      asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026,
+      CHG-SPF-001).'
     bindsTo: DynamicPricingControl
     confirm:
       label: Save dynamic pricing guardrail policy
@@ -165985,8 +165937,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - scopePath
       - scopeLevel
       - automationLevel
       - scopeId
@@ -166142,11 +166092,12 @@ screens:
     component: modal
     trigger: Save dynamic pricing guardrail policy
     body: '**Collects what `setDynamicPricingGuardrailPolicy` sends before it is called.** Required:
-      `id`, `scopePath`, `scopeLevel`, `automationLevel`. Optional: `scopeId`, `absoluteMinimumPrice`,
-      `absoluteMaximumPrice`, `minimumMarginPercent`, `maximumUpliftPercent`, `maximumReductionPercent`,
-      `maximumSingleChangePercent`, `maximumDailyChangePercent`, `maximumWeeklyChangePercent`, `minimumChangeIntervalMinutes`,
-      `maximumChangesPerDay`, `minimumInventory` and 21 more. Dismissing sends nothing; the screen behind
-      is unchanged.'
+      `scopeLevel`, `automationLevel`. Optional: `scopeId`, `absoluteMinimumPrice`, `absoluteMaximumPrice`,
+      `minimumMarginPercent`, `maximumUpliftPercent`, `maximumReductionPercent`, `maximumSingleChangePercent`,
+      `maximumDailyChangePercent`, `maximumWeeklyChangePercent`, `minimumChangeIntervalMinutes`, `maximumChangesPerDay`,
+      `minimumInventory` and 21 more. Dismissing sends nothing; the screen behind is unchanged. Not
+      asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026,
+      CHG-SPF-001).'
     bindsTo: DynamicPricingControl
     confirm:
       label: Save dynamic pricing guardrail policy
@@ -166154,8 +166105,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - scopePath
       - scopeLevel
       - automationLevel
       - scopeId
@@ -166738,10 +166687,11 @@ screens:
   - id: formSetDemandSignalConfiguration
     component: modal
     trigger: Save demand signal configuration
-    body: '**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `id`,
-      `scopePath`, `signalKind`, `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`,
-      `marketCode`, `periodStart`, `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and
-      11 more. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `signalKind`,
+      `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`, `marketCode`, `periodStart`,
+      `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and 11 more. Dismissing sends
+      nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in
+      the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).'
     bindsTo: DemandSignal
     confirm:
       label: Save demand signal configuration
@@ -166749,8 +166699,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - scopePath
       - signalKind
       - source
       - signalType
@@ -166919,10 +166867,11 @@ screens:
   - id: formSetDemandSignalConfiguration
     component: modal
     trigger: Save demand signal configuration
-    body: '**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `id`,
-      `scopePath`, `signalKind`, `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`,
-      `marketCode`, `periodStart`, `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and
-      11 more. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `signalKind`,
+      `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`, `marketCode`, `periodStart`,
+      `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and 11 more. Dismissing sends
+      nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in
+      the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).'
     bindsTo: DemandSignal
     confirm:
       label: Save demand signal configuration
@@ -166930,8 +166879,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - scopePath
       - signalKind
       - source
       - signalType
@@ -167085,10 +167032,11 @@ screens:
   - id: formSetDemandSignalConfiguration
     component: modal
     trigger: Save demand signal configuration
-    body: '**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `id`,
-      `scopePath`, `signalKind`, `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`,
-      `marketCode`, `periodStart`, `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and
-      11 more. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `signalKind`,
+      `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`, `marketCode`, `periodStart`,
+      `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and 11 more. Dismissing sends
+      nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in
+      the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).'
     bindsTo: DemandSignal
     confirm:
       label: Save demand signal configuration
@@ -167096,8 +167044,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - scopePath
       - signalKind
       - source
       - signalType
@@ -167225,10 +167171,11 @@ screens:
   - id: formSetDemandSignalConfiguration
     component: modal
     trigger: Save demand signal configuration
-    body: '**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `id`,
-      `scopePath`, `signalKind`, `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`,
-      `marketCode`, `periodStart`, `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and
-      11 more. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `signalKind`,
+      `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`, `marketCode`, `periodStart`,
+      `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and 11 more. Dismissing sends
+      nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in
+      the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).'
     bindsTo: DemandSignal
     confirm:
       label: Save demand signal configuration
@@ -167236,8 +167183,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - scopePath
       - signalKind
       - source
       - signalType
@@ -167776,10 +167721,11 @@ screens:
   - id: formSetSignalRegistryPolicy
     component: modal
     trigger: Save signal registry policy
-    body: '**Collects what `setSignalRegistryPolicy` sends before it is called.** Required: `id`, `scopePath`,
-      `registryKind`, `name`, `trustLevel`. Optional: `category`, `provider`, `source`, `internalExternal`,
-      `marketCode`, `refreshFrequency`, `aiUsePermissions`, `fallbackPolicy`, `status`, `ownerPrincipalId`,
-      `purpose`, `deployedAt` and 5 more. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setSignalRegistryPolicy` sends before it is called.** Required: `registryKind`,
+      `name`, `trustLevel`. Optional: `category`, `provider`, `source`, `internalExternal`, `marketCode`,
+      `refreshFrequency`, `aiUsePermissions`, `fallbackPolicy`, `status`, `ownerPrincipalId`, `purpose`,
+      `deployedAt` and 5 more. Dismissing sends nothing; the screen behind is unchanged. Not asked,
+      because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).'
     bindsTo: SignalRegistryEntry
     confirm:
       label: Save signal registry policy
@@ -167787,8 +167733,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - scopePath
       - registryKind
       - name
       - trustLevel
@@ -168812,11 +168756,12 @@ screens:
     component: modal
     trigger: Save dynamic pricing guardrail policy
     body: '**Collects what `setDynamicPricingGuardrailPolicy` sends before it is called.** Required:
-      `id`, `scopePath`, `scopeLevel`, `automationLevel`. Optional: `scopeId`, `absoluteMinimumPrice`,
-      `absoluteMaximumPrice`, `minimumMarginPercent`, `maximumUpliftPercent`, `maximumReductionPercent`,
-      `maximumSingleChangePercent`, `maximumDailyChangePercent`, `maximumWeeklyChangePercent`, `minimumChangeIntervalMinutes`,
-      `maximumChangesPerDay`, `minimumInventory` and 21 more. Dismissing sends nothing; the screen behind
-      is unchanged.'
+      `scopeLevel`, `automationLevel`. Optional: `scopeId`, `absoluteMinimumPrice`, `absoluteMaximumPrice`,
+      `minimumMarginPercent`, `maximumUpliftPercent`, `maximumReductionPercent`, `maximumSingleChangePercent`,
+      `maximumDailyChangePercent`, `maximumWeeklyChangePercent`, `minimumChangeIntervalMinutes`, `maximumChangesPerDay`,
+      `minimumInventory` and 21 more. Dismissing sends nothing; the screen behind is unchanged. Not
+      asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026,
+      CHG-SPF-001).'
     bindsTo: DynamicPricingControl
     confirm:
       label: Save dynamic pricing guardrail policy
@@ -168824,8 +168769,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - scopePath
       - scopeLevel
       - automationLevel
       - scopeId
@@ -169259,10 +169202,11 @@ screens:
   - id: formSetSignalRegistryPolicy
     component: modal
     trigger: Save signal registry policy
-    body: '**Collects what `setSignalRegistryPolicy` sends before it is called.** Required: `id`, `scopePath`,
-      `registryKind`, `name`, `trustLevel`. Optional: `category`, `provider`, `source`, `internalExternal`,
-      `marketCode`, `refreshFrequency`, `aiUsePermissions`, `fallbackPolicy`, `status`, `ownerPrincipalId`,
-      `purpose`, `deployedAt` and 5 more. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setSignalRegistryPolicy` sends before it is called.** Required: `registryKind`,
+      `name`, `trustLevel`. Optional: `category`, `provider`, `source`, `internalExternal`, `marketCode`,
+      `refreshFrequency`, `aiUsePermissions`, `fallbackPolicy`, `status`, `ownerPrincipalId`, `purpose`,
+      `deployedAt` and 5 more. Dismissing sends nothing; the screen behind is unchanged. Not asked,
+      because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).'
     bindsTo: SignalRegistryEntry
     confirm:
       label: Save signal registry policy
@@ -169270,8 +169214,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - scopePath
       - registryKind
       - name
       - trustLevel
@@ -170248,10 +170190,11 @@ screens:
   - id: formSetConfigurationTemplate
     component: modal
     trigger: Save configuration template
-    body: '**Collects what `setConfigurationTemplate` sends before it is called.** Required: `id`, `scopePath`,
-      `subject`, `name`, `status`. Optional: `description`, `templateKind`, `productKind`, `venueId`,
-      `sourceProductId`, `sourcePriceListId`, `includedComponents`, `reviewFields`, `isAiDrafted`, `ownerPrincipalId`.
-      Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setConfigurationTemplate` sends before it is called.** Required: `subject`,
+      `name`, `status`. Optional: `description`, `templateKind`, `productKind`, `venueId`, `sourceProductId`,
+      `sourcePriceListId`, `includedComponents`, `reviewFields`, `isAiDrafted`, `ownerPrincipalId`.
+      Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them
+      (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).'
     bindsTo: ConfigurationTemplate
     confirm:
       label: Save configuration template
@@ -170259,8 +170202,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - scopePath
       - subject
       - name
       - status
@@ -188040,10 +187981,11 @@ screens:
   - id: formSetChannelSalesRule
     component: modal
     trigger: Save channel sales rule
-    body: '**Collects what `setChannelSalesRule` sends before it is called.** Required: `id`, `scopePath`,
-      `salesChannelId`, `ruleKind`, `isActive`. Optional: `productId`, `name`, `ruleLevel`, `overridesProductRule`,
-      `effectiveFrom`, `effectiveTo`, `salesStartDate`, `salesStartTime`, `salesEndDate`, `salesEndTime`,
-      `timeZone`, `daysOfWeek` and 31 more. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setChannelSalesRule` sends before it is called.** Required: `salesChannelId`,
+      `ruleKind`, `isActive`. Optional: `productId`, `name`, `ruleLevel`, `overridesProductRule`, `effectiveFrom`,
+      `effectiveTo`, `salesStartDate`, `salesStartTime`, `salesEndDate`, `salesEndTime`, `timeZone`,
+      `daysOfWeek` and 31 more. Dismissing sends nothing; the screen behind is unchanged. Not asked,
+      because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).'
     bindsTo: ChannelSalesRule
     confirm:
       label: Save channel sales rule
@@ -188051,8 +187993,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - scopePath
       - salesChannelId
       - ruleKind
       - isActive
@@ -188169,10 +188109,11 @@ screens:
   - id: formSetChannelSalesRule
     component: modal
     trigger: Save channel sales rule
-    body: '**Collects what `setChannelSalesRule` sends before it is called.** Required: `id`, `scopePath`,
-      `salesChannelId`, `ruleKind`, `isActive`. Optional: `productId`, `name`, `ruleLevel`, `overridesProductRule`,
-      `effectiveFrom`, `effectiveTo`, `salesStartDate`, `salesStartTime`, `salesEndDate`, `salesEndTime`,
-      `timeZone`, `daysOfWeek` and 31 more. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setChannelSalesRule` sends before it is called.** Required: `salesChannelId`,
+      `ruleKind`, `isActive`. Optional: `productId`, `name`, `ruleLevel`, `overridesProductRule`, `effectiveFrom`,
+      `effectiveTo`, `salesStartDate`, `salesStartTime`, `salesEndDate`, `salesEndTime`, `timeZone`,
+      `daysOfWeek` and 31 more. Dismissing sends nothing; the screen behind is unchanged. Not asked,
+      because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).'
     bindsTo: ChannelSalesRule
     confirm:
       label: Save channel sales rule
@@ -188180,8 +188121,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - scopePath
       - salesChannelId
       - ruleKind
       - isActive
@@ -188340,10 +188279,11 @@ screens:
   - id: formSetChannelSalesRule
     component: modal
     trigger: Save channel sales rule
-    body: '**Collects what `setChannelSalesRule` sends before it is called.** Required: `id`, `scopePath`,
-      `salesChannelId`, `ruleKind`, `isActive`. Optional: `productId`, `name`, `ruleLevel`, `overridesProductRule`,
-      `effectiveFrom`, `effectiveTo`, `salesStartDate`, `salesStartTime`, `salesEndDate`, `salesEndTime`,
-      `timeZone`, `daysOfWeek` and 31 more. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setChannelSalesRule` sends before it is called.** Required: `salesChannelId`,
+      `ruleKind`, `isActive`. Optional: `productId`, `name`, `ruleLevel`, `overridesProductRule`, `effectiveFrom`,
+      `effectiveTo`, `salesStartDate`, `salesStartTime`, `salesEndDate`, `salesEndTime`, `timeZone`,
+      `daysOfWeek` and 31 more. Dismissing sends nothing; the screen behind is unchanged. Not asked,
+      because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).'
     bindsTo: ChannelSalesRule
     confirm:
       label: Save channel sales rule
@@ -188351,8 +188291,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - scopePath
       - salesChannelId
       - ruleKind
       - isActive
@@ -188951,10 +188889,11 @@ screens:
     component: modal
     trigger: Save channel connection configuration
     body: '**Collects what `setChannelConnectionConfiguration` sends before it is called.** Required:
-      `id`, `scopePath`, `salesChannelId`, `connectorName`, `environment`, `connectionType`. Optional:
-      `partner`, `direction`, `endpoint`, `apiVersion`, `authenticationType`, `credentialsReference`,
-      `certificateReference`, `certificateExpiresAt`, `timeoutMs`, `rateLimitPerMinute`, `ipRestrictions`,
-      `retryPolicy` and 3 more. Dismissing sends nothing; the screen behind is unchanged.'
+      `salesChannelId`, `connectorName`, `environment`, `connectionType`. Optional: `partner`, `direction`,
+      `endpoint`, `apiVersion`, `authenticationType`, `credentialsReference`, `certificateReference`,
+      `certificateExpiresAt`, `timeoutMs`, `rateLimitPerMinute`, `ipRestrictions`, `retryPolicy` and
+      3 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server
+      sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).'
     bindsTo: ChannelConnection
     confirm:
       label: Save channel connection configuration
@@ -188962,8 +188901,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - scopePath
       - salesChannelId
       - connectorName
       - environment
@@ -189156,10 +189093,11 @@ screens:
   - id: formSetChannelSyncSetting
     component: modal
     trigger: Save channel sync setting
-    body: '**Collects what `setChannelSyncSetting` sends before it is called.** Required: `id`, `scopePath`,
-      `salesChannelId`, `domain`. Optional: `channelConnectionId`, `direction`, `frequency`, `isPaused`,
-      `lastSuccessfulSyncAt`, `nextSyncAt`, `recordsProcessed`, `successful`, `failed`, `pending`, `warnings`,
-      `durationMs` and 1 more. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setChannelSyncSetting` sends before it is called.** Required: `salesChannelId`,
+      `domain`. Optional: `channelConnectionId`, `direction`, `frequency`, `isPaused` and 1 more. Dismissing
+      sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly
+      in the contract): `durationMs`, `failed`, `id`, `lastSuccessfulSyncAt`, `mismatchCount`, `nextSyncAt`,
+      `pending`, `recordsProcessed`, `scopePath`, `successful`, `warnings` (3 October 2026, CHG-SPF-001).'
     bindsTo: ChannelSync
     confirm:
       label: Save channel sync setting
@@ -189167,23 +189105,12 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - scopePath
       - salesChannelId
       - domain
       - channelConnectionId
       - direction
       - frequency
       - isPaused
-      - lastSuccessfulSyncAt
-      - nextSyncAt
-      - recordsProcessed
-      - successful
-      - failed
-      - pending
-      - warnings
-      - durationMs
-      - mismatchCount
     provenance: contract catalogue.yaml PUT /channel-syncs
 - id: ADM-271
   name: Real-Time Channel Availability & Inventory Monitor
@@ -190731,12 +190658,12 @@ screens:
   - id: formSetResaleMarketplaceConfig
     component: modal
     trigger: Save resale marketplace config
-    body: '**Collects what `setResaleMarketplaceConfig` sends before it is called.** Required: `id`,
-      `marketplaceName`, `pricingMode`, `moderationMode`, `isActive`. Optional: `maximumDiscountPercent`,
-      `sellerCanEditPrice`, `maximumPriceChanges`, `minimumMinutesBetweenPriceChanges`, `reviewTriggers`,
-      `expiryRule`, `expiryOffset`, `withdrawalPolicy`, `maximumWithdrawals`, `cancellationFee`, `checkoutHoldMinutes`,
-      `buyerIdentityVerificationRequired` and 16 more. Dismissing sends nothing; the screen behind is
-      unchanged.'
+    body: '**Collects what `setResaleMarketplaceConfig` sends before it is called.** Required: `marketplaceName`,
+      `pricingMode`, `moderationMode`, `isActive`. Optional: `maximumDiscountPercent`, `sellerCanEditPrice`,
+      `maximumPriceChanges`, `minimumMinutesBetweenPriceChanges`, `reviewTriggers`, `expiryRule`, `expiryOffset`,
+      `withdrawalPolicy`, `maximumWithdrawals`, `cancellationFee`, `checkoutHoldMinutes`, `buyerIdentityVerificationRequired`
+      and 16 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the
+      server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).'
     bindsTo: ResaleMarketplaceConfig
     confirm:
       label: Save resale marketplace config
@@ -190744,7 +190671,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - marketplaceName
       - pricingMode
       - moderationMode
@@ -191071,12 +190997,12 @@ screens:
   - id: formSetResaleMarketplaceConfig
     component: modal
     trigger: Save resale marketplace config
-    body: '**Collects what `setResaleMarketplaceConfig` sends before it is called.** Required: `id`,
-      `marketplaceName`, `pricingMode`, `moderationMode`, `isActive`. Optional: `maximumDiscountPercent`,
-      `sellerCanEditPrice`, `maximumPriceChanges`, `minimumMinutesBetweenPriceChanges`, `reviewTriggers`,
-      `expiryRule`, `expiryOffset`, `withdrawalPolicy`, `maximumWithdrawals`, `cancellationFee`, `checkoutHoldMinutes`,
-      `buyerIdentityVerificationRequired` and 16 more. Dismissing sends nothing; the screen behind is
-      unchanged.'
+    body: '**Collects what `setResaleMarketplaceConfig` sends before it is called.** Required: `marketplaceName`,
+      `pricingMode`, `moderationMode`, `isActive`. Optional: `maximumDiscountPercent`, `sellerCanEditPrice`,
+      `maximumPriceChanges`, `minimumMinutesBetweenPriceChanges`, `reviewTriggers`, `expiryRule`, `expiryOffset`,
+      `withdrawalPolicy`, `maximumWithdrawals`, `cancellationFee`, `checkoutHoldMinutes`, `buyerIdentityVerificationRequired`
+      and 16 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the
+      server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).'
     bindsTo: ResaleMarketplaceConfig
     confirm:
       label: Save resale marketplace config
@@ -191084,7 +191010,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - marketplaceName
       - pricingMode
       - moderationMode
@@ -215376,18 +215301,6 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: setStepUpPolicy
-      - kind: multiSelect
-        label: Permissions that require MFA
-        bindsTo: PasswordPolicy.id
-        columns:
-        - PasswordPolicy.mfaRequiredForPermissions
-        operation: setPasswordPolicy
-        notes: '**MFA is required by permission (decided 28 September, audit R135).** A principal holding
-          any permission listed here must present a second factor at sign-in and keep an active method.
-          The floor — `ROLE_MANAGE`, `LEDGER_APPROVE` and every `PLATFORM_*` permission — is shown locked:
-          the tenant may add permissions and never drop a floor entry (`setPasswordPolicy` refuses such
-          a body with 400).'
-        provenance: contract identity.yaml PUT /password-policy
       - kind: primaryButton
         label: Save MFA requirement
         operation: setPasswordPolicy

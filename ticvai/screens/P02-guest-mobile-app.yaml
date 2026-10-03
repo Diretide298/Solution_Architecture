@@ -12941,7 +12941,6 @@ screens:
       - outletId
       - partySize
       - startsAt
-      - id
       - subjectId
       - guestName
       - contactPoint
@@ -12950,8 +12949,6 @@ screens:
       - status
       - groupId
       - notes
-      - actualPartySize
-      - tableVisitId
     provenance: corrected 2 October 2026 (CHG-SGU-002, decided by Chinmay 2 October 2026, DEC-204)
   - id: formUpdateTableReservation
     component: modal
@@ -12968,7 +12965,6 @@ screens:
       - outletId
       - partySize
       - startsAt
-      - id
       - subjectId
       - guestName
       - contactPoint
@@ -12977,8 +12973,6 @@ screens:
       - status
       - groupId
       - notes
-      - actualPartySize
-      - tableVisitId
     provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
   - id: formJoinRestaurantWaitlist
     component: modal
@@ -13001,7 +12995,6 @@ screens:
       - quotedWaitMinutes
       - seatingPreference
       - notifiedAt
-      - syncedAt
       - holdExpiresAt
     provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
   - id: confirmLeaveRestaurantWaitlist

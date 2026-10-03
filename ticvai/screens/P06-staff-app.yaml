@@ -9867,9 +9867,10 @@ screens:
     component: modal
     trigger: Publish announcement
     body: '**Collects what `publishAnnouncement` sends before it is called.** Required: `title`, `body`,
-      `kind`, `publishedAt`. Optional: `id`, `venueIds`, `departmentIds`, `roleIds`, `requiresAcknowledgement`,
-      `expiresAt`, `publishedByPrincipalId`, `locale`. **An `emergency` kind requires ANNOUNCEMENT_EMERGENCY**
-      (audit R091 (1)). Dismissing sends nothing; the screen behind is unchanged.'
+      `kind`, `publishedAt`. Optional: `venueIds`, `departmentIds`, `roleIds`, `requiresAcknowledgement`,
+      `expiresAt`, `locale`. **An `emergency` kind requires ANNOUNCEMENT_EMERGENCY** (audit R091 (1)).
+      Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them
+      (readOnly in the contract): `id`, `publishedByPrincipalId` (3 October 2026, CHG-SPF-001).'
     bindsTo: Announcement
     confirm:
       label: Publish announcement
@@ -9881,13 +9882,11 @@ screens:
       - body
       - kind
       - publishedAt
-      - id
       - venueIds
       - departmentIds
       - roleIds
       - requiresAcknowledgement
       - expiresAt
-      - publishedByPrincipalId
       - locale
     provenance: contract workforce.yaml POST /announcements
   gaps:
@@ -10537,16 +10536,8 @@ screens:
       - model
       - pushToken
       - pushPlatform
-      - pushFailureCount
       - offlineScope
-      - firmwareVersion
       - isRequired
-      - status
-      - batteryPercent
-      - lastCheckedAt
-      - health
-      - lastHeartbeatAt
-      - capabilities
     provenance: contract tenancy.yaml POST /devices
 - id: EMP-044
   name: Accessibility

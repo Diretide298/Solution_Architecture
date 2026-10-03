@@ -1409,8 +1409,9 @@ screens:
     component: modal
     trigger: Create content page
     body: '**Collects what `createContentPage` sends.** Required: `slug`, `title`, `body`. Optional: `isEnabled`,
-      `iconAssetRef`, `categoryCode`, `sortOrder`. `id`, `status`, `isReferenced` and `scopePath` are
-      the server''s and never asked. Dismissing sends nothing.'
+      `iconAssetRef`, `categoryCode`, `sortOrder`. are the server''s and never asked. Dismissing sends
+      nothing. Not asked, because the server sets them (readOnly in the contract): `id`, `isReferenced`,
+      `scopePath`, `status` (3 October 2026, CHG-SPF-001).'
     bindsTo: ContentPage
     confirm:
       label: Create content page
@@ -1451,11 +1452,10 @@ screens:
   - id: formSetHomepageLayout
     component: modal
     trigger: Save homepage layout
-    body: '**Collects what `setHomepageLayout` sends before it is called.** Required: `sections`. Optional:
-      `id`. A section whose module is off is disabled here and cannot be made visible (audit R163 (4)).
-      Dismissing sends nothing; the screen behind is unchanged. Per section: `maxItems` (the venue''s
-      choice) and `scrollAnimation` (rise, scale, slide, blur, none); `templateKey` and `landingSource`
-      (CHG-SGU-009).'
+    body: '**Collects what `setHomepageLayout` sends before it is called.** Required: `sections`. Dismissing
+      sends nothing; the screen behind is unchanged. Per section: `maxItems` (the venue''s choice) and
+      `scrollAnimation` (rise, scale, slide, blur, none); `templateKey` and `landingSource` (CHG-SGU-009).
+      Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).'
     bindsTo: HomepageLayout
     confirm:
       label: Save homepage layout
@@ -1464,7 +1464,6 @@ screens:
       label: Cancel
       discards:
       - sections
-      - id
     provenance: contract white-label.yaml PUT /tenant-config/homepage
   - id: formCreateContentBlock
     component: modal
@@ -5561,10 +5560,11 @@ screens:
   - id: formSetPrivacyNoticePolicyGovernance
     component: modal
     trigger: Save privacy notice policy governance
-    body: '**Collects what `setPrivacyNoticePolicyGovernance` sends before it is called.** Required: `id`,
-      `policyId`, `documentType`, `status`. Optional: `changeClassification`, `requiresReAcceptance`,
-      `requiresNotification`, `ownerPrincipalId`, `approvedByPrincipalId`, `approvalRequestId`, `approvedAt`,
-      `scopePath`. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setPrivacyNoticePolicyGovernance` sends before it is called.** Required: `policyId`,
+      `documentType`, `status`. Optional: `changeClassification`, `requiresReAcceptance`, `requiresNotification`,
+      `ownerPrincipalId`, `approvedByPrincipalId`, `approvedAt`. Dismissing sends nothing; the screen
+      behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `approvalRequestId`,
+      `id`, `scopePath` (3 October 2026, CHG-SPF-001).'
     bindsTo: PrivacyNoticeGovernance
     confirm:
       label: Save privacy notice policy governance
@@ -5572,7 +5572,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - policyId
       - documentType
       - status
@@ -5581,9 +5580,7 @@ screens:
       - requiresNotification
       - ownerPrincipalId
       - approvedByPrincipalId
-      - approvalRequestId
       - approvedAt
-      - scopePath
     provenance: contract marketing-crm.yaml PUT /privacy-notice-policy
 - id: CMS-029
   name: Minor, Guardian & Age-Based Privacy Configuration
@@ -5889,10 +5886,11 @@ screens:
   - id: formSetPrivacyNoticePolicyGovernance
     component: modal
     trigger: Save privacy notice policy governance
-    body: '**Collects what `setPrivacyNoticePolicyGovernance` sends before it is called.** Required: `id`,
-      `policyId`, `documentType`, `status`. Optional: `changeClassification`, `requiresReAcceptance`,
-      `requiresNotification`, `ownerPrincipalId`, `approvedByPrincipalId`, `approvalRequestId`, `approvedAt`,
-      `scopePath`. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setPrivacyNoticePolicyGovernance` sends before it is called.** Required: `policyId`,
+      `documentType`, `status`. Optional: `changeClassification`, `requiresReAcceptance`, `requiresNotification`,
+      `ownerPrincipalId`, `approvedByPrincipalId`, `approvedAt`. Dismissing sends nothing; the screen
+      behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `approvalRequestId`,
+      `id`, `scopePath` (3 October 2026, CHG-SPF-001).'
     bindsTo: PrivacyNoticeGovernance
     confirm:
       label: Save privacy notice policy governance
@@ -5900,7 +5898,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - policyId
       - documentType
       - status
@@ -5909,9 +5906,7 @@ screens:
       - requiresNotification
       - ownerPrincipalId
       - approvedByPrincipalId
-      - approvalRequestId
       - approvedAt
-      - scopePath
     provenance: contract marketing-crm.yaml PUT /privacy-notice-policy
 - id: CMS-031
   name: Privacy Operations Command Center

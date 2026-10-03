@@ -4996,8 +4996,9 @@ screens:
     component: modal
     trigger: Save API quota
     body: '**Collects what `setApiQuota` sends before it is called.** Required: `clientId`, `sustainedPerMinute`.
-      Optional: `id`, `burstPerSecond`, `dailyCap`, `perOperationOverrides`, `onBreach`. Dismissing
-      sends nothing; the screen behind is unchanged.'
+      Optional: `burstPerSecond`, `dailyCap`, `perOperationOverrides`, `onBreach`. Dismissing sends
+      nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the
+      contract): `id` (3 October 2026, CHG-SPF-001).'
     bindsTo: ApiQuota
     confirm:
       label: Save API quota
@@ -5007,7 +5008,6 @@ screens:
       discards:
       - clientId
       - sustainedPerMinute
-      - id
       - burstPerSecond
       - dailyCap
       - perOperationOverrides
@@ -5513,8 +5513,9 @@ screens:
       Optional: `logoDarkAssetRef`, `logoVariant`, `faviconAssetRef`, `splashImageAssetRefs`, `splashDurationSeconds`,
       `splashBackgroundColour`, `showLoadingIndicator`, `introVideoAssetRef`, `introVideoMode`, `showPoweredBy`.
       The same fields as the tenant''s brand kit (CMS-004): logo variant and the intro video; "Powered
-      by TICVAI" is a toggle, on by default (DEC-160). `splashChangeScope` is not sent. Dismissing sends
-      nothing; the screen behind is unchanged.'
+      by TICVAI" is a toggle, on by default (DEC-160). is not sent. Dismissing sends nothing; the screen
+      behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `splashChangeScope`
+      (3 October 2026, CHG-SPF-001).'
     confirm:
       label: Save brand identity
       operation: setBrandIdentity
@@ -7719,9 +7720,10 @@ screens:
     component: modal
     trigger: Publish support notice
     body: '**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`.
-      Optional: `message`, `affectedTenantIds`, `publishedByPrincipalId`, `scopePath`. **Not asked:**
-      `id` is a client UUIDv7 generated silently; `publishedAt` is set by the server (design-note correction,
-      2 October 2026). Dismissing sends nothing; the screen behind is unchanged.'
+      Optional: `message`, `publishedByPrincipalId`, `scopePath`. **Not asked:** `id` is a client UUIDv7
+      generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026).
+      Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it
+      (readOnly in the contract): `affectedTenantIds` (3 October 2026, CHG-SPF-001).'
     bindsTo: SupportNotice
     confirm:
       label: Publish support notice
@@ -7731,7 +7733,6 @@ screens:
       discards:
       - supportEndsAt
       - message
-      - affectedTenantIds
       - publishedByPrincipalId
       - scopePath
     provenance: contract platform-ops.yaml POST /support-notices
@@ -8085,9 +8086,10 @@ screens:
     component: modal
     trigger: Publish support notice
     body: '**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`.
-      Optional: `message`, `affectedTenantIds`, `publishedByPrincipalId`, `scopePath`. **Not asked:**
-      `id` is a client UUIDv7 generated silently; `publishedAt` is set by the server (design-note correction,
-      2 October 2026). Dismissing sends nothing; the screen behind is unchanged.'
+      Optional: `message`, `publishedByPrincipalId`, `scopePath`. **Not asked:** `id` is a client UUIDv7
+      generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026).
+      Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it
+      (readOnly in the contract): `affectedTenantIds` (3 October 2026, CHG-SPF-001).'
     bindsTo: SupportNotice
     confirm:
       label: Publish support notice
@@ -8097,7 +8099,6 @@ screens:
       discards:
       - supportEndsAt
       - message
-      - affectedTenantIds
       - publishedByPrincipalId
       - scopePath
     provenance: contract platform-ops.yaml POST /support-notices
@@ -10173,9 +10174,10 @@ screens:
     component: modal
     trigger: Publish support notice
     body: '**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`.
-      Optional: `message`, `affectedTenantIds`, `publishedByPrincipalId`, `scopePath`. **Not asked:**
-      `id` is a client UUIDv7 generated silently; `publishedAt` is set by the server (design-note correction,
-      2 October 2026). Dismissing sends nothing; the screen behind is unchanged.'
+      Optional: `message`, `publishedByPrincipalId`, `scopePath`. **Not asked:** `id` is a client UUIDv7
+      generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026).
+      Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it
+      (readOnly in the contract): `affectedTenantIds` (3 October 2026, CHG-SPF-001).'
     bindsTo: SupportNotice
     confirm:
       label: Publish support notice
@@ -10185,7 +10187,6 @@ screens:
       discards:
       - supportEndsAt
       - message
-      - affectedTenantIds
       - publishedByPrincipalId
       - scopePath
     provenance: contract platform-ops.yaml POST /support-notices
@@ -10329,9 +10330,10 @@ screens:
     component: modal
     trigger: Publish support notice
     body: '**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`.
-      Optional: `message`, `affectedTenantIds`, `publishedByPrincipalId`, `scopePath`. **Not asked:**
-      `id` is a client UUIDv7 generated silently; `publishedAt` is set by the server (design-note correction,
-      2 October 2026). Dismissing sends nothing; the screen behind is unchanged.'
+      Optional: `message`, `publishedByPrincipalId`, `scopePath`. **Not asked:** `id` is a client UUIDv7
+      generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026).
+      Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it
+      (readOnly in the contract): `affectedTenantIds` (3 October 2026, CHG-SPF-001).'
     bindsTo: SupportNotice
     confirm:
       label: Publish support notice
@@ -10341,7 +10343,6 @@ screens:
       discards:
       - supportEndsAt
       - message
-      - affectedTenantIds
       - publishedByPrincipalId
       - scopePath
     provenance: contract platform-ops.yaml POST /support-notices
@@ -10752,10 +10753,11 @@ screens:
     trigger: Save AI provider
     body: '**Collects what `setAiProvider` sends before it is called.** Required: `kind`, `capability`,
       `priority`, `isActive`. Optional: `id`, `model`, `failoverProviderId`, `degradeGracefully`, `scopeLevel`,
-      `scopePath`, `credentialRef`, `credentialRotatedAt`, `credentialExpiresAt`, `lastVerifiedAt`,
-      `endpoint`, `residency` and 1 more. **Set for the picked tenant**; a `residency` outside what
-      the tenant''s region allows is refused `409 residency-refused` and shown against that field (decided
-      28 September, audit R203). Dismissing sends nothing; the screen behind is unchanged.'
+      `scopePath`, `credentialRef`, `credentialExpiresAt`, `endpoint`, `residency` and 1 more. **Set
+      for the picked tenant**; a `residency` outside what the tenant''s region allows is refused `409
+      residency-refused` and shown against that field (decided 28 September, audit R203). Dismissing
+      sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly
+      in the contract): `credentialRotatedAt`, `lastVerifiedAt` (3 October 2026, CHG-SPF-001).'
     bindsTo: AiProvider
     confirm:
       label: Save AI provider
@@ -10774,9 +10776,7 @@ screens:
       - scopeLevel
       - scopePath
       - credentialRef
-      - credentialRotatedAt
       - credentialExpiresAt
-      - lastVerifiedAt
       - endpoint
       - residency
       - maxTokens
