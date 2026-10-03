@@ -107,6 +107,9 @@ screens:
     params:
     - name: challengeId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createMfaChallenge`;
+        a link or an edge that holds one opens it instead.'
     coldEntry: '**The only screen in venue-pos that needs nothing.** That is what makes it the door. `workstationId`
       travels in the login request and comes from the terminal itself, not from a session -- the contract
       says it identifies the device and is *NOT a permission source*.'
@@ -211,6 +214,10 @@ screens:
         bindsTo: ActiveSession
         operation: listActiveSessions
         provenance: contract identity.yaml GET /auth/sessions
+        notes: '**Opens only after a supervisor''s PIN step-up** (decided by Chinmay, 3 October 2026 (CHG-SPF-012),
+          not the recommendation; reverses CHG-DOOR-003 for this screen). Nobody is signed in at a till''s
+          door, so a supervisor''s PIN, asked in the step-up prompt this panel opens, authorises `listActiveSessions`
+          and `forceLogout` here; BO-053 keeps them too. The PIN is masked and never stored on the till.'
       - kind: destructiveButton
         label: Take the till over
         operation: forceLogout
@@ -244,8 +251,9 @@ screens:
     trigger: onAction
   - operationId: listActiveSessions
     contract: identity
-    purpose: Who holds this till now
-    trigger: onLoad
+    purpose: 'Who holds this till now, read only after a supervisor''s PIN step-up: nobody is signed in
+      at the door (decided by Chinmay, 3 October 2026 (CHG-SPF-012))'
+    trigger: onAction
   - operationId: forceLogout
     contract: identity
     purpose: A supervisor ends the session of the operator holding the till, after login was refused 409
@@ -566,7 +574,6 @@ screens:
         label: Every denomination
         bindsTo: Denomination
         columns:
-        - Denomination.id
         - Denomination.currencyCode
         - Denomination.displayName
         - Denomination.kind
@@ -604,11 +611,6 @@ screens:
         label: The shift
         bindsTo: Shift
         columns:
-        - Shift.id
-        - Shift.workstationId
-        - Shift.venueId
-        - Shift.scopePath
-        - Shift.principalId
         - Shift.principalDisplayName
         - Shift.incidents
         - Shift.status
@@ -707,9 +709,11 @@ screens:
       has been decided; it offers no create action, because creating work is not what it needs.'
     emptyNoResults: 'Never shown: nothing on this screen filters its list, so an empty list is always
       the first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `SHIFT_OPEN`, which `getCurrentShift` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `SHIFT_OPEN`, which `getCurrentShift` requires to show
+      this screen, and names that permission (the screen''s other reads need `DEVICE_VIEW` and say so
+      in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question. A caller who can see the screen but lacks what an action needs
+      sees that action disabled, naming its permission: `SHIFT_APPROVE_OPEN` for `approveShiftOpen`.'
     offline: '**Cannot open offline.** `openShift` is online only (F32; audit R257): an opening float
       declared offline is one nobody can reconcile against the safe. Says so and keeps the count on screen
       until the link returns (design-notes correction fnb-retail POS-001).'
@@ -799,9 +803,9 @@ screens:
     note: '**Drawn by Claude Design on `TICVAI Boards v2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 17 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 17 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: POS-002
   name: Sell — Ticket Catalogue
   module: Sell
@@ -1150,16 +1154,10 @@ screens:
         label: Every product
         bindsTo: Product
         columns:
-        - Product.id
         - Product.code
         - Product.name
         - Product.description
         - Product.kind
-        - Product.venueId
-        - Product.scopePath
-        - Product.createdByPrincipalId
-        - Product.approvedByPrincipalId
-        - Product.responsibleDepartmentId
         - Product.onSaleFrom
         - Product.onSaleTo
         operation: listProducts
@@ -1179,14 +1177,10 @@ screens:
         label: Every order
         bindsTo: OrderSummary
         columns:
-        - OrderSummary.id
         - OrderSummary.orderNumber
         - OrderSummary.status
-        - OrderSummary.grossAmount
-        - OrderSummary.refundedAmount
         - OrderSummary.channel
         - OrderSummary.lineCount
-        - OrderSummary.principalId
         - OrderSummary.holdLabel
         - OrderSummary.heldUntil
         operation: listOrders
@@ -1212,15 +1206,9 @@ screens:
         - Promotion.code
         - Promotion.name
         - Promotion.description
-        - Promotion.venueId
         - Promotion.discount
-        - Promotion.conditions
         - Promotion.stackingMode
-        - Promotion.stackingGroup
-        - Promotion.precedence
         - Promotion.validFrom
-        - Promotion.validTo
-        - Promotion.maxRedemptions
         operation: listPromotions
         provenance: contract promotions.yaml GET /promotions
       - kind: dataTable
@@ -1228,31 +1216,17 @@ screens:
         bindsTo: MerchandiseItem
         columns:
         - MerchandiseItem.description
-        - MerchandiseItem.id
         - MerchandiseItem.sku
         - MerchandiseItem.barcode
         - MerchandiseItem.name
-        - MerchandiseItem.outletId
-        - MerchandiseItem.categoryId
-        - MerchandiseItem.variantId
-        - MerchandiseItem.inventoryItemId
         - MerchandiseItem.price
         - MerchandiseItem.onHand
-        - MerchandiseItem.isReturnable
         operation: listMerchandise
         provenance: contract retail.yaml GET /merchandise
       - kind: dataTable
         label: Every entitlement
         bindsTo: Entitlement
         columns:
-        - Entitlement.id
-        - Entitlement.templateId
-        - Entitlement.productId
-        - Entitlement.orderId
-        - Entitlement.orderLineId
-        - Entitlement.subjectId
-        - Entitlement.venueId
-        - Entitlement.scopePath
         - Entitlement.mediaCode
         - Entitlement.status
         - Entitlement.statusNote
@@ -1263,12 +1237,9 @@ screens:
         label: Every sale board
         bindsTo: SaleBoard
         columns:
-        - SaleBoard.id
         - SaleBoard.code
         - SaleBoard.name
-        - SaleBoard.venueId
         - SaleBoard.kind
-        - SaleBoard.pages
         - SaleBoard.isActive
         operation: listSaleBoards
         provenance: contract tenancy.yaml GET /sale-boards
@@ -1311,22 +1282,14 @@ screens:
         label: The selected product
         bindsTo: Product
         columns:
-        - Product.id
         - Product.code
         - Product.name
         - Product.description
         - Product.kind
-        - Product.venueId
-        - Product.scopePath
-        - Product.createdByPrincipalId
-        - Product.approvedByPrincipalId
-        - Product.responsibleDepartmentId
         - Product.onSaleFrom
         - Product.onSaleTo
-        - Product.categoryId
         - Product.lifecycleState
         - Product.isSellable
-        - Product.isStockTracked
         operation: getProduct
         provenance: contract catalogue.yaml GET /products/{productId}
       - kind: detailPanel
@@ -1336,18 +1299,10 @@ screens:
         - Promotion.code
         - Promotion.name
         - Promotion.description
-        - Promotion.venueId
         - Promotion.discount
         - Promotion.conditions
         - Promotion.stackingMode
-        - Promotion.stackingGroup
-        - Promotion.precedence
         - Promotion.validFrom
-        - Promotion.validTo
-        - Promotion.maxRedemptions
-        - Promotion.maxRedemptionsPerGuest
-        - Promotion.budgetCap
-        - Promotion.id
         - Promotion.status
         operation: getPromotion
         provenance: contract promotions.yaml GET /promotions/{promotionId}
@@ -1402,22 +1357,14 @@ screens:
         label: The order
         bindsTo: Order
         columns:
-        - Order.id
         - Order.orderNumber
-        - Order.channel
-        - Order.venueId
-        - Order.scopePath
         - Order.status
         - Order.currency
-        - Order.currencyScale
         - Order.grossAmount
         - Order.taxAmount
         - Order.netAmount
         - Order.refundedAmount
         - Order.totalPriceVariance
-        - Order.lines
-        - Order.payments
-        - Order.principalId
         operation: getOrder
         provenance: contract orders.yaml GET /orders/{orderId}
       - kind: cartPanel
@@ -1882,9 +1829,14 @@ screens:
       filter that matched nothing.
     emptyNoResults: Nothing matches the filter on venueId, kind, isSellable and the sell ticket catalogue
       are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires to show
+      this screen, and names that permission (the screen''s other reads need `ORDER_VIEW`, `PRICE_VIEW`,
+      `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `APPROVAL_REQUEST`
+      for `createApprovalRequest`; `APPROVAL_VIEW` for `evaluateApprovalRequirement`; `GUEST_VIEW` for
+      `getGuestLoyalty`, `identifyGuest`; `LOYALTY_REDEEM` for `redeemLoyaltyPoints`; `ORDER_CREATE` for
+      `createOrder`, `createPayment`, `issueGameCard`, `createRetailSale`; `ORDER_DISCOUNT` for `applyManualDiscount`.'
     offline: Served from the local catalogue bundle (ADR-0013). One read path, always local — the terminal
       does not know whether it has a network.
     denied: The catalogue reads normally and **Charge is refused** without `payment.take`. The cart is
@@ -2055,6 +2007,9 @@ screens:
       from: session
     - name: cardCode
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `issueGameCard`;
+        a link or an edge that holds one opens it instead.'
     - name: cartId
       from: session
     - name: orderId
@@ -2115,9 +2070,9 @@ screens:
     note: '**Drawn by Claude Design on `Retail Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 41 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 41 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: POS-003
   name: Sell — Timed Entry
   module: Sell
@@ -2247,14 +2202,8 @@ screens:
         label: Every inventory hold
         bindsTo: InventoryHold
         columns:
-        - InventoryHold.id
-        - InventoryHold.channelCapacityId
-        - InventoryHold.holderWorkstationId
-        - InventoryHold.parentLeaseId
         - InventoryHold.requestedUnits
         - InventoryHold.channel
-        - InventoryHold.grantedUnits
-        - InventoryHold.consumedUnits
         - InventoryHold.status
         - InventoryHold.acquiredAt
         - InventoryHold.expiresAt
@@ -2265,16 +2214,10 @@ screens:
         label: Every product
         bindsTo: Product
         columns:
-        - Product.id
         - Product.code
         - Product.name
         - Product.description
         - Product.kind
-        - Product.venueId
-        - Product.scopePath
-        - Product.createdByPrincipalId
-        - Product.approvedByPrincipalId
-        - Product.responsibleDepartmentId
         - Product.onSaleFrom
         - Product.onSaleTo
         operation: listProducts
@@ -2318,22 +2261,14 @@ screens:
         label: The product
         bindsTo: Product
         columns:
-        - Product.id
         - Product.code
         - Product.name
         - Product.description
         - Product.kind
-        - Product.venueId
-        - Product.scopePath
-        - Product.createdByPrincipalId
-        - Product.approvedByPrincipalId
-        - Product.responsibleDepartmentId
         - Product.onSaleFrom
         - Product.onSaleTo
-        - Product.categoryId
         - Product.lifecycleState
         - Product.isSellable
-        - Product.isStockTracked
         operation: getProduct
         provenance: contract catalogue.yaml GET /products/{productId}
   states:
@@ -2343,9 +2278,10 @@ screens:
       that makes one — and says so rather than showing an empty table.
     emptyNoResults: 'Never shown: `listProductVariants` takes no filter, so an empty list is always the
       first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `getAvailability` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `getAvailability` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no data*
+      and sends somebody to support with the wrong question. A caller who can see the screen but lacks
+      what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `acquireInventoryHold`.'
     offline: '**Availability is never served from the bundle.** A lease is acquired against the server;
       without one the terminal sells only from its allocated lease and refuses beyond it (ADR-0013)'
     denied: Session and date selection are readable; adding to a sale needs `payment.take` to complete.
@@ -2389,6 +2325,9 @@ screens:
     params:
     - name: inventoryHoldId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listInventoryHolds`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: productId
       from: POS-002
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
@@ -2427,9 +2366,9 @@ screens:
         (decided 2 October 2026, Chinmay, batch 5; POSV2-10, DEC-551; CHG-SPO-001): the business-date
         card with Change, the entry-slot card with what is left and Change, guests by ticket type and
         the group and family bundles are the specification; the hold the cashier sees is the cart''s countdown.'
-  apisNote: Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formAcquireInventoryHold
     component: modal
@@ -2454,7 +2393,7 @@ screens:
   name: Sell — Seat Map
   module: Sell
   requiresModule: seating
-  wave: 2
+  wave: 1
   capability: C51
   implementation:
     app: venue-pos
@@ -2643,9 +2582,12 @@ screens:
     loading: The sell seat map, read by `getSeatAvailability`.
     error: Could not load. Names which read failed and leaves the sell seat map untouched.
     emptyFirstRun: No sell seat map yet. Offers Create seat hold (`createSeatHold`).
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `getSeatAvailability` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `getSeatAvailability` requires to
+      show this screen, and names that permission (the screen''s other reads need `ORDER_VIEW` and say
+      so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question. A caller who can see the screen but lacks what an action needs
+      sees that action disabled, naming its permission: `ORDER_CREATE` for `createSeatHold`, `relinquishSeatHold`,
+      `createOrder`, `createPayment`.'
     offline: '**Not available offline.** Seat holds require the primary; two terminals selling the same
       seat is unrecoverable'
     denied: Seats can be viewed but not held without `payment.take` — an unchargeable hold takes capacity
@@ -2685,6 +2627,9 @@ screens:
     params:
     - name: holdId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createSeatHold`;
+        a link or an edge that holds one opens it instead.'
     - name: performanceId
       from: deepLink
     coldEntry: '**A link to a performance that has happened.** Offers the next performance of the same
@@ -2723,9 +2668,9 @@ screens:
     note: '**Drawn by Claude Design on `Seat Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formCreateSeatHold
     component: modal
@@ -2965,13 +2910,7 @@ screens:
         label: Every retail sale
         bindsTo: RetailSale
         columns:
-        - RetailSale.id
         - RetailSale.receiptNumber
-        - RetailSale.orderId
-        - RetailSale.outletId
-        - RetailSale.shiftId
-        - RetailSale.subjectId
-        - RetailSale.lines
         - RetailSale.subtotal
         - RetailSale.discountAmount
         - RetailSale.taxAmount
@@ -3017,12 +2956,7 @@ screens:
         label: The selected retail sale
         bindsTo: RetailSale
         columns:
-        - RetailSale.id
         - RetailSale.receiptNumber
-        - RetailSale.orderId
-        - RetailSale.outletId
-        - RetailSale.shiftId
-        - RetailSale.subjectId
         - RetailSale.lines
         - RetailSale.subtotal
         - RetailSale.discountAmount
@@ -3135,9 +3069,13 @@ screens:
     emptyFirstRun: No payment yet. Offers Create payment (`createPayment`); distinct from a filter that
       matched nothing.
     emptyNoResults: 'Never shown: the payment screen completes one sale and has no list filter.'
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `getRetailSale` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `listRetailSales` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no data*
+      and sends somebody to support with the wrong question. A caller who can see the screen but lacks
+      what an action needs sees that action disabled, naming its permission: `GUEST_MANAGE` for `enrolFaceTag`;
+      `LOYALTY_REDEEM` for `redeemLoyaltyPoints`; `ORDER_CREATE` for `createPayment`, `inquirePaymentStatus`,
+      `capturePayment`, `createRetailSale` and 2 more; `ORDER_MODIFY` for `addTip`; `ORDER_REPRINT` for
+      `reprintReceipt`.'
     offline: Cash completes locally and journals. **Card does not** — an offline card approval the acquirer
       never saw is a sale that vanishes at settlement
   apis:
@@ -3218,6 +3156,9 @@ screens:
       from: deepLink
     - name: saleId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listRetailSales`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -3266,9 +3207,9 @@ screens:
     note: '**Drawn by Claude Design on `Retail Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formCreatePayment
     component: modal
@@ -3506,18 +3447,12 @@ screens:
         label: Every refund
         bindsTo: Refund
         columns:
-        - Refund.id
-        - Refund.orderId
-        - Refund.batchId
         - Refund.fxRate
-        - Refund.taxReversalEntryId
         - Refund.settleTo
         - Refund.fxVariance
         - Refund.amount
         - Refund.appliedPercentage
         - Refund.status
-        - Refund.reason
-        - Refund.requestedByPrincipalId
         operation: listOrderRefunds
         provenance: contract orders.yaml GET /orders/{orderId}/refunds
       - kind: dataTable
@@ -3564,22 +3499,14 @@ screens:
         label: The order
         bindsTo: Order
         columns:
-        - Order.id
         - Order.orderNumber
         - Order.channel
-        - Order.venueId
-        - Order.scopePath
         - Order.status
-        - Order.currency
-        - Order.currencyScale
         - Order.grossAmount
         - Order.taxAmount
         - Order.netAmount
         - Order.refundedAmount
         - Order.totalPriceVariance
-        - Order.lines
-        - Order.payments
-        - Order.principalId
         operation: getOrder
         provenance: contract orders.yaml GET /orders/{orderId}
     - name: actionBar
@@ -3642,12 +3569,12 @@ screens:
     confirm:
       label: Void
       operation: voidOrder
-      carries: &id001
+      carries:
       - orderId
       - reason
     dismiss:
       label: Keep the sale
-      discards: &id002
+      discards:
       - reason
   - id: formApplyManualDiscount
     component: modal
@@ -3811,9 +3738,13 @@ screens:
       matched nothing.
     emptyNoResults: Nothing on this terminal matches the search; the holds are still there. Clear the
       search.
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that
-      permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support
-      with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this
+      screen, and names that permission. **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createOrder`;
+      `ORDER_DISCOUNT` for `applyManualDiscount`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_MODIFY`
+      for `resumeOrder`, `holdOrder`, `modifyOrder`; `ORDER_REFUND` for `createRefund`; `ORDER_REPRINT`
+      for `reprintOrder`.'
     offline: Orders held at this terminal are listed. Those held elsewhere are not — resuming another
       till's sale needs the server
     denied: Held sales are listed and cannot be recalled without `sale.resume`. **The list is still shown**,
@@ -3939,9 +3870,9 @@ screens:
     note: '**Drawn by Claude Design on `Retail Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: POS-007
   name: Close Shift
   module: Shift
@@ -4080,16 +4011,11 @@ screens:
         label: Waiting for a decision
         bindsTo: CashMovement
         columns:
-        - CashMovement.id
         - CashMovement.kind
         - CashMovement.amount
-        - CashMovement.denominations
         - CashMovement.reference
         - CashMovement.reason
         - CashMovement.recordedAt
-        - CashMovement.shiftId
-        - CashMovement.authorisedByPrincipalId
-        - CashMovement.sequence
         - CashMovement.syncedAt
         operation: listCashMovements
         provenance: contract shift.yaml GET /shifts/{shiftId}/cash-movements
@@ -4097,7 +4023,6 @@ screens:
         label: Every denomination
         bindsTo: Denomination
         columns:
-        - Denomination.id
         - Denomination.currencyCode
         - Denomination.displayName
         - Denomination.kind
@@ -4128,19 +4053,13 @@ screens:
         label: The selected cash movement
         bindsTo: CashMovement
         columns:
-        - CashMovement.id
         - CashMovement.kind
         - CashMovement.amount
         - CashMovement.denominations
         - CashMovement.reference
         - CashMovement.reason
         - CashMovement.recordedAt
-        - CashMovement.shiftId
-        - CashMovement.depositBoxId
-        - CashMovement.witnessPrincipalId
         - CashMovement.withdrawalReason
-        - CashMovement.authorisedByPrincipalId
-        - CashMovement.sequence
         - CashMovement.syncedAt
         operation: listCashMovements
         provenance: contract shift.yaml GET /shifts/{shiftId}/cash-movements
@@ -4148,11 +4067,6 @@ screens:
         label: The shift
         bindsTo: Shift
         columns:
-        - Shift.id
-        - Shift.workstationId
-        - Shift.venueId
-        - Shift.scopePath
-        - Shift.principalId
         - Shift.principalDisplayName
         - Shift.incidents
         - Shift.status
@@ -4275,9 +4189,12 @@ screens:
       has been decided; it offers no create action, because creating work is not what it needs.'
     emptyNoResults: 'Never shown: `listCashMovements` takes no filter, so an empty list is always the
       first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `SHIFT_OPEN`, which `getCurrentShift` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `SHIFT_OPEN`, which `getCurrentShift` requires to show
+      this screen, and names that permission (the screen''s other reads need `REPORT_VIEW_WORKSTATION`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `OVERSHORT_ACCEPT` for `acceptShiftVariance`,
+      `rejectShiftVariance`; `SHIFT_CLOSE` for `submitShiftCount`, `closeShift`.'
     offline: Cannot close. Closing requires the server total, and a locally computed variance is not a
       variance
     denied: '`acceptShiftVariance` was refused: the caller lacks OVERSHORT_ACCEPT at this venue, or is
@@ -4376,9 +4293,9 @@ screens:
     note: '**Drawn by Claude Design on `TICVAI Boards v2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 17 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 17 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: adjustDepositBoxFloat
     removed: true
@@ -4468,7 +4385,7 @@ screens:
   name: Reports
   module: Reports
   requiresModule: analytics
-  wave: 2
+  wave: 1
   capability: C21
   implementation:
     app: venue-pos
@@ -4534,14 +4451,7 @@ screens:
         - ReportDefinition.name
         - ReportDefinition.description
         - ReportDefinition.category
-        - ReportDefinition.dataSource
-        - ReportDefinition.columns
-        - ReportDefinition.filters
-        - ReportDefinition.groupBy
-        - ReportDefinition.parameters
-        - ReportDefinition.requiredPermission
         - ReportDefinition.maxDateRangeDays
-        - ReportDefinition.id
         - ReportDefinition.isSystem
         operation: listReports
         provenance: contract reporting.yaml GET /reports
@@ -4570,15 +4480,7 @@ screens:
         - ReportDefinition.dataSource
         - ReportDefinition.columns
         - ReportDefinition.filters
-        - ReportDefinition.groupBy
-        - ReportDefinition.parameters
-        - ReportDefinition.requiredPermission
-        - ReportDefinition.maxDateRangeDays
-        - ReportDefinition.id
-        - ReportDefinition.isSystem
-        - ReportDefinition.isRetired
         - ReportDefinition.estimatedCost
-        - ReportDefinition.createdByPrincipalId
         - ReportDefinition.lastRunAt
         operation: getReport
         provenance: contract reporting.yaml GET /reports/{reportId}
@@ -4666,8 +4568,14 @@ screens:
     params:
     - name: conversationId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `askReportingQuestion`;
+        a link or an edge that holds one opens it instead.'
     - name: reportId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listReports`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
       and by whom.
     preloaded:
@@ -4689,9 +4597,9 @@ screens:
       differences: The prototype is a fixed cross-venue command dashboard. There is no report list, run-report
         action, natural-language question or saved query (all declared in the YAML). It also shows terminal
         health and cross-outlet data, which is broader than 'from the terminal'.
-  apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: deleteReport
     removed: true
@@ -4715,7 +4623,7 @@ screens:
   name: Staff Roster
   module: Shift
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C11
   implementation:
     app: venue-pos
@@ -4793,13 +4701,7 @@ screens:
         label: Waiting for a decision
         bindsTo: Shift
         columns:
-        - Shift.id
-        - Shift.workstationId
-        - Shift.venueId
-        - Shift.scopePath
-        - Shift.principalId
         - Shift.principalDisplayName
-        - Shift.incidents
         - Shift.status
         - Shift.currency
         - Shift.currencyScale
@@ -4815,14 +4717,8 @@ screens:
         - RotaAssignment.restPeriodBefore
         - RotaAssignment.breachesWorkingHourLimit
         - RotaAssignment.labourCost
-        - RotaAssignment.id
-        - RotaAssignment.principalId
         - RotaAssignment.displayName
-        - RotaAssignment.venueId
-        - RotaAssignment.departmentId
         - RotaAssignment.position
-        - RotaAssignment.requiredRoleId
-        - RotaAssignment.workstationId
         operation: listRotaAssignments
         provenance: contract workforce.yaml GET /rota-assignments
       - kind: dataTable
@@ -4872,9 +4768,11 @@ screens:
       has been decided; it offers no create action, because creating work is not what it needs.'
     emptyNoResults: Nothing matches the filter on workstationId, status, openedFrom, openedTo and the
       staff roster are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires
+      to show this screen, and names that permission (the screen''s other reads need `WORKFORCE_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `ATTENDANCE_RECORD` for `recordAttendance`.'
     offline: Last known roster, with its age shown
   apis:
   - operationId: listShifts
@@ -4916,9 +4814,9 @@ screens:
     note: '**Drawn by Claude Design on `POS Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 16 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 16 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: acceptShiftVariance
     removed: true
@@ -5093,7 +4991,6 @@ screens:
         label: The media asset
         bindsTo: MediaAssetDetail
         columns:
-        - MediaAssetDetail.id
         - MediaAssetDetail.kind
         - MediaAssetDetail.status
         - MediaAssetDetail.filename
@@ -5101,36 +4998,21 @@ screens:
         - MediaAssetDetail.sizeBytes
         - MediaAssetDetail.title
         - MediaAssetDetail.description
-        - MediaAssetDetail.altText
-        - MediaAssetDetail.width
-        - MediaAssetDetail.height
         - MediaAssetDetail.durationSeconds
-        - MediaAssetDetail.customMetadata
-        - MediaAssetDetail.sharedWithTenantIds
-        - MediaAssetDetail.tags
-        - MediaAssetDetail.venueId
         operation: getMediaAsset
         provenance: contract assets.yaml GET /media/{mediaId}
       - kind: detailPanel
         label: The cart
         bindsTo: Cart
         columns:
-        - Cart.id
         - Cart.token
-        - Cart.venueId
         - Cart.channel
-        - Cart.subjectId
         - Cart.status
-        - Cart.lines
-        - Cart.conflicts
         - Cart.subtotal
         - Cart.discountTotal
         - Cart.taxTotal
         - Cart.total
-        - Cart.appliedPromotionIds
         - Cart.expiresAt
-        - Cart.extensionsUsed
-        - Cart.maxExtensions
         operation: getCart
         provenance: contract orders.yaml GET /carts/{cartId}
       - kind: scanTarget
@@ -5166,9 +5048,11 @@ screens:
     error: Could not load. Names which read failed and leaves the add existing ticket untouched.
     emptyFirstRun: No add existing ticket yet. **Offers no create action** — this screen declares no operation
       that makes one — and says so rather than showing an empty table.
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ASSET_LIBRARY_VIEW`, which `getMediaAsset` requires to
+      show this screen, and names that permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE`
+      for `appendEntitlementToMedia`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_VIEW` for `getMediaEntitlements`.'
     offline: '**Not available.** The entitlement set must be read live; appending to a stale picture double-sells
       a locker'
   apis:
@@ -5196,6 +5080,10 @@ screens:
     params:
     - name: mediaCode
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getMediaEntitlements`,
+        `appendEntitlementToMedia` take the id from the record the user acts on, and an edge or link that
+        holds one only pre-selects it.'
     - name: mediaId
       from: deepLink
     - name: cartId
@@ -5218,9 +5106,9 @@ screens:
       note: 'The prototype has no view for this screen. It was drawn in Claude Design on 29 September
         in the prototype''s style and accepted as its design the same day (the frame on this screen''s
         board): build the layout from that frame.'
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formAppendEntitlementToMedia
     component: modal
@@ -5355,13 +5243,8 @@ screens:
         label: Every serialised
         bindsTo: SerialisedItem
         columns:
-        - SerialisedItem.id
-        - SerialisedItem.itemId
-        - SerialisedItem.batchId
         - SerialisedItem.serial
-        - SerialisedItem.locationId
         - SerialisedItem.status
-        - SerialisedItem.soldOnOrderLineId
         - SerialisedItem.warrantyUntil
         - SerialisedItem.receivedAt
         operation: listSerialisedItems
@@ -5376,8 +5259,6 @@ screens:
         label: The return policy
         bindsTo: ReturnPolicy
         columns:
-        - ReturnPolicy.id
-        - ReturnPolicy.outletId
         - ReturnPolicy.defaultWindowDays
         - ReturnPolicy.requiresReceipt
         - ReturnPolicy.allowCashRefundOnCardSale
@@ -5385,7 +5266,6 @@ screens:
         - ReturnPolicy.requiresSecondUserAbove
         - ReturnPolicy.requiresApprovalAbove
         - ReturnPolicy.restockableConditions
-        - ReturnPolicy.nonReturnableCategoryIds
         operation: getReturnPolicy
         provenance: contract retail.yaml GET /outlets/{outletId}/return-policy
     - name: actionBar
@@ -5435,9 +5315,12 @@ screens:
       a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on includeInactive and the returns refunds exchanges are
       still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `getReturnPolicy` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `listSerialisedItems` requires to
+      show this screen, and names that permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_POST` for
+      `issueCreditMemo`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_REFUND` for `createRefund`,
+      `createRetailReturn`; `ORDER_VIEW` for `getReturnPolicy`, `lookupRetailSale`.'
     offline: '**Refunds and returns are refused offline** (F58 step 8; design-notes correction fnb-retail
       POS-011). The till keeps selling from the local journal; a refund needs the original sale and its
       payment, which only the server holds. Says so and offers to try again when the link returns.'
@@ -5509,9 +5392,9 @@ screens:
     note: '**Drawn by Claude Design on `POS Frontline Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formCreateRefund
     component: modal
@@ -5744,19 +5627,11 @@ screens:
         label: The shift
         bindsTo: Shift
         columns:
-        - Shift.id
-        - Shift.workstationId
-        - Shift.venueId
-        - Shift.scopePath
-        - Shift.principalId
         - Shift.principalDisplayName
         - Shift.incidents
         - Shift.status
-        - Shift.currency
-        - Shift.currencyScale
         - Shift.depositBoxCode
         - Shift.bagNumber
-        - Shift.openingFloat
         - Shift.salesTotal
         - Shift.refundsTotal
         - Shift.liftsTotal
@@ -5787,9 +5662,12 @@ screens:
     emptyNoResults: Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom,
       createdTo and the omnichannel order fulfilment are still there. Names the active filter and offers
       to clear it.
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that
-      permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support
-      with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this
+      screen, and names that permission (the screen''s other reads need `SHIFT_OPEN` and say so in their
+      own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support
+      with the wrong question. A caller who can see the screen but lacks what an action needs sees that
+      action disabled, naming its permission: `ORDER_CREATE` for `reserveMerchandise`; `ORDER_MODIFY`
+      for `recordOrderHandover`, `collectShopAndDrop`.'
     offline: '**Working from the local journal.** The till keeps taking money; this reconciles on sync.'
   apis:
   - operationId: listOrders
@@ -5878,9 +5756,9 @@ screens:
     note: '**Drawn by Claude Design on `POS Frontline Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRecordOrderHandover
     component: modal
@@ -6106,9 +5984,11 @@ screens:
     emptyFirstRun: No mobile pos event yet. Offers Create order (`createOrder`).
     emptyNoResults: 'Never shown: nothing on this screen filters its list, so an empty list is always
       the first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no data*
+      and sends somebody to support with the wrong question. A caller who can see the screen but lacks
+      what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `syncOrders`,
+      `createOrder`.'
     offline: '**Working from the local journal.** The till keeps taking money; this reconciles on sync.'
     denied: The sync queue is readable by anyone on shift. Resolving a conflict changes stock and needs
       `inventory.conflict.resolve`; a supervisor PIN unlocks it in place.
@@ -6160,9 +6040,9 @@ screens:
     note: '**Drawn by Claude Design on `POS Frontline Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: adjustDepositBoxFloat
     removed: true
@@ -6294,10 +6174,13 @@ screens:
     confirm:
       label: Void
       operation: voidOrder
-      carries: *id001
+      carries:
+      - orderId
+      - reason
     dismiss:
       label: Keep the sale
-      discards: *id002
+      discards:
+      - reason
   - id: formApplyManualDiscount
     component: modal
     trigger: Apply manual discount
@@ -6350,6 +6233,10 @@ screens:
       from: session
     - name: orderId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `voidOrder`, `applyManualDiscount`
+        take the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: shiftId
       from: deepLink
     coldEntry: '**Resolves from the session, which carries the workstation** — a till is signed into,
@@ -6369,9 +6256,9 @@ screens:
         drawer'' (the no-sale) takes no reason, checks no permission and writes no audit entry; it only
         shows a toast. This is the POS-020 gap C-4/C-5, still present. The approval modal has a reject
         path that the YAML does not model.'
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: POS-015
   name: Cash Operations Dashboard
   module: Sell
@@ -6424,16 +6311,11 @@ screens:
         label: Every cash movement
         bindsTo: CashMovement
         columns:
-        - CashMovement.id
         - CashMovement.kind
         - CashMovement.amount
-        - CashMovement.denominations
         - CashMovement.reference
         - CashMovement.reason
         - CashMovement.recordedAt
-        - CashMovement.shiftId
-        - CashMovement.authorisedByPrincipalId
-        - CashMovement.sequence
         - CashMovement.syncedAt
         operation: listCashMovements
         provenance: contract shift.yaml GET /shifts/{shiftId}/cash-movements
@@ -6441,17 +6323,9 @@ screens:
         label: Every deposit box
         bindsTo: DepositBox
         columns:
-        - DepositBox.id
-        - DepositBox.cashierPrincipalId
         - DepositBox.cashierName
-        - DepositBox.venueId
-        - DepositBox.workstationId
-        - DepositBox.shiftId
         - DepositBox.status
-        - DepositBox.openingFloat
-        - DepositBox.openingDenominations
         - DepositBox.withdrawnTotal
-        - DepositBox.foreignHoldings
         - DepositBox.expectedTotal
         operation: listDepositBoxes
         provenance: contract shift.yaml GET /deposit-boxes
@@ -6532,9 +6406,9 @@ screens:
       note: 'The prototype has no view for this screen. It was drawn in Claude Design on 29 September
         in the prototype''s style and accepted as its design the same day (the frame on this screen''s
         board): build the layout from that frame.'
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-010): The purpose read "Cash Operations Dashboard
     — from the client design board, 20 August"; the client asked for live cash status per till with expected
     cash and card totals for supervisors (DI-273, DI-308; design-notes correction fnb-retail POS-015).'
@@ -6658,9 +6532,11 @@ screens:
     error: Could not load. Names which read failed and leaves the till untouched.
     emptyFirstRun: No till configured. The form opens empty and `allocateDepositBox` saves the first one;
       it says what the platform does in the meantime.
-    emptyNoAccess: Shown when the caller lacks `DEVICE_VIEW`, which `listDevices` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `DEVICE_VIEW`, which `listDevices` requires to show this
+      screen, and names that permission. **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `DEVICE_MANAGE` for `setDeviceAssignment`;
+      `SHIFT_OPEN` for `allocateDepositBox`; `WORKSTATION_CONFIGURE` for `configureWorkstation`.'
     offline: '**Working from the local journal.** The till keeps taking money; this reconciles on sync.'
   apis:
   - operationId: allocateDepositBox
@@ -6688,6 +6564,9 @@ screens:
       from: session
     - name: deviceId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listDevices`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**Resolves from the session, which carries the workstation** — a till is signed into,
       not navigated to.'
   wireframe:
@@ -6707,9 +6586,9 @@ screens:
     note: '**Drawn by Claude Design on `POS Frontline Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSetReaderScannerPeripheral
     component: modal
@@ -6731,9 +6610,10 @@ screens:
     component: modal
     trigger: Configure workstation
     body: '**Collects what `configureWorkstation` sends before it is called.** Required: `name`, `saleBoardId`.
-      Optional: `cashierInputMode`, `guestDisplayContent`, `loadedMediaStockId`, `mediaStockRemaining`,
-      `departmentId`, `accessPointId`, `devices`, `deploymentProfile`, `edgeNodeId`, `isActive`. Dismissing
-      sends nothing; the screen behind is unchanged.'
+      Optional: `cashierInputMode`, `guestDisplayContent`, `loadedMediaStockId`, `departmentId`, `accessPointId`,
+      `devices`, `deploymentProfile`, `edgeNodeId`, `isActive`. Dismissing sends nothing; the screen behind
+      is unchanged. Not asked, because the server sets it (readOnly in the contract): `mediaStockRemaining`
+      (3 October 2026, CHG-SPF-001).'
     bindsTo: ConfigureWorkstationRequest
     confirm:
       label: Configure workstation
@@ -6746,7 +6626,6 @@ screens:
       - cashierInputMode
       - guestDisplayContent
       - loadedMediaStockId
-      - mediaStockRemaining
       - departmentId
       - accessPointId
       - devices
@@ -6879,9 +6758,9 @@ screens:
     note: '**Drawn by Claude Design on `POS Frontline Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: POS-018
   name: Safe Drop & Cash Transfer Management
   module: Sell
@@ -7005,9 +6884,11 @@ screens:
       from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on scopePath, isActive and the safe drop cash are still
       there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `SHIFT_OPEN`, which `listDepositBoxes` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `SHIFT_OPEN`, which `listDepositBoxes` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no data*
+      and sends somebody to support with the wrong question. A caller who can see the screen but lacks
+      what an action needs sees that action disabled, naming its permission: `CASH_LIFT` for `createCashMovement`,
+      `withdrawFromDepositBox`.'
     offline: '**Working from the local journal.** The till keeps taking money; this reconciles on sync.'
   apis:
   - operationId: createCashMovement
@@ -7055,9 +6936,9 @@ screens:
     note: '**Drawn by Claude Design on `POS Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: createRotaAssignment
     removed: true
@@ -7166,19 +7047,11 @@ screens:
         label: The selected shift
         bindsTo: Shift
         columns:
-        - Shift.id
-        - Shift.workstationId
-        - Shift.venueId
-        - Shift.scopePath
-        - Shift.principalId
         - Shift.principalDisplayName
         - Shift.incidents
         - Shift.status
-        - Shift.currency
-        - Shift.currencyScale
         - Shift.depositBoxCode
         - Shift.bagNumber
-        - Shift.openingFloat
         - Shift.salesTotal
         - Shift.refundsTotal
         - Shift.liftsTotal
@@ -7210,9 +7083,11 @@ screens:
       no operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: Nothing matches the filter on workstationId, status, openedFrom, openedTo and the
       shift templates policies are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires
+      to show this screen, and names that permission (the screen''s other reads need `SCOPE_VIEW` and
+      say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question. A caller who can see the screen but lacks what an action
+      needs sees that action disabled, naming its permission: `WORKSTATION_CONFIGURE` for `setTillShiftPolicy`.'
     offline: '**Working from the local journal.** The till keeps taking money; this reconciles on sync.'
   apis:
   - operationId: listShifts
@@ -7261,9 +7136,9 @@ screens:
     note: '**Drawn by Claude Design on `POS Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: getVenueSettings
     removed: true
@@ -7378,18 +7253,12 @@ screens:
         label: Waiting for a decision
         bindsTo: Alert
         columns:
-        - Alert.id
-        - Alert.ruleId
         - Alert.raisedAt
         - Alert.severity
         - Alert.status
-        - Alert.observedValue
         - Alert.threshold
-        - Alert.scopePath
-        - Alert.acknowledgedByPrincipalId
         - Alert.acknowledgedAt
         - Alert.resolvedAt
-        - Alert.escalatedAt
         operation: listAlerts
         provenance: contract reporting.yaml GET /alerts
       - kind: primaryButton
@@ -7446,9 +7315,11 @@ screens:
       has been decided; it offers no create action, because creating work is not what it needs.'
     emptyNoResults: Nothing matches the filter on status, severity, workstationId, shiftId, itemId and
       the shift exceptions alerts are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listAlerts` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listAlerts` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no data*
+      and sends somebody to support with the wrong question. A caller who can see the screen but lacks
+      what an action needs sees that action disabled, naming its permission: `APPROVAL_DECIDE` for `decideApprovalRequest`;
+      `APPROVAL_REQUEST` for `createApprovalRequest`; `CASH_NO_SALE` for `recordNoSale`.'
     offline: '**The till keeps taking money; this screen does not keep showing alerts.** `listAlerts`
       reads the analytical replica (ADR-0016) and there is nothing local to read — the offline trading
       happens on POS-002 and POS-013, and this monitor goes quiet until the network returns. **Corrected
@@ -7490,8 +7361,14 @@ screens:
       from: deepLink
     - name: reportId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `runReport` takes the
+        id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
     - name: requestId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createApprovalRequest`;
+        a link or an edge that holds one opens it instead.'
     coldEntry: '**Resolves from the session, which carries the workstation** — a till is signed into,
       not navigated to. An approval request opened from the queue.'
     preloaded:
@@ -7517,9 +7394,9 @@ screens:
     note: '**Drawn by Claude Design on `POS Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRecordNoSale
     component: modal
@@ -7767,6 +7644,10 @@ screens:
       from: session
     - name: itemId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `setItemAvailability`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     coldEntry: '**Resolves from the session, which carries the workstation and its outlet.** A till is
       signed into, not navigated to — and the outlet is a property of where the till is bolted down, not
       something a cashier picks.'
@@ -7805,9 +7686,9 @@ screens:
         the default send-first outlet audit R261 stands. Design corrections (CHG-SPO-016): no "Open-dated
         · any day" validity chip on food tiles, no "Today" or "Low capacity" REFINE chips and no "Reserve"
         button in a food-only cart; those are ticket concepts.'
-  apisNote: Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formAddCartLine
     component: modal
@@ -7949,18 +7830,12 @@ screens:
         label: Every kitchen ticket
         bindsTo: KitchenTicket
         columns:
-        - KitchenTicket.id
-        - KitchenTicket.orderId
         - KitchenTicket.orderNumber
-        - KitchenTicket.outletId
         - KitchenTicket.tableLabel
         - KitchenTicket.serviceMode
-        - KitchenTicket.coursing
         - KitchenTicket.buzzerCode
         - KitchenTicket.status
         - KitchenTicket.priority
-        - KitchenTicket.prioritisedByPrincipalId
-        - KitchenTicket.prioritiseReason
         operation: listKitchenTickets
         provenance: contract fnb.yaml GET /kitchen/tickets
       - kind: metricTile
@@ -7977,19 +7852,12 @@ screens:
         label: The selected kitchen ticket
         bindsTo: KitchenTicket
         columns:
-        - KitchenTicket.id
-        - KitchenTicket.orderId
         - KitchenTicket.orderNumber
-        - KitchenTicket.outletId
         - KitchenTicket.tableLabel
         - KitchenTicket.serviceMode
-        - KitchenTicket.coursing
         - KitchenTicket.buzzerCode
         - KitchenTicket.status
         - KitchenTicket.priority
-        - KitchenTicket.prioritisedByPrincipalId
-        - KitchenTicket.prioritiseReason
-        - KitchenTicket.lines
         - KitchenTicket.targetReadyAt
         - KitchenTicket.elapsedSeconds
         operation: listKitchenTickets
@@ -8020,9 +7888,11 @@ screens:
       that matched nothing.
     emptyNoResults: Nothing matches the filter on stationId, status and the send kitchen are still there.
       Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `listKitchenTickets` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `listKitchenTickets` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no data*
+      and sends somebody to support with the wrong question. A caller who can see the screen but lacks
+      what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createFnbOrder`;
+      `ORDER_MODIFY` for `setKitchenTicketStatus`, `markOrderCollected`, `cancelFnbOrder`.'
     offline: '**Queued locally and sent on reconnect.** The kitchen display is on the same LAN, so a venue-wide
       outage stops both and a device outage stops neither.'
     denied: The rail is readable and **Send to kitchen is refused** without `payment.take`. Tickets already
@@ -8105,9 +7975,9 @@ screens:
         and collection are worked from the queue, not from a screen of their own. Design correction (decided
         1 October, POSV2-4): a counter order is not fired on payment; audit R261 stands: send to kitchen,
         then charge. The guest status board is owned by KIT-007 (POSV2-7).'
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formCreateFnbOrder
     component: modal
@@ -8347,9 +8217,9 @@ screens:
         Chinmay, batch 5: "Lockers tab, refine chips and Scan; no inventory ledger on the till"; POSV2-13,
         DEC-554; CHG-SPO-001). Chip wording: "Low stock", never "Low capacity", and no "Open-dated" validity
         on merchandise (DI-354; design-notes correction fnb-retail POS-023).'
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formAddCartLine
     component: modal
@@ -8541,6 +8411,10 @@ screens:
       from: session
     - name: itemId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `setItemAvailability`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     coldEntry: '**Resolves from the session, which carries the workstation and its outlet.** A till is
       signed into, not navigated to — and the outlet is a property of where the till is bolted down, not
       something a cashier picks.'
@@ -8561,9 +8435,9 @@ screens:
       note: 'The prototype has no view for this screen. It was drawn in Claude Design on 29 September
         in the prototype''s style and accepted as its design the same day (the frame on this screen''s
         board): build the layout from that frame.'
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSetTableLayout
     component: modal
@@ -8949,7 +8823,7 @@ screens:
   - operationId: getTaxDocumentRendition
     contract: finance
     purpose: Download the invoice / credit memo PDF
-    trigger: onLoad
+    trigger: onAction
     provenance: build, 29 September 2026
   entryState:
     params:
@@ -8963,8 +8837,15 @@ screens:
       from: navigation
     - name: documentId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getTaxDocumentRendition`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: invoiceId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `issueTaxInvoice`;
+        a link or an edge that holds one opens it instead.'
     coldEntry: '**Resolves from the session, which carries the workstation** — a till is signed into,
       not navigated to.'
   requiresModule: ticketing
@@ -9090,6 +8971,9 @@ screens:
       from: session
     - name: subjectId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `searchGuests`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**Resolves from the session, which carries the workstation** — a till is signed into,
       not navigated to.'
   requiresModule: core
@@ -9321,10 +9205,19 @@ screens:
       from: session
     - name: tableId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getTableVisit`;
+        an edge that holds one may still carry it to open on that record.'
     - name: visitId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getTableMap`;
+        an edge that holds one may still carry it to open on that record.'
     - name: reservationId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listTableReservations`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**Resolves from the session, which carries the workstation** — a till is signed into,
       not navigated to.'
   requiresModule: fnb
@@ -9837,8 +9730,12 @@ screens:
       are made.'
     emptyNoResults: Nothing matches the filter on terminal, day, customer, payment method or status, and
       the till's sales are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that
-      permission. **Never an empty table** — that reads as *there is no data*.
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this
+      screen, and names that permission. **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `GUEST_VIEW` for `searchGuests`;
+      `LEDGER_POST` for `issueTaxInvoice`; `LEDGER_VIEW` for `getTaxDocumentRendition`; `ORDER_REPRINT`
+      for `reprintReceipt`, `reprintOrder`.'
     denied: Another terminal's or another cashier's sales need `ORDER_VIEW_OTHER`. **This terminal's own
       sales are still listed**; the filter names what is withheld.
     offline: '**Orders taken on this terminal are listed from the local journal**; other terminals, the
@@ -9889,8 +9786,15 @@ screens:
       optional: true
     - name: documentId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getTaxDocumentRendition`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: saleId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `reprintReceipt` takes
+        the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
     coldEntry: '**Resolves from the session, which carries the workstation** — the journal opens on this
       terminal''s sales today.'
   wireframe:
@@ -10147,8 +10051,12 @@ screens:
     emptyFirstRun: '**No reservations held and no groups due today.** Offers New reservation (`createReservation`).'
     emptyNoResults: Nothing matches the status or expiry filter, and the reservations are still there.
       Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `listReservations` requires, and names
-      that permission. **Never an empty table**.
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `listReservations` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no data*
+      and sends somebody to support with the wrong question. A caller who can see the screen but lacks
+      what an action needs sees that action disabled, naming its permission: `ORDER_CANCEL` for `cancelReservation`;
+      `ORDER_CREATE` for `createReservation`, `extendReservation`, `convertReservation`; `ORDER_MODIFY`
+      for `recordGroupCheckIn`.'
     denied: Reservations are listed; New reservation, Take payment and Extend need `ORDER_CREATE`, Cancel
       needs `ORDER_CANCEL` and the check-in `ORDER_MODIFY`. **The list is still shown**, so the cashier
       can fetch a supervisor to the right reservation.
@@ -10215,6 +10123,10 @@ screens:
       optional: true
     - name: groupBookingId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getGroupBooking`,
+        `recordGroupCheckIn` take the id from the record the user acts on, and an edge or link that holds
+        one only pre-selects it.'
     coldEntry: '**Resolves from the session, which carries the workstation and its venue** — the screen
       opens on the venue''s held reservations and today''s groups.'
   wireframe:

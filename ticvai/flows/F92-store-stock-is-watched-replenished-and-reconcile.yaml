@@ -36,8 +36,7 @@ steps:
   screen: BO-078
   action: Requisitions.
   operations:
-  - rejectRequisition
-  - returnRequisition
+  - approveRequisition
   - updateRequisitionLines
   outcome: '**Drawn by the client as RET-4C.**'
 - step: 4

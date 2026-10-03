@@ -120,9 +120,9 @@ screens:
     note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not
       starting from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 0 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 0 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: KSK-002
   name: Language Select
   module: Sell
@@ -207,9 +207,9 @@ screens:
     note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not
       starting from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: getTenantConfig
     removed: true
@@ -315,9 +315,9 @@ screens:
     note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not
       starting from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: KSK-004
   name: Choose tickets
   module: Sell
@@ -428,9 +428,9 @@ screens:
     note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not
       starting from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: KSK-005
   name: Choose a performance
   module: Sell
@@ -514,13 +514,17 @@ screens:
     note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not
       starting from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   entryState:
     params:
     - name: cartId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `addCartLine` takes
+        the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
 - id: KSK-006
   name: Review
   module: Sell
@@ -643,9 +647,9 @@ screens:
     note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not
       starting from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: KSK-007
   name: Payment
   module: Sell
@@ -752,9 +756,9 @@ screens:
     note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not
       starting from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: KSK-008
   name: Payment unresolved
   module: Sell
@@ -849,9 +853,9 @@ screens:
     note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not
       starting from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: KSK-009
   name: Ticket issued
   module: Sell
@@ -957,9 +961,9 @@ screens:
     note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not
       starting from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: sendTickets
     component: modal
@@ -1064,9 +1068,9 @@ screens:
     note: '**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not
       starting from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: transferOrderTickets
     removed: true
@@ -1122,22 +1126,14 @@ screens:
         label: The order
         bindsTo: Order
         columns:
-        - Order.id
         - Order.orderNumber
         - Order.channel
-        - Order.venueId
-        - Order.scopePath
         - Order.status
         - Order.currency
-        - Order.currencyScale
         - Order.grossAmount
         - Order.taxAmount
         - Order.netAmount
         - Order.refundedAmount
-        - Order.totalPriceVariance
-        - Order.lines
-        - Order.payments
-        - Order.principalId
         operation: getOrder
         provenance: contract orders.yaml GET /orders/{orderId}
       - kind: searchField
@@ -1189,9 +1185,9 @@ screens:
     note: '**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not
       starting from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: KSK-012
   name: Booking found
   module: Sell
@@ -1268,9 +1264,9 @@ screens:
     note: '**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not
       starting from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: transferOrderTickets
     removed: true
@@ -1354,9 +1350,9 @@ screens:
     note: '**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not
       starting from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: KSK-014
   name: Out of service
   module: Sell
@@ -1412,14 +1408,14 @@ screens:
     note: '**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not
       starting from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 0 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 0 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: KSK-015
   name: Assistant
   module: AI
   requiresModule: ai
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: guest-app
@@ -1448,12 +1444,12 @@ screens:
   notes: 'Added 17 August for 2.1.28, which names the kiosk explicitly and was the only surface with
     no AI screen. **Scoped to `guestCapabilityScope`** — ticket selection, promotions, FAQs, recommendations
     and checkout, and nothing else. **No keyboard**: voice or a constrained touch interface, which is
-    why the app chat pattern does not transfer. Depends on CF-14. **Not on the wireframe board.** **Wave
-    2 with the rest of the kiosk.** Set to Wave 1 in error on 17 August — an assistant that guides a
-    guest through ticket selection and checkout cannot ship before the screens that do the selecting
-    and the checking out. **Cross-platform navigation removed 24 August**: SUP-004. **A till does not
-    navigate to a back office and a guest app does not navigate to either** — those are device handovers,
-    and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.'
+    why the app chat pattern does not transfer. Depends on CF-14. **Not on the wireframe board.** **Built
+    with the kiosk''s selection and checkout screens** (17 August): an assistant that guides a guest
+    through ticket selection and checkout cannot ship before the screens that do the selecting and the
+    checking out. **Cross-platform navigation removed 24 August**: SUP-004. **A till does not navigate
+    to a back office and a guest app does not navigate to either** — those are device handovers, and
+    a flow declares them with `crossesDevice` rather than a screen pretending there is a link.'
   density: touchLarge
   boardFrames:
   - Kiosk Board 2.dc.html#KSK-015
@@ -1543,8 +1539,14 @@ screens:
     params:
     - name: conversationId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createAiConversation`;
+        a link or an edge that holds one opens it instead.'
     - name: messageId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `sendAiMessage`;
+        a link or an edge that holds one opens it instead.'
     coldEntry: 'None: a kiosk has no notification cold entry. The assistant opens from KSK-004 at the
       point of confusion and closes when the guest returns or the session times out.'
     preloaded: []
@@ -1556,9 +1558,9 @@ screens:
     note: '**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not
       starting from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: confirmHandover
     component: confirmDialog
@@ -1687,9 +1689,9 @@ screens:
     note: '**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not
       starting from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formCreateGuestFnbOrder
     component: modal
@@ -1878,9 +1880,9 @@ screens:
     note: '**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not
       starting from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formReserveMerchandise
     component: modal

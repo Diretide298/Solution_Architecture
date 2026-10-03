@@ -1,0 +1,39 @@
+id: CHG-SPF-010
+date: '2026-10-03'
+source: audit
+kind: spec
+summary: BO-078 decides a requisition with one approveRequisition call (approve, reject or return); the reject and
+  return operations leave the screen and flow F92.
+decision:
+  what: Drop rejectRequisition and returnRequisition from BO-078 and F92 step 3; the form becomes Decide requisition.
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Chinmay''s answers of 3 October to the Block A audit (CHG-AUD-001), section ''Asked as questions instead of
+  defaults: requisitions.'').'
+keys_touched:
+  screens:
+  - BO-078
+  operations:
+  - approveRequisition
+  - rejectRequisition
+  - returnRequisition
+  flows:
+  - F92
+  - F15
+  files:
+  - tools/applied/screen-decisions-3-october.py
+  - tools/check-screen-patterns.py
+root_class: A26 BUSINESS-RULES
+tickets:
+  started: []
+  unstarted:
+  - VM-BO-078
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-patterns.py
+status: closed
+closed_by_commit: 1303d854
+notes: Batch SPF (spec-screens), 3 October 2026. check-screen-patterns (DEC) fails if the screen drifts back.

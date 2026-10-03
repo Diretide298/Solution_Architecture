@@ -66,7 +66,7 @@ screens:
   name: Tenant Workspace
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -231,9 +231,9 @@ screens:
     note: '**Drawn by Claude Design on `Marketing Board 7.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   layout:
     template: detail
     regions:
@@ -362,7 +362,7 @@ screens:
   name: Brand Kit
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -477,9 +477,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-002
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSetBrandIdentity
     component: modal
@@ -509,7 +509,7 @@ screens:
   name: Typography
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -600,9 +600,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-003
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSetFonts
     component: modal
@@ -642,7 +642,7 @@ screens:
   name: Logo & Assets
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -715,9 +715,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-004
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   layout:
     template: detail
     regions:
@@ -811,7 +811,7 @@ screens:
   name: Theme Editor
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -929,9 +929,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-005
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSetTheme
     component: modal
@@ -963,7 +963,7 @@ screens:
   name: Component Preview
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -1075,9 +1075,10 @@ screens:
     emptyFirstRun: No component preview yet. Offers Create preview (`createPreview`).
     emptyNoResults: 'Never shown: nothing on this screen filters its list, so an empty list is always
       the first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `getTheme` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `TENANT_CONFIGURE`, which `getTheme` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no data*
+      and sends somebody to support with the wrong question. A caller who can see the screen but lacks
+      what an action needs sees that action disabled, naming its permission: `PRODUCT_VIEW` for `previewProductTickets`.'
   apis:
   - operationId: createPreview
     contract: white-label
@@ -1127,9 +1128,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-006
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formCreatePreview
     component: modal
@@ -1181,7 +1182,7 @@ screens:
   name: Page Builder
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -1276,17 +1277,12 @@ screens:
         label: Every content page
         bindsTo: ContentPage
         columns:
-        - ContentPage.id
         - ContentPage.slug
         - ContentPage.title
-        - ContentPage.body
-        - ContentPage.isEnabled
         - ContentPage.status
         - ContentPage.iconAssetRef
         - ContentPage.categoryCode
         - ContentPage.sortOrder
-        - ContentPage.isReferenced
-        - ContentPage.scopePath
         operation: listContentPages
         provenance: contract white-label.yaml GET /tenant-config/pages
     - name: actionBar
@@ -1324,9 +1320,11 @@ screens:
     loading: The record, read by `getHomepageLayout`.
     error: Could not load. Names which read failed and leaves the record untouched.
     emptyFirstRun: No record yet. Offers Create content page (`createContentPage`).
-    emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `listContentPages` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `TENANT_CONFIGURE`, which `listContentPages` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `proposeMarketingContent`,
+      `decideProposedAction`; `TENANT_PUBLISH` for `publishContentBlock`.'
   apis:
   - operationId: listContentPages
     contract: white-label
@@ -1393,24 +1391,35 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-007
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   entryState:
     params:
     - name: pageId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listContentPages`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: actionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `decideProposedAction`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: blockId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createContentBlock`;
+        a link or an edge that holds one opens it instead.'
   overlays:
   - id: formCreateContentPage
     component: modal
     trigger: Create content page
     body: '**Collects what `createContentPage` sends.** Required: `slug`, `title`, `body`. Optional: `isEnabled`,
-      `iconAssetRef`, `categoryCode`, `sortOrder`. `id`, `status`, `isReferenced` and `scopePath` are
-      the server''s and never asked. Dismissing sends nothing.'
+      `iconAssetRef`, `categoryCode`, `sortOrder`. are the server''s and never asked. Dismissing sends
+      nothing. Not asked, because the server sets them (readOnly in the contract): `id`, `isReferenced`,
+      `scopePath`, `status` (3 October 2026, CHG-SPF-001).'
     bindsTo: ContentPage
     confirm:
       label: Create content page
@@ -1451,11 +1460,10 @@ screens:
   - id: formSetHomepageLayout
     component: modal
     trigger: Save homepage layout
-    body: '**Collects what `setHomepageLayout` sends before it is called.** Required: `sections`. Optional:
-      `id`. A section whose module is off is disabled here and cannot be made visible (audit R163 (4)).
-      Dismissing sends nothing; the screen behind is unchanged. Per section: `maxItems` (the venue''s
-      choice) and `scrollAnimation` (rise, scale, slide, blur, none); `templateKey` and `landingSource`
-      (CHG-SGU-009).'
+    body: '**Collects what `setHomepageLayout` sends before it is called.** Required: `sections`. Dismissing
+      sends nothing; the screen behind is unchanged. Per section: `maxItems` (the venue''s choice) and
+      `scrollAnimation` (rise, scale, slide, blur, none); `templateKey` and `landingSource` (CHG-SGU-009).
+      Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).'
     bindsTo: HomepageLayout
     confirm:
       label: Save homepage layout
@@ -1464,7 +1472,6 @@ screens:
       label: Cancel
       discards:
       - sections
-      - id
     provenance: contract white-label.yaml PUT /tenant-config/homepage
   - id: formCreateContentBlock
     component: modal
@@ -1491,7 +1498,7 @@ screens:
   name: Content Blocks
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -1543,34 +1550,24 @@ screens:
         label: Every promo block
         bindsTo: PromoBlock
         columns:
-        - PromoBlock.id
         - PromoBlock.title
         - PromoBlock.description
         - PromoBlock.iconAssetRef
-        - PromoBlock.promotionId
-        - PromoBlock.linkTarget
         - PromoBlock.startsAt
         - PromoBlock.endsAt
         - PromoBlock.state
-        - PromoBlock.sortOrder
-        - PromoBlock.scopePath
         operation: listPromoBlocks
         provenance: contract white-label.yaml GET /tenant-config/promo-blocks
       - kind: dataTable
         label: Every banner
         bindsTo: Banner
         columns:
-        - Banner.id
         - Banner.title
         - Banner.subtitle
         - Banner.imageAssetRef
-        - Banner.placement
-        - Banner.linkTarget
         - Banner.startsAt
         - Banner.endsAt
         - Banner.state
-        - Banner.sortOrder
-        - Banner.isActive
         operation: listBanners
         provenance: contract white-label.yaml GET /tenant-config/banners
     - name: contextPanel
@@ -1580,17 +1577,14 @@ screens:
         label: The selected promo block
         bindsTo: PromoBlock
         columns:
-        - PromoBlock.id
         - PromoBlock.title
         - PromoBlock.description
         - PromoBlock.iconAssetRef
-        - PromoBlock.promotionId
         - PromoBlock.linkTarget
         - PromoBlock.startsAt
         - PromoBlock.endsAt
         - PromoBlock.state
         - PromoBlock.sortOrder
-        - PromoBlock.scopePath
         operation: listPromoBlocks
         provenance: contract white-label.yaml GET /tenant-config/promo-blocks
       - kind: detailPanel
@@ -1632,9 +1626,11 @@ screens:
     emptyFirstRun: No content blocks yet. Offers Create banner (`createBanner`).
     emptyNoResults: 'Never shown: `listPromoBlocks` takes no filter, so an empty list is always the first-run
       state above.'
-    emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `listPromoBlocks` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `TENANT_CONFIGURE`, which `listPromoBlocks` requires to
+      show this screen, and names that permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `proposeMarketingContent`,
+      `decideProposedAction`.'
   apis:
   - operationId: createBanner
     contract: white-label
@@ -1703,17 +1699,27 @@ screens:
     params:
     - name: bannerId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listBanners`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: promoBlockId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPromoBlocks`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: actionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `decideProposedAction`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
   wireframe:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-008
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formCreateBanner
     component: modal
@@ -1823,7 +1829,7 @@ screens:
   name: Navigation & Menus
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -1984,9 +1990,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-009
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSetNavigation
     component: modal
@@ -2076,7 +2082,7 @@ screens:
   name: Media Library
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -2213,7 +2219,6 @@ screens:
         label: The selected media asset
         bindsTo: MediaAsset
         columns:
-        - MediaAsset.id
         - MediaAsset.kind
         - MediaAsset.status
         - MediaAsset.filename
@@ -2221,21 +2226,13 @@ screens:
         - MediaAsset.sizeBytes
         - MediaAsset.title
         - MediaAsset.description
-        - MediaAsset.altText
-        - MediaAsset.width
-        - MediaAsset.height
         - MediaAsset.durationSeconds
-        - MediaAsset.customMetadata
-        - MediaAsset.sharedWithTenantIds
-        - MediaAsset.tags
-        - MediaAsset.venueId
         operation: searchMedia
         provenance: contract assets.yaml GET /media
       - kind: detailPanel
         label: The expiring media
         bindsTo: ExpiringMedia
         columns:
-        - ExpiringMedia.assetId
         - ExpiringMedia.filename
         - ExpiringMedia.thumbnailUrl
         - ExpiringMedia.licensor
@@ -2250,7 +2247,6 @@ screens:
         label: The media asset
         bindsTo: MediaAssetDetail
         columns:
-        - MediaAssetDetail.id
         - MediaAssetDetail.kind
         - MediaAssetDetail.status
         - MediaAssetDetail.filename
@@ -2258,14 +2254,7 @@ screens:
         - MediaAssetDetail.sizeBytes
         - MediaAssetDetail.title
         - MediaAssetDetail.description
-        - MediaAssetDetail.altText
-        - MediaAssetDetail.width
-        - MediaAssetDetail.height
         - MediaAssetDetail.durationSeconds
-        - MediaAssetDetail.customMetadata
-        - MediaAssetDetail.sharedWithTenantIds
-        - MediaAssetDetail.tags
-        - MediaAssetDetail.venueId
         operation: getMediaAsset
         provenance: contract assets.yaml GET /media/{mediaId}
     - name: actionBar
@@ -2426,9 +2415,12 @@ screens:
       that matched nothing.
     emptyNoResults: Nothing matches the filter on kind, tag, collectionId, venueId, search, unusedOnly
       and the media are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `ASSET_LIBRARY_VIEW`, which `searchMedia` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ASSET_LIBRARY_VIEW`, which `searchMedia` requires to
+      show this screen, and names that permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `semanticSearch`;
+      `ASSET_LIBRARY_MANAGE` for `completeUpload`, `createCollection`, `createUpload`, `deleteMediaAsset`
+      and 2 more.'
   apis:
   - operationId: searchMedia
     contract: assets
@@ -2491,8 +2483,14 @@ screens:
     params:
     - name: mediaId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `searchMedia`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: uploadId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createUpload`;
+        a link or an edge that holds one opens it instead.'
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -2508,9 +2506,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-010
-  apisNote: Rebuilt 9 September 2026 from the 12 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 12 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: appendEntitlementToMedia
     removed: true
@@ -2528,7 +2526,7 @@ screens:
   name: SEO & Metadata
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -2635,9 +2633,11 @@ screens:
     error: Could not load
     emptyFirstRun: 'No metadata saved for this page yet: the generated title and description are shown
       with the "Generated" badge.'
-    emptyNoAccess: Shown when the caller lacks `MARKETING_MANAGE`, which `setSeoMetadata` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `MARKETING_VIEW`, which `getSeoMetadata` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no data*
+      and sends somebody to support with the wrong question. A caller who can see the screen but lacks
+      what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `setSeoMetadata`,
+      `createUrlRedirect`.'
   apis:
   - operationId: setSeoMetadata
     contract: marketing-crm
@@ -2657,9 +2657,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-013
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formCreateUrlRedirect
     component: modal
@@ -2677,7 +2677,7 @@ screens:
   name: Translations
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -2784,9 +2784,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-011
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: proposeTranslations
     removed: true
@@ -2798,7 +2798,7 @@ screens:
   name: RTL Preview
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -2878,14 +2878,14 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-012
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: CMS-014
   name: Publishing Workflow
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -3046,9 +3046,11 @@ screens:
     error: Could not load. Names which read failed and leaves the publishing workflow untouched.
     emptyFirstRun: No publishing workflow yet. **Offers no create action** — this screen declares no operation
       that makes one — and says so rather than showing an empty table.
-    emptyNoAccess: Shown when the caller lacks `TENANT_PUBLISH`, which `publishTenantConfig` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `TENANT_CONFIGURE`, which `listBookingFlows` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `TENANT_PUBLISH`
+      for `publishTenantConfig`, `setPublishReviewPolicy`, `exportSitePackage`, `getSitePackage`.'
   apis:
   - operationId: publishTenantConfig
     contract: white-label
@@ -3096,9 +3098,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-014
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formPublishTenantConfig
     component: modal
@@ -3143,11 +3145,14 @@ screens:
       from: navigation
     - name: packageId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getSitePackage` takes
+        the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
 - id: CMS-015
   name: Version History
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -3218,14 +3223,10 @@ screens:
         bindsTo: ConfigVersion
         columns:
         - ConfigVersion.publishedAt
-        - ConfigVersion.publishedByPrincipalId
         - ConfigVersion.publishedByName
         - ConfigVersion.note
         - ConfigVersion.isCurrent
         - ConfigVersion.scheduledFor
-        - ConfigVersion.contentHash
-        - ConfigVersion.pendingBuildTimeChanges
-        - ConfigVersion.scopePath
         operation: listConfigVersions
         provenance: contract white-label.yaml GET /tenant-config/versions
     - name: contextPanel
@@ -3304,9 +3305,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-015
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: confirmRestoreConfigVersion
     component: confirmDialog
@@ -3325,7 +3326,7 @@ screens:
   name: Site Settings
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -3398,35 +3399,14 @@ screens:
         label: The booking flow config
         bindsTo: BookingFlowConfig
         columns:
-        - BookingFlowConfig.preset
-        - BookingFlowConfig.stepIndicator
         - BookingFlowConfig.cartLayout
         - BookingFlowConfig.cardLayout
-        - BookingFlowConfig.cardSize
-        - BookingFlowConfig.seatPicker
-        - BookingFlowConfig.mapView
         - BookingFlowConfig.density
-        - BookingFlowConfig.embedMode
-        - BookingFlowConfig.heroBanner
-        - BookingFlowConfig.searchInBanner
-        - BookingFlowConfig.singleEventPage
-        - BookingFlowConfig.quantitiesOnAddOns
         - BookingFlowConfig.cartSideInRtl
         - BookingFlowConfig.eventBannerDates
         - BookingFlowConfig.timesPerPage
-        - BookingFlowConfig.dayPartFilter
-        - BookingFlowConfig.dayPartBoundaries
         - BookingFlowConfig.seatViewPosition
         - BookingFlowConfig.seatTimeBar
-        - BookingFlowConfig.ticketCategories
-        - BookingFlowConfig.ticketTags
-        - BookingFlowConfig.cardInfo
-        - BookingFlowConfig.conciergeMascot
-        - BookingFlowConfig.showInfoOnly
-        - BookingFlowConfig.locationSwitcher
-        - BookingFlowConfig.guestContactFields
-        - BookingFlowConfig.dateStripDays
-        - BookingFlowConfig.venueOverrides
         operation: getBookingFlowConfig
         notes: '**Venue-wide booking settings only (decided 29 September, W12).** The settings that belong
           to one flow (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`,
@@ -3514,9 +3494,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-016
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSetBookingFlowConfig
     component: modal
@@ -3580,7 +3560,7 @@ screens:
   name: Domain & Certificate
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -3741,6 +3721,9 @@ screens:
     params:
     - name: domainId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listCustomDomains`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**Verification and release act on one domain**, taken from the row. A release issued against
       a domain nobody can see is a site going dark with no record of who asked.'
     preloaded:
@@ -3753,9 +3736,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-017
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formClaimCustomDomain
     component: modal
@@ -3799,7 +3782,7 @@ screens:
   name: Consent & Legal
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -3857,9 +3840,12 @@ screens:
     emptyNoResults: '`listPolicies` takes no filter. The consent questions (kind, status) and the consent
       records (order, guest, question) do: an empty result names the active filter and offers to clear
       it.'
-    emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `listPolicies` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `TENANT_CONFIGURE`, which `listPolicies` requires to show
+      this screen, and names that permission (the screen''s other reads need `GUEST_VIEW` and say so in
+      their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question. A caller who can see the screen but lacks what an action needs
+      sees that action disabled, naming its permission: `GUEST_MANAGE` for `setConsentPurposes`, `createConsentQuestion`,
+      `updateConsentQuestion`.'
   apis:
   - operationId: listPolicies
     contract: white-label
@@ -3905,9 +3891,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-018
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   layout:
     template: split
     regions:
@@ -3936,7 +3922,6 @@ screens:
         - ConsentPurposeConfig.purpose
         - ConsentPurposeConfig.displayName
         - ConsentPurposeConfig.description
-        - ConsentPurposeConfig.channels
         - ConsentPurposeConfig.noticeVersion
         - ConsentPurposeConfig.isRequiredForService
         - ConsentPurposeConfig.expiresAfterMonths
@@ -3968,16 +3953,10 @@ screens:
         bindsTo: BookingConsentRecord
         columns:
         - BookingConsentRecord.answeredAt
-        - BookingConsentRecord.questionId
         - BookingConsentRecord.questionVersion
         - BookingConsentRecord.answer
         - BookingConsentRecord.scope
         - BookingConsentRecord.personName
-        - BookingConsentRecord.orderId
-        - BookingConsentRecord.answeredBySubjectId
-        - BookingConsentRecord.answeredByPrincipalId
-        - BookingConsentRecord.source
-        - BookingConsentRecord.blocksBooking
         - BookingConsentRecord.supersededAt
         operation: listConsentAnswers
         notes: '**What was asked, at which version, what was answered, for whom, by whom and when** (rev
@@ -4055,8 +4034,14 @@ screens:
     params:
     - name: policyKind
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPolicies`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: questionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listConsentQuestions`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     preloaded:
     - Policy.kind
     - Policy.title
@@ -4138,7 +4123,7 @@ screens:
   name: User Access
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -4231,13 +4216,11 @@ screens:
         label: The selected principal
         bindsTo: Principal
         columns:
-        - Principal.id
         - Principal.username
         - Principal.displayName
         - Principal.isActive
         - Principal.validFrom
         - Principal.validTo
-        - Principal.primaryRoleId
         - Principal.roles
         - Principal.lastLoginAt
         operation: listPrincipals
@@ -4287,9 +4270,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-019
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formUpdatePrincipal
     component: modal
@@ -4892,7 +4875,7 @@ screens:
   name: Cookie, Tracking & Digital Technology Registry
   module: Policy
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '1'
@@ -5087,6 +5070,9 @@ screens:
     params:
     - name: scanRunId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listCookieScans`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -5134,7 +5120,7 @@ screens:
   name: Cookie Banner & Preference Center Designer
   module: Policy
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '1'
@@ -5561,10 +5547,11 @@ screens:
   - id: formSetPrivacyNoticePolicyGovernance
     component: modal
     trigger: Save privacy notice policy governance
-    body: '**Collects what `setPrivacyNoticePolicyGovernance` sends before it is called.** Required: `id`,
-      `policyId`, `documentType`, `status`. Optional: `changeClassification`, `requiresReAcceptance`,
-      `requiresNotification`, `ownerPrincipalId`, `approvedByPrincipalId`, `approvalRequestId`, `approvedAt`,
-      `scopePath`. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setPrivacyNoticePolicyGovernance` sends before it is called.** Required: `policyId`,
+      `documentType`, `status`. Optional: `changeClassification`, `requiresReAcceptance`, `requiresNotification`,
+      `ownerPrincipalId`, `approvedByPrincipalId`, `approvedAt`. Dismissing sends nothing; the screen
+      behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `approvalRequestId`,
+      `id`, `scopePath` (3 October 2026, CHG-SPF-001).'
     bindsTo: PrivacyNoticeGovernance
     confirm:
       label: Save privacy notice policy governance
@@ -5572,7 +5559,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - policyId
       - documentType
       - status
@@ -5581,9 +5567,7 @@ screens:
       - requiresNotification
       - ownerPrincipalId
       - approvedByPrincipalId
-      - approvalRequestId
       - approvedAt
-      - scopePath
     provenance: contract marketing-crm.yaml PUT /privacy-notice-policy
 - id: CMS-029
   name: Minor, Guardian & Age-Based Privacy Configuration
@@ -5889,10 +5873,11 @@ screens:
   - id: formSetPrivacyNoticePolicyGovernance
     component: modal
     trigger: Save privacy notice policy governance
-    body: '**Collects what `setPrivacyNoticePolicyGovernance` sends before it is called.** Required: `id`,
-      `policyId`, `documentType`, `status`. Optional: `changeClassification`, `requiresReAcceptance`,
-      `requiresNotification`, `ownerPrincipalId`, `approvedByPrincipalId`, `approvalRequestId`, `approvedAt`,
-      `scopePath`. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setPrivacyNoticePolicyGovernance` sends before it is called.** Required: `policyId`,
+      `documentType`, `status`. Optional: `changeClassification`, `requiresReAcceptance`, `requiresNotification`,
+      `ownerPrincipalId`, `approvedByPrincipalId`, `approvedAt`. Dismissing sends nothing; the screen
+      behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `approvalRequestId`,
+      `id`, `scopePath` (3 October 2026, CHG-SPF-001).'
     bindsTo: PrivacyNoticeGovernance
     confirm:
       label: Save privacy notice policy governance
@@ -5900,7 +5885,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - policyId
       - documentType
       - status
@@ -5909,9 +5893,7 @@ screens:
       - requiresNotification
       - ownerPrincipalId
       - approvedByPrincipalId
-      - approvalRequestId
       - approvedAt
-      - scopePath
     provenance: contract marketing-crm.yaml PUT /privacy-notice-policy
 - id: CMS-031
   name: Privacy Operations Command Center
@@ -8894,16 +8876,10 @@ screens:
         label: Every participant waiver status
         columns:
         - ParticipantWaiverStatusTrackingView.participant
-        - ParticipantWaiverStatusTrackingView.participantId
-        - ParticipantWaiverStatusTrackingView.customerPurchaser
         - ParticipantWaiverStatusTrackingView.booking
         - ParticipantWaiverStatusTrackingView.ticket
-        - ParticipantWaiverStatusTrackingView.product
-        - ParticipantWaiverStatusTrackingView.event
         - ParticipantWaiverStatusTrackingView.visitDate
         - ParticipantWaiverStatusTrackingView.ageCategory
-        - ParticipantWaiverStatusTrackingView.group
-        - ParticipantWaiverStatusTrackingView.waiverRequirements
         - ParticipantWaiverStatusTrackingView.completionStatus
         bindsTo: ParticipantWaiverStatusTrackingView
         operation: listParticipantWaiverStatus
@@ -8916,16 +8892,12 @@ screens:
         bindsTo: ParticipantWaiverStatusTrackingView
         columns:
         - ParticipantWaiverStatusTrackingView.participant
-        - ParticipantWaiverStatusTrackingView.participantId
         - ParticipantWaiverStatusTrackingView.customerPurchaser
         - ParticipantWaiverStatusTrackingView.booking
         - ParticipantWaiverStatusTrackingView.ticket
         - ParticipantWaiverStatusTrackingView.product
-        - ParticipantWaiverStatusTrackingView.event
         - ParticipantWaiverStatusTrackingView.visitDate
         - ParticipantWaiverStatusTrackingView.ageCategory
-        - ParticipantWaiverStatusTrackingView.group
-        - ParticipantWaiverStatusTrackingView.waiverRequirements
         - ParticipantWaiverStatusTrackingView.completionStatus
         notes: null
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 28 §Display
@@ -10297,8 +10269,14 @@ screens:
     params:
     - name: assetId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createUpload`;
+        a link or an edge that holds one opens it instead.'
     - name: uploadId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createUpload`;
+        a link or an edge that holds one opens it instead.'
 - id: CMS-064
   name: Folder, Collection & Workspace Management
   module: Media Library
@@ -10605,6 +10583,10 @@ screens:
     params:
     - name: assetId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `setMediaAssetTags`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
 - id: CMS-067
   name: Advanced Search & Discovery
   module: Media Library
@@ -10829,8 +10811,14 @@ screens:
     params:
     - name: assetId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getMediaDistribution`;
+        an edge that holds one may still carry it to open on that record.'
     - name: mediaId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getMediaAsset` takes
+        the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-068
@@ -11398,6 +11386,10 @@ screens:
     params:
     - name: assetId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `analyseMediaAsset`,
+        `setMediaAssetTags` take the id from the record the user acts on, and an edge or link that holds
+        one only pre-selects it.'
 - id: CMS-073
   name: Semantic & Natural-Language Asset Search
   module: Media Library
@@ -11770,6 +11762,10 @@ screens:
     params:
     - name: mediaId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `deleteMediaAsset`,
+        `updateMediaAsset` take the id from the record the user acts on, and an edge or link that holds
+        one only pre-selects it.'
 - id: CMS-076
   name: Asset Version Control & Revision History
   module: Media Library
@@ -11867,8 +11863,16 @@ screens:
     params:
     - name: assetId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `listMediaAssetVersions`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: mediaId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `replaceMediaAsset`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
 - id: CMS-077
   name: Version Comparison & Replacement Impact
   module: Media Library
@@ -11948,6 +11952,10 @@ screens:
     params:
     - name: assetId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `listMediaAssetVersions`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
 - id: CMS-078
   name: Transformation & Rendition Management
   module: Media Library
@@ -12036,6 +12044,10 @@ screens:
     params:
     - name: assetId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `listMediaRenditions`,
+        `requestMediaRendition` take the id from the record the user acts on, and an edge or link that
+        holds one only pre-selects it.'
 - id: CMS-079
   name: Rendition Processing & Delivery Readiness
   module: Media Library
@@ -12138,6 +12150,10 @@ screens:
     params:
     - name: assetId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `listMediaRenditions`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
 - id: CMS-080
   name: AI Quality, Intelligence Review & Recommendations
   module: Media Library
@@ -12566,6 +12582,10 @@ screens:
     params:
     - name: mediaId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `updateMediaAsset`,
+        `getMediaAsset` take the id from the record the user acts on, and an edge or link that holds one
+        only pre-selects it.'
 - id: CMS-083
   name: Rights, License & Usage Policy Management
   module: Media Library
@@ -14018,6 +14038,10 @@ screens:
     params:
     - name: mediaId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `replaceMediaAsset`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
 - id: CMS-096
   name: Fallback, Expiry & Distribution Continuity
   module: Media Library
@@ -14494,7 +14518,7 @@ screens:
   name: Help Me Choose
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   implementation:
     app: venue-management-web
     route: /white-label/help-me-choose
@@ -14658,9 +14682,12 @@ screens:
       that once the venue''s products are uploaded the assistant proposes set-ups here as drafts for review.'
     emptyNoResults: The source or status filter matched nothing and the venue's other set-ups are still
       there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `listGuidedChoices` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `TENANT_CONFIGURE`, which `listGuidedChoices` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `suggestGuidedChoice`,
+      `getGuidedChoiceSuggestion`; `PRODUCT_VIEW` for `listProducts`, `listProductCategories`, `listEvents`;
+      `TENANT_PUBLISH` for `publishGuidedChoice`, `unpublishGuidedChoice`.'
   apis:
   - operationId: listGuidedChoices
     contract: white-label
@@ -14729,8 +14756,15 @@ screens:
       from: session
     - name: guidedChoiceId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listGuidedChoices`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: suggestionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getGuidedChoiceSuggestion`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     coldEntry: Resolves the venue from the session and opens on the suggestions awaiting review, or on
       the list when there are none.
   wireframe:
@@ -15303,8 +15337,13 @@ screens:
       step.'
     emptyNoResults: The flow-type filter matched nothing and the venue's other flows are still there.
       Names the filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `listBookingFlows` requires,
-      and names that permission. **Never an empty table** — that reads as *there are no flows*.
+    emptyNoAccess: 'Shown when the caller lacks `TENANT_CONFIGURE`, which `listBookingFlows` requires
+      to show this screen, and names that permission (the screen''s other reads need `GUEST_VIEW` and
+      say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question. A caller who can see the screen but lacks what an action
+      needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `updateProduct`,
+      `setProductCategories`; `PRODUCT_VIEW` for `listProducts`, `listProductCategories`; `TENANT_PUBLISH`
+      for `publishTenantConfig`.'
   apis:
   - operationId: listBookingFlows
     contract: white-label
@@ -15382,6 +15421,9 @@ screens:
       optional: true
     - name: productId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listProducts`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: Resolves the venue from the session and opens on the flow list, or on the flow named in
       the link.
   wireframe:
@@ -15581,8 +15623,11 @@ screens:
     emptyFirstRun: '**No build yet.** Shows the checklist first: nothing can be built until the client''s
       store account for the platform is recorded and a version is published.'
     emptyNoResults: No build for the platform picked. Names it and offers the other.
-    emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `listAppBuilds` requires, and
-      names that permission.
+    emptyNoAccess: 'Shown when the caller lacks `TENANT_CONFIGURE`, which `getStoreAccounts` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `createAiConversation`,
+      `sendAiMessage`; `TENANT_PUBLISH` for `requestAppBuild`.'
   apis:
   - operationId: getStoreAccounts
     contract: white-label
@@ -15631,6 +15676,9 @@ screens:
       optional: true
     - name: conversationId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createAiConversation`;
+        a link or an edge that holds one opens it instead.'
     coldEntry: Resolves the tenant from the session and opens on the checklist and the newest build.
   wireframe:
     status: notStarted

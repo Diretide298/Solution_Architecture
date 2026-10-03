@@ -1,0 +1,37 @@
+id: CHG-SPF-007
+date: '2026-10-03'
+source: audit
+kind: spec
+summary: GST-001 and WEB-001 stop calling listAnalyticsProviders; a guest reads the analytics providers from the
+  published tenant config.
+decision:
+  what: Remove listAnalyticsProviders (TENANT_CONFIGURE) from GST-001 and WEB-001.
+  by: Chinmay
+  date: '2026-10-03'
+why: Chinmay's answers of 3 October to the Block A audit (CHG-AUD-001), section 'Pattern 4 answers (guest screens
+  calling staff-permission operations).').
+keys_touched:
+  screens:
+  - GST-001
+  - WEB-001
+  operations:
+  - listAnalyticsProviders
+  - getPublishedTenantConfig
+  files:
+  - tools/applied/screen-decisions-3-october.py
+  - tools/check-screen-patterns.py
+root_class: A23 AUTH-SCOPE
+tickets:
+  started: []
+  unstarted:
+  - APP-MOB-GST-001
+  - APP-WEB-WEB-001
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-patterns.py
+status: closed
+closed_by_commit: 1303d854
+notes: Batch SPF (spec-screens), 3 October 2026. check-screen-patterns (DEC) fails if the screen drifts back.

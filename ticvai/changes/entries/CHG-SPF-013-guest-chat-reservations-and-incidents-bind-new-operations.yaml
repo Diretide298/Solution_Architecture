@@ -1,0 +1,59 @@
+id: CHG-SPF-013
+date: '2026-10-03'
+source: audit
+kind: spec
+summary: The guest chat screens send with sendGuestConversationMessage and stream the assistant's answers; GST-070 lists
+  the guest's own reservations and the bookable restaurants; EMP-026 uploads photos and records a person involved.
+decision:
+  what: 'Bind, by their agreed names, the operations other agents add for Chinmay''s 3 October answers: GST-031, GST-032
+    and WEB-044 replace sendConversationMessage (CASE_MANAGE) with sendGuestConversationMessage and say the answers stream
+    (server-sent events: tokens, then sources and any proposed action; the full message stored); GST-070 binds
+    listMyTableReservations (self-scoped) and listBookableOutlets (published); EMP-026 binds uploadIncidentMedia, and
+    addIncidentPerson with an optional guest lookup (searchGuests), stored as a PII subject under the consent rules.'
+  by: Chinmay
+  date: '2026-10-03'
+why: Chinmay's answers of 3 October to the Block A audit (CHG-AUD-001), sections 'Pattern 4' (Group 4, AI and chat),
+  'Block A audit business rules' (AI concierge streams answers) and the questions answered as recommended (GST-070
+  reservations, EMP-026 incident form). The audit found GST-032 and WEB-044 calling a staff operation and GST-070 and
+  EMP-026 missing what their forms needed.
+keys_touched:
+  screens:
+  - GST-031
+  - GST-032
+  - WEB-044
+  - GST-070
+  - EMP-026
+  operations:
+  - sendConversationMessage
+  - sendGuestConversationMessage
+  - sendAiMessage
+  - listMyTableReservations
+  - listBookableOutlets
+  - uploadIncidentMedia
+  - addIncidentPerson
+  - searchGuests
+  files:
+  - tools/applied/screen-decisions-3-october.py
+  - tools/check-screen-patterns.py
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - APP-STAFF-EMP-026
+  - APP-MOB-GST-031
+  - APP-MOB-GST-032
+  - APP-MOB-GST-070
+  - APP-WEB-WEB-044
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-patterns.py
+status: open
+notes: 'Batch SPF (spec-screens), 3 October 2026, commit cf7cb692. Open until the operations exist: sendGuestConversationMessage
+  comes from the guest-contracts branch, listMyTableReservations, listBookableOutlets, uploadIncidentMedia and
+  addIncidentPerson from the rules branch (or their equivalents, renamed here when they land). Until those merge,
+  check-screens reports the five as unknown operations on these screens; merge cf7cb692 after them, then close this
+  entry on the merge. The contract names assumed: marketing-crm for sendGuestConversationMessage, fnb for the two
+  reservation reads, maintenance for the two incident writes. check-screen-patterns (DEC) fails if a screen drifts back.'

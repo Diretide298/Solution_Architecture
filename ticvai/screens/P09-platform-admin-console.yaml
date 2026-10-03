@@ -740,12 +740,9 @@ screens:
         - Tenant.code
         - Tenant.name
         - Tenant.status
-        - Tenant.suspensionMode
-        - Tenant.suspensionReason
         - Tenant.planName
         - Tenant.cellCount
         - Tenant.venueCount
-        - Tenant.billingEmail
         operation: listTenants
         provenance: contract subscription.yaml GET /tenants
       - kind: dataTable
@@ -754,13 +751,10 @@ screens:
         columns:
         - Cell.name
         - Cell.kind
-        - Cell.isReachable
         - Cell.lastContactAt
         - Cell.licenceExpiresAt
-        - Cell.participatesInCrossCell
         - Cell.regionName
         - Cell.countryCode
-        - Cell.tier
         operation: listTenantCells
         provenance: contract subscription.yaml GET /tenants/{tenantId}/cells
     - name: contextPanel
@@ -770,19 +764,11 @@ screens:
         label: The selected tenant
         bindsTo: Tenant
         columns:
-        - Tenant.id
         - Tenant.code
         - Tenant.name
         - Tenant.status
         - Tenant.suspensionMode
-        - Tenant.suspensionReason
         - Tenant.suspensionEffectiveAt
-        - Tenant.suspensionNoticeMessage
-        - Tenant.terminationScheduledAt
-        - Tenant.terminationRetentionUntil
-        - Tenant.terminationReason
-        - Tenant.terminationRequestedByPrincipalId
-        - Tenant.planId
         - Tenant.planName
         - Tenant.cellCount
         - Tenant.venueCount
@@ -792,19 +778,11 @@ screens:
         label: The tenant
         bindsTo: TenantDetail
         columns:
-        - TenantDetail.id
         - TenantDetail.code
         - TenantDetail.name
         - TenantDetail.status
         - TenantDetail.suspensionMode
-        - TenantDetail.suspensionReason
         - TenantDetail.suspensionEffectiveAt
-        - TenantDetail.suspensionNoticeMessage
-        - TenantDetail.terminationScheduledAt
-        - TenantDetail.terminationRetentionUntil
-        - TenantDetail.terminationReason
-        - TenantDetail.terminationRequestedByPrincipalId
-        - TenantDetail.planId
         - TenantDetail.planName
         - TenantDetail.cellCount
         - TenantDetail.venueCount
@@ -877,9 +855,9 @@ screens:
     note: '**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not
       starting from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: getSsoConfig
     removed: true
@@ -891,7 +869,7 @@ screens:
   name: Cross-Tenant Health Dashboard
   module: Overview & Health
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C95
   implementation:
     app: ticvai-web
@@ -983,22 +961,14 @@ screens:
         label: The cell
         bindsTo: CellDetail
         columns:
-        - CellDetail.id
         - CellDetail.name
         - CellDetail.kind
-        - CellDetail.clusterId
-        - CellDetail.isReachable
         - CellDetail.lastContactAt
         - CellDetail.licenceExpiresAt
-        - CellDetail.participatesInCrossCell
-        - CellDetail.regionId
         - CellDetail.regionName
         - CellDetail.countryCode
         - CellDetail.tier
         - CellDetail.status
-        - CellDetail.cloudProvider
-        - CellDetail.cloudRegion
-        - CellDetail.apiEndpoint
         operation: getCell
         provenance: contract subscription.yaml GET /cells/{cellId}
       - kind: detailPanel
@@ -1084,9 +1054,11 @@ screens:
       operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: 'Never shown: `listCellJobs` takes no filter, so an empty list is always the first-run
       state above.'
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellHealth` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellHealth` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_CELL_MANAGE`
+      for `cancelDecommission`, `decommissionCell`, `updateCellTier`.'
   apis:
   - operationId: getCellHealth
     contract: subscription
@@ -1144,9 +1116,9 @@ screens:
     note: '**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not
       starting from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: getCrossRegionEntitlement
     removed: true
@@ -1304,17 +1276,10 @@ screens:
         label: Every AI interaction
         bindsTo: AiInteraction
         columns:
-        - AiInteraction.id
-        - AiInteraction.conversationId
-        - AiInteraction.principalId
         - AiInteraction.audience
-        - AiInteraction.subjectId
-        - AiInteraction.billableToTenantId
-        - AiInteraction.scopePath
         - AiInteraction.capability
         - AiInteraction.prompt
         - AiInteraction.response
-        - AiInteraction.sources
         - AiInteraction.outcome
         operation: listAiInteractions
         provenance: contract ai.yaml GET /interactions
@@ -1329,13 +1294,7 @@ screens:
         label: The selected AI interaction
         bindsTo: AiInteraction
         columns:
-        - AiInteraction.id
-        - AiInteraction.conversationId
-        - AiInteraction.principalId
         - AiInteraction.audience
-        - AiInteraction.subjectId
-        - AiInteraction.billableToTenantId
-        - AiInteraction.scopePath
         - AiInteraction.capability
         - AiInteraction.prompt
         - AiInteraction.response
@@ -1343,8 +1302,6 @@ screens:
         - AiInteraction.outcome
         - AiInteraction.refusalReason
         - AiInteraction.provider
-        - AiInteraction.model
-        - AiInteraction.promptTokens
         operation: listAiInteractions
         provenance: contract ai.yaml GET /interactions
   states:
@@ -1354,9 +1311,12 @@ screens:
       operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: Nothing matches the filter on principalId, outcome, from and the platform audit
       log are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `AI_AUDIT_VIEW`, which `listAiInteractions` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `AI_AUDIT_VIEW`, which `listAiInteractions` requires
+      to show this screen, and names that permission (the screen''s other reads need `AUDIT_VIEW`, `PLATFORM_TENANT_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for
+      `listOwnPlatformStaffGrants`, `openPlatformStaffGrant`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
       (`openPlatformStaffGrant`: reason, permissions `AI_AUDIT_VIEW`, `AUDIT_VIEW`, expiry). The same
@@ -1402,6 +1362,10 @@ screens:
     params:
     - name: decisionRecordId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listAiInteractions` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -1409,9 +1373,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-004
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formOpenPlatformStaffGrant
     component: modal
@@ -1554,12 +1518,9 @@ screens:
         - Tenant.code
         - Tenant.name
         - Tenant.status
-        - Tenant.suspensionMode
-        - Tenant.suspensionReason
         - Tenant.planName
         - Tenant.cellCount
         - Tenant.venueCount
-        - Tenant.billingEmail
         operation: listTenants
         provenance: contract subscription.yaml GET /tenants
       - kind: dataTable
@@ -1568,13 +1529,10 @@ screens:
         columns:
         - Cell.name
         - Cell.kind
-        - Cell.isReachable
         - Cell.lastContactAt
         - Cell.licenceExpiresAt
-        - Cell.participatesInCrossCell
         - Cell.regionName
         - Cell.countryCode
-        - Cell.tier
         operation: listTenantCells
         provenance: contract subscription.yaml GET /tenants/{tenantId}/cells
     - name: contextPanel
@@ -1584,19 +1542,11 @@ screens:
         label: The selected tenant
         bindsTo: Tenant
         columns:
-        - Tenant.id
         - Tenant.code
         - Tenant.name
         - Tenant.status
         - Tenant.suspensionMode
-        - Tenant.suspensionReason
         - Tenant.suspensionEffectiveAt
-        - Tenant.suspensionNoticeMessage
-        - Tenant.terminationScheduledAt
-        - Tenant.terminationRetentionUntil
-        - Tenant.terminationReason
-        - Tenant.terminationRequestedByPrincipalId
-        - Tenant.planId
         - Tenant.planName
         - Tenant.cellCount
         - Tenant.venueCount
@@ -1606,36 +1556,25 @@ screens:
         label: The SSO provider config
         bindsTo: SsoProviderConfig
         columns:
-        - SsoProviderConfig.id
         - SsoProviderConfig.displayName
         - SsoProviderConfig.protocol
         - SsoProviderConfig.metadataUrl
         - SsoProviderConfig.issuer
-        - SsoProviderConfig.clientId
         - SsoProviderConfig.clientSecretRef
         - SsoProviderConfig.groupMappings
         - SsoProviderConfig.autoProvisionPrincipals
         - SsoProviderConfig.isEnforced
-        - SsoProviderConfig.isActive
         operation: getSsoConfig
         provenance: contract identity.yaml GET /tenants/sso-config
       - kind: detailPanel
         label: The tenant
         bindsTo: TenantDetail
         columns:
-        - TenantDetail.id
         - TenantDetail.code
         - TenantDetail.name
         - TenantDetail.status
         - TenantDetail.suspensionMode
-        - TenantDetail.suspensionReason
         - TenantDetail.suspensionEffectiveAt
-        - TenantDetail.suspensionNoticeMessage
-        - TenantDetail.terminationScheduledAt
-        - TenantDetail.terminationRetentionUntil
-        - TenantDetail.terminationReason
-        - TenantDetail.terminationRequestedByPrincipalId
-        - TenantDetail.planId
         - TenantDetail.planName
         - TenantDetail.cellCount
         - TenantDetail.venueCount
@@ -1848,9 +1787,14 @@ screens:
       a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on status, planId and the tenant are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires
+      to show this screen, and names that permission (the screen''s other reads need `PLATFORM_CELL_VIEW`,
+      `USER_MANAGE` and say so in their own panels). **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_CELL_MANAGE`
+      for `provisionCell`; `PLATFORM_TENANT_ACCESS` for `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`;
+      `PLATFORM_TENANT_MANAGE` for `addLicenceAddOn`, `createTenant`, `reactivateTenant`, `removeLicenceAddOn`
+      and 2 more; `PLATFORM_TENANT_TERMINATE` for `terminateTenant`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
       (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant
@@ -1958,9 +1902,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-005
-  apisNote: Rebuilt 9 September 2026 from the 15 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 15 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the generic list template
     ("Find the right one quickly, and act on it without opening it").'
 - id: ADM-006
@@ -2086,12 +2030,9 @@ screens:
         - Tenant.code
         - Tenant.name
         - Tenant.status
-        - Tenant.suspensionMode
-        - Tenant.suspensionReason
         - Tenant.planName
         - Tenant.cellCount
         - Tenant.venueCount
-        - Tenant.billingEmail
         operation: listTenants
         provenance: contract subscription.yaml GET /tenants
       - kind: dataTable
@@ -2100,13 +2041,10 @@ screens:
         columns:
         - Cell.name
         - Cell.kind
-        - Cell.isReachable
         - Cell.lastContactAt
         - Cell.licenceExpiresAt
-        - Cell.participatesInCrossCell
         - Cell.regionName
         - Cell.countryCode
-        - Cell.tier
         operation: listTenantCells
         provenance: contract subscription.yaml GET /tenants/{tenantId}/cells
       - kind: dataTable
@@ -2128,19 +2066,11 @@ screens:
         label: The selected tenant
         bindsTo: Tenant
         columns:
-        - Tenant.id
         - Tenant.code
         - Tenant.name
         - Tenant.status
         - Tenant.suspensionMode
-        - Tenant.suspensionReason
         - Tenant.suspensionEffectiveAt
-        - Tenant.suspensionNoticeMessage
-        - Tenant.terminationScheduledAt
-        - Tenant.terminationRetentionUntil
-        - Tenant.terminationReason
-        - Tenant.terminationRequestedByPrincipalId
-        - Tenant.planId
         - Tenant.planName
         - Tenant.cellCount
         - Tenant.venueCount
@@ -2158,19 +2088,11 @@ screens:
         label: The tenant
         bindsTo: TenantDetail
         columns:
-        - TenantDetail.id
         - TenantDetail.code
         - TenantDetail.name
         - TenantDetail.status
         - TenantDetail.suspensionMode
-        - TenantDetail.suspensionReason
         - TenantDetail.suspensionEffectiveAt
-        - TenantDetail.suspensionNoticeMessage
-        - TenantDetail.terminationScheduledAt
-        - TenantDetail.terminationRetentionUntil
-        - TenantDetail.terminationReason
-        - TenantDetail.terminationRequestedByPrincipalId
-        - TenantDetail.planId
         - TenantDetail.planName
         - TenantDetail.cellCount
         - TenantDetail.venueCount
@@ -2203,9 +2125,13 @@ screens:
       a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on status, planId and the tenant hierarchy are still
       there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires
+      to show this screen, and names that permission (the screen''s other reads need `PLATFORM_CELL_VIEW`,
+      `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS`
+      for `listOwnPlatformStaffGrants`, `openPlatformStaffGrant`; `PLATFORM_TENANT_MANAGE` for `updateTenant`;
+      `SCOPE_MANAGE` for `createOrgUnit`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
       (`openPlatformStaffGrant`: reason, permissions `SCOPE_MANAGE`, `SCOPE_VIEW`, expiry). The same
@@ -2273,9 +2199,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-006
-  apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formUpdateTenant
     component: modal
@@ -2421,13 +2347,10 @@ screens:
         columns:
         - Cell.name
         - Cell.kind
-        - Cell.isReachable
         - Cell.lastContactAt
         - Cell.licenceExpiresAt
-        - Cell.participatesInCrossCell
         - Cell.regionName
         - Cell.countryCode
-        - Cell.tier
         operation: listTenantCells
         provenance: contract subscription.yaml GET /tenants/{tenantId}/cells
       - kind: dataTable
@@ -2437,13 +2360,9 @@ screens:
         - Tenant.code
         - Tenant.name
         - Tenant.status
-        - Tenant.suspensionMode
-        - Tenant.suspensionReason
         - Tenant.suspensionEffectiveAt
-        - Tenant.suspensionNoticeMessage
         - Tenant.terminationScheduledAt
         - Tenant.terminationRetentionUntil
-        - Tenant.terminationReason
         operation: listTenants
         provenance: contract subscription.yaml GET /tenants
       - kind: confirmDialog
@@ -2465,22 +2384,14 @@ screens:
         label: The selected cell
         bindsTo: Cell
         columns:
-        - Cell.id
         - Cell.name
         - Cell.kind
-        - Cell.clusterId
-        - Cell.isReachable
         - Cell.lastContactAt
         - Cell.licenceExpiresAt
-        - Cell.participatesInCrossCell
-        - Cell.regionId
         - Cell.regionName
         - Cell.countryCode
         - Cell.tier
         - Cell.status
-        - Cell.cloudProvider
-        - Cell.cloudRegion
-        - Cell.apiEndpoint
         operation: listTenantCells
         provenance: contract subscription.yaml GET /tenants/{tenantId}/cells
       - kind: detailPanel
@@ -2510,19 +2421,11 @@ screens:
         label: The tenant
         bindsTo: TenantDetail
         columns:
-        - TenantDetail.id
         - TenantDetail.code
         - TenantDetail.name
         - TenantDetail.status
         - TenantDetail.suspensionMode
-        - TenantDetail.suspensionReason
         - TenantDetail.suspensionEffectiveAt
-        - TenantDetail.suspensionNoticeMessage
-        - TenantDetail.terminationScheduledAt
-        - TenantDetail.terminationRetentionUntil
-        - TenantDetail.terminationReason
-        - TenantDetail.terminationRequestedByPrincipalId
-        - TenantDetail.planId
         - TenantDetail.planName
         - TenantDetail.cellCount
         - TenantDetail.venueCount
@@ -2583,9 +2486,12 @@ screens:
     emptyFirstRun: No module feature entitlement yet. Offers Add licence add on (`addLicenceAddOn`).
     emptyNoResults: 'Never shown: `listTenantCells` takes no filter, so an empty list is always the
       first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getTenantLicences` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getTenantLicences` requires
+      to show this screen, and names that permission (the screen''s other reads need `PLATFORM_CELL_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_MANAGE` for
+      `addLicenceAddOn`, `removeLicenceAddOn`.'
   apis:
   - operationId: getTenantLicences
     contract: subscription
@@ -2638,9 +2544,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-007
-  apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: getSsoConfig
     removed: true
@@ -2719,13 +2625,8 @@ screens:
         - Plan.name
         - Plan.description
         - Plan.cellTier
-        - Plan.licensedModules
-        - Plan.limits
         - Plan.basePrice
         - Plan.billingPeriod
-        - Plan.includesBrandedApp
-        - Plan.includedAiTokens
-        - Plan.isActive
         operation: listPlans
         provenance: contract subscription.yaml GET /plans
       - kind: dataTable
@@ -2733,12 +2634,9 @@ screens:
         bindsTo: SubscriptionInvoice
         columns:
         - SubscriptionInvoice.invoiceNumber
-        - SubscriptionInvoice.periodStart
-        - SubscriptionInvoice.periodEnd
         - SubscriptionInvoice.status
         - SubscriptionInvoice.subtotal
         - SubscriptionInvoice.taxAmount
-        - SubscriptionInvoice.total
         - SubscriptionInvoice.issuedAt
         - SubscriptionInvoice.dueAt
         operation: listSubscriptionInvoices
@@ -2749,13 +2647,10 @@ screens:
         columns:
         - Cell.name
         - Cell.kind
-        - Cell.isReachable
         - Cell.lastContactAt
         - Cell.licenceExpiresAt
-        - Cell.participatesInCrossCell
         - Cell.regionName
         - Cell.countryCode
-        - Cell.tier
         operation: listTenantCells
         provenance: contract subscription.yaml GET /tenants/{tenantId}/cells
       - kind: dataTable
@@ -2765,13 +2660,9 @@ screens:
         - Tenant.code
         - Tenant.name
         - Tenant.status
-        - Tenant.suspensionMode
-        - Tenant.suspensionReason
         - Tenant.suspensionEffectiveAt
-        - Tenant.suspensionNoticeMessage
         - Tenant.terminationScheduledAt
         - Tenant.terminationRetentionUntil
-        - Tenant.terminationReason
         operation: listTenants
         provenance: contract subscription.yaml GET /tenants
     - name: contextPanel
@@ -2786,13 +2677,7 @@ screens:
         - Plan.description
         - Plan.cellTier
         - Plan.licensedModules
-        - Plan.limits
         - Plan.basePrice
-        - Plan.billingPeriod
-        - Plan.includesBrandedApp
-        - Plan.includedAiTokens
-        - Plan.id
-        - Plan.isActive
         - Plan.subscriberCount
         - Plan.publishedAt
         operation: getPlan
@@ -2816,19 +2701,11 @@ screens:
         label: The tenant
         bindsTo: TenantDetail
         columns:
-        - TenantDetail.id
         - TenantDetail.code
         - TenantDetail.name
         - TenantDetail.status
         - TenantDetail.suspensionMode
-        - TenantDetail.suspensionReason
         - TenantDetail.suspensionEffectiveAt
-        - TenantDetail.suspensionNoticeMessage
-        - TenantDetail.terminationScheduledAt
-        - TenantDetail.terminationRetentionUntil
-        - TenantDetail.terminationReason
-        - TenantDetail.terminationRequestedByPrincipalId
-        - TenantDetail.planId
         - TenantDetail.planName
         - TenantDetail.cellCount
         - TenantDetail.venueCount
@@ -2889,9 +2766,13 @@ screens:
     emptyFirstRun: No subscription plan yet. Offers Create plan (`createPlan`).
     emptyNoResults: 'Never shown: `listPlans` takes no filter, so an empty list is always the first-run
       state above.'
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listPlans` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listPlans` requires to
+      show this screen, and names that permission (the screen''s other reads need `PLATFORM_BILLING_VIEW`,
+      `PLATFORM_CELL_VIEW` and say so in their own panels). **Never an empty table** — that reads as
+      *there is no data* and sends somebody to support with the wrong question. A caller who can see
+      the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_BILLING_MANAGE`
+      for `generateInvoice`; `PLATFORM_PLAN_MANAGE` for `createPlan`, `createPlanVersion`; `PLATFORM_TENANT_MANAGE`
+      for `setSubscription`.'
   apis:
   - operationId: listPlans
     contract: subscription
@@ -2981,9 +2862,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-008
-  apisNote: Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSetSubscription
     component: modal
@@ -3180,16 +3061,10 @@ screens:
         label: Every subscription invoice
         bindsTo: SubscriptionInvoice
         columns:
-        - SubscriptionInvoice.id
         - SubscriptionInvoice.invoiceNumber
-        - SubscriptionInvoice.periodStart
-        - SubscriptionInvoice.periodEnd
         - SubscriptionInvoice.status
-        - SubscriptionInvoice.lines
         - SubscriptionInvoice.subtotal
         - SubscriptionInvoice.taxAmount
-        - SubscriptionInvoice.total
-        - SubscriptionInvoice.planVersionUsed
         - SubscriptionInvoice.issuedAt
         - SubscriptionInvoice.dueAt
         operation: listSubscriptionInvoices
@@ -3198,18 +3073,12 @@ screens:
         label: Every tenant
         bindsTo: Tenant
         columns:
-        - Tenant.id
         - Tenant.code
         - Tenant.name
         - Tenant.status
-        - Tenant.suspensionMode
-        - Tenant.suspensionReason
         - Tenant.suspensionEffectiveAt
-        - Tenant.suspensionNoticeMessage
         - Tenant.terminationScheduledAt
         - Tenant.terminationRetentionUntil
-        - Tenant.terminationReason
-        - Tenant.terminationRequestedByPrincipalId
         operation: listTenants
         provenance: contract subscription.yaml GET /tenants
     - name: contextPanel
@@ -3219,16 +3088,11 @@ screens:
         label: The selected subscription invoice
         bindsTo: SubscriptionInvoice
         columns:
-        - SubscriptionInvoice.id
         - SubscriptionInvoice.invoiceNumber
-        - SubscriptionInvoice.periodStart
-        - SubscriptionInvoice.periodEnd
         - SubscriptionInvoice.status
-        - SubscriptionInvoice.lines
         - SubscriptionInvoice.subtotal
         - SubscriptionInvoice.taxAmount
         - SubscriptionInvoice.total
-        - SubscriptionInvoice.planVersionUsed
         - SubscriptionInvoice.issuedAt
         - SubscriptionInvoice.dueAt
         - SubscriptionInvoice.paidAt
@@ -3253,19 +3117,11 @@ screens:
         label: The tenant
         bindsTo: TenantDetail
         columns:
-        - TenantDetail.id
         - TenantDetail.code
         - TenantDetail.name
         - TenantDetail.status
         - TenantDetail.suspensionMode
-        - TenantDetail.suspensionReason
         - TenantDetail.suspensionEffectiveAt
-        - TenantDetail.suspensionNoticeMessage
-        - TenantDetail.terminationScheduledAt
-        - TenantDetail.terminationRetentionUntil
-        - TenantDetail.terminationReason
-        - TenantDetail.terminationRequestedByPrincipalId
-        - TenantDetail.planId
         - TenantDetail.planName
         - TenantDetail.cellCount
         - TenantDetail.venueCount
@@ -3302,9 +3158,12 @@ screens:
       from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on status and the tenant billing invoicing are still
       there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_BILLING_VIEW`, which `listSubscriptionInvoices`
-      requires, and names that permission. **Never an empty table** — that reads as *there is no data*
-      and sends somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_BILLING_VIEW`, which `listSubscriptionInvoices`
+      requires to show this screen, and names that permission (the screen''s other reads need `PLATFORM_TENANT_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `PLATFORM_BILLING_MANAGE` for
+      `generateInvoice`.'
   apis:
   - operationId: listSubscriptionInvoices
     contract: subscription
@@ -3356,9 +3215,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-009
-  apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formGenerateInvoice
     component: modal
@@ -3454,13 +3313,10 @@ screens:
         columns:
         - Cell.name
         - Cell.kind
-        - Cell.isReachable
         - Cell.lastContactAt
         - Cell.licenceExpiresAt
-        - Cell.participatesInCrossCell
         - Cell.regionName
         - Cell.countryCode
-        - Cell.tier
         operation: listTenantCells
         provenance: contract subscription.yaml GET /tenants/{tenantId}/cells
       - kind: dataTable
@@ -3470,13 +3326,9 @@ screens:
         - Tenant.code
         - Tenant.name
         - Tenant.status
-        - Tenant.suspensionMode
-        - Tenant.suspensionReason
         - Tenant.suspensionEffectiveAt
-        - Tenant.suspensionNoticeMessage
         - Tenant.terminationScheduledAt
         - Tenant.terminationRetentionUntil
-        - Tenant.terminationReason
         operation: listTenants
         provenance: contract subscription.yaml GET /tenants
     - name: contextPanel
@@ -3486,22 +3338,14 @@ screens:
         label: The selected cell
         bindsTo: Cell
         columns:
-        - Cell.id
         - Cell.name
         - Cell.kind
-        - Cell.clusterId
-        - Cell.isReachable
         - Cell.lastContactAt
         - Cell.licenceExpiresAt
-        - Cell.participatesInCrossCell
-        - Cell.regionId
         - Cell.regionName
         - Cell.countryCode
         - Cell.tier
         - Cell.status
-        - Cell.cloudProvider
-        - Cell.cloudRegion
-        - Cell.apiEndpoint
         operation: listTenantCells
         provenance: contract subscription.yaml GET /tenants/{tenantId}/cells
       - kind: detailPanel
@@ -3516,19 +3360,11 @@ screens:
         label: The tenant
         bindsTo: TenantDetail
         columns:
-        - TenantDetail.id
         - TenantDetail.code
         - TenantDetail.name
         - TenantDetail.status
         - TenantDetail.suspensionMode
-        - TenantDetail.suspensionReason
         - TenantDetail.suspensionEffectiveAt
-        - TenantDetail.suspensionNoticeMessage
-        - TenantDetail.terminationScheduledAt
-        - TenantDetail.terminationRetentionUntil
-        - TenantDetail.terminationReason
-        - TenantDetail.terminationRequestedByPrincipalId
-        - TenantDetail.planId
         - TenantDetail.planName
         - TenantDetail.cellCount
         - TenantDetail.venueCount
@@ -3602,9 +3438,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-010
-  apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: getSsoConfig
     removed: true
@@ -3696,13 +3532,10 @@ screens:
         columns:
         - Cell.name
         - Cell.kind
-        - Cell.isReachable
         - Cell.lastContactAt
         - Cell.licenceExpiresAt
-        - Cell.participatesInCrossCell
         - Cell.regionName
         - Cell.countryCode
-        - Cell.tier
         operation: listTenantCells
         provenance: contract subscription.yaml GET /tenants/{tenantId}/cells
       - kind: dataTable
@@ -3712,13 +3545,9 @@ screens:
         - Tenant.code
         - Tenant.name
         - Tenant.status
-        - Tenant.suspensionMode
-        - Tenant.suspensionReason
         - Tenant.suspensionEffectiveAt
-        - Tenant.suspensionNoticeMessage
         - Tenant.terminationScheduledAt
         - Tenant.terminationRetentionUntil
-        - Tenant.terminationReason
         operation: listTenants
         provenance: contract subscription.yaml GET /tenants
     - name: contextPanel
@@ -3728,22 +3557,14 @@ screens:
         label: The selected cell
         bindsTo: Cell
         columns:
-        - Cell.id
         - Cell.name
         - Cell.kind
-        - Cell.clusterId
-        - Cell.isReachable
         - Cell.lastContactAt
         - Cell.licenceExpiresAt
-        - Cell.participatesInCrossCell
-        - Cell.regionId
         - Cell.regionName
         - Cell.countryCode
         - Cell.tier
         - Cell.status
-        - Cell.cloudProvider
-        - Cell.cloudRegion
-        - Cell.apiEndpoint
         operation: listTenantCells
         provenance: contract subscription.yaml GET /tenants/{tenantId}/cells
       - kind: detailPanel
@@ -3765,19 +3586,11 @@ screens:
         label: The tenant
         bindsTo: TenantDetail
         columns:
-        - TenantDetail.id
         - TenantDetail.code
         - TenantDetail.name
         - TenantDetail.status
         - TenantDetail.suspensionMode
-        - TenantDetail.suspensionReason
         - TenantDetail.suspensionEffectiveAt
-        - TenantDetail.suspensionNoticeMessage
-        - TenantDetail.terminationScheduledAt
-        - TenantDetail.terminationRetentionUntil
-        - TenantDetail.terminationReason
-        - TenantDetail.terminationRequestedByPrincipalId
-        - TenantDetail.planId
         - TenantDetail.planName
         - TenantDetail.cellCount
         - TenantDetail.venueCount
@@ -3869,9 +3682,12 @@ screens:
     emptyFirstRun: No licence seat yet. Offers Add licence add on (`addLicenceAddOn`).
     emptyNoResults: 'Never shown: `listTenantCells` takes no filter, so an empty list is always the
       first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getEntitlementUsage` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getEntitlementUsage`
+      requires to show this screen, and names that permission (the screen''s other reads need `PLATFORM_CELL_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_MANAGE` for
+      `addLicenceAddOn`, `removeLicenceAddOn`.'
   apis:
   - operationId: getEntitlementUsage
     contract: subscription
@@ -3930,9 +3746,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-011
-  apisNote: Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: getSsoConfig
     removed: true
@@ -4024,13 +3840,10 @@ screens:
         columns:
         - Cell.name
         - Cell.kind
-        - Cell.isReachable
         - Cell.lastContactAt
         - Cell.licenceExpiresAt
-        - Cell.participatesInCrossCell
         - Cell.regionName
         - Cell.countryCode
-        - Cell.tier
         operation: listTenantCells
         provenance: contract subscription.yaml GET /tenants/{tenantId}/cells
       - kind: dataTable
@@ -4040,13 +3853,9 @@ screens:
         - Tenant.code
         - Tenant.name
         - Tenant.status
-        - Tenant.suspensionMode
-        - Tenant.suspensionReason
         - Tenant.suspensionEffectiveAt
-        - Tenant.suspensionNoticeMessage
         - Tenant.terminationScheduledAt
         - Tenant.terminationRetentionUntil
-        - Tenant.terminationReason
         operation: listTenants
         provenance: contract subscription.yaml GET /tenants
     - name: contextPanel
@@ -4056,41 +3865,25 @@ screens:
         label: The selected cell
         bindsTo: Cell
         columns:
-        - Cell.id
         - Cell.name
         - Cell.kind
-        - Cell.clusterId
-        - Cell.isReachable
         - Cell.lastContactAt
         - Cell.licenceExpiresAt
-        - Cell.participatesInCrossCell
-        - Cell.regionId
         - Cell.regionName
         - Cell.countryCode
         - Cell.tier
         - Cell.status
-        - Cell.cloudProvider
-        - Cell.cloudRegion
-        - Cell.apiEndpoint
         operation: listTenantCells
         provenance: contract subscription.yaml GET /tenants/{tenantId}/cells
       - kind: detailPanel
         label: The tenant
         bindsTo: TenantDetail
         columns:
-        - TenantDetail.id
         - TenantDetail.code
         - TenantDetail.name
         - TenantDetail.status
         - TenantDetail.suspensionMode
-        - TenantDetail.suspensionReason
         - TenantDetail.suspensionEffectiveAt
-        - TenantDetail.suspensionNoticeMessage
-        - TenantDetail.terminationScheduledAt
-        - TenantDetail.terminationRetentionUntil
-        - TenantDetail.terminationReason
-        - TenantDetail.terminationRequestedByPrincipalId
-        - TenantDetail.planId
         - TenantDetail.planName
         - TenantDetail.cellCount
         - TenantDetail.venueCount
@@ -4140,9 +3933,11 @@ screens:
       no operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: 'Never shown: `listTenantCells` takes no filter, so an empty list is always the
       first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getEntitlementUsage` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getEntitlementUsage`
+      requires to show this screen, and names that permission (the screen''s other reads need `PLATFORM_CELL_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `PLATFORM_CELL_MANAGE` for `provisionCell`.'
   apis:
   - operationId: provisionCell
     contract: subscription
@@ -4192,9 +3987,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-012
-  apisNote: Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formProvisionCell
     component: modal
@@ -4316,22 +4111,14 @@ screens:
         label: The cell
         bindsTo: CellDetail
         columns:
-        - CellDetail.id
         - CellDetail.name
         - CellDetail.kind
-        - CellDetail.clusterId
-        - CellDetail.isReachable
         - CellDetail.lastContactAt
         - CellDetail.licenceExpiresAt
-        - CellDetail.participatesInCrossCell
-        - CellDetail.regionId
         - CellDetail.regionName
         - CellDetail.countryCode
         - CellDetail.tier
         - CellDetail.status
-        - CellDetail.cloudProvider
-        - CellDetail.cloudRegion
-        - CellDetail.apiEndpoint
         operation: getCell
         provenance: contract subscription.yaml GET /cells/{cellId}
       - kind: detailPanel
@@ -4408,9 +4195,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-013
-  apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: cancelDecommission
     removed: true
@@ -4518,22 +4305,14 @@ screens:
         label: The cell
         bindsTo: CellDetail
         columns:
-        - CellDetail.id
         - CellDetail.name
         - CellDetail.kind
-        - CellDetail.clusterId
-        - CellDetail.isReachable
         - CellDetail.lastContactAt
         - CellDetail.licenceExpiresAt
-        - CellDetail.participatesInCrossCell
-        - CellDetail.regionId
         - CellDetail.regionName
         - CellDetail.countryCode
         - CellDetail.tier
         - CellDetail.status
-        - CellDetail.cloudProvider
-        - CellDetail.cloudRegion
-        - CellDetail.apiEndpoint
         operation: getCell
         provenance: contract subscription.yaml GET /cells/{cellId}
       - kind: detailPanel
@@ -4626,9 +4405,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-014
-  apisNote: Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: cancelDecommission
     removed: true
@@ -4770,13 +4549,9 @@ screens:
         - Tenant.code
         - Tenant.name
         - Tenant.status
-        - Tenant.suspensionMode
-        - Tenant.suspensionReason
         - Tenant.suspensionEffectiveAt
-        - Tenant.suspensionNoticeMessage
         - Tenant.terminationScheduledAt
         - Tenant.terminationRetentionUntil
-        - Tenant.terminationReason
         operation: listTenants
         provenance: contract subscription.yaml GET /tenants
       - kind: dataTable
@@ -4835,19 +4610,11 @@ screens:
         label: The tenant
         bindsTo: TenantDetail
         columns:
-        - TenantDetail.id
         - TenantDetail.code
         - TenantDetail.name
         - TenantDetail.status
         - TenantDetail.suspensionMode
-        - TenantDetail.suspensionReason
         - TenantDetail.suspensionEffectiveAt
-        - TenantDetail.suspensionNoticeMessage
-        - TenantDetail.terminationScheduledAt
-        - TenantDetail.terminationRetentionUntil
-        - TenantDetail.terminationReason
-        - TenantDetail.terminationRequestedByPrincipalId
-        - TenantDetail.planId
         - TenantDetail.planName
         - TenantDetail.cellCount
         - TenantDetail.venueCount
@@ -4865,7 +4632,6 @@ screens:
         - ApiUsageSummary.p95LatencyMs
         - ApiUsageSummary.p99LatencyMs
         - ApiUsageSummary.quotaBreaches
-        - ApiUsageSummary.byOperation
         operation: getApiUsage
         provenance: contract public-api.yaml GET /api-usage
       - kind: detailPanel
@@ -4899,9 +4665,13 @@ screens:
       that makes one — and says so rather than showing an empty table.
     emptyNoResults: 'Never shown: nothing on this screen filters its list, so an empty list is always
       the first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getTenantLicences` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getTenantLicences` requires
+      to show this screen, and names that permission (the screen''s other reads need `DEVELOPER_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `DEVELOPER_ADMIN` for `setApiQuota`,
+      `decideProductionAccess`, `setApiAnomalyRule`; `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants`,
+      `openPlatformStaffGrant`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
       (`openPlatformStaffGrant`: reason, permissions `DEVELOPER_ADMIN`, `DEVELOPER_VIEW`, expiry). The
@@ -4977,6 +4747,10 @@ screens:
       from: ADM-002
     - name: requestId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listProductionAccessRequests` and the user picks one; an edge that holds one may still carry
+        it to open on that record.'
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
     preloaded:
     - Cell.id
@@ -4988,16 +4762,17 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-015
-  apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSetApiQuota
     component: modal
     trigger: Save API quota
     body: '**Collects what `setApiQuota` sends before it is called.** Required: `clientId`, `sustainedPerMinute`.
-      Optional: `id`, `burstPerSecond`, `dailyCap`, `perOperationOverrides`, `onBreach`. Dismissing
-      sends nothing; the screen behind is unchanged.'
+      Optional: `burstPerSecond`, `dailyCap`, `perOperationOverrides`, `onBreach`. Dismissing sends
+      nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the
+      contract): `id` (3 October 2026, CHG-SPF-001).'
     bindsTo: ApiQuota
     confirm:
       label: Save API quota
@@ -5007,7 +4782,6 @@ screens:
       discards:
       - clientId
       - sustainedPerMinute
-      - id
       - burstPerSecond
       - dailyCap
       - perOperationOverrides
@@ -5091,7 +4865,7 @@ screens:
   name: White-Label Branding Management
   module: Branding & Localisation
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C57
   implementation:
     app: ticvai-web
@@ -5180,14 +4954,10 @@ screens:
         bindsTo: ConfigVersion
         columns:
         - ConfigVersion.publishedAt
-        - ConfigVersion.publishedByPrincipalId
         - ConfigVersion.publishedByName
         - ConfigVersion.note
         - ConfigVersion.isCurrent
         - ConfigVersion.scheduledFor
-        - ConfigVersion.contentHash
-        - ConfigVersion.pendingBuildTimeChanges
-        - ConfigVersion.scopePath
         operation: listConfigVersions
         provenance: contract white-label.yaml GET /tenant-config/versions
       - kind: publishGate
@@ -5305,9 +5075,12 @@ screens:
     emptyFirstRun: No white-label branding yet. Offers Create preview (`createPreview`).
     emptyNoResults: 'Never shown: `listConfigVersions` takes no filter, so an empty list is always the
       first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `getAppIcons` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires
+      to show this screen, and names that permission (the screen''s other reads need `TENANT_CONFIGURE`,
+      `TENANT_PUBLISH` and say so in their own panels). **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS`
+      for `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
       (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant
@@ -5409,15 +5182,22 @@ screens:
       optional: true
     - name: packageId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): `getSitePackage` follows a package only after
+        this screen has generated one; the screen opens without it.'
     - name: version
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listConfigVersions` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
   wireframe:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-016
-  apisNote: Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formOpenPlatformStaffGrant
     component: modal
@@ -5513,8 +5293,9 @@ screens:
       Optional: `logoDarkAssetRef`, `logoVariant`, `faviconAssetRef`, `splashImageAssetRefs`, `splashDurationSeconds`,
       `splashBackgroundColour`, `showLoadingIndicator`, `introVideoAssetRef`, `introVideoMode`, `showPoweredBy`.
       The same fields as the tenant''s brand kit (CMS-004): logo variant and the intro video; "Powered
-      by TICVAI" is a toggle, on by default (DEC-160). `splashChangeScope` is not sent. Dismissing sends
-      nothing; the screen behind is unchanged.'
+      by TICVAI" is a toggle, on by default (DEC-160). is not sent. Dismissing sends nothing; the screen
+      behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `splashChangeScope`
+      (3 October 2026, CHG-SPF-001).'
     confirm:
       label: Save brand identity
       operation: setBrandIdentity
@@ -5553,7 +5334,7 @@ screens:
   name: Domain & Certificate Management
   module: Branding & Localisation
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C96
   implementation:
     app: ticvai-web
@@ -5679,16 +5460,10 @@ screens:
         - CustomDomain.kind
         - CustomDomain.status
         - CustomDomain.verificationMethod
-        - CustomDomain.verificationRecord
-        - CustomDomain.dnsRecords
-        - CustomDomain.routing
         - CustomDomain.revalidation
-        - CustomDomain.cnameLost
-        - CustomDomain.isPrimary
         - CustomDomain.readiness
         - CustomDomain.certificateExpiresAt
         - CustomDomain.lastCheckedAt
-        - CustomDomain.failureReason
         operation: listCustomDomains
         provenance: contract white-label.yaml GET /tenant-domains
     - name: actionBar
@@ -5724,9 +5499,12 @@ screens:
       operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: 'Never shown: `listCustomDomains` takes no filter, so an empty list is always the
       first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `listCustomDomains` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires
+      to show this screen, and names that permission (the screen''s other reads need `TENANT_CONFIGURE`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for
+      `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
       (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant
@@ -5804,9 +5582,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-017
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formOpenPlatformStaffGrant
     component: modal
@@ -5849,7 +5627,7 @@ screens:
   name: Interface Languages
   module: Branding & Localisation
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C57
   implementation:
     app: ticvai-web
@@ -5952,9 +5730,12 @@ screens:
       no operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: 'Never shown: `listFaqs` takes no filter, so an empty list is always the first-run
       state above.'
-    emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `listFaqs` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires
+      to show this screen, and names that permission (the screen''s other reads need `TENANT_CONFIGURE`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for
+      `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
       (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant
@@ -5986,12 +5767,24 @@ screens:
     params:
     - name: bannerId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): no operation on the screen takes it; a link that
+        carries it only pre-selects the record.'
     - name: pageId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): no operation on the screen takes it; a link that
+        carries it only pre-selects the record.'
     - name: policyKind
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): no operation on the screen takes it; a link that
+        carries it only pre-selects the record.'
     - name: version
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getTenantConfig`;
+        an edge that holds one may still carry it to open on that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -6009,9 +5802,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-018
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formOpenPlatformStaffGrant
     component: modal
@@ -6188,9 +5981,12 @@ screens:
     emptyFirstRun: No global defaults yet. Offers Open access grant (`openPlatformStaffGrant`).
     emptyNoResults: 'Never shown: nothing on this screen filters its list, so an empty list is always
       the first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `TENANT_VIEW`, which `getVenueSettingsDefaults` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `TENANT_VIEW`, which `getVenueSettingsDefaults` requires
+      to show this screen, and names that permission (the screen''s other reads need `PLATFORM_TENANT_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for
+      `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`; `TENANT_CONFIGURE` for `setVenueSettingsDefaults`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
       (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant
@@ -6239,9 +6035,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-019
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formOpenPlatformStaffGrant
     component: modal
@@ -6431,13 +6227,11 @@ screens:
         label: The selected principal
         bindsTo: Principal
         columns:
-        - Principal.id
         - Principal.username
         - Principal.displayName
         - Principal.isActive
         - Principal.validFrom
         - Principal.validTo
-        - Principal.primaryRoleId
         - Principal.roles
         - Principal.lastLoginAt
         operation: getPrincipal
@@ -6460,9 +6254,12 @@ screens:
       a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on scopePath, isActive and the platform user are still
       there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `USER_MANAGE`, which `listPrincipals` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `USER_MANAGE`, which `listPrincipals` requires to show
+      this screen, and names that permission (the screen''s other reads need `PLATFORM_TENANT_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for
+      `listOwnPlatformStaffGrants`, `openPlatformStaffGrant`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
       (`openPlatformStaffGrant`: reason, permissions `USER_MANAGE`, expiry). The same state returns
@@ -6522,9 +6319,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-020
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formCreatePrincipal
     component: modal
@@ -6718,9 +6515,12 @@ screens:
     emptyFirstRun: No platform role yet. Offers Create role (`createRole`).
     emptyNoResults: 'Never shown: `listRoles` takes no filter, so an empty list is always the first-run
       state above.'
-    emptyNoAccess: Shown when the caller lacks `ROLE_MANAGE`, which `listRoles` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ROLE_MANAGE`, which `listRoles` requires to show this
+      screen, and names that permission (the screen''s other reads need `PLATFORM_TENANT_VIEW` and say
+      so in their own panels). **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question. A caller who can see the screen but lacks what an
+      action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants`,
+      `openPlatformStaffGrant`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
       (`openPlatformStaffGrant`: reason, permissions `ROLE_MANAGE`, expiry). The same state returns
@@ -6765,9 +6565,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-021
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formOpenPlatformStaffGrant
     component: modal
@@ -7053,8 +6853,15 @@ screens:
     params:
     - name: challengeId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createMfaChallenge`;
+        a link or an edge that holds one opens it instead.'
     - name: methodId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listMfaMethods` and the user picks one; an edge that holds one may still carry it to open on
+        that record.'
     - name: sessionId
       from: session
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
@@ -7266,9 +7073,11 @@ screens:
       filter that matched nothing.
     emptyNoResults: Nothing matches the filter on status, environment and the release version are still
       there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listReleases` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listReleases` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_RELEASE_MANAGE`
+      for `createRelease`, `withdrawRelease`; `PLATFORM_RELEASE_PROMOTE` for `promoteRelease`, `rejectRelease`.'
   apis:
   - operationId: listReleases
     contract: platform-ops
@@ -7310,6 +7119,10 @@ screens:
     params:
     - name: releaseId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listReleases` and the user picks one; an edge that holds one may still carry it to open on
+        that record.'
     coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
       does not hold that tenant.** A link is not authorisation. If the target is gone the screen says
       so and returns to the directory — **an admin console that silently shows the wrong tenant is worse
@@ -7324,9 +7137,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-022
-  apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the generator template
     ("Find release & version management for this venue"); releases are platform-wide (design-notes correction
     platform-foundation ADM-022).'
@@ -7498,9 +7311,11 @@ screens:
       no operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on status, environment and the staging promotion approval
       are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `getReleaseReadiness`
-      requires, and names that permission. **Never an empty table** — that reads as *there is no data*
-      and sends somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listReleases` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_RELEASE_PROMOTE`
+      for `promoteRelease`, `rejectRelease`.'
   apis:
   - operationId: promoteRelease
     contract: platform-ops
@@ -7528,6 +7343,10 @@ screens:
     params:
     - name: releaseId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listReleases` and the user picks one; an edge that holds one may still carry it to open on
+        that record.'
     coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
       does not hold that tenant.** A link is not authorisation. If the target is gone the screen says
       so and returns to the directory — **an admin console that silently shows the wrong tenant is worse
@@ -7542,9 +7361,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-023
-  apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: createRelease
     removed: true
@@ -7684,9 +7503,11 @@ screens:
       no operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: 'Never shown: `listSupportNotices` takes no filter, so an empty list is always the
       first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices`
+      requires to show this screen, and names that permission. **Never an empty table** — that reads
+      as *there is no data* and sends somebody to support with the wrong question. A caller who can
+      see the screen but lacks what an action needs sees that action disabled, naming its permission:
+      `PLATFORM_RELEASE_MANAGE` for `publishSupportNotice`.'
   apis:
   - operationId: publishSupportNotice
     contract: platform-ops
@@ -7711,17 +7532,18 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-024
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formPublishSupportNotice
     component: modal
     trigger: Publish support notice
     body: '**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`.
-      Optional: `message`, `affectedTenantIds`, `publishedByPrincipalId`, `scopePath`. **Not asked:**
-      `id` is a client UUIDv7 generated silently; `publishedAt` is set by the server (design-note correction,
-      2 October 2026). Dismissing sends nothing; the screen behind is unchanged.'
+      Optional: `message`, `publishedByPrincipalId`, `scopePath`. **Not asked:** `id` is a client UUIDv7
+      generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026).
+      Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it
+      (readOnly in the contract): `affectedTenantIds` (3 October 2026, CHG-SPF-001).'
     bindsTo: SupportNotice
     confirm:
       label: Publish support notice
@@ -7731,7 +7553,6 @@ screens:
       discards:
       - supportEndsAt
       - message
-      - affectedTenantIds
       - publishedByPrincipalId
       - scopePath
     provenance: contract platform-ops.yaml POST /support-notices
@@ -7825,9 +7646,11 @@ screens:
       operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: 'Never shown: `listUpgradeSchedules` takes no filter, so an empty list is always
       the first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listUpgradeSchedules`
-      requires, and names that permission. **Never an empty table** — that reads as *there is no data*
-      and sends somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listUpgradeSchedules`
+      requires to show this screen, and names that permission. **Never an empty table** — that reads
+      as *there is no data* and sends somebody to support with the wrong question. A caller who can
+      see the screen but lacks what an action needs sees that action disabled, naming its permission:
+      `PLATFORM_RELEASE_MANAGE` for `scheduleTenantUpgrade`.'
   apis:
   - operationId: listUpgradeSchedules
     contract: platform-ops
@@ -7848,9 +7671,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-025
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formScheduleTenantUpgrade
     component: modal
@@ -8017,9 +7840,13 @@ screens:
       that makes one; distinct from a filter that matched nothing.
     emptyNoResults: 'Never shown: `listSupportNotices` takes no filter, so an empty list is always the
       first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices`
+      requires to show this screen, and names that permission (the screen''s other reads need `PLATFORM_TENANT_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `DEVELOPER_ADMIN` for `deprecateApiVersion`;
+      `PLATFORM_RELEASE_MANAGE` for `publishSupportNotice`; `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants`,
+      `openPlatformStaffGrant`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
       (`openPlatformStaffGrant`: reason, permissions `DEVELOPER_ADMIN`, expiry). The same state returns
@@ -8061,6 +7888,10 @@ screens:
     params:
     - name: version
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listSupportNotices` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -8077,17 +7908,18 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-026
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formPublishSupportNotice
     component: modal
     trigger: Publish support notice
     body: '**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`.
-      Optional: `message`, `affectedTenantIds`, `publishedByPrincipalId`, `scopePath`. **Not asked:**
-      `id` is a client UUIDv7 generated silently; `publishedAt` is set by the server (design-note correction,
-      2 October 2026). Dismissing sends nothing; the screen behind is unchanged.'
+      Optional: `message`, `publishedByPrincipalId`, `scopePath`. **Not asked:** `id` is a client UUIDv7
+      generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026).
+      Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it
+      (readOnly in the contract): `affectedTenantIds` (3 October 2026, CHG-SPF-001).'
     bindsTo: SupportNotice
     confirm:
       label: Publish support notice
@@ -8097,7 +7929,6 @@ screens:
       discards:
       - supportEndsAt
       - message
-      - affectedTenantIds
       - publishedByPrincipalId
       - scopePath
     provenance: contract platform-ops.yaml POST /support-notices
@@ -8204,11 +8035,8 @@ screens:
         columns:
         - Migration.module
         - Migration.description
-        - Migration.isReversible
         - Migration.rollbackTestedAt
         - Migration.checksum
-        - Migration.estimatedLockMs
-        - Migration.touchesPartitionedTable
         - Migration.appliedCellCount
         - Migration.pendingCellCount
         operation: listMigrations
@@ -8235,22 +8063,14 @@ screens:
         label: The migration run
         bindsTo: MigrationRun
         columns:
-        - MigrationRun.id
-        - MigrationRun.planId
         - MigrationRun.status
-        - MigrationRun.canaryCellId
-        - MigrationRun.canaryTenantId
         - MigrationRun.tenantsTotal
         - MigrationRun.tenantsComplete
         - MigrationRun.tenantsFailed
         - MigrationRun.cellsTotal
-        - MigrationRun.cellsComplete
-        - MigrationRun.cellsFailed
-        - MigrationRun.startedByPrincipalId
         - MigrationRun.startedAt
         - MigrationRun.completedAt
         - MigrationRun.cells
-        - MigrationRun.tenants
         operation: getMigrationRun
         provenance: contract platform-ops.yaml GET /migrations/runs/{runId}
       - kind: detailPanel
@@ -8284,9 +8104,11 @@ screens:
       no operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on appliedTo, pendingOnly and the database migration
       console are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_MIGRATION_VIEW`, which `listMigrations` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_MIGRATION_VIEW`, which `listMigrations` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_MIGRATION_APPLY`
+      for `applyMigration`, `rollbackMigrationRun`.'
   apis:
   - operationId: listMigrations
     contract: platform-ops
@@ -8332,9 +8154,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-027
-  apisNote: Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formPlanMigration
     component: modal
@@ -8476,9 +8298,11 @@ screens:
     emptyFirstRun: No environment registry yet. Offers Register environment (`registerEnvironment`).
     emptyNoResults: 'Never shown: `listEnvironments` takes no filter, so an empty list is always the
       first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listEnvironments` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listEnvironments` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_RELEASE_MANAGE`
+      for `registerEnvironment`.'
   apis:
   - operationId: listEnvironments
     contract: platform-ops
@@ -8499,9 +8323,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-028
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRegisterEnvironment
     component: modal
@@ -8744,6 +8568,9 @@ screens:
       optional: true
     - name: challengeId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createMfaChallenge`;
+        a link or an edge that holds one opens it instead.'
     coldEntry: Opened cold, it starts at Export package; with a package id it opens that package.
   wireframe:
     status: notStarted
@@ -8849,22 +8676,14 @@ screens:
         label: The cell
         bindsTo: CellDetail
         columns:
-        - CellDetail.id
         - CellDetail.name
         - CellDetail.kind
-        - CellDetail.clusterId
-        - CellDetail.isReachable
         - CellDetail.lastContactAt
         - CellDetail.licenceExpiresAt
-        - CellDetail.participatesInCrossCell
-        - CellDetail.regionId
         - CellDetail.regionName
         - CellDetail.countryCode
         - CellDetail.tier
         - CellDetail.status
-        - CellDetail.cloudProvider
-        - CellDetail.cloudRegion
-        - CellDetail.apiEndpoint
         operation: getCell
         provenance: contract subscription.yaml GET /cells/{cellId}
       - kind: detailPanel
@@ -8897,19 +8716,14 @@ screens:
         label: The rollout
         bindsTo: RolloutDetail
         columns:
-        - RolloutDetail.id
-        - RolloutDetail.releaseId
         - RolloutDetail.environment
         - RolloutDetail.status
         - RolloutDetail.cellsTotal
         - RolloutDetail.cellsComplete
         - RolloutDetail.cellsFailed
-        - RolloutDetail.startedByPrincipalId
-        - RolloutDetail.approvedByPrincipalId
         - RolloutDetail.pausedReason
         - RolloutDetail.startedAt
         - RolloutDetail.completedAt
-        - RolloutDetail.cells
         operation: getRollout
         provenance: contract platform-ops.yaml GET /rollouts/{rolloutId}
     - name: actionBar
@@ -8982,9 +8796,12 @@ screens:
       that matched nothing.
     emptyNoResults: 'Never shown: `listCellJobs` takes no filter, so an empty list is always the first-run
       state above.'
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listCellJobs` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listCellJobs` requires
+      to show this screen, and names that permission (the screen''s other reads need `PLATFORM_RELEASE_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `PLATFORM_RELEASE_PROMOTE` for
+      `pauseRollout`, `rollbackRollout`, `startRollout`.'
     rolloutPendingApproval: '**Requested, not moved.** `startRollout` answered 202: the rollout shows
       the stage it has reached, the stage requested and that a `releasePromotion` approval is pending
       with the platform release manager. The requester sees no approve action for their own request
@@ -9049,9 +8866,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-029
-  apisNote: Rebuilt 9 September 2026 from the 12 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 12 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: cancelDecommission
     removed: true
@@ -9187,9 +9004,11 @@ screens:
       no operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: 'Never shown: `listCellJobs` takes no filter, so an empty list is always the first-run
       state above.'
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellCapacity` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellCapacity` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_CELL_MANAGE`
+      for `setScalingPolicy`.'
   apis:
   - operationId: getCellCapacity
     contract: subscription
@@ -9221,9 +9040,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-030
-  apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: cancelDecommission
     removed: true
@@ -9263,7 +9082,7 @@ screens:
   name: Security & Compliance Dashboard
   module: Security & Compliance
   requiresModule: core
-  wave: 3
+  wave: 1
   capability: C97
   implementation:
     app: ticvai-web
@@ -9414,9 +9233,13 @@ screens:
       from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on module, includeArchived and the security compliance
       are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listDashboards` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires
+      to show this screen, and names that permission (the screen''s other reads need `REPORT_VIEW_VENUE`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for
+      `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`; `REPORT_MANAGE` for `createDashboard`,
+      `updateDashboard`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so every tenant action is disabled and the screen offers **Open access grant**
       (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant
@@ -9464,6 +9287,10 @@ screens:
     params:
     - name: dashboardId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listDashboards` and the user picks one; an edge that holds one may still carry it to open on
+        that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -9481,9 +9308,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-031
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formOpenPlatformStaffGrant
     component: modal
@@ -9650,9 +9477,11 @@ screens:
       operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: 'Never shown: `listCellJobs` takes no filter, so an empty list is always the first-run
       state above.'
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellHealth` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listWafRules` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_CELL_MANAGE`
+      for `setWafPolicy`.'
   apis:
   - operationId: listWafRules
     contract: platform-ops
@@ -9666,6 +9495,10 @@ screens:
     params:
     - name: cellId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listWafRules` and the user picks one; an edge that holds one may still carry it to open on
+        that record.'
     coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
       does not hold that tenant.** A link is not authorisation. If the target is gone the screen says
       so and returns to the directory — **an admin console that silently shows the wrong tenant is worse
@@ -9680,9 +9513,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-032
-  apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: cancelDecommission
     removed: true
@@ -9793,22 +9626,14 @@ screens:
         label: The cell
         bindsTo: CellDetail
         columns:
-        - CellDetail.id
         - CellDetail.name
         - CellDetail.kind
-        - CellDetail.clusterId
-        - CellDetail.isReachable
         - CellDetail.lastContactAt
         - CellDetail.licenceExpiresAt
-        - CellDetail.participatesInCrossCell
-        - CellDetail.regionId
         - CellDetail.regionName
         - CellDetail.countryCode
         - CellDetail.tier
         - CellDetail.status
-        - CellDetail.cloudProvider
-        - CellDetail.cloudRegion
-        - CellDetail.apiEndpoint
         operation: getCell
         provenance: contract subscription.yaml GET /cells/{cellId}
       - kind: detailPanel
@@ -9868,9 +9693,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-033
-  apisNote: Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: cancelDecommission
     removed: true
@@ -9991,6 +9816,10 @@ screens:
     params:
     - name: cellId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listArchivalJobs` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
     coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
       does not hold that tenant.** A link is not authorisation. If the target is gone the screen says
       so and returns to the directory — **an admin console that silently shows the wrong tenant is worse
@@ -10005,9 +9834,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-034
-  apisNote: Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: cancelDecommission
     removed: true
@@ -10140,9 +9969,11 @@ screens:
       no operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: 'Never shown: `listSupportNotices` takes no filter, so an empty list is always the
       first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices`
+      requires to show this screen, and names that permission. **Never an empty table** — that reads
+      as *there is no data* and sends somebody to support with the wrong question. A caller who can
+      see the screen but lacks what an action needs sees that action disabled, naming its permission:
+      `PLATFORM_RELEASE_MANAGE` for `publishSupportNotice`.'
   apis:
   - operationId: listSupportNotices
     contract: platform-ops
@@ -10165,17 +9996,18 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-035
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formPublishSupportNotice
     component: modal
     trigger: Publish support notice
     body: '**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`.
-      Optional: `message`, `affectedTenantIds`, `publishedByPrincipalId`, `scopePath`. **Not asked:**
-      `id` is a client UUIDv7 generated silently; `publishedAt` is set by the server (design-note correction,
-      2 October 2026). Dismissing sends nothing; the screen behind is unchanged.'
+      Optional: `message`, `publishedByPrincipalId`, `scopePath`. **Not asked:** `id` is a client UUIDv7
+      generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026).
+      Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it
+      (readOnly in the contract): `affectedTenantIds` (3 October 2026, CHG-SPF-001).'
     bindsTo: SupportNotice
     confirm:
       label: Publish support notice
@@ -10185,7 +10017,6 @@ screens:
       discards:
       - supportEndsAt
       - message
-      - affectedTenantIds
       - publishedByPrincipalId
       - scopePath
     provenance: contract platform-ops.yaml POST /support-notices
@@ -10296,9 +10127,11 @@ screens:
       no operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: 'Never shown: `listSupportNotices` takes no filter, so an empty list is always the
       first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices`
+      requires to show this screen, and names that permission. **Never an empty table** — that reads
+      as *there is no data* and sends somebody to support with the wrong question. A caller who can
+      see the screen but lacks what an action needs sees that action disabled, naming its permission:
+      `PLATFORM_RELEASE_MANAGE` for `publishSupportNotice`.'
   apis:
   - operationId: publishSupportNotice
     contract: platform-ops
@@ -10321,17 +10154,18 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-036
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formPublishSupportNotice
     component: modal
     trigger: Publish support notice
     body: '**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`.
-      Optional: `message`, `affectedTenantIds`, `publishedByPrincipalId`, `scopePath`. **Not asked:**
-      `id` is a client UUIDv7 generated silently; `publishedAt` is set by the server (design-note correction,
-      2 October 2026). Dismissing sends nothing; the screen behind is unchanged.'
+      Optional: `message`, `publishedByPrincipalId`, `scopePath`. **Not asked:** `id` is a client UUIDv7
+      generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026).
+      Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it
+      (readOnly in the contract): `affectedTenantIds` (3 October 2026, CHG-SPF-001).'
     bindsTo: SupportNotice
     confirm:
       label: Publish support notice
@@ -10341,7 +10175,6 @@ screens:
       discards:
       - supportEndsAt
       - message
-      - affectedTenantIds
       - publishedByPrincipalId
       - scopePath
     provenance: contract platform-ops.yaml POST /support-notices
@@ -10476,17 +10309,11 @@ screens:
         bindsTo: AiProvider
         columns:
         - AiProvider.kind
-        - AiProvider.capability
         - AiProvider.model
-        - AiProvider.failoverProviderId
-        - AiProvider.degradeGracefully
         - AiProvider.priority
         - AiProvider.scopeLevel
         - AiProvider.credentialRotatedAt
         - AiProvider.credentialExpiresAt
-        - AiProvider.vendor
-        - AiProvider.credentialHint
-        - AiProvider.compatibility
         operation: listAiProviders
         provenance: contract ai.yaml GET /providers
       - kind: dataTable
@@ -10512,24 +10339,14 @@ screens:
         label: The selected AI provider
         bindsTo: AiProvider
         columns:
-        - AiProvider.id
         - AiProvider.kind
-        - AiProvider.capability
         - AiProvider.model
-        - AiProvider.failoverProviderId
-        - AiProvider.degradeGracefully
         - AiProvider.priority
         - AiProvider.scopeLevel
         - AiProvider.credentialRotatedAt
         - AiProvider.credentialExpiresAt
         - AiProvider.lastVerifiedAt
-        - AiProvider.endpoint
         - AiProvider.residency
-        - AiProvider.maxTokens
-        - AiProvider.vendor
-        - AiProvider.residencyClasses
-        - AiProvider.credentialHint
-        - AiProvider.compatibility
         operation: listAiProviders
         provenance: contract ai.yaml GET /providers
       - kind: detailPanel
@@ -10614,9 +10431,13 @@ screens:
       nothing.
     emptyNoResults: 'Never shown: `listAiProviders` takes no filter, so an empty list is always the
       first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `AI_CONFIGURE`, which `listAiProviders` requires, and
-      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `AI_CONFIGURE`, which `listAiProviders` requires to
+      show this screen, and names that permission (the screen''s other reads need `AI_USE`, `PLATFORM_TENANT_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `AI_APPROVE` for `publishPromptTemplate`;
+      `PLATFORM_AI_MANAGE` for `setAiModel`, `setAiByokEnablement`; `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants`,
+      `openPlatformStaffGrant`; `PLATFORM_TENANT_MANAGE` for `setAiProvider`; `SCOPE_VIEW` for `getRegionSettings`.'
     grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
       into it is open, so the provider list and every action are disabled and the screen offers **Open
       access grant** (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns
@@ -10699,13 +10520,25 @@ screens:
     params:
     - name: providerId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listAiProviders` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
     - name: regionId
       from: navigation
       optional: true
     - name: modelId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listAiProviders` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
     - name: templateKey
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listPromptTemplates` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
     - name: tenantId
       from: session
     coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
@@ -10724,9 +10557,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-037
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formOpenPlatformStaffGrant
     component: modal
@@ -10752,10 +10585,11 @@ screens:
     trigger: Save AI provider
     body: '**Collects what `setAiProvider` sends before it is called.** Required: `kind`, `capability`,
       `priority`, `isActive`. Optional: `id`, `model`, `failoverProviderId`, `degradeGracefully`, `scopeLevel`,
-      `scopePath`, `credentialRef`, `credentialRotatedAt`, `credentialExpiresAt`, `lastVerifiedAt`,
-      `endpoint`, `residency` and 1 more. **Set for the picked tenant**; a `residency` outside what
-      the tenant''s region allows is refused `409 residency-refused` and shown against that field (decided
-      28 September, audit R203). Dismissing sends nothing; the screen behind is unchanged.'
+      `scopePath`, `credentialRef`, `credentialExpiresAt`, `endpoint`, `residency` and 1 more. **Set
+      for the picked tenant**; a `residency` outside what the tenant''s region allows is refused `409
+      residency-refused` and shown against that field (decided 28 September, audit R203). Dismissing
+      sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly
+      in the contract): `credentialRotatedAt`, `lastVerifiedAt` (3 October 2026, CHG-SPF-001).'
     bindsTo: AiProvider
     confirm:
       label: Save AI provider
@@ -10774,9 +10608,7 @@ screens:
       - scopeLevel
       - scopePath
       - credentialRef
-      - credentialRotatedAt
       - credentialExpiresAt
-      - lastVerifiedAt
       - endpoint
       - residency
       - maxTokens
@@ -11330,17 +11162,11 @@ screens:
         label: The selected republish and its progress
         bindsTo: OutboxRepublish
         columns:
-        - OutboxRepublish.id
-        - OutboxRepublish.tenantId
         - OutboxRepublish.from
         - OutboxRepublish.to
-        - OutboxRepublish.eventNames
-        - OutboxRepublish.reason
         - OutboxRepublish.status
         - OutboxRepublish.cursorAt
         - OutboxRepublish.rowsPublished
-        - OutboxRepublish.lastError
-        - OutboxRepublish.requestedBy
         - OutboxRepublish.requestedAt
         - OutboxRepublish.startedAt
         - OutboxRepublish.finishedAt
@@ -11403,9 +11229,11 @@ screens:
       that makes one; distinct from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on consumer, since and the dead letters are still there.
       Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listDeadLetters` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listDeadLetters` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_CELL_MANAGE`
+      for `replayDeadLetter`, `republishOutbox`, `cancelOutboxRepublish`.'
   apis:
   - operationId: listDeadLetters
     contract: platform-ops
@@ -11442,8 +11270,16 @@ screens:
     params:
     - name: deadLetterId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listDeadLetters` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
     - name: republishId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listOutboxRepublishes` and the user picks one; an edge that holds one may still carry it to
+        open on that record.'
     coldEntry: '**The ordinary path is a row on this screen**, and `replayDeadLetter` takes the id from
       the row the operator chose. A deep link is how an alert reaches one directly; if that id is already
       replayed or gone the screen says so and shows the list, because a replay issued against a row
@@ -11458,11 +11294,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-318
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen. The four outbox republish
-    operations (ADR-0058, amended 1 October) were added on 1 October 2026 and sit here until republish
-    has a screen of its own.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself. The four
+    outbox republish operations (ADR-0058, amended 1 October) were added on 1 October 2026 and sit here
+    until republish has a screen of its own.'
 - id: ADM-369
   name: Commercial Command Center
   module: Tenants & Licensing
@@ -12937,6 +12773,9 @@ screens:
     params:
     - name: challengeId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `startProspectSignup`;
+        a link or an edge that holds one opens it instead.'
 - id: ADM-381
   name: Venue Type & Business Profile
   module: Tenants & Licensing
@@ -14695,6 +14534,10 @@ screens:
     params:
     - name: planId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `createPlanVersion`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
 - id: ADM-399
   name: Recommended Package Overview
   module: Tenants & Licensing
@@ -16080,7 +15923,7 @@ screens:
   name: Payment Method & Settlement Setup
   module: Tenants & Licensing
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '5'
@@ -17672,7 +17515,7 @@ screens:
   name: Module Activation & Dependency Validation
   module: Tenants & Licensing
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '6'
@@ -19705,6 +19548,10 @@ screens:
     params:
     - name: invoiceId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listSubscriptionInvoices` and the user picks one; an edge that holds one may still carry it
+        to open on that record.'
     - name: tenantId
       from: session
 - id: ADM-463
@@ -20248,6 +20095,10 @@ screens:
     params:
     - name: invoiceId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listCreditNotes` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
     - name: tenantId
       from: session
 - id: ADM-468
@@ -21080,7 +20931,9 @@ screens:
     - name: sessionId
       from: session
     - name: venueId
-      from: navigation
+      from: session
+      notes: 'From the session (3 October 2026, CHG-SPF-004): a staff screen works in the venue its
+        sign-in or device is scoped to; nothing navigates to it (the venue-scope rule).'
     - name: tenantId
       from: navigation
       optional: true
@@ -21978,6 +21831,9 @@ screens:
     params:
     - name: decisionKey
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getConfigurationBlueprint`;
+        an edge that holds one may still carry it to open on that record.'
     - name: sessionId
       from: session
     - name: tenantId
@@ -22167,6 +22023,9 @@ screens:
     params:
     - name: decisionKey
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getConfigurationBlueprint`;
+        an edge that holds one may still carry it to open on that record.'
     - name: sessionId
       from: session
     - name: tenantId
@@ -25003,6 +24862,9 @@ screens:
     params:
     - name: decisionKey
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getConfigurationBlueprint`;
+        an edge that holds one may still carry it to open on that record.'
     - name: sessionId
       from: session
     - name: tenantId
@@ -25192,6 +25054,10 @@ screens:
     params:
     - name: actionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listProposedActions` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
     - name: planId
       from: navigation
     - name: tenantId
@@ -26501,6 +26367,10 @@ screens:
     params:
     - name: decisionRecordId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `searchAiDecisions` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -26782,7 +26652,7 @@ screens:
   name: Forecast Configuration & Forecasting Strategy
   module: Analytics
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf
     board: '1'
@@ -27213,6 +27083,10 @@ screens:
       from: navigation
     - name: signalKey
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listForecastSignals` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -27397,6 +27271,10 @@ screens:
     params:
     - name: detectorKey
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `configureAnomalyDetector`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: tenantId
       from: navigation
       optional: true
@@ -28007,7 +27885,7 @@ screens:
   name: Forecast Drivers, Confidence & Explainability
   module: Analytics
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf
     board: '1'
@@ -28422,7 +28300,7 @@ screens:
   name: Forecast Accuracy, Review & Publication Center
   module: AI
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf
     board: '1'
@@ -28503,13 +28381,9 @@ screens:
         columns:
         - AiForecastVersion.versionNumber
         - AiForecastVersion.status
-        - AiForecastVersion.basis
-        - AiForecastVersion.maturity
         - AiForecastVersion.modelVersion
         - AiForecastVersion.dataCutoffAt
         - AiForecastVersion.horizonStart
-        - AiForecastVersion.horizonEnd
-        - AiForecastVersion.qualityChecks
         - AiForecastVersion.publishedAt
         operation: listForecastVersions
         notes: The versions of the picked definition, newest first. The board's example values ("Saturday
@@ -29117,6 +28991,10 @@ screens:
     params:
     - name: detectorKey
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `configureAnomalyDetector`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: tenantId
       from: navigation
       optional: true
@@ -30572,6 +30450,10 @@ screens:
     params:
     - name: requirementId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listOperationalRequirements` and the user picks one; an edge that holds one may still carry
+        it to open on that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -30844,6 +30726,10 @@ screens:
       from: navigation
     - name: releaseId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listAiGovernanceAlerts` and the user picks one; an edge that holds one may still carry it to
+        open on that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -31468,7 +31354,7 @@ screens:
   name: AI Action & Permission Policy Builder
   module: Platform
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: AI_Governance_Reference.pdf
     board: '1'
@@ -31857,6 +31743,10 @@ screens:
     params:
     - name: dataClass
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listDataRetentionSettings` and the user picks one; an edge that holds one may still carry it
+        to open on that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -32248,6 +32138,9 @@ screens:
     params:
     - name: exceptionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createAiPolicyException`;
+        a link or an edge that holds one opens it instead.'
     - name: tenantId
       from: navigation
       optional: true
@@ -32314,7 +32207,7 @@ screens:
   name: AI Policy Testing & Governance Simulation
   module: Platform
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: AI_Governance_Reference.pdf
     board: '1'
@@ -32464,6 +32357,10 @@ screens:
     params:
     - name: versionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listAiGovernancePolicyVersions` and the user picks one; an edge that holds one may still carry
+        it to open on that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -32515,7 +32412,7 @@ screens:
   name: AI Governance Policy Publication & Effective Policy Map
   module: Platform
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: AI_Governance_Reference.pdf
     board: '1'
@@ -32703,6 +32600,10 @@ screens:
     params:
     - name: versionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listAiGovernancePolicyVersions` and the user picks one; an edge that holds one may still carry
+        it to open on that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -33381,6 +33282,10 @@ screens:
     params:
     - name: actionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `decideProposedAction`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: planId
       from: navigation
     - name: tenantId
@@ -33584,6 +33489,10 @@ screens:
     params:
     - name: actionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `decideProposedAction`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: planId
       from: navigation
     - name: tenantId
@@ -33783,6 +33692,9 @@ screens:
     params:
     - name: conversationId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getAiDecisionTrace`;
+        an edge that holds one may still carry it to open on that record.'
     - name: decisionRecordId
       from: navigation
     - name: tenantId
@@ -34512,8 +34424,16 @@ screens:
     params:
     - name: capabilityKey
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listAiCapabilities` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
     - name: decisionRecordId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `searchAiDecisions` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
     - name: planId
       from: navigation
     - name: tenantId
@@ -34748,6 +34668,10 @@ screens:
     params:
     - name: decisionRecordId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `searchAiDecisions` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -34938,6 +34862,10 @@ screens:
       from: navigation
     - name: versionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `simulateAiGovernancePolicy`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: tenantId
       from: navigation
       optional: true
@@ -35385,6 +35313,10 @@ screens:
     params:
     - name: decisionRecordId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `searchAiDecisions` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -35899,6 +35831,10 @@ screens:
     params:
     - name: decisionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `explainRecommendationDecision`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: decisionRecordId
       from: navigation
     - name: tenantId
@@ -37358,6 +37294,10 @@ screens:
     params:
     - name: entryId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listAiRiskRegister` and the user picks one; an edge that holds one may still carry it to open
+        on that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -37536,6 +37476,10 @@ screens:
     params:
     - name: controlKey
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listAiControls` and the user picks one; an edge that holds one may still carry it to open on
+        that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -37748,6 +37692,10 @@ screens:
     params:
     - name: alertId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listAiGovernanceAlerts` and the user picks one; an edge that holds one may still carry it to
+        open on that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -37985,6 +37933,10 @@ screens:
     params:
     - name: alertId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listAiGovernanceAlerts` and the user picks one; an edge that holds one may still carry it to
+        open on that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -38017,7 +37969,7 @@ screens:
   name: AI Quality, Behavior & Governance Drift Monitoring
   module: Platform
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: AI_Governance_Reference.pdf
     board: '4'
@@ -38464,6 +38416,10 @@ screens:
     params:
     - name: alertId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with
+        `listAiGovernanceAlerts` and the user picks one; an edge that holds one may still carry it to
+        open on that record.'
     - name: tenantId
       from: navigation
       optional: true
@@ -38496,7 +38452,7 @@ screens:
   name: AI Incident & Remediation Management
   module: Platform
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: AI_Governance_Reference.pdf
     board: '4'

@@ -1,0 +1,164 @@
+id: CHG-SPF-001
+date: '2026-10-03'
+source: audit
+kind: spec
+summary: Forms no longer ask for a field the request schema marks readOnly; the form says the server sets it.
+decision:
+  what: Take every readOnly field out of the Required / Optional lists and discards of the generated forms (and
+    any input bound to one), and stop the generator writing them.
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Block A audit on live r2, 3 October (CHG-AUD-001, finding batches judge-log, judge-a-mid, judge-d-mid): BO-094''s
+  Save venue point form asked for `id` and `mapId`, which the server sets; the generator listed every body field,
+  readOnly or not. Chinmay, 3 October: fix the specs now, refresh, cut r1 of a fresh start.'
+keys_touched:
+  screens:
+  - ADM-015
+  - ADM-016
+  - ADM-024
+  - ADM-026
+  - ADM-035
+  - ADM-036
+  - ADM-037
+  - ADM-050
+  - ADM-053
+  - ADM-054
+  - ADM-056
+  - ADM-071
+  - ADM-074
+  - ADM-075
+  - ADM-086
+  - ADM-092
+  - ADM-094
+  - ADM-095
+  - ADM-096
+  - ADM-100
+  - ADM-101
+  - ADM-102
+  - ADM-103
+  - ADM-107
+  - ADM-114
+  - ADM-117
+  - ADM-126
+  - ADM-263
+  - ADM-264
+  - ADM-265
+  - ADM-269
+  - ADM-270
+  - ADM-280
+  - ADM-282
+  - ADM-342
+  - ANL-047
+  - BO-001
+  - BO-003
+  - BO-006
+  - BO-011
+  - BO-012
+  - BO-032
+  - BO-036
+  - BO-037
+  - BO-044
+  - BO-055
+  - BO-062
+  - BO-065
+  - BO-066
+  - BO-067
+  - BO-074
+  - BO-076
+  - BO-077
+  - BO-086
+  - BO-087
+  - BO-091
+  - BO-092
+  - BO-094
+  - BO-116
+  - BO-120
+  - BO-123
+  - BO-124
+  - BO-125
+  - BO-126
+  - BO-129
+  - BO-130
+  - BO-800
+  - BO-807
+  - BO-891
+  - BO-910
+  - BO-912
+  - BO-945
+  - CMS-007
+  - CMS-028
+  - CMS-030
+  - DEV-008
+  - EMP-038
+  - EMP-043
+  - GST-070
+  - POS-016
+  - SUP-007
+  - SUP-020
+  - WEB-020
+  files:
+  - tools/screen_patterns.py
+  - tools/check-screen-patterns.py
+  - tools/generate-screens-from-contracts.py
+  - tools/derive-entrystate-params.py
+  - tools/applied/spec-screen-patterns-3-october.py
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-ANALYTICS-ANL-047
+  - APP-CONSOLE-ADM-015
+  - APP-CONSOLE-ADM-024
+  - APP-CONSOLE-ADM-026
+  - APP-CONSOLE-ADM-035
+  - APP-CONSOLE-ADM-036
+  - APP-MOB-GST-070
+  - APP-POS-POS-016
+  - APP-SETUP-ADM-037
+  - APP-SETUP-ADM-342
+  - APP-SETUP-BO-001
+  - APP-SETUP-BO-006
+  - APP-SETUP-BO-011
+  - APP-SETUP-BO-012
+  - APP-SETUP-BO-032
+  - APP-SETUP-BO-044
+  - APP-SETUP-BO-065
+  - APP-SETUP-BO-074
+  - APP-SETUP-BO-077
+  - APP-SETUP-BO-087
+  - APP-SETUP-BO-091
+  - APP-SETUP-BO-092
+  - APP-SETUP-BO-094
+  - APP-SETUP-BO-116
+  - APP-SETUP-BO-124
+  - APP-SETUP-DEV-008
+  - APP-STAFF-EMP-043
+  - APP-WEB-WEB-020
+  - APP-WL-ADM-016
+  - APP-WL-CMS-007
+  - VM-BO-003
+  - VM-BO-036
+  - VM-BO-037
+  - VM-BO-055
+  - VM-BO-062
+  - VM-BO-066
+  - VM-BO-067
+  - VM-BO-076
+  - VM-BO-086
+  - VM-BO-120
+  - VM-BO-123
+  - VM-BO-125
+  - VM-BO-126
+  - VM-BO-129
+  - VM-BO-130
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-patterns.py
+status: closed
+closed_by_commit: c9d287c6
+notes: 'Batch SPF (spec-screens), 3 October 2026. Counts: 212 readOnly fields asked in 95 forms on 83 screens (57
+  on Block A) -> 0. The check fails on the commit before the fix (bf90f1ce''s parent, 4e2c56c1: P1 findings) and
+  passes after it. Tickets: none started (Block A starts Monday 5 October).'

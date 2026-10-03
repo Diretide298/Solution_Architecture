@@ -1,0 +1,44 @@
+id: CHG-SPF-012
+date: '2026-10-03'
+source: audit
+kind: spec
+summary: POS-000 keeps session management behind a supervisor PIN step-up; GST-055's QR rotates every 30 seconds;
+  GST-053's add-on toggle sends updateVisitPlan addAddOn / removeAddOn; signed-out guests build plans.
+decision:
+  what: Read listActiveSessions on POS-000 only after a supervisor PIN (reverses CHG-DOOR-003 for this screen),
+    and record the QR, add-on and signed-out planning decisions on GST-055, GST-053 and GST-054.
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Chinmay''s answers of 3 October to the Block A audit (CHG-AUD-001), section ''Asked as questions instead of
+  defaults: POS-000, visit plan add-ons; QR; Block A audit business rules: visit planner.'').'
+keys_touched:
+  screens:
+  - POS-000
+  - GST-055
+  - GST-053
+  - GST-054
+  operations:
+  - listActiveSessions
+  - forceLogout
+  - getEntitlementCredential
+  - updateVisitPlan
+  files:
+  - tools/applied/screen-decisions-3-october.py
+  - tools/check-screen-patterns.py
+root_class: A26 BUSINESS-RULES
+tickets:
+  started: []
+  unstarted:
+  - APP-MOB-GST-053
+  - APP-MOB-GST-054
+  - APP-MOB-GST-055
+  - APP-POS-POS-000
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-patterns.py
+status: closed
+closed_by_commit: 1303d854
+notes: Batch SPF (spec-screens), 3 October 2026. check-screen-patterns (DEC) fails if the screen drifts back.
