@@ -131,16 +131,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-414` | Wallet & Credit Management Dashboard | B–D | 2 | 2 | 6 | 19 | 1 | 6 | — | notStarted (—) |
-| `BO-415` | Wallet & Credit Type Configuration | B–D | 10 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-416` | Wallet Account & Balance View | B–D | 0 | 0 | 6 | 18 | 1 | 6 | — | notStarted (—) |
-| `BO-417` | Top-Up Configuration | B–D | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-418` | Top-Up Bonus Rule Configuration | B–D | 0 | 20 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `BO-419` | Bonus Usage Restrictions | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-420` | Bonus Validity & Expiry Configuration | B–D | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-421` | Free Game & Ride Credit Management | B–D | 8 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-422` | Refund, Adjustment & Manual Bonus Control | B–D | 0 | 15 | 6 | 28 | 1 | 6 | — | notStarted (—) |
-| `BO-423` | Wallet Credit Transaction Ledger & Audit | B–D | 0 | 0 | 6 | 3 | 1 | 6 | — | notStarted (—) |
+| `BO-414` | Wallet & Credit Management Dashboard | C | 2 | 2 | 6 | 19 | 1 | 6 | — | notStarted (—) |
+| `BO-415` | Wallet & Credit Type Configuration | C | 10 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-416` | Wallet Account & Balance View | C | 0 | 0 | 6 | 18 | 1 | 6 | — | notStarted (—) |
+| `BO-417` | Top-Up Configuration | C | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-418` | Top-Up Bonus Rule Configuration | C | 0 | 20 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `BO-419` | Bonus Usage Restrictions | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-420` | Bonus Validity & Expiry Configuration | C | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-421` | Free Game & Ride Credit Management | D | 8 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-422` | Refund, Adjustment & Manual Bonus Control | C | 0 | 15 | 6 | 28 | 1 | 6 | — | notStarted (—) |
+| `BO-423` | Wallet Credit Transaction Ledger & Audit | C | 0 | 0 | 6 | 3 | 1 | 6 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -160,7 +160,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-414 |
 | Who uses it | venue staff holding `WALLET_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§KPI Cards) and a per-row directory (§Show) — counts over a population, then the population |
@@ -339,7 +339,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-415 |
 | Who uses it | venue staff holding `WALLET_CONFIGURE`, `WALLET_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configuration Fields) and no display directory — it is settings, not a population |
@@ -469,7 +469,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-416 |
 | Who uses it | venue staff holding `WALLET_OPERATE`, `WALLET_VIEW` (1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -628,7 +628,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-417 |
 | Who uses it | venue staff holding `WALLET_CONFIGURE`, `WALLET_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -769,7 +769,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-418 |
 | Who uses it | venue staff holding `WALLET_CONFIGURE`, `WALLET_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -910,7 +910,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-419 |
 | Who uses it | venue staff holding `WALLET_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1022,7 +1022,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-420 |
 | Who uses it | venue staff holding `WALLET_CONFIGURE`, `WALLET_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1152,7 +1152,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-421 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Free Credit Configuration) and no display directory — it is settings, not a population |
@@ -1325,7 +1325,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-422 |
 | Who uses it | venue staff holding `WALLET_OPERATE`, `WALLET_VIEW` (1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1479,7 +1479,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-423 |
 | Who uses it | venue staff holding `WALLET_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1707,7 +1707,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "CreditEligibility": {"type":"object","x-ticvai-persistence":"wallet.credit_eligibility","description":"Board 3.4. **Where credit may be spent** — acceptance, not funding.","properties":{"creditTypeId":{"type":"string","format":"uuid"},"allowedVenueIds":{"type":"array","items":{"type":"string","format":"uuid"}},"allowedOutletKinds":{"type":"array","items":{"type":"string"}},"allowedProductCategoryIds":{"type":"array","items":{"type":"string","format":"uuid"}},"excludedProductIds":{"type":"array","items":{"type":"string","format":"uuid"}},"allowedChannels":{"type":"array","items":{"type":"string"}},"minimumSpend":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maximumPercentOfBasket":{"type":"number","nullable":true,"description":"**Caps how much of a purchase one credit type may cover.** A venue that lets promotional credit pay for everything has run a free day it did not intend.\n"},"validDaysOfWeek":{"type":"array","items":{"type":"string"}},"scopePath":{"type":"string"}}},
 "CreditLot": {"type":"object","x-ticvai-persistence":"wallet.credit_lot","description":"Board 3.7. **The tranche behind a balance.** Expiry belongs here, not on the wallet.","required":["id","walletId","creditTypeId"],"properties":{"id":{"type":"string","format":"uuid"},"walletId":{"type":"string","format":"uuid"},"creditTypeId":{"type":"string","format":"uuid"},"issuedAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"remainingAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"issuedAt":{"type":"string","format":"date-time"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"sourceKind":{"type":"string","enum":["topUp","refund","promotion","giftCard","membershipBenefit","loyaltyConversion","transfer","adjustment"]},"sourceReference":{"type":"string","nullable":true},"termsSnapshot":{"type":"object","additionalProperties":true,"description":"**The credit type's terms as they stood at issue.** Changing a credit type must not retro-expire credit already given, so the lot carries its own terms.\n**Open on purpose, and its shape lives in `CreditType`**: the snapshot is that credit type's properties copied at issue, so it follows `CreditType` as it stood then rather than as it stands now.\n"},"status":{"type":"string","enum":["active","exhausted","expired","forfeited","reversed"]},"scopePath":{"type":"string"}}},
 "CreditType": {"type":"object","x-ticvai-persistence":"wallet.credit_type","description":"Board 1.6. **What value sits inside a wallet** — the second vocabulary, and the one the acceptance condition requires to be a table.\n","required":["code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"category":{"type":"string","enum":["cash","refund","bonus","promotional","giftCard","membership","loyalty","ride","attraction","redemption","fnb","retail","parking","event","other"]},"monetary":{"type":"boolean","default":true,"description":"**Loyalty points are not money.** A non-monetary credit has a conversion rate to money or it cannot be spent, and treating points as currency puts them on the balance sheet.\n"},"conversionRate":{"type":"number","nullable":true},"refundable":{"type":"boolean","default":false,"description":"**Promotional credit is not refundable and cash credit is.** A venue that refunds promotional credit to a card has converted marketing spend into cash.\n"},"transferable":{"type":"boolean","default":false},"expires":{"type":"boolean","default":false},"validityDays":{"type":"integer","nullable":true},"breakageEligible":{"type":"boolean","default":false},"ledgerAccountCode":{"type":"string","nullable":true},"priority":{"type":"integer","default":0},"scopePath":{"type":"string"},"isActive":{"type":"boolean","default":true}}},
-"GameEntitlement": {"type":"object","x-ticvai-persistence":"games.entitlement","description":"Board 4. **A right to play, not money** — consumed before money is.","required":["code","kind"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"kind":{"type":"string","enum":["allGamesPass","unlimitedSingleGame","limitedSingleGame","package","freePlay"]},"gameIds":{"type":"array","items":{"type":"string","format":"uuid"}},"attractionTypeIds":{"type":"array","items":{"type":"string","format":"uuid"}},"coversGamesAddedLater":{"type":"boolean","default":true,"description":"**Whether a pass sold today covers a game added tomorrow** (Chinmay, 2 October, workbook Q397: \"venue configures; default yes\"; CHG-CSA-028). True, the default: an `allGamesPass`, or a pass bound by `attractionTypeIds`, covers games added after it was sold that match it; the coverage summary says so. False: it covers only the games that existed at sale. A pass listing `gameIds` covers those games only, whatever this says."},"playCount":{"type":"integer","nullable":true,"description":"For `limitedSingleGame` and `package`. Null means unlimited."},"validityKind":{"type":"string","enum":["sameDay","days","untilDate","untilUsed"]},"validityDays":{"type":"integer","nullable":true},"activationKind":{"type":"string","enum":["onPurchase","onFirstUse","onDate"],"default":"onFirstUse","description":"**On first use is what a guest expects from a day pass bought the night before.** On purchase is what a venue defaults to by accident, and it costs them a day.\n"},"dailyPlayCap":{"type":"integer","nullable":true},"cooldownMinutes":{"type":"integer","nullable":true,"description":"**Unlimited does not mean continuous.** A cooldown is how one child does not hold a popular ride all afternoon.\n"},"linkedProductId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"},"isActive":{"type":"boolean","default":true}}},
+"GameEntitlement": {"type":"object","x-ticvai-persistence":"games.entitlement","description":"Board 4. **A right to play, not money** — consumed before money is.","required":["code","kind"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"kind":{"type":"string","enum":["allGamesPass","unlimitedSingleGame","limitedSingleGame","package","freePlay"]},"gameIds":{"type":"array","items":{"type":"string","format":"uuid"}},"attractionTypeIds":{"type":"array","items":{"type":"string","format":"uuid"}},"includesGamesAddedLater":{"type":"boolean","default":true,"description":"**Whether a pass sold today covers a game added tomorrow** (Chinmay, 2 October, workbook Q397: \"venue configures; default yes\"; CHG-CSA-028). True, the default: an `allGamesPass`, or a pass bound by `attractionTypeIds`, covers games added after it was sold that match it; the coverage summary says so. False: it covers only the games that existed at sale. A pass listing `gameIds` covers those games only, whatever this says."},"playCount":{"type":"integer","nullable":true,"description":"For `limitedSingleGame` and `package`. Null means unlimited."},"validityKind":{"type":"string","enum":["sameDay","days","untilDate","untilUsed"]},"validityDays":{"type":"integer","nullable":true},"activationKind":{"type":"string","enum":["onPurchase","onFirstUse","onDate"],"default":"onFirstUse","description":"**On first use is what a guest expects from a day pass bought the night before.** On purchase is what a venue defaults to by accident, and it costs them a day.\n"},"dailyPlayCap":{"type":"integer","nullable":true},"cooldownMinutes":{"type":"integer","nullable":true,"description":"**Unlimited does not mean continuous.** A cooldown is how one child does not hold a popular ride all afternoon.\n"},"linkedProductId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"},"isActive":{"type":"boolean","default":true}}},
 "Money": {"type":"object","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,4)","description":"**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n","required":["amount","currency","scale"],"properties":{"amount":{"type":"string","description":"Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n","pattern":"^-?\\d+(\\.\\d{1,4})?$"},"currency":{"type":"string","description":"**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n","pattern":"^[A-Z]{3}$"},"scale":{"type":"integer","description":"Resolved from the region alongside `currency`.","minimum":0,"maximum":4}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "Wallet": {"x-ticvai-persistence":"wallet.wallet + wallet.credit_lot","type":"object","required":["subjectId","balance","currency","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"subjectId":{"type":"string","format":"uuid"},"balance":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"credits":{"type":"array","description":"4.3.5 and 4.3.19. **One balance and one bonus balance with one expiry could not express what the requirement asks for** — cash, bonus and redemption credit, each with its own expiry.\n**The expiries are the reason this is a list.** Cash a guest paid for should outlive a promotional credit they were given, and a single `expiresAt` either expires the money they paid or never expires the promotion.\n**Consumed first-expiry-first-out across all three** (4.3.19), which is also the order that is fairest to the guest — spend what is about to die before what is not.\n**One entry per `active` lot in `wallet.credit_lot`** for this wallet: `amount` is the lot's `remaining_amount`, `expiresAt` its `expires_at`, `sourceRef` its `source_reference`. `kind` and `isRefundable` are not stored on the lot; they come from the lot's credit type (`listCreditLots` returns the lots themselves).\n","items":{"type":"object","required":["kind","amount"],"properties":{"kind":{"type":"string","enum":["cash","bonus","redemption","refund","goodwill"],"description":"**`cash` is money the guest paid and the others are not.** That distinction decides what is refundable, what expires, and what shows as a liability.\n","x-ticvai-persisted":false},"amount":{"x-ticvai-column":"remaining_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"sourceRef":{"type":"string","nullable":true,"x-ticvai-column":"source_reference"},"isRefundable":{"type":"boolean","default":false,"x-ticvai-persisted":false,"description":"**True only for `cash`.** A guest cannot cash out a promotional credit, and a wallet that lets them has given away the promotion twice.\n"}}}},"bonusBalance":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Promotional value. Typically non-refundable and spent first."},"currency":{"type":"string","pattern":"^[A-Z]{3}$"},"status":{"type":"string","enum":["active","suspended","closed"]},"homeCellName":{"type":"string","nullable":true,"description":"Where the authoritative balance lives. Present when the guest is linked across cells.\n"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"lastActivityAt":{"type":"string","format":"date-time","nullable":true}}},

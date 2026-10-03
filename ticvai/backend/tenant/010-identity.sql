@@ -1,10 +1,10 @@
--- identity — 31 tables
+-- identity — 32 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS identity.access_decision (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     effect                            text CONSTRAINT access_decision_effect_chk CHECK (effect IN ('permit', 'deny')),
     decided_at                        timestamptz,
     decided_by                        text CONSTRAINT access_decision_decided_by_chk CHECK (decided_by IN ('central', 'deviceBundle')),
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS identity.access_decision (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS identity.access_override (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     principal_id                      uuid,
     scope_path                        ltree NOT NULL,
     permissions                       text[],
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS identity.access_override (
 -- Holds 17 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS identity.access_review_campaign (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     name                              text NOT NULL CONSTRAINT access_review_campaign_name_chk CHECK (char_length(name) <= 200),
     scope_path                        ltree NOT NULL,
     role_ids                          text[],
@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS identity.access_review_campaign (
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS identity.access_review_item (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     campaign_id                       uuid NOT NULL,
     delegated_access_id               uuid NOT NULL,
     principal_id                      uuid NOT NULL,
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS identity.access_review_item (
 -- Holds 16 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS identity.authorisation_policy (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text NOT NULL,
     description                       text,
@@ -121,7 +121,7 @@ CREATE TABLE IF NOT EXISTS identity.authz_audit (
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS identity.benefit_usage (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     customer_membership_id            uuid NOT NULL,
     membership_benefit_id             uuid NOT NULL,
     quantity                          numeric(18,4) NOT NULL,
@@ -135,18 +135,21 @@ CREATE TABLE IF NOT EXISTS identity.benefit_usage (
 -- Holds 6 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS identity.capability_template (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL CONSTRAINT capability_template_code_chk CHECK (char_length(code) <= 64),
     name                              text NOT NULL CONSTRAINT capability_template_name_chk CHECK (char_length(name) <= 200),
     description                       text,
     capabilities                      text[] NOT NULL,
+    module                            text,
+    preset_level                      text CONSTRAINT capability_template_preset_level_chk CHECK (preset_level IN ('all', 'viewer', 'midLevel')),
+    is_preset                         boolean DEFAULT false,
     scope_path                        ltree NOT NULL
 );
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS identity.customer_membership (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     customer_id                       uuid NOT NULL,
     entitlement_template_id           uuid NOT NULL,
     number                            text NOT NULL CONSTRAINT customer_membership_number_chk CHECK (char_length(number) <= 50),
@@ -208,7 +211,7 @@ CREATE TABLE IF NOT EXISTS identity.guest_identity_verification (
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS identity.guest_verification_policy (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     scope_path                        ltree NOT NULL,
     registration_requires             text[] NOT NULL,
     id_document_required_for          text[],
@@ -218,6 +221,7 @@ CREATE TABLE IF NOT EXISTS identity.guest_verification_policy (
     is_social_login_counts_as_email_verified boolean DEFAULT true,
     is_selfie_required                boolean DEFAULT false,
     review_mode                       text DEFAULT 'manual' CONSTRAINT guest_verification_policy_review_mode_chk CHECK (review_mode IN ('manual', 'provider', 'providerThenManual')),
+    verification_provider             text CONSTRAINT guest_verification_policy_verification_provider_chk CHECK (verification_provider IN ('icp')),
     document_image_retention          text DEFAULT 'deleteOnDecision' CONSTRAINT guest_verification_policy_document_image_retention_chk CHECK (document_image_retention IN ('deleteOnDecision', 'keepUntilDocumentExpiry')),
     max_resubmissions                 integer DEFAULT 3,
     updated_at                        timestamptz
@@ -226,7 +230,7 @@ CREATE TABLE IF NOT EXISTS identity.guest_verification_policy (
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS identity.membership_history (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     customer_membership_id            uuid NOT NULL,
     from_status                       text CONSTRAINT membership_history_from_status_chk CHECK (char_length(from_status) <= 30),
     to_status                         text NOT NULL CONSTRAINT membership_history_to_status_chk CHECK (char_length(to_status) <= 30),
@@ -278,7 +282,7 @@ CREATE TABLE IF NOT EXISTS identity.mfa_recovery_code (
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS identity.module (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL CONSTRAINT module_code_chk CHECK (char_length(code) <= 100),
     name                              text NOT NULL CONSTRAINT module_name_chk CHECK (char_length(name) <= 150),
     description                       text CONSTRAINT module_description_chk CHECK (char_length(description) <= 500),
@@ -332,7 +336,7 @@ CREATE TABLE IF NOT EXISTS identity.password_policy (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS identity.permission (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     module_id                         uuid NOT NULL,
     code                              text NOT NULL CONSTRAINT permission_code_chk CHECK (char_length(code) <= 150),
     name                              text NOT NULL CONSTRAINT permission_name_chk CHECK (char_length(name) <= 150),
@@ -385,7 +389,7 @@ CREATE TABLE IF NOT EXISTS identity.principal_credential (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS identity.refresh_token (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     principal_id                      uuid NOT NULL,
     hash                              text NOT NULL CONSTRAINT refresh_token_hash_chk CHECK (char_length(hash) <= 500),
     expires_at                        timestamptz NOT NULL,
@@ -406,6 +410,7 @@ CREATE TABLE IF NOT EXISTS identity.role (
     description                       text,
     inherits_from_role_id             uuid,
     is_system                         boolean DEFAULT false,
+    preset_code                       text CONSTRAINT role_preset_code_chk CHECK (char_length(preset_code) <= 64),
     principal_count                   integer,
     grant_count                       integer
 );
@@ -415,7 +420,7 @@ CREATE TABLE IF NOT EXISTS identity.role (
 -- and 1 write it.
 CREATE TABLE IF NOT EXISTS identity.role_permission (
     role_id                           uuid NOT NULL,
-    permission                        text NOT NULL CONSTRAINT role_permission_permission_chk CHECK (permission IN ('SESSION_FORCE_LOGOUT', 'USER_MANAGE', 'ROLE_MANAGE', 'PERMISSION_GRANT', 'PERMISSION_VIEW', 'PERMISSION_MANAGE', 'PLATFORM_TENANT_VIEW', 'PLATFORM_TENANT_MANAGE', 'PLATFORM_TENANT_TERMINATE', 'PLATFORM_PLAN_MANAGE', 'PLATFORM_CELL_VIEW', 'PLATFORM_CELL_MANAGE', 'PLATFORM_BILLING_VIEW', 'PLATFORM_AI_MANAGE', 'PLATFORM_BILLING_MANAGE', 'PLATFORM_RELEASE_VIEW', 'PLATFORM_RELEASE_MANAGE', 'PLATFORM_RELEASE_PROMOTE', 'PLATFORM_MIGRATION_VIEW', 'PLATFORM_MIGRATION_APPLY', 'PLATFORM_TENANT_ACCESS', 'TENANT_CONFIGURE', 'TENANT_VIEW', 'TENANT_PUBLISH', 'SCOPE_VIEW', 'SCOPE_MANAGE', 'REGION_CONFIGURE', 'WORKSTATION_CONFIGURE', 'PRODUCT_VIEW', 'PRODUCT_CONFIGURE', 'PRODUCT_APPROVE', 'PRODUCT_PUBLISH', 'PRICE_VIEW', 'PRICE_CONFIGURE', 'EVENT_CONFIGURE', 'PERFORMANCE_CONFIGURE', 'CAPACITY_CONFIGURE', 'ORDER_VIEW', 'ORDER_VIEW_OTHER', 'ORDER_CREATE', 'ORDER_MODIFY', 'ORDER_DISCOUNT', 'ORDER_CANCEL', 'ORDER_VOID', 'ORDER_REFUND', 'ORDER_REFUND_APPROVE', 'ORDER_REFUND_BULK', 'ORDER_EXCHANGE', 'ORDER_RESCHEDULE', 'ORDER_REPRINT', 'PRICE_OVERRIDE', 'DISCOUNT_APPLY', 'CREDIT_MANAGE', 'CREDIT_OVERRIDE', 'WALLET_VIEW', 'WALLET_OPERATE', 'WALLET_CONFIGURE', 'PAYMENT_VIEW', 'PAYMENT_CONFIGURE', 'PAYMENT_PROVIDER_MANAGE', 'PAYMENT_DISPUTE', 'SHIFT_OPEN', 'SHIFT_CLOSE', 'SHIFT_SUSPEND', 'SHIFT_CLOSE_OTHER', 'SHIFT_APPROVE_OPEN', 'SHIFT_APPROVE_CLOSE', 'SHIFT_REOPEN', 'CASH_LIFT', 'CASH_ADD', 'CASH_NO_SALE', 'DEPOSIT_BOX_MODIFY_OWN', 'DEPOSIT_BOX_MODIFY_OTHER', 'OVERSHORT_ACCEPT', 'ACCESS_VALIDATE', 'ACCESS_OVERRIDE', 'ACCESS_POINT_CONFIGURE', 'TURNSTILE_MODE_SET', 'TICKET_LOOKUP', 'ACCREDITATION_VIEW', 'ACCREDITATION_APPLY', 'ACCREDITATION_APPROVE', 'ACCREDITATION_ISSUE', 'ACCREDITATION_MANAGE', 'ACCREDITATION_CONFIGURE', 'REPORT_VIEW_OWN', 'REPORT_VIEW_WORKSTATION', 'REPORT_VIEW_VENUE', 'REPORT_VIEW_REGION', 'REPORT_VIEW_TENANT', 'REPORT_EXPORT', 'REPORT_EXPORT_PII', 'REPORT_MANAGE', 'REPORT_SCHEDULE', 'LEDGER_VIEW', 'LEDGER_POST', 'LEDGER_APPROVE', 'TAX_CONFIGURE', 'ACCOUNT_CONFIGURE', 'SETTLEMENT_VIEW', 'SETTLEMENT_RECONCILE', 'GUEST_VIEW', 'GUEST_VIEW_PII', 'GUEST_MANAGE', 'VENUE_MAP_VIEW', 'VENUE_MAP_MANAGE', 'VENUE_MAP_PUBLISH', 'RESOURCE_VIEW', 'RESOURCE_BOOK', 'RESOURCE_MANAGE', 'RESOURCE_CONFIGURE', 'RENTAL_VIEW', 'RENTAL_BOOK', 'RENTAL_OPERATE', 'RENTAL_MANAGE', 'RENTAL_CONFIGURE', 'RENTAL_PRICE', 'RENTAL_APPROVE', 'RENTAL_OVERRIDE', 'DEVELOPER_VIEW', 'DEVELOPER_MANAGE', 'DEVELOPER_ADMIN', 'LOYALTY_ACCRUE', 'LOYALTY_REDEEM', 'LOYALTY_ADJUST', 'MARKETING_VIEW', 'MARKETING_MANAGE', 'MARKETING_SEND', 'CASE_VIEW', 'CASE_MANAGE', 'ASSET_LIBRARY_VIEW', 'ASSET_LIBRARY_MANAGE', 'ASSET_LIBRARY_APPROVE', 'ASSET_LIBRARY_SHARE', 'QUEUE_VIEW', 'QUEUE_MANAGE', 'QUEUE_REDEEM', 'QUEUE_OVERRIDE', 'TRANSPORT_VIEW', 'TRANSPORT_MANAGE', 'TRANSPORT_PRICE', 'ASSET_VIEW', 'ASSET_MANAGE', 'WORK_ORDER_VIEW', 'WORK_ORDER_MANAGE', 'WORK_ORDER_VERIFY', 'INSPECTION_VIEW', 'INSPECTION_SUBMIT', 'INSPECTION_MANAGE', 'INCIDENT_REPORT', 'INCIDENT_VIEW', 'INCIDENT_MANAGE', 'KIOSK_ATTEND', 'DEVICE_VIEW', 'DEVICE_CONFIGURE', 'DEVICE_MANAGE', 'APPROVAL_ACT', 'APPROVAL_DELEGATE', 'AI_USE', 'AI_CONFIGURE', 'AI_APPROVE', 'AI_AUDIT_VIEW', 'RISK_REVIEW', 'RISK_INVESTIGATE', 'AUDIT_VIEW', 'APPROVAL_VIEW', 'APPROVAL_REQUEST', 'APPROVAL_DECIDE', 'APPROVAL_CONFIGURE', 'MAINTENANCE_EXECUTE', 'MAINTENANCE_APPROVE', 'WORKFORCE_VIEW', 'WORKFORCE_MANAGE', 'ATTENDANCE_RECORD', 'ANNOUNCEMENT_PUBLISH', 'ANNOUNCEMENT_EMERGENCY', 'PARTNER_VIEW', 'PARTNER_MANAGE', 'PARKING_CONFIGURE', 'PAYMENT_VOID', 'PROCUREMENT_VIEW', 'PROCUREMENT_REQUEST', 'PROCUREMENT_MANAGE', 'PROCUREMENT_RECEIVE')),
+    permission                        text NOT NULL CONSTRAINT role_permission_permission_chk CHECK (permission IN ('SESSION_FORCE_LOGOUT', 'USER_MANAGE', 'ROLE_MANAGE', 'PERMISSION_GRANT', 'PERMISSION_VIEW', 'PERMISSION_MANAGE', 'PLATFORM_TENANT_VIEW', 'PLATFORM_TENANT_MANAGE', 'PLATFORM_TENANT_TERMINATE', 'PLATFORM_PLAN_MANAGE', 'PLATFORM_CELL_VIEW', 'PLATFORM_CELL_MANAGE', 'PLATFORM_BILLING_VIEW', 'PLATFORM_AI_MANAGE', 'PLATFORM_BILLING_MANAGE', 'PLATFORM_RELEASE_VIEW', 'PLATFORM_RELEASE_MANAGE', 'PLATFORM_RELEASE_PROMOTE', 'PLATFORM_MIGRATION_VIEW', 'PLATFORM_MIGRATION_APPLY', 'PLATFORM_TENANT_ACCESS', 'TENANT_CONFIGURE', 'TENANT_VIEW', 'TENANT_PUBLISH', 'SCOPE_VIEW', 'SCOPE_MANAGE', 'REGION_CONFIGURE', 'WORKSTATION_CONFIGURE', 'PRODUCT_VIEW', 'PRODUCT_CONFIGURE', 'PRODUCT_APPROVE', 'PRODUCT_PUBLISH', 'PRICE_VIEW', 'PRICE_CONFIGURE', 'EVENT_CONFIGURE', 'PERFORMANCE_CONFIGURE', 'CAPACITY_CONFIGURE', 'ORDER_VIEW', 'ORDER_VIEW_OTHER', 'ORDER_CREATE', 'ORDER_MODIFY', 'ORDER_DISCOUNT', 'ORDER_CANCEL', 'ORDER_VOID', 'ORDER_REFUND', 'ORDER_REFUND_APPROVE', 'ORDER_REFUND_BULK', 'ORDER_EXCHANGE', 'ORDER_RESCHEDULE', 'ORDER_REPRINT', 'PRICE_OVERRIDE', 'DISCOUNT_APPLY', 'CREDIT_MANAGE', 'CREDIT_OVERRIDE', 'WALLET_VIEW', 'WALLET_OPERATE', 'WALLET_CONFIGURE', 'PAYMENT_VIEW', 'PAYMENT_CONFIGURE', 'PAYMENT_PROVIDER_MANAGE', 'PAYMENT_DISPUTE', 'SHIFT_OPEN', 'SHIFT_CLOSE', 'SHIFT_SUSPEND', 'SHIFT_CLOSE_OTHER', 'SHIFT_APPROVE_OPEN', 'SHIFT_APPROVE_CLOSE', 'SHIFT_REOPEN', 'CASH_LIFT', 'CASH_ADD', 'CASH_NO_SALE', 'DEPOSIT_BOX_MODIFY_OWN', 'DEPOSIT_BOX_MODIFY_OTHER', 'OVERSHORT_ACCEPT', 'ACCESS_VALIDATE', 'ACCESS_OVERRIDE', 'ACCESS_POINT_CONFIGURE', 'TURNSTILE_MODE_SET', 'TICKET_LOOKUP', 'ACCREDITATION_VIEW', 'ACCREDITATION_APPLY', 'ACCREDITATION_APPROVE', 'ACCREDITATION_ISSUE', 'ACCREDITATION_MANAGE', 'ACCREDITATION_CONFIGURE', 'REPORT_VIEW_OWN', 'REPORT_VIEW_WORKSTATION', 'REPORT_VIEW_VENUE', 'REPORT_VIEW_REGION', 'REPORT_VIEW_TENANT', 'REPORT_EXPORT', 'REPORT_EXPORT_PII', 'REPORT_MANAGE', 'REPORT_SCHEDULE', 'LEDGER_VIEW', 'LEDGER_POST', 'LEDGER_APPROVE', 'TAX_CONFIGURE', 'ACCOUNT_CONFIGURE', 'SETTLEMENT_VIEW', 'SETTLEMENT_RECONCILE', 'GUEST_VIEW', 'GUEST_VIEW_PII', 'GUEST_MANAGE', 'VENUE_MAP_VIEW', 'VENUE_MAP_MANAGE', 'VENUE_MAP_PUBLISH', 'RESOURCE_VIEW', 'RESOURCE_BOOK', 'RESOURCE_MANAGE', 'RESOURCE_CONFIGURE', 'RENTAL_VIEW', 'RENTAL_BOOK', 'RENTAL_OPERATE', 'RENTAL_MANAGE', 'RENTAL_CONFIGURE', 'RENTAL_PRICE', 'RENTAL_APPROVE', 'RENTAL_OVERRIDE', 'DEVELOPER_VIEW', 'DEVELOPER_MANAGE', 'DEVELOPER_ADMIN', 'LOYALTY_ACCRUE', 'LOYALTY_REDEEM', 'LOYALTY_ADJUST', 'MARKETING_VIEW', 'MARKETING_MANAGE', 'MARKETING_SEND', 'CASE_VIEW', 'CASE_MANAGE', 'ASSET_LIBRARY_VIEW', 'ASSET_LIBRARY_MANAGE', 'ASSET_LIBRARY_APPROVE', 'ASSET_LIBRARY_SHARE', 'QUEUE_VIEW', 'QUEUE_MANAGE', 'QUEUE_REDEEM', 'QUEUE_OVERRIDE', 'TRANSPORT_VIEW', 'TRANSPORT_MANAGE', 'TRANSPORT_PRICE', 'ASSET_VIEW', 'ASSET_MANAGE', 'WORK_ORDER_VIEW', 'WORK_ORDER_MANAGE', 'WORK_ORDER_VERIFY', 'INSPECTION_VIEW', 'INSPECTION_SUBMIT', 'INSPECTION_MANAGE', 'INCIDENT_REPORT', 'INCIDENT_VIEW', 'INCIDENT_MANAGE', 'KIOSK_ATTEND', 'DEVICE_VIEW', 'DEVICE_CONFIGURE', 'DEVICE_MANAGE', 'APPROVAL_ACT', 'APPROVAL_DELEGATE', 'AI_USE', 'AI_CONFIGURE', 'AI_APPROVE', 'AI_AUDIT_VIEW', 'RISK_REVIEW', 'RISK_INVESTIGATE', 'AUDIT_VIEW', 'APPROVAL_VIEW', 'APPROVAL_REQUEST', 'APPROVAL_DECIDE', 'APPROVAL_CONFIGURE', 'MAINTENANCE_EXECUTE', 'MAINTENANCE_APPROVE', 'WORKFORCE_VIEW', 'WORKFORCE_MANAGE', 'ATTENDANCE_RECORD', 'ANNOUNCEMENT_PUBLISH', 'ANNOUNCEMENT_EMERGENCY', 'PARTNER_VIEW', 'PARTNER_MANAGE', 'PARKING_CONFIGURE', 'PAYMENT_VOID', 'PROCUREMENT_VIEW', 'PROCUREMENT_REQUEST', 'PROCUREMENT_MANAGE', 'PROCUREMENT_RECEIVE', 'CORE_AI_PUBLISH', 'TICKETING_AI_PUBLISH', 'ACCESS_AI_PUBLISH', 'FNB_AI_PUBLISH', 'RETAIL_AI_PUBLISH', 'INVENTORY_AI_PUBLISH', 'SEATING_AI_PUBLISH', 'MEMBERSHIP_AI_PUBLISH', 'MARKETING_AI_PUBLISH', 'RESOURCES_AI_PUBLISH', 'QUEUE_AI_PUBLISH', 'TRANSPORT_AI_PUBLISH', 'GAMES_AI_PUBLISH', 'MAINTENANCE_AI_PUBLISH', 'ACCREDITATION_AI_PUBLISH', 'PARTNER_AI_PUBLISH', 'ANALYTICS_AI_PUBLISH', 'BIOMETRIC_IMAGE_VIEW', 'ACCESS_DIRECTION_SET', 'REPORT_GOVERNANCE_MANAGE')),
     granted_at                        timestamptz,
     granted_by_principal_id           uuid,
     is_active                         boolean DEFAULT true,
@@ -436,9 +441,28 @@ CREATE TABLE IF NOT EXISTS identity.segregation_rule (
     scope_path                        ltree NOT NULL
 );
 
+-- Redis, not Postgres. ActiveSession and Session both declare persistence: none — Redis session
+-- registry, and ADR-0004 makes a session a token with a validity window rather than a row. The
+-- schema reference had it as a Postgres table with one column — a core auth table with nothing in
+-- it, found while chasing Hrushikant's role_permission note
+CREATE TABLE IF NOT EXISTS identity."session" (
+    status                            text NOT NULL,
+    session_id                        text NOT NULL,
+    principal_id                      uuid NOT NULL,
+    role_id                           uuid,
+    workstation_id                    uuid,
+    venue_id                          uuid,
+    ip_address                        text,
+    device_info                       text,
+    is_mfa_satisfied                  boolean,
+    started_at                        timestamptz NOT NULL,
+    last_seen_at                      timestamptz NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
 -- Which provider group becomes which role. The join that stops SSO meaning manual role assignment
 CREATE TABLE IF NOT EXISTS identity.sso_group_mapping (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     external_group                    text NOT NULL,
     role_id                           uuid NOT NULL,
     scope_path                        ltree NOT NULL,

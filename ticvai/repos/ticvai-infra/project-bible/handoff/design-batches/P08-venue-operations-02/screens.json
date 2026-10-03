@@ -432,6 +432,21 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "cardList",
+       "label": "Load the offline policy saved at this scope",
+       "operation": "getOfflinePolicy",
+       "bindsTo": "OfflinePolicy",
+       "columns": [
+        "OfflinePolicy.maxOfflineHours",
+        "OfflinePolicy.allowedOffline",
+        "OfflinePolicy.offlineValueCeiling",
+        "OfflinePolicy.offlineTransactionCeiling",
+        "OfflinePolicy.onCeilingBreach",
+        "OfflinePolicy.requiresManagerToExtend"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
+      {
        "kind": "textField",
        "label": "Workstation id",
        "operation": "listSyncRejections",
@@ -545,6 +560,13 @@
     "purpose": "Record what was done about each refused entry",
     "trigger": "onAction",
     "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
+   },
+   {
+    "operationId": "getOfflinePolicy",
+    "contract": "tenancy",
+    "purpose": "Load the offline policy saved at this scope",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "entryState": {

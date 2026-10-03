@@ -1,6 +1,6 @@
 # WS05 — Access Control board 5
 
-**10 screens · 19 operations · 22 schemas · 7 permissions**
+**10 screens · 21 operations · 22 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -98,15 +98,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-184` | Biometric Access Command Center | C | 0 | 240 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `BO-185` | Biometric Verification Profile Builder | A | 8 | 0 | 5 | 0 | 0 | 6 | — | notStarted (generated) |
-| `BO-186` | Face Pass Enrollment Configuration | A | 19 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
-| `BO-187` | Biometric Consent & Guardian Management | B–D | 84 | 20 | 5 | 17 | 1 | 6 | — | notStarted (generated) |
+| `BO-185` | Biometric Verification Profile Builder | A | 8 | 4 | 5 | 0 | 0 | 6 | — | notStarted (generated) |
+| `BO-186` | Face Pass Enrollment Configuration | A | 19 | 8 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
+| `BO-187` | Biometric Consent & Guardian Management | B | 84 | 20 | 5 | 17 | 1 | 6 | — | notStarted (generated) |
 | `BO-188` | Face Tag Temporary Enrollment | A | 10 | 17 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
 | `BO-189` | Face Matching & Verification Thresholds | A | 21 | 0 | 5 | 0 | 0 | 6 | — | notStarted (generated) |
-| `BO-190` | Face Change, Re-enrollment & Identity Protection | B–D | 2 | 16 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `BO-191` | Biometric Validation at Gate | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `BO-192` | Biometric Lifecycle, Retention & Deletion | B–D | 9 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
-| `BO-193` | Biometric Simulation, Audit & Publication | B–D | 7 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `BO-190` | Face Change, Re-enrollment & Identity Protection | C | 2 | 16 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `BO-191` | Biometric Validation at Gate | C | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `BO-192` | Biometric Lifecycle, Retention & Deletion | C | 9 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
+| `BO-193` | Biometric Simulation, Audit & Publication | C | 7 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

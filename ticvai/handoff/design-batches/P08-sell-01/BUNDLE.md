@@ -1,6 +1,6 @@
 # P08-sell-01 — P08 · Sell (1 of 4)
 
-**10 screens · 93 operations · 106 schemas · 13 permissions**
+**10 screens · 97 operations · 106 schemas · 13 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-007` | Product Directory | A | 97 | 38 | 6 | 75 | 3 | 0 | — | notStarted (generated) |
-| `BO-008` | Product Detail & Variants | A | 41 | 34 | 6 | 37 | 22 | 3 | — | notStarted (generated) |
+| `BO-007` | Product Directory | A | 97 | 41 | 6 | 75 | 3 | 0 | — | notStarted (generated) |
+| `BO-008` | Product Detail & Variants | A | 41 | 37 | 6 | 37 | 22 | 3 | — | notStarted (generated) |
 | `BO-009` | Pricing Rules | A | 57 | 21 | 6 | 19 | 3 | 0 | — | notStarted (generated) |
 | `BO-010` | Promotions & Coupons | A | 165 | 39 | 6 | 51 | 3 | 2 | — | notStarted (generated) |
-| `BO-011` | Packages & Bundles | A | 69 | 36 | 6 | 11 | 4 | 0 | — | notStarted (generated) |
-| `BO-012` | Membership Products | A | 115 | 33 | 6 | 112 | 0 | 0 | — | notStarted (generated) |
-| `BO-013` | Channel & Distribution | B–D | 40 | 32 | 6 | 34 | 2 | 0 | — | notStarted (generated) |
-| `BO-014` | Catalogue Publishing | B–D | 8 | 19 | 6 | 30 | 0 | 6 | — | notStarted (generated) |
-| `BO-015` | Performance Calendar | B–D | 39 | 44 | 6 | 38 | 5 | 0 | — | notStarted (generated) |
-| `BO-016` | Performance Template | B–D | 19 | 15 | 6 | 0 | 5 | 0 | — | notStarted (generated) |
+| `BO-011` | Packages & Bundles | A | 69 | 56 | 6 | 11 | 4 | 0 | — | notStarted (generated) |
+| `BO-012` | Membership Products | A | 115 | 36 | 6 | 112 | 0 | 0 | — | notStarted (generated) |
+| `BO-013` | Channel & Distribution | A | 40 | 32 | 6 | 34 | 2 | 0 | — | notStarted (generated) |
+| `BO-014` | Catalogue Publishing | B | 8 | 19 | 6 | 30 | 0 | 6 | — | notStarted (generated) |
+| `BO-015` | Performance Calendar | A | 39 | 44 | 6 | 38 | 5 | 0 | — | notStarted (generated) |
+| `BO-016` | Performance Template | B | 19 | 15 | 6 | 0 | 5 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -349,6 +349,14 @@ Errors to draw in the form: 400 The selection names nothing (`empty-selection`),
 
 **Shown**
 
+**Load the product's attribute axes before they are replaced** (card list, from `getProductAttributes`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Code | text | — |
+| Name | text | — |
+| Values | list or chips (count when long) | — |
+
 **Every product** (data table, from `listProducts`)
 
 | Shows | Format | Notes |
@@ -440,7 +448,7 @@ Errors to draw in the form: 400 The selection names nothing (`empty-selection`),
 - **Bulk update**: Select rows (or "all matching the filter"), choose the change, always see the preview count first ("142 products matched, 3 will fail: no price list") and confirm; the result reports succeeded and failed with the reason per failure. *(source: contracts/satellite/inventory.yaml#bulkUpdateProducts)*
 - **Transition (approve, publish, withdraw, archive)**: The picker offers only transitions the user holds (approve needs PRODUCT_APPROVE, publish PRODUCT_PUBLISH); a reason is required; an approved product still shows "Not yet on tills" until the next catalogue release (PR-3). *(source: R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle)*
 
-**Data it reads**: `listProducts` (onLoad, List products); `listMenus` (onLoad, List menus); `listMerchandise` (onLoad, List merchandise)
+**Data it reads**: `listProducts` (onLoad, List products); `listMenus` (onLoad, List menus); `listMerchandise` (onLoad, List merchandise); `getProductAttributes` (onLoad, Load the product's attribute axes before they are replaced)
 
 **Where the user goes next**
 
@@ -534,6 +542,7 @@ products:
 - `listMenus` → `PRODUCT_VIEW` (read) · staff
 - `listMerchandise` → `PRODUCT_VIEW` (read) · staff, guest
 - `bulkUpdateCatalogueProducts` → `PRODUCT_CONFIGURE` (configure) · staff
+- `getProductAttributes` → `PRODUCT_VIEW` (read) · staff
 
 **A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `createProduct`, `setAlternativeCodes`, `setProductAttributes`, `transitionProductLifecycle` and 3 more; `TENANT_CONFIGURE` …
 
@@ -586,7 +595,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (97), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
-- [ ] Every output is drawn (38 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (41 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-007?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create product, Resolve product by code, Save alternative codes, Save product attributes, Transition product lifecycle, Save product, Create merchandise, Bulk update products.
 - [ ] Every transition is wired: `BO-112`, `BO-008`, `BO-009`, `BO-010`, `BO-045`.
@@ -727,6 +736,14 @@ Errors to draw in the form: 400 A `description` value longer than 300 characters
 
 **Shown**
 
+**Load the product's attribute axes before they are replaced** (card list, from `getProductAttributes`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Code | text | — |
+| Name | text | — |
+| Values | list or chips (count when long) | — |
+
 **Every product variant** (data table, from `listProductVariants`)
 
 | Shows | Format | Notes |
@@ -805,7 +822,7 @@ Errors to draw in the form: 400 A `description` value longer than 300 characters
 - **Clone**: Creates a draft with a new code and its ticket types, never its orders; the user lands on the clone. *(source: contracts/spine/catalogue.yaml#cloneProduct)*
 - **Restore version**: Confirmation states that orders are untouched and that the restored state becomes a new version; tickets already sold keep their terms. *(source: contracts/spine/catalogue.yaml#restoreProductVersion)*
 
-**Data it reads**: `getProduct` (onLoad, Read a product); `listProductVariants` (onLoad, List generated variants); `previewProductTickets` (onLoad, The PDF ticket and the Apple and Google Wallet pass proofs …)
+**Data it reads**: `getProduct` (onLoad, Read a product); `listProductVariants` (onLoad, List generated variants); `previewProductTickets` (onLoad, The PDF ticket and the Apple and Google Wallet pass proofs …); `getProductAttributes` (onLoad, Load the product's attribute axes before they are replaced)
 
 **Where the user goes next**
 
@@ -893,6 +910,7 @@ impact:
 - `cloneProduct` → `PRODUCT_CONFIGURE` (configure) · staff
 - `listProductVersions` → `PRODUCT_VIEW` (read) · staff
 - `previewProductTickets` → `PRODUCT_VIEW` (read) · staff
+- `getProductAttributes` → `PRODUCT_VIEW` (read) · staff
 
 **A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getProduct` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ASSET_LIBRARY_VIEW` for `searchMedia`; `GUEST_VIEW` for `listConsentQuestions`; `PRODUCT_CONFIGURE` for `setProductAttributes`, `updateProduct` …
 
@@ -966,7 +984,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (41), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
-- [ ] Every output is drawn (34 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (37 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-008?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save product attributes, Save product, Save ticket type.
 - [ ] Every transition is wired: `BO-007`.
@@ -2012,6 +2030,41 @@ Errors to draw in the form: 409 `changeRequestRequired`.; 422 `priceRequired` or
 
 **Shown**
 
+**Load the package pricing as saved** (card list, from `getPackagePricingDefinition`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Record kind | chip: Package, Bundle, Add on | — |
+| Name | text | — |
+| Pricing model | chip: Fixed package price, Sum of components, Discounted component sum, Component override | — |
+| Add on type | chip: Fast track, Parking, Meal, Photo, Equipment, Upgrade… | — |
+| Package price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Components | grouped details | `[{productId, quantity, role, componentPrice}]`; `componentPrice` only for `componentOverride`. |
+| Component price visibility | chip: Package total only, Individual components, Component and saving | — |
+| Status | chip: Draft, Active, Inactive, Retired | The status of a catalogue configuration record (29 September, data model DM3): price lists, rates, fees and fee rules, tax profiles and … |
+
+**Load the bundle being edited** (card list, from `getBundle`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Code | text | — |
+| Name | text | — |
+| Description | text | — |
+| Kind | chip: Fixed, Dynamic, Mandatory, Optional, Promotional | — |
+| Price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Savings amount | AED 1,234.50 | Sum of component list prices less the bundle price. |
+| Savings percentage | 1,234.5 | — |
+| Has been sold | yes / no (icon or chip) | True locks components and allocation against amendment. |
+
+**List the combos and their slots** (card list, from `listCombos`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Name | text | — |
+| Price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Availability | grouped details | Service periods it sells in, in the same shape as a menu's. A lunch deal at 9pm is a margin leak and the venue only notices at month end. |
+| Is active | yes / no (icon or chip) | — |
+
 **Every bundle** (data table, from `listCatalogueBundles`)
 
 | Shows | Format | Notes |
@@ -2091,7 +2144,7 @@ Errors to draw in the form: 409 `changeRequestRequired`.; 422 `priceRequired` or
 
 - **Publish to tills**: Publishes the venue's catalogue release (not the bundle alone); the confirmation says every pending catalogue change at the venue goes with it and shows how many workstations have applied the last release. *(source: contracts/spine/catalogue.yaml#publishBundle / contracts/spine/catalogue.yaml#reportBundleApplied)*
 
-**Data it reads**: `listCatalogueBundles` (onLoad, List published bundles); `getLatestBundle` (onLoad, Pull the current bundle for this workstation's venue); `listCommercialCampaigns` (onLoad, List commercial campaigns)
+**Data it reads**: `listCatalogueBundles` (onLoad, List published bundles); `getLatestBundle` (onLoad, Pull the current bundle for this workstation's venue); `listCommercialCampaigns` (onLoad, List commercial campaigns); `listCombos` (onLoad, List the combos and their slots); `getBundle` (onLoad, Load the bundle being edited); `getPackagePricingDefinition` (onLoad, Load the package pricing as saved)
 
 **Where the user goes next**
 
@@ -2161,6 +2214,9 @@ groupPackage:
 - `updateBundle` → `PRODUCT_CONFIGURE` (configure) · staff
 - `listCommercialCampaigns` → `PRICE_VIEW` (read) · staff
 - `setPackagePricingDefinition` → `PRICE_CONFIGURE` (configure) · staff
+- `listCombos` → `PRODUCT_VIEW` (read) · staff
+- `getBundle` → `PRODUCT_VIEW` (read) · staff, guest
+- `getPackagePricingDefinition` → `PRICE_VIEW` (read) · staff
 
 **A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listCatalogueBundles` requires to show this screen, and names that permission (the screen's other reads need `PRICE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRICE_CONFIGURE` for `setPackagePricingDefinition` …
 
@@ -2204,13 +2260,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Drawn by: Claude Design Retail pack, 24 August
 - Client design-board frames: `FnB Board 2.dc.html#fnb-2g`, `Retail Board 5.dc.html#ret-5h`
 - Flow F77 *A promotion is built, bundled, published and measured*, step 2: Packages & Bundles. → **Drawn by the client as RET-5H.** 2 operations on this step.
-- ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
+- ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (69), with its required mark, default, format and its error state (400, 403, 404, 409, 412, 422).
-- [ ] Every output is drawn (36 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (56 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-011?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create bundle, What publishing changes, Save group package definition, Save package pricing definition.
 - [ ] Every transition is wired: `BO-007`, `BO-008`, `BO-009`, `ANL-009`.
@@ -2437,6 +2493,14 @@ Errors to draw in the form: 400 `media` with no `isPrimary` item or more than on
 
 **Shown**
 
+**Load the product's attribute axes before they are replaced** (card list, from `getProductAttributes`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Code | text | — |
+| Name | text | — |
+| Values | list or chips (count when long) | — |
+
 **Every product** (data table, from `listProducts`)
 
 | Shows | Format | Notes |
@@ -2515,7 +2579,7 @@ Errors to draw in the form: 400 `media` with no `isPrimary` item or more than on
 
 - **New entitlement template**: Created and selected on the product; reusable by other products at other prices. *(source: contracts/spine/catalogue.yaml#listEntitlementTemplates)*
 
-**Data it reads**: `listProducts` (onLoad, List products); `listEntitlementTemplates` (onLoad, List entitlement templates)
+**Data it reads**: `listProducts` (onLoad, List products); `listEntitlementTemplates` (onLoad, List entitlement templates); `getProductAttributes` (onLoad, Load the product's attribute axes before they are replaced)
 
 **Where the user goes next**
 
@@ -2579,6 +2643,7 @@ entitlement:
 - `setProductAttributes` → `PRODUCT_CONFIGURE` (configure) · staff
 - `transitionProductLifecycle` → `PRODUCT_CONFIGURE` (configure) · staff
 - `updateProduct` → `PRODUCT_CONFIGURE` (configure) · staff
+- `getProductAttributes` → `PRODUCT_VIEW` (read) · staff
 
 **A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `createEntitlementTemplate`, `createProduct`, `setAlternativeCodes`, `setProductAttributes` and 2 more.
 
@@ -2621,7 +2686,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (115), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
-- [ ] Every output is drawn (33 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (36 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-012?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create entitlement template, Create product, Resolve product by code, Save alternative codes, Save product attributes, Transition product lifecycle, Save product.
 - [ ] Every transition is wired: `BO-007`, `BO-008`, `BO-009`.
@@ -2640,7 +2705,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 1 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block A · task APP-SETUP-BO-013 |
 | Who uses it | venue staff holding `CAPACITY_CONFIGURE`, `PARTNER_MANAGE`, `PARTNER_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (3 configure, 2 read); in the flows as marketer |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listChannelCapacities` reads the population and `getChannelAllocations` reads one of them — list, select, act |
@@ -2982,7 +3047,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 1 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-014 |
 | Who uses it | venue staff holding `PRICE_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 read, 1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listProducts` reads the population and `getProduct` reads one of them — list, select, act |
@@ -3219,7 +3284,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 1 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block A · task APP-SETUP-BO-015 |
 | Who uses it | venue staff holding `EVENT_CONFIGURE`, `PERFORMANCE_CONFIGURE`, `PRODUCT_VIEW` (2 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listPerformances` reads the population and `getPerformance` reads one of them — list, select, act |
@@ -3569,7 +3634,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 1 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-016 |
 | Who uses it | venue staff holding `PERFORMANCE_CONFIGURE` (1 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listPerformanceTemplates` reads the population and the selected row is the detail; `setPerformanceTemplate` saves one — list, select, act |
@@ -3856,15 +3921,18 @@ Method, path, parameters, request and response for every operation these screens
 "endPromotion": {"method":"POST","path":"/promotions/{promotionId}/end","contract":"promotions","summary":"End a promotion early","permission":"PRICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "evaluatePromotions": {"method":"POST","path":"/promotions/evaluate","contract":"promotions","summary":"Evaluate promotions against a cart","permission":"PRICE_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"EvaluatePromotionsRequest","responds":"PromotionEvaluation"},
 "generateCouponCodes": {"method":"POST","path":"/coupon-campaigns/{campaignId}/codes","contract":"promotions","summary":"Generate codes in bulk","permission":"PRICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
+"getBundle": {"method":"GET","path":"/bundles/{bundleId}","contract":"promotions","summary":"Read a bundle with components and allocation","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"Bundle"},
 "getChannelAllocations": {"method":"GET","path":"/channel-capacities/{channelCapacityId}/channel-allocations","contract":"catalogue","summary":"Capacity allocated to each channel","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"ChannelAllocationSet"},
 "getDashboard": {"method":"GET","path":"/dashboards/{dashboardId}","contract":"reporting","summary":"Read a dashboard with tile data","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"refresh","in":"query","required":null}],"requestBody":null,"responds":"DashboardData"},
 "getDynamicPriceRule": {"method":"GET","path":"/pricing/dynamic-rules/{ruleId}","contract":"catalogue","summary":"One rule with its conditions and actions","permission":"PRICE_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"ruleId","in":"path","required":true}],"requestBody":null,"responds":"DynamicPriceRuleDetail"},
 "getEvent": {"method":"GET","path":"/events/{eventId}","contract":"catalogue","summary":"Read an event","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"Event"},
 "getGroupPackageDefinition": {"method":"GET","path":"/products/{productId}/group-package","contract":"catalogue","summary":"A school-trip format or party package","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"productId","in":"path","required":true}],"requestBody":null,"responds":"GroupPackageDefinition"},
 "getLatestBundle": {"method":"GET","path":"/catalogue/bundles/latest","contract":"catalogue","summary":"Pull the current bundle for this workstation's venue","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"workstation","parameters":[{"name":"since","in":"query","required":null},{"name":"If-None-Match","in":"header","required":null}],"requestBody":null,"responds":"CatalogueBundle"},
+"getPackagePricingDefinition": {"method":"GET","path":"/package-pricing","contract":"catalogue","summary":"The package pricing definition as saved","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"PackagePricing"},
 "getPerformance": {"method":"GET","path":"/performances/{performanceId}","contract":"catalogue","summary":"Read a performance","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"Performance"},
 "getPriceList": {"method":"GET","path":"/price-lists/{priceListId}","contract":"catalogue","summary":"Read a price list","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"PriceList"},
 "getProduct": {"method":"GET","path":"/products/{productId}","contract":"catalogue","summary":"Read a product","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"Product"},
+"getProductAttributes": {"method":"GET","path":"/products/{productId}/attributes","contract":"catalogue","summary":"A product's attribute axes","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":null},
 "getPromotion": {"method":"GET","path":"/promotions/{promotionId}","contract":"promotions","summary":"Read a promotion","permission":"PRICE_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"Promotion"},
 "getPromotionUsage": {"method":"GET","path":"/promotions/{promotionId}/usage","contract":"promotions","summary":"Redemption count and discount given","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"PromotionUsage"},
 "getSeatAvailability": {"method":"GET","path":"/performances/{performanceId}/seat-availability","contract":"seating","summary":"Seat status for a performance","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"sectionCode","in":"query","required":null},{"name":"categoryId","in":"query","required":null},{"name":"availableOnly","in":"query","required":null},{"name":"mode","in":"query","required":null}],"requestBody":null,"responds":"SeatAvailability"},
@@ -3873,6 +3941,7 @@ Method, path, parameters, request and response for every operation these screens
 "listCatalogueBundles": {"method":"GET","path":"/catalogue/bundles","contract":"catalogue","summary":"List published catalogue bundles","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"BundleSummary"},
 "listChannelCapacities": {"method":"GET","path":"/channel-capacities","contract":"catalogue","summary":"List channel capacities","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"performanceId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listChannelListings": {"method":"GET","path":"/channel-listings","contract":"subscription","summary":"What is listed on which OTA","permission":"PARTNER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"ChannelListing"},
+"listCombos": {"method":"GET","path":"/combos","contract":"fnb","summary":"The combos defined at the venue, with their slots","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listCommercialCampaigns": {"method":"GET","path":"/commercial-campaigns","contract":"promotions","summary":"List commercial campaigns","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"activeAt","in":"query","required":null},{"name":"ownerPrincipalId","in":"query","required":null},{"name":"q","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listConsentQuestions": {"method":"GET","path":"/consent-questions","contract":"marketing-crm","summary":"The consent questions a venue asks at booking","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"kind","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listCouponCampaigns": {"method":"GET","path":"/coupon-campaigns","contract":"promotions","summary":"List coupon campaigns","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
@@ -3987,11 +4056,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "FieldType": {"type":"string","enum":["string","integer","decimal","money","boolean","date","dateTime","uuid","enum"]},
 "GroupPackageDefinition": {"type":"object","x-ticvai-persistence":"catalogue.group_package","required":["kind","maxParticipants","durationMinutes"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"productId":{"type":"string","readOnly":true},"kind":{"type":"string","enum":["school","party"]},"maxParticipants":{"type":"integer","minimum":1,"description":"Pupils or children, e.g. 30 or 10."},"durationMinutes":{"type":"integer","minimum":15},"hostCount":{"type":"integer","minimum":0,"default":1,"description":"Party hosts included."},"pricingBasis":{"type":"string","enum":["perParticipant","perPackage"]},"freeLeaderRatio":{"type":"integer","nullable":true,"default":10,"description":"Schools: one teacher or assistant enters free per this many pupils."},"paymentMode":{"type":"string","enum":["invoice","deposit","full"],"description":"Schools are invoiced; parties take a deposit (see `DepositPolicy`)."},"includes":{"type":"array","items":{"type":"string","maxLength":120}},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Operations write it at `venue` scope."}}},
 "GuestListing": {"type":"string","enum":["bookable","infoOnly","hidden"],"default":"bookable","description":"**How a product appears to a guest** (decided 29 September, rev 3 REV3-14). `bookable`: listed and searched while it is on sale, and added to the basket. `infoOnly`: listed and searched with its details, photo and `notBookableLabel` whether or not it is on sale, and **never added to a basket** (`addCartLine` refuses it with `409`); the screen opens its details instead. `hidden`: never listed or searched for a guest, and reachable only where a staff channel sells it. Independent of `isSellable`, which says whether a channel may sell it at all.\n"},
-"GuestMerchandiseItem": {"x-ticvai-persistence":"none — guest projection of MerchandiseItem","type":"object","description":"**What a guest caller of `listMerchandise` receives.** The fields a shop screen shows and the ids a guest needs to reserve or buy, and nothing else: no inventory link, no catalogue variant, no stock count, no serial-number flag. `additionalProperties: false` is the guarantee: a staff field added to `MerchandiseItem` does not reach a guest by default.\n","additionalProperties":false,"required":["id","name","outletId","price","isAvailable"],"properties":{"id":{"type":"string","format":"uuid"},"sku":{"type":"string"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"outletId":{"type":"string","format":"uuid"},"categoryId":{"type":"string","format":"uuid","nullable":true},"price":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"isAvailable":{"type":"boolean","description":"True when the item is active and in stock at its outlet. An item with no `inventoryItemId` never runs out, so it is available while active.\n"},"isReturnable":{"type":"boolean"},"returnWindowDays":{"type":"integer","nullable":true},"imageAssetRef":{"type":"string","nullable":true}}},
+"GuestMerchandiseItem": {"x-ticvai-persistence":"none — guest projection of MerchandiseItem","type":"object","description":"**What a guest caller of `listMerchandise` receives.** The fields a shop screen shows and the ids a guest needs to reserve or buy, and nothing else: no inventory link, no catalogue variant, no stock count, no serial-number flag. `additionalProperties: false` is the guarantee: a staff field added to `MerchandiseItem` does not reach a guest by default.\n","additionalProperties":false,"required":["id","name","outletId","price","isAvailable"],"properties":{"id":{"type":"string","format":"uuid"},"sku":{"type":"string"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"outletId":{"type":"string","format":"uuid"},"categoryId":{"type":"string","format":"uuid","nullable":true},"price":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"isAvailable":{"type":"boolean","description":"True when the item is active and in stock at its outlet. An item with no `inventoryItemId` never runs out, so it is available while active.\n"},"isReturnable":{"type":"boolean"},"returnWindowDays":{"type":"integer","nullable":true},"imageAssetRef":{"type":"string","nullable":true},"productVariantId":{"type":"string","format":"uuid","description":"The catalogue Product variant the item sells, which `addCartLine` takes as its `variantId` (added 3 October 2026, CHG-R1S-004: the r1 gate found WEB-033 could not add to the cart from the guest projection; qualified from `variantId` by CHG-GTRB-001, since the glossary bans a bare Variant). An id, not the variant record: price and tax still come from the server.\n","x-ticvai-references":"catalogue.ProductVariant"}}},
 "GuestPromotion": {"x-ticvai-persistence":"none — guest projection of promotions.promotion","type":"object","description":"**What a guest may see of a promotion.** `Promotion` carries the commercial internals (`budgetCap`, `maxRedemptions`, `redemptionCount`, `discountGiven`, `precedence`, `stackingGroup`), and `listPromotions` and `getPromotion` are guest-audience. A guest caller receives this shape instead. `additionalProperties: false` is the point: a server that adds an internal field to it fails validation instead of publishing the field.\n","additionalProperties":false,"required":["id","code","name","discount","validFrom"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"description":{"type":"string"},"discount":{"$ref":"#/components/schemas/Discount"},"conditions":{"$ref":"#/components/schemas/PromotionConditions"},"stackingMode":{"$ref":"#/components/schemas/StackingMode"},"validFrom":{"type":"string","format":"date-time"},"validTo":{"type":"string","format":"date-time"},"maxRedemptionsPerGuest":{"type":"integer","nullable":true}}},
 "LocalisedText": {"x-ticvai-persistence":"none — jsonb column","type":"object","additionalProperties":{"type":"string"}},
 "MediaAsset": {"x-ticvai-persistence":"assets.media_asset","type":"object","required":["id","kind","status","filename","contentType","sizeBytes","referenceCount","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"kind":{"$ref":"#/components/schemas/MediaKind"},"status":{"$ref":"#/components/schemas/MediaStatus"},"filename":{"type":"string"},"contentType":{"type":"string"},"sizeBytes":{"type":"integer"},"title":{"$ref":"#/components/schemas/LocalisedText"},"description":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"description":"Set by `updateMediaAsset` and matched by `searchMedia`'s `search`. It was accepted and searched on before it had anywhere to be stored.\n"},"altText":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"description":"Required before use in a guest-facing surface. WCAG 2.2 AA."},"width":{"type":"integer","nullable":true},"height":{"type":"integer","nullable":true},"durationSeconds":{"type":"number","nullable":true},"customMetadata":{"type":"object","nullable":true,"additionalProperties":true,"description":"BL-178. **`assets` is a strong contract and its metadata was fixed** — kind, title, alt text, dimensions, rights. A venue photographing four thousand products wants its own fields: shoot date, photographer, model release, season.\n**Free-form and searchable, not a schema.** Every venue would want a different one, and a fixed set would be wrong for all of them.\n"},"sharedWithTenantIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"BL-178. **Cross-tenant sharing, and it is refused by default for a reason.** A brand operating three venues wants one logo library; two unrelated tenants sharing an asset store is the isolation breach ADR-0011 exists to prevent.\n**Only within one tenant's own scope tree.** A share naming a tenant outside it is refused rather than warned about — this is the one place where a permissive default would be a cross-tenant data leak.\n"},"tags":{"type":"array","items":{"type":"string"}},"categoryId":{"type":"string","format":"uuid","nullable":true,"description":"The asset's category, one of `MediaTaxonomy.categories[].id`; null while unclassified. Set by `bulkUpdateMediaAssets` (`setCategoryId`) (decided 29 September, data model DM4).\n"},"venueId":{"type":"string","format":"uuid","nullable":true},"url":{"type":"string","description":"Signed and expiring for private assets; stable CDN URL for public ones."},"thumbnailUrl":{"type":"string","nullable":true},"referenceCount":{"type":"integer","description":"How many surfaces reference this asset. Non-zero refuses deletion.\n"},"rights":{"$ref":"#/components/schemas/MediaRights"},"isRightsExpired":{"type":"boolean"},"version":{"type":"integer"},"uploadedByPrincipalId":{"type":"string","format":"uuid"},"createdAt":{"type":"string","format":"date-time"}}},
-"MediaKind": {"type":"string","enum":["image","video","audio","document","vector","font","archive"]},
+"MediaKind": {"type":"string","enum":["image","video","audio","document","vector","font","archive","model3d"],"description":"`model3d` added 3 October 2026 (r1 additions; ADR-0069 action item 4): a glTF binary (`model/gltf-binary`, `.glb`) venue model, at most 40 MB. No rendition or derivative is generated for it; the guest app downloads the file as uploaded.\n"},
 "MediaRights": {"x-ticvai-persistence":"none — embedded in asset","type":"object","description":"Licensing terms. Tracked because an expired licence on a live surface is a legal exposure, not a housekeeping item.\n","properties":{"licenceKind":{"type":"string","enum":["owned","royaltyFree","rightsManaged","creativeCommons","editorialOnly","unknown"]},"licensor":{"type":"string","nullable":true},"licenceReference":{"type":"string","nullable":true},"validFrom":{"type":"string","format":"date","nullable":true},"validTo":{"type":"string","format":"date","nullable":true},"permittedUses":{"type":"array","items":{"type":"string","enum":["web","print","socialMedia","inVenue","advertising","internal"]}},"attributionRequired":{"type":"boolean","default":false},"attributionText":{"type":"string","nullable":true},"permittedTerritories":{"type":"array","items":{"type":"string"},"description":"ISO country or region codes. **Empty means unrestricted, which is a claim rather than an absence** — an unknown territory and a worldwide licence are not the same thing, and `licenceKind: unknown` is how the second is said.\n"},"permittedChannels":{"type":"array","items":{"type":"string"},"description":"Distribution channel codes, checked by `setMediaDistributionChannels`. Narrower than `permittedUses`, which describes the medium rather than the route.\n"},"modelReleaseHeld":{"type":"boolean","default":false},"renewalOwner":{"type":"string","format":"uuid","nullable":true}}},
 "MediaStatus": {"type":"string","enum":["processing","ready","quarantined","failed","archived"]},
 "Menu": {"x-ticvai-persistence":"fnb.menu","type":"object","required":["id","code","name","outletId","isActive"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"outletId":{"type":"string","format":"uuid"},"availability":{"$ref":"#/components/schemas/MenuAvailability"},"sections":{"type":"array","items":{"$ref":"#/components/schemas/MenuSection"}},"isActive":{"type":"boolean"},"publishedVersion":{"type":"integer","nullable":true,"readOnly":true,"description":"The `MenuVersion.version` live now. Null for a menu never published."},"publishedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true}}},

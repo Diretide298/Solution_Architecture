@@ -849,7 +849,24 @@
     "BO-096",
     "BO-097",
     "BO-098",
-    "BO-099"
+    "BO-099",
+    "BO-1045",
+    "BO-1062",
+    "BO-151",
+    "BO-155",
+    "BO-161",
+    "BO-166",
+    "BO-167",
+    "BO-168",
+    "BO-185",
+    "BO-186",
+    "BO-188",
+    "BO-189",
+    "BO-201",
+    "BO-230",
+    "BO-335",
+    "BO-346",
+    "BO-618"
    ],
    "transitions": [
     {
@@ -949,6 +966,94 @@
      "to": "BO-099",
      "trigger": "Performance Manifest",
      "provenance": "derived — BO-099 declares entryState.params performanceId and BO-103 holds none of them. The edge carries nothing: BO-103 is the Access & Venue hub and this is its menu entry; BO-099 has no source yet for performanceId"
+    },
+    {
+     "to": "BO-1045",
+     "trigger": "Opens Price Bands & Categories",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-1062",
+     "trigger": "Opens Tenant & Brand Context",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-151",
+     "trigger": "Opens Access Location Grouping",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-155",
+     "trigger": "Opens Visual Access Rule Builder",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-161",
+     "trigger": "Opens Guest, Companion & Eligibility Rules",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-166",
+     "trigger": "Opens Credential Activation & Display Rules",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-167",
+     "trigger": "Opens Device Binding & Session Security",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-168",
+     "trigger": "Opens BLE Beacon & Geofence Configuration",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-185",
+     "trigger": "Opens Biometric Verification Profile Builder",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-186",
+     "trigger": "Opens Face Pass Enrollment Configuration",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-188",
+     "trigger": "Opens Face Tag Temporary Enrollment",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-189",
+     "trigger": "Opens Face Matching & Verification Thresholds",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-201",
+     "trigger": "Opens Gate Modes, Free Spin & Emergency Controls",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-230",
+     "trigger": "Opens Live Gate Mode & Lane Control",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A",
+     "carries": [
+      "accessPointId"
+     ]
+    },
+    {
+     "to": "BO-335",
+     "trigger": "Opens Virtual Ticket Identity & Master Record Configuration",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-346",
+     "trigger": "Opens PDF, Printable & POS Ticket Designer",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-618",
+     "trigger": "Opens Accreditation Form Builder",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
     }
    ]
   },

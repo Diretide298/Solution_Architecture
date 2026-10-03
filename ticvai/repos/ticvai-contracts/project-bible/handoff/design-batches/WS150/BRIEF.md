@@ -1,6 +1,6 @@
 # WS150 — Payment Payment Orchestration board 4
 
-**10 screens · 11 operations · 19 schemas · 5 permissions**
+**10 screens · 12 operations · 19 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-589` | Digital Payments Command Center | B–D | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-590` | Digital & Alternative Payment Method Manager | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-591` | Digital Wallet & Mobile Payment Configuration | B–D | 0 | 18 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `ADM-592` | Payment Link Builder & Configuration | B–D | 13 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
-| `ADM-593` | Payment Link Distribution & Customer Journey Manager | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `ADM-594` | Hosted Checkout, Redirect & Return Flow Configuration | B–D | 10 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `ADM-595` | Digital Payment Session & Transaction Monitor | B–D | 2 | 24 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-596` | Authentication, Tokenization & Recurring Payment Controls | B–D | 0 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-597` | Digital Payment Exception, Recovery & Expiry Center | B–D | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-598` | Digital Payment Simulator, Conversion & AI Advisor | B–D | 13 | 31 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-589` | Digital Payments Command Center | C | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-590` | Digital & Alternative Payment Method Manager | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-591` | Digital Wallet & Mobile Payment Configuration | C | 0 | 18 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `ADM-592` | Payment Link Builder & Configuration | C | 13 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
+| `ADM-593` | Payment Link Distribution & Customer Journey Manager | C | 1 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `ADM-594` | Hosted Checkout, Redirect & Return Flow Configuration | C | 10 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `ADM-595` | Digital Payment Session & Transaction Monitor | C | 2 | 24 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-596` | Authentication, Tokenization & Recurring Payment Controls | C | 0 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-597` | Digital Payment Exception, Recovery & Expiry Center | C | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-598` | Digital Payment Simulator, Conversion & AI Advisor | C | 13 | 31 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

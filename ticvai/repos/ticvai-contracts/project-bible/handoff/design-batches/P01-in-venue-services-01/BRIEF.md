@@ -1,6 +1,6 @@
 # P01-in-venue-services-01 — P01 · In-venue Services
 
-**6 screens · 23 operations · 51 schemas · 5 permissions**
+**6 screens · 25 operations · 54 schemas · 5 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
@@ -147,12 +147,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `WEB-036` | F&B – Browse & Order | A | 70 | 43 | 6 | 22 | 11 | 0 | guest | review (client-verified) |
+| `WEB-036` | F&B – Browse & Order | A | 70 | 47 | 6 | 22 | 11 | 0 | guest | review (client-verified) |
 | `WEB-037` | Menu Item Detail | A | 0 | 7 | 5 | 1 | 2 | 2 | guest | review (client-verified) |
 | `WEB-038` | F&B – Order Tracking | A | 0 | 14 | 5 | 0 | 0 | 0 | guest | review (client-verified) |
 | `WEB-039` | Venue Map & Wait Times | A | 0 | 18 | 6 | 5 | 4 | 6 | guest | review (client-verified) |
 | `WEB-040` | Virtual Queue | A | 8 | 15 | 6 | 11 | 3 | 6 | guest | review (client-verified) |
-| `WEB-041` | Parking – Reserve & Pay | A | 22 | 2 | 7 | 7 | 2 | 2 | guest | review (client-verified) |
+| `WEB-041` | Parking – Reserve & Pay | A | 22 | 10 | 7 | 7 | 2 | 2 | guest | review (client-verified) |
 
 ## Thin screens in this batch
 

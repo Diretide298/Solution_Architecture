@@ -372,7 +372,8 @@
    "inferred": false,
    "fromFlows": true,
    "entryFrom": [
-    "EMP-031"
+    "EMP-031",
+    "EMP-003"
    ],
    "notes": "**Reached from EMP-031** — a manual wait is entered from the queue that is not counting it. Stated on 4 September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph entirely.",
    "transitions": [
@@ -394,7 +395,7 @@
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-032 holds none of them. The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens on its own"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-032 holds none of them. The edge carries nothing: EMP-032 is opened from EMP-003, so this edge is the way back and EMP-003 keeps its own state"
     },
     {
      "to": "BO-005",

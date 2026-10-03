@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-048` | Commercial Pricing Command Center | B–D | 2 | 26 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `ADM-048` | Commercial Pricing Command Center | B | 2 | 26 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
 | `ADM-049` | Price List Master Configuration | B–D | 21 | 20 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-050` | Price Category & Rate Type Library | B | 12 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-051` | Rate Structure Builder | B–D | 0 | 12 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
-| `ADM-052` | Product & Service Price Assignment | B–D | 0 | 2 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `ADM-053` | Package, Bundle & Add-On Pricing | B–D | 21 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-054` | Market, Venue & Currency Pricing Structure | B–D | 23 | 0 | 5 | 0 | 1 | 4 | — | notStarted (generated) |
+| `ADM-052` | Product & Service Price Assignment | B | 0 | 2 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `ADM-053` | Package, Bundle & Add-On Pricing | B | 21 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-054` | Market, Venue & Currency Pricing Structure | B | 23 | 0 | 5 | 0 | 1 | 4 | — | notStarted (generated) |
 | `ADM-055` | Price Hierarchy & Inheritance Configuration | B | 10 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
-| `ADM-056` | Price List Templates, Clone & Reuse | B–D | 18 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-057` | Commercial Pricing Structure Validation | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-056` | Price List Templates, Clone & Reuse | B | 18 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-057` | Commercial Pricing Structure Validation | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

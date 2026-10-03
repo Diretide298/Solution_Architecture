@@ -7,20 +7,20 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-10-03",
+ "generated": "2026-10-04",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 1661,
-  "operations": 1837,
+  "operations": 1860,
   "contracts": 31,
   "modules": 19,
   "undrawn": 0,
-  "operationsWithNoScreen": 198
+  "operationsWithNoScreen": 189
  },
  "waves": {
-  "wave1": 125,
-  "wave2": 64,
-  "wave3": 1472
+  "wave1": 139,
+  "wave2": 58,
+  "wave3": 1464
  },
  "modules": [
   {
@@ -156,6 +156,7 @@
    "module": "Transport",
    "screens": 7,
    "waves": [
+    1,
     2
    ]
   },
@@ -171,26 +172,26 @@
    "module": "Setup",
    "screens": 1,
    "waves": [
-    3
+    1
    ]
   }
  ],
  "contracts": [
   {
    "contract": "access",
-   "operations": 230
+   "operations": 236
   },
   {
    "contract": "catalogue",
-   "operations": 219
+   "operations": 223
   },
   {
    "contract": "orders",
-   "operations": 168
+   "operations": 169
   },
   {
    "contract": "marketing-crm",
-   "operations": 137
+   "operations": 140
   },
   {
    "contract": "promotions",
@@ -198,7 +199,7 @@
   },
   {
    "contract": "fnb",
-   "operations": 70
+   "operations": 75
   },
   {
    "contract": "finance",
@@ -214,7 +215,7 @@
   },
   {
    "contract": "ai",
-   "operations": 53
+   "operations": 54
   },
   {
    "contract": "inventory",
@@ -233,11 +234,11 @@
    "operations": 46
   },
   {
-   "contract": "subscription",
-   "operations": 44
+   "contract": "tenancy",
+   "operations": 45
   },
   {
-   "contract": "tenancy",
+   "contract": "subscription",
    "operations": 44
   },
   {
@@ -253,11 +254,11 @@
    "operations": 41
   },
   {
-   "contract": "identity",
+   "contract": "rental",
    "operations": 40
   },
   {
-   "contract": "rental",
+   "contract": "identity",
    "operations": 40
   },
   {
@@ -277,11 +278,11 @@
    "operations": 15
   },
   {
-   "contract": "queue",
-   "operations": 13
+   "contract": "venue-map",
+   "operations": 15
   },
   {
-   "contract": "venue-map",
+   "contract": "queue",
    "operations": 13
   },
   {
@@ -578,7 +579,7 @@
    "module": "Commercial",
    "wave": 1,
    "route": "/commercial/tax-profile-jurisdiction-configuration-adm-069",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -2144,7 +2145,7 @@
    "module": "Platform",
    "wave": 1,
    "route": "/approvals/approval-delegations/roles-authority-delegation-approval-limits-adm-243",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -3566,7 +3567,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/payment-link-distribution-customer-journey-manager-t74-adm-593",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -4565,7 +4566,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/venue-operations/product-directory",
-   "operations": 15,
+   "operations": 16,
    "drawn": true
   },
   {
@@ -4574,7 +4575,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/venue-operations/product-detail-variants",
-   "operations": 13,
+   "operations": 14,
    "drawn": true
   },
   {
@@ -4601,7 +4602,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/venue-operations/packages-bundles",
-   "operations": 11,
+   "operations": 14,
    "drawn": true
   },
   {
@@ -4610,7 +4611,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/venue-operations/membership-products",
-   "operations": 12,
+   "operations": 13,
    "drawn": true
   },
   {
@@ -4790,7 +4791,7 @@
    "module": "Access & Venue",
    "wave": 1,
    "route": "/venue-operations/admission-rules",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -4898,7 +4899,7 @@
    "module": "Venue Operations",
    "wave": 1,
    "route": "/venue-operations/f-b-outlets",
-   "operations": 15,
+   "operations": 16,
    "drawn": true
   },
   {
@@ -5087,7 +5088,7 @@
    "module": "Orders & Money",
    "wave": 1,
    "route": "/venue-operations/venue-configuration",
-   "operations": 9,
+   "operations": 10,
    "drawn": true
   },
   {
@@ -5339,7 +5340,7 @@
    "module": "Access & Venue",
    "wave": 1,
    "route": "/venue-mapping/map-import",
-   "operations": 5,
+   "operations": 9,
    "drawn": true
   },
   {
@@ -5348,7 +5349,7 @@
    "module": "Access & Venue",
    "wave": 1,
    "route": "/venue-mapping/map-editor",
-   "operations": 10,
+   "operations": 14,
    "drawn": true
   },
   {
@@ -5850,7 +5851,7 @@
    "id": "BO-1045",
    "name": "Price Bands & Categories",
    "module": "Access & Venue",
-   "wave": 3,
+   "wave": 1,
    "route": "/access-venue/price-bands-categories-bo-1045",
    "operations": 3,
    "drawn": true
@@ -6021,7 +6022,7 @@
    "id": "BO-1062",
    "name": "Tenant & Brand Context",
    "module": "Access & Venue",
-   "wave": 3,
+   "wave": 1,
    "route": "/access-venue/tenant-brand-context-bo-1062",
    "operations": 3,
    "drawn": true
@@ -6048,7 +6049,7 @@
    "id": "BO-1065",
    "name": "Currency, Timezone & Channels",
    "module": "Setup",
-   "wave": 3,
+   "wave": 1,
    "route": "/access-venue/currency-timezone-channels-bo-1065",
    "operations": 4,
    "drawn": true
@@ -6336,7 +6337,7 @@
    "id": "BO-1094",
    "name": "Funding Method Configuration",
    "module": "Orders & Money",
-   "wave": 3,
+   "wave": 1,
    "route": "/orders-money/funding-method-configuration-bo-1094",
    "operations": 2,
    "drawn": true
@@ -6491,7 +6492,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/ingredient-substitution-allergen-nutrition",
-   "operations": 6,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -6507,7 +6508,7 @@
    "id": "BO-1111",
    "name": "Credit Expiry, Extension & Forfeiture Operations",
    "module": "Orders & Money",
-   "wave": 3,
+   "wave": 1,
    "route": "/orders-money/credit-expiry-extension-forfeiture-operations-bo-1111",
    "operations": 2,
    "drawn": true
@@ -6849,7 +6850,7 @@
    "id": "BO-1146",
    "name": "Refund-to-Wallet Policy Configuration",
    "module": "Orders & Money",
-   "wave": 3,
+   "wave": 1,
    "route": "/orders-money/refund-to-wallet-policy-configuration-bo-1146",
    "operations": 3,
    "drawn": true
@@ -7011,7 +7012,7 @@
    "id": "BO-1162",
    "name": "Security Governance, Audit & Rule Publication",
    "module": "Orders & Money",
-   "wave": 3,
+   "wave": 1,
    "route": "/orders-money/security-governance-audit-rule-publication-bo-1162",
    "operations": 6,
    "drawn": true
@@ -7085,7 +7086,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/product-import-governance-ai-configuration-assistant",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -7218,7 +7219,7 @@
    "id": "BO-1183",
    "name": "Transport Stations",
    "module": "Transport",
-   "wave": 2,
+   "wave": 1,
    "route": "/transport/stations",
    "operations": 3,
    "drawn": true
@@ -7227,7 +7228,7 @@
    "id": "BO-1184",
    "name": "Transport Routes & Stops",
    "module": "Transport",
-   "wave": 2,
+   "wave": 1,
    "route": "/transport/routes",
    "operations": 6,
    "drawn": true
@@ -7236,7 +7237,7 @@
    "id": "BO-1185",
    "name": "Transport Fares & Passenger Types",
    "module": "Transport",
-   "wave": 2,
+   "wave": 1,
    "route": "/transport/fares",
    "operations": 4,
    "drawn": true
@@ -7245,7 +7246,7 @@
    "id": "BO-1186",
    "name": "Transport Timetables",
    "module": "Transport",
-   "wave": 2,
+   "wave": 1,
    "route": "/transport/timetables",
    "operations": 6,
    "drawn": true
@@ -7263,7 +7264,7 @@
    "id": "BO-1188",
    "name": "Transport Pass Types",
    "module": "Transport",
-   "wave": 2,
+   "wave": 1,
    "route": "/transport/pass-types",
    "operations": 4,
    "drawn": true
@@ -7272,7 +7273,7 @@
    "id": "BO-1189",
    "name": "Transport Network Import",
    "module": "Transport",
-   "wave": 2,
+   "wave": 1,
    "route": "/transport/import",
    "operations": 5,
    "drawn": true
@@ -7382,7 +7383,7 @@
    "module": "Venue Operations",
    "wave": 1,
    "route": "/venue-operations/offline-policy-rules-configuration",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -7436,7 +7437,7 @@
    "module": "Food & Beverage",
    "wave": 1,
    "route": "/food-beverage/f-b-global-settings-controls",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -7724,7 +7725,7 @@
    "module": "Access & Venue",
    "wave": 1,
    "route": "/access-venue/ble-beacon-geofence-configuration-bo-168",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -7877,7 +7878,7 @@
    "module": "Access & Venue",
    "wave": 1,
    "route": "/access-venue/biometric-verification-profile-builder-bo-185",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -7886,7 +7887,7 @@
    "module": "Access & Venue",
    "wave": 1,
    "route": "/access-venue/face-pass-enrollment-configuration-bo-186",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9218,7 +9219,7 @@
    "module": "Access & Venue",
    "wave": 1,
    "route": "/access-venue/virtual-ticket-identity-master-record-configuration-bo-335",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9317,7 +9318,7 @@
    "module": "Access & Venue",
    "wave": 1,
    "route": "/access-venue/pdf-printable-pos-ticket-designer-bo-346",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -11756,7 +11757,7 @@
    "module": "Access & Venue",
    "wave": 1,
    "route": "/access-venue/accreditation-form-builder-bo-618",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -13367,14 +13368,14 @@
    "module": "Engagement & Support",
    "wave": 1,
    "route": "/engagement-support/intent-knowledge-management-bo-798",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
    "id": "BO-799",
    "name": "Agent Workspace",
    "module": "Engagement & Support",
-   "wave": 3,
+   "wave": 1,
    "route": "/engagement-support/agent-workspace-bo-799",
    "operations": 4,
    "drawn": true
@@ -13628,7 +13629,7 @@
    "module": "Engagement & Support",
    "wave": 1,
    "route": "/engagement-support/points-activity-rules-bo-827",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -13637,7 +13638,7 @@
    "module": "Engagement & Support",
    "wave": 1,
    "route": "/engagement-support/milestones-reward-rules-bo-828",
-   "operations": 2,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -14078,7 +14079,7 @@
    "module": "Rentals",
    "wave": 1,
    "route": "/rentals/qualification-assignment-rule-engine-bo-877",
-   "operations": 2,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -15279,12 +15280,6 @@
     "summary": "Entry, Exit & Re-entry Rules"
    },
    {
-    "operation": "listEntryRulePoints",
-    "contract": "access",
-    "verb": "GET",
-    "summary": "Which access points an admission rule covers"
-   },
-   {
     "operation": "listEntryTemporaryExit",
     "contract": "access",
     "verb": "GET",
@@ -15331,12 +15326,6 @@
     "contract": "ai",
     "verb": "GET",
     "summary": "What is indexed, and how current it is"
-   },
-   {
-    "operation": "proposeWalkways",
-    "contract": "ai",
-    "verb": "POST",
-    "summary": "Find walkable space in a drawing that has no vectors"
    },
    {
     "operation": "reindexSource",
@@ -15427,12 +15416,6 @@
     "contract": "approvals",
     "verb": "POST",
     "summary": "Send a saved draft for approval"
-   },
-   {
-    "operation": "getCatalogueImportJob",
-    "contract": "catalogue",
-    "verb": "GET",
-    "summary": "Progress and findings of a catalogue import"
    },
    {
     "operation": "getEventChangeTreatmentPolicy",
@@ -15583,12 +15566,6 @@
     "contract": "fnb",
     "verb": "GET",
     "summary": "Upsell and pairing suggestions for F&B"
-   },
-   {
-    "operation": "listIngredientSubstitutes",
-    "contract": "fnb",
-    "verb": "GET",
-    "summary": "Approved substitutions for a recipe's ingredients"
    },
    {
     "operation": "sendOrderNotification",
@@ -15801,12 +15778,6 @@
     "summary": "List case routing rules"
    },
    {
-    "operation": "listLoyaltyCampaigns",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Time-boxed campaigns inside a programme"
-   },
-   {
     "operation": "listLoyaltyPointEntries",
     "contract": "marketing-crm",
     "verb": "GET",
@@ -15969,12 +15940,6 @@
     "summary": "Store a guest photo, ID or signed document"
    },
    {
-    "operation": "cancelPaymentLink",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Cancel a live payment link"
-   },
-   {
     "operation": "convertToTermProduct",
     "contract": "orders",
     "verb": "POST",
@@ -16009,12 +15974,6 @@
     "contract": "orders",
     "verb": "GET",
     "summary": "Fees charged on an order"
-   },
-   {
-    "operation": "listPaymentProviders",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "Gateways configured for this scope"
    },
    {
     "operation": "openGuestCreditAccount",
@@ -16173,12 +16132,6 @@
     "summary": "List returns"
    },
    {
-    "operation": "extendSeatHold",
-    "contract": "seating",
-    "verb": "POST",
-    "summary": "Extend a hold"
-   },
-   {
     "operation": "adjustDepositBoxFloat",
     "contract": "shift",
     "verb": "POST",
@@ -16327,12 +16280,6 @@
     "contract": "tenancy",
     "verb": "GET",
     "summary": "The connectivity thresholds saved at one scope node"
-   },
-   {
-    "operation": "getOfflinePolicy",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "The offline policy saved at one scope node"
    },
    {
     "operation": "getOutlet",
@@ -16527,6 +16474,13 @@
    },
    {
     "module": "Stock & Supply",
+    "waves": [
+     1,
+     2
+    ]
+   },
+   {
+    "module": "Transport",
     "waves": [
      1,
      2

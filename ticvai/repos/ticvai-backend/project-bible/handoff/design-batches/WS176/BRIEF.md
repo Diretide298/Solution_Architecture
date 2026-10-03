@@ -1,6 +1,6 @@
 # WS176 — Seat Management Venue Mapping Reference v1.0 board 12
 
-**10 screens · 32 operations · 30 schemas · 12 permissions**
+**10 screens · 32 operations · 31 schemas · 12 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -157,16 +157,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-1061` | Platform Command Center | B–D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `BO-1062` | Tenant & Brand Context | B–D | 79 | 12 | 6 | 28 | 0 | 6 | — | notStarted (—) |
-| `BO-1063` | Venue-Specific Configuration | B–D | 1 | 0 | 6 | 17 | 0 | 0 | — | notStarted (—) |
-| `BO-1064` | Naming, Numbering & Localization | B–D | 0 | 0 | 6 | 6 | 0 | 0 | — | notStarted (—) |
-| `BO-1065` | Currency, Timezone & Channels | B–D | 26 | 14 | 6 | 0 | 0 | 4 | — | notStarted (—) |
-| `BO-1066` | Roles, Permissions & Masking | B–D | 0 | 0 | 6 | 12 | 1 | 5 | — | notStarted (—) |
-| `BO-1067` | Seat Approval Workflows | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-1068` | Lifecycle & Environment Promotion | B–D | 0 | 0 | 6 | 0 | 0 | 2 | — | notStarted (—) |
-| `BO-1069` | Platform Health & Observability | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1070` | Setup, Clone & Inheritance | B–D | 0 | 30 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `BO-1061` | Platform Command Center | C | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `BO-1062` | Tenant & Brand Context | A | 79 | 12 | 6 | 28 | 0 | 6 | — | notStarted (—) |
+| `BO-1063` | Venue-Specific Configuration | B | 1 | 0 | 6 | 17 | 0 | 0 | — | notStarted (—) |
+| `BO-1064` | Naming, Numbering & Localization | C | 0 | 0 | 6 | 6 | 0 | 0 | — | notStarted (—) |
+| `BO-1065` | Currency, Timezone & Channels | A | 47 | 17 | 6 | 0 | 0 | 4 | — | notStarted (—) |
+| `BO-1066` | Roles, Permissions & Masking | B | 0 | 0 | 6 | 12 | 1 | 5 | — | notStarted (—) |
+| `BO-1067` | Seat Approval Workflows | B | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-1068` | Lifecycle & Environment Promotion | B | 0 | 0 | 6 | 0 | 0 | 2 | — | notStarted (—) |
+| `BO-1069` | Platform Health & Observability | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1070` | Setup, Clone & Inheritance | C | 0 | 30 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

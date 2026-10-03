@@ -168,6 +168,19 @@
   "requestBody": null,
   "responds": "Order"
  },
+ "getParkingEntitlement": {
+  "method": "GET",
+  "path": "/parking-entitlements/{entitlementId}",
+  "contract": "access",
+  "summary": "One of the guest's parking entitlements",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ParkingEntitlement"
+ },
  "getTenantAppStatus": {
   "method": "GET",
   "path": "/tenant-config/status",

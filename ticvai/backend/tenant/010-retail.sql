@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS retail.merchandise (
 -- Holds 17 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS retail.product_recommendation (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     scope_path                        ltree NOT NULL,
     source_product_id                 uuid NOT NULL,
     source_variant_id                 uuid,
@@ -113,7 +113,7 @@ CREATE TABLE IF NOT EXISTS retail.return_line (
 
 -- When goods may come back and in what state. Outlet-scoped
 CREATE TABLE IF NOT EXISTS retail.return_policy (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     outlet_id                         uuid NOT NULL,
     default_window_days               integer NOT NULL,
     requires_receipt                  boolean NOT NULL DEFAULT true,
@@ -199,6 +199,8 @@ CREATE TABLE IF NOT EXISTS retail.store_rule (
     outlet_id                         uuid,
     kind                              text CONSTRAINT store_rule_kind_chk CHECK (kind IN ('discountLimit', 'refundThreshold', 'ageCheck', 'managerOverride', 'priceOverride')),
     threshold_amount                  numeric(18,4),
+    limit_kind                        text CONSTRAINT store_rule_limit_kind_chk CHECK (limit_kind IN ('percent', 'amount')),
+    threshold_percent                 numeric(18,4),
     minimum_age_years                 integer,
     requires_permission               text,
     is_enabled                        boolean,

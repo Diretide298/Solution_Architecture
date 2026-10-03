@@ -1,5 +1,5 @@
 id: LLD-PlatformService
-title: PlatformService — 221 operations, 108 tables
+title: PlatformService — 225 operations, 108 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 deployable: operations
@@ -14,7 +14,7 @@ why: '**Three contracts, two schemas, 108 tables.** Subscription, platform opera
 scale: Low volume, high consequence. Tenant provisioning and licensing.
 ifDown: Down blocks provisioning and the developer API. **Trading is unaffected.**
 coverage:
-  operations: 221
+  operations: 225
   inAFlow: 80
   percent: 36%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -233,7 +233,7 @@ operationsByContract:
     permission: PLATFORM_CELL_MANAGE
     offline: false
     reads: 1
-    writes: 1
+    writes: 2
   - operation: executeTenantMigration
     verb: POST
     path: /tenant-migrations/{migrationId}/execute
@@ -897,7 +897,7 @@ operationsByContract:
     permission: PLATFORM_CELL_MANAGE
     offline: false
     reads: 3
-    writes: 1
+    writes: 2
   - operation: resolveInvoiceDispute
     verb: POST
     path: /invoices/{invoiceId}/resolve-dispute
@@ -921,7 +921,7 @@ operationsByContract:
     permission: PLATFORM_TENANT_MANAGE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: scoreVsiAssessment
     verb: POST
     path: /vsi-assessments
@@ -1244,7 +1244,7 @@ operationsByContract:
     permission: PLATFORM_MIGRATION_APPLY
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: applyMigration
     verb: POST
     path: /migrations/apply
@@ -1276,7 +1276,7 @@ operationsByContract:
     permission: PLATFORM_RELEASE_VIEW
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: exportConfigPackage
     verb: POST
     path: /config-packages
@@ -1284,7 +1284,7 @@ operationsByContract:
     permission: PLATFORM_RELEASE_MANAGE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: getMigrationRun
     verb: GET
     path: /migrations/runs/{runId}
@@ -1558,7 +1558,7 @@ operationsByContract:
     reads: 2
     writes: 2
 - contract: public-api
-  count: 31
+  count: 35
   operations:
   - operation: certifyIntegration
     verb: POST
@@ -1616,6 +1616,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: getDeveloperAccount
+    verb: GET
+    path: /developers/{developerId}
+    scope: tenant
+    permission: DEVELOPER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: issueApiToken
     verb: POST
     path: /oauth/token
@@ -1632,11 +1640,35 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: listApiAnomalyRules
+    verb: GET
+    path: /api-anomaly-rules
+    scope: tenant
+    permission: DEVELOPER_ADMIN
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listApiClients
     verb: GET
     path: /api-clients
     scope: tenant
     permission: DEVELOPER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listApiLicences
+    verb: GET
+    path: /api-licensing
+    scope: tenant
+    permission: DEVELOPER_ADMIN
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listApiQuotas
+    verb: GET
+    path: /api-quotas
+    scope: tenant
+    permission: DEVELOPER_ADMIN
     offline: false
     reads: 1
     writes: 0
@@ -1767,7 +1799,7 @@ operationsByContract:
     permission: DEVELOPER_MANAGE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: setApiLicensing
     verb: PUT
     path: /api-licensing
@@ -1807,7 +1839,7 @@ operationsByContract:
     permission: DEVELOPER_MANAGE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
 tables:
 - store: cache:idempotency
   kind: cache
@@ -2106,7 +2138,8 @@ tables:
   columns: 19
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - subscription
   foreignWriters: null
 - table: control.cell
   columns: 20
@@ -2154,19 +2187,22 @@ tables:
   columns: 8
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - platform-ops
   foreignWriters: null
 - table: control.config_package_application
   columns: 6
   store: postgres
   parent: control.config_package
-  writtenBy: []
+  writtenBy:
+  - platform-ops
   foreignWriters: null
 - table: control.config_package_diff
   columns: 5
   store: postgres
   parent: control.config_package
-  writtenBy: []
+  writtenBy:
+  - platform-ops
   foreignWriters: null
 - table: control.content_block
   columns: 12
@@ -2661,7 +2697,8 @@ tables:
   columns: 8
   store: postgres
   parent: platform.tenant
-  writtenBy: []
+  writtenBy:
+  - subscription
   foreignWriters: null
 - table: subscription.licensing_model
   columns: 12

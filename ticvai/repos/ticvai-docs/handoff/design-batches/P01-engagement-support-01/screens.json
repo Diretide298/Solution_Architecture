@@ -144,8 +144,8 @@
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-025",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (pointer moved to the 30 September build, CHG-R1S-015)",
     "verified": "2026-09-28",
     "match": "exact",
     "view": "Header 'Help'",
@@ -388,8 +388,8 @@
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-026",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (pointer moved to the 30 September build, CHG-R1S-015)",
     "verified": "2026-09-28",
     "match": "partial",
     "view": "Account → 'Reviews & feedback'",
@@ -616,8 +616,8 @@
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-027",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (pointer moved to the 30 September build, CHG-R1S-015)",
     "verified": "2026-09-28",
     "match": "partial",
     "view": "Account → 'Newsletters'; Contact page → 'Choose newsletters'",
@@ -742,8 +742,8 @@
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-028",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (pointer moved to the 30 September build, CHG-R1S-015)",
     "verified": "2026-09-28",
     "match": "exact",
     "view": "Footer 'Contact', or Discover → 'Contact & venue info'",
@@ -838,6 +838,20 @@
        "bindsTo": "ConversationMessage.body"
       },
       {
+       "kind": "detailPanel",
+       "label": "The agent's replies",
+       "bindsTo": "GuestConversation",
+       "columns": [
+        "GuestConversation.state",
+        "GuestConversation.queuePosition",
+        "GuestConversation.estimatedWaitSeconds",
+        "GuestConversation.messages"
+       ],
+       "operation": "getGuestConversation",
+       "notes": "**After a handover the thread is read here** (Chinmay, 3 October 2026, r1 additions; CHG-RONEC-003): the agent's replies, where the guest is in the queue and the wait, until an agent claims it. Polled every 5 seconds while the chat is on screen and every 30 seconds while the app or tab is hidden, with `afterMessageId` so each poll fetches only what is new; it stops when the conversation ends (`resolved`, `abandoned`, `timedOut`).",
+       "provenance": "decided 3 October 2026, r1 additions (CHG-RONEC-003)"
+      },
+      {
        "kind": "cardList",
        "label": "Earlier conversations",
        "bindsTo": "AiConversation",
@@ -911,7 +925,7 @@
    {
     "operationId": "requestSuggestion",
     "contract": "ai",
-    "purpose": "From the conversation only, kinds waitTime and upsell (prepPlan is the kitchen's production plan; an itinerary is asked on the Plan tab); never a kind picker",
+    "purpose": "From the conversation only, kinds waitTime and upsell (prepPlan is the kitchen's production plan; an itinerary is asked on the Plan tab); never a kind picker. Later (CHG-RONEP-010): the wait-time and upsell suggestions of the day-one suggestions (AI-ENGINE-SUGGESTIONS) ships in Block A2 (Chinmay, 3 October); until then the control shows 'Later'.",
     "trigger": "background"
    },
    {
@@ -931,6 +945,15 @@
     "contract": "marketing-crm",
     "purpose": "After a handover, the guest writes to the agent, as the guest: sendConversationMessage needs CASE_MANAGE (decided by Chinmay, 3 October 2026 (CHG-SPF-013))",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getGuestConversation",
+    "contract": "marketing-crm",
+    "purpose": "The agent's replies, the queue position and the wait after a handover, polled every 5 s while the chat is on screen and every 30 s while hidden, with afterMessageId (decided by Chinmay, 3 October 2026, r1 additions; CHG-RONEC-003)",
+    "trigger": "onInterval",
+    "pollSeconds": 5,
+    "pollSecondsHidden": 30,
+    "provenance": "decided 3 October 2026, r1 additions (CHG-RONEC-003)"
    },
    {
     "operationId": "recordAnswerFeedback",
@@ -966,8 +989,8 @@
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-044",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (pointer moved to the 30 September build, CHG-R1S-015)",
     "verified": "2026-09-28",
     "match": "exact",
     "view": "Floating 'Ask Sahli' button on every page",

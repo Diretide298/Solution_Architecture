@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-1143` | Wallet Operations Command Center | B–D | 2 | 46 | 6 | 3 | 0 | 6 | — | notStarted (—) |
-| `BO-1144` | Peer-to-Peer Transfer Configuration | B–D | 21 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-1145` | Transfer Eligibility, Limits & Approval Rules | B–D | 19 | 0 | 6 | 0 | 1 | 3 | — | notStarted (—) |
-| `BO-1146` | Refund-to-Wallet Policy Configuration | B–D | 21 | 11 | 6 | 0 | 3 | 6 | — | notStarted (—) |
-| `BO-1147` | Refund Routing & Credit Restoration Engine | B–D | 6 | 40 | 6 | 6 | 0 | 6 | — | notStarted (—) |
-| `BO-1148` | Reversal & Transaction Correction Management | B–D | 11 | 14 | 6 | 3 | 0 | 0 | — | notStarted (—) |
-| `BO-1149` | Administrative Balance Adjustment Studio | B–D | 9 | 35 | 6 | 77 | 1 | 0 | — | notStarted (—) |
-| `BO-1150` | Wallet Block, Freeze & Restriction Management | B–D | 6 | 15 | 6 | 28 | 0 | 6 | — | notStarted (—) |
-| `BO-1151` | Wallet Disputes & Operational Exception Queue | B–D | 24 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-1152` | Operations Simulator, Approval & Audit Trail | B–D | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
+| `BO-1143` | Wallet Operations Command Center | C | 2 | 46 | 6 | 3 | 0 | 6 | — | notStarted (—) |
+| `BO-1144` | Peer-to-Peer Transfer Configuration | C | 21 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-1145` | Transfer Eligibility, Limits & Approval Rules | C | 19 | 0 | 6 | 0 | 1 | 3 | — | notStarted (—) |
+| `BO-1146` | Refund-to-Wallet Policy Configuration | A | 21 | 11 | 6 | 0 | 3 | 6 | — | notStarted (—) |
+| `BO-1147` | Refund Routing & Credit Restoration Engine | C | 6 | 40 | 6 | 6 | 0 | 6 | — | notStarted (—) |
+| `BO-1148` | Reversal & Transaction Correction Management | C | 11 | 14 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `BO-1149` | Administrative Balance Adjustment Studio | C | 9 | 35 | 6 | 77 | 1 | 0 | — | notStarted (—) |
+| `BO-1150` | Wallet Block, Freeze & Restriction Management | C | 6 | 15 | 6 | 28 | 0 | 6 | — | notStarted (—) |
+| `BO-1151` | Wallet Disputes & Operational Exception Queue | C | 24 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-1152` | Operations Simulator, Approval & Audit Trail | C | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

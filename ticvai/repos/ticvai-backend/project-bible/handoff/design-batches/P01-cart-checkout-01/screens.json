@@ -69,7 +69,10 @@
     {
      "to": "WEB-011",
      "trigger": "Answers attendee forms and consent, only where the cart needs them",
-     "provenance": "flow F01 step 5→6, F02 step 3→4, F55 step 1→2"
+     "provenance": "flow F01 step 5→6, F02 step 3→4, F55 step 1→2",
+     "carries": [
+      "holdId"
+     ]
     },
     {
      "to": "WEB-030",
@@ -369,8 +372,8 @@
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-010",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (pointer moved to the 30 September build, CHG-R1S-015)",
     "verified": "2026-09-28",
     "match": "partial",
     "view": "Visible on every booking step as the cart sidebar (Config → Layout & locale → 'Cart & summary' changes it to slide-in, bottom sheet, floating icon or single column)",
@@ -461,6 +464,7 @@
      "provenance": "flow F55 step 2→3",
      "carries": [
       "cartId",
+      "holdId",
       "lineId",
       "performanceId"
      ]
@@ -548,6 +552,12 @@
        "kind": "primaryButton",
        "label": "Continue to payment",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Keep my seats longer",
+       "operation": "extendSeatHold",
+       "provenance": "design cross-check, 3 October 2026 (CHG-R1S-023)"
       }
      ]
     }
@@ -626,6 +636,13 @@
     "contract": "marketing-crm",
     "purpose": "Prefill the buyer's contact from their own profile",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "extendSeatHold",
+    "contract": "seating",
+    "purpose": "Extend the seat hold once, from the warning before it lapses",
+    "trigger": "onAction",
+    "provenance": "design cross-check, 3 October 2026 (CHG-R1S-023)"
    }
   ],
   "entryState": {
@@ -641,6 +658,12 @@
     {
      "name": "venueId",
      "from": "session"
+    },
+    {
+     "name": "holdId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `extendSeatHold` takes it, from the record the user acts on."
     }
    ],
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `deviceId`, `itemId`.",
@@ -657,8 +680,8 @@
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-011",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (pointer moved to the 30 September build, CHG-R1S-015)",
     "verified": "2026-09-28",
     "match": "exact",
     "view": "Book → 'Your details' step (after Extras)",
@@ -743,7 +766,7 @@
     {
      "to": "WEB-011",
      "trigger": "Guest Details & Attendee Forms",
-     "provenance": "derived — WEB-011 declares entryState.params  and WEB-012 holds none of them. The edge carries nothing: WEB-012 is opened from WEB-011, so this edge is the way back and WEB-011 keeps its own state"
+     "provenance": "derived — WEB-011 declares entryState.params holdId and WEB-012 holds none of them. The edge carries nothing: WEB-012 is opened from WEB-011, so this edge is the way back and WEB-011 keeps its own state"
     },
     {
      "to": "WEB-016",
@@ -932,8 +955,8 @@
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-012",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (pointer moved to the 30 September build, CHG-R1S-015)",
     "verified": "2026-09-28",
     "match": "partial",
     "view": "Book → 'Payment' step; Config → Layout & locale → 'Payment outcome (demo)' = Interrupted / Declined for the failure states; Config → Steps & cards → 'Guest checkout (code proof)' for the guest route",
@@ -1019,7 +1042,7 @@
     {
      "to": "WEB-011",
      "trigger": "Guest Details & Attendee Forms",
-     "provenance": "derived — WEB-011 declares entryState.params  and WEB-013 holds none of them. The edge carries nothing: WEB-011 needs nothing to open"
+     "provenance": "derived — WEB-011 declares entryState.params holdId and WEB-013 holds none of them. The edge carries nothing: holdId only pre-selects (deep link or optional), and WEB-011 opens on its own"
     },
     {
      "to": "WEB-012",
@@ -1156,8 +1179,8 @@
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-013",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (pointer moved to the 30 September build, CHG-R1S-015)",
     "verified": "2026-09-28",
     "match": "exact",
     "view": "Book → final step 'Confirmed' after paying",
@@ -1361,8 +1384,8 @@
    "provenance": "designed",
    "board": "wireframes/P01 Guest Web.dc.html#web-014",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (pointer moved to the 30 September build, CHG-R1S-015)",
     "match": "none",
     "note": "The prototype has no view for this screen. It was drawn in Claude Design on 29 September in the prototype's style and accepted as its design the same day (the frame on this screen's board): build the layout from that frame."
    }

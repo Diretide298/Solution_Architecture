@@ -22,28 +22,28 @@ modulesUsed:
 - module: ticketing
   screens: 9
 - module: core
-  screens: 3
-- module: retail
-  screens: 2
+  screens: 4
 - module: marketing
   screens: 1
 - module: ai
   screens: 1
 - module: fnb
   screens: 1
+- module: retail
+  screens: 1
 servicesCalled:
 - service: OrderService
   operationCalls: 12
 - service: CatalogueService
   operationCalls: 7
-- service: RetailService
-  operationCalls: 4
+- service: WhiteLabelService
+  operationCalls: 3
+- service: MarketingService
+  operationCalls: 3
 - service: AiService
   operationCalls: 3
-- service: WhiteLabelService
-  operationCalls: 2
-- service: MarketingService
-  operationCalls: 2
+- service: RetailService
+  operationCalls: 3
 - service: FnbService
   operationCalls: 2
 coverage:
@@ -57,9 +57,10 @@ screens:
   name: Attract Loop
   module: Sell
   requiresModule: core
-  wave: 2
+  wave: 1
   density: touchLarge
-  operations: []
+  operations:
+  - listProducts
   states:
   - emptyFirstRun
   - error
@@ -72,6 +73,7 @@ screens:
   - KSK-003
   - KSK-004
   - KSK-014
+  - KSK-015
   boardFrames:
   - Kiosk Board 1.dc.html#KSK-001
   wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-001
@@ -200,9 +202,7 @@ screens:
   wave: 2
   density: touchLarge
   operations:
-  - addCartLine
   - checkoutCart
-  - evaluatePromotions
   - getCart
   states:
   - emptyFirstRun
@@ -340,12 +340,11 @@ screens:
 - screen: KSK-011
   name: Collect a booking
   module: Sell
-  requiresModule: retail
+  requiresModule: core
   wave: 2
   density: touchLarge
   operations:
   - getOrder
-  - lookupShopAndDrop
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -396,6 +395,7 @@ screens:
   density: touchLarge
   operations:
   - endKioskAssist
+  - handoverToAgent
   states:
   - emptyFirstRun
   - error
@@ -404,6 +404,7 @@ screens:
   offlineState: true
   entryParams:
   - sessionId<-session
+  - conversationId<-navigation
   goesTo:
   - KSK-001
   - KSK-002
@@ -420,7 +421,8 @@ screens:
   requiresModule: core
   wave: 2
   density: touchLarge
-  operations: []
+  operations:
+  - getTenantAppStatus
   states:
   - emptyFirstRun
   - error
@@ -443,6 +445,7 @@ screens:
   wave: 1
   density: touchLarge
   operations:
+  - addCartLine
   - createAiConversation
   - getAvailability
   - handoverToAgent
@@ -458,6 +461,7 @@ screens:
   entryParams:
   - conversationId<-deepLink
   - messageId<-navigation
+  - cartId<-navigation
   goesTo:
   - KSK-001
   boardFrames:
@@ -484,6 +488,7 @@ screens:
   entryParams:
   - outletId<-deepLink
   goesTo:
+  - KSK-007
   - KSK-017
   boardFrames:
   - Kiosk Board 2.dc.html#KSK-016

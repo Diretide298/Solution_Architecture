@@ -9,12 +9,12 @@
 | Contracts | 2 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 9 |
+| Operations with no screen | 8 |
 | Waves | wave1 10 |
 
 ## Gaps
 
-### 9 operations with no screen here
+### 8 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -23,7 +23,6 @@
 | `createTable` | fnb | POST | A table as a thing, not an inference |
 | `getPrepSheetTemplate` | fnb | GET | The venue's prep-sheet print template |
 | `listFnbRecommendations` | fnb | GET | Upsell and pairing suggestions for F&B |
-| `listIngredientSubstitutes` | fnb | GET | Approved substitutions for a recipe's ingredients |
 | `sendOrderNotification` | fnb | POST | Tell the guest where their order is |
 | `setFnbReservationPolicy` | fnb | PUT | Set turn times and seating buffers |
 | `setPrepSheetTemplate` | fnb | PUT | Set the prep-sheet print template |

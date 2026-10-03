@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-953` | Seat Map Command Center | B–D | 0 | 0 | 6 | 1 | 4 | 6 | — | notStarted (—) |
-| `BO-954` | Venue Canvas | B–D | 0 | 0 | 6 | 3 | 3 | 0 | — | notStarted (—) |
-| `BO-955` | Sections & Zones | B–D | 7 | 0 | 6 | 2 | 2 | 0 | — | notStarted (—) |
-| `BO-956` | Rows & Seats | B–D | 0 | 0 | 6 | 9 | 2 | 6 | — | notStarted (—) |
-| `BO-957` | Standing Zones | B–D | 0 | 20 | 6 | 0 | 3 | 0 | — | notStarted (—) |
-| `BO-958` | Suites & Boxes | B–D | 0 | 20 | 6 | 0 | 3 | 0 | — | notStarted (—) |
-| `BO-959` | Stage & Focal Point | B–D | 0 | 20 | 6 | 4 | 0 | 0 | — | notStarted (—) |
-| `BO-960` | Entrances, Exits & Aisles | B–D | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-961` | Amenities & Obstructions | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-962` | Templates, Validation & Publish | B–D | 0 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
+| `BO-953` | Seat Map Command Center | C | 0 | 0 | 6 | 1 | 4 | 6 | — | notStarted (—) |
+| `BO-954` | Venue Canvas | C | 0 | 0 | 6 | 3 | 3 | 0 | — | notStarted (—) |
+| `BO-955` | Sections & Zones | C | 7 | 0 | 6 | 2 | 2 | 0 | — | notStarted (—) |
+| `BO-956` | Rows & Seats | C | 0 | 0 | 6 | 9 | 2 | 6 | — | notStarted (—) |
+| `BO-957` | Standing Zones | C | 0 | 20 | 6 | 0 | 3 | 0 | — | notStarted (—) |
+| `BO-958` | Suites & Boxes | C | 0 | 20 | 6 | 0 | 3 | 0 | — | notStarted (—) |
+| `BO-959` | Stage & Focal Point | C | 0 | 20 | 6 | 4 | 0 | 0 | — | notStarted (—) |
+| `BO-960` | Entrances, Exits & Aisles | C | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-961` | Amenities & Obstructions | C | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-962` | Templates, Validation & Publish | C | 0 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -135,7 +135,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `seating` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-953 |
 | Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -285,7 +285,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `seating` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-954 |
 | Who uses it | venue staff holding `CAPACITY_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -407,7 +407,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `seating` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-955 |
 | Who uses it | venue staff holding `ASSET_LIBRARY_MANAGE`, `CAPACITY_CONFIGURE`, `PRODUCT_VIEW` (2 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -523,6 +523,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS140 Seat Management Venue Mapping Reference v1.0 Board 1.dc.html#bo-955`
 - Workshop pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf board 1
 - Flow F274 *Seat Management Venue Mapping Reference v1.0 board 1: Seat Map Command Center*, step 4: Works in Sections & Zones → Define the commercial and operational hierarchy of the venue. Create, draw and edit section or zone polygons with name, code, level, capacity, color, category and parent hierarchy. Support curved …
+- ADR-0069 *In-park 3D navigation is built natively, from a venue model, a pathway file and GPS* (`docs/adr/0069-in-park-3d-navigation-is-built-natively.md`)
 
 #### Acceptance for the design
 
@@ -545,7 +546,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `seating` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-956 |
 | Who uses it | venue staff holding `CAPACITY_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -674,7 +675,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `seating` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-957 |
 | Who uses it | venue staff holding `CAPACITY_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -814,7 +815,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `seating` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-958 |
 | Who uses it | venue staff holding `CAPACITY_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -956,7 +957,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `seating` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-959 |
 | Who uses it | venue staff holding `CAPACITY_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1100,7 +1101,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `seating` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-960 |
 | Who uses it | venue staff holding `CAPACITY_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1236,7 +1237,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `seating` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-961 |
 | Who uses it | venue staff holding `CAPACITY_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1370,7 +1371,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `seating` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-962 |
 | Who uses it | venue staff holding `CAPACITY_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1614,7 +1615,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "LocalisedText": {"x-ticvai-persistence":"none — jsonb column","type":"object","additionalProperties":{"type":"string"}},
 "MapZone": {"type":"object","x-ticvai-persistence":"seating.zone","description":"BL-166. **`seating` is strong on everything that is a seat and the map itself was only seats.**\n**A standing area is a capacity without individual seats**, and modelling it as seats means inventing seat numbers nobody prints and a guest cannot find. A suite is the opposite — one sellable unit containing many seats, sold whole.\nNon-sellable zones matter too: **a stage, an entry and a sightline obstruction are not inventory and they change what the seats beside them are worth.**\n","required":["id","seatMapId","kind","name"],"properties":{"id":{"type":"string","format":"uuid"},"seatMapId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["standing","suite","box","lounge","accessiblePlatform","stage","entry","exit","concourse","obstruction","camera","aisle"]},"name":{"type":"string"},"capacity":{"type":"integer","nullable":true,"description":"**For a standing zone this is the inventory** — sold as a count rather than as seats. Null for a stage or an obstruction, which sell nothing.\n"},"seatCategoryId":{"type":"string","format":"uuid","nullable":true},"containsSeatIds":{"type":"array","description":"For a suite or box. **Sold whole, so the seats inside are held together** — selling one seat of a suite is not a thing a venue does.\n","items":{"type":"string","format":"uuid"}},"obstructsZoneIds":{"type":"array","description":"What this blocks the view of. **A pillar is not inventory and it decides what the seats behind it are worth**, which is the only reason to draw it.\n","items":{"type":"string","format":"uuid"}},"geometry":{"type":"string","nullable":true}}},
 "MediaAsset": {"x-ticvai-persistence":"assets.media_asset","type":"object","required":["id","kind","status","filename","contentType","sizeBytes","referenceCount","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"kind":{"$ref":"#/components/schemas/MediaKind"},"status":{"$ref":"#/components/schemas/MediaStatus"},"filename":{"type":"string"},"contentType":{"type":"string"},"sizeBytes":{"type":"integer"},"title":{"$ref":"#/components/schemas/LocalisedText"},"description":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"description":"Set by `updateMediaAsset` and matched by `searchMedia`'s `search`. It was accepted and searched on before it had anywhere to be stored.\n"},"altText":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"description":"Required before use in a guest-facing surface. WCAG 2.2 AA."},"width":{"type":"integer","nullable":true},"height":{"type":"integer","nullable":true},"durationSeconds":{"type":"number","nullable":true},"customMetadata":{"type":"object","nullable":true,"additionalProperties":true,"description":"BL-178. **`assets` is a strong contract and its metadata was fixed** — kind, title, alt text, dimensions, rights. A venue photographing four thousand products wants its own fields: shoot date, photographer, model release, season.\n**Free-form and searchable, not a schema.** Every venue would want a different one, and a fixed set would be wrong for all of them.\n"},"sharedWithTenantIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"BL-178. **Cross-tenant sharing, and it is refused by default for a reason.** A brand operating three venues wants one logo library; two unrelated tenants sharing an asset store is the isolation breach ADR-0011 exists to prevent.\n**Only within one tenant's own scope tree.** A share naming a tenant outside it is refused rather than warned about — this is the one place where a permissive default would be a cross-tenant data leak.\n"},"tags":{"type":"array","items":{"type":"string"}},"categoryId":{"type":"string","format":"uuid","nullable":true,"description":"The asset's category, one of `MediaTaxonomy.categories[].id`; null while unclassified. Set by `bulkUpdateMediaAssets` (`setCategoryId`) (decided 29 September, data model DM4).\n"},"venueId":{"type":"string","format":"uuid","nullable":true},"url":{"type":"string","description":"Signed and expiring for private assets; stable CDN URL for public ones."},"thumbnailUrl":{"type":"string","nullable":true},"referenceCount":{"type":"integer","description":"How many surfaces reference this asset. Non-zero refuses deletion.\n"},"rights":{"$ref":"#/components/schemas/MediaRights"},"isRightsExpired":{"type":"boolean"},"version":{"type":"integer"},"uploadedByPrincipalId":{"type":"string","format":"uuid"},"createdAt":{"type":"string","format":"date-time"}}},
-"MediaKind": {"type":"string","enum":["image","video","audio","document","vector","font","archive"]},
+"MediaKind": {"type":"string","enum":["image","video","audio","document","vector","font","archive","model3d"],"description":"`model3d` added 3 October 2026 (r1 additions; ADR-0069 action item 4): a glTF binary (`model/gltf-binary`, `.glb`) venue model, at most 40 MB. No rendition or derivative is generated for it; the guest app downloads the file as uploaded.\n"},
 "MediaRights": {"x-ticvai-persistence":"none — embedded in asset","type":"object","description":"Licensing terms. Tracked because an expired licence on a live surface is a legal exposure, not a housekeeping item.\n","properties":{"licenceKind":{"type":"string","enum":["owned","royaltyFree","rightsManaged","creativeCommons","editorialOnly","unknown"]},"licensor":{"type":"string","nullable":true},"licenceReference":{"type":"string","nullable":true},"validFrom":{"type":"string","format":"date","nullable":true},"validTo":{"type":"string","format":"date","nullable":true},"permittedUses":{"type":"array","items":{"type":"string","enum":["web","print","socialMedia","inVenue","advertising","internal"]}},"attributionRequired":{"type":"boolean","default":false},"attributionText":{"type":"string","nullable":true},"permittedTerritories":{"type":"array","items":{"type":"string"},"description":"ISO country or region codes. **Empty means unrestricted, which is a claim rather than an absence** — an unknown territory and a worldwide licence are not the same thing, and `licenceKind: unknown` is how the second is said.\n"},"permittedChannels":{"type":"array","items":{"type":"string"},"description":"Distribution channel codes, checked by `setMediaDistributionChannels`. Narrower than `permittedUses`, which describes the medium rather than the route.\n"},"modelReleaseHeld":{"type":"boolean","default":false},"renewalOwner":{"type":"string","format":"uuid","nullable":true}}},
 "MediaStatus": {"type":"string","enum":["processing","ready","quarantined","failed","archived"]},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},

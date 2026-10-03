@@ -643,7 +643,7 @@
     "source": "contracts/satellite/games.yaml#createGameEntitlement"
    }
   ],
-  "notes": "**An all-games pass covers games added after sale unless the venue says not; type-based passes cover new games by default (decided 2 October 2026 by Chinmay, DEC-397; CHG-CSA-028, `coversGamesAddedLater`).**",
+  "notes": "**An all-games pass covers games added after sale unless the venue says not; type-based passes cover new games by default (decided 2 October 2026 by Chinmay, DEC-397; CHG-CSA-028, `includesGamesAddedLater`).**",
   "_platform": {
    "code": "P08",
    "audience": "staff",

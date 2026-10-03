@@ -128,20 +128,20 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-615` | Accreditation Command Center | B–D | 0 | 38 | 6 | 6 | 1 | 6 | — | notStarted (—) |
-| `BO-616` | Accreditation Application Directory | B–D | 0 | 24 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-617` | New Accreditation Application | B–D | 0 | 0 | 6 | 1 | 1 | 6 | — | notStarted (—) |
-| `BO-618` | Accreditation Form Builder | A | 1 | 40 | 6 | 75 | 1 | 6 | — | notStarted (—) |
-| `BO-619` | Accreditation Category Management | B–D | 25 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-620` | Accreditation Program Setup | B–D | 0 | 0 | 6 | 4 | 1 | 6 | — | notStarted (—) |
-| `BO-621` | Applicant Type Configuration | B–D | 0 | 0 | 6 | 7 | 1 | 0 | — | notStarted (—) |
-| `BO-622` | Application Requirements Matrix | B–D | 0 | 0 | 6 | 7 | 1 | 0 | — | notStarted (—) |
-| `BO-623` | Accreditation Intake Monitor | B–D | 0 | 29 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-624` | Registration Rules & Publication | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-615` | Accreditation Command Center | D | 0 | 38 | 6 | 6 | 1 | 6 | — | notStarted (—) |
+| `BO-616` | Accreditation Application Directory | D | 0 | 24 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-617` | New Accreditation Application | D | 0 | 0 | 6 | 1 | 1 | 6 | — | notStarted (—) |
+| `BO-618` | Accreditation Form Builder | A | 1 | 46 | 6 | 75 | 1 | 6 | — | notStarted (—) |
+| `BO-619` | Accreditation Category Management | D | 25 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-620` | Accreditation Program Setup | D | 0 | 0 | 6 | 4 | 1 | 6 | — | notStarted (—) |
+| `BO-621` | Applicant Type Configuration | D | 0 | 0 | 6 | 7 | 1 | 0 | — | notStarted (—) |
+| `BO-622` | Application Requirements Matrix | D | 0 | 0 | 6 | 7 | 1 | 0 | — | notStarted (—) |
+| `BO-623` | Accreditation Intake Monitor | D | 0 | 29 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-624` | Registration Rules & Publication | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
-**BO-616, BO-617, BO-618, BO-619, BO-620, BO-621, BO-622, BO-623, BO-624 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-616, BO-617, BO-619, BO-620, BO-621, BO-622, BO-623, BO-624 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

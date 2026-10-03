@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-288` | Resale Operations Command Center | B–D | 0 | 36 | 6 | 0 | 2 | 5 | — | notStarted (generated) |
-| `ADM-289` | Buyer Purchase & Resale Order Management | B–D | 13 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
-| `ADM-290` | Ticket Ownership Transfer Management | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `ADM-291` | Credential Revocation & Regeneration | B–D | 13 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-292` | Resale Fraud & Duplicate Sale Protection | B–D | 0 | 24 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
-| `ADM-293` | Capacity & Inventory Reconciliation | B–D | 0 | 20 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
-| `ADM-294` | Seller Settlement & Payout Management | B–D | 2 | 28 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-295` | Refunds, Disputes & Resale Exceptions | B–D | 2 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
-| `ADM-296` | Resale Audit & Ownership History | B–D | 19 | 0 | 6 | 0 | 1 | 5 | — | notStarted (generated) |
-| `ADM-297` | Resale Analytics & AI Intelligence | B–D | 2 | 0 | 6 | 0 | 0 | 5 | — | notStarted (generated) |
+| `ADM-288` | Resale Operations Command Center | C | 0 | 36 | 6 | 0 | 2 | 5 | — | notStarted (generated) |
+| `ADM-289` | Buyer Purchase & Resale Order Management | C | 13 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
+| `ADM-290` | Ticket Ownership Transfer Management | C | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `ADM-291` | Credential Revocation & Regeneration | C | 13 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-292` | Resale Fraud & Duplicate Sale Protection | C | 0 | 24 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `ADM-293` | Capacity & Inventory Reconciliation | C | 0 | 20 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
+| `ADM-294` | Seller Settlement & Payout Management | C | 2 | 28 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-295` | Refunds, Disputes & Resale Exceptions | C | 2 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `ADM-296` | Resale Audit & Ownership History | C | 19 | 0 | 6 | 0 | 1 | 5 | — | notStarted (generated) |
+| `ADM-297` | Resale Analytics & AI Intelligence | C | 2 | 0 | 6 | 0 | 0 | 5 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

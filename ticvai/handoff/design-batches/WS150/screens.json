@@ -808,8 +808,15 @@
       {
        "kind": "banner",
        "label": "Permissions this screen separates",
-       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Resend, Change approved delivery channel, Extend expiry, Cancel. Each needs attaching to the control it gates, or the screen needs the control.",
+       "notes": "**The pack separates these permissions:** Resend, Change approved delivery channel, Extend expiry, Cancel. Resend is `resendPaymentLink` (ORDER_MODIFY) and Cancel is `cancelPaymentLink` (ORDER_CREATE, 3 October 2026); changing the channel and extending expiry still have no control.",
        "provenance": "pack Payment_Payment_Orchestration.pdf, page 73 §Authorized users can"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Cancel link",
+       "operation": "cancelPaymentLink",
+       "notes": "**Withdraws a live link** (Chinmay, 3 October 2026: cancelPaymentLink bound on the screen that manages payment links; CHG-RUL-021, CHG-RONEC-005). Shown on an `issued` or `viewed` link only; asks for a reason (kept in the audit trail, never shown to the guest). The token stops working at once and a guest holding it is told it was withdrawn; a hold the link kept is released. The order stays: a new link can be created straight after on ADM-592. A link that is no longer live answers `409 payment-link-not-live`, and the screen refreshes its state.",
+       "provenance": "contract orders.yaml POST /payment-links/{linkId}/cancel; decided 3 October 2026 (CHG-RONEC-005)"
       }
      ]
     },
@@ -860,6 +867,16 @@
     "purpose": "Its state",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "cancelPaymentLink",
+    "contract": "orders",
+    "purpose": "Cancel a live link with a reason; the order stays and a new link may follow (CHG-RUL-021)",
+    "trigger": "onAction",
+    "provenance": "decided 3 October 2026, r1 additions (CHG-RONEC-005)",
+    "invalidates": [
+     "getPaymentLink"
+    ]
    }
   ],
   "wireframe": {
@@ -882,6 +899,25 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formCancelPaymentLink",
+    "component": "modal",
+    "trigger": "Cancel link",
+    "body": "**Collects what `cancelPaymentLink` sends before it is called.** Required: `reason` (3 to 500 characters, kept in the audit trail, never shown to the guest). Says that the guest's link stops working at once and that the order is not cancelled. Dismissing sends nothing; the link stays live.",
+    "confirm": {
+     "label": "Cancel link",
+     "operation": "cancelPaymentLink"
+    },
+    "dismiss": {
+     "label": "Keep the link",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /payment-links/{linkId}/cancel; decided 3 October 2026 (CHG-RONEC-005)"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

@@ -1,4 +1,4 @@
--- control — 81 tables
+-- control — 85 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS control.api_anomaly (
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS control.api_anomaly_rule (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     rule_key                          text NOT NULL,
     client_id                         uuid,
     measure                           text NOT NULL CONSTRAINT api_anomaly_rule_measure_chk CHECK (measure IN ('callsPerMinute', 'clientErrorShare', 'allowListRefusals', 'unusualOperations', 'authFailures')),
@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS control.api_client (
 -- Which API modules a tenant licensed (13.3.24, D5). Configuration, not code — rates change
 -- without a release
 CREATE TABLE IF NOT EXISTS control.api_licence (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     tenant_id                         uuid NOT NULL,
     licensed_modules                  text[] NOT NULL,
     call_allowance_per_month          integer,
@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS control.api_licence (
 -- reaches control.partner through its keys; references control.api_client. Reached by: 1
 -- operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS control.api_limit (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     client_id                         uuid NOT NULL,
     sustained_per_minute              integer NOT NULL,
     burst_per_second                  integer,
@@ -121,6 +121,22 @@ CREATE TABLE IF NOT EXISTS control.backup_run (
     size_bytes                        integer,
     restore_tested_at                 timestamptz,
     error                             text
+);
+
+-- Holds 11 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.billing_entity (
+    id                                uuid PRIMARY KEY NOT NULL,
+    tenant_id                         uuid,
+    legal_name                        text CONSTRAINT billing_entity_legal_name_chk CHECK (char_length(legal_name) <= 300),
+    trade_licence_number              text CONSTRAINT billing_entity_trade_licence_number_chk CHECK (char_length(trade_licence_number) <= 100),
+    trn                               text CONSTRAINT billing_entity_trn_chk CHECK (char_length(trn) <= 30),
+    country_code                      text CONSTRAINT billing_entity_country_code_chk CHECK (char_length(country_code) <= 2),
+    address                           text CONSTRAINT billing_entity_address_chk CHECK (char_length(address) <= 1000),
+    invoice_email                     text,
+    documents                         jsonb,
+    missing_documents                 text[],
+    updated_at                        timestamptz
 );
 
 -- One flash sale's own environment, from provisioning to teardown (ADR-0035). A cell stood up for
@@ -255,6 +271,40 @@ CREATE TABLE IF NOT EXISTS control.channel_listing (
     guest_data_scope                  text DEFAULT 'nameOnly' CONSTRAINT channel_listing_guest_data_scope_chk CHECK (guest_data_scope IN ('none', 'nameOnly', 'nameAndContact', 'full')),
     last_pushed_at                    timestamptz,
     scope_path                        ltree NOT NULL
+);
+
+-- Holds 8 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.config_package (
+    id                                uuid PRIMARY KEY NOT NULL,
+    tenant_id                         uuid,
+    source_environment                text CONSTRAINT config_package_source_environment_chk CHECK (source_environment IN ('dev', 'staging', 'production')),
+    version                           integer,
+    checksum                          text,
+    record_counts                     jsonb,
+    excluded_kinds                    text[],
+    created_at                        timestamptz
+);
+
+-- Holds 6 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.config_package_application (
+    id                                uuid PRIMARY KEY NOT NULL,
+    diff_id                           uuid,
+    status                            text CONSTRAINT config_package_application_status_chk CHECK (status IN ('applying', 'applied', 'failed')),
+    applied_count                     integer,
+    previous_package_id               uuid,
+    started_at                        timestamptz
+);
+
+-- Holds 5 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.config_package_diff (
+    id                                uuid PRIMARY KEY NOT NULL,
+    package_id                        uuid,
+    target_environment                text CONSTRAINT config_package_diff_target_environment_chk CHECK (target_environment IN ('dev', 'staging', 'production')),
+    computed_at                       timestamptz,
+    changes                           jsonb
 );
 
 -- Authored content with a schedule (BL-172). The CMS modelled configuration and not authoring — a
@@ -517,7 +567,8 @@ CREATE TABLE IF NOT EXISTS control.onboarding_application (
     status                            text NOT NULL CONSTRAINT onboarding_application_status_chk CHECK (status IN ('submitted', 'verifying', 'approved', 'provisioning', 'active', 'rejected', 'abandoned')),
     trial_ends_at                     timestamptz,
     rejection_reason                  text,
-    provisioned_tenant_id             uuid
+    provisioned_tenant_id             uuid,
+    billing_entity_id                 uuid
 );
 
 -- Holds 6 columns. No description has been written for this table — the name is the only thing
@@ -531,6 +582,8 @@ CREATE TABLE IF NOT EXISTS control.outbox_relay (
     last_polled_at                    timestamptz
 );
 
+-- Holds 14 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
 CREATE TABLE IF NOT EXISTS control.outbox_republish (
     id                                uuid PRIMARY KEY NOT NULL,
     tenant_id                         uuid NOT NULL,
@@ -587,7 +640,7 @@ CREATE TABLE IF NOT EXISTS control.partner (
 -- read it and 7 write it; 10 tables reference it; written by 2 contracts — approvals,
 -- subscription.
 CREATE TABLE IF NOT EXISTS control.partner_agreement (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     partner_id                        uuid NOT NULL,
     version                           integer,
     status                            text CONSTRAINT partner_agreement_status_chk CHECK (status IN ('pendingApproval', 'active', 'expiringSoon', 'expired', 'suspended', 'terminated')),
@@ -1363,7 +1416,7 @@ CREATE TABLE IF NOT EXISTS control.tenant (
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS control.tenant_domain (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     hostname                          text NOT NULL CONSTRAINT tenant_domain_hostname_chk CHECK (char_length(hostname) <= 253),
     tenant_id                         uuid NOT NULL,
     cell_id                           uuid,
@@ -1371,7 +1424,10 @@ CREATE TABLE IF NOT EXISTS control.tenant_domain (
     kind                              text NOT NULL CONSTRAINT tenant_domain_kind_chk CHECK (kind IN ('platformSubdomain', 'customDomain')),
     channel                           text CONSTRAINT tenant_domain_channel_chk CHECK (channel IN ('guestWeb', 'backOffice', 'partnerPortal', 'developerPortal')),
     status                            text NOT NULL CONSTRAINT tenant_domain_status_chk CHECK (status IN ('active', 'detached')),
-    verified_at                       timestamptz
+    verified_at                       timestamptz,
+    is_primary                        boolean DEFAULT false,
+    redirect_to_hostname              text CONSTRAINT tenant_domain_redirect_to_hostname_chk CHECK (char_length(redirect_to_hostname) <= 253),
+    last_validated_at                 timestamptz
 );
 
 -- a tenant moving between cells — shared to dedicated, or rebalancing Hangs off: a child of

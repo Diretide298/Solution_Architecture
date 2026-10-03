@@ -314,7 +314,7 @@
   "name": "Funding Method Configuration",
   "module": "Orders & Money",
   "requiresModule": "core",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "2",
@@ -329,7 +329,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "BO-1093"
+    "BO-1093",
+    "BO-101"
    ],
    "exitTo": [
     "BO-1093"

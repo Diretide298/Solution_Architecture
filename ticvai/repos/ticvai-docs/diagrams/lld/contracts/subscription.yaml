@@ -433,6 +433,7 @@ operations:
   - control.burst_environment
   writes:
   - cache:idempotency
+  - control.burst_environment
 - operation: executeTenantMigration
   verb: POST
   path: /tenant-migrations/{migrationId}/execute
@@ -1678,6 +1679,7 @@ operations:
   - control.cell
   writes:
   - cache:idempotency
+  - control.burst_environment
 - operation: resolveInvoiceDispute
   verb: POST
   path: /invoices/{invoiceId}/resolve-dispute
@@ -1716,7 +1718,8 @@ operations:
   offline: false
   reads:
   - subscription.go_live_readiness
-  writes: []
+  writes:
+  - subscription.go_live_readiness
 - operation: scoreVsiAssessment
   verb: POST
   path: /vsi-assessments

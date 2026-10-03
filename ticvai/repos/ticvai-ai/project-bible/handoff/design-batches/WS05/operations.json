@@ -1,4 +1,30 @@
 {
+ "getBiometricVerificationProfile": {
+  "method": "GET",
+  "path": "/biometric-verification-profile",
+  "contract": "access",
+  "summary": "The biometric verification profile as saved",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "BiometricVerificationProfileBuilderView"
+ },
+ "getFacePassEnrollmentConfiguration": {
+  "method": "GET",
+  "path": "/face-pass-enrollment",
+  "contract": "access",
+  "summary": "The FacePass enrolment configuration as saved",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "FacePassEnrollmentConfigurationView"
+ },
  "getFaceReenrolmentImages": {
   "method": "GET",
   "path": "/face-reenrolment-attempts/{attemptId}/images",

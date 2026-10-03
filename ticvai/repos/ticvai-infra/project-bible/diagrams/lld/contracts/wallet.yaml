@@ -49,6 +49,7 @@ operations:
   - wallet.wallet
   writes:
   - cache:idempotency
+  - platform.outbox
   - wallet.wallet
 - operation: blockGiftCard
   verb: POST
@@ -585,7 +586,8 @@ operations:
   offline: false
   reads:
   - wallet.dispute
-  writes: []
+  writes:
+  - wallet.dispute
 - operation: restoreWalletConfigurationVersion
   verb: POST
   path: /wallet-configuration/versions/{version}/restore
@@ -622,7 +624,8 @@ operations:
   offline: false
   reads:
   - wallet.adjustment
-  writes: []
+  writes:
+  - wallet.adjustment
 - operation: setCreditConsumptionPolicy
   verb: PUT
   path: /credit-consumption-policy
@@ -797,7 +800,8 @@ operations:
   offline: false
   reads:
   - wallet.risk_rules
-  writes: []
+  writes:
+  - wallet.risk_rules
 - operation: setWalletRiskRules
   verb: PUT
   path: /wallet-risk-rules
@@ -893,6 +897,7 @@ operations:
   - wallet.wallet
   writes:
   - cache:idempotency
+  - platform.outbox
   - wallet.wallet
 - operation: transferWalletBalance
   verb: POST
@@ -947,4 +952,5 @@ operations:
   offline: false
   reads:
   - wallet.dispute
-  writes: []
+  writes:
+  - wallet.dispute

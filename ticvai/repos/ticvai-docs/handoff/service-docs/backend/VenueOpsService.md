@@ -7,7 +7,7 @@
 | Tier | operations: What a venue does with what it sold. Licensed per module. |
 | Contracts | `queue`, `maintenance`, `resources`, `venue-map`, `assets`, `games`, `rental`, `transport` |
 | Schemas owned | `queue`, `maintenance`, `resources`, `venuemap`, `assets`, `games`, `rental`, `transport` |
-| Operations in the slice | 69 of 287 |
+| Operations in the slice | 78 of 290 |
 | Scale | Low and steady. Queue readings are the only frequent write. |
 | If it is down | Down degrades venue operations. Selling and admitting continue. |
 
@@ -40,6 +40,7 @@
 | collection | [`listCollections`](#listcollections) | GET | `/media/collections` | core | 1 | CMS-010, CMS-062, CMS-064 |
 | departure | [`getNextTransportDeparture`](#getnexttransportdeparture) | GET | `/transport/departures/next` | core | 1 | GST-076, WEB-049 |
 | departure | [`searchTransportDepartures`](#searchtransportdepartures) | GET | `/transport/departures` | core | 1 | GST-076, WEB-049 |
+| departure | [`updateTransportDeparture`](#updatetransportdeparture) | PATCH | `/transport/departures/{departureId}` | setup | 1 | BO-1187 |
 | entry | [`getWaitingGuest`](#getwaitingguest) | GET | `/waiting-guests/{entryId}` | core | 1 | GST-023, WEB-040 |
 | entry | [`joinQueue`](#joinqueue) | POST | `/waiting-guests` | core | 1 | GST-023, WEB-040 |
 | entry | [`leaveQueue`](#leavequeue) | DELETE | `/waiting-guests/{entryId}` | core | 1 | GST-023, WEB-040 |
@@ -49,14 +50,17 @@
 | favourite | [`deleteFavouriteRoute`](#deletefavouriteroute) | DELETE | `/transport/favourite-routes/{favouriteId}` | core | 1 | GST-079, WEB-049 |
 | favourite | [`listMyFavouriteRoutes`](#listmyfavouriteroutes) | GET | `/transport/favourite-routes` | core | 1 | GST-079, WEB-049 |
 | favourite | [`saveFavouriteRoute`](#savefavouriteroute) | POST | `/transport/favourite-routes` | core | 1 | GST-077, WEB-049 |
+| general | [`getTransportDeparture`](#gettransportdeparture) | GET | `/transport/departures/{departureId}` | core | 1 | GST-077 |
 | inspection | [`createInspectionTemplate`](#createinspectiontemplate) | POST | `/inspection-templates` | setup | 1 | BO-911 |
 | networkImport | [`applyTransportNetworkImport`](#applytransportnetworkimport) | POST | `/transport/network-imports/{importId}/apply` | setup | 1 | BO-1189 |
 | networkImport | [`importTransportNetwork`](#importtransportnetwork) | POST | `/transport/network-imports` | setup | 1 | BO-1189 |
 | pass | [`createTransportPassType`](#createtransportpasstype) | POST | `/transport/pass-types` | setup | 1 | BO-1188 |
 | pass | [`listTransportPassOffers`](#listtransportpassoffers) | GET | `/transport/pass-offers` | core | 1 | GST-078, WEB-049 |
+| pass | [`updateTransportPassType`](#updatetransportpasstype) | PATCH | `/transport/pass-types/{passTypeId}` | setup | 1 | BO-1188 |
 | queue | [`createQueue`](#createqueue) | POST | `/queues` | setup | 1 | BO-001, BO-002, BO-005 |
 | queue | [`listQueues`](#listqueues) | GET | `/queues` | core | 1 | BO-001, BO-002, BO-004, BO-005, BO-221, EMP-031 … |
 | queue | [`updateQueue`](#updatequeue) | PATCH | `/queues/{queueId}` | setup | 1 | BO-001, BO-002, BO-005, BO-221 |
+| resources | [`cloneResource`](#cloneresource) | POST | `/resources/{resourceId}/clone` | setup | 1 | BO-857 |
 | resources | [`createResource`](#createresource) | POST | `/resources` | setup | 1 | BO-095, BO-857 |
 | resources | [`createResourceBlock`](#createresourceblock) | POST | `/resource-blocks` | setup | 1 | BO-864, BO-870, BO-880, BO-910 |
 | resources | [`createResourceHold`](#createresourcehold) | POST | `/resource-holds` | core | 1 | GST-074, WEB-047 |
@@ -69,6 +73,7 @@
 | resources | [`releaseResourceBlock`](#releaseresourceblock) | DELETE | `/resource-blocks/{blockId}` | setup | 1 | BO-870, BO-910 |
 | resources | [`relinquishResourceHold`](#relinquishresourcehold) | DELETE | `/resource-holds/{holdId}` | core | 1 | GST-074, WEB-047 |
 | resources | [`setExperienceResourceRequirements`](#setexperienceresourcerequirements) | PUT | `/experiences/{experienceId}/resource-requirements` | setup | 1 | BO-877, BO-893, BO-894 |
+| resources | [`setResourceLifecycleState`](#setresourcelifecyclestate) | POST | `/resources/{resourceId}/state` | setup | 1 | BO-857, BO-863, BO-912 |
 | resources | [`setResourceSchedule`](#setresourceschedule) | PUT | `/resources/{resourceId}/schedule` | setup | 1 | BO-866, BO-867, BO-878 |
 | resources | [`updateResource`](#updateresource) | PUT | `/resources/{resourceId}` | setup | 1 | BO-857, BO-866 |
 | resources | [`updateResourcePackage`](#updateresourcepackage) | PUT | `/resource-packages/{packageId}` | setup | 1 | BO-861, BO-895, BO-918 |
@@ -77,13 +82,16 @@
 | route | [`getTransportRoute`](#gettransportroute) | GET | `/transport/routes/{routeId}` | core | 1 | BO-1184, GST-077, WEB-049 |
 | route | [`getTransportRouteMap`](#gettransportroutemap) | GET | `/transport/routes/{routeId}/map` | core | 1 | GST-077, WEB-049 |
 | route | [`listTransportRoutes`](#listtransportroutes) | GET | `/transport/routes` | core | 1 | BO-1184, BO-1185, BO-1186, BO-1187, BO-1188, GST-076 … |
+| route | [`setTransportRouteStatus`](#settransportroutestatus) | PUT | `/transport/routes/{routeId}/status` | setup | 1 | BO-1184 |
 | route | [`updateTransportRoute`](#updatetransportroute) | PATCH | `/transport/routes/{routeId}` | setup | 1 | BO-1184 |
 | station | [`createTransportStation`](#createtransportstation) | POST | `/transport/stations` | setup | 1 | BO-1183 |
 | station | [`listTransportStations`](#listtransportstations) | GET | `/transport/stations` | core | 1 | BO-1183, BO-1184, GST-076, GST-078, WEB-049 |
+| station | [`updateTransportStation`](#updatetransportstation) | PATCH | `/transport/stations/{stationId}` | setup | 1 | BO-1183 |
 | timetable | [`createTransportTimetable`](#createtransporttimetable) | POST | `/transport/routes/{routeId}/timetables` | setup | 1 | BO-1186 |
 | timetable | [`publishTransportTimetable`](#publishtransporttimetable) | POST | `/transport/timetables/{timetableId}/publish` | setup | 1 | BO-1186 |
-| upload | [`completeUpload`](#completeupload) | POST | `/media/uploads/{uploadId}/complete` | core | 1 | BO-1189, BO-955, CMS-002, CMS-010, CMS-063, SUP-013 |
-| upload | [`createUpload`](#createupload) | POST | `/media/uploads` | core | 1 | BO-1189, BO-955, CMS-002, CMS-010, CMS-063, SUP-013 |
+| timetable | [`withdrawTransportTimetable`](#withdrawtransporttimetable) | POST | `/transport/timetables/{timetableId}/withdraw` | setup | 1 | BO-1186 |
+| upload | [`completeUpload`](#completeupload) | POST | `/media/uploads/{uploadId}/complete` | core | 1 | BO-093, BO-094, BO-1189, BO-955, CMS-002, CMS-010 … |
+| upload | [`createUpload`](#createupload) | POST | `/media/uploads` | core | 1 | BO-093, BO-094, BO-1189, BO-955, CMS-002, CMS-010 … |
 | venueMap | [`createVenueMap`](#createvenuemap) | POST | `/venue-maps` | setup | 1 | BO-092 |
 | venueMap | [`getVenueMap`](#getvenuemap) | GET | `/venue-maps/{mapId}` | core | 1 | BO-094, EMP-030, GST-004, GST-021, GST-074, WEB-039 … |
 | venueMap | [`getVenueMapGraph`](#getvenuemapgraph) | GET | `/venue-maps/{mapId}/graph` | core | 1 | BO-094, GST-021, WEB-039 |
@@ -91,6 +99,7 @@
 | venueMap | [`listBookableVenueMaps`](#listbookablevenuemaps) | GET | `/bookable-venue-maps` | core | 1 | GST-074, WEB-047 |
 | venueMap | [`publishVenueMap`](#publishvenuemap) | POST | `/venue-maps/{mapId}/publish` | setup | 1 | BO-094 |
 | venueMap | [`setPlacedResource`](#setplacedresource) | POST | `/venue-maps/{mapId}/resources` | setup | 1 | BO-094 |
+| venueMap | [`setVenueMapArtwork`](#setvenuemapartwork) | POST | `/venue-maps/{mapId}/artwork` | setup | 1 | BO-094 |
 | venueMap | [`setVenuePoint`](#setvenuepoint) | POST | `/venue-maps/{mapId}/points` | setup | 1 | BO-094 |
 | visitPlan | [`bookVisitPlan`](#bookvisitplan) | POST | `/visit-plans/{planId}/booking` | core | 1 | GST-053, WEB-050 |
 | visitPlan | [`generateVisitPlan`](#generatevisitplan) | POST | `/visit-plans` | core | 1 | GST-051, GST-052, WEB-050 |
@@ -166,7 +175,7 @@ Returns every generated size and every place the asset is referenced. Usage is w
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes |  |
-| kind | MediaKind: enum (image, video, audio, document, vector, font, archive) | yes |  |
+| kind | MediaKind: enum (image, video, audio, document, vector, font, archive, model3d) | yes | model3d added 3 October 2026 (r1 additions; ADR-0069 action item 4): a glTF binary (model/gltf-binary, .glb) venue model, at most 40 MB. |
 | status | MediaStatus: enum (processing, ready, quarantined, failed, archived) | yes |  |
 | filename | string | yes |  |
 | contentType | string | yes |  |
@@ -271,7 +280,7 @@ Derivatives regenerate. The previous version is retained for rollback.
 |---|---|---|---|
 | asset | MediaAsset | yes |  |
 | asset.id | string (uuid) | yes |  |
-| asset.kind | MediaKind: enum (image, video, audio, document, vector, font, archive) | yes |  |
+| asset.kind | MediaKind: enum (image, video, audio, document, vector, font, archive, model3d) | yes | model3d added 3 October 2026 (r1 additions; ADR-0069 action item 4): a glTF binary (model/gltf-binary, .glb) venue model, at most 40 MB. |
 | asset.status | MediaStatus: enum (processing, ready, quarantined, failed, archived) | yes |  |
 | asset.filename | string | yes |  |
 | asset.contentType | string | yes |  |
@@ -342,7 +351,7 @@ Filter by kind, tag, collection, venue or usage. `unusedOnly` surfaces assets no
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| kind | query |  | MediaKind: enum (image, video, audio, document, vector, font, archive) |  |
+| kind | query |  | MediaKind: enum (image, video, audio, document, vector, font, archive, model3d) |  |
 | tag | query |  | string |  |
 | collectionId | query |  | string (uuid) |  |
 | venueId | query |  | string (uuid) |  |
@@ -358,7 +367,7 @@ Filter by kind, tag, collection, venue or usage. `unusedOnly` surfaces assets no
 |---|---|---|---|
 | items | array of MediaAsset | yes |  |
 | items[].id | string (uuid) | yes |  |
-| items[].kind | MediaKind: enum (image, video, audio, document, vector, font, archive) | yes |  |
+| items[].kind | MediaKind: enum (image, video, audio, document, vector, font, archive, model3d) | yes | model3d added 3 October 2026 (r1 additions; ADR-0069 action item 4): a glTF binary (model/gltf-binary, .glb) venue model, at most 40 MB. |
 | items[].status | MediaStatus: enum (processing, ready, quarantined, failed, archived) | yes |  |
 | items[].filename | string | yes |  |
 | items[].contentType | string | yes |  |
@@ -462,7 +471,7 @@ A partial update: only the fields sent change. `collectionIds`, when sent, repla
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes |  |
-| kind | MediaKind: enum (image, video, audio, document, vector, font, archive) | yes |  |
+| kind | MediaKind: enum (image, video, audio, document, vector, font, archive, model3d) | yes | model3d added 3 October 2026 (r1 additions; ADR-0069 action item 4): a glTF binary (model/gltf-binary, .glb) venue model, at most 40 MB. |
 | status | MediaStatus: enum (processing, ready, quarantined, failed, archived) | yes |  |
 | filename | string | yes |  |
 | contentType | string | yes |  |
@@ -722,7 +731,7 @@ Folders — by campaign, venue, season or product line. An asset may sit in seve
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `transport.departure`, `transport.fare_matrix_cell`, `transport.fare_passenger_type`, `transport.fare_table`, `transport.route`, `transport.route_stop`, `transport.station`, `transport.timetable` |
+| Reads | `catalogue.channel_capacity`, `transport.departure`, `transport.fare_matrix_cell`, `transport.fare_passenger_type`, `transport.fare_table`, `transport.route`, `transport.route_stop`, `transport.station`, `transport.timetable` |
 | Writes | - |
 | Called by | GST-076, WEB-049 |
 
@@ -784,7 +793,7 @@ Only departures `onSale` and before the route's booking cut-off are returned; a 
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `transport.departure`, `transport.fare_matrix_cell`, `transport.fare_passenger_type`, `transport.fare_table`, `transport.route`, `transport.route_stop`, `transport.station`, `transport.timetable` |
+| Reads | `catalogue.channel_capacity`, `transport.departure`, `transport.fare_matrix_cell`, `transport.fare_passenger_type`, `transport.fare_table`, `transport.route`, `transport.route_stop`, `transport.station`, `transport.timetable` |
 | Writes | - |
 | Called by | GST-076, WEB-049 |
 
@@ -842,6 +851,64 @@ Only departures `onSale` and before the route's booking cut-off are returned; a 
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Departures by departure time at the boarding stop |
 | 422 |  | The stations are the same, or no active route serves them in this order. |
+
+### updateTransportDeparture
+
+**`PATCH /transport/departures/{departureId}`**: Change a departure's coach or capacity
+
+A bigger or smaller coach on one run. **Capacity cannot go below the seats already sold**; the refusal is a 422. The new capacity is written to the performance's channel capacity. To cancel a departure use `cancelPerformance` on its `performanceId`.
+
+|  |  |
+|---|---|
+| Permission | `TRANSPORT_MANAGE` |
+| Scope level | venue |
+| Part of slice | setup, changes rows of `transport.departure` that another operation creates |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `transport.departure` |
+| Writes | `transport.departure` |
+| Called by | BO-1187 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| departureId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| seatCapacity | integer |  | (min 1; max 200) |
+| vehicleResourceId | string (uuid) |  | (nullable) |
+| note | string |  | (max length 500; nullable) |
+
+**Response**: `Departure`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
+| routeId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
+| timetableId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
+| performanceId | string (uuid) | yes | The catalogue performance this departure is sold as. |
+| serviceDate | string (date) | yes |  |
+| departsAt | string (date-time) | yes | At the route's first stop. |
+| status | TransportDepartureStatus: enum (scheduled, onSale, soldOut, departed, cancelled) | yes | Mirrors the catalogue performance behind the departure, in the words a coach operator uses. |
+| seatCapacity | integer | yes | (min 1) |
+| seatsSold | integer |  | From catalogue availability on read; not stored here. (read-only) |
+| vehicleResourceId | string (uuid) |  | (nullable) |
+| note | string |  | (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Updated |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 422 |  | Capacity below seats sold. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: entry
@@ -1425,6 +1492,66 @@ The Favourites tab (decided 29 September, rev 3 REV3-21): each saved pair of sta
 | 422 |  | The stations are the same, or no active route serves them in this order. |
 
 
+## Group: general
+
+### getTransportDeparture
+
+**`GET /transport/departures/{departureId}`**: One departure, as a guest books it
+
+**Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.** GST-077 is opened on a departure (`departureId` from GST-076) and never read it: the r1 gate found the trip page showing a departure it had no read of. Published network data, as `getNextTransportDeparture` is. Returns what the write stores, in the write's own shape.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `catalogue.channel_capacity`, `transport.departure`, `transport.fare_matrix_cell`, `transport.fare_passenger_type`, `transport.fare_table`, `transport.route`, `transport.route_stop`, `transport.station`, `transport.timetable` |
+| Writes | - |
+| Called by | GST-077 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| departureId | path | yes | string (uuid) |  |
+
+**Response**: `DepartureOffer`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| departureId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
+| performanceId | string (uuid) | yes |  |
+| routeId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
+| routeCode | string |  | The price card's label, e.g. |
+| departsAt | string (date-time) | yes | At the boarding stop. |
+| arrivesAt | string (date-time) | yes | At the alighting stop. |
+| durationMinutes | integer | yes | (min 0) |
+| period | TimePeriod: enum (morning, afternoon, evening, night) | yes | Proposed, client to correct (rev 3 REV3-21): morning 05:00–11:59, afternoon 12:00–16:59, evening 17:00–20:59, night 21:00–04:59. |
+| seatsLeft | integer | yes | Catalogue availability for the performance. (min 0) |
+| fitsParty | boolean |  |  |
+| fare | Money | yes | On the wire this is three fields; in the database it is one column. |
+| fare.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| fare.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| fare.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| partyTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| partyTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| partyTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| partyTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | One departure, as a guest books it |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+
 ## Group: inspection
 
 ### createInspectionTemplate
@@ -1780,6 +1907,72 @@ The Multi-trip tab (decided 29 September, rev 3 REV3-21): 5-trip and 10-trip car
 | 200 |  | Pass offers, by sortOrder |
 | 422 |  | The stations are the same, or no active route serves them in this order. |
 
+### updateTransportPassType
+
+**`PATCH /transport/pass-types/{passTypeId}`**: Amend or retire a pass type
+
+**A pass already sold keeps its trips, validity and price.** A change applies to passes sold after it; `active: false` stops selling it.
+
+|  |  |
+|---|---|
+| Permission | `TRANSPORT_PRICE` |
+| Scope level | venue |
+| Part of slice | setup, changes rows of `transport.pass_type` that another operation creates |
+| Wave | 1 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Reads | `transport.pass_type` |
+| Writes | `transport.pass_type` |
+| Called by | BO-1188 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| passTypeId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| name | LocalisedText |  |  |
+| description | LocalisedText |  |  |
+| fareMultiplier | number |  | (min 0; max 1000) |
+| referenceTrips | integer |  | (min 1; max 1000) |
+| validityDays | integer |  | (min 1; max 366) |
+| routeIds | array of string (uuid) |  |  |
+| sortOrder | integer |  | (min 0) |
+| active | boolean |  |  |
+
+**Response**: `PassType`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| venueId | string (uuid) | yes |  |
+| code | string | yes | (max length 32) |
+| name | LocalisedText | yes |  |
+| description | LocalisedText |  |  |
+| kind | enum (multiTrip, unlimited) | yes |  |
+| trips | integer |  | Journeys included. (min 2; max 100; nullable) |
+| fareMultiplier | number | yes | The pass price as a multiple of the single adult fare between its two stations. (min 0; max 1000) |
+| referenceTrips | integer | yes | The single trips the saving is measured against — trips for a multi-trip card, an number the venue sets for unlimited (14 a week, 60 a month in the demo seed data). (min 1; max 1000) |
+| validityDays | integer | yes | (min 1; max 366) |
+| routeIds | array of string (uuid) |  | Routes it is sold on. |
+| sortOrder | integer |  | (min 0; default 0) |
+| id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
+| active | boolean | yes | (default True) |
+| catalogueProductId | string (uuid) |  | The catalogue openDated product this pass is sold as. (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Updated |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 
 ## Group: queue
 
@@ -2087,6 +2280,46 @@ Guest-facing when called with a guest token — returns only queues that are ope
 
 ## Group: resources
 
+### cloneResource
+
+**`POST /resources/{resourceId}/clone`**: Copy a resource and its configuration into new ones
+
+**A venue with forty identical strollers has forty resources.** That is the model, and it is only bearable if the fortieth is one action rather than forty fields.
+Clone copies configuration and never copies identity: code, serial and barcode are cleared, and bookings, history and deposits are not carried.
+
+|  |  |
+|---|---|
+| Permission | `RESOURCE_MANAGE` |
+| Scope level | venue |
+| Part of slice | setup, makes `resources.resource` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `resources.resource` |
+| Writes | `resources.resource` |
+| Called by | BO-857 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| resourceId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| count | integer |  | Forty strollers in one act. (default 1) |
+| codePattern | string |  | (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Created |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### createResource
 
 **`POST /resources`**: Define a bookable resource
@@ -2256,7 +2489,7 @@ Board 2.07. **A block is not a booking and the difference is operational.** An o
 | Lock | rowExclusive |
 | Guest callable | True |
 | Reads | `resources.resource_hold` |
-| Writes | - |
+| Writes | `resources.resource_hold` |
 | Called by | GST-074, WEB-047 |
 | State model | Resource hold ([states/resource-hold.yaml](../../../states/resource-hold.yaml)): created as `held` |
 
@@ -2421,7 +2654,7 @@ For a guest still completing payment. **The same bounds as a seat hold**: `Venue
 | Conflict policy | serverWins |
 | Guest callable | True |
 | Reads | `resources.resource_hold` |
-| Writes | - |
+| Writes | `resources.resource_hold` |
 | Called by | GST-074, WEB-047 |
 
 **Parameters**
@@ -2805,6 +3038,80 @@ Requirements are stated as type and quantity with optional qualifications — *o
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Set |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### setResourceLifecycleState
+
+**`POST /resources/{resourceId}/state`**: Move a resource through its lifecycle, with a reason
+
+Board 1.10. **One operation, not seven.** Draft, pending approval, approved, active, temporarily unavailable, under maintenance, suspended, retired and archived are states of one machine, and *the allowed transitions are themselves configuration* — so `activateResource`, `suspendResource` and `retireResource` as separate operations would each re-implement the same transition table and still not cover a state the customer adds.
+**The reason is required on the states that need one.** Retirement carries disposal and depreciation references, suspension carries a cause, and either may name a replacement resource. The board asks for all three, and an audit whose reason column is blank answers nothing.
+
+|  |  |
+|---|---|
+| Permission | `RESOURCE_MANAGE` |
+| Scope level | venue |
+| Part of slice | setup, makes `resources.resource` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `resources.resource` |
+| Writes | `resources.resource` |
+| Called by | BO-857, BO-863, BO-912 |
+| State model | Resource ([states/resource.yaml](../../../states/resource.yaml)): moves `maintenance` -> `available` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| resourceId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| state | ResourceLifecycleState: enum (draft, pendingApproval, approved, active, temporarilyUnavailable, underMaintenance, suspended, retired, …) | yes | Board 1.10. |
+| reason | string |  | (nullable) |
+| effectiveFrom | string (date-time) |  | (nullable) |
+| replacementResourceId | string (uuid) |  | (nullable) |
+| disposal | object |  | (nullable) |
+
+**Response**: `Resource`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| code | string | yes |  |
+| name | string | yes |  |
+| kind | ResourceKind: enum (cabana, lounger, locker, wheelchair, stroller, equipment, room, auditorium, …) | yes | BL-135. |
+| venueId | string (uuid) | yes |  |
+| scopePath | string |  |  |
+| parentResourceId | string (uuid) |  | A pool cabana belongs to the pool area; a seat belongs to an auditorium. (nullable) |
+| principalId | string (uuid) |  | For a resource of kind instructor or staff. (nullable) |
+| attributes | object |  | Configurable per kind — capacity, size, shade, power, poolside. |
+| setupMinutes | integer |  | Before the booking, not inside it. (default 0) |
+| teardownMinutes | integer |  | After the booking. (default 0) |
+| cleaningPolicy | object |  | How the resource is cleaned between uses (decided 29 September, W10). (nullable) |
+| cleaningPolicy.mode | enum (afterEveryBooking, timesPerDay) | yes |  |
+| cleaningPolicy.bufferMinutes | integer | yes | Minutes one cleaning takes. (min 5; max 240) |
+| cleaningPolicy.cleaningsPerDay | integer |  | Required for timesPerDay; ignored for afterEveryBooking. (min 1; max 24; nullable) |
+| cleaningPolicy.windowStart | string |  | Venue-local time the cleaning window opens. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; nullable) |
+| cleaningPolicy.windowEnd | string |  | Venue-local time the cleaning window closes. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; nullable) |
+| requiresQualification | array of string |  | Qualification codes a person must hold to be assigned to this. |
+| depositAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| depositAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| depositAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| depositAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| status | enum (available, booked, checkedOut, maintenance, retired) |  |  |
+| isActive | boolean |  | (default True) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Moved |
+| 409 |  | The transition is not allowed from the current state, or an approval the configuration requires has not been given. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setResourceSchedule
@@ -3390,6 +3697,82 @@ A guest or public caller sees `active` routes only; `status` is honoured only fo
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Routes |
 
+### setTransportRouteStatus
+
+**`PUT /transport/routes/{routeId}/status`**: Activate, suspend or retire a route
+
+`draft` → `active` needs a fare table and at least two stops with coordinates or not (the map omits a stop without them). `active` → `suspended` stops new sales and keeps sold tickets valid. **Retiring is refused while a departure on sale has sold seats** — cancel those departures (`cancelPerformance`) first. See `states/transport-route.yaml`.
+**PUT semantics.** The target is the route in the path; this never creates one.
+
+|  |  |
+|---|---|
+| Permission | `TRANSPORT_MANAGE` |
+| Scope level | venue |
+| Part of slice | setup, makes `transport.route` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `transport.route`, `transport.route_stop`, `transport.station` |
+| Writes | `transport.route` |
+| Called by | BO-1184 |
+| State model | Transport route ([states/transport-route.yaml](../../../states/transport-route.yaml)): moves `draft` -> `active`, `active` -> `suspended`, `suspended` -> `active`, `active` -> `retired`, `suspended` -> `retired`, `draft` -> `retired` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| routeId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| status | TransportRouteStatus: enum (draft, active, suspended, retired) | yes |  |
+| reason | string |  | (max length 500) |
+
+**Response**: `TransportRoute`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| venueId | string (uuid) | yes |  |
+| code | string | yes | The line and direction, e.g. (max length 32) |
+| lineCode | string |  | The public line number shared by both directions, e.g. (max length 16) |
+| name | LocalisedText | yes |  |
+| colour | string |  | (pattern ^#[0-9a-fA-F]{6}$) |
+| pairedRouteId | string (uuid) |  | The same line run the other way. (nullable) |
+| bookingCutoffMinutes | integer |  | How long before a departure leaves the boarding stop that online sale stops. (min 0; max 1440; default 5) |
+| stops | array of RouteStop | yes |  |
+| stops[].stationId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
+| stops[].offsetMinutes | integer | yes | Minutes after the departure from the first stop that the coach leaves this one. (min 0; max 1440) |
+| stops[].boardingAllowed | boolean |  | (default True) |
+| stops[].alightingAllowed | boolean |  | (default True) |
+| stops[].id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
+| stops[].sequence | integer | yes | 1 for the origin. (min 1) |
+| stops[].station | Station |  |  |
+| stops[].station.venueId | string (uuid) | yes |  |
+| stops[].station.code | string | yes | Short operator code, e.g. (max length 32) |
+| stops[].station.name | LocalisedText | yes |  |
+| stops[].station.shortName | LocalisedText |  | The label on the route diagram and the map pin (Union Sq, MoE). |
+| stops[].station.latitude | number |  | (min -90; max 90; nullable) |
+| stops[].station.longitude | number |  | (min -180; max 180; nullable) |
+| stops[].station.id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
+| stops[].station.active | boolean | yes | (default True) |
+| id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
+| status | TransportRouteStatus: enum (draft, active, suspended, retired) | yes |  |
+| totalMinutes | integer |  | The last stop's offset. (read-only) |
+| catalogueEventId | string (uuid) |  | The catalogue event its departures are performances of. (read-only) |
+| catalogueProductId | string (uuid) |  | The one-way trip product (kind timedAdmission); one variant per passenger type. (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Status set |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The transition is not allowed from the current status, the route has no fare table, or retiring a route with sold seats on a departure still on sale. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### updateTransportRoute
 
 **`PATCH /transport/routes/{routeId}`**: Amend a route
@@ -3584,6 +3967,63 @@ The From and To station menus (decided 29 September, rev 3 REV3-21). A guest or 
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Stations |
 
+### updateTransportStation
+
+**`PATCH /transport/stations/{stationId}`**: Amend or deactivate a station
+
+**A station on an active route cannot be deactivated** — the route would offer a stop nobody can book. Remove it from the route first, or suspend the route. The refusal is a 409 naming the routes.
+
+|  |  |
+|---|---|
+| Permission | `TRANSPORT_MANAGE` |
+| Scope level | venue |
+| Part of slice | setup, changes rows of `transport.station` that another operation creates |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `transport.station` |
+| Writes | `transport.station` |
+| Called by | BO-1183 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| stationId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| name | LocalisedText |  |  |
+| shortName | LocalisedText |  |  |
+| latitude | number |  | (min -90; max 90; nullable) |
+| longitude | number |  | (min -180; max 180; nullable) |
+| active | boolean |  |  |
+
+**Response**: `Station`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| venueId | string (uuid) | yes |  |
+| code | string | yes | Short operator code, e.g. (max length 32) |
+| name | LocalisedText | yes |  |
+| shortName | LocalisedText |  | The label on the route diagram and the map pin (Union Sq, MoE). |
+| latitude | number |  | (min -90; max 90; nullable) |
+| longitude | number |  | (min -180; max 180; nullable) |
+| id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
+| active | boolean | yes | (default True) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Updated |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The station is a stop on one or more active routes and cannot be deactivated. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 
 ## Group: timetable
 
@@ -3714,6 +4154,67 @@ The route must be `active` and have a fare table.
 | 409 |  | Not a draft, the route is not active or has no fare table, or a superseded timetable has departures with sold seats on or after this validFrom. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### withdrawTransportTimetable
+
+**`POST /transport/timetables/{timetableId}/withdraw`**: Withdraw a published timetable
+
+Removes its unsold future departures and stops releasing new ones. **Refused while any future departure has sold seats** — cancel those first, so every guest affected is refunded and told through `performance-cancelled`.
+
+|  |  |
+|---|---|
+| Permission | `TRANSPORT_MANAGE` |
+| Scope level | venue |
+| Part of slice | setup, changes rows of `transport.timetable` that another operation creates |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `transport.timetable`, `transport.timetable_run` |
+| Writes | `transport.timetable` |
+| Called by | BO-1186 |
+| State model | Transport timetable ([states/transport-timetable.yaml](../../../states/transport-timetable.yaml)): moves `published` -> `withdrawn`, `draft` -> `withdrawn` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| timetableId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| reason | string | yes | (min length 3; max length 500) |
+
+**Response**: `Timetable`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| name | string | yes | (max length 120) |
+| validFrom | string (date) | yes |  |
+| validTo | string (date) |  | (nullable) |
+| releaseHorizonDays | integer |  | How many days ahead departures go on sale. (min 1; max 365; default 30) |
+| seatCapacity | integer | yes | Seats per departure, unless a departure overrides it. (min 1; max 200) |
+| seatMapId | string (uuid) |  | The coach seat map for Seat Selection (seating). (nullable) |
+| runs | array of TimetableRun | yes | (min items 1; max items 500) |
+| runs[].departsAt | string | yes | Venue local time, 24-hour HH:MM, at the route's first stop. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| runs[].days | array of enum (mon, tue, wed, thu, fri, sat, sun) | yes | (min items 1) |
+| id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
+| routeId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
+| status | TransportTimetableStatus: enum (draft, published, superseded, withdrawn) | yes |  |
+| publishedAt | string (date-time) |  | (read-only; nullable) |
+| releasedThrough | string (date) |  | The last date whose departures have been generated. (read-only; nullable) |
+| supersededById | string (uuid) |  | (read-only; nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Withdrawn |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | Not published, or a future departure has sold seats. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 
 ## Group: upload
 
@@ -3736,7 +4237,7 @@ Files are scanned before becoming available. An asset that fails scanning is qua
 | Conflict policy | serverWins |
 | Reads | `assets.media_asset`, `assets.media_upload`, `cache:idempotency` |
 | Writes | `assets.media_asset`, `assets.media_fingerprint`, `cache:idempotency` |
-| Called by | BO-1189, BO-955, CMS-002, CMS-010, CMS-063, SUP-013 |
+| Called by | BO-093, BO-094, BO-1189, BO-955, CMS-002, CMS-010, CMS-063, SUP-013 |
 | State model | Media asset ([states/media.yaml](../../../states/media.yaml)): created as `processing` |
 
 **Parameters**
@@ -3773,7 +4274,7 @@ Files are scanned before becoming available. An asset that fails scanning is qua
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes |  |
-| kind | MediaKind: enum (image, video, audio, document, vector, font, archive) | yes |  |
+| kind | MediaKind: enum (image, video, audio, document, vector, font, archive, model3d) | yes | model3d added 3 October 2026 (r1 additions; ADR-0069 action item 4): a glTF binary (model/gltf-binary, .glb) venue model, at most 40 MB. |
 | status | MediaStatus: enum (processing, ready, quarantined, failed, archived) | yes |  |
 | filename | string | yes |  |
 | contentType | string | yes |  |
@@ -3824,6 +4325,7 @@ Files are scanned before becoming available. An asset that fails scanning is qua
 
 Uploads go **direct to object storage**, not through this API. Large media passing through an application tier is latency, memory and a timeout waiting to happen.
 Confirm with `POST /media/uploads/{id}/complete` once the transfer finishes. The `MediaAsset.id` that returns is the reference every other contract stores for the file.
+**A 3D venue model is a `model3d` asset** (ADR-0069 section 7, contract item closed 3 October 2026, r1 additions): content type `model/gltf-binary` (`.glb`), **at most 41,943,040 bytes (40 MB)**, refused here with `400` beyond that, before the transfer starts. Its navigation file is a `document` (`application/json`). Both stay in the tenant's region (UAE-hosted for a UAE tenant) and are served through the platform's delivery rules; no asset goes to a third-party map service. `venue-map.importVenueGeometry` measures the rest of the budget.
 
 |  |  |
 |---|---|
@@ -3835,7 +4337,7 @@ Confirm with `POST /media/uploads/{id}/complete` once the transfer finishes. The
 | Conflict policy | serverWins |
 | Reads | `assets.media_upload`, `cache:idempotency` |
 | Writes | `assets.media_upload`, `cache:idempotency` |
-| Called by | BO-1189, BO-955, CMS-002, CMS-010, CMS-063, SUP-013 |
+| Called by | BO-093, BO-094, BO-1189, BO-955, CMS-002, CMS-010, CMS-063, SUP-013 |
 
 **Parameters**
 
@@ -3933,6 +4435,22 @@ A venue may have several — **a park map and a floor plan per building are diff
 | tileSetRef | string |  | Where a base image is large enough to need zoom levels. (read-only; nullable) |
 | boundsGeoJson | string |  | (nullable) |
 | graphStatus | enum (notBuilt, connected, disconnected, partial) |  | Whether every public point can actually be reached. (read-only) |
+| modelAssetId | string (uuid) |  | The 3D layer of the working draft (ADR-0069, contract item closed 3 October 2026): the GLB (model3d asset) the last glbModel import brought in. (read-only; nullable) |
+| navigationFileAssetId | string (uuid) |  | The navigation file imported with the model, kept so the import can be re-run and audited. (read-only; nullable) |
+| modelTransform | object |  | How the model's local frame sits on the earth (ADR-0069 section 3): the navigation file's anchor, stored once and used both ways. (read-only) |
+| modelTransform.originLat | number | yes | (min -90; max 90) |
+| modelTransform.originLng | number | yes | (min -180; max 180) |
+| modelTransform.originAltitudeMetres | number |  | (default 0) |
+| modelTransform.headingDegrees | number | yes | True-north bearing of the model's -Z axis, clockwise. (min 0) |
+| modelTransform.scale | number |  | Metres per model unit; 1 for a model in metres. (default 1) |
+| modelTransform.controlPoints | array of object |  | Surveyed checks, far apart. (min items 2; max items 8) |
+| modelTransform.controlPoints[].label | string | yes |  |
+| modelTransform.controlPoints[].x | number | yes |  |
+| modelTransform.controlPoints[].z | number | yes |  |
+| modelTransform.controlPoints[].lat | number | yes |  |
+| modelTransform.controlPoints[].lng | number | yes |  |
+| modelTransform.controlPoints[].residualMetres | number |  | Measured at import. (read-only; nullable) |
+| model3dStatus | enum (none, publishable, blocked) |  | Whether the next publish carries the 3D layer. (read-only) |
 
 **Response**: `VenueMap`
 
@@ -3960,6 +4478,22 @@ A venue may have several — **a park map and a floor plan per building are diff
 | tileSetRef | string |  | Where a base image is large enough to need zoom levels. (read-only; nullable) |
 | boundsGeoJson | string |  | (nullable) |
 | graphStatus | enum (notBuilt, connected, disconnected, partial) |  | Whether every public point can actually be reached. (read-only) |
+| modelAssetId | string (uuid) |  | The 3D layer of the working draft (ADR-0069, contract item closed 3 October 2026): the GLB (model3d asset) the last glbModel import brought in. (read-only; nullable) |
+| navigationFileAssetId | string (uuid) |  | The navigation file imported with the model, kept so the import can be re-run and audited. (read-only; nullable) |
+| modelTransform | object |  | How the model's local frame sits on the earth (ADR-0069 section 3): the navigation file's anchor, stored once and used both ways. (read-only) |
+| modelTransform.originLat | number | yes | (min -90; max 90) |
+| modelTransform.originLng | number | yes | (min -180; max 180) |
+| modelTransform.originAltitudeMetres | number |  | (default 0) |
+| modelTransform.headingDegrees | number | yes | True-north bearing of the model's -Z axis, clockwise. (min 0) |
+| modelTransform.scale | number |  | Metres per model unit; 1 for a model in metres. (default 1) |
+| modelTransform.controlPoints | array of object |  | Surveyed checks, far apart. (min items 2; max items 8) |
+| modelTransform.controlPoints[].label | string | yes |  |
+| modelTransform.controlPoints[].x | number | yes |  |
+| modelTransform.controlPoints[].z | number | yes |  |
+| modelTransform.controlPoints[].lat | number | yes |  |
+| modelTransform.controlPoints[].lng | number | yes |  |
+| modelTransform.controlPoints[].residualMetres | number |  | Measured at import. (read-only; nullable) |
+| model3dStatus | enum (none, publishable, blocked) |  | Whether the next publish carries the 3D layer. (read-only) |
 
 **Responses**
 
@@ -4022,6 +4556,16 @@ A venue may have several — **a park map and a floor plan per building are diff
 | map.tileSetRef | string |  | Where a base image is large enough to need zoom levels. (read-only; nullable) |
 | map.boundsGeoJson | string |  | (nullable) |
 | map.graphStatus | enum (notBuilt, connected, disconnected, partial) |  | Whether every public point can actually be reached. (read-only) |
+| map.modelAssetId | string (uuid) |  | The 3D layer of the working draft (ADR-0069, contract item closed 3 October 2026): the GLB (model3d asset) the last glbModel import brought in. (read-only; nullable) |
+| map.navigationFileAssetId | string (uuid) |  | The navigation file imported with the model, kept so the import can be re-run and audited. (read-only; nullable) |
+| map.modelTransform | object |  | How the model's local frame sits on the earth (ADR-0069 section 3): the navigation file's anchor, stored once and used both ways. (read-only) |
+| map.modelTransform.originLat | number | yes | (min -90; max 90) |
+| map.modelTransform.originLng | number | yes | (min -180; max 180) |
+| map.modelTransform.originAltitudeMetres | number |  | (default 0) |
+| map.modelTransform.headingDegrees | number | yes | True-north bearing of the model's -Z axis, clockwise. (min 0) |
+| map.modelTransform.scale | number |  | Metres per model unit; 1 for a model in metres. (default 1) |
+| map.modelTransform.controlPoints | array of object |  | Surveyed checks, far apart. (min items 2; max items 8) |
+| map.model3dStatus | enum (none, publishable, blocked) |  | Whether the next publish carries the 3D layer. (read-only) |
 | points | array of VenuePoint |  |  |
 | points[].id | string (uuid) | yes | (read-only) |
 | points[].mapId | string (uuid) | yes | From the path of the operation that writes the point. (read-only) |
@@ -4082,6 +4626,16 @@ A venue may have several — **a park map and a floor plan per building are diff
 | resources[].boundary[].x | number |  |  |
 | resources[].boundary[].y | number |  |  |
 | resources[].isBookable | boolean |  | False keeps it on the map and off sale, e.g. (default True) |
+| model3d | object |  | The 3D layer of the version read (ADR-0069; 3 October 2026, r1 additions). (nullable) |
+| model3d.modelAssetId | string (uuid) | yes |  |
+| model3d.sizeBytes | integer |  | (nullable) |
+| model3d.transform | VenueModelTransform | yes | ADR-0069 section 3: the navigation file's anchor. |
+| model3d.transform.originLat | number | yes | (min -90; max 90) |
+| model3d.transform.originLng | number | yes | (min -180; max 180) |
+| model3d.transform.originAltitudeMetres | number |  | (default 0) |
+| model3d.transform.headingDegrees | number | yes | True-north bearing of the model's -Z axis, clockwise. (min 0) |
+| model3d.transform.scale | number |  | Metres per model unit; 1 for a model in metres. (default 1) |
+| model3d.transform.controlPoints | array of object |  | Surveyed checks, far apart. (min items 2; max items 8) |
 
 **Responses**
 
@@ -4160,6 +4714,35 @@ Carries every lesson CF-122 taught on the seat importer, because it is the same 
 **A file that yields no shapes reports `nothingFound`, not success.**
 **The file is uploaded first, through `assets`.** The drawing does not travel in this request: the client calls `assets.createUpload`, sends the file to the signed URL, calls `assets.completeUpload`, and passes the `MediaAsset.id` that returns as `sourceRef` (and the manifest's as `manifestRef`). Uploading needs `ASSET_LIBRARY_MANAGE` as well as this operation's permission.
 **Returns `202` with the job, which is still `parsing`.** Poll `getVenueMapImportJob` until it is `previewReady` or `failed`. The shapes it extracts go into the working draft, never into the published map.
+**The sources accepted in r1** (Chinmay, 3 October 2026, r1 additions; ADR-0069 as amended on 3 October):
+- **`dwgPlan`, `dxfPlan`**: native CAD, preferred, read by layer as above. - **`pdfPlan`**: a vector PDF is read by its layers. **A scanned PDF (a page with no vector
+  geometry) goes through the OCR step** (`ocr`, on by default): the text on the image is read
+  in English and Arabic, each block placed on the plan with its confidence, and returned as
+  `VenueMapImportJob.ocr`. **The text is a hint, never a label**: `ai.proposeVenueLabels`
+  reads the blocks near a shape ("WC", "First Aid", a ride's name) and says which one it used
+  (`VenueLabelProposal.ocrHint`); nothing is named until a person accepts it. The geometry of
+  a scanned page is a raster's (`rasterOnly`), so its paths come from `ai.proposeWalkways`.
+- **`svgPlan`**: read by its named layers or groups, as CAD. - **`rasterPlan`**: a PNG or JPG. **A plan with paths marked by hand** (a marker line along
+  each walkway) says so in `handMarkedPaths`; the import finds the marks
+  (`VenueMapImportJob.handMarkedPaths`), `ai.proposeWalkways` proposes a segment per marked
+  stretch with its confidence, and the operator accepts or rejects **each segment** with
+  `acceptWalkwayProposals`. A plain raster with no marks still works: the proposal then
+  follows what it can see.
+- **`glbModel`**: the venue's 3D model (ADR-0069 section 1) as `sourceRef`, **with its
+  navigation file** (section 2, the `VenueNavigationFile` schema) as `navigationFileRef`.
+  The navigation file's nodes, edges and locations import into the working draft as paths and
+  points, exactly as a CAD walkway layer would (codes resolve to outlets and products, an
+  unresolved one is a finding); its anchor becomes `VenueMap.modelTransform`; the model
+  becomes the draft's 3D layer (`VenueMap.modelAssetId`). **The budget is measured here**
+  (`VenueMapImportJob.model`): a GLB over **40 MB** is refused (`422 modelTooLarge`, and
+  `assets.createUpload` refuses it first); over **300,000 triangles** at LOD0 in any zone,
+  uncompressed textures, or an anchor residual over 10 m at a control point is an `error`
+  finding that keeps the 3D layer out of the next publish (the 2D map still publishes); the
+  other budget lines (25 MB, 1.5 million triangles in all, 150 draw calls, 2048 px and
+  128 MB of textures, a 3 m residual) are `warning`s with the number.
+- **`navigationFile`**: the navigation file alone, as `sourceRef`: its graph and locations
+  import as above, with no 3D layer. The file `getVenueNavigationFile` exports is this format,
+  so a venue (or its 3D studio) starts from the graph the platform already holds.
 
 |  |  |
 |---|---|
@@ -4185,8 +4768,15 @@ Carries every lesson CF-122 taught on the seat importer, because it is the same 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| format | enum (pdfPlan, svgPlan, dwgPlan, dxfPlan, rasterPlan) | yes |  |
+| format | enum (pdfPlan, svgPlan, dwgPlan, dxfPlan, rasterPlan, glbModel, navigationFile) | yes | glbModel and navigationFile added 3 October 2026 (r1 additions, ADR-0069): a GLB with its navigation file, or the navigation file alone. |
 | sourceRef | string (uuid) | yes | The drawing, as the MediaAsset.id from assets.completeUpload. |
+| navigationFileRef | string (uuid) |  | The navigation (pathway) file that goes with a GLB (ADR-0069 section 2; the VenueNavigationFile schema), uploaded like sourceRef as JSON. (nullable) |
+| ocr | object |  | The OCR step (3 October 2026, r1 additions); VenueMapOcrOptions. (nullable) |
+| ocr.mode | enum (auto, off) |  | off skips it, for a plan whose text is noise (a dimensioned drawing). (default auto) |
+| ocr.languages | array of enum (en, ar) |  | The scripts to read. |
+| handMarkedPaths | object |  | A raster plan with hand-marked paths (3 October 2026, r1 additions); VenueMapHandMarkedPaths. (nullable) |
+| handMarkedPaths.markColour | string |  | The marker's colour, where the operator knows it (#E53935 for a red pen). (pattern ^#[0-9A-Fa-f]{6}$; nullable) |
+| handMarkedPaths.note | string |  | Anything the marks mean that the image does not say ("dashed = staff only"). (max length 300; nullable) |
 | layerMapping | object |  | Each role takes a list. |
 | layerMapping.buildingLayer | array of string |  |  |
 | layerMapping.pathLayer | array of string |  | Optional, and the platform derives paths without it. |
@@ -4239,12 +4829,48 @@ Carries every lesson CF-122 taught on the seat importer, because it is the same 
 | findings[].message | string | yes |  |
 | findings[].specSection | string |  | Which part of the spec covers it — §2 Layers, §4 Digits. (nullable) |
 | findings[].affected | array of string |  | The layers, sections or rows involved. |
+| ocr | object |  | What the OCR step read off a scanned PDF or a raster (3 October 2026, r1 additions). (nullable) |
+| ocr.pagesRead | integer |  |  |
+| ocr.meanConfidence | number |  | (min 0; max 1; nullable) |
+| ocr.textBlocks | array of object |  |  |
+| ocr.textBlocks[].text | string | yes | (max length 500) |
+| ocr.textBlocks[].language | enum (en, ar) |  | (nullable) |
+| ocr.textBlocks[].confidence | number | yes | (min 0; max 1) |
+| ocr.textBlocks[].planX | number |  | (nullable) |
+| ocr.textBlocks[].planY | number |  | (nullable) |
+| ocr.textBlocks[].widthUnits | number |  | (nullable) |
+| ocr.textBlocks[].heightUnits | number |  | (nullable) |
+| handMarkedPaths | object |  | The hand-marked strokes the import found on a raster plan sent with handMarkedPaths (3 October 2026, r1 additions). (nullable) |
+| handMarkedPaths.strokesFound | integer |  |  |
+| handMarkedPaths.markColourUsed | string |  | The colour the import matched. (nullable) |
+| handMarkedPaths.totalLengthUnits | number |  | In drawing units. (nullable) |
+| model | object |  | The GLB and navigation file, measured (glbModel and navigationFile imports; ADR-0069 sections 1, 2, 3 and 6; 3 October 2026). (nullable) |
+| model.sizeBytes | integer |  | The GLB. (nullable) |
+| model.lod0TrianglesMaxZone | integer |  | The most LOD0 triangles any one zone carries, which is what is on screen near the camera. (nullable) |
+| model.trianglesTotal | integer |  | Across every zone and LOD. (nullable) |
+| model.drawCalls | integer |  | Over 150 is a warning. (nullable) |
+| model.textureMemoryBytes | integer |  | After KTX2 transcoding. (nullable) |
+| model.maxTexturePx | integer |  | Over 2048 is a warning. (nullable) |
+| model.zones | integer |  | (nullable) |
+| model.nodes | integer |  |  |
+| model.edges | integer |  |  |
+| model.locations | integer |  |  |
+| model.anchorResidualMaxMetres | number |  | The worst control point. (nullable) |
+| model.publishable3d | boolean |  | True when no finding below is an error: the next publish carries the 3D layer. |
+| model.findings | array of object |  |  |
+| model.findings[].code | enum (modelOverDownloadBudget, zoneOverDownloadBudget, triangleBudgetExceeded, triangleTotalExceeded, drawCallBudgetExceeded, textureBudgetExceeded, textureTooLarge, uncompressedTextures, …) | yes | A closed set, separate from findings so the plan importer's codes stay as they were. |
+| model.findings[].severity | enum (error, warning, info) | yes |  |
+| model.findings[].message | string | yes |  |
+| model.findings[].measured | number |  | The number found. (nullable) |
+| model.findings[].limit | number |  | The budget it was measured against. (nullable) |
+| model.findings[].affected | array of string |  | The zones, nodes, locations or codes involved. |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
 | 202 |  | Accepted and parsing. |
+| 422 |  | Refused before any parsing (3 October 2026, r1 additions): glbModel with no navigationFileRef (navigationFileMissing), a sourceRef whose asset kind does not fit the format (formatMismatch: a GLB sent… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listBookableVenueMaps
@@ -4309,6 +4935,7 @@ Publishing creates a version. **The previous version stays readable** so a guest
 Refuses a draft with unresolved proposals or a point linked to something that no longer exists — **a restaurant point pointing at a closed outlet is worse than no point**, because a guest walks there.
 **Refuses a draft whose graph is disconnected** (decided 28 September, audit R106 (8)). Where `validateVenueMapGraph` finds more than one component, or a public point with no path to it, the publish is refused with a `disconnectedArea` blocker per unreachable point. A venue made of two sites is two maps.
 **Refuses a draft with a placed resource a guest could not buy** (decided 29 September, rev 3 REV3-15): no linked resource (`resourceUnlinked`), no price band or a band with no variant (`resourcePriceBandMissing`), or a label used twice (`duplicateResourceLabel`). Publishing copies placed resources into the snapshot with the points and paths; from then on a guest can pick them. Holds and bookings on a resource survive a republish because they are keyed by `resourceId`, not by the placement.
+**The 3D layer publishes with the map only when it is `publishable`** (ADR-0069, amended 3 October 2026). A draft whose `model3dStatus` is `blocked` publishes its 2D map and graph and carries no model (`VenueMapVersion.model3d` null); the model is never a reason to refuse the map. A `publishable` model is copied into the version with its transform.
 
 |  |  |
 |---|---|
@@ -4362,6 +4989,22 @@ Refuses a draft with unresolved proposals or a point linked to something that no
 | tileSetRef | string |  | Where a base image is large enough to need zoom levels. (read-only; nullable) |
 | boundsGeoJson | string |  | (nullable) |
 | graphStatus | enum (notBuilt, connected, disconnected, partial) |  | Whether every public point can actually be reached. (read-only) |
+| modelAssetId | string (uuid) |  | The 3D layer of the working draft (ADR-0069, contract item closed 3 October 2026): the GLB (model3d asset) the last glbModel import brought in. (read-only; nullable) |
+| navigationFileAssetId | string (uuid) |  | The navigation file imported with the model, kept so the import can be re-run and audited. (read-only; nullable) |
+| modelTransform | object |  | How the model's local frame sits on the earth (ADR-0069 section 3): the navigation file's anchor, stored once and used both ways. (read-only) |
+| modelTransform.originLat | number | yes | (min -90; max 90) |
+| modelTransform.originLng | number | yes | (min -180; max 180) |
+| modelTransform.originAltitudeMetres | number |  | (default 0) |
+| modelTransform.headingDegrees | number | yes | True-north bearing of the model's -Z axis, clockwise. (min 0) |
+| modelTransform.scale | number |  | Metres per model unit; 1 for a model in metres. (default 1) |
+| modelTransform.controlPoints | array of object |  | Surveyed checks, far apart. (min items 2; max items 8) |
+| modelTransform.controlPoints[].label | string | yes |  |
+| modelTransform.controlPoints[].x | number | yes |  |
+| modelTransform.controlPoints[].z | number | yes |  |
+| modelTransform.controlPoints[].lat | number | yes |  |
+| modelTransform.controlPoints[].lng | number | yes |  |
+| modelTransform.controlPoints[].residualMetres | number |  | Measured at import. (read-only; nullable) |
+| model3dStatus | enum (none, publishable, blocked) |  | Whether the next publish carries the 3D layer. (read-only) |
 
 **Responses**
 
@@ -4448,6 +5091,99 @@ Refuses a draft with unresolved proposals or a point linked to something that no
 | 400 | BadRequest | Validation failed |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### setVenueMapArtwork
+
+**`POST /venue-maps/{mapId}/artwork`**: Set the illustrated map guests see, and how it lines up with the plan
+
+**The guest map artwork** (`handoff/venue-map-input-spec.md` section 6; the F26 flow brief's open item "no screen is named for the illustrated map upload and its alignment points", closed 3 October 2026 on BO-094). The illustration is uploaded first through `assets.createUpload` and `completeUpload`, like a drawing, and its `MediaAsset.id` sent here as `baseAssetId` with the alignment points that place it on the plan. **Two points at least, four recommended** (spec section 6): without them a point placed on the plan lands in the wrong place on the painting. `baseAssetId: null` removes the artwork, and the map renders as plain geometry.
+**Set on the working draft; guests see it from the next publish**, which records it on the version (`VenueMapVersion.baseAssetId`), so a guest mid-route keeps the artwork they started with. Tiles for a large image (`tileSetRef`) are generated after the call returns.
+
+|  |  |
+|---|---|
+| Permission | `VENUE_MAP_MANAGE` |
+| Scope level | venue |
+| Part of slice | setup, makes `venuemap.map` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `venuemap.map` |
+| Writes | `venuemap.map` |
+| Called by | BO-094 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| mapId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| baseAssetId | string (uuid) | yes | The illustrated map (an image asset, PNG or JPG, up to about 12,000 px wide). (nullable) |
+| baseImageAlignment | object |  | Required with an image. (nullable) |
+| baseImageAlignment.imageWidthPx | integer | yes | (min 1) |
+| baseImageAlignment.imageHeightPx | integer | yes | (min 1) |
+| baseImageAlignment.anchors | array of object | yes | (min items 2; max items 4) |
+| baseImageAlignment.anchors[].planX | number | yes |  |
+| baseImageAlignment.anchors[].planY | number | yes |  |
+| baseImageAlignment.anchors[].imageX | number | yes |  |
+| baseImageAlignment.anchors[].imageY | number | yes |  |
+
+**Response**: `VenueMap`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| name | string | yes |  |
+| venueId | string (uuid) | yes |  |
+| scopePath | string |  | Derived from venueId. (read-only) |
+| kind | enum (park, floor, zone, parking) |  |  |
+| floorLevel | integer |  | (nullable) |
+| status | enum (draft, published, archived) | yes | draft on create. (read-only) |
+| publishedVersion | integer |  | The VenueMapVersion.version guests are served. (read-only; nullable) |
+| graphVersion | integer |  | Bumped by a publish or a closure, and returned as VenueMapGraph.version. (read-only) |
+| isGeoreferenced | boolean |  | Whether a guest can be located on it. (read-only) |
+| baseAssetId | string (uuid) |  | The illustrated map a guest actually sees, held in assets like any other media. (nullable) |
+| baseImageAlignment | object |  | How the illustration lines up with the geometry. (nullable) |
+| baseImageAlignment.imageWidthPx | integer |  |  |
+| baseImageAlignment.imageHeightPx | integer |  |  |
+| baseImageAlignment.anchors | array of object |  | (min items 2; max items 4) |
+| baseImageAlignment.anchors[].planX | number |  |  |
+| baseImageAlignment.anchors[].planY | number |  |  |
+| baseImageAlignment.anchors[].imageX | number |  |  |
+| baseImageAlignment.anchors[].imageY | number |  |  |
+| tileSetRef | string |  | Where a base image is large enough to need zoom levels. (read-only; nullable) |
+| boundsGeoJson | string |  | (nullable) |
+| graphStatus | enum (notBuilt, connected, disconnected, partial) |  | Whether every public point can actually be reached. (read-only) |
+| modelAssetId | string (uuid) |  | The 3D layer of the working draft (ADR-0069, contract item closed 3 October 2026): the GLB (model3d asset) the last glbModel import brought in. (read-only; nullable) |
+| navigationFileAssetId | string (uuid) |  | The navigation file imported with the model, kept so the import can be re-run and audited. (read-only; nullable) |
+| modelTransform | object |  | How the model's local frame sits on the earth (ADR-0069 section 3): the navigation file's anchor, stored once and used both ways. (read-only) |
+| modelTransform.originLat | number | yes | (min -90; max 90) |
+| modelTransform.originLng | number | yes | (min -180; max 180) |
+| modelTransform.originAltitudeMetres | number |  | (default 0) |
+| modelTransform.headingDegrees | number | yes | True-north bearing of the model's -Z axis, clockwise. (min 0) |
+| modelTransform.scale | number |  | Metres per model unit; 1 for a model in metres. (default 1) |
+| modelTransform.controlPoints | array of object |  | Surveyed checks, far apart. (min items 2; max items 8) |
+| modelTransform.controlPoints[].label | string | yes |  |
+| modelTransform.controlPoints[].x | number | yes |  |
+| modelTransform.controlPoints[].z | number | yes |  |
+| modelTransform.controlPoints[].lat | number | yes |  |
+| modelTransform.controlPoints[].lng | number | yes |  |
+| modelTransform.controlPoints[].residualMetres | number |  | Measured at import. (read-only; nullable) |
+| model3dStatus | enum (none, publishable, blocked) |  | Whether the next publish carries the 3D layer. (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Set on the draft |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 422 |  | An image with no baseImageAlignment, an asset that is not an image, or alignment points too close together to place the plan (artwork-alignment-required, artwork-not-image, artwork-anchors-too-close). |
+| 409 |  | The map is archived (map-archived); an archived map takes no new artwork. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setVenuePoint
@@ -5719,6 +6455,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | resources_found | integer | no | Bookable resource shapes found on the resource layer (rev 3 REV3-15). |
 | resource_rows_joined | integer | no | Resource manifest rows that joined a shape and a resources.Resource. |
 | manifest_rows_joined | integer | no | The number to check against your own count. |
+| ocr | jsonb | no | What the OCR step read off a scanned PDF or a raster (3 October 2026, r1 additions). |
+| hand_marked_paths | jsonb | no | The hand-marked strokes the import found on a raster plan sent with handMarkedPaths (3 October 2026, r1 additions). |
+| model | jsonb | no | The GLB and navigation file, measured (glbModel and navigationFile imports; ADR-0069 sections 1, 2, 3 and 6; 3 October 2026). |
 
 ### `venuemap.map`
 
@@ -5739,6 +6478,10 @@ Every table this service owns that the slice reads or writes, with its columns a
 | tile_set_ref | text | no | Where a base image is large enough to need zoom levels. |
 | bounds_geo_json | text | no |  |
 | graph_status | text | no | Whether every public point can actually be reached. |
+| model_asset_id | uuid | no | The 3D layer of the working draft (ADR-0069, contract item closed 3 October 2026): the GLB (model3d asset) the last glbModel import brought in. |
+| navigation_file_asset_id | uuid | no | The navigation file imported with the model, kept so the import can be re-run and audited. |
+| model_transform | jsonb | no | How the model's local frame sits on the earth (ADR-0069 section 3): the navigation file's anchor, stored once and used both ways. |
+| model3d_status | text | no | Whether the next publish carries the 3D layer. |
 
 ### `venuemap.map_version`
 
@@ -5750,6 +6493,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | published_at | timestamptz | yes |  |
 | published_by_principal_id | uuid | yes |  |
 | note | text | no | The note sent to publishVenueMap. |
+| base_asset_id | uuid | no | The illustrated map this version published with (setVenueMapArtwork, 3 October 2026), so a guest mid-route keeps the artwork they started with. |
+| base_image_alignment | jsonb | no | The alignment published with baseAssetId, as VenueMap.baseImageAlignment. |
+| model3d | jsonb | no | The 3D layer this version published (ADR-0069; 3 October 2026): the model and transform checked with this graph, so a published 3D map is always the model and the graph that were checked together. |
 | snapshot | jsonb | yes | The points and paths as they were published, stored as one document. |
 
 ### `venuemap.path`
@@ -5854,14 +6600,14 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-218 operations, added to this service in later releases without changing any of the above.
+212 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | asset | `createAsset`, `getAsset`, `getAssetHistory`, `listAssets`, `lookupAsset`, `setAssetStatus`, `updateAsset` |
 | assets | `analyseMediaAsset`, `bulkUpdateMediaAssets`, `createMediaShare`, `findSimilarMediaAssets`, `getMediaDistribution`, `getMediaTaxonomy`, `getMediaUsageAnalytics`, `listMediaAssetAudit`, `listMediaAssetVersions`, `listMediaRenditions`, `requestMediaRendition`, `setMediaAssetApproval`, `setMediaAssetRights`, `setMediaAssetTags`, `setMediaDistributionChannels`, `setMediaTaxonomy` |
 | card | `transferGameCard` |
-| departure | `listTransportRouteDepartures`, `updateTransportDeparture` |
+| departure | `listTransportRouteDepartures` |
 | entry | `callNextParties`, `listMyWaitingGuests`, `listQueueEntries`, `overrideWaitingGuest`, `redeemWaitingGuest` |
 | feed | `configureQueueFeed`, `getQueueFeedHealth`, `listQueueFeeds`, `submitQueueReading`, `testQueueFeed` |
 | game | `cloneGame`, `createGame`, `listGames`, `updateGame` |
@@ -5870,18 +6616,16 @@ Every table this service owns that the slice reads or writes, with its columns a
 | inspection | `listInspectionTemplates`, `listInspections`, `submitInspection` |
 | maintenance | `acceptWorkOrder`, `attachWorkOrderEvidence`, `closeWorkOrder`, `pauseWorkOrder`, `rejectWorkOrder`, `resumeWorkOrder`, `startWorkOrder` |
 | networkImport | `getTransportNetworkImport` |
-| pass | `listTransportPassTypes`, `updateTransportPassType` |
+| pass | `listTransportPassTypes` |
 | planned | `createMaintenancePlan`, `getDueMaintenance`, `listMaintenancePlans`, `updateMaintenancePlan` |
 | play | `recordGamePlay`, `syncGamePlays` |
 | prize | `createPrize`, `listPrizes`, `lookupPrize`, `redeemPrize` |
 | queue | `getQueue`, `setQueueStatus` |
 | rental | `assessRentalDamage`, `assignRentalEquipment`, `checkOutRental`, `createRentalAgreement`, `createRentalBlackout`, `createRentalBooking`, `createRentalCategory`, `createRentalPricingProfile`, `createRentalProduct`, `explainRentalPrice`, `extendRental`, `getRentalAgreement`, `getRentalAvailability`, `getRentalBooking`, `getRentalProduct`, `importRentalCatalogue`, `listOverdueRentals`, `listRentalAgreements`, `listRentalBookings`, `listRentalCategories`, `listRentalPricingProfiles`, `listRentalProducts`, `publishRentalProduct`, `quoteRentalPrice`, `recordRentalInspection`, `reportRentalIncident`, `requestRentalCommercialOverride`, `returnRental`, `setRentalAgreementRequirements`, `setRentalAvailabilityRules`, `setRentalDepositPolicy`, `setRentalDurationRules`, `setRentalFeePolicy`, `setRentalInventoryModel`, `setRentalOperationalRules`, `setRentalProductLocations`, `signRentalAgreement`, `simulateRentalPricing`, `swapRentalEquipment`, `updateRentalBooking`, `updateRentalPricingProfile`, `updateRentalProduct`, `validateRentalProduct` |
-| resources | `allocateResources`, `bookResource`, `cancelResourceBooking`, `checkInResource`, `checkOutResource`, `cloneResource`, `createResourceAttribute`, `createResourceCategory`, `createResourceCost`, `createResourceType`, `deleteResourceCost`, `getExperienceResourceRequirements`, `getPerformanceManifest`, `getResource`, `getResourceAllocationPolicy`, `getResourceAuditTrail`, `getResourceCalendar`, `getResourceCostAnalytics`, `getResourceDependencies`, `getResourceHierarchy`, `getResourceQualifications`, `getResourceSchedule`, `getResourceUtilisation`, `listResourceAttributes`, `listResourceBlocks`, `listResourceBookings`, `listResourceCategories`, `listResourceCosts`, `listResourcePackages`, `listResourceTypes`, `listResources`, `raiseResourceRequest`, `reorderPerformanceManifest`, `replaceResourceAllocation`, `setResourceAllocationPolicy`, `setResourceBookingProgress`, `setResourceDependencies`, `setResourceHierarchy`, `setResourceLifecycleState`, `setResourceQualifications`, `setResourceSelectionPolicy`, `setResourceVenueAssignment`, `suggestResources`, `updateResourceBooking`, `updateResourceCategory`, `updateResourceType` |
-| route | `setTransportRouteStatus` |
+| resources | `allocateResources`, `bookResource`, `cancelResourceBooking`, `checkInResource`, `checkOutResource`, `createResourceAttribute`, `createResourceCategory`, `createResourceCost`, `createResourceType`, `deleteResourceCost`, `getExperienceResourceRequirements`, `getPerformanceManifest`, `getResource`, `getResourceAllocationPolicy`, `getResourceAuditTrail`, `getResourceCalendar`, `getResourceCostAnalytics`, `getResourceDependencies`, `getResourceHierarchy`, `getResourceQualifications`, `getResourceSchedule`, `getResourceUtilisation`, `listResourceAttributes`, `listResourceBlocks`, `listResourceBookings`, `listResourceCategories`, `listResourceCosts`, `listResourcePackages`, `listResourceTypes`, `listResources`, `raiseResourceRequest`, `reorderPerformanceManifest`, `replaceResourceAllocation`, `setResourceAllocationPolicy`, `setResourceBookingProgress`, `setResourceDependencies`, `setResourceHierarchy`, `setResourceQualifications`, `setResourceSelectionPolicy`, `setResourceVenueAssignment`, `suggestResources`, `updateResourceBooking`, `updateResourceCategory`, `updateResourceType` |
 | signage | `getSignageQueueBoard`, `getSignageQueueCalls` |
-| station | `updateTransportStation` |
-| timetable | `listTransportTimetables`, `updateTransportTimetable`, `withdrawTransportTimetable` |
-| venueMap | `acceptVenueLabelProposals`, `acceptWalkwayProposals`, `getVenueMapImportJob`, `getVenueMapLive`, `listVenueMaps`, `setPathClosure`, `validateVenueMapGraph` |
+| timetable | `listTransportTimetables`, `updateTransportTimetable` |
+| venueMap | `acceptVenueLabelProposals`, `acceptWalkwayProposals`, `getVenueMapImportJob`, `getVenueMapLive`, `getVenueNavigationFile`, `listVenueMaps`, `setPathClosure`, `validateVenueMapGraph` |
 | waitTime | `setWaitTime` |
 | work | `cancelWorkOrder` |
 | workOrder | `completeWorkOrder`, `createVendorServiceRequest`, `createWorkOrder`, `getWorkOrder`, `getWorkOrderPriorityPolicy`, `listVendorServiceRequests`, `listWorkOrders`, `recordWorkOrderParts`, `recordWorkOrderTime`, `setWorkOrderPriorityPolicy`, `suggestWorkOrderAssignee`, `updateVendorServiceRequest`, `updateWorkOrder`, `verifyWorkOrder` |

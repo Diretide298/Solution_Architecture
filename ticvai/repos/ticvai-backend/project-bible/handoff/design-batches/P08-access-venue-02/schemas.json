@@ -1367,8 +1367,10 @@
    "document",
    "vector",
    "font",
-   "archive"
-  ]
+   "archive",
+   "model3d"
+  ],
+  "description": "`model3d` added 3 October 2026 (r1 additions; ADR-0069 action item 4): a glTF binary (`model/gltf-binary`, `.glb`) venue model, at most 40 MB. No rendition or derivative is generated for it; the guest app downloads the file as uploaded.\n"
  },
  "MediaRights": {
   "x-ticvai-persistence": "none — embedded in asset",
@@ -1994,6 +1996,126 @@
     ],
     "nullable": true,
     "description": "A line shown under the contact, e.g. *Group courses are booked by phone*. At most 200 characters per language."
+   }
+  }
+ },
+ "ProposedAction": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.proposed_action",
+  "required": [
+   "id",
+   "kind",
+   "targetContract",
+   "targetOperation",
+   "payload",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "interactionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "pricing",
+     "promotion",
+     "operational",
+     "financial",
+     "configuration",
+     "content",
+     "audience"
+    ],
+    "description": "`content` (a marketing or storefront draft from `proposeMarketingContent`) and `audience` (a lookalike segment from `proposeLookalikeSegment`) added 29 September (build); both are applied by a person in the owning screen."
+   },
+   "targetContract": {
+    "type": "string",
+    "description": "Which contract would perform it. The assistant never performs it itself."
+   },
+   "targetOperation": {
+    "type": "string"
+   },
+   "payload": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "The request body a person would submit, ready to review. **Open on purpose: its shape is the request body of `targetOperation` in `targetContract`**, and it is validated against that operation, not restated here.\n"
+   },
+   "summary": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "description": "**Expiry (decided 28 September, audit R213)**: a `proposed` action expires 7 days after `proposedAt`; an `approved` action not applied expires 24 hours after `decidedAt`. Both are proposed values, client to correct, and `expiresAt` carries the one that applies.\n",
+    "enum": [
+     "proposed",
+     "approved",
+     "rejected",
+     "applied",
+     "expired"
+    ]
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "When the expiry timer moves this action to `expired` — `proposedAt` plus 7 days while `proposed`, `decidedAt` plus 24 hours once `approved`, null once `rejected`, `applied` or `expired` (audit R213)."
+   },
+   "approvalLevel": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 2,
+    "description": "8.3.65. Multi-level, because a discount and a pricing change differ in authority. **Two levels (decided 28 September, audit R213)**: `2` for anything touching prices or permissions (every `pricing` and `promotion` action, and any other whose payload sets a price, a discount, a role or a permission grant), which needs a manager other than the requester; `1` for everything else, which the requester approves themselves.\n"
+   },
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "decisionReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "Required on rejection. **The only signal the assistant is proposing badly**, and without it a poor model degrades silently.\n"
+   },
+   "proposedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**Added 29 September (AI design 3.1):** `ai.proposed_action` had no policy — its only references were nullable. The scope it was proposed at, and the partition key row-level security reads.\n"
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "ai.action_plan",
+    "description": "The plan this action presents for a decision (AI design 2.2 D, 3.8)."
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `approvals` request deciding a tier 2 or matrix-caught action (AI design 2.3)."
+   },
+   "changeSetHash": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Hash of the change set approved; execution refuses a plan whose hash differs (AIC-181)."
    }
   }
  },
@@ -2657,6 +2779,73 @@
    }
   }
  },
+ "UploadTicket": {
+  "x-ticvai-persistence": "assets.media_upload",
+  "type": "object",
+  "required": [
+   "uploadId",
+   "uploadUrl",
+   "method",
+   "expiresAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "uploadId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "uploadUrl": {
+    "type": "string",
+    "description": "Signed. PUT the file here, then confirm with `/complete`."
+   },
+   "method": {
+    "type": "string",
+    "enum": [
+     "PUT",
+     "POST"
+    ]
+   },
+   "headers": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "string"
+    }
+   },
+   "maxSizeBytes": {
+    "type": "integer"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "filename": {
+    "type": "string"
+   },
+   "contentType": {
+    "type": "string"
+   },
+   "sizeBytes": {
+    "type": "integer"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The asset this upload became — created by `completeUpload`, or the asset whose file `replaceMediaAsset` swapped. Null while the transfer is outstanding.\n"
+   }
+  }
+ },
  "VenueMap": {
   "type": "object",
   "x-ticvai-persistence": "venuemap.map",
@@ -2786,6 +2975,41 @@
      "partial"
     ],
     "description": "**Whether every public point can actually be reached.** Computed at publish.\n`disconnected` means a point has no path to it at all — a toilet nobody can walk to is a toilet that does not exist. `partial` means every point is reachable and at least one only by steps, which is a different and quieter failure: **the map works until a wheelchair user opens it.**\n"
+   },
+   "modelAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "assets.MediaAsset",
+    "description": "**The 3D layer of the working draft** (ADR-0069, contract item closed 3 October 2026): the GLB (`model3d` asset) the last `glbModel` import brought in. Set by `importVenueGeometry`, never by sending a value. Null for a 2D-only map, which is the default and needs nothing. The 3D model is a rendering of the map, never the source of its truth: routes come from the graph.\n"
+   },
+   "navigationFileAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "assets.MediaAsset",
+    "description": "The navigation file imported with the model, kept so the import can be re-run and audited."
+   },
+   "modelTransform": {
+    "readOnly": true,
+    "description": "**How the model's local frame sits on the earth** (ADR-0069 section 3): the navigation file's anchor, stored once and used both ways. Null without a model. It maps onto the plan's georeference as the ADR says, so a map with a model is georeferenced.\n",
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/VenueModelTransform"
+     }
+    ]
+   },
+   "model3dStatus": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "none",
+     "publishable",
+     "blocked"
+    ],
+    "description": "**Whether the next publish carries the 3D layer.** `none`: no model. `publishable`: the last model import had no `error` finding. `blocked`: it had one (over 300,000 triangles at LOD0, uncompressed textures, a control point more than 10 m out, an invalid navigation file), named in that job's `model.findings`; the 2D map still publishes and guests see 2D until a corrected model is imported (ADR-0069 sections 3 and 6).\n"
    }
   }
  },
@@ -2820,6 +3044,15 @@
     "items": {
      "$ref": "#/components/schemas/PlacedResource"
     }
+   },
+   "model3d": {
+    "nullable": true,
+    "description": "**The 3D layer of the version read** (ADR-0069; 3 October 2026, r1 additions). Null when that version has none, and then the guest app shows the 2D map with the same route, as it does on a phone that cannot hold 30 fps.\n",
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/VenueModel3d"
+     }
+    ]
    }
   }
  },
@@ -2902,6 +3135,25 @@
    "components": {
     "type": "integer",
     "description": "How many disconnected parts. **One is the answer for a park.** More than one on a map that should be a single site means something is unreachable and the client can say so without walking the graph.\n"
+   }
+  }
+ },
+ "VenueMapHandMarkedPaths": {
+  "x-ticvai-persistence": "none — part of the importVenueGeometry request",
+  "type": "object",
+  "description": "**A raster plan (or a scanned PDF) with the walkways marked by hand** (3 October 2026, r1 additions). The import finds the marks and reports them (`VenueMapImportJob.handMarkedPaths`); `ai.proposeWalkways` then proposes a path segment per marked stretch, and each segment is accepted or rejected on its own with `acceptWalkwayProposals`. Nothing becomes a path without a person.\n",
+  "properties": {
+   "markColour": {
+    "type": "string",
+    "nullable": true,
+    "pattern": "^#[0-9A-Fa-f]{6}$",
+    "description": "The marker's colour, where the operator knows it (`#E53935` for a red pen). Absent, the import looks for the strokes that differ from the printed plan.\n"
+   },
+   "note": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 300,
+    "description": "Anything the marks mean that the image does not say (\"dashed = staff only\")."
    }
   }
  },
@@ -3036,6 +3288,522 @@
        "description": "The layers, sections or rows involved. **Named, not counted.**",
        "items": {
         "type": "string"
+       }
+      }
+     }
+    }
+   },
+   "ocr": {
+    "type": "object",
+    "nullable": true,
+    "description": "**What the OCR step read** off a scanned PDF or a raster (3 October 2026, r1 additions). Null for a vector source or with `ocr.mode: off`. Each block sits on the plan, so `ai.proposeVenueLabels` can use the text near a shape as a hint; the text names nothing by itself. Low-confidence blocks are returned, not dropped.\n",
+    "properties": {
+     "pagesRead": {
+      "type": "integer"
+     },
+     "meanConfidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "nullable": true
+     },
+     "textBlocks": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "required": [
+        "text",
+        "confidence"
+       ],
+       "properties": {
+        "text": {
+         "type": "string",
+         "maxLength": 500
+        },
+        "language": {
+         "type": "string",
+         "enum": [
+          "en",
+          "ar"
+         ],
+         "nullable": true
+        },
+        "confidence": {
+         "type": "number",
+         "minimum": 0,
+         "maximum": 1
+        },
+        "planX": {
+         "type": "number",
+         "nullable": true
+        },
+        "planY": {
+         "type": "number",
+         "nullable": true
+        },
+        "widthUnits": {
+         "type": "number",
+         "nullable": true
+        },
+        "heightUnits": {
+         "type": "number",
+         "nullable": true
+        }
+       }
+      }
+     }
+    }
+   },
+   "handMarkedPaths": {
+    "type": "object",
+    "nullable": true,
+    "description": "**The hand-marked strokes the import found** on a raster plan sent with `handMarkedPaths` (3 October 2026, r1 additions). `ai.proposeWalkways` reads them and proposes one segment per marked stretch; nothing is a path until a person accepts it.\n",
+    "properties": {
+     "strokesFound": {
+      "type": "integer"
+     },
+     "markColourUsed": {
+      "type": "string",
+      "nullable": true,
+      "description": "The colour the import matched."
+     },
+     "totalLengthUnits": {
+      "type": "number",
+      "nullable": true,
+      "description": "In drawing units."
+     }
+    }
+   },
+   "model": {
+    "type": "object",
+    "nullable": true,
+    "description": "**The GLB and navigation file, measured** (`glbModel` and `navigationFile` imports; ADR-0069 sections 1, 2, 3 and 6; 3 October 2026). Every budget line is a number, so an over-budget model is a finding a 3D studio can act on, not a slow app. Null for any other source.\n",
+    "properties": {
+     "sizeBytes": {
+      "type": "integer",
+      "nullable": true,
+      "description": "The GLB. Over 41",
+      "943": null,
+      "040 (40 MB) is refused before import.": null
+     },
+     "lod0TrianglesMaxZone": {
+      "type": "integer",
+      "nullable": true,
+      "description": "The most LOD0 triangles any one zone carries, which is what is on screen near the camera. Over 300,000 is an error."
+     },
+     "trianglesTotal": {
+      "type": "integer",
+      "nullable": true,
+      "description": "Across every zone and LOD. Over 1,500,000 is a warning."
+     },
+     "drawCalls": {
+      "type": "integer",
+      "nullable": true,
+      "description": "Over 150 is a warning."
+     },
+     "textureMemoryBytes": {
+      "type": "integer",
+      "nullable": true,
+      "description": "After KTX2 transcoding. Over 128 MB is a warning."
+     },
+     "maxTexturePx": {
+      "type": "integer",
+      "nullable": true,
+      "description": "Over 2048 is a warning."
+     },
+     "zones": {
+      "type": "integer",
+      "nullable": true
+     },
+     "nodes": {
+      "type": "integer"
+     },
+     "edges": {
+      "type": "integer"
+     },
+     "locations": {
+      "type": "integer"
+     },
+     "anchorResidualMaxMetres": {
+      "type": "number",
+      "nullable": true,
+      "description": "The worst control point. Over 3 m warns; over 10 m is an error."
+     },
+     "publishable3d": {
+      "type": "boolean",
+      "description": "**True when no finding below is an `error`**: the next publish carries the 3D layer. False keeps it out (`VenueMap.model3dStatus` `blocked`); the 2D map still publishes.\n"
+     },
+     "findings": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "required": [
+        "code",
+        "severity",
+        "message"
+       ],
+       "properties": {
+        "code": {
+         "type": "string",
+         "enum": [
+          "modelOverDownloadBudget",
+          "zoneOverDownloadBudget",
+          "triangleBudgetExceeded",
+          "triangleTotalExceeded",
+          "drawCallBudgetExceeded",
+          "textureBudgetExceeded",
+          "textureTooLarge",
+          "uncompressedTextures",
+          "missingLevelsOfDetail",
+          "notMetres",
+          "anchorResidualHigh",
+          "anchorResidualTooHigh",
+          "controlPointsTooClose",
+          "unresolvedCatalogueCode",
+          "unknownNodeInEdge",
+          "locationNodeMissing",
+          "navigationFileInvalid",
+          "navigationFileMismatch",
+          "nodeRefWithoutLocation"
+         ],
+         "description": "**A closed set, separate from `findings`** so the plan importer's codes stay as they were. Errors (keep the 3D layer out of the publish): `triangleBudgetExceeded` (over 300,000 at LOD0 in a zone), `uncompressedTextures`, `anchorResidualTooHigh` (over 10 m), `navigationFileInvalid`, `unknownNodeInEdge`, `locationNodeMissing`. Warnings: the other budget lines, `anchorResidualHigh` (over 3 m), `controlPointsTooClose`, `unresolvedCatalogueCode`, `missingLevelsOfDetail`, `notMetres`, `navigationFileMismatch` (venue, map or model file differ). Info: `nodeRefWithoutLocation` (a named GLB node with no location is scenery).\n"
+        },
+        "severity": {
+         "type": "string",
+         "enum": [
+          "error",
+          "warning",
+          "info"
+         ]
+        },
+        "message": {
+         "type": "string"
+        },
+        "measured": {
+         "type": "number",
+         "nullable": true,
+         "description": "The number found."
+        },
+        "limit": {
+         "type": "number",
+         "nullable": true,
+         "description": "The budget it was measured against."
+        },
+        "affected": {
+         "type": "array",
+         "description": "The zones, nodes, locations or codes involved. Named, not counted.",
+         "items": {
+          "type": "string"
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "VenueMapOcrOptions": {
+  "x-ticvai-persistence": "none — part of the importVenueGeometry request",
+  "type": "object",
+  "description": "**The OCR step for a scanned PDF or a raster plan** (3 October 2026, r1 additions). Absent means `auto`: a PDF page with no vector geometry, and every raster, is read for text; a vector page is read by its layers and never OCR'd. The text found is returned on the job (`VenueMapImportJob.ocr`) and offered to `ai.proposeVenueLabels` as hints; it never names a point by itself.\n",
+  "properties": {
+   "mode": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "off"
+    ],
+    "default": "auto",
+    "description": "`off` skips it, for a plan whose text is noise (a dimensioned drawing)."
+   },
+   "languages": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "en",
+      "ar"
+     ]
+    },
+    "description": "The scripts to read. Absent means both."
+   }
+  }
+ },
+ "VenueModel3d": {
+  "type": "object",
+  "x-ticvai-persistence": "none — jsonb column",
+  "description": "**The 3D layer a guest app loads** (ADR-0069): the model and the transform of the version it read. The app downloads the GLB through the asset delivery rules (UAE-hosted for a UAE tenant, ADR-0069 section 7) and caches it with the graph.\n",
+  "required": [
+   "modelAssetId",
+   "transform"
+  ],
+  "properties": {
+   "modelAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "assets.MediaAsset"
+   },
+   "sizeBytes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "transform": {
+    "$ref": "#/components/schemas/VenueModelTransform"
+   }
+  }
+ },
+ "VenueModelTransform": {
+  "type": "object",
+  "x-ticvai-persistence": "none — jsonb column",
+  "description": "ADR-0069 section 3: the navigation file's `anchor`. Local to WGS84: rotate (x, z) by `headingDegrees` into east/north metres, scale, offset from the origin on a local tangent plane; GPS to local is the inverse, done on the phone for every fix.\n",
+  "required": [
+   "originLat",
+   "originLng",
+   "headingDegrees"
+  ],
+  "properties": {
+   "originLat": {
+    "type": "number",
+    "minimum": -90,
+    "maximum": 90
+   },
+   "originLng": {
+    "type": "number",
+    "minimum": -180,
+    "maximum": 180
+   },
+   "originAltitudeMetres": {
+    "type": "number",
+    "default": 0
+   },
+   "headingDegrees": {
+    "type": "number",
+    "minimum": 0,
+    "exclusiveMaximum": 360,
+    "description": "True-north bearing of the model's -Z axis, clockwise."
+   },
+   "scale": {
+    "type": "number",
+    "default": 1,
+    "description": "Metres per model unit; 1 for a model in metres."
+   },
+   "controlPoints": {
+    "type": "array",
+    "minItems": 2,
+    "maxItems": 8,
+    "description": "Surveyed checks, far apart. They verify the anchor; they do not define it.",
+    "items": {
+     "type": "object",
+     "required": [
+      "label",
+      "x",
+      "z",
+      "lat",
+      "lng"
+     ],
+     "properties": {
+      "label": {
+       "type": "string"
+      },
+      "x": {
+       "type": "number"
+      },
+      "z": {
+       "type": "number"
+      },
+      "lat": {
+       "type": "number"
+      },
+      "lng": {
+       "type": "number"
+      },
+      "residualMetres": {
+       "type": "number",
+       "nullable": true,
+       "readOnly": true,
+       "description": "Measured at import. Over 3 m is a warning; over 10 m blocks the 3D layer."
+      }
+     }
+    }
+   }
+  }
+ },
+ "VenueNavigationFile": {
+  "x-ticvai-schema-id": "urn:ticvai:venue-navigation-file:1.0",
+  "type": "object",
+  "x-ticvai-persistence": "none — a file format: imported by importVenueGeometry, exported by getVenueNavigationFile",
+  "description": "**The navigation (pathway) file of ADR-0069 section 2**, fixed as a contract schema on 3 October 2026 (the ADR's `$id` open item: `urn:ticvai:venue-navigation-file:1.0`). JSON, UTF-8, one per venue map, in the model's local frame (metres, +Y up). Codes, not ids: `productCode`, `outletCode` and `facilityCode` resolve at import, and an unresolved code is a finding (`unresolvedCatalogueCode`), never a silent drop. Point names stay unique per venue (audit R108).\n",
+  "required": [
+   "formatVersion",
+   "venueCode",
+   "mapName",
+   "anchor",
+   "nodes",
+   "edges",
+   "locations"
+  ],
+  "properties": {
+   "formatVersion": {
+    "type": "string",
+    "enum": [
+     "1.0"
+    ]
+   },
+   "venueCode": {
+    "type": "string",
+    "description": "The venue's code on the platform."
+   },
+   "mapName": {
+    "type": "string",
+    "description": "Matches VenueMap.name; a floor plan is its own file."
+   },
+   "floorLevel": {
+    "type": "integer",
+    "nullable": true
+   },
+   "modelFile": {
+    "type": "string",
+    "nullable": true,
+    "description": "The GLB this file belongs to (park-2026-10.glb). Null in a file exported from a 2D map."
+   },
+   "anchor": {
+    "$ref": "#/components/schemas/VenueModelTransform"
+   },
+   "nodes": {
+    "type": "array",
+    "minItems": 2,
+    "description": "Graph vertices in model coordinates. A junction, or the door of a location.",
+    "items": {
+     "type": "object",
+     "required": [
+      "id",
+      "x",
+      "z"
+     ],
+     "properties": {
+      "id": {
+       "type": "string",
+       "pattern": "^[A-Za-z0-9_-]{1,64}$"
+      },
+      "x": {
+       "type": "number"
+      },
+      "y": {
+       "type": "number",
+       "default": 0
+      },
+      "z": {
+       "type": "number"
+      },
+      "zone": {
+       "type": "string",
+       "nullable": true,
+       "description": "The GLB zone node it sits in."
+      }
+     }
+    }
+   },
+   "edges": {
+    "type": "array",
+    "minItems": 1,
+    "description": "Walkable connections. Undirected; a one-way passage names the access point that makes it one-way.",
+    "items": {
+     "type": "object",
+     "required": [
+      "from",
+      "to"
+     ],
+     "properties": {
+      "from": {
+       "type": "string"
+      },
+      "to": {
+       "type": "string"
+      },
+      "polyline": {
+       "type": "array",
+       "description": "Intermediate [x, z] or [x, y, z] points along the centreline; straight when absent.",
+       "items": {
+        "type": "array",
+        "minItems": 2,
+        "maxItems": 3,
+        "items": {
+         "type": "number"
+        }
+       }
+      },
+      "isStepFree": {
+       "type": "boolean",
+       "default": true
+      },
+      "isIndoor": {
+       "type": "boolean",
+       "default": false
+      },
+      "throughAccessPointCode": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "locations": {
+    "type": "array",
+    "description": "Points of interest. Each becomes a VenuePoint.",
+    "items": {
+     "type": "object",
+     "required": [
+      "ref",
+      "kind",
+      "name",
+      "nodeId"
+     ],
+     "properties": {
+      "ref": {
+       "type": "string",
+       "description": "Stable key; also the name of the GLB node drawn for it."
+      },
+      "kind": {
+       "type": "string",
+       "description": "One of VenuePoint.kind; junction is not allowed here."
+      },
+      "name": {
+       "type": "string"
+      },
+      "nameLocalised": {
+       "type": "object",
+       "additionalProperties": {
+        "type": "string"
+       }
+      },
+      "nodeId": {
+       "type": "string",
+       "description": "The node a guest is routed to: the entrance, not the centre."
+      },
+      "labelPosition": {
+       "type": "array",
+       "minItems": 3,
+       "maxItems": 3,
+       "items": {
+        "type": "number"
+       }
+      },
+      "catalogue": {
+       "type": "object",
+       "properties": {
+        "productCode": {
+         "type": "string",
+         "nullable": true
+        },
+        "outletCode": {
+         "type": "string",
+         "nullable": true
+        },
+        "facilityCode": {
+         "type": "string",
+         "nullable": true
+        }
        }
       }
      }

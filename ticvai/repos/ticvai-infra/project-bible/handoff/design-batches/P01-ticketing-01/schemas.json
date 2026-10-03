@@ -581,6 +581,47 @@
    "type": "string"
   }
  },
+ "MyTableBooking": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over fnb.table_reservation and fnb.waitlist_entry",
+  "description": "One row of the guest's own list (`listMyTableReservations`; CHG-RUL-013): a reservation or a waitlist place, as `kind` says; exactly one of `reservation` and `waitlistEntry` is set.",
+  "required": [
+   "kind",
+   "outletId"
+  ],
+  "properties": {
+   "kind": {
+    "type": "string",
+    "enum": [
+     "reservation",
+     "waitlist"
+    ]
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "outletName": {
+    "type": "string"
+   },
+   "reservation": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/TableReservation"
+     }
+    ],
+    "nullable": true
+   },
+   "waitlistEntry": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/RestaurantWaitlist"
+     }
+    ],
+    "nullable": true
+   }
+  }
+ },
  "Order": {
   "x-ticvai-persistence": "orders.sales_order + orders.order_line",
   "type": "object",
@@ -1680,6 +1721,85 @@
       }
      }
     }
+   }
+  }
+ },
+ "RestaurantWaitlist": {
+  "type": "object",
+  "x-ticvai-persistence": "fnb.waitlist_entry",
+  "description": "BL-130. **Distinct from `queue`, which is for rides.** A restaurant waitlist has a party size, a table preference and a walk-away point, and a guest who leaves is not the same as a guest who was served.\n",
+  "required": [
+   "id",
+   "outletId",
+   "partySize",
+   "status",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "partySize": {
+    "type": "integer"
+   },
+   "quotedWaitMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "seatingPreference": {
+    "type": "string",
+    "enum": [
+     "any",
+     "indoor",
+     "outdoor",
+     "bar",
+     "booth",
+     "highChair"
+    ],
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "waiting",
+     "notified",
+     "seated",
+     "walkedAway",
+     "noShow",
+     "cancelled"
+    ]
+   },
+   "notifiedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "**When the party joined, on the device.** The wait a party had is measured from here to `notifiedAt` or to seating, which is the report `walkedAway` exists for. Required on a join — the operation is offline-capable."
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "holdExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**How long a table waits for somebody who was called.** Too short and a guest returning from the bathroom loses it; too long and the table sits empty at peak — which is why it is a setting rather than a constant.\n"
    }
   }
  },

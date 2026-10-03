@@ -130,16 +130,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-1023` | Group Reservation Center | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1024` | Group Type Configuration | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-1025` | Group Request Intake | B–D | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1026` | Availability & Best-Fit Search | B–D | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1027` | Bulk Seat Allocation | B–D | 0 | 14 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-1028` | Roster & Participant Assignment | B–D | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1029` | Quote, Deposit & Payment | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1030` | Modify, Release & Cancel | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1031` | Contracts & Approval Workflow | B–D | 0 | 0 | 6 | 5 | 0 | 3 | — | notStarted (—) |
-| `BO-1032` | Group Reporting & Audit | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1023` | Group Reservation Center | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1024` | Group Type Configuration | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-1025` | Group Request Intake | C | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1026` | Availability & Best-Fit Search | C | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1027` | Bulk Seat Allocation | C | 0 | 14 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-1028` | Roster & Participant Assignment | C | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1029` | Quote, Deposit & Payment | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1030` | Modify, Release & Cancel | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1031` | Contracts & Approval Workflow | B | 0 | 0 | 6 | 5 | 0 | 3 | — | notStarted (—) |
+| `BO-1032` | Group Reporting & Audit | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

@@ -1,6 +1,6 @@
 # P02-booking-selection-01 — P02 · Booking & Selection
 
-**10 screens · 32 operations · 66 schemas · 8 permissions**
+**10 screens · 32 operations · 67 schemas · 8 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -146,7 +146,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `GST-007` | Select Date & Time | A | 22 | 30 | 6 | 20 | 28 | 0 | guest | notStarted (client-verified) |
 | `GST-008` | Tickets & Add-ons | A | 19 | 66 | 6 | 26 | 25 | 0 | guest | notStarted (client-verified) |
-| `GST-048` | Upsell / Cross-Sell | A | 19 | 5 | 5 | 46 | 9 | 0 | guest | notStarted (designed) |
+| `GST-048` | Upsell / Cross-Sell | A | 19 | 10 | 5 | 48 | 9 | 0 | guest | notStarted (designed) |
 | `GST-049` | Interactive Seat Selection | A | 8 | 38 | 5 | 29 | 21 | 6 | guest | notStarted (client-verified) |
 | `GST-050` | Resource Booking – Cabana | A | 19 | 18 | 6 | 21 | 4 | 6 | guest | notStarted (designed) |
 | `GST-056` | Bundle Package | A | 19 | 5 | 6 | 4 | 4 | 0 | guest | notStarted (designed) |

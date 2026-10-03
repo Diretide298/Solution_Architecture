@@ -130,16 +130,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-609` | Refund & Payment Adjustment Command Center | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `ADM-610` | Refund Request & Eligibility Workspace | B–D | 10 | 10 | 6 | 2 | 0 | 6 | — | notStarted (—) |
-| `ADM-611` | Refund Policy & Rule Configuration | B–D | 9 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `ADM-612` | Refund Allocation & Original Tender Manager | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `ADM-613` | Void, Reversal & Cancellation Manager | B–D | 0 | 11 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-614` | Refund Approval & Exception Workflow | B–D | 0 | 20 | 6 | 6 | 0 | 6 | — | notStarted (—) |
-| `ADM-615` | Refund Processing, Provider Status & Recovery Center | B–D | 0 | 20 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `ADM-616` | Payment Adjustment & Financial Correction Manager | B–D | 0 | 20 | 6 | 2 | 0 | 0 | — | notStarted (—) |
-| `ADM-617` | Refund Transaction Trace & Audit Investigation | B–D | 0 | 24 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `ADM-618` | Refund Simulator, Risk Analysis & AI Advisor | B–D | 13 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `ADM-609` | Refund & Payment Adjustment Command Center | C | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `ADM-610` | Refund Request & Eligibility Workspace | C | 10 | 10 | 6 | 2 | 0 | 6 | — | notStarted (—) |
+| `ADM-611` | Refund Policy & Rule Configuration | B | 9 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `ADM-612` | Refund Allocation & Original Tender Manager | C | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `ADM-613` | Void, Reversal & Cancellation Manager | C | 0 | 11 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-614` | Refund Approval & Exception Workflow | C | 0 | 20 | 6 | 6 | 0 | 6 | — | notStarted (—) |
+| `ADM-615` | Refund Processing, Provider Status & Recovery Center | C | 0 | 20 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `ADM-616` | Payment Adjustment & Financial Correction Manager | C | 0 | 20 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `ADM-617` | Refund Transaction Trace & Audit Investigation | C | 0 | 24 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `ADM-618` | Refund Simulator, Risk Analysis & AI Advisor | B | 13 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

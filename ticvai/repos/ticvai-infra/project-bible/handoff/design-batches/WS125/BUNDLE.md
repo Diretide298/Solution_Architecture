@@ -106,8 +106,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-694` | Event Catalogue Command Center | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-695` | Event Type & Behaviour Configuration | B–D | 12 | 11 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-694` | Event Catalogue Command Center | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-695` | Event Type & Behaviour Configuration | B | 12 | 11 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-696` | Event Duplication & Clone Configuration | A | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
@@ -128,7 +128,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-694 |
 | Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -238,7 +238,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-695 |
 | Who uses it | venue staff holding `EVENT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |

@@ -158,16 +158,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-444` | Redemption Operations Dashboard | B–D | 2 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-445` | Redemption Credit Rule Configuration | B–D | 7 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-446` | Ticket-Based Redemption / Ticket-Eater Integration | B–D | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-447` | Ticketless Redemption Game Integration | B–D | 0 | 17 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-448` | Redemption Wallet & Balance View | B–D | 0 | 0 | 6 | 16 | 0 | 6 | — | notStarted (—) |
-| `BO-449` | Redemption Counter / Prize Checkout | B–D | 0 | 4 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-450` | Prize Catalogue & Credit Cost Configuration | B–D | 19 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-451` | Prize Inventory Integration | B–D | 0 | 15 | 6 | 12 | 0 | 4 | — | notStarted (—) |
-| `BO-452` | Direct-Pay / Crane & Prize Machine Configuration | B–D | 23 | 56 | 6 | 13 | 0 | 0 | — | notStarted (—) |
-| `BO-453` | Redemption Transaction Ledger, Reconciliation & Audit | B–D | 0 | 41 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `BO-444` | Redemption Operations Dashboard | B | 2 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-445` | Redemption Credit Rule Configuration | D | 7 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-446` | Ticket-Based Redemption / Ticket-Eater Integration | D | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-447` | Ticketless Redemption Game Integration | D | 0 | 17 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-448` | Redemption Wallet & Balance View | C | 0 | 0 | 6 | 16 | 0 | 6 | — | notStarted (—) |
+| `BO-449` | Redemption Counter / Prize Checkout | D | 0 | 4 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-450` | Prize Catalogue & Credit Cost Configuration | D | 19 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-451` | Prize Inventory Integration | D | 0 | 15 | 6 | 12 | 0 | 4 | — | notStarted (—) |
+| `BO-452` | Direct-Pay / Crane & Prize Machine Configuration | D | 23 | 56 | 6 | 13 | 0 | 0 | — | notStarted (—) |
+| `BO-453` | Redemption Transaction Ledger, Reconciliation & Audit | D | 0 | 41 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

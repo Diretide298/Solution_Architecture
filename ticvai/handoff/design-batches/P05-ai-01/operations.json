@@ -1,4 +1,28 @@
 {
+ "addCartLine": {
+  "method": "POST",
+  "path": "/carts/{cartId}/lines",
+  "contract": "orders",
+  "summary": "Add something",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AddCartLineRequest",
+  "responds": "Cart"
+ },
  "createAiConversation": {
   "method": "POST",
   "path": "/conversations",

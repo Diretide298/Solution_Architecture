@@ -97,16 +97,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-354` | Credential Operations Command Center | B–D | 2 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-355` | Virtual Ticket & Credential 360° Workspace | B–D | 0 | 46 | 6 | 2 | 3 | 0 | — | notStarted (generated) |
-| `BO-356` | Credential Generation & Issuance Monitor | B–D | 10 | 28 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-357` | Credential Delivery & Distribution Operations | B–D | 5 | 20 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-358` | Media Binding, Activation & Assignment Operations | B–D | 0 | 34 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
-| `BO-359` | Credential Replacement, Reissue, Revocation & Recovery | B–D | 11 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-360` | Failed Generation, Delivery & Credential Exception Management | B–D | 4 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-361` | Credential Usage & Cross-Media Traceability | B–D | 11 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-362` | Credential Security, Audit & Operational Evidence | B–D | 0 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-363` | Ticket Media Analytics & AI Operations Intelligence | B–D | 2 | 42 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-354` | Credential Operations Command Center | C | 2 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-355` | Virtual Ticket & Credential 360° Workspace | C | 0 | 46 | 6 | 2 | 3 | 0 | — | notStarted (generated) |
+| `BO-356` | Credential Generation & Issuance Monitor | C | 10 | 28 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-357` | Credential Delivery & Distribution Operations | C | 5 | 20 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-358` | Media Binding, Activation & Assignment Operations | C | 0 | 34 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
+| `BO-359` | Credential Replacement, Reissue, Revocation & Recovery | C | 11 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-360` | Failed Generation, Delivery & Credential Exception Management | C | 4 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-361` | Credential Usage & Cross-Media Traceability | C | 11 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-362` | Credential Security, Audit & Operational Evidence | C | 0 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-363` | Ticket Media Analytics & AI Operations Intelligence | C | 2 | 42 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

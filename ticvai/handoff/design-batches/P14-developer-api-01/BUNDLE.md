@@ -1,6 +1,6 @@
 # P14-developer-api-01 — P14 · Developer & API
 
-**8 screens · 28 operations · 18 schemas · 3 permissions**
+**8 screens · 32 operations · 18 schemas · 3 permissions**
 
 Platform P14 Developer · ships as **ticvai-control** ·
 partner audience · web ·
@@ -97,13 +97,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `DEV-001` | API Reference | B | 1 | 38 | 6 | 11 | 4 | 0 | — | notStarted (generated) |
-| `DEV-002` | Register & Organisation | A | 12 | 0 | 5 | 6 | 0 | 0 | — | notStarted (generated) |
+| `DEV-002` | Register & Organisation | A | 12 | 6 | 5 | 6 | 0 | 0 | — | notStarted (generated) |
 | `DEV-003` | Clients & Credentials | A | 15 | 16 | 6 | 17 | 4 | 0 | — | notStarted (generated) |
 | `DEV-004` | Sandbox | B | 14 | 31 | 6 | 20 | 3 | 0 | — | notStarted (generated) |
 | `DEV-005` | Webhooks | B | 9 | 21 | 6 | 13 | 0 | 0 | — | notStarted (generated) |
 | `DEV-006` | Usage & Limits | B | 0 | 13 | 6 | 5 | 1 | 0 | — | notStarted (generated) |
 | `DEV-007` | Marketplace Listing | B | 8 | 17 | 6 | 2 | 1 | 0 | — | notStarted (generated) |
-| `DEV-008` | Programme Administration | A | 41 | 24 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
+| `DEV-008` | Programme Administration | A | 41 | 39 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
 
 ---
 
@@ -118,7 +118,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | | |
 |---|---|
 | App · platform | TICVAI Control · P14 Developer (web) |
-| Module | Developer & API · wave 2 · needs the `developerApi` module |
+| Module | Developer & API · wave 1 · needs the `developerApi` module |
 | Block | Block B · task APP-DEVPORTAL-DEV-001 |
 | Who uses it | partner staff holding `DEVELOPER_VIEW` (1 read); in the flows as partner |
 | Device and orientation | This is a developer portal on a desktop browser, 1440 wide, with a docs-style left navigation. · LTR · light, dark theme |
@@ -382,6 +382,17 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Shown**
 
+**Show the registered organisation and its members** (card list, from `getDeveloperAccount`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Organisation name | text | — |
+| Contact email | email, tap to write | — |
+| Website URL | text | — |
+| Country code | text | — |
+| Status | chip: Pending, Verified, Suspended, Closed | — |
+| Verified at | 1 Oct 2026, 14:30 | — |
+
 **Registration status** (banner): Shown after registering: "Pending: check your email" until the email is verified, then "Verified on <date>" (`DeveloperAccount.status`, `verifiedAt`). The partner link (`partnerId`) is set by TICVAI, never typed.
 
 **Data table** (data table): Role per member — owner, admin, developer, read-only.
@@ -397,6 +408,8 @@ Answered questions: draw the decision, not the old default. Where a decision and
 **Rules for what is shown** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
 
 - **Verification status**: Pending, verified (with date), suspended or closed, and what pending means ("we review within 2 working days; you can explore the docs and sandbox meanwhile"). *(source: contracts/satellite/public-api.yaml#/components/schemas/DeveloperAccount)*
+
+**Data it reads**: `getDeveloperAccount` (onLoad, Show the registered organisation and its members)
 
 **Where the user goes next**
 
@@ -439,6 +452,7 @@ members:
 
 - `registerDeveloper` → `DEVELOPER_VIEW` (read) · public
 - `setDeveloperMembers` → `DEVELOPER_MANAGE` (configure) · partner
+- `getDeveloperAccount` → `DEVELOPER_VIEW` (read) · partner, staff
 
 **A refused user sees:** **You are a member and not an owner.** Stated plainly rather than shown as an empty list, because a developer who sees no colleagues assumes the page is broken.
 
@@ -473,8 +487,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (12), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (12), with its required mark, default, format and its error state (403, 404).
+- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#DEV-002?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Invite, Register developer, Save developer members.
 - [ ] Every transition is wired: `DEV-003`.
@@ -1662,6 +1676,36 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 
 **Shown**
 
+**Show the licences per client** (card list, from `listApiLicences`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Call allowance per month | 1,234 | — |
+| Overage rate per thousand | 1,234.5 | — |
+| Revenue share percent | 1,234.5 | — |
+| Effective from | 1 Oct 2026 | — |
+| Effective to | 1 Oct 2026 | — |
+
+**Show the anomaly rules** (card list, from `listApiAnomalyRules`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Rule key | text | — |
+| Measure | chip: Calls per minute, Client error share, Allow list refusals, Unusual operations, Auth … | — |
+| Comparison | chip: Above baseline multiple, Above fixed | `aboveBaselineMultiple`: above `threshold` x the same hour over the last four weeks. |
+| Threshold | 1,234.5 | — |
+| Window minutes | 1,234 | — |
+| Action | chip: Flag, Throttle, Suspend | — |
+
+**Show the quotas per client** (card list, from `listApiQuotas`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Sustained per minute | 1,234 | — |
+| Burst per second | 1,234 | Separate from the sustained rate, because a nightly sync is a legitimate spike and a flat per-second limit either blocks it or permits the … |
+| Daily cap | 1,234 | — |
+| On breach | chip: Throttle, Reject, Queue | — |
+
 **Per-operation limits** (data table, from `setApiQuota`): An operation and its own per-minute limit, one row each.
 
 | Shows | Format | Notes |
@@ -1713,7 +1757,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Decide production access (secondary button) | `decideProductionAccess` POST `/production-access-requests/{requestId}/decide` | inline | ProductionAccessRequest | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Already decided (`already-decided`), or the listing's certification lapsed since the request … | opens modal first |
 | Save anomaly rule (secondary button) | `setApiAnomalyRule` PUT `/api-anomaly-rules` | ApiAnomalyRule | ApiAnomalyRule | — | opens modal first |
 
-**Data it reads**: `listProductionAccessRequests` (onLoad, The production key queue)
+**Data it reads**: `listProductionAccessRequests` (onLoad, The production key queue); `listApiQuotas` (onLoad, Show the quotas per client); `listApiAnomalyRules` (onLoad, Show the anomaly rules); `listApiLicences` (onLoad, Show the licences per client)
 
 **Where the user goes next**
 
@@ -1774,6 +1818,9 @@ quota:
 - `listProductionAccessRequests` → `DEVELOPER_VIEW` (read) · staff, partner
 - `decideProductionAccess` → `DEVELOPER_ADMIN` (configure) · staff
 - `setApiAnomalyRule` → `DEVELOPER_ADMIN` (configure) · staff
+- `listApiQuotas` → `DEVELOPER_ADMIN` (configure) · staff
+- `listApiAnomalyRules` → `DEVELOPER_ADMIN` (configure) · staff
+- `listApiLicences` → `DEVELOPER_ADMIN` (configure) · staff
 
 **A refused user sees:** **This is a Softlabs screen and you are a developer.** Said plainly — a blank administration page shown to a partner is worse than a refusal, because they will file a support ticket about it.
 
@@ -1809,7 +1856,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (41), with its required mark, default, format and its error state (403, 404, 409, 422).
-- [ ] Every output is drawn (24 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (39 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#DEV-008?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] Every action is wired with its success and its failure: Approve, Reject, Save API quota, Certify integration, Save API licensing, Deprecate API version, Decide production access, Save anomaly rule.
 - [ ] Every transition is wired: `DEV-003`.
@@ -1894,8 +1941,12 @@ Method, path, parameters, request and response for every operation these screens
 "decideProductionAccess": {"method":"POST","path":"/production-access-requests/{requestId}/decide","contract":"public-api","summary":"Approve or reject production access","permission":"DEVELOPER_ADMIN","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"ProductionAccessRequest"},
 "deprecateApiVersion": {"method":"POST","path":"/api-versions/{version}/deprecate","contract":"public-api","summary":"Announce a sunset date and notify subscribers","permission":"DEVELOPER_ADMIN","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"ApiVersion"},
 "getApiUsage": {"method":"GET","path":"/api-usage","contract":"public-api","summary":"Calls, errors, latency and success rate","permission":"DEVELOPER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null}],"requestBody":null,"responds":"ApiUsageSummary"},
+"getDeveloperAccount": {"method":"GET","path":"/developers/{developerId}","contract":"public-api","summary":"A registered developer organisation","permission":"DEVELOPER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"developerId","in":"path","required":true}],"requestBody":null,"responds":"DeveloperAccount"},
 "listApiAnomalies": {"method":"GET","path":"/api-anomalies","contract":"public-api","summary":"Flagged API traffic","permission":"DEVELOPER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"clientId","in":"query","required":null},{"name":"from","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listApiAnomalyRules": {"method":"GET","path":"/api-anomaly-rules","contract":"public-api","summary":"The rules that flag abnormal API traffic","permission":"DEVELOPER_ADMIN","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listApiClients": {"method":"GET","path":"/api-clients","contract":"public-api","summary":"Registered clients for this developer","permission":"DEVELOPER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"ApiClient"},
+"listApiLicences": {"method":"GET","path":"/api-licensing","contract":"public-api","summary":"The API licences granted, per client","permission":"DEVELOPER_ADMIN","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listApiQuotas": {"method":"GET","path":"/api-quotas","contract":"public-api","summary":"The rate limits and quotas set per client","permission":"DEVELOPER_ADMIN","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listApiScopes": {"method":"GET","path":"/api-scopes","contract":"public-api","summary":"The scope catalogue, one read and one write scope per module","permission":"DEVELOPER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"module","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listApiVersions": {"method":"GET","path":"/api-versions","contract":"public-api","summary":"Versions, their status and their sunset dates","permission":"DEVELOPER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"ApiVersion"},
 "listIntegrationListings": {"method":"GET","path":"/listings","contract":"public-api","summary":"Published third-party integrations","permission":"DEVELOPER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"IntegrationListing"},

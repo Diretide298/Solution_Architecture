@@ -1,6 +1,6 @@
 # WS59 — Ticket Media   Credential Management board 1
 
-**10 screens · 16 operations · 18 schemas · 3 permissions**
+**10 screens · 17 operations · 18 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -97,16 +97,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-334` | Virtual Ticket Command Center | B–D | 2 | 26 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-335` | Virtual Ticket Identity & Master Record Configuration | A | 9 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-336` | Virtual Ticket Status & Lifecycle Model | B–D | 7 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-337` | Media Type & Credential Technology Registry | B–D | 18 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-338` | Multi-Media Binding & Association Rules | B–D | 36 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-339` | Credential Identity, Token & Reference Mapping | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-340` | Entitlement & Cross-Media Synchronization Rules | B–D | 7 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-341` | Media Activation, Priority & Fallback Rules | B–D | 6 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-342` | Media Replacement, Revocation & Rebinding Rules | B–D | 22 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-343` | Virtual Ticket Architecture Testing, Governance & Audit | B–D | 9 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-334` | Virtual Ticket Command Center | C | 2 | 26 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-335` | Virtual Ticket Identity & Master Record Configuration | A | 9 | 8 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-336` | Virtual Ticket Status & Lifecycle Model | C | 7 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-337` | Media Type & Credential Technology Registry | C | 18 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-338` | Multi-Media Binding & Association Rules | C | 36 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-339` | Credential Identity, Token & Reference Mapping | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-340` | Entitlement & Cross-Media Synchronization Rules | C | 7 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-341` | Media Activation, Priority & Fallback Rules | C | 6 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-342` | Media Replacement, Revocation & Rebinding Rules | C | 22 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-343` | Virtual Ticket Architecture Testing, Governance & Audit | C | 9 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -126,7 +126,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-334 |
 | Who uses it | venue staff holding `SCOPE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each record should show) — counts over a population, then the population |
@@ -457,6 +457,21 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 #### Outputs: what the screen shows and produces
 
+**Shown**
+
+**Load the configuration as saved** (detail panel, from `getVirtualTicketIdentity`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID generation pattern | text | Virtual Ticket ID format: prefix, suffix and length |
+| Ticket classification | text | Ticket classification |
+| Ticket ownership model | text | Ticket ownership model |
+| Holder assignment requirements | text | Holder assignment requirements |
+| Transferability reference | text | Transferability reference |
+| Validity model | text | Validity model |
+| Consumption model | text | Consumption model |
+| Entitlement model | text | Entitlement model |
+
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
@@ -471,6 +486,8 @@ Answered questions: draw the decision, not the old default. Where a decision and
 **What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
 - **Save configuration**: Applies to tickets issued after saving; existing numbers never change (say so in the confirmation). *(source: screens/P08-venue-back-office.yaml#BO-335 / TRACKER Actions row 194)*
+
+**Data it reads**: `getVirtualTicketIdentity` (onLoad, Load the configuration as saved)
 
 **Where the user goes next**
 
@@ -506,6 +523,7 @@ mediaIndependence: RFID-77812 lost and revoked; RFID-99142 issued; ticket stays 
 #### Permissions
 
 - `setVirtualTicketIdentity` → `ACCESS_POINT_CONFIGURE` (configure) · staff
+- `getVirtualTicketIdentity` → `ACCESS_POINT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -534,8 +552,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (9), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (9), with its required mark, default, format and its error state (403, 404).
+- [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-335?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save changes.
 - [ ] Every transition is wired: `BO-334`.
@@ -554,7 +572,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-336 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -738,7 +756,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-337 |
 | Who uses it | venue staff holding `SCOPE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§For each technology configure) and no display directory — it is settings, not a population |
@@ -916,7 +934,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-338 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -1129,7 +1147,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-339 |
 | Who uses it | venue staff holding `SCOPE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1295,7 +1313,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-340 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Detect) and no metric row |
@@ -1469,7 +1487,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-341 |
 | Who uses it | venue staff holding `SCOPE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -1625,7 +1643,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-342 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -1833,7 +1851,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-343 |
 | Who uses it | venue staff holding `AUDIT_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configuration Simulator; Configuration Owner; AI Configuration Review) and no display directory — it is settings, not a population |
@@ -2077,6 +2095,7 @@ Method, path, parameters, request and response for every operation these screens
 ```json
 {
 "deleteMediaBindingRule": {"method":"DELETE","path":"/media-binding-rules/{ruleId}","contract":"access","summary":"Delete a multi-media binding rule","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
+"getVirtualTicketIdentity": {"method":"GET","path":"/virtual-ticket-identity","contract":"access","summary":"The virtual ticket identity configuration as saved","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"VirtualTicketIdentityMasterRecordConfigurationView"},
 "listCredentialIdentityToken": {"method":"GET","path":"/credential-identity-token","contract":"access","summary":"Credential Identity, Token & Reference Mapping","permission":"SCOPE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"virtualTicketId","in":"query","required":false},{"name":"mediaType","in":"query","required":false},{"name":"credentialReference","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listEntitlementCrossMedia": {"method":"GET","path":"/entitlement-cross-media","contract":"access","summary":"Entitlement & Cross-Media Synchronization Rules","permission":"SCOPE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"EntitlementCrossMediaSynchronizationRulesView"},
 "listMediaActivationPriority": {"method":"GET","path":"/media-activation-priority","contract":"access","summary":"Media Activation, Priority & Fallback Rules","permission":"SCOPE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"MediaActivationPriorityFallbackRulesView"},

@@ -1,10 +1,10 @@
--- ai — 74 tables
+-- ai — 75 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 19 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.action_plan (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     origin                            text NOT NULL CONSTRAINT action_plan_origin_chk CHECK (origin IN ('configurationSession', 'generateConfiguration', 'assistant', 'riskCase', 'operationalRequirement', 'rollback')),
     origin_ref                        text,
     summary                           text,
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS ai.action_plan (
 -- Holds 21 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.action_step (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     plan_id                           uuid NOT NULL,
     step_number                       integer NOT NULL,
     depends_on                        integer[],
@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS ai.action_step (
 -- store, not the transactional primary (ADR-0020) — append-only with an analytical read pattern,
 -- and it must not compete with a gate scan for a connection
 CREATE TABLE IF NOT EXISTS ai.activity (
+    scrub_audit                       jsonb,
     id                                uuid PRIMARY KEY NOT NULL,
     conversation_id                   uuid,
     principal_id                      uuid NOT NULL,
@@ -84,7 +85,7 @@ CREATE TABLE IF NOT EXISTS ai.activity (
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.anomaly_detector (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     detector_key                      text NOT NULL,
     source                            text DEFAULT 'metric' CONSTRAINT anomaly_detector_source_chk CHECK (source IN ('metric', 'forecast', 'deviceHealth')),
     metric_key                        text,
@@ -103,7 +104,7 @@ CREATE TABLE IF NOT EXISTS ai.anomaly_detector (
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.answer_feedback (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     message_id                        uuid NOT NULL,
     conversation_id                   uuid,
     rating                            text NOT NULL CONSTRAINT answer_feedback_rating_chk CHECK (rating IN ('helpful', 'notHelpful')),
@@ -119,7 +120,7 @@ CREATE TABLE IF NOT EXISTS ai.answer_feedback (
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.approval_request_score (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     approval_request_id               uuid NOT NULL,
     trigger                           text CONSTRAINT approval_request_score_trigger_chk CHECK (trigger IN ('submitted', 'resubmitted', 'slaTick', 'escalated')),
     risk_score                        integer NOT NULL,
@@ -135,7 +136,7 @@ CREATE TABLE IF NOT EXISTS ai.approval_request_score (
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.assistant_profile (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     profile_key                       text NOT NULL,
     name                              text,
     audience                          text NOT NULL CONSTRAINT assistant_profile_audience_chk CHECK (audience IN ('staff', 'guest', 'support')),
@@ -154,7 +155,7 @@ CREATE TABLE IF NOT EXISTS ai.assistant_profile (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.blueprint (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     session_id                        uuid NOT NULL,
     version                           integer NOT NULL,
     readiness                         text NOT NULL CONSTRAINT blueprint_readiness_chk CHECK (readiness IN ('notReady', 'readyWithWarnings', 'ready')),
@@ -169,7 +170,7 @@ CREATE TABLE IF NOT EXISTS ai.blueprint (
 -- Holds 15 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.blueprint_decision (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     blueprint_id                      uuid NOT NULL,
     decision_key                      text NOT NULL,
     module                            text,
@@ -189,11 +190,12 @@ CREATE TABLE IF NOT EXISTS ai.blueprint_decision (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.byok_enablement (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     tenant_id                         uuid NOT NULL,
     is_enabled                        boolean NOT NULL,
     coverage                          text DEFAULT 'perTask' CONSTRAINT byok_enablement_coverage_chk CHECK (coverage IN ('perTask', 'allTasks')),
     allowed_tasks                     text[],
+    task_model_map                    jsonb,
     reason                            text CONSTRAINT byok_enablement_reason_chk CHECK (char_length(reason) <= 1000),
     platform_staff_grant_id           uuid,
     decided_by_principal_id           uuid,
@@ -204,7 +206,7 @@ CREATE TABLE IF NOT EXISTS ai.byok_enablement (
 -- Holds 18 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.capability (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     capability_key                    text NOT NULL,
     family                            text NOT NULL CONSTRAINT capability_family_chk CHECK (family IN ('gatewayAndModels', 'governance', 'actionPipeline', 'knowledgeRetrieval', 'assistants', 'analyticsInsights', 'configurationAssistant', 'forecasting', 'anomalyDetection', 'riskIntelligence', 'recommendations', 'decisionRecords', 'operationsEvaluation', 'residencyPrivacy')),
     name                              text,
@@ -227,7 +229,7 @@ CREATE TABLE IF NOT EXISTS ai.capability (
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.capability_maturity (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     capability_key                    text NOT NULL,
     suggestion_kind                   text,
     forecast_definition_key           text,
@@ -241,7 +243,7 @@ CREATE TABLE IF NOT EXISTS ai.capability_maturity (
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.case_action (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     case_id                           uuid NOT NULL,
     action                            text NOT NULL CONSTRAINT case_action_action_chk CHECK (action IN ('blockPaymentToken', 'suspendAccount', 'restrictWallet', 'revokeEntitlement', 'flagCustomer', 'requireStepUp', 'holdRefunds', 'lockIdentity')),
     target_contract                   text NOT NULL,
@@ -257,7 +259,7 @@ CREATE TABLE IF NOT EXISTS ai.case_action (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.case_evidence (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     case_id                           uuid NOT NULL,
     kind                              text NOT NULL CONSTRAINT case_evidence_kind_chk CHECK (kind IN ('assessment', 'alert', 'transaction', 'networkSnapshot', 'note', 'document')),
     ref                               text,
@@ -272,7 +274,7 @@ CREATE TABLE IF NOT EXISTS ai.case_evidence (
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.chunk_embedding (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     document_id                       uuid NOT NULL,
     chunk_index                       integer NOT NULL,
     parent_chunk_id                   uuid,
@@ -289,7 +291,7 @@ CREATE TABLE IF NOT EXISTS ai.chunk_embedding (
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.config_session (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     intent                            text NOT NULL CONSTRAINT config_session_intent_chk CHECK (intent IN ('create', 'modify', 'extend', 'clone')),
     venue_type                        text,
     source_scope_path                 ltree,
@@ -308,7 +310,7 @@ CREATE TABLE IF NOT EXISTS ai.config_session (
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.config_source (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     session_id                        uuid NOT NULL,
     asset_id                          uuid NOT NULL,
     source_kind                       text NOT NULL CONSTRAINT config_source_source_kind_chk CHECK (source_kind IN ('brief', 'brochure', 'catalogue', 'priceList', 'spreadsheet', 'brandAsset')),
@@ -325,7 +327,7 @@ CREATE TABLE IF NOT EXISTS ai.config_source (
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.control (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     control_key                       text NOT NULL,
     name                              text NOT NULL,
     description                       text,
@@ -342,7 +344,7 @@ CREATE TABLE IF NOT EXISTS ai.control (
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.control_test (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     control_id                        uuid NOT NULL,
     result                            text NOT NULL CONSTRAINT control_test_result_chk CHECK (result IN ('pass', 'fail', 'error')),
     exceptions_found                  integer,
@@ -369,7 +371,7 @@ CREATE TABLE IF NOT EXISTS ai.conversation (
 -- Holds 25 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.decision_record (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     trace_id                          text NOT NULL,
     capability_key                    text NOT NULL,
     task                              text,
@@ -399,7 +401,7 @@ CREATE TABLE IF NOT EXISTS ai.decision_record (
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.entity_risk (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     entity_type                       text NOT NULL CONSTRAINT entity_risk_entity_type_chk CHECK (entity_type IN ('customer', 'account', 'device', 'paymentToken', 'credential', 'cluster', 'staff', 'ipAddress')),
     entity_ref                        text NOT NULL,
     score                             integer NOT NULL,
@@ -413,7 +415,7 @@ CREATE TABLE IF NOT EXISTS ai.entity_risk (
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.eval_run (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     suite_id                          uuid NOT NULL,
     release_id                        uuid,
     kind                              text NOT NULL CONSTRAINT eval_run_kind_chk CHECK (kind IN ('offline', 'backtest', 'shadow')),
@@ -432,7 +434,7 @@ CREATE TABLE IF NOT EXISTS ai.eval_run (
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.eval_suite (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     suite_key                         text NOT NULL,
     capability_key                    text NOT NULL,
     layer                             text NOT NULL CONSTRAINT eval_suite_layer_chk CHECK (layer IN ('platform', 'tenant')),
@@ -446,7 +448,7 @@ CREATE TABLE IF NOT EXISTS ai.eval_suite (
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.evidence_package (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     scope_kind                        text NOT NULL CONSTRAINT evidence_package_scope_kind_chk CHECK (scope_kind IN ('singleDecision', 'customerJourney', 'capability', 'incident', 'modelVersion', 'governancePolicy')),
     scope_ref                         text,
     valid_from                        timestamptz,
@@ -465,7 +467,7 @@ CREATE TABLE IF NOT EXISTS ai.evidence_package (
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.forecast_accuracy (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     definition_id                     uuid NOT NULL,
     version_id                        uuid,
     producer_ref                      text,
@@ -483,10 +485,11 @@ CREATE TABLE IF NOT EXISTS ai.forecast_accuracy (
 -- Holds 17 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.forecast_definition (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     definition_key                    text NOT NULL,
     name                              text,
     subject                           text NOT NULL CONSTRAINT forecast_definition_subject_chk CHECK (subject IN ('attendance', 'arrivalPattern', 'productDemand', 'timeslotDemand', 'channelPace', 'revenue', 'occupancy', 'attractionUtilisation', 'queue', 'entryFlow', 'staffing', 'posDemand', 'fnbDemand', 'retailDemand', 'stockDemand', 'resourceDemand', 'refunds', 'cashCollection', 'membershipRenewals', 'churn')),
+    module                            text,
     grain                             text NOT NULL CONSTRAINT forecast_definition_grain_chk CHECK (grain IN ('hour', 'day', 'week', 'month')),
     dimensions                        text[],
     segment_ids                       text[],
@@ -507,7 +510,7 @@ CREATE TABLE IF NOT EXISTS ai.forecast_definition (
 -- Holds 16 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.forecast_export (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     version_id                        uuid NOT NULL,
     scenario_id                       uuid,
     format                            text NOT NULL CONSTRAINT forecast_export_format_chk CHECK (format IN ('csv', 'xlsx', 'json')),
@@ -528,7 +531,7 @@ CREATE TABLE IF NOT EXISTS ai.forecast_export (
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.forecast_point (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     version_id                        uuid NOT NULL,
     scenario_id                       uuid,
     target_start                      timestamptz NOT NULL,
@@ -545,7 +548,7 @@ CREATE TABLE IF NOT EXISTS ai.forecast_point (
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.forecast_scenario (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     name                              text,
     base_version_id                   uuid NOT NULL,
     status                            text CONSTRAINT forecast_scenario_status_chk CHECK (status IN ('computing', 'ready', 'failed')),
@@ -558,9 +561,10 @@ CREATE TABLE IF NOT EXISTS ai.forecast_scenario (
 -- Holds 16 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.forecast_version (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     definition_id                     uuid NOT NULL,
     version_number                    integer NOT NULL,
+    module                            text,
     status                            text NOT NULL CONSTRAINT forecast_version_status_chk CHECK (status IN ('running', 'draft', 'awaitingApproval', 'published', 'superseded', 'rejected', 'failed')),
     basis                             text NOT NULL CONSTRAINT forecast_version_basis_chk CHECK (basis IN ('heuristic', 'statistical', 'model', 'hybrid', 'manual')),
     maturity                          jsonb,
@@ -580,7 +584,7 @@ CREATE TABLE IF NOT EXISTS ai.forecast_version (
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.governance_alert (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     kind                              text NOT NULL CONSTRAINT governance_alert_kind_chk CHECK (kind IN ('policyViolation', 'crossScopeAttempt', 'maskingDefect', 'dataUsage', 'behaviourDrift', 'inputDrift', 'bias', 'overrideRateShift', 'controlFailed', 'spend', 'providerBreaker', 'evaluationRegression', 'forecastNotPublished', 'indexLag', 'promotionReady')),
     severity                          text NOT NULL CONSTRAINT governance_alert_severity_chk CHECK (severity IN ('info', 'low', 'medium', 'high', 'critical')),
     capability_key                    text,
@@ -599,7 +603,7 @@ CREATE TABLE IF NOT EXISTS ai.governance_alert (
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.governance_policy (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     policy_key                        text NOT NULL,
     name                              text,
     kind                              text NOT NULL CONSTRAINT governance_policy_kind_chk CHECK (kind IN ('action', 'data', 'scope', 'autonomy', 'approval', 'environment')),
@@ -613,7 +617,7 @@ CREATE TABLE IF NOT EXISTS ai.governance_policy (
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.governance_policy_version (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     policy_id                         uuid NOT NULL,
     version                           integer NOT NULL,
     status                            text NOT NULL CONSTRAINT governance_policy_version_status_chk CHECK (status IN ('draft', 'simulated', 'published', 'superseded')),
@@ -630,7 +634,7 @@ CREATE TABLE IF NOT EXISTS ai.governance_policy_version (
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.guided_choice_suggestion (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     venue_id                          uuid NOT NULL,
     trigger                           text NOT NULL CONSTRAINT guided_choice_suggestion_trigger_chk CHECK (trigger IN ('productsUploaded', 'mappedProductWithdrawn', 'productsUncovered', 'manual')),
     status                            text NOT NULL CONSTRAINT guided_choice_suggestion_status_chk CHECK (status IN ('running', 'proposed', 'noSuggestion', 'failed', 'superseded')),
@@ -670,7 +674,7 @@ CREATE TABLE IF NOT EXISTS ai.history_import (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.history_observation (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     import_id                         uuid NOT NULL,
     venue_id                          uuid NOT NULL,
     data_kind                         text NOT NULL,
@@ -694,7 +698,7 @@ CREATE TABLE IF NOT EXISTS ai.inbox (
 -- Holds 16 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.incident (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     reference                         text NOT NULL,
     title                             text NOT NULL,
     kind                              text CONSTRAINT incident_kind_chk CHECK (kind IN ('governance', 'operational', 'both')),
@@ -705,6 +709,9 @@ CREATE TABLE IF NOT EXISTS ai.incident (
     operational_incident_ref          text,
     root_cause                        text,
     remediation                       text,
+    impact                            text,
+    control_failure                   text,
+    lessons_learned                   text,
     owner_principal_id                uuid,
     opened_at                         timestamptz,
     contained_at                      timestamptz,
@@ -760,7 +767,7 @@ CREATE TABLE IF NOT EXISTS ai.index_job (
 -- its keys; references ai.knowledge_collection. Reached by: 3 operations read it and 1 write it; 3
 -- tables reference it.
 CREATE TABLE IF NOT EXISTS ai.index_source (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     table_name                        text NOT NULL,
     contract                          text,
     text_fields                       text[] NOT NULL,
@@ -780,7 +787,7 @@ CREATE TABLE IF NOT EXISTS ai.index_source (
 -- Holds 22 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.insight (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     kind                              text NOT NULL CONSTRAINT insight_kind_chk CHECK (kind IN ('anomaly', 'forecastDeviation', 'trend', 'opportunity', 'executiveSummary', 'rootCause', 'forecastThreshold', 'marketingRecommendation')),
     detector_id                       uuid,
     metric_key                        text,
@@ -807,7 +814,7 @@ CREATE TABLE IF NOT EXISTS ai.insight (
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.intervention (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     kind                              text NOT NULL CONSTRAINT intervention_kind_chk CHECK (kind IN ('override', 'pause', 'resume', 'cancel', 'retry', 'rollback', 'capabilityPause', 'capabilityResume')),
     target_kind                       text NOT NULL CONSTRAINT intervention_target_kind_chk CHECK (target_kind IN ('plan', 'step', 'decision', 'capability')),
     target_ref                        text NOT NULL,
@@ -825,7 +832,7 @@ CREATE TABLE IF NOT EXISTS ai.intervention (
 -- which is the tenant boundary on shared placement Hangs off: reaches ai.decision_record through
 -- its keys. Reached by: 5 operations read it and 1 write it; 3 tables reference it.
 CREATE TABLE IF NOT EXISTS ai.knowledge_collection (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     name                              text NOT NULL,
     description                       text,
     scope_level                       text NOT NULL CONSTRAINT knowledge_collection_scope_level_chk CHECK (scope_level IN ('tenant', 'region', 'venue')),
@@ -843,7 +850,7 @@ CREATE TABLE IF NOT EXISTS ai.knowledge_collection (
 -- ai.decision_record through its keys; references ai.knowledge_collection, ai.knowledge_document.
 -- Reached by: 4 operations read it and 1 write it; 3 tables reference it.
 CREATE TABLE IF NOT EXISTS ai.knowledge_document (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     collection_id                     uuid,
     title                             text NOT NULL,
     source_asset_id                   uuid NOT NULL,
@@ -859,7 +866,7 @@ CREATE TABLE IF NOT EXISTS ai.knowledge_document (
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.knowledge_gap (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     question                          text NOT NULL,
     examples                          text[],
     occurrences                       integer,
@@ -879,7 +886,7 @@ CREATE TABLE IF NOT EXISTS ai.knowledge_gap (
 -- reaches ai.decision_record through its keys; references assets.media_asset. Reached by: 1
 -- operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS ai.layout_draft (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     import_job_id                     uuid NOT NULL,
     status                            text NOT NULL CONSTRAINT layout_draft_status_chk CHECK (status IN ('parsing', 'previewReady', 'failed')),
     seat_count                        integer,
@@ -915,9 +922,10 @@ CREATE TABLE IF NOT EXISTS ai.message (
 -- Holds 16 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.model (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     layer                             text NOT NULL CONSTRAINT model_layer_chk CHECK (layer IN ('platform', 'tenant')),
     provider_kind                     text,
+    vendor                            text,
     producer_type                     text NOT NULL CONSTRAINT model_producer_type_chk CHECK (producer_type IN ('llm', 'embedding', 'reranker', 'classical', 'rule')),
     model_name                        text NOT NULL,
     capabilities                      text[],
@@ -930,13 +938,15 @@ CREATE TABLE IF NOT EXISTS ai.model (
     output_cost_per_million_tokens    numeric(18,4),
     lifecycle                         jsonb,
     is_default_for_tasks              text[],
+    curated_range                     jsonb,
+    residency_classes                 text[],
     scope_path                        ltree NOT NULL
 );
 
 -- Holds 17 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.operational_requirement (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     version_id                        uuid NOT NULL,
     kind                              text NOT NULL CONSTRAINT operational_requirement_kind_chk CHECK (kind IN ('staff', 'pos', 'kiosk', 'gates', 'fnb', 'retail', 'stock', 'resource', 'equipment', 'facility')),
     target_contract                   text,
@@ -959,15 +969,19 @@ CREATE TABLE IF NOT EXISTS ai.operational_requirement (
 -- (ADR-0018) Hangs off: reaches ai.decision_record through its keys; references ai.provider,
 -- platform.tenant. Reached by: 22 operations read it and 4 write it.
 CREATE TABLE IF NOT EXISTS ai.policy (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     scope_level                       text NOT NULL CONSTRAINT policy_scope_level_chk CHECK (scope_level IN ('tenant', 'venue')),
     scope_path                        ltree NOT NULL,
     enabled_capabilities              text[] NOT NULL,
     allowed_role_ids                  text[],
     masked_fields                     text[],
     requires_approval_for             text[],
+    scrubbing                         jsonb,
+    global_endpoint_exclusions        jsonb,
     monthly_token_ceiling             integer,
     ceiling_behaviour                 text DEFAULT 'warn' CONSTRAINT policy_ceiling_behaviour_chk CHECK (ceiling_behaviour IN ('warn', 'warnThenDisable', 'block')),
+    ceiling_behaviour_by_capability   jsonb,
+    autonomy_overrides                jsonb,
     ceiling_warning_percent           integer DEFAULT 80,
     guest_capability_scope            text[],
     retrieve_top_k                    integer DEFAULT 30,
@@ -992,7 +1006,7 @@ CREATE TABLE IF NOT EXISTS ai.policy (
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.policy_exception (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     policy_id                         uuid NOT NULL,
     capability_key                    text,
     reason                            text NOT NULL CONSTRAINT policy_exception_reason_chk CHECK (char_length(reason) <= 2000),
@@ -1010,7 +1024,7 @@ CREATE TABLE IF NOT EXISTS ai.policy_exception (
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.prompt_template (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     template_key                      text NOT NULL,
     version                           integer NOT NULL,
     layer                             text NOT NULL CONSTRAINT prompt_template_layer_chk CHECK (layer IN ('platform', 'tenant')),
@@ -1053,8 +1067,10 @@ CREATE TABLE IF NOT EXISTS ai.proposed_action (
 -- Hangs off: reaches ai.decision_record through its keys; references ai.model, ai.provider,
 -- platform.scope. Reached by: 18 operations read it and 3 write it; 2 tables reference it.
 CREATE TABLE IF NOT EXISTS ai.provider (
-    id                                uuid PRIMARY KEY,
+    is_stateless_only                 boolean,
+    id                                uuid PRIMARY KEY NOT NULL,
     kind                              text NOT NULL CONSTRAINT provider_kind_chk CHECK (kind IN ('openai', 'gemini', 'anthropic', 'azureOpenai', 'localLlm', 'openaiCompatible')),
+    vendor                            text,
     capability                        text NOT NULL CONSTRAINT provider_capability_chk CHECK (capability IN ('chat', 'embedding', 'vision', 'rerank', 'speechToText', 'textToSpeech')),
     model                             text,
     failover_provider_id              uuid,
@@ -1064,11 +1080,14 @@ CREATE TABLE IF NOT EXISTS ai.provider (
     scope_path                        ltree NOT NULL,
     tenant_id                         uuid,
     credential_ref                    text,
+    credential_hint                   text CONSTRAINT provider_credential_hint_chk CHECK (char_length(credential_hint) <= 4),
     credential_rotated_at             timestamptz,
     credential_expires_at             timestamptz,
     last_verified_at                  timestamptz,
+    compatibility                     jsonb,
     endpoint                          text,
     residency                         text,
+    residency_classes                 text[],
     max_tokens                        integer,
     is_active                         boolean NOT NULL,
     managed_by                        text DEFAULT 'ticvai' CONSTRAINT provider_managed_by_chk CHECK (managed_by IN ('ticvai', 'tenant')),
@@ -1080,7 +1099,7 @@ CREATE TABLE IF NOT EXISTS ai.provider (
 -- Holds 19 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.rec_decision (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     placement                         text NOT NULL CONSTRAINT rec_decision_placement_chk CHECK (placement IN ('productPage', 'cart', 'checkout', 'postPurchase', 'preVisit', 'inVenue', 'posBasket', 'kioskBasket', 'fnbMenu', 'retailBasket', 'seatUpgrade', 'membership', 'email', 'homepage', 'loyalty')),
     channel                           text,
     cart_id                           uuid,
@@ -1104,7 +1123,7 @@ CREATE TABLE IF NOT EXISTS ai.rec_decision (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.rec_decline (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     subject_id                        uuid,
     session_ref                       text,
     product_id                        uuid,
@@ -1119,7 +1138,7 @@ CREATE TABLE IF NOT EXISTS ai.rec_decline (
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.rec_event (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     decision_id                       uuid,
     tracking_id                       uuid NOT NULL,
     event_type                        text NOT NULL CONSTRAINT rec_event_event_type_chk CHECK (event_type IN ('impression', 'click', 'addToCart', 'purchase', 'dismiss', 'decline')),
@@ -1135,13 +1154,14 @@ CREATE TABLE IF NOT EXISTS ai.rec_event (
 -- Holds 17 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.release (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     capability_key                    text NOT NULL,
     artefact_kind                     text NOT NULL CONSTRAINT release_artefact_kind_chk CHECK (artefact_kind IN ('model', 'prompt', 'routing', 'embedding', 'retrieval', 'rule')),
     candidate_ref                     text NOT NULL,
     current_ref                       text,
     previous_ref                      text,
     layer                             text NOT NULL CONSTRAINT release_layer_chk CHECK (layer IN ('platform', 'tenant')),
+    module                            text,
     suggestion_kind                   text,
     stage                             text NOT NULL CONSTRAINT release_stage_chk CHECK (stage IN ('draft', 'offlineEval', 'shadow', 'canary', 'production', 'monitored', 'rolledBack', 'rejected')),
     shadow_started_at                 timestamptz,
@@ -1157,7 +1177,7 @@ CREATE TABLE IF NOT EXISTS ai.release (
 -- Holds 16 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.risk_alert (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     kind                              text NOT NULL CONSTRAINT risk_alert_kind_chk CHECK (kind IN ('transaction', 'velocity', 'entity', 'network', 'staffLeakage', 'scanAbuse', 'accountTakeover', 'chargeback')),
     entity_type                       text NOT NULL CONSTRAINT risk_alert_entity_type_chk CHECK (entity_type IN ('customer', 'account', 'device', 'paymentToken', 'credential', 'cluster', 'staff', 'wallet', 'ipAddress')),
     entity_ref                        text NOT NULL,
@@ -1178,7 +1198,7 @@ CREATE TABLE IF NOT EXISTS ai.risk_alert (
 -- Holds 15 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.risk_assessment (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     subject_kind                      text NOT NULL CONSTRAINT risk_assessment_subject_kind_chk CHECK (subject_kind IN ('payment', 'login', 'scan', 'refund', 'walletTransfer', 'entitlementTransfer')),
     order_id                          uuid,
     payment_attempt_ref               text,
@@ -1198,7 +1218,7 @@ CREATE TABLE IF NOT EXISTS ai.risk_assessment (
 -- Holds 15 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.risk_case (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     reference                         text NOT NULL,
     title                             text,
     status                            text NOT NULL CONSTRAINT risk_case_status_chk CHECK (status IN ('open', 'investigating', 'pendingAction', 'closed')),
@@ -1218,7 +1238,7 @@ CREATE TABLE IF NOT EXISTS ai.risk_case (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.risk_edge (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     from_entity_type                  text NOT NULL CONSTRAINT risk_edge_from_entity_type_chk CHECK (from_entity_type IN ('customer', 'account', 'device', 'paymentToken', 'credential', 'cluster', 'staff', 'ipAddress')),
     from_entity_ref                   text NOT NULL,
     to_entity_type                    text NOT NULL CONSTRAINT risk_edge_to_entity_type_chk CHECK (to_entity_type IN ('customer', 'account', 'device', 'paymentToken', 'credential', 'cluster', 'staff', 'ipAddress')),
@@ -1233,7 +1253,7 @@ CREATE TABLE IF NOT EXISTS ai.risk_edge (
 -- Holds 15 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.risk_register (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     title                             text NOT NULL,
     category                          text NOT NULL CONSTRAINT risk_register_category_chk CHECK (category IN ('customer', 'commercial', 'financial', 'operational', 'security', 'modelQuality', 'privacy', 'compliance')),
     capability_keys                   text[],
@@ -1253,7 +1273,7 @@ CREATE TABLE IF NOT EXISTS ai.risk_register (
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.risk_strategy (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     version                           integer NOT NULL,
     mode                              text NOT NULL CONSTRAINT risk_strategy_mode_chk CHECK (mode IN ('monitor', 'enforce')),
     weights                           jsonb,
@@ -1270,7 +1290,7 @@ CREATE TABLE IF NOT EXISTS ai.risk_strategy (
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.signal_observation (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     source_id                         uuid NOT NULL,
     observed_for                      timestamptz NOT NULL,
     value                             jsonb,
@@ -1282,7 +1302,7 @@ CREATE TABLE IF NOT EXISTS ai.signal_observation (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.signal_source (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     signal_key                        text NOT NULL,
     kind                              text NOT NULL CONSTRAINT signal_source_kind_chk CHECK (kind IN ('weather', 'publicHoliday', 'schoolCalendar', 'religiousCalendar', 'event', 'marketing', 'internal')),
     provider                          text,
@@ -1292,6 +1312,16 @@ CREATE TABLE IF NOT EXISTS ai.signal_source (
     fresh_at                          timestamptz,
     is_active                         boolean DEFAULT true,
     scope_path                        ltree NOT NULL
+);
+
+-- Holds 5 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS ai.spend_ceiling (
+    scope_path                        ltree NOT NULL,
+    spend                             numeric(18,4) NOT NULL,
+    token_equivalent                  integer,
+    updated_at                        timestamptz,
+    id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- One answer to one question, with its basis and its reasoning (24 August). Built so machine
@@ -1335,7 +1365,7 @@ CREATE TABLE IF NOT EXISTS ai.suggestion_outcome (
 -- Holds 15 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.tool (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     tool_key                          text NOT NULL,
     target_contract                   text NOT NULL,
     target_operation                  text NOT NULL,
@@ -1355,7 +1385,7 @@ CREATE TABLE IF NOT EXISTS ai.tool (
 -- Holds 17 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.training_run (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     capability_key                    text NOT NULL,
     suggestion_kind                   text,
     forecast_definition_key           text,
@@ -1377,7 +1407,7 @@ CREATE TABLE IF NOT EXISTS ai.training_run (
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.venue_settings (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     venue_id                          uuid NOT NULL,
     venue_type                        text NOT NULL CONSTRAINT venue_settings_venue_type_chk CHECK (venue_type IN ('waterPark', 'themePark', 'familyEntertainmentCentre', 'museum', 'arena', 'zooAquarium', 'other')),
     is_outdoor                        boolean DEFAULT true,

@@ -97,16 +97,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-424` | Gameplay Validation Command Center | B–D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-425` | Gameplay Validation Rule Configuration | B–D | 0 | 6 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-426` | Deduction Priority & Funding Source Rules | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-427` | All Games & Rides Pass Configuration | B–D | 11 | 15 | 6 | 0 | 2 | 6 | — | notStarted (—) |
-| `BO-428` | Specific Game/Ride Unlimited Entitlement | B–D | 9 | 0 | 6 | 0 | 2 | 6 | — | notStarted (—) |
-| `BO-429` | Specific Game/Ride Limited Entitlement | B–D | 1 | 0 | 6 | 0 | 2 | 6 | — | notStarted (—) |
-| `BO-430` | Game Package Builder | B–D | 0 | 0 | 6 | 0 | 2 | 6 | — | notStarted (—) |
-| `BO-431` | Entitlement Validity & Activation Rules | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-432` | Real-Time Gameplay Authorization | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-433` | Validation Simulator & Exception Analysis | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-424` | Gameplay Validation Command Center | D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-425` | Gameplay Validation Rule Configuration | D | 0 | 6 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-426` | Deduction Priority & Funding Source Rules | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-427` | All Games & Rides Pass Configuration | D | 11 | 15 | 6 | 0 | 2 | 6 | — | notStarted (—) |
+| `BO-428` | Specific Game/Ride Unlimited Entitlement | D | 9 | 0 | 6 | 0 | 2 | 6 | — | notStarted (—) |
+| `BO-429` | Specific Game/Ride Limited Entitlement | D | 1 | 0 | 6 | 0 | 2 | 6 | — | notStarted (—) |
+| `BO-430` | Game Package Builder | D | 0 | 0 | 6 | 0 | 2 | 6 | — | notStarted (—) |
+| `BO-431` | Entitlement Validity & Activation Rules | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-432` | Real-Time Gameplay Authorization | B | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-433` | Validation Simulator & Exception Analysis | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -126,7 +126,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-424 |
 | Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
@@ -349,7 +349,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-425 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -524,7 +524,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-426 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -683,7 +683,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-427 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Pass Setup; Options) and no display directory — it is settings, not a population |
@@ -691,7 +691,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/games-rides/all-games-rides-pass-configuration-bo-427` |
 
-**What the spec says about it.** **An all-games pass covers games added after sale unless the venue says not; type-based passes cover new games by default (decided 2 October 2026 by Chinmay, DEC-397; CHG-CSA-028, `coversGamesAddedLater`).**
+**What the spec says about it.** **An all-games pass covers games added after sale unless the venue says not; type-based passes cover new games by default (decided 2 October 2026 by Chinmay, DEC-397; CHG-CSA-028, `includesGamesAddedLater`).**
 
 **Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-004): No get, update or deactivate operation for a game entitlement.
 
@@ -751,7 +751,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Kind | chip: All games pass, Unlimited single game, Limited single game, Package, Free play | — |
 | Games | list or chips (count when long) | — |
 | Attraction types | list or chips (count when long) | — |
-| Covers games added later | yes / no (icon or chip) | Whether a pass sold today covers a game added tomorrow (Chinmay, 2 October, workbook Q397: "venue configures; default yes"; CHG-CSA-028). |
+| Includes games added later | yes / no (icon or chip) | Whether a pass sold today covers a game added tomorrow (Chinmay, 2 October, workbook Q397: "venue configures; default yes"; CHG-CSA-028). |
 | Play count | 1,234 | For `limitedSingleGame` and `package`. Null means unlimited. |
 | Validity kind | chip: Same day, Days, Until date, Until used | — |
 | Validity days | 1,234 | — |
@@ -879,7 +879,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-428 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Entitlement Configuration) and no display directory — it is settings, not a population |
@@ -1039,7 +1039,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-429 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configuration) and no display directory — it is settings, not a population |
@@ -1207,7 +1207,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-430 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1381,7 +1381,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-431 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1526,7 +1526,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-432 |
 | Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1687,7 +1687,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-433 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1952,7 +1952,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"GameEntitlement": {"type":"object","x-ticvai-persistence":"games.entitlement","description":"Board 4. **A right to play, not money** — consumed before money is.","required":["code","kind"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"kind":{"type":"string","enum":["allGamesPass","unlimitedSingleGame","limitedSingleGame","package","freePlay"]},"gameIds":{"type":"array","items":{"type":"string","format":"uuid"}},"attractionTypeIds":{"type":"array","items":{"type":"string","format":"uuid"}},"coversGamesAddedLater":{"type":"boolean","default":true,"description":"**Whether a pass sold today covers a game added tomorrow** (Chinmay, 2 October, workbook Q397: \"venue configures; default yes\"; CHG-CSA-028). True, the default: an `allGamesPass`, or a pass bound by `attractionTypeIds`, covers games added after it was sold that match it; the coverage summary says so. False: it covers only the games that existed at sale. A pass listing `gameIds` covers those games only, whatever this says."},"playCount":{"type":"integer","nullable":true,"description":"For `limitedSingleGame` and `package`. Null means unlimited."},"validityKind":{"type":"string","enum":["sameDay","days","untilDate","untilUsed"]},"validityDays":{"type":"integer","nullable":true},"activationKind":{"type":"string","enum":["onPurchase","onFirstUse","onDate"],"default":"onFirstUse","description":"**On first use is what a guest expects from a day pass bought the night before.** On purchase is what a venue defaults to by accident, and it costs them a day.\n"},"dailyPlayCap":{"type":"integer","nullable":true},"cooldownMinutes":{"type":"integer","nullable":true,"description":"**Unlimited does not mean continuous.** A cooldown is how one child does not hold a popular ride all afternoon.\n"},"linkedProductId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"},"isActive":{"type":"boolean","default":true}}},
+"GameEntitlement": {"type":"object","x-ticvai-persistence":"games.entitlement","description":"Board 4. **A right to play, not money** — consumed before money is.","required":["code","kind"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"kind":{"type":"string","enum":["allGamesPass","unlimitedSingleGame","limitedSingleGame","package","freePlay"]},"gameIds":{"type":"array","items":{"type":"string","format":"uuid"}},"attractionTypeIds":{"type":"array","items":{"type":"string","format":"uuid"}},"includesGamesAddedLater":{"type":"boolean","default":true,"description":"**Whether a pass sold today covers a game added tomorrow** (Chinmay, 2 October, workbook Q397: \"venue configures; default yes\"; CHG-CSA-028). True, the default: an `allGamesPass`, or a pass bound by `attractionTypeIds`, covers games added after it was sold that match it; the coverage summary says so. False: it covers only the games that existed at sale. A pass listing `gameIds` covers those games only, whatever this says."},"playCount":{"type":"integer","nullable":true,"description":"For `limitedSingleGame` and `package`. Null means unlimited."},"validityKind":{"type":"string","enum":["sameDay","days","untilDate","untilUsed"]},"validityDays":{"type":"integer","nullable":true},"activationKind":{"type":"string","enum":["onPurchase","onFirstUse","onDate"],"default":"onFirstUse","description":"**On first use is what a guest expects from a day pass bought the night before.** On purchase is what a venue defaults to by accident, and it costs them a day.\n"},"dailyPlayCap":{"type":"integer","nullable":true},"cooldownMinutes":{"type":"integer","nullable":true,"description":"**Unlimited does not mean continuous.** A cooldown is how one child does not hold a popular ride all afternoon.\n"},"linkedProductId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"},"isActive":{"type":"boolean","default":true}}},
 "GameplayAuthorisation": {"type":"object","x-ticvai-persistence":"games.authorisation","description":"Board 4.9. **The refusal reason is the product.**","properties":{"id":{"type":"string","format":"uuid"},"decision":{"type":"string","enum":["allow","refuse"]},"reason":{"type":"string","nullable":true,"enum":["ok","cardNotFound","cardExpired","cardBlocked","retapTooSoon","heightRestriction","ageRestriction","insufficientFunds","entitlementExhausted","entitlementNotValidHere","cooldownActive","dailyCapReached","readerNotConfigured","gameUnavailable"]},"guestMessage":{"type":"string","nullable":true,"description":"***\"No plays left on your pass\"* rather than *\"Declined\"*.** One is a guest who understands; the other is a member of staff walking over.\n"},"chargedFrom":{"type":"string","nullable":true},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"entitlementId":{"type":"string","format":"uuid","nullable":true},"remainingBalance":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"remainingPlays":{"type":"integer","nullable":true},"trace":{"type":"array","items":{"type":"object","properties":{"check":{"type":"string"},"passed":{"type":"boolean"},"detail":{"type":"string","nullable":true}}}},"decidedOffline":{"type":"boolean","default":false},"scopePath":{"type":"string"}}},
 "GameplayAuthorisationRequest": {"type":"object","required":["readerId"],"properties":{"readerId":{"type":"string","format":"uuid"},"cardId":{"type":"string","format":"uuid","nullable":true},"credentialIdentifier":{"type":"string","nullable":true},"gameId":{"type":"string","format":"uuid","nullable":true},"at":{"type":"string","format":"date-time","nullable":true},"guestHeightCm":{"type":"integer","nullable":true},"offline":{"type":"boolean","default":false}}},
 "GameplayTransaction": {"type":"object","x-ticvai-persistence":"games.gameplay_transaction","description":"Boards 8.2 and 8.5. **The refused ones are the valuable half.**","properties":{"id":{"type":"string","format":"uuid"},"readerId":{"type":"string","format":"uuid"},"gameId":{"type":"string","format":"uuid","nullable":true},"cardId":{"type":"string","format":"uuid","nullable":true},"at":{"type":"string","format":"date-time"},"outcome":{"type":"string","enum":["allowed","refused","reversed"]},"reason":{"type":"string","nullable":true},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"chargedFrom":{"type":"string","nullable":true},"entitlementId":{"type":"string","format":"uuid","nullable":true},"ticketsEarned":{"type":"integer","nullable":true},"decidedOffline":{"type":"boolean","default":false},"syncedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string"}}},

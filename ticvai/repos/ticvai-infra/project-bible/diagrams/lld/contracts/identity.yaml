@@ -100,7 +100,8 @@ operations:
   offline: false
   reads:
   - identity.access_override
-  writes: []
+  writes:
+  - identity.access_override
 - operation: createMfaChallenge
   verb: POST
   path: /auth/mfa/challenge
@@ -224,8 +225,10 @@ operations:
   - staff
   - partner
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - identity.session
+  writes:
+  - identity.session
 - operation: enrolMfaMethod
   verb: POST
   path: /auth/mfa/methods
@@ -731,7 +734,8 @@ operations:
   - staff
   - partner
   offline: false
-  reads: []
+  reads:
+  - identity.session
   writes: []
 - operation: listPermissionFindings
   verb: GET
@@ -878,7 +882,8 @@ operations:
   offline: false
   reads:
   - identity.platform_staff_grant
-  writes: []
+  writes:
+  - identity.platform_staff_grant
 - operation: recordBenefitUsage
   verb: POST
   path: /memberships/{membershipId}/benefit-usage
@@ -1052,7 +1057,8 @@ operations:
   offline: false
   reads:
   - identity.authorisation_policy
-  writes: []
+  writes:
+  - identity.authorisation_policy
 - operation: setCapabilityTemplate
   verb: PUT
   path: /capability-templates
@@ -1241,7 +1247,8 @@ operations:
   offline: false
   reads:
   - identity.role
-  writes: []
+  writes:
+  - identity.role
 - operation: verifyGuestEmail
   verb: POST
   path: /auth/guest/verify-email

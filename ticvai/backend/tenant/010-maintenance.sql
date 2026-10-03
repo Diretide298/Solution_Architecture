@@ -1,4 +1,4 @@
--- maintenance — 17 tables
+-- maintenance — 18 tables
 -- **Derived. Do not hand-edit.**
 
 -- A physical thing with a service history — a lift, a chiller, a ride. Distinct from a resource,
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS maintenance.asset (
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS maintenance.asset_category (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text NOT NULL,
     description                       text,
@@ -97,6 +97,8 @@ CREATE TABLE IF NOT EXISTS maintenance.incident (
     assigned_to_principal_id          uuid,
     reported_by_principal_id          uuid NOT NULL,
     corrective_work_order_id          uuid,
+    escalation                        jsonb,
+    reopen_count                      integer,
     occurred_at                       timestamptz NOT NULL,
     recorded_at                       timestamptz,
     closed_at                         timestamptz,
@@ -130,6 +132,9 @@ CREATE TABLE IF NOT EXISTS maintenance.incident_investigation_note (
     id                                uuid PRIMARY KEY NOT NULL,
     incident_id                       uuid NOT NULL,
     note                              text NOT NULL CONSTRAINT incident_investigation_note_note_chk CHECK (char_length(note) <= 10000),
+    kind                              text DEFAULT 'note' CONSTRAINT incident_investigation_note_kind_chk CHECK (kind IN ('note', 'statusChange', 'escalation', 'reopen')),
+    from_status                       text,
+    to_status                         text,
     written_by_principal_id           uuid,
     recorded_at                       timestamptz NOT NULL
 );
@@ -141,7 +146,23 @@ CREATE TABLE IF NOT EXISTS maintenance.incident_involved_party (
     incident_id                       uuid NOT NULL,
     kind                              text NOT NULL CONSTRAINT incident_involved_party_kind_chk CHECK (kind IN ('subject', 'staff')),
     subject_id                        uuid,
-    principal_id                      uuid
+    principal_id                      uuid,
+    role                              text CONSTRAINT incident_involved_party_role_chk CHECK (role IN ('injured', 'involved', 'witness', 'reporter')),
+    is_contact_stored                 boolean
+);
+
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 0 write it.
+CREATE TABLE IF NOT EXISTS maintenance.incident_media (
+    id                                uuid PRIMARY KEY NOT NULL,
+    incident_id                       uuid NOT NULL,
+    kind                              text NOT NULL CONSTRAINT incident_media_kind_chk CHECK (kind IN ('photo', 'video', 'document')),
+    status                            text NOT NULL CONSTRAINT incident_media_status_chk CHECK (status IN ('awaitingUpload', 'stored')),
+    asset_ref                         uuid,
+    caption                           text,
+    captured_at                       timestamptz,
+    uploaded_by_principal_id          uuid,
+    created_at                        timestamptz
 );
 
 -- A completed check against a template. The responses are children
@@ -227,7 +248,7 @@ CREATE TABLE IF NOT EXISTS maintenance.preventive_plan (
 -- Holds 5 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS maintenance.priority_scoring_model (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     venue_id                          uuid,
     weights                           jsonb NOT NULL,
     updated_at                        timestamptz,
@@ -237,7 +258,7 @@ CREATE TABLE IF NOT EXISTS maintenance.priority_scoring_model (
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS maintenance.vendor_service_request (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     venue_id                          uuid,
     work_order_id                     uuid NOT NULL,
     supplier_id                       uuid NOT NULL,

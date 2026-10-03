@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — AI
   version: 1.0.0
-  x-ticvai-screen-count: 130
+  x-ticvai-screen-count: 131
   x-ticvai-module: 8 — Unified Operations Dashboard (AI)
   x-ticvai-platforms:
   - P01 Guest Web
@@ -810,6 +810,8 @@ paths:
         format: uuid
     post:
       operationId: proposeWalkways
+      x-ticvai-consumed-by:
+        - "P08 BO-093 Map Import & Labelling"
       summary: Find walkable space in a drawing that has no vectors
       description: '**The last resort, and it says so.** Walkable space is normally derived by subtraction
         — the site minus buildings, seating, water and keep-out — which is exact, repeatable and needs

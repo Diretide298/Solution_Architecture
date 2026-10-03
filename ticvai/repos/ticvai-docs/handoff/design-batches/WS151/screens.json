@@ -728,7 +728,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "ADM-599"
+    "ADM-599",
+    "BO-102"
    ],
    "exitTo": [
     "ADM-599"

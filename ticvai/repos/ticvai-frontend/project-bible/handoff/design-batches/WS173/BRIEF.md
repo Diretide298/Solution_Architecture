@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-1033` | Recommendation Command Center | B–D | 0 | 15 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1034` | Best Seat Recommendations | B–D | 0 | 10 | 6 | 0 | 2 | 6 | — | notStarted (—) |
-| `BO-1035` | Best Value Recommendations | B–D | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1036` | Closest-to-Stage Recommendations | B–D | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1037` | Family Seating Recommendations | B–D | 0 | 10 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-1038` | Accessibility Recommendations | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1039` | Seat Upgrade Recommendations | B–D | 0 | 20 | 6 | 20 | 0 | 6 | — | notStarted (—) |
-| `BO-1040` | Alternatives & Reseating | B–D | 0 | 20 | 6 | 8 | 0 | 0 | — | notStarted (—) |
-| `BO-1041` | Scoring Rules & Model Governance | B–D | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1042` | Performance, Feedback & Audit | B–D | 0 | 15 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1033` | Recommendation Command Center | C | 0 | 15 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1034` | Best Seat Recommendations | C | 0 | 10 | 6 | 0 | 2 | 6 | — | notStarted (—) |
+| `BO-1035` | Best Value Recommendations | C | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1036` | Closest-to-Stage Recommendations | C | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1037` | Family Seating Recommendations | C | 0 | 10 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-1038` | Accessibility Recommendations | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1039` | Seat Upgrade Recommendations | C | 0 | 20 | 6 | 20 | 0 | 6 | — | notStarted (—) |
+| `BO-1040` | Alternatives & Reseating | C | 0 | 20 | 6 | 8 | 0 | 0 | — | notStarted (—) |
+| `BO-1041` | Scoring Rules & Model Governance | C | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1042` | Performance, Feedback & Audit | C | 0 | 15 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

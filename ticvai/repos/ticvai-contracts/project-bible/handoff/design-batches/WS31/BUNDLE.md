@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-304` | Order & Reservation Command Center | B–D | 0 | 14 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-305` | Order Detail & Transaction Workspace | B–D | 0 | 50 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
-| `BO-306` | Reservation & Hold Policy Configuration | B–D | 12 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-307` | Order & Reservation Status Lifecycle Configuration | B–D | 8 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-308` | Order Creation & Source/Channel Configuration | B–D | 24 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-309` | Customer, Guest & Account Assignment | B–D | 10 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-310` | Order Line, Product & Entitlement Composition | B–D | 15 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-311` | Capacity Reservation & Inventory Commitment | B–D | 0 | 0 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
-| `BO-312` | Reservation Confirmation, Expiry & Fulfillment Readiness | B–D | 9 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-313` | Order Lifecycle Timeline, SLA, Exceptions & AI Operations | B–D | 0 | 4 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-304` | Order & Reservation Command Center | C | 0 | 14 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-305` | Order Detail & Transaction Workspace | C | 0 | 50 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
+| `BO-306` | Reservation & Hold Policy Configuration | C | 12 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-307` | Order & Reservation Status Lifecycle Configuration | C | 8 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-308` | Order Creation & Source/Channel Configuration | C | 24 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-309` | Customer, Guest & Account Assignment | C | 10 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-310` | Order Line, Product & Entitlement Composition | C | 15 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-311` | Capacity Reservation & Inventory Commitment | C | 0 | 0 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
+| `BO-312` | Reservation Confirmation, Expiry & Fulfillment Readiness | C | 9 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-313` | Order Lifecycle Timeline, SLA, Exceptions & AI Operations | C | 0 | 4 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -135,7 +135,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-304 |
 | Who uses it | venue staff holding `ORDER_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -306,7 +306,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-305 |
 | Who uses it | venue staff holding `ORDER_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Display; Show) and a per-row directory (§Each line should display) — counts over a population, then the population |
@@ -538,7 +538,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-306 |
 | Who uses it | venue staff holding `ORDER_CREATE` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure by; Configure) and no display directory — it is settings, not a population |
@@ -668,7 +668,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-307 |
 | Who uses it | venue staff holding `ORDER_CREATE` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§For each transition define) and no display directory — it is settings, not a population |
@@ -791,7 +791,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-308 |
 | Who uses it | venue staff holding `ORDER_CREATE` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Capture; Configure numbering rules; Configure whether a channel may) and no display directory — it is settings, not a population |
@@ -928,7 +928,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-309 |
 | Who uses it | venue staff holding `ORDER_CREATE` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Depending on configuration) and no display directory — it is settings, not a population |
@@ -1053,7 +1053,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-310 |
 | Who uses it | venue staff holding `ORDER_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Each line captures) and no display directory — it is settings, not a population |
@@ -1174,7 +1174,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-311 |
 | Who uses it | venue staff holding `ORDER_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1285,7 +1285,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-312 |
 | Who uses it | venue staff holding `ORDER_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure combinations of) and no display directory — it is settings, not a population |
@@ -1399,7 +1399,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-313 |
 | Who uses it | venue staff holding `ORDER_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Detect) and no metric row |

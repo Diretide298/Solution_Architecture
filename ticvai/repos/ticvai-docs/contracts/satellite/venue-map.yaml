@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Venue map
   version: 1.0.0
-  x-ticvai-screen-count: 20
+  x-ticvai-screen-count: 22
   x-ticvai-tier: satellite
   x-ticvai-module: "21 — Seat Management & Venue Mapping"
   x-ticvai-platforms:
@@ -611,6 +611,8 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: setVenueMapArtwork
+      x-ticvai-consumed-by:
+        - "P08 BO-094 Map Editor & Publish"
       summary: Set the illustrated map guests see, and how it lines up with the plan
       description: >
         **The guest map artwork** (`handoff/venue-map-input-spec.md` section 6; the F26 flow brief's open item
@@ -702,6 +704,8 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getVenueNavigationFile
+      x-ticvai-consumed-by:
+        - "P08 BO-094 Map Editor & Publish"
       summary: The map's graph and points as a navigation file
       description: >
         **ADR-0069 section 8, closed 3 October 2026: the venue does not describe its paths twice.**

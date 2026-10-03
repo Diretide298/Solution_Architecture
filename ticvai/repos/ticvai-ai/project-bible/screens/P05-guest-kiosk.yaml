@@ -81,6 +81,8 @@ screens:
     - to: KSK-004
       trigger: Choose tickets
       provenance: structural — KSK-001 is P05's home screen and its exits are its launcher
+      carries:
+      - productId
     - to: KSK-014
       trigger: Out of service
       provenance: structural — KSK-001 is P05's home screen and its exits are its launcher
@@ -358,9 +360,9 @@ screens:
       provenance: flow F07 step 4→5
     - to: KSK-015
       trigger: Assistant
-      provenance: 'derived — KSK-015 declares entryState.params conversationId, messageId and KSK-004
-        holds none of them. The edge carries nothing: conversationId, messageId only pre-select (deep
-        link or optional), and KSK-015 opens on its own'
+      provenance: 'derived — KSK-015 declares entryState.params cartId, conversationId, messageId and
+        KSK-004 holds none of them. The edge carries nothing: conversationId, messageId, cartId only pre-select
+        (deep link or optional), and KSK-015 opens on its own'
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
 

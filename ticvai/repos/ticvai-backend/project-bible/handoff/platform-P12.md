@@ -9,12 +9,12 @@
 | Contracts | 8 |
 | Modules | 5 |
 | Undrawn | 0 |
-| Operations with no screen | 89 |
+| Operations with no screen | 85 |
 | Waves | wave1 4 · wave3 24 |
 
 ## Gaps
 
-### 89 operations with no screen here
+### 85 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -24,7 +24,6 @@
 | `generateVenueLayout` | ai | POST | Draft a seat map from an uploaded plan |
 | `listIndexJobs` | ai | GET | Indexing in flight and recently finished |
 | `listIndexSources` | ai | GET | What is indexed, and how current it is |
-| `proposeWalkways` | ai | POST | Find walkable space in a drawing that has no vectors |
 | `reindexSource` | ai | POST | Rebuild a source |
 | `removeIndexEntry` | ai | DELETE | Remove one record from the index |
 | `setAiTool` | ai | PUT | Register or change a tool (platform) |
@@ -60,7 +59,8 @@
 | `getGuestExtraValues` | marketing-crm | GET | What a guest answered |
 | `getSuppressionList` | marketing-crm | GET | Addresses suppressed from all sending |
 | `getWaiverTesting` | marketing-crm | GET | Checklist, rule simulation and approval record of a waiver version |
-| … | | | 49 more |
+| `issueReward` | marketing-crm | POST | Issue a reward to a guest |
+| … | | | 45 more |
 
 ### 2 modules split across waves
 
@@ -84,7 +84,7 @@
 | | Name | Module | Wave | Ops | Drawn |
 |---|---|---|---|---|---|
 | `SUP-001` | Venue Management Sign In | Access & Availability | 1 | 11 | yes |
-| `SUP-002` | Agent Dashboard | Overview | 1 | 9 | yes |
+| `SUP-002` | Agent Dashboard | Overview | 1 | 10 | yes |
 | `SUP-003` | Availability & Routing Settings | Access & Availability | 3 | 1 | yes |
 | `SUP-004` | Conversation Queue | Conversations | 1 | 3 | yes |
 | `SUP-005` | Live Chat Workspace | Conversations | 1 | 11 | yes |

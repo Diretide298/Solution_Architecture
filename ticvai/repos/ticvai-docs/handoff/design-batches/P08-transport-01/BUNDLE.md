@@ -106,13 +106,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-1183` | Transport Stations | B–D | 13 | 13 | 7 | 0 | 0 | 6 | — | notStarted (generated) |
-| `BO-1184` | Transport Routes & Stops | B–D | 27 | 18 | 7 | 0 | 1 | 6 | — | notStarted (generated) |
-| `BO-1185` | Transport Fares & Passenger Types | B–D | 22 | 44 | 7 | 0 | 0 | 6 | — | notStarted (generated) |
-| `BO-1186` | Transport Timetables | B–D | 21 | 14 | 7 | 0 | 0 | 6 | — | notStarted (generated) |
-| `BO-1187` | Transport Departure Board | B–D | 14 | 17 | 7 | 4 | 0 | 6 | — | notStarted (generated) |
-| `BO-1188` | Transport Pass Types | B–D | 19 | 18 | 7 | 0 | 0 | 6 | — | notStarted (generated) |
-| `BO-1189` | Transport Network Import | B–D | 6 | 27 | 6 | 1 | 0 | 6 | — | notStarted (generated) |
+| `BO-1183` | Transport Stations | A | 13 | 13 | 7 | 0 | 0 | 6 | — | notStarted (generated) |
+| `BO-1184` | Transport Routes & Stops | A | 27 | 18 | 7 | 0 | 1 | 6 | — | notStarted (generated) |
+| `BO-1185` | Transport Fares & Passenger Types | A | 22 | 44 | 7 | 0 | 0 | 6 | — | notStarted (generated) |
+| `BO-1186` | Transport Timetables | A | 21 | 14 | 7 | 0 | 0 | 6 | — | notStarted (generated) |
+| `BO-1187` | Transport Departure Board | C | 14 | 17 | 7 | 4 | 0 | 6 | — | notStarted (generated) |
+| `BO-1188` | Transport Pass Types | A | 19 | 18 | 7 | 0 | 0 | 6 | — | notStarted (generated) |
+| `BO-1189` | Transport Network Import | A | 6 | 27 | 6 | 1 | 0 | 6 | — | notStarted (generated) |
 
 ---
 
@@ -127,8 +127,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Transport · wave 2 · needs the `transport` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Module | Transport · wave 1 · needs the `transport` module |
+| Block | Block A · task APP-SETUP-BO-1183 |
 | Who uses it | venue staff holding `TRANSPORT_MANAGE` (1 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listTransportStations` reads the population and the panel acts on one of them — list, select, act |
@@ -321,8 +321,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Transport · wave 2 · needs the `transport` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Module | Transport · wave 1 · needs the `transport` module |
+| Block | Block A · task APP-SETUP-BO-1184 |
 | Who uses it | venue staff holding `TRANSPORT_MANAGE` (1 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listTransportRoutes` reads the population and `getTransportRoute` reads one of them — list, select, act |
@@ -587,8 +587,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Transport · wave 2 · needs the `transport` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Module | Transport · wave 1 · needs the `transport` module |
+| Block | Block A · task APP-SETUP-BO-1185 |
 | Who uses it | venue staff holding `TRANSPORT_PRICE` (1 operate) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): one fare table per route, replaced as a whole — settings that take effect on sales from a date, not a list |
@@ -829,8 +829,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Transport · wave 2 · needs the `transport` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Module | Transport · wave 1 · needs the `transport` module |
+| Block | Block A · task APP-SETUP-BO-1186 |
 | Who uses it | venue staff holding `TRANSPORT_MANAGE`, `TRANSPORT_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listTransportTimetables` reads the route's timetables and the panel acts on one of them — list, select, act |
@@ -1072,7 +1072,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Transport · wave 2 · needs the `transport` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-1187 |
 | Who uses it | venue staff holding `PERFORMANCE_CONFIGURE`, `TRANSPORT_MANAGE`, `TRANSPORT_VIEW` (2 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listTransportRouteDepartures` reads the population and the panel acts on one departure — list, select, act |
@@ -1272,8 +1272,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Transport · wave 2 · needs the `transport` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Module | Transport · wave 1 · needs the `transport` module |
+| Block | Block A · task APP-SETUP-BO-1188 |
 | Who uses it | venue staff holding `TRANSPORT_PRICE`, `TRANSPORT_VIEW` (1 operate, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listTransportPassTypes` reads the population and the panel acts on one of them — list, select, act |
@@ -1464,8 +1464,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Transport · wave 2 · needs the `transport` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Module | Transport · wave 1 · needs the `transport` module |
+| Block | Block A · task APP-SETUP-BO-1189 |
 | Who uses it | venue staff holding `ASSET_LIBRARY_MANAGE`, `TRANSPORT_MANAGE`, `TRANSPORT_VIEW` (2 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): an upload, a preview and one apply — a staged change to the network, not a list |
@@ -1636,6 +1636,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 #### References
 
 - Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-1189` · status **notStarted** · provenance generated
+- ADR-0069 *In-park 3D navigation is built natively, from a venue model, a pathway file and GPS* (`docs/adr/0069-in-park-3d-navigation-is-built-natively.md`)
 
 #### Acceptance for the design
 
@@ -1791,7 +1792,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "ImportTransportNetworkRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["format","sourceRef"],"properties":{"format":{"type":"string","enum":["csvBundle","gtfs"],"description":"A zip of the four CSV files described on `importTransportNetwork`, or a GTFS static feed."},"sourceRef":{"type":"string","format":"uuid","description":"The uploaded file, as the `MediaAsset.id` from `assets.completeUpload`. Never a URL.","x-ticvai-references":"assets.MediaAsset"},"include":{"type":"array","uniqueItems":true,"description":"Which parts of the file to read. Absent reads all three.","items":{"type":"string","enum":["stations","routes","timetables"]}}}},
 "LocalisedText": {"x-ticvai-persistence":"none — jsonb column","type":"object","additionalProperties":{"type":"string"}},
 "MediaAsset": {"x-ticvai-persistence":"assets.media_asset","type":"object","required":["id","kind","status","filename","contentType","sizeBytes","referenceCount","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"kind":{"$ref":"#/components/schemas/MediaKind"},"status":{"$ref":"#/components/schemas/MediaStatus"},"filename":{"type":"string"},"contentType":{"type":"string"},"sizeBytes":{"type":"integer"},"title":{"$ref":"#/components/schemas/LocalisedText"},"description":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"description":"Set by `updateMediaAsset` and matched by `searchMedia`'s `search`. It was accepted and searched on before it had anywhere to be stored.\n"},"altText":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"description":"Required before use in a guest-facing surface. WCAG 2.2 AA."},"width":{"type":"integer","nullable":true},"height":{"type":"integer","nullable":true},"durationSeconds":{"type":"number","nullable":true},"customMetadata":{"type":"object","nullable":true,"additionalProperties":true,"description":"BL-178. **`assets` is a strong contract and its metadata was fixed** — kind, title, alt text, dimensions, rights. A venue photographing four thousand products wants its own fields: shoot date, photographer, model release, season.\n**Free-form and searchable, not a schema.** Every venue would want a different one, and a fixed set would be wrong for all of them.\n"},"sharedWithTenantIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"BL-178. **Cross-tenant sharing, and it is refused by default for a reason.** A brand operating three venues wants one logo library; two unrelated tenants sharing an asset store is the isolation breach ADR-0011 exists to prevent.\n**Only within one tenant's own scope tree.** A share naming a tenant outside it is refused rather than warned about — this is the one place where a permissive default would be a cross-tenant data leak.\n"},"tags":{"type":"array","items":{"type":"string"}},"categoryId":{"type":"string","format":"uuid","nullable":true,"description":"The asset's category, one of `MediaTaxonomy.categories[].id`; null while unclassified. Set by `bulkUpdateMediaAssets` (`setCategoryId`) (decided 29 September, data model DM4).\n"},"venueId":{"type":"string","format":"uuid","nullable":true},"url":{"type":"string","description":"Signed and expiring for private assets; stable CDN URL for public ones."},"thumbnailUrl":{"type":"string","nullable":true},"referenceCount":{"type":"integer","description":"How many surfaces reference this asset. Non-zero refuses deletion.\n"},"rights":{"$ref":"#/components/schemas/MediaRights"},"isRightsExpired":{"type":"boolean"},"version":{"type":"integer"},"uploadedByPrincipalId":{"type":"string","format":"uuid"},"createdAt":{"type":"string","format":"date-time"}}},
-"MediaKind": {"type":"string","enum":["image","video","audio","document","vector","font","archive"]},
+"MediaKind": {"type":"string","enum":["image","video","audio","document","vector","font","archive","model3d"],"description":"`model3d` added 3 October 2026 (r1 additions; ADR-0069 action item 4): a glTF binary (`model/gltf-binary`, `.glb`) venue model, at most 40 MB. No rendition or derivative is generated for it; the guest app downloads the file as uploaded.\n"},
 "MediaRights": {"x-ticvai-persistence":"none — embedded in asset","type":"object","description":"Licensing terms. Tracked because an expired licence on a live surface is a legal exposure, not a housekeeping item.\n","properties":{"licenceKind":{"type":"string","enum":["owned","royaltyFree","rightsManaged","creativeCommons","editorialOnly","unknown"]},"licensor":{"type":"string","nullable":true},"licenceReference":{"type":"string","nullable":true},"validFrom":{"type":"string","format":"date","nullable":true},"validTo":{"type":"string","format":"date","nullable":true},"permittedUses":{"type":"array","items":{"type":"string","enum":["web","print","socialMedia","inVenue","advertising","internal"]}},"attributionRequired":{"type":"boolean","default":false},"attributionText":{"type":"string","nullable":true},"permittedTerritories":{"type":"array","items":{"type":"string"},"description":"ISO country or region codes. **Empty means unrestricted, which is a claim rather than an absence** — an unknown territory and a worldwide licence are not the same thing, and `licenceKind: unknown` is how the second is said.\n"},"permittedChannels":{"type":"array","items":{"type":"string"},"description":"Distribution channel codes, checked by `setMediaDistributionChannels`. Narrower than `permittedUses`, which describes the medium rather than the route.\n"},"modelReleaseHeld":{"type":"boolean","default":false},"renewalOwner":{"type":"string","format":"uuid","nullable":true}}},
 "MediaStatus": {"type":"string","enum":["processing","ready","quarantined","failed","archived"]},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},

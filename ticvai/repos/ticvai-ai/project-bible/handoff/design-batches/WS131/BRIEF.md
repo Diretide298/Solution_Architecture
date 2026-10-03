@@ -131,10 +131,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-716` | Event Lifecycle & Change Command Center | A | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-717` | Lifecycle Transition Configuration | B–D | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-718` | Event Change Request Configuration | B–D | 0 | 0 | 6 | 5 | 0 | 0 | — | notStarted (—) |
-| `BO-719` | Event Cancellation Workflow Configuration | B–D | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-720` | Ticket, Reservation & Customer Treatment Configuration | B–D | 0 | 11 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-717` | Lifecycle Transition Configuration | B | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-718` | Event Change Request Configuration | B | 0 | 0 | 6 | 5 | 0 | 0 | — | notStarted (—) |
+| `BO-719` | Event Cancellation Workflow Configuration | B | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-720` | Ticket, Reservation & Customer Treatment Configuration | B | 0 | 11 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

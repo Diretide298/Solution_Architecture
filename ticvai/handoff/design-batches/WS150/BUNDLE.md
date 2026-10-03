@@ -1,6 +1,6 @@
 # WS150 — Payment Payment Orchestration board 4
 
-**10 screens · 11 operations · 19 schemas · 5 permissions**
+**10 screens · 12 operations · 19 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-589` | Digital Payments Command Center | B–D | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-590` | Digital & Alternative Payment Method Manager | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-591` | Digital Wallet & Mobile Payment Configuration | B–D | 0 | 18 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `ADM-592` | Payment Link Builder & Configuration | B–D | 13 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
-| `ADM-593` | Payment Link Distribution & Customer Journey Manager | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `ADM-594` | Hosted Checkout, Redirect & Return Flow Configuration | B–D | 10 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `ADM-595` | Digital Payment Session & Transaction Monitor | B–D | 2 | 24 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-596` | Authentication, Tokenization & Recurring Payment Controls | B–D | 0 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-597` | Digital Payment Exception, Recovery & Expiry Center | B–D | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-598` | Digital Payment Simulator, Conversion & AI Advisor | B–D | 13 | 31 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-589` | Digital Payments Command Center | C | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-590` | Digital & Alternative Payment Method Manager | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-591` | Digital Wallet & Mobile Payment Configuration | C | 0 | 18 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `ADM-592` | Payment Link Builder & Configuration | C | 13 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
+| `ADM-593` | Payment Link Distribution & Customer Journey Manager | C | 1 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `ADM-594` | Hosted Checkout, Redirect & Return Flow Configuration | C | 10 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `ADM-595` | Digital Payment Session & Transaction Monitor | C | 2 | 24 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-596` | Authentication, Tokenization & Recurring Payment Controls | C | 0 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-597` | Digital Payment Exception, Recovery & Expiry Center | C | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-598` | Digital Payment Simulator, Conversion & AI Advisor | C | 13 | 31 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -135,7 +135,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-ADM-589 |
 | Who uses it | venue staff holding `PAYMENT_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§KPI Cards) and a per-row directory (§Compare) — counts over a population, then the population |
@@ -314,7 +314,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-ADM-590 |
 | Who uses it | venue staff holding `PAYMENT_CONFIGURE`, `PAYMENT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -438,7 +438,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-ADM-591 |
 | Who uses it | venue staff holding `PAYMENT_CONFIGURE`, `PAYMENT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -588,7 +588,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-ADM-592 |
 | Who uses it | venue staff holding `ORDER_CREATE` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -719,8 +719,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `ORDER_MODIFY`, `ORDER_VIEW` (1 operate, 1 read); in the flows as venue manager |
+| Block | Block C · task VM-ADM-593 |
+| Who uses it | venue staff holding `ORDER_CREATE`, `ORDER_MODIFY`, `ORDER_VIEW` (2 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -739,13 +739,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Inputs: what the user enters or picks
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Form: Cancel link** (modal, opened by *Cancel link*; *Cancel link* calls `cancelPaymentLink`, *Keep the link* sends nothing)
+
+**Collects what `cancelPaymentLink` sends before it is called.** Required: `reason` (3 to 500 characters, kept in the audit trail, never shown to the guest). Says that the guest's link stops working at once and that the order is not cancelled. Dismissing sends nothing; the link stays live.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Reason `reason` | text area | required | — | min length 3; max length 500 | — | Why the link is withdrawn. Kept in the audit trail; never shown to the guest. | `cancelPaymentLink` body |
+
+Errors to draw in the form: 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The link is not live (paid, expired, superseded or already cancelled; `payment-link-not-live`; CHG-RUL-021).
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Permissions this screen separates** (banner): **The pack separates these permissions and no action on the screen claims them yet:** Resend, Change approved delivery channel, Extend expiry, Cancel. Each needs attaching to the control it gates, or the screen needs the control.
+**Permissions this screen separates** (banner): **The pack separates these permissions:** Resend, Change approved delivery channel, Extend expiry, Cancel. Resend is `resendPaymentLink` (ORDER_MODIFY) and Cancel is `cancelPaymentLink` (ORDER_CREATE, 3 October 2026); changing the channel and extending expiry still have no control.
 
 **Detail panel** (detail panel): One record, read-only.
 
@@ -753,6 +761,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
+| Cancel link (destructive button) | `cancelPaymentLink` POST `/payment-links/{linkId}/cancel` | inline | PaymentLink | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The link is not live (paid, expired, superseded or already cancelled; `payment-link-not-live`; CHG-RUL-021). | opens modal first |
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
@@ -776,6 +785,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the payment link distribution are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The link is not live (paid, expired, superseded or already cancelled; `payment-link-not-live`; CHG-RUL-021). |
 
 #### Sample data for the mock-up
 
@@ -791,6 +801,7 @@ link:
 
 - `resendPaymentLink` → `ORDER_MODIFY` (operate) · staff
 - `getPaymentLink` → `ORDER_VIEW` (read) · guest, anonymous
+- `cancelPaymentLink` → `ORDER_CREATE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -822,12 +833,12 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (410).
+- [ ] Every input above is drawn (1), with its required mark, default, format and its error state (404, 409, 410).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-593?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: , Cancel.
+- [ ] Every action is wired with its success and its failure: Cancel link, , Cancel.
 - [ ] Every transition is wired: `ADM-589`.
-- [ ] Every gated control is gated: `ORDER_MODIFY`, `ORDER_VIEW`.
+- [ ] Every gated control is gated: `ORDER_CREATE`, `ORDER_MODIFY`, `ORDER_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -842,7 +853,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-ADM-594 |
 | Who uses it | venue staff holding `PAYMENT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -974,7 +985,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-ADM-595 |
 | Who uses it | venue staff holding `ORDER_CREATE` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
@@ -1125,7 +1136,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-ADM-596 |
 | Who uses it | venue staff holding `PAYMENT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -1270,7 +1281,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-ADM-597 |
 | Who uses it | venue staff holding `ORDER_CREATE`, `PAYMENT_CONFIGURE` (1 operate, 1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
@@ -1400,7 +1411,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-ADM-598 |
 | Who uses it | venue staff holding `PAYMENT_CONFIGURE`, `PAYMENT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Select; Merchant Configuration; Captured) and no display directory — it is settings, not a population |
@@ -1656,6 +1667,7 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+"cancelPaymentLink": {"method":"POST","path":"/payment-links/{linkId}/cancel","contract":"orders","summary":"Cancel a live payment link","permission":"ORDER_CREATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"PaymentLink"},
 "createPaymentLink": {"method":"POST","path":"/payment-links","contract":"orders","summary":"Send a guest a link to pay later","permission":"ORDER_CREATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"PaymentLink"},
 "getPaymentLink": {"method":"GET","path":"/payment-links/{token}","contract":"orders","summary":"What a guest holding a link is being asked to pay for","permission":"ORDER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":null},
 "getPaymentPerformance": {"method":"GET","path":"/payment-performance","contract":"payments","summary":"Authorisation rate, conversion and where payments are lost","permission":"PAYMENT_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":"from","in":"query","required":null},{"name":"groupBy","in":"query","required":null}],"requestBody":null,"responds":"PaymentPerformanceRow"},

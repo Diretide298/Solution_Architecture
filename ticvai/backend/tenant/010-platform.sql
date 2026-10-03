@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS platform.audit_read (
 -- Written by the platform on every write, not by any one operation (ADR-0022 sits above this).
 -- Naming it on 431 lineage rows would say nothing Hangs off: reaches platform.scope through its
 -- keys; references identity.platform_staff_grant, identity.principal, platform.scope. Reached by:
--- 1 operations read it and 10 write it; written by 5 contracts — finance, inventory, orders,
+-- 1 operations read it and 12 write it; written by 6 contracts — finance, inventory, orders,
 -- payments.
 CREATE TABLE IF NOT EXISTS platform.audit_record (
     id                                uuid NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS platform.audit_record (
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS platform.cell_endpoint (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     cell_id                           uuid NOT NULL,
     service_name                      text NOT NULL CONSTRAINT cell_endpoint_service_name_chk CHECK (char_length(service_name) <= 100),
     url                               text NOT NULL CONSTRAINT cell_endpoint_url_chk CHECK (char_length(url) <= 1000),
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS platform.configuration_profile (
 -- When a workstation decides it is offline, and when it is back (Board 5). Asymmetric thresholds,
 -- because symmetric ones make it flap across a marginal connection
 CREATE TABLE IF NOT EXISTS platform.connectivity_policy (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     scope_path                        ltree NOT NULL,
     failures_before_offline           integer DEFAULT 3,
     probe_interval_seconds            integer DEFAULT 15,
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS platform.connectivity_policy (
 -- where? Hangs off: reaches platform.scope through its keys; references access.admission_rules,
 -- access.entitlement, platform.guest_link. Reached by: 5 operations read it and 4 write it.
 CREATE TABLE IF NOT EXISTS platform.cross_region_entitlement (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     right_id                          uuid NOT NULL,
     ticket_id                         uuid NOT NULL,
     guest_link_id                     uuid,
@@ -116,7 +116,7 @@ CREATE TABLE IF NOT EXISTS platform.dead_letter (
 -- a table — a note withdrawn from circulation is deactivated and stays in the count history, and a
 -- JSON blob cannot deactivate anything
 CREATE TABLE IF NOT EXISTS platform.denomination (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     currency_code                     text NOT NULL,
     display_name                      text,
     kind                              text NOT NULL CONSTRAINT denomination_kind_chk CHECK (kind IN ('note', 'coin')),
@@ -130,6 +130,7 @@ CREATE TABLE IF NOT EXISTS platform.denomination (
 CREATE TABLE IF NOT EXISTS platform.device (
     state                             text NOT NULL CONSTRAINT device_state_chk CHECK (state IN ('enrolled', 'provisioned', 'active', 'deactivated', 'retired')),
     reason                            text,
+    test_result                       jsonb,
     id                                uuid PRIMARY KEY NOT NULL,
     kind                              text NOT NULL CONSTRAINT device_kind_chk CHECK (kind IN ('receiptPrinter', 'ticketPrinter', 'labelPrinter', 'cashDrawer', 'barcodeScanner', 'rfidReader', 'nfcReader', 'cardReader', 'idReader', 'biometricReader', 'accessReader', 'paymentTerminal', 'customerDisplay', 'signageDisplay', 'kitchenDisplay', 'turnstileController', 'wristbandEncoder', 'signaturePad', 'scale', 'camera', 'mobileHandset', 'handheldScanner', 'accessPodium', 'bleBeacon')),
     driver                            text NOT NULL,
@@ -161,7 +162,13 @@ CREATE TABLE IF NOT EXISTS platform.device (
     capabilities                      text[],
     enrolment_state                   text DEFAULT 'registered' CONSTRAINT device_enrolment_state_chk CHECK (enrolment_state IN ('registered', 'enrolled', 'provisioned', 'active', 'deactivated', 'retired')),
     retired_at                        timestamptz,
-    configuration_profile_id          uuid
+    configuration_profile_id          uuid,
+    approval_status                   text DEFAULT 'pendingApproval',
+    enrolment_code                    text CONSTRAINT device_enrolment_code_chk CHECK (char_length(enrolment_code) <= 12),
+    enrolment_code_expires_at         timestamptz,
+    tested_by_principal_id            uuid,
+    approved_by_principal_id          uuid,
+    approved_at                       timestamptz
 );
 
 -- high-volume, short-lived. Trimmed by retention Hangs off: a child of platform.device; reaches
@@ -174,7 +181,7 @@ CREATE TABLE IF NOT EXISTS platform.device_heartbeat (
 
 -- A data-subject request and its progress. The reason pii is a schema of its own
 CREATE TABLE IF NOT EXISTS platform.dsar_request (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     request_id                        uuid NOT NULL,
     guest_link_id                     uuid NOT NULL,
     kind                              text NOT NULL CONSTRAINT dsar_request_kind_chk CHECK (kind IN ('access', 'rectification', 'erasure', 'portability', 'restriction')),
@@ -212,7 +219,7 @@ CREATE TABLE IF NOT EXISTS platform.idempotency_record (
 -- holding 900 unsynced sales is a reconciliation nobody can do. Hangs off: reaches platform.scope
 -- through its keys. Reached by: 2 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS platform.offline_policy (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     scope_path                        ltree NOT NULL,
     max_offline_hours                 integer DEFAULT 24,
     allowed_offline                   text[],
@@ -224,7 +231,7 @@ CREATE TABLE IF NOT EXISTS platform.offline_policy (
 
 -- Written in the same transaction as the state change, by the platform, not by an operation. That
 -- is what makes it exactly-once Hangs off: reaches platform.scope through its keys; references
--- catalogue.event, platform.tenant. Reached by: 3 operations read it and 97 write it; 1 tables
+-- catalogue.event, platform.tenant. Reached by: 4 operations read it and 97 write it; 1 tables
 -- reference it; written by 20 contracts — access, accreditation, approvals, catalogue.
 CREATE TABLE IF NOT EXISTS platform.outbox (
     id                                uuid NOT NULL,
@@ -252,11 +259,18 @@ CREATE TABLE IF NOT EXISTS platform.outlet (
     id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL CONSTRAINT outlet_code_chk CHECK (char_length(code) <= 64),
     name                              text NOT NULL CONSTRAINT outlet_name_chk CHECK (char_length(name) <= 200),
+    name_translations                 jsonb,
     venue_id                          uuid NOT NULL,
     kind                              text NOT NULL CONSTRAINT outlet_kind_chk CHECK (kind IN ('shop', 'restaurant', 'bar', 'cafe', 'kiosk', 'gameFloor', 'ticketOffice', 'mobile')),
+    outlet_type                       text,
+    department_id                     uuid,
     zone                              text,
     stock_location_id                 uuid,
     cost_center_id                    uuid,
+    payment_timing                    text DEFAULT 'sendFirst',
+    admission_context                 text DEFAULT 'insideVenue',
+    produces_for_outlet_ids           text[],
+    sale_board_id                     uuid,
     is_active                         boolean
 );
 
@@ -287,6 +301,13 @@ CREATE TABLE IF NOT EXISTS platform.region_settings (
     number_format                     text DEFAULT '#,##0.00',
     fiscal_year_start_month           integer NOT NULL,
     allowed_ai_residencies            text[],
+    ai_residency_class                text DEFAULT 'uaeOnly' CONSTRAINT region_settings_ai_residency_class_chk CHECK (ai_residency_class IN ('uaeOnly', 'globalAllowed', 'onPrem')),
+    is_ai_residency_class_locked      boolean DEFAULT false,
+    tenant_category                   text DEFAULT 'private' CONSTRAINT region_settings_tenant_category_chk CHECK (tenant_category IN ('private', 'semiGovernment', 'government', 'banking', 'payments', 'health', 'difc', 'adgm')),
+    ai_residency_opt_in               jsonb,
+    local_language_name_locales       text[],
+    required_billing_documents        jsonb,
+    minor_age_threshold               integer DEFAULT 18,
     placement                         jsonb,
     cell_name                         text,
     id                                uuid PRIMARY KEY NOT NULL,
@@ -344,9 +365,9 @@ CREATE TABLE IF NOT EXISTS platform.tenant (
 );
 
 -- read through composed tenancy operations Hangs off: reaches platform.scope through its keys;
--- references platform.scope. Reached by: 6 operations read it and 2 write it.
+-- references platform.scope. Reached by: 7 operations read it and 2 write it.
 CREATE TABLE IF NOT EXISTS platform.venue_settings (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     venue_id                          uuid,
     calendar_day_start_hour           integer DEFAULT 6,
     currency_code                     text,
@@ -357,6 +378,7 @@ CREATE TABLE IF NOT EXISTS platform.venue_settings (
     segregated_access                 jsonb,
     alerting                          jsonb,
     display_currencies                text[],
+    charge_currencies                 text[],
     cart_lease_seconds                integer DEFAULT 900,
     cart_hold_extension_minutes       integer DEFAULT 5,
     cart_max_extensions               integer DEFAULT 1,
@@ -365,6 +387,7 @@ CREATE TABLE IF NOT EXISTS platform.venue_settings (
     reschedule_cutoff_hours           integer DEFAULT 24,
     reservation_max_extensions        integer DEFAULT 1,
     shift_variance_threshold          numeric(18,4),
+    cash_drawer_limit                 text,
     catalogue                         jsonb,
     inventory                         jsonb,
     seating                           jsonb,
@@ -386,7 +409,7 @@ CREATE TABLE IF NOT EXISTS platform.wallet_authorisation (
     available_amount                  numeric(18,4) NOT NULL,
     last_topped_up_at                 timestamptz,
     allocation_currency               text,
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     authorisation_id                  text NOT NULL,
     guest_link_id                     uuid NOT NULL,
     amount                            numeric(18,4) NOT NULL,
@@ -416,8 +439,11 @@ CREATE TABLE IF NOT EXISTS platform.workstation (
     venue_id                          uuid NOT NULL,
     region_id                         uuid NOT NULL,
     department_id                     uuid,
+    outlet_id                         uuid,
     scope_path                        ltree NOT NULL,
     sale_board                        jsonb NOT NULL,
+    sale_board_source                 text CONSTRAINT workstation_sale_board_source_chk CHECK (sale_board_source IN ('outlet', 'workstation')),
+    cash_drawer_limit                 text,
     access_point_id                   uuid,
     time_zone                         text NOT NULL,
     deployment_profile                text CONSTRAINT workstation_deployment_profile_chk CHECK (deployment_profile IN ('terminalLocal', 'venueEdge', 'thin')),

@@ -61,7 +61,9 @@ operations:
   offline: true
   reads:
   - cache:idempotency
+  - catalogue.tax_profile
   - ledger.tax_code
+  - ledger.tax_exemption
   - platform.region_settings
   writes:
   - cache:idempotency
@@ -1032,4 +1034,5 @@ operations:
   offline: false
   reads:
   - ledger.tax_exemption
-  writes: []
+  writes:
+  - ledger.tax_exemption

@@ -118,8 +118,8 @@
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-015",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (pointer moved to the 30 September build, CHG-R1S-015)",
     "verified": "2026-09-28",
     "match": "partial",
     "view": "Only when the host tweak 'waitingRoom' is on; it is not in the Config drawer lists, so a reviewer cannot switch it on from the page",

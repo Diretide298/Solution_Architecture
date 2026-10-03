@@ -15,7 +15,10 @@ CREATE TABLE IF NOT EXISTS venuemap.import_job (
     manifest_rows_read                integer,
     resources_found                   integer,
     resource_rows_joined              integer,
-    manifest_rows_joined              integer
+    manifest_rows_joined              integer,
+    ocr                               jsonb,
+    hand_marked_paths                 jsonb,
+    model                             jsonb
 );
 
 -- A park map or floor plan (19.2.55, CF-123). Not a seat map — nothing on it is sold. Published
@@ -35,7 +38,11 @@ CREATE TABLE IF NOT EXISTS venuemap.map (
     base_image_alignment              jsonb,
     tile_set_ref                      text,
     bounds_geo_json                   text,
-    graph_status                      text CONSTRAINT map_graph_status_chk CHECK (graph_status IN ('notBuilt', 'connected', 'disconnected', 'partial'))
+    graph_status                      text CONSTRAINT map_graph_status_chk CHECK (graph_status IN ('notBuilt', 'connected', 'disconnected', 'partial')),
+    model_asset_id                    uuid,
+    navigation_file_asset_id          uuid,
+    model_transform                   jsonb,
+    model3d_status                    text CONSTRAINT map_model3d_status_chk CHECK (model3d_status IN ('none', 'publishable', 'blocked'))
 );
 
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
@@ -47,6 +54,9 @@ CREATE TABLE IF NOT EXISTS venuemap.map_version (
     published_at                      timestamptz NOT NULL,
     published_by_principal_id         uuid NOT NULL,
     note                              text CONSTRAINT map_version_note_chk CHECK (char_length(note) <= 300),
+    base_asset_id                     uuid,
+    base_image_alignment              jsonb,
+    model3d                           jsonb,
     snapshot                          jsonb NOT NULL
 );
 
@@ -117,6 +127,7 @@ CREATE TABLE IF NOT EXISTS venuemap.visit_plan (
     scope_path                        ltree NOT NULL,
     subject_id                        uuid,
     session_ref                       text,
+    ownership                         text CONSTRAINT visit_plan_ownership_chk CHECK (ownership IN ('anonymous', 'account')),
     status                            text NOT NULL CONSTRAINT visit_plan_status_chk CHECK (status IN ('draft', 'booked', 'archived')),
     version                           integer NOT NULL,
     source                            text CONSTRAINT visit_plan_source_chk CHECK (source IN ('rules', 'preset', 'aiAgent')),
@@ -146,6 +157,7 @@ CREATE TABLE IF NOT EXISTS venuemap.visit_plan_item (
     expected_wait_minutes             integer,
     add_on_suggestion                 jsonb,
     is_add_on_accepted                boolean DEFAULT false,
+    add_on_product_ids                text[],
     is_pinned                         boolean DEFAULT false,
     note                              text CONSTRAINT visit_plan_item_note_chk CHECK (char_length(note) <= 200)
 );

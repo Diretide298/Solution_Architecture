@@ -106,10 +106,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-706` | Registration & Attendance Command Center | B–D | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-707` | Attendee Data & Registration Form Configuration | B–D | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-708` | Accreditation & Participant Category Configuration | B–D | 0 | 4 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-709` | Event Admission & Entry Policy Configuration | B–D | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-706` | Registration & Attendance Command Center | B | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-707` | Attendee Data & Registration Form Configuration | B | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-708` | Accreditation & Participant Category Configuration | B | 0 | 4 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-709` | Event Admission & Entry Policy Configuration | B | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -129,7 +129,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-706 |
 | Who uses it | venue staff holding `EVENT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -262,7 +262,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-707 |
 | Who uses it | venue staff holding `EVENT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -387,7 +387,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-708 |
 | Who uses it | venue staff holding `ACCREDITATION_VIEW`, `EVENT_CONFIGURE` (1 read, 1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -518,7 +518,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-709 |
 | Who uses it | venue staff holding `EVENT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |

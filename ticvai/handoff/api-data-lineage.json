@@ -75148,5 +75148,51 @@
    "postgres-analytical",
    "redis"
   ]
+ },
+ "getVenueNavigationFile": {
+  "contract": "venue-map",
+  "verb": "GET",
+  "path": "/venue-maps/{mapId}/navigation-file",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "VENUE_MAP_VIEW",
+  "offline": false,
+  "summary": "The map's graph and points as a navigation file",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setVenueMapArtwork": {
+  "contract": "venue-map",
+  "verb": "POST",
+  "path": "/venue-maps/{mapId}/artwork",
+  "reads": [
+   "venuemap.map"
+  ],
+  "writes": [
+   "venuemap.map"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "VENUE_MAP_MANAGE",
+  "offline": false,
+  "summary": "Set the illustrated map guests see, and how it lines up with the plan",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
  }
 }

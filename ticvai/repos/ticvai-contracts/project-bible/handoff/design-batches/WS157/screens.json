@@ -750,7 +750,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "BO-873"
+    "BO-873",
+    "BO-108"
    ],
    "exitTo": [
     "BO-873"
@@ -806,6 +807,34 @@
      "name": "contentBody",
      "components": [
       {
+       "kind": "cardList",
+       "label": "List the resources the assignment rules choose from",
+       "operation": "listResources",
+       "bindsTo": "Resource",
+       "columns": [
+        "Resource.code",
+        "Resource.name",
+        "Resource.setupMinutes",
+        "Resource.teardownMinutes",
+        "Resource.depositAmount",
+        "Resource.status"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
+      {
+       "kind": "cardList",
+       "label": "Load the experience's resource requirements",
+       "operation": "getExperienceResourceRequirements",
+       "bindsTo": "ResourceRequirement",
+       "columns": [
+        "ResourceRequirement.quantity",
+        "ResourceRequirement.mandatory",
+        "ResourceRequirement.requiredQualifications",
+        "ResourceRequirement.requiredAttributes"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
+      {
        "kind": "dataTable",
        "label": "Requirement rules",
        "operation": "setExperienceResourceRequirements",
@@ -846,6 +875,20 @@
     "invalidates": [
      "suggestResources"
     ]
+   },
+   {
+    "operationId": "getExperienceResourceRequirements",
+    "contract": "resources",
+    "purpose": "Load the experience's resource requirements",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+   },
+   {
+    "operationId": "listResources",
+    "contract": "resources",
+    "purpose": "List the resources the assignment rules choose from",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "wireframe": {

@@ -121,16 +121,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-204` | Offline & Edge Operations Command Center | B–D | 0 | 182 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-205` | Edge Node & Local Processing Configuration | B–D | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-206` | Offline Validation Policy Builder | B–D | 13 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-207` | Edge Package & Data Distribution | B–D | 16 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-208` | Offline Credential & Revocation Cache | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-209` | Offline Entitlement & Usage Ledger | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-210` | Connectivity Failure & Degraded Mode Policy | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-211` | Reconnection, Synchronization & Conflict Resolution | B–D | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-212` | Offline Simulation & Resilience Testing | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-213` | Edge Security, Audit & Deployment | B–D | 3 | 110 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-204` | Offline & Edge Operations Command Center | C | 0 | 182 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-205` | Edge Node & Local Processing Configuration | C | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-206` | Offline Validation Policy Builder | C | 13 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-207` | Edge Package & Data Distribution | C | 16 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-208` | Offline Credential & Revocation Cache | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-209` | Offline Entitlement & Usage Ledger | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-210` | Connectivity Failure & Degraded Mode Policy | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-211` | Reconnection, Synchronization & Conflict Resolution | C | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-212` | Offline Simulation & Resilience Testing | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-213` | Edge Security, Audit & Deployment | C | 3 | 110 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

@@ -1,6 +1,6 @@
 {
  "generatedBy": "tools/derive-design-manifest.py",
- "generated": "2026-10-03",
+ "generated": "2026-10-04",
  "note": "The Claude Design work list. Status is read off wireframes/frames/ every run and never stored, so a batch cannot claim to be finished and not be. Batches with thin screens sort last: a screen with fewer than 4 components cannot be drawn from what it declares, and drawing it invents requirements.",
  "batchSize": 10,
  "drawableAt": 4,
@@ -969,6 +969,28 @@
    "status": "pending"
   },
   {
+   "id": "P08-sell-03",
+   "kind": "module",
+   "label": "P08 · Sell (3 of 4)",
+   "platform": "P08",
+   "screens": [
+    "BO-113",
+    "BO-114",
+    "BO-115",
+    "BO-116",
+    "BO-117",
+    "BO-118",
+    "BO-119",
+    "BO-1190",
+    "BO-120",
+    "BO-121"
+   ],
+   "drawable": 9,
+   "thin": 1,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "P08-setup-go-live-01",
    "kind": "module",
    "label": "P08 · Setup & Go-Live",
@@ -1305,6 +1327,28 @@
    "status": "pending"
   },
   {
+   "id": "WS157",
+   "kind": "workshop",
+   "label": "Resource Management Configuration board 3",
+   "platform": "P08",
+   "screens": [
+    "BO-873",
+    "BO-874",
+    "BO-875",
+    "BO-876",
+    "BO-877",
+    "BO-878",
+    "BO-879",
+    "BO-880",
+    "BO-881",
+    "BO-882"
+   ],
+   "drawable": 9,
+   "thin": 1,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS179",
    "kind": "workshop",
    "label": "TICVAI Finance Backend Structure Reference v1.0 board 2",
@@ -1591,28 +1635,6 @@
     "BO-110",
     "BO-111",
     "BO-112"
-   ],
-   "drawable": 8,
-   "thin": 2,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "P08-sell-03",
-   "kind": "module",
-   "label": "P08 · Sell (3 of 4)",
-   "platform": "P08",
-   "screens": [
-    "BO-113",
-    "BO-114",
-    "BO-115",
-    "BO-116",
-    "BO-117",
-    "BO-118",
-    "BO-119",
-    "BO-1190",
-    "BO-120",
-    "BO-121"
    ],
    "drawable": 8,
    "thin": 2,
@@ -2144,28 +2166,6 @@
     "ADM-606",
     "ADM-607",
     "ADM-608"
-   ],
-   "drawable": 8,
-   "thin": 2,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS157",
-   "kind": "workshop",
-   "label": "Resource Management Configuration board 3",
-   "platform": "P08",
-   "screens": [
-    "BO-873",
-    "BO-874",
-    "BO-875",
-    "BO-876",
-    "BO-877",
-    "BO-878",
-    "BO-879",
-    "BO-880",
-    "BO-881",
-    "BO-882"
    ],
    "drawable": 8,
    "thin": 2,
@@ -3690,6 +3690,28 @@
    "status": "pending"
   },
   {
+   "id": "WS144",
+   "kind": "workshop",
+   "label": "Marketing CRM Configuration Reference v1.0 board 10",
+   "platform": "P08",
+   "screens": [
+    "BO-824",
+    "BO-825",
+    "BO-826",
+    "BO-827",
+    "BO-828",
+    "BO-829",
+    "BO-830",
+    "BO-831",
+    "BO-832",
+    "BO-833"
+   ],
+   "drawable": 5,
+   "thin": 5,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS152",
    "kind": "workshop",
    "label": "Payment Payment Orchestration board 6",
@@ -4627,28 +4649,6 @@
    "status": "pending"
   },
   {
-   "id": "WS144",
-   "kind": "workshop",
-   "label": "Marketing CRM Configuration Reference v1.0 board 10",
-   "platform": "P08",
-   "screens": [
-    "BO-824",
-    "BO-825",
-    "BO-826",
-    "BO-827",
-    "BO-828",
-    "BO-829",
-    "BO-830",
-    "BO-831",
-    "BO-832",
-    "BO-833"
-   ],
-   "drawable": 3,
-   "thin": 7,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "WS176",
    "kind": "workshop",
    "label": "Seat Management Venue Mapping Reference v1.0 board 12",
@@ -4891,6 +4891,28 @@
    "status": "pending"
   },
   {
+   "id": "WS108",
+   "kind": "workshop",
+   "label": "ACCREDITATION board 1",
+   "platform": "P08",
+   "screens": [
+    "BO-615",
+    "BO-616",
+    "BO-617",
+    "BO-618",
+    "BO-619",
+    "BO-620",
+    "BO-621",
+    "BO-622",
+    "BO-623",
+    "BO-624"
+   ],
+   "drawable": 2,
+   "thin": 8,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS111",
    "kind": "workshop",
    "label": "ACCREDITATION board 4",
@@ -5108,28 +5130,6 @@
    "status": "pending"
   },
   {
-   "id": "P05-sell-01",
-   "kind": "module",
-   "label": "P05 · Sell (1 of 2)",
-   "platform": "P05",
-   "screens": [
-    "KSK-001",
-    "KSK-002",
-    "KSK-003",
-    "KSK-004",
-    "KSK-005",
-    "KSK-006",
-    "KSK-007",
-    "KSK-008",
-    "KSK-009",
-    "KSK-010"
-   ],
-   "drawable": 1,
-   "thin": 9,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "P06-rentals-01",
    "kind": "module",
    "label": "P06 · Rentals (1 of 3)",
@@ -5255,28 +5255,6 @@
     "BO-571",
     "BO-572",
     "BO-573"
-   ],
-   "drawable": 1,
-   "thin": 9,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS108",
-   "kind": "workshop",
-   "label": "ACCREDITATION board 1",
-   "platform": "P08",
-   "screens": [
-    "BO-615",
-    "BO-616",
-    "BO-617",
-    "BO-618",
-    "BO-619",
-    "BO-620",
-    "BO-621",
-    "BO-622",
-    "BO-623",
-    "BO-624"
    ],
    "drawable": 1,
    "thin": 9,
@@ -5412,6 +5390,28 @@
    ],
    "drawable": 1,
    "thin": 9,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "P05-sell-01",
+   "kind": "module",
+   "label": "P05 · Sell (1 of 2)",
+   "platform": "P05",
+   "screens": [
+    "KSK-001",
+    "KSK-002",
+    "KSK-003",
+    "KSK-004",
+    "KSK-005",
+    "KSK-006",
+    "KSK-007",
+    "KSK-008",
+    "KSK-009",
+    "KSK-010"
+   ],
+   "drawable": 0,
+   "thin": 10,
    "frames": 0,
    "status": "pending"
   },

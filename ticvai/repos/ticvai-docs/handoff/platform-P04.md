@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 32 |
-| Operations | 151 |
+| Operations | 152 |
 | Contracts | 19 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 161 |
+| Operations with no screen | 153 |
 | Waves | wave1 32 |
 
 ## Gaps
 
-### 161 operations with no screen here
+### 153 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -24,7 +24,6 @@
 | `getHardwareModelCertification` | access | GET | A reader model's certification and its test results |
 | `listAccessChanges` | access | GET | Changes made to an entitlement's access |
 | `listEntryExitRule` | access | GET | Entry, Exit & Re-entry Rules |
-| `listEntryRulePoints` | access | GET | Which access points an admission rule covers |
 | `listEntryTemporaryExit` | access | GET | Re-entry & Temporary Exit Journey |
 | `setHardwareModelCertification` | access | PUT | Certify a reader model, or record that it failed |
 | `setVirtualTicketCredential` | access | PUT | Virtual Ticket & Credential 360° Workspace |
@@ -39,7 +38,6 @@
 | `listAutomationExecutions` | approvals | GET | What automations ran, when, on whose rule, and the outcome |
 | `reopenApprovalRequest` | approvals | POST | Reopen an expired or cancelled request as a new one |
 | `submitApprovalRequest` | approvals | POST | Send a saved draft for approval |
-| `getCatalogueImportJob` | catalogue | GET | Progress and findings of a catalogue import |
 | `getEventChangeTreatmentPolicy` | catalogue | GET | What happens to tickets, reservations and guests when an event changes, by default |
 | `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
 | `getWaitingRoomStatus` | catalogue | GET | A performance's waiting room, its setting and how it is moving |
@@ -60,7 +58,9 @@
 | `listInterEntityObligations` | finance | GET | What one entity owes another |
 | `recordWriteOff` | finance | POST | Write off an uncollectable balance |
 | `resolveObligationDispute` | finance | POST | Agree what is actually owed |
-| … | | | 121 more |
+| `runFxRevaluation` | finance | POST | Revalue monetary balances at close |
+| `setFxProvider` | finance | PUT | Which provider serves which purpose |
+| … | | | 113 more |
 
 ## Modules
 
@@ -89,17 +89,17 @@
 | `POS-011` | Returns, Refunds & Exchanges | Sell | 1 | 7 | yes |
 | `POS-012` | Omnichannel Order & Fulfilment Center | Sell | 1 | 6 | yes |
 | `POS-013` | Mobile POS, Event Sales & Offline Operations | Sell | 1 | 3 | yes |
-| `POS-014` | Sales Exceptions, Controls & Operational Actions | Sell | 1 | 3 | yes |
+| `POS-014` | Sales Exceptions, Controls & Operational Actions | Sell | 1 | 4 | yes |
 | `POS-015` | Cash Operations Dashboard | Sell | 1 | 2 | yes |
-| `POS-016` | Till Configuration | Sell | 1 | 4 | yes |
-| `POS-017` | Cash In / Cash Out Operations | Sell | 1 | 1 | yes |
+| `POS-016` | Till Configuration | Sell | 1 | 5 | yes |
+| `POS-017` | Cash In / Cash Out Operations | Sell | 1 | 2 | yes |
 | `POS-018` | Safe Drop & Cash Transfer Management | Sell | 1 | 3 | yes |
 | `POS-019` | Shift Templates & Policies | Sell | 1 | 3 | yes |
 | `POS-020` | Shift Exceptions & Alerts | Sell | 1 | 5 | yes |
 | `POS-021` | Sell — Food & Drink | Sell | 1 | 4 | yes |
 | `POS-022` | Send to Kitchen | Sell | 1 | 5 | yes |
 | `POS-023` | Sell — Merchandise | Sell | 1 | 4 | yes |
-| `POS-024` | Outlet Setup | Sell | 1 | 4 | yes |
+| `POS-024` | Outlet Setup | Sell | 1 | 5 | yes |
 | `POS-025` | Till Home | Sell | 1 | 7 | yes |
 | `POS-026` | Receipt & Reprint | Sell | 1 | 6 | yes |
 | `POS-027` | Guest Lookup | Sell | 1 | 5 | yes |

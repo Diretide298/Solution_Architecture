@@ -289,6 +289,40 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listLoyaltyCampaigns": {
+  "method": "GET",
+  "path": "/loyalty/campaigns",
+  "contract": "marketing-crm",
+  "summary": "Time-boxed campaigns inside a programme",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "programmeId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "activeOn",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listLoyaltyProgrammes": {
   "method": "GET",
   "path": "/loyalty/programmes",
@@ -299,6 +333,35 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listRewards": {
+  "method": "GET",
+  "path": "/loyalty/rewards",
+  "contract": "marketing-crm",
+  "summary": "What points can be turned into",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "programmeId",
+    "in": "query",
+    "required": null
+   },
    {
     "name": null,
     "in": null,

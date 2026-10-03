@@ -7,25 +7,26 @@
  "audience": "guest",
  "formFactor": "kiosk",
  "offlineCapable": false,
- "generated": "2026-10-03",
+ "generated": "2026-10-04",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 17,
-  "operations": 24,
-  "contracts": 8,
+  "operations": 22,
+  "contracts": 7,
   "modules": 2,
   "undrawn": 0,
-  "operationsWithNoScreen": 15
+  "operationsWithNoScreen": 11
  },
  "waves": {
-  "wave1": 1,
-  "wave2": 16
+  "wave1": 2,
+  "wave2": 15
  },
  "modules": [
   {
    "module": "Sell",
    "screens": 16,
    "waves": [
+    1,
     2
    ]
   },
@@ -44,10 +45,6 @@
   },
   {
    "contract": "retail",
-   "operations": 4
-  },
-  {
-   "contract": "ai",
    "operations": 3
   },
   {
@@ -55,8 +52,8 @@
    "operations": 3
   },
   {
-   "contract": "marketing-crm",
-   "operations": 2
+   "contract": "ai",
+   "operations": 3
   },
   {
    "contract": "white-label",
@@ -67,8 +64,8 @@
    "operations": 2
   },
   {
-   "contract": "promotions",
-   "operations": 1
+   "contract": "marketing-crm",
+   "operations": 2
   }
  ],
  "screens": [
@@ -76,9 +73,9 @@
    "id": "KSK-001",
    "name": "Attract Loop",
    "module": "Sell",
-   "wave": 2,
+   "wave": 1,
    "route": "/sell/attract-loop",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -123,7 +120,7 @@
    "module": "Sell",
    "wave": 2,
    "route": "/sell/review",
-   "operations": 4,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -168,7 +165,7 @@
    "module": "Sell",
    "wave": 2,
    "route": "/sell/collect-a-booking",
-   "operations": 2,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -186,7 +183,7 @@
    "module": "Sell",
    "wave": 2,
    "route": "/sell/call-staff",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -195,7 +192,7 @@
    "module": "Sell",
    "wave": 2,
    "route": "/sell/out-of-service",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -204,7 +201,7 @@
    "module": "AI",
    "wave": 1,
    "route": "/kiosk/assistant",
-   "operations": 6,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -283,43 +280,27 @@
     "summary": "Use the existing profile or keep this booking separate"
    },
    {
-    "operation": "getGuestConversation",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "The guest's own handed-over conversation, with the agent's replies and the queue position"
-   },
-   {
     "operation": "uploadGuestDocument",
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Store a guest photo, ID or signed document"
    },
    {
-    "operation": "listTicketTransfers",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "The ticket transfers this guest sent or received"
-   },
-   {
     "operation": "revokeEntitlementShare",
     "contract": "orders",
     "verb": "POST",
     "summary": "Take back a share"
-   },
-   {
-    "operation": "getUpsellSuggestions",
-    "contract": "promotions",
-    "verb": "POST",
-    "summary": "Suggestions for a cart"
-   },
-   {
-    "operation": "recordRecommendationOutcome",
-    "contract": "promotions",
-    "verb": "POST",
-    "summary": "Shown, clicked, accepted or dismissed"
    }
   ],
-  "modulesSplitAcrossWaves": [],
+  "modulesSplitAcrossWaves": [
+   {
+    "module": "Sell",
+    "waves": [
+     1,
+     2
+    ]
+   }
+  ],
   "screensNotDrawn": [],
   "flowsNamingAMissingScreen": []
  }

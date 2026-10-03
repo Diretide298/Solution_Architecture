@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-304` | Order & Reservation Command Center | B–D | 0 | 14 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-305` | Order Detail & Transaction Workspace | B–D | 0 | 50 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
-| `BO-306` | Reservation & Hold Policy Configuration | B–D | 12 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-307` | Order & Reservation Status Lifecycle Configuration | B–D | 8 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-308` | Order Creation & Source/Channel Configuration | B–D | 24 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-309` | Customer, Guest & Account Assignment | B–D | 10 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-310` | Order Line, Product & Entitlement Composition | B–D | 15 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-311` | Capacity Reservation & Inventory Commitment | B–D | 0 | 0 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
-| `BO-312` | Reservation Confirmation, Expiry & Fulfillment Readiness | B–D | 9 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-313` | Order Lifecycle Timeline, SLA, Exceptions & AI Operations | B–D | 0 | 4 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-304` | Order & Reservation Command Center | C | 0 | 14 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-305` | Order Detail & Transaction Workspace | C | 0 | 50 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
+| `BO-306` | Reservation & Hold Policy Configuration | C | 12 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-307` | Order & Reservation Status Lifecycle Configuration | C | 8 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-308` | Order Creation & Source/Channel Configuration | C | 24 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-309` | Customer, Guest & Account Assignment | C | 10 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-310` | Order Line, Product & Entitlement Composition | C | 15 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-311` | Capacity Reservation & Inventory Commitment | C | 0 | 0 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
+| `BO-312` | Reservation Confirmation, Expiry & Fulfillment Readiness | C | 9 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-313` | Order Lifecycle Timeline, SLA, Exceptions & AI Operations | C | 0 | 4 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

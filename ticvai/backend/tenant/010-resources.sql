@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS resources.allocation_policy (
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS resources.attribute_definition (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     label                             text NOT NULL,
     data_type                         text NOT NULL CONSTRAINT attribute_definition_data_type_chk CHECK (data_type IN ('text', 'number', 'decimal', 'currency', 'date', 'dateTime', 'boolean', 'singleSelect', 'multiSelect', 'lookup', 'attachment', 'url', 'measurement', 'formula')),
@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS resources.resource (
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS resources.resource_audit (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     resource_id                       uuid,
     at                                timestamptz,
     actor_id                          uuid,
@@ -125,7 +125,7 @@ CREATE TABLE IF NOT EXISTS resources.resource_audit (
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS resources.resource_block (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     resource_id                       uuid NOT NULL,
     valid_from                        timestamptz NOT NULL,
     valid_to                          timestamptz NOT NULL,
@@ -138,7 +138,7 @@ CREATE TABLE IF NOT EXISTS resources.resource_block (
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS resources.resource_category (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text NOT NULL,
     description                       text,
@@ -172,7 +172,7 @@ CREATE TABLE IF NOT EXISTS resources.resource_cost (
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS resources.resource_dependency (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     kind                              text NOT NULL CONSTRAINT resource_dependency_kind_chk CHECK (kind IN ('requires', 'requiresOneOf', 'requiresAll', 'conflictsWith', 'cannotOperateSimultaneously', 'preferredWith', 'substituteFor', 'backupFor', 'sharesCapacityWith')),
     target_resource_id                uuid,
     target_resource_type_id           uuid,
@@ -209,7 +209,7 @@ CREATE TABLE IF NOT EXISTS resources.resource_hold (
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS resources.resource_package (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text NOT NULL,
     description                       text,
@@ -254,7 +254,7 @@ CREATE TABLE IF NOT EXISTS resources.resource_request (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS resources.resource_requirement (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     resource_type_id                  uuid,
     category_id                       uuid,
     resource_id                       uuid,
@@ -282,7 +282,7 @@ CREATE TABLE IF NOT EXISTS resources.resource_schedule (
 -- Holds 19 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS resources.resource_type (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text NOT NULL,
     description                       text,
@@ -306,7 +306,7 @@ CREATE TABLE IF NOT EXISTS resources.resource_type (
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS resources.selection_policy (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     ticket_type_id                    uuid NOT NULL,
     mode                              text NOT NULL CONSTRAINT selection_policy_mode_chk CHECK (mode IN ('autoAssign', 'guestMayChoose')),
     resource_type_id                  uuid,

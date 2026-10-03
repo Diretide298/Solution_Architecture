@@ -231,6 +231,20 @@
        "bindsTo": "ConversationMessage.body"
       },
       {
+       "kind": "detailPanel",
+       "label": "The agent's replies",
+       "bindsTo": "GuestConversation",
+       "columns": [
+        "GuestConversation.state",
+        "GuestConversation.queuePosition",
+        "GuestConversation.estimatedWaitSeconds",
+        "GuestConversation.messages"
+       ],
+       "operation": "getGuestConversation",
+       "notes": "**After a handover the thread is read here** (Chinmay, 3 October 2026, r1 additions; CHG-RONEC-003): the agent's replies, where the guest is in the queue and the wait, until an agent claims it. Polled every 5 seconds while the chat is on screen and every 30 seconds while the app or tab is hidden, with `afterMessageId` so each poll fetches only what is new; it stops when the conversation ends (`resolved`, `abandoned`, `timedOut`).",
+       "provenance": "decided 3 October 2026, r1 additions (CHG-RONEC-003)"
+      },
+      {
        "kind": "cardList",
        "label": "Earlier conversations",
        "bindsTo": "AiConversation",
@@ -309,7 +323,7 @@
    {
     "operationId": "requestSuggestion",
     "contract": "ai",
-    "purpose": "From the conversation only, kinds waitTime and upsell (prepPlan is the kitchen's production plan; an itinerary is asked on the Plan tab); never a kind picker",
+    "purpose": "From the conversation only, kinds waitTime and upsell (prepPlan is the kitchen's production plan; an itinerary is asked on the Plan tab); never a kind picker. Later (CHG-RONEP-010): the wait-time and upsell suggestions of the day-one suggestions (AI-ENGINE-SUGGESTIONS) ships in Block A2 (Chinmay, 3 October); until then the control shows 'Later'.",
     "trigger": "background"
    },
    {
@@ -329,6 +343,15 @@
     "contract": "marketing-crm",
     "purpose": "After a handover, the guest writes to the agent, as the guest: sendConversationMessage needs CASE_MANAGE (decided by Chinmay, 3 October 2026 (CHG-SPF-013))",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getGuestConversation",
+    "contract": "marketing-crm",
+    "purpose": "The agent's replies, the queue position and the wait after a handover, polled every 5 s while the chat is on screen and every 30 s while hidden, with afterMessageId (decided by Chinmay, 3 October 2026, r1 additions; CHG-RONEC-003)",
+    "trigger": "onInterval",
+    "pollSeconds": 5,
+    "pollSecondsHidden": 30,
+    "provenance": "decided 3 October 2026, r1 additions (CHG-RONEC-003)"
    }
   ],
   "entryState": {
@@ -358,7 +381,7 @@
    "provenance": "designed",
    "board": "wireframes/P02 Guest App.dc.html#gst-031",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
     "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-031.html, and #GST-031 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → AI concierge – home (exact)."
@@ -485,6 +508,20 @@
        "operation": "createGuestFnbOrder",
        "notes": "An order the concierge proposes is a card in the conversation: items, total and Confirm, which places it (`createGuestFnbOrder`). No raw form.",
        "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The agent's replies",
+       "bindsTo": "GuestConversation",
+       "columns": [
+        "GuestConversation.state",
+        "GuestConversation.queuePosition",
+        "GuestConversation.estimatedWaitSeconds",
+        "GuestConversation.messages"
+       ],
+       "operation": "getGuestConversation",
+       "notes": "**After a handover the thread is read here** (Chinmay, 3 October 2026, r1 additions; CHG-RONEC-003): the agent's replies, where the guest is in the queue and the wait, until an agent claims it. Polled every 5 seconds while the chat is on screen and every 30 seconds while the app or tab is hidden, with `afterMessageId` so each poll fetches only what is new; it stops when the conversation ends (`resolved`, `abandoned`, `timedOut`).",
+       "provenance": "decided 3 October 2026, r1 additions (CHG-RONEC-003)"
       }
      ]
     },
@@ -579,6 +616,15 @@
     "trigger": "onAction"
    },
    {
+    "operationId": "getGuestConversation",
+    "contract": "marketing-crm",
+    "purpose": "The agent's replies, the queue position and the wait after a handover, polled every 5 s while the chat is on screen and every 30 s while hidden, with afterMessageId (decided by Chinmay, 3 October 2026, r1 additions; CHG-RONEC-003)",
+    "trigger": "onInterval",
+    "pollSeconds": 5,
+    "pollSecondsHidden": 30,
+    "provenance": "decided 3 October 2026, r1 additions (CHG-RONEC-003)"
+   },
+   {
     "operationId": "handoverToAgent",
     "contract": "marketing-crm",
     "purpose": "Pass an assistant conversation to a person",
@@ -618,7 +664,7 @@
    "provenance": "designed",
    "board": "wireframes/P02 Guest App.dc.html#gst-032",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
     "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-032.html, and #GST-032 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → AI concierge – chat (exact)."
@@ -800,6 +846,19 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "dataTable",
+       "label": "Show the guest's earlier conversations with the assistant",
+       "operation": "listAiConversations",
+       "bindsTo": "AiConversation",
+       "columns": [
+        "AiConversation.locale",
+        "AiConversation.messageCount",
+        "AiConversation.startedAt",
+        "AiConversation.lastMessageAt"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
+      {
        "kind": "assistantPanel",
        "label": "Ask about this",
        "operation": "sendAiMessage",
@@ -868,6 +927,13 @@
     "contract": "ai",
     "purpose": "Say whether an answer helped",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listAiConversations",
+    "contract": "ai",
+    "purpose": "Show the guest's earlier conversations with the assistant",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "entryState": {
@@ -1843,7 +1909,7 @@
    "provenance": "designed",
    "board": "wireframes/P02 Guest App.dc.html#gst-052",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
     "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-052.html, and #GST-052 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 3 → Suggested itineraries (exact). What v2 did differently: Mobile v4 draws no ready-made plans list: its Plan tab goes straight to the questions. Built from this definition in the v4 style."
@@ -2382,7 +2448,7 @@
    {
     "operationId": "requestSuggestion",
     "contract": "ai",
-    "purpose": "A suggestion of kind `itinerary` (guest-allowed since 29 September): the planner agent's proposal for the plan, applied through `updateVisitPlan`",
+    "purpose": "A suggestion of kind `itinerary` (guest-allowed since 29 September): the planner agent's proposal for the plan, applied through `updateVisitPlan`. Later (CHG-RONEP-010): the planner agent's refinement in chat (AI-ENGINE-PLANNER); the rules plan still answers in A1 ships in Block A2 (Chinmay, 3 October); until then the control shows 'Later'.",
     "trigger": "onAction",
     "provenance": "decided 29 September 2026, MOB-6"
    }

@@ -290,6 +290,9 @@
  "document:docs\\adr\\0064-per-tenant-limits.md": [
   "ai:names it"
  ],
+ "document:docs\\adr\\0069-in-park-3d-navigation-is-built-natively.md": [
+  "ai:names it"
+ ],
  "document:docs\\architecture\\README.md": [
   "ai:names it"
  ],
@@ -1293,7 +1296,7 @@
   "ai:calls 11"
  ],
  "screen:BO-093": [
-  "ai:calls 1"
+  "ai:calls 3"
  ],
  "screen:BO-102": [
   "ai:calls 1"
@@ -1449,7 +1452,7 @@
   "ai:calls 2"
  ],
  "screen:GST-033": [
-  "ai:calls 3"
+  "ai:calls 4"
  ],
  "screen:GST-036": [
   "ai:calls 2"

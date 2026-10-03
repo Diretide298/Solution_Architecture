@@ -45,6 +45,14 @@
      "provenance": "derived — BO-080 declares entryState.params transferId and BO-049 holds transferId, so an edge into it carries them"
     },
     {
+     "to": "BO-081",
+     "trigger": "Inventory Items",
+     "provenance": "flow F92 step 1→2",
+     "carries": [
+      "itemId"
+     ]
+    },
+    {
      "to": "EMP-065",
      "trigger": "The delivery arrives",
      "provenance": "flow F35 step 1→2",
@@ -52,14 +60,6 @@
      "back": false,
      "carries": [
       "transferId"
-     ]
-    },
-    {
-     "to": "BO-081",
-     "trigger": "Inventory Items",
-     "provenance": "flow F92 step 1→2",
-     "carries": [
-      "itemId"
      ]
     }
    ]

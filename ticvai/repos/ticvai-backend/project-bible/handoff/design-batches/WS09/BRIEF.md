@@ -97,16 +97,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-224` | Live Access Operations Command Center | B–D | 0 | 260 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
-| `BO-225` | Podium Operations Console | B–D | 7 | 7 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-226` | Ticket & Credential Investigation Console | B–D | 2 | 0 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
-| `BO-227` | Validation Exception & Reason Code Manager | B–D | 9 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-228` | Manual Override & Supervisor Approval | B–D | 11 | 0 | 5 | 0 | 1 | 3 | — | notStarted (generated) |
-| `BO-229` | Credential Disable, Blacklist & Whitelist Operations | B–D | 9 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-224` | Live Access Operations Command Center | C | 0 | 260 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
+| `BO-225` | Podium Operations Console | C | 7 | 7 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-226` | Ticket & Credential Investigation Console | C | 2 | 0 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
+| `BO-227` | Validation Exception & Reason Code Manager | C | 9 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-228` | Manual Override & Supervisor Approval | C | 11 | 0 | 5 | 0 | 1 | 3 | — | notStarted (generated) |
+| `BO-229` | Credential Disable, Blacklist & Whitelist Operations | C | 9 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-230` | Live Gate Mode & Lane Control | A | 8 | 8 | 6 | 3 | 1 | 0 | — | notStarted (generated) |
-| `BO-231` | Queue, Throughput & Lane Optimization | B–D | 0 | 2 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `BO-232` | Operational Incident & Exception Workspace | B–D | 7 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-233` | Operations Audit, Shift Handover & Control Summary | B–D | 1 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `BO-231` | Queue, Throughput & Lane Optimization | C | 0 | 2 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `BO-232` | Operational Incident & Exception Workspace | C | 7 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-233` | Operations Audit, Shift Handover & Control Summary | C | 1 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

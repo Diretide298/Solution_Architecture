@@ -99,13 +99,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-234` | Dynamic Access Policy Command Center | C | 0 | 182 | 6 | 2 | 1 | 0 | — | notStarted (generated) |
 | `BO-235` | Access Attribute Catalog | C | 6 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-236` | Visual Dynamic Policy Builder | B–D | 0 | 20 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
-| `BO-237` | Context, Time, Event & Capacity Policy Builder | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-238` | Identity, Membership & Accreditation Policies | B–D | 0 | 0 | 6 | 7 | 0 | 6 | — | notStarted (generated) |
-| `BO-239` | Policy Scope, Hierarchy & Inheritance | B–D | 11 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-240` | Authorization Governance & Temporary Access | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-241` | Policy Evaluation Architecture & Offline Distribution | B–D | 7 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-242` | Policy Simulation, Conflict & Impact Analysis | B–D | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-236` | Visual Dynamic Policy Builder | C | 0 | 20 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
+| `BO-237` | Context, Time, Event & Capacity Policy Builder | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-238` | Identity, Membership & Accreditation Policies | C | 0 | 0 | 6 | 7 | 0 | 6 | — | notStarted (generated) |
+| `BO-239` | Policy Scope, Hierarchy & Inheritance | C | 11 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-240` | Authorization Governance & Temporary Access | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-241` | Policy Evaluation Architecture & Offline Distribution | C | 7 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-242` | Policy Simulation, Conflict & Impact Analysis | C | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-243` | Policy Approval, Audit, Analytics & AI Optimization | C | 2 | 7 | 6 | 13 | 0 | 3 | — | notStarted (generated) |
 
 ## Thin screens in this batch
@@ -126,7 +126,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | Block C · task APP-SETUP-BO-234 |
+| Block | Block C · task VM-BO-234 |
 | Who uses it | venue staff holding `SCOPE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
@@ -530,7 +530,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | Block C · task APP-SETUP-BO-235 |
+| Block | Block C · task VM-BO-235 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -687,7 +687,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-236 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -877,7 +877,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-237 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§MONITOR) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
@@ -1035,7 +1035,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-238 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `ACCREDITATION_CONFIGURE`, `SCOPE_VIEW` (2 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1197,7 +1197,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-239 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Administrator defines) and no display directory — it is settings, not a population |
@@ -1371,7 +1371,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-240 |
 | Who uses it | venue staff holding `SCOPE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1515,7 +1515,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-241 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1692,7 +1692,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-242 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
@@ -1860,7 +1860,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | Block C · task APP-SETUP-BO-243 |
+| Block | Block C · task VM-BO-243 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `APPROVAL_DECIDE`, `APPROVAL_REQUEST`, `SCOPE_VIEW` (1 configure, 2 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Monitor; Measure) and no metric row |

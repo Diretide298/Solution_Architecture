@@ -4,7 +4,7 @@
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS rental.agreement (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     rental_number                     text NOT NULL CONSTRAINT agreement_rental_number_chk CHECK (char_length(rental_number) <= 50),
     order_id                          uuid NOT NULL,
     customer_id                       uuid NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS rental.agreement (
 -- Holds 19 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS rental.agreement_item (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     rental_agreement_id               uuid NOT NULL,
     order_line_id                     uuid NOT NULL,
     catalogue_product_id              uuid NOT NULL,
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS rental.agreement_rules (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS rental.agreement_signature (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     participant_id                    uuid,
     agreement_version                 text NOT NULL,
     signatory_name                    text,
@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS rental.availability_rules (
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS rental.blackout (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     product_id                        uuid,
     location_id                       uuid,
     valid_from                        timestamptz NOT NULL,
@@ -122,7 +122,7 @@ CREATE TABLE IF NOT EXISTS rental.booking (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS rental.damage_assessment (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     asset_id                          uuid,
     description                       text NOT NULL,
     amount                            numeric(18,4) NOT NULL,
@@ -137,7 +137,7 @@ CREATE TABLE IF NOT EXISTS rental.damage_assessment (
 -- Holds 17 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS rental.deposit_policy (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     product_id                        uuid,
     category_id                       uuid,
     is_required                       boolean DEFAULT true,
@@ -175,7 +175,7 @@ CREATE TABLE IF NOT EXISTS rental.duration_rules (
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS rental.equipment_assignment (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     asset_id                          uuid NOT NULL,
     serial_number                     text,
     scanned_code                      text,
@@ -188,7 +188,7 @@ CREATE TABLE IF NOT EXISTS rental.equipment_assignment (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS rental.fee_policy (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     product_id                        uuid,
     grace_period_minutes              integer DEFAULT 0,
     late_fee_basis                    text CONSTRAINT fee_policy_late_fee_basis_chk CHECK (late_fee_basis IN ('fixed', 'perMinute', 'per15Minutes', 'per30Minutes', 'perHour', 'tiered')),
@@ -207,7 +207,7 @@ CREATE TABLE IF NOT EXISTS rental.fee_policy (
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS rental.incident (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     booking_id                        uuid,
     asset_id                          uuid,
     kind                              text NOT NULL CONSTRAINT incident_kind_chk CHECK (kind IN ('injury', 'loss', 'theft', 'complaint', 'equipmentFailure', 'safetyBreach', 'other')),
@@ -224,7 +224,7 @@ CREATE TABLE IF NOT EXISTS rental.incident (
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS rental.inspection (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     asset_id                          uuid,
     phase                             text NOT NULL CONSTRAINT inspection_phase_chk CHECK (phase IN ('preRental', 'postRental')),
     condition                         text NOT NULL CONSTRAINT inspection_condition_chk CHECK (condition IN ('good', 'minorDamage', 'majorDamage', 'faulty', 'notReturned')),
@@ -238,7 +238,7 @@ CREATE TABLE IF NOT EXISTS rental.inspection (
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS rental.inspection_item (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     rental_inspection_id              uuid NOT NULL,
     rental_agreement_item_id          uuid NOT NULL,
     component_code                    text CONSTRAINT inspection_item_component_code_chk CHECK (char_length(component_code) <= 100),
@@ -307,7 +307,7 @@ CREATE TABLE IF NOT EXISTS rental.operational_rules (
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS rental.override (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     booking_id                        uuid,
     kind                              text NOT NULL CONSTRAINT override_kind_chk CHECK (kind IN ('priceOverride', 'complimentary', 'depositWaiver', 'depositReduction', 'lateFeeWaiver', 'damageFeeWaiver', 'extensionFeeWaiver', 'manualRefund', 'goodwill')),
     original_amount                   numeric(18,4),
@@ -323,7 +323,7 @@ CREATE TABLE IF NOT EXISTS rental.override (
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS rental.participant (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     name                              text,
     is_primary_renter                 boolean DEFAULT false,
     date_of_birth                     date,
@@ -337,7 +337,7 @@ CREATE TABLE IF NOT EXISTS rental.participant (
 -- Holds 23 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS rental.pricing_profile (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text NOT NULL,
     product_id                        uuid,
@@ -364,7 +364,7 @@ CREATE TABLE IF NOT EXISTS rental.pricing_profile (
 -- Holds 18 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS rental.product (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text NOT NULL,
     internal_name                     text,

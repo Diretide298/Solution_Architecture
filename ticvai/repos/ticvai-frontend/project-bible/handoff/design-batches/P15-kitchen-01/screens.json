@@ -27,14 +27,6 @@
    ],
    "transitions": [
     {
-     "to": "KIT-002",
-     "trigger": "Kitchen Display System (KDS)",
-     "provenance": "flow F83 step 1→2",
-     "carries": [
-      "ticketId"
-     ]
-    },
-    {
      "to": "KIT-003",
      "trigger": "Order Firing & Course Management",
      "provenance": "structural — KIT-001 is P15's home screen and its exits are its launcher",
@@ -88,6 +80,14 @@
      "to": "KIT-010",
      "trigger": "Kitchen Performance, AI & Operational Optimization",
      "provenance": "structural — KIT-001 is P15's home screen and its exits are its launcher"
+    },
+    {
+     "to": "KIT-002",
+     "trigger": "Kitchen Display System (KDS)",
+     "provenance": "flow F83 step 1→2",
+     "carries": [
+      "ticketId"
+     ]
     }
    ]
   },

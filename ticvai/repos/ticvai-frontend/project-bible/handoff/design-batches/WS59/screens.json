@@ -369,7 +369,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "BO-334"
+    "BO-334",
+    "BO-103"
    ],
    "exitTo": [
     "BO-334"
@@ -397,6 +398,23 @@
      "name": "contentBody",
      "slot": "fields",
      "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Load the configuration as saved",
+       "operation": "getVirtualTicketIdentity",
+       "bindsTo": "VirtualTicketIdentityMasterRecordConfigurationView",
+       "columns": [
+        "VirtualTicketIdentityMasterRecordConfigurationView.idGenerationPattern",
+        "VirtualTicketIdentityMasterRecordConfigurationView.ticketClassification",
+        "VirtualTicketIdentityMasterRecordConfigurationView.ticketOwnershipModel",
+        "VirtualTicketIdentityMasterRecordConfigurationView.holderAssignmentRequirements",
+        "VirtualTicketIdentityMasterRecordConfigurationView.transferabilityReference",
+        "VirtualTicketIdentityMasterRecordConfigurationView.validityModel",
+        "VirtualTicketIdentityMasterRecordConfigurationView.consumptionModel",
+        "VirtualTicketIdentityMasterRecordConfigurationView.entitlementModel"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
       {
        "kind": "selectField",
        "label": "ID generation pattern",
@@ -469,6 +487,13 @@
     "contract": "access",
     "purpose": "Virtual Ticket Identity & Master Record Configuration",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getVirtualTicketIdentity",
+    "contract": "access",
+    "purpose": "Load the configuration as saved",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "wireframe": {

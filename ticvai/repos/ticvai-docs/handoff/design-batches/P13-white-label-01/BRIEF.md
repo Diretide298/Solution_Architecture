@@ -1,6 +1,6 @@
 # P13-white-label-01 — P13 · White Label (1 of 3)
 
-**10 screens · 54 operations · 51 schemas · 6 permissions**
+**10 screens · 55 operations · 55 schemas · 6 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -152,14 +152,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `CMS-001` | Tenant Workspace | A | 20 | 35 | 5 | 5 | 1 | 0 | configures | notStarted (generated) |
-| `CMS-002` | Brand Kit | A | 12 | 9 | 5 | 3 | 4 | 6 | configures | notStarted (generated) |
+| `CMS-002` | Brand Kit | A | 12 | 10 | 5 | 3 | 4 | 6 | configures | notStarted (generated) |
 | `CMS-003` | Typography | A | 5 | 6 | 5 | 1 | 4 | 6 | configures | notStarted (generated) |
 | `CMS-004` | Logo & Assets | A | 12 | 16 | 5 | 3 | 3 | 6 | configures | notStarted (generated) |
 | `CMS-005` | Theme Editor | A | 27 | 10 | 5 | 4 | 9 | 6 | configures | notStarted (generated) |
 | `CMS-006` | Component Preview | A | 6 | 63 | 6 | 10 | 4 | 0 | — | notStarted (generated) |
 | `CMS-007` | Page Builder | A | 36 | 23 | 5 | 13 | 4 | 6 | configures | notStarted (generated) |
 | `CMS-008` | Content Blocks | A | 62 | 40 | 6 | 10 | 2 | 6 | configures | notStarted (generated) |
-| `CMS-009` | Navigation & Menus | A | 46 | 29 | 5 | 4 | 4 | 6 | configures | notStarted (generated) |
+| `CMS-009` | Navigation & Menus | A | 46 | 37 | 5 | 9 | 4 | 6 | configures | notStarted (generated) |
 | `CMS-010` | Media Library | A | 91 | 37 | 6 | 14 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch

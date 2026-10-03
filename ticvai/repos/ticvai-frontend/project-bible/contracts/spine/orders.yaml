@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Order & Payment
   version: 0.1.0
-  x-ticvai-screen-count: 207
+  x-ticvai-screen-count: 208
   x-ticvai-tier: spine
   x-ticvai-module: 2 — Ticketing Sales
   x-ticvai-requirements: 343
@@ -862,6 +862,8 @@ paths:
         format: uuid
     post:
       operationId: cancelPaymentLink
+      x-ticvai-consumed-by:
+        - "P08 ADM-593 Payment Link Distribution & Customer Journey Manager"
       x-ticvai-agreed: '3 October: Chinmay, defaults taken on the business-rules questions ("add cancelPaymentLink under
         ORDER_CREATE"); CHG-RUL-021; shape follows resendPaymentLink'
       summary: Cancel a live payment link

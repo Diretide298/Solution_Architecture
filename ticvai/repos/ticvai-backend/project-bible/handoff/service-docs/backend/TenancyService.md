@@ -6,8 +6,8 @@
 |---|---|
 | Tier | foundation: Read by everything, reads nothing above. Deploys first and alone. |
 | Contracts | `tenancy`, `workforce`, `approvals`, `accreditation` |
-| Schemas owned | `platform`, `workforce`, `approvals`, `accreditation`, `tenancy` |
-| Operations in the slice | 28 of 209 |
+| Schemas owned | `platform`, `workforce`, `approvals`, `accreditation`, `tenancy`, `kernel` |
+| Operations in the slice | 29 of 210 |
 | Scale | Read-heavy and highly cacheable. Config changes are rare. |
 | If it is down | Same as identity — nothing runs without a scope. |
 
@@ -36,6 +36,7 @@
 | attendance | [`recordAttendance`](#recordattendance) | POST | `/attendance/clock` | core | 1 | BO-889, BO-935, BO-936, EMP-024, EMP-025, POS-009 |
 | delegation | [`createApprovalDelegation`](#createapprovaldelegation) | POST | `/delegations` | setup | 1 | ADM-243, ADM-534, BO-087, BO-385 |
 | devices | [`setDeviceAssignment`](#setdeviceassignment) | PUT | `/devices/{deviceId}/assignment` | core | 1 | ADM-582, BO-732, POS-016 |
+| general | [`getDeviceAssignment`](#getdeviceassignment) | GET | `/devices/{deviceId}/assignment` | core | 1 | POS-016 |
 | matrix | [`setApprovalExternalProvider`](#setapprovalexternalprovider) | PUT | `/approval-external-providers` | setup | 1 | ADM-354 |
 | matrix | [`setApprovalMatrix`](#setapprovalmatrix) | PUT | `/approval-matrices` | setup | 1 | ADM-243, ADM-330, ADM-331, ADM-332, ADM-333, ADM-334 … |
 | region | [`getRegionSettings`](#getregionsettings) | GET | `/regions/{regionId}/settings` | core | 1 | ADM-037, ADM-426, BO-1064, BO-1065 |
@@ -474,6 +475,59 @@ The delegate cannot exceed the delegator's own authority, and **cannot approve a
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
+## Group: general
+
+### getDeviceAssignment
+
+**`GET /devices/{deviceId}/assignment`**: Where a device is assigned
+
+**Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.** POS-016 assigns a device with `setDeviceAssignment` and could not show where it was assigned. Returns what the write stores, in the write's own shape.
+
+|  |  |
+|---|---|
+| Permission | `DEVICE_VIEW` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `tenancy.device_assignment` |
+| Writes | - |
+| Called by | POS-016 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| deviceId | path | yes | string (uuid) |  |
+
+**Response**: `DeviceAssignment`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| deviceId | string (uuid) |  | From the path of setDeviceAssignment. (read-only) |
+| ownerOrgUnitId | string (uuid) |  | Who the device belongs to — the cost centre that replaces it when it breaks. (nullable) |
+| custodianPrincipalId | string (uuid) |  | Who is holding it right now. (nullable) |
+| assignedWorkstationId | string (uuid) |  | (nullable) |
+| locationScopePath | string |  | (nullable) |
+| lastSeenLocation | string |  | Reported by the heartbeat; distinct from where it is supposed to be. (read-only; nullable) |
+| assetTag | string |  | (nullable) |
+| acquiredAt | string (date) |  | A calendar date in the region's time zone. (nullable) |
+| warrantyExpiresAt | string (date) |  | A calendar date in the region's time zone. (nullable) |
+| assignedAt | string (date-time) |  | (read-only) |
+| scopePath | string |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Where a device is assigned |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+
 ## Group: matrix
 
 What requires approval, and who grants it
@@ -519,7 +573,7 @@ What requires approval, and who grants it
 | outboundCredential | string (password) |  | The credential TICVAI presents to the provider. (nullable) |
 | signingSecret | string (password) |  | Signs every request TICVAI sends, as webhook deliveries are signed, so the provider can tell it came from TICVAI. (nullable) |
 | apiClientId | string (uuid) | yes | The public-api client the provider calls back as. |
-| requestMapping | array of object |  | Which request fields go to the provider, under which names. |
+| requestMapping | array of object |  | Stored whole on the provider row (request_mapping, jsonb; 3 October 2026, CHG-R1S-020: the r1 gate found no column held it). |
 | requestMapping[].from | string | yes | A field of ApprovalRequest, e.g. |
 | requestMapping[].to | string | yes | The provider's field name. |
 | decisionMapping | array of object | yes | The provider's outcome values and the decision each means. (min items 2) |
@@ -544,7 +598,7 @@ What requires approval, and who grants it
 | outboundCredential | string (password) |  | The credential TICVAI presents to the provider. (nullable) |
 | signingSecret | string (password) |  | Signs every request TICVAI sends, as webhook deliveries are signed, so the provider can tell it came from TICVAI. (nullable) |
 | apiClientId | string (uuid) | yes | The public-api client the provider calls back as. |
-| requestMapping | array of object |  | Which request fields go to the provider, under which names. |
+| requestMapping | array of object |  | Stored whole on the provider row (request_mapping, jsonb; 3 October 2026, CHG-R1S-020: the r1 gate found no column held it). |
 | requestMapping[].from | string | yes | A field of ApprovalRequest, e.g. |
 | requestMapping[].to | string | yes | The provider's field name. |
 | decisionMapping | array of object | yes | The provider's outcome values and the decision each means. (min items 2) |
@@ -724,6 +778,7 @@ Currency, decimal scale, time zone, date format and fiscal year. These inherit t
 | allowedAiResidencies | array of string |  | The region's compliance gate on AI providers (decided 28 September, audit R203; ADR-0009). (default []) |
 | aiResidencyClass | enum (uaeOnly, globalAllowed, onPrem) |  | The tenant's AI residency class (decided 2 October 2026, Chinmay, "AI residency: per-tenant residency class"; DEC-539; CHG-CSP-009; amends AI-D02 and ADR-0009 section 1). (default uaeOnly) |
 | aiResidencyClassLocked | boolean |  | Set by TICVAI at onboarding for a government, bank or health tenant (DEC-539), which must stay uaeOnly. (default False; read-only) |
+| tenantCategory | enum (private, semiGovernment, government, banking, payments, health, difc, adgm) |  | What kind of organisation the tenant is, for AI residency (3 October 2026, CHG-R1S-016; the legal research docs/active/research/openai-key-uae-3-october.md, item 2, and Chinmay's per-tenant residency… (default private; read-only) |
 | aiResidencyOptIn | object |  | The evidence a globalAllowed opt-in needs under PDPL Article 23 (DEC-539; CHG-CSP-009): the tenant's references to its vendor contract, its DPIA and the notice guests see. (nullable) |
 | aiResidencyOptIn.vendorContractReference | string |  | (max length 200) |
 | aiResidencyOptIn.dpiaReference | string |  | (max length 200) |
@@ -791,6 +846,7 @@ Changing `currencyCode` or `currencyScale` after transactions exist is rejected.
 | allowedAiResidencies | array of string |  | The region's compliance gate on AI providers (decided 28 September, audit R203; ADR-0009). (default []) |
 | aiResidencyClass | enum (uaeOnly, globalAllowed, onPrem) |  | The tenant's AI residency class (decided 2 October 2026, Chinmay, "AI residency: per-tenant residency class"; DEC-539; CHG-CSP-009; amends AI-D02 and ADR-0009 section 1). (default uaeOnly) |
 | aiResidencyClassLocked | boolean |  | Set by TICVAI at onboarding for a government, bank or health tenant (DEC-539), which must stay uaeOnly. (default False; read-only) |
+| tenantCategory | enum (private, semiGovernment, government, banking, payments, health, difc, adgm) |  | What kind of organisation the tenant is, for AI residency (3 October 2026, CHG-R1S-016; the legal research docs/active/research/openai-key-uae-3-october.md, item 2, and Chinmay's per-tenant residency… (default private; read-only) |
 | aiResidencyOptIn | object |  | The evidence a globalAllowed opt-in needs under PDPL Article 23 (DEC-539; CHG-CSP-009): the tenant's references to its vendor contract, its DPIA and the notice guests see. (nullable) |
 | aiResidencyOptIn.vendorContractReference | string |  | (max length 200) |
 | aiResidencyOptIn.dpiaReference | string |  | (max length 200) |
@@ -822,6 +878,7 @@ Changing `currencyCode` or `currencyScale` after transactions exist is rejected.
 | allowedAiResidencies | array of string |  | The region's compliance gate on AI providers (decided 28 September, audit R203; ADR-0009). (default []) |
 | aiResidencyClass | enum (uaeOnly, globalAllowed, onPrem) |  | The tenant's AI residency class (decided 2 October 2026, Chinmay, "AI residency: per-tenant residency class"; DEC-539; CHG-CSP-009; amends AI-D02 and ADR-0009 section 1). (default uaeOnly) |
 | aiResidencyClassLocked | boolean |  | Set by TICVAI at onboarding for a government, bank or health tenant (DEC-539), which must stay uaeOnly. (default False; read-only) |
+| tenantCategory | enum (private, semiGovernment, government, banking, payments, health, difc, adgm) |  | What kind of organisation the tenant is, for AI residency (3 October 2026, CHG-R1S-016; the legal research docs/active/research/openai-key-uae-3-october.md, item 2, and Chinmay's per-tenant residency… (default private; read-only) |
 | aiResidencyOptIn | object |  | The evidence a globalAllowed opt-in needs under PDPL Article 23 (DEC-539; CHG-CSP-009): the tenant's references to its vendor contract, its DPIA and the notice guests see. (nullable) |
 | aiResidencyOptIn.vendorContractReference | string |  | (max length 200) |
 | aiResidencyOptIn.dpiaReference | string |  | (max length 200) |
@@ -847,7 +904,7 @@ Changing `currencyCode` or `currencyScale` after transactions exist is rejected.
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
-| 409 |  | Currency or scale change rejected because transactions exist in this region, or a change to aiResidencyClass on a tenant TICVAI locked to uaeOnly (residency-class-locked; CHG-CSP-009). |
+| 409 |  | Currency or scale change rejected because transactions exist in this region, or a change to aiResidencyClass on a tenant TICVAI locked to uaeOnly (residency-class-locked; CHG-CSP-009), or globalAllow… |
 | 422 |  | aiResidencyClass globalAllowed without the three references of aiResidencyOptIn (residency-opt-in-required; PDPL Article 23; DEC-539; CHG-CSP-009). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -2735,6 +2792,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | outbound_credential | text | no | The credential TICVAI presents to the provider. |
 | signing_secret | text | no | Signs every request TICVAI sends, as webhook deliveries are signed, so the provider can tell it came from TICVAI. |
 | api_client_id | uuid | yes | The public-api client the provider calls back as. |
+| request_mapping | jsonb | no | Stored whole on the provider row (request_mapping, jsonb; 3 October 2026, CHG-R1S-020: the r1 gate found no column held it). |
+| decision_mapping | jsonb | yes | The provider's outcome values and the decision each means. |
 | timeout_minutes | integer | no | How long a level waits for the provider before onTimeout applies. |
 | on_timeout | text | no |  |
 | max_attempts | integer | no | Delivery attempts, with backoff, before a dispatch is failed and the level falls back as on timeout. |
@@ -2921,6 +2980,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | allowed_ai_residencies | text[] | no | The region's compliance gate on AI providers (decided 28 September, audit R203; ADR-0009). |
 | ai_residency_class | text | no | The tenant's AI residency class (decided 2 October 2026, Chinmay, "AI residency: per-tenant residency class"; DEC-539; CHG-CSP-009; amends AI-D02 and ADR-0009 section 1). |
 | is_ai_residency_class_locked | boolean | no | Set by TICVAI at onboarding for a government, bank or health tenant (DEC-539), which must stay uaeOnly. |
+| tenant_category | text | no | What kind of organisation the tenant is, for AI residency (3 October 2026, CHG-R1S-016; the legal research docs/active/research/openai-key-uae-3-october.md, item 2, and Chinmay's per-tenant residency… |
 | ai_residency_opt_in | jsonb | no | The evidence a globalAllowed opt-in needs under PDPL Article 23 (DEC-539; CHG-CSP-009): the tenant's references to its vendor contract, its DPIA and the notice guests see. |
 | local_language_name_locales | text[] | no | The languages an outlet name must also be given in, in this country (decided 2 October 2026, Chinmay, batch 2 #26: "English plus the local language where the country needs it"; DEC-031; CHG-CSP-005). |
 | required_billing_documents | jsonb | no | Which documents a TICVAI customer's billing entity must upload, in this country (decided 2 October 2026, Chinmay, batch 6 set 7, ADM-411: "Trade licence always; VAT certificate when a TRN is entered;… |

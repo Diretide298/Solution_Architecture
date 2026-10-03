@@ -103,16 +103,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-844` | Waiver Command Center | B–D | 0 | 0 | 6 | 0 | 1 | 4 | — | notStarted (—) |
-| `BO-845` | Waiver Template Builder | B–D | 20 | 20 | 6 | 0 | 1 | 4 | — | notStarted (—) |
-| `BO-846` | Assignment Rules | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-847` | Version, Expiry & Renewal | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-848` | Signature Experience Setup | B–D | 17 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-849` | Guardian & Group Signing | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-850` | Pre-Arrival Completion | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-851` | Verification & Access Control | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-852` | Documents, Search & Retention | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-853` | Legal Evidence & Audit | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-844` | Waiver Command Center | D | 0 | 0 | 6 | 0 | 1 | 4 | — | notStarted (—) |
+| `BO-845` | Waiver Template Builder | D | 20 | 20 | 6 | 0 | 1 | 4 | — | notStarted (—) |
+| `BO-846` | Assignment Rules | D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-847` | Version, Expiry & Renewal | D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-848` | Signature Experience Setup | D | 17 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-849` | Guardian & Group Signing | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-850` | Pre-Arrival Completion | D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-851` | Verification & Access Control | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-852` | Documents, Search & Retention | D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-853` | Legal Evidence & Audit | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

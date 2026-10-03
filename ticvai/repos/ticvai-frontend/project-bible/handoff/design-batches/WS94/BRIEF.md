@@ -99,16 +99,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-554` | Active Rental Operations Command Center | B–D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-555` | Active Rental Detail & Live Timeline | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-556` | Rental Extension Request | B–D | 2 | 8 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-557` | Extension Pricing & Confirmation | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-558` | Equipment Swap / Replacement | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-559` | Rental Incident & Operational Exception | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-560` | Due Soon & Customer Notification Management | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-561` | Overdue Rental Management | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-562` | Active Group Rental Management | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-563` | Active Rental Intelligence & Operational Alerts | B–D | 0 | 9 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-554` | Active Rental Operations Command Center | D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-555` | Active Rental Detail & Live Timeline | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-556` | Rental Extension Request | D | 2 | 8 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-557` | Extension Pricing & Confirmation | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-558` | Equipment Swap / Replacement | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-559` | Rental Incident & Operational Exception | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-560` | Due Soon & Customer Notification Management | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-561` | Overdue Rental Management | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-562` | Active Group Rental Management | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-563` | Active Rental Intelligence & Operational Alerts | D | 0 | 9 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

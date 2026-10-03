@@ -131,16 +131,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-394` | Game & Ride Operations Dashboard | B–D | 0 | 14 | 6 | 1 | 1 | 6 | — | notStarted (—) |
-| `BO-395` | Game & Ride Directory | B–D | 28 | 6 | 6 | 1 | 2 | 6 | — | notStarted (—) |
-| `BO-396` | Attraction Profile | B–D | 1 | 15 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `BO-397` | Attraction Type Configuration | B–D | 5 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-398` | Game & Ride Operational Configuration | B–D | 6 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-399` | Wallet & Credit Acceptance Mapping | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-400` | Attraction / Reader Mapping | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-401` | Game Package & Entitlement Association | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-402` | Configuration Health & Validation | B–D | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-403` | Attraction Audit, Dependencies & Governed Actions | B–D | 0 | 11 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-394` | Game & Ride Operations Dashboard | D | 0 | 14 | 6 | 1 | 1 | 6 | — | notStarted (—) |
+| `BO-395` | Game & Ride Directory | A | 28 | 6 | 6 | 1 | 2 | 6 | — | notStarted (—) |
+| `BO-396` | Attraction Profile | D | 1 | 15 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `BO-397` | Attraction Type Configuration | D | 5 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-398` | Game & Ride Operational Configuration | D | 6 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-399` | Wallet & Credit Acceptance Mapping | C | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-400` | Attraction / Reader Mapping | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-401` | Game Package & Entitlement Association | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-402` | Configuration Health & Validation | D | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-403` | Attraction Audit, Dependencies & Governed Actions | B | 0 | 11 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-1103` | Stored Value & Credit Command Center | B–D | 2 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-1104` | Credit Type Definition Studio | B–D | 24 | 14 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-1105` | Credit Issuance Rule Configuration | B–D | 13 | 14 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-1106` | Credit Usage & Eligibility Rules | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-1107` | Consumption Priority Engine | B–D | 16 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `BO-1108` | Expiry & Validity Policy Configuration | B–D | 11 | 14 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `BO-1109` | FEFO & Credit Lot Management | B–D | 8 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-1110` | Split Tender & Multi-Credit Consumption | B–D | 18 | 5 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-1111` | Credit Expiry, Extension & Forfeiture Operations | B–D | 0 | 25 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-1112` | Consumption Simulator, Validation & Rule Publication | B–D | 0 | 5 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-1103` | Stored Value & Credit Command Center | C | 2 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-1104` | Credit Type Definition Studio | C | 24 | 14 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-1105` | Credit Issuance Rule Configuration | C | 13 | 14 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-1106` | Credit Usage & Eligibility Rules | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-1107` | Consumption Priority Engine | C | 16 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `BO-1108` | Expiry & Validity Policy Configuration | C | 11 | 14 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `BO-1109` | FEFO & Credit Lot Management | C | 8 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-1110` | Split Tender & Multi-Credit Consumption | C | 18 | 5 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-1111` | Credit Expiry, Extension & Forfeiture Operations | A | 0 | 25 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-1112` | Consumption Simulator, Validation & Rule Publication | C | 0 | 5 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

@@ -126,7 +126,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-031` | Security & Compliance Dashboard | A | 42 | 26 | 7 | 19 | 0 | 0 | — | notStarted (generated) |
+| `ADM-031` | Security & Compliance Dashboard | D | 42 | 26 | 7 | 19 | 0 | 0 | — | notStarted (generated) |
 | `ADM-032` | WAF & Security Policy View | B | 9 | 6 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch

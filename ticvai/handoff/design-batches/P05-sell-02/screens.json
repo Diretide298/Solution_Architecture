@@ -3,7 +3,7 @@
   "id": "KSK-011",
   "name": "Collect a booking",
   "module": "Sell",
-  "requiresModule": "retail",
+  "requiresModule": "core",
   "wave": 2,
   "capability": "C00",
   "implementation": {
@@ -56,38 +56,27 @@
        "bindsTo": "Order",
        "columns": [
         "Order.orderNumber",
-        "Order.channel",
         "Order.status",
-        "Order.currency",
-        "Order.grossAmount",
-        "Order.taxAmount",
-        "Order.netAmount",
-        "Order.refundedAmount"
+        "Order.grossAmount"
        ],
        "operation": "getOrder",
        "provenance": "contract orders.yaml GET /orders/{orderId}"
       },
       {
-       "kind": "searchField",
+       "kind": "scanTarget",
        "derived": true,
        "impliedBy": "lookupShopAndDrop",
-       "label": "Search",
-       "notes": "A search that returns nothing must say so differently from a search not yet run.",
-       "provenance": "carried from the previous definition"
+       "label": "Scan your booking QR",
+       "notes": "The booking's QR carries the order; scanning it opens the booking. Shop-and-drop collection is staff-only and not here (CHG-R1S-022).",
+       "provenance": "carried from the previous definition",
+       "operation": "getOrder"
       }
      ]
     },
     {
      "name": "actionBar",
      "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Lookup shop and drop",
-       "operation": "lookupShopAndDrop",
-       "provenance": "contract retail.yaml GET /shop-and-drop/lookup"
-      }
-     ]
+     "components": []
     }
    ]
   },
@@ -99,12 +88,6 @@
    "offline": "Not available"
   },
   "apis": [
-   {
-    "operationId": "lookupShopAndDrop",
-    "contract": "retail",
-    "purpose": "Find a guest's dropped goods",
-    "trigger": "onAction"
-   },
    {
     "operationId": "getOrder",
     "contract": "orders",
@@ -308,13 +291,7 @@
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`endKioskAssist`) and no read of a population — it is settings, not a list",
   "purpose": "Get a human, without leaving the kiosk.",
-  "gaps": [
-   {
-    "operation": "endKioskAssist",
-    "why": "**`endKioskAssist` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
-    "source": "contract marketing-crm.yaml POST /kiosk-assists/{sessionId}/end"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "form",
    "regions": [
@@ -324,7 +301,14 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "End kiosk assist",
+       "label": "Call a member of staff",
+       "operation": "handoverToAgent",
+       "notes": "Hands the kiosk's conversation to a person; the agent workspace (BO-799) shows it and staff help remotely with startKioskAssist. The guest sees who is helping and can end it (endKioskAssist) (CHG-R1S-022).",
+       "provenance": "design cross-check, 3 October 2026 (CHG-R1S-022)"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "End the help session",
        "operation": "endKioskAssist",
        "provenance": "contract marketing-crm.yaml POST /kiosk-assists/{sessionId}/end"
       }
@@ -356,6 +340,13 @@
     "contract": "marketing-crm",
     "purpose": "Stop assisting",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "handoverToAgent",
+    "contract": "marketing-crm",
+    "purpose": "Call a member of staff: the conversation goes to the agent workspace (BO-799), where staff join with startKioskAssist",
+    "trigger": "onAction",
+    "provenance": "design cross-check, 3 October 2026 (CHG-R1S-022)"
    }
   ],
   "entryState": {
@@ -363,6 +354,12 @@
     {
      "name": "sessionId",
      "from": "session"
+    },
+    {
+     "name": "conversationId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen makes one with `createAiConversation`."
     }
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case."
@@ -375,6 +372,22 @@
    "note": "**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
+  "overlays": [
+   {
+    "id": "formHandoverToAgent",
+    "component": "modal",
+    "trigger": "Call a member of staff",
+    "body": "**Asks what the guest needs help with, in one tap** (paying, finding a booking, something else); the kiosk sends its conversation and that reason, and a member of staff joins from the agent workspace (BO-799). (CHG-R1S-022)",
+    "confirm": {
+     "label": "Call a member of staff",
+     "operation": "handoverToAgent"
+    },
+    "dismiss": {
+     "label": "Back"
+    },
+    "provenance": "design cross-check, 3 October 2026 (CHG-R1S-022)"
+   }
+  ],
   "_platform": {
    "code": "P05",
    "audience": "guest",
@@ -430,19 +443,21 @@
   "pattern": "listDetail",
   "patternReason": "**the screen's operations choose no pattern** — no list, no get, no write that groups. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Fail in a way that does not strand anybody.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen declares no operation the contracts recognise.** Nothing fills it, nothing it does is committed anywhere, and its shape below is a default rather than a reading.",
-    "source": "the screen's own declarations"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "banner",
+       "label": "Out of service",
+       "operation": "getTenantAppStatus",
+       "notes": "Shown while the tenant's app status or this kiosk's own health (its heartbeat, recordDeviceHeartbeat) says it cannot sell; polled, and the attract loop returns when both clear (CHG-R1S-022).",
+       "provenance": "design cross-check, 3 October 2026 (CHG-R1S-022)"
+      }
+     ]
     }
    ]
   },
@@ -452,7 +467,15 @@
    "emptyFirstRun": "Not applicable",
    "offline": "This is the offline state. It does not attempt a cached sale"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getTenantAppStatus",
+    "contract": "white-label",
+    "purpose": "Read whether the app is in service; the screen leaves when it is back",
+    "trigger": "onLoad",
+    "provenance": "design cross-check, 3 October 2026 (CHG-R1S-022)"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
@@ -500,7 +523,8 @@
     "KSK-003"
    ],
    "exitTo": [
-    "KSK-017"
+    "KSK-017",
+    "KSK-007"
    ],
    "transitions": [
     {
@@ -510,6 +534,14 @@
       "outletId"
      ],
      "provenance": "derived — KSK-017 declares entryState.params outletId and KSK-016 holds outletId, so an edge into it carries them"
+    },
+    {
+     "to": "KSK-007",
+     "trigger": "Pays for the food order",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "design cross-check, 3 October 2026 (CHG-R1S-022)"
     }
    ]
   },
@@ -554,7 +586,7 @@
       },
       {
        "kind": "banner",
-       "notes": "Allergens shown on the card, not behind a tap. **contains and mayContain are different claims** and a fryer shared with breaded fish makes chips a fish risk",
+       "notes": "Says *contains* and *may contain* apart, from each item's `allergenDetail` (`Allergen.contains`, `Allergen.mayContain`) (CHG-R1S-022).",
        "provenance": "carried from the previous definition"
       },
       {
@@ -621,7 +653,7 @@
     "id": "formCreateGuestFnbOrder",
     "component": "modal",
     "trigger": "Pay",
-    "body": "**Collects what `createGuestFnbOrder` sends before it is called.** Required: `id`, `lines`, `quotedTotal`, `recordedAt`. Optional: `locationSessionId`, `outletId`, `fulfilment`, `paymentMethod`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Confirms the basket before it is sent; the guest types nothing here.** The kiosk sends the basket's lines; `id`, `recordedAt`, `quotedTotal` and `locationSessionId` are set by the kiosk and `fulfilment` is the outlet's counter pickup. Then the guest pays at the terminal (KSK-007) and the kitchen sees the order only once it is paid; KSK-009 confirms it (CHG-R1S-022). Dismissing sends nothing.",
     "bindsTo": "CreateGuestOrderRequest",
     "confirm": {
      "label": "Pay",

@@ -245,10 +245,10 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; evaluatePromotions · listProductVariants · listProductCategories · listProducts +2</div>
+          <div><b>OPERATIONS</b> &middot; evaluatePromotions · listProductVariants · listProductCategories · listProducts +3</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; productId&larr;WEB-004, venueId&larr;session</div>
-          <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-006">WEB-006</a>  &mdash; <i>Change date or time (the dated flow picks th</i> <span class="car">eventId</span><br><a href="#web-007">WEB-007</a>  &mdash; <i>Interactive Seat Selection</i> <span class="car">eventId</span><br><a href="#web-008">WEB-008</a>  &mdash; <i>Add-ons &amp; Upsell</i><br><a href="#web-010">WEB-010</a>  &mdash; <i>Shopping Cart</i> <span class="car">code · lineId</span><br><a href="#web-016">WEB-016</a>  &mdash; <i>Continue, when sign-in is asked after add-on</i> <span class="car">cartId</span></div>
+          <div><b>ARRIVES WITH</b> &middot; productId&larr;WEB-004, venueId&larr;session, cartId&larr;navigation</div>
+          <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-006">WEB-006</a>  &mdash; <i>Change date or time (the dated flow picks th</i> <span class="car">eventId</span><br><a href="#web-007">WEB-007</a>  &mdash; <i>Interactive Seat Selection</i> <span class="car">eventId</span><br><a href="#web-008">WEB-008</a>  &mdash; <i>Add-ons &amp; Upsell</i><br><a href="#web-010">WEB-010</a>  &mdash; <i>Shopping Cart</i> <span class="car">cartId · code · lineId · performanceId</span><br><a href="#web-016">WEB-016</a>  &mdash; <i>Continue, when sign-in is asked after add-on</i> <span class="car">cartId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> helpMeChoose &middot; <i>Help me choose (the button, the banner, or once on first arrival when the mode is popupOnArrival)</i> &middot; <b>Show me</b> &middot; Close <span class="dis">discards answers</span></div><div class="ov"><b>modal</b> quickTour &middot; <i>First booking visit on this device, or Quick tour</i> &middot; End tour</div></div>
         </div>
@@ -305,7 +305,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; addCartLine · getBundle · decideRecommendations · recordRecommendationEvents +1</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; cartId&larr;session, bundleId&larr;navigation, venueId&larr;session</div>
-          <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-005">WEB-005</a>  &mdash; <i>Ticket Type Selection</i><br><a href="#web-006">WEB-006</a>  &mdash; <i>Date &amp; Performance Selection</i> <span class="car">cartId · performanceId</span><br><a href="#web-010">WEB-010</a>  &mdash; <i>Shopping Cart</i> <span class="car">cartId · code · lineId · performanceId</span><br><a href="#web-016">WEB-016</a>  &mdash; <i>Continue — sign in or use a guest code (when</i> <span class="car">cartId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-005">WEB-005</a>  &mdash; <i>Ticket Type Selection</i> <span class="car">cartId</span><br><a href="#web-006">WEB-006</a>  &mdash; <i>Date &amp; Performance Selection</i> <span class="car">cartId · performanceId</span><br><a href="#web-010">WEB-010</a>  &mdash; <i>Shopping Cart</i> <span class="car">cartId · code · lineId · performanceId</span><br><a href="#web-016">WEB-016</a>  &mdash; <i>Continue — sign in or use a guest code (when</i> <span class="car">cartId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formAddCartLine &middot; <i>Add cart line</i> &middot; <b>Add cart line</b> &middot; Cancel <span class="dis">discards variantId · quantity · performanceId · seatIds · parentLineId · attributes</span></div></div>
         </div>
@@ -381,7 +381,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; applyCartPromoCode · getCart · addCartLine · updateCartLine +10</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; cartId&larr;WEB-008, code&larr;deepLink, lineId&larr;deepLink</div>
-          <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-011">WEB-011</a>  &mdash; <i>Answers attendee forms and consent, only whe</i><br><a href="#web-012">WEB-012</a>  &mdash; <i>Checkout — Payment</i> <span class="car">orderId · paymentId</span><br><a href="#web-013">WEB-013</a>  &mdash; <i>Booking Confirmation</i> <span class="car">orderId</span><br><a href="#web-016">WEB-016</a>  &mdash; <i>Login / Register</i> <span class="car">subjectId</span><br><a href="#web-030">WEB-030</a>  &mdash; <i>They transfer three tickets</i> <span class="car">orderId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-011">WEB-011</a>  &mdash; <i>Answers attendee forms and consent, only whe</i> <span class="car">holdId</span><br><a href="#web-012">WEB-012</a>  &mdash; <i>Checkout — Payment</i> <span class="car">orderId · paymentId</span><br><a href="#web-013">WEB-013</a>  &mdash; <i>Booking Confirmation</i> <span class="car">orderId</span><br><a href="#web-016">WEB-016</a>  &mdash; <i>Login / Register</i> <span class="car">subjectId</span><br><a href="#web-030">WEB-030</a>  &mdash; <i>They transfer three tickets</i> <span class="car">orderId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmRemoveCartLine &middot; <i>Remove</i></div><div class="ov"><b>confirmDialog</b> confirmAbandonCart &middot; <i>Empty cart</i></div></div>
         </div>
@@ -397,10 +397,10 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listConsentPurposes · updateMyProfile · getCart · recordConsentAnswers +2</div>
+          <div><b>OPERATIONS</b> &middot; listConsentPurposes · updateMyProfile · getCart · recordConsentAnswers +3</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session, cartId&larr;session, venueId&larr;session</div>
-          <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-010">WEB-010</a>  &mdash; <i>They check out</i> <span class="car">cartId · lineId · performanceId</span><br><a href="#web-012">WEB-012</a>  &mdash; <i>Pays</i><br><a href="#web-016">WEB-016</a>  &mdash; <i>Chooses to sign in rather than continue as a</i> <span class="car">cartId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-010">WEB-010</a>  &mdash; <i>They check out</i> <span class="car">cartId · holdId · lineId · performanceId</span><br><a href="#web-012">WEB-012</a>  &mdash; <i>Pays</i><br><a href="#web-016">WEB-016</a>  &mdash; <i>Chooses to sign in rather than continue as a</i> <span class="car">cartId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formUpdateMyProfile &middot; <i>Save my profile</i> &middot; <b>Save my profile</b> &middot; Cancel <span class="dis">discards displayName · email · phone · preferredLanguage · preferredChannel · dietary · accessibility</span></div></div>
         </div>
@@ -850,7 +850,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createAiConversation · sendAiMessage · handoverToAgent · requestSuggestion +4</div>
+          <div><b>OPERATIONS</b> &middot; createAiConversation · sendAiMessage · handoverToAgent · requestSuggestion +5</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; conversationId&larr;deepLink, outletId&larr;session, messageId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> </div>
@@ -926,7 +926,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listGroupPackages · getGroupPackageDefinition · requestGroupBooking · listReservations +5</div>
+          <div><b>OPERATIONS</b> &middot; listGroupPackages · getGroupPackageDefinition · requestGroupBooking · listReservations +6</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session, reservationId&larr;deepLink, groupBookingId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-030">WEB-030</a>  &mdash; <i>Ticket Transfer</i> <span class="car">orderId</span><br><a href="#web-035">WEB-035</a> </div>
@@ -1059,7 +1059,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getFnbDeliveryPolicy · listFulfilmentSlots · getGuestMenu · listDiningOutlets +9</div>
+          <div><b>OPERATIONS</b> &middot; getFnbDeliveryPolicy · listFulfilmentSlots · getGuestMenu · listDiningOutlets +10</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; outletId&larr;deepLink, venueId&larr;session, orderId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-037">WEB-037</a>  &mdash; <i>Menu Item Detail</i> <span class="car">outletId</span></div>
@@ -1154,7 +1154,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listParkingFacilities · addCartLine · updateParkingEntitlement</div>
+          <div><b>OPERATIONS</b> &middot; listParkingFacilities · addCartLine · updateParkingEntitlement · getParkingEntitlement</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline · soldOutForDay</span></div>
           <div><b>ARRIVES WITH</b> &middot; entitlementId&larr;deepLink, venueId&larr;session, cartId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> </div>
@@ -1488,7 +1488,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; addCartLine · decideRecommendations · recordRecommendationEvents</div>
+          <div><b>OPERATIONS</b> &middot; addCartLine · decideRecommendations · recordRecommendationEvents · getCart</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; cartId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i><br><a href="#gst-002">GST-002</a> </div>
@@ -3387,7 +3387,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; transferOrderTickets</div>
+          <div><b>OPERATIONS</b> &middot; transferOrderTickets · listTicketTransfers</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · offline · emptyNoResults</span></div>
           <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i><br><a href="#gst-002">GST-002</a> </div>
@@ -3569,9 +3569,9 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createRefundRequest · createResaleListing</div>
+          <div><b>OPERATIONS</b> &middot; createRefundRequest · createResaleListing · getOrder</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session</div>
+          <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session, orderId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#gst-039">GST-039</a>  &mdash; <i>Profile</i> <span class="car">subjectId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateRefundRequest &middot; <i>Create refund request</i> &middot; <b>Create refund request</b> &middot; Cancel <span class="dis">discards orderId · reason · lineIds</span></div><div class="ov"><b>modal</b> formCreateResaleListing &middot; <i>Create resale listing</i> &middot; <b>Create resale listing</b> &middot; Cancel <span class="dis">discards entitlementId · askPrice · sellerSubjectId</span></div></div>
@@ -3941,7 +3941,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; addCartLine · updateParkingEntitlement · listParkingFacilities</div>
+          <div><b>OPERATIONS</b> &middot; addCartLine · updateParkingEntitlement · listParkingFacilities · getParkingEntitlement</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline · soldOutForDay</span></div>
           <div><b>ARRIVES WITH</b> &middot; entitlementId&larr;deepLink, cartId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i><br><a href="#gst-002">GST-002</a> <br><a href="#gst-009">GST-009</a>  &mdash; <i>They pay in the basket, and the parking enti</i> <span class="car">token</span><br><a href="#gst-028">GST-028</a>  &mdash; <i>It is confirmed with a facility</i> <span class="car">orderId</span></div>
@@ -4199,7 +4199,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getGuestMenu · sendAiMessage · createAiConversation · handoverToAgent +4</div>
+          <div><b>OPERATIONS</b> &middot; getGuestMenu · sendAiMessage · createAiConversation · handoverToAgent +5</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; conversationId&larr;deepLink, outletId&larr;deepLink, messageId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i><br><a href="#gst-002">GST-002</a> <br><a href="#gst-032">GST-032</a>  &mdash; <i>AI Concierge – Chat</i> <span class="car">conversationId · messageId</span></div>
@@ -4343,7 +4343,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createGuestFnbOrder · getGuestOrderStatus · getCart · addCartLine +5</div>
+          <div><b>OPERATIONS</b> &middot; createGuestFnbOrder · getGuestOrderStatus · getCart · addCartLine +6</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline · emptyNoResults</span></div>
           <div><b>ARRIVES WITH</b> &middot; cartId&larr;session, conversationId&larr;deepLink, orderId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i><br><a href="#gst-002">GST-002</a> <br><a href="#gst-033">GST-033</a>  &mdash; <i>AI Concierge – Contextual Help</i> <span class="car">conversationId · messageId</span></div>
@@ -4362,7 +4362,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; sendAiMessage · createAiConversation · handoverToAgent · recordAnswerFeedback</div>
+          <div><b>OPERATIONS</b> &middot; sendAiMessage · createAiConversation · handoverToAgent · recordAnswerFeedback +1</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; conversationId&larr;deepLink, messageId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i><br><a href="#gst-002">GST-002</a> </div>
@@ -4973,7 +4973,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getTransportRoute · getTransportRouteMap · getTransportFareTable · quoteTransportFare +2</div>
+          <div><b>OPERATIONS</b> &middot; getTransportRoute · getTransportRouteMap · getTransportFareTable · quoteTransportFare +3</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; routeId&larr;GST-076, departureId&larr;GST-076, cartId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#gst-076">GST-076</a>  &mdash; <i>Back to departures</i> <span class="car">routeId</span><br><a href="#gst-049">GST-049</a>  &mdash; <i>Choose seats on this departure</i> <span class="car">performanceId</span><br><a href="#gst-041">GST-041</a>  &mdash; <i>Continue to payment</i> <span class="car">cartId</span><br><a href="#gst-042">GST-042</a>  &mdash; <i>Sign in to save this route</i></div>
@@ -5030,21 +5030,21 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div class="body">
             <div class="top">
               <div><h2>Attract Loop</h2>
-                <small>Guest Kiosk &middot; wave 2 &middot; touchLarge</small></div>
+                <small>Guest Kiosk &middot; wave 1 &middot; touchLarge</small></div>
               <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
             </div>
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>What&#x27;s on</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Published products only, primary media first; a touch opens the language choice (CHG-R1S-022).</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>OPERATIONS</b> &middot; listProducts</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · offline</span></div>
           
-          <div><b>GOES TO</b> &middot; entry point · <a href="#ksk-002">KSK-002</a>  &mdash; <i>Chooses a language</i><br><a href="#ksk-003">KSK-003</a>  &mdash; <i>What are you buying</i><br><a href="#ksk-004">KSK-004</a>  &mdash; <i>Choose tickets</i><br><a href="#ksk-014">KSK-014</a>  &mdash; <i>Out of service</i></div>
+          <div><b>GOES TO</b> &middot; entry point · <a href="#ksk-002">KSK-002</a>  &mdash; <i>Chooses a language</i><br><a href="#ksk-003">KSK-003</a>  &mdash; <i>What are you buying</i><br><a href="#ksk-004">KSK-004</a>  &mdash; <i>Choose tickets</i> <span class="car">productId</span><br><a href="#ksk-014">KSK-014</a>  &mdash; <i>Out of service</i><br><a href="#ksk-015">KSK-015</a>  &mdash; <i>Opens Assistant</i></div>
           
           
         </div>
@@ -5186,17 +5186,17 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><b>The cart</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Offers applied</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">The promotions that apply and the near misses, evaluated by themselves (`evaluatePromotions`) and shown before payment (F75 step 4).</span></div><div class="panel"><b>Quantity</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">A large stepper per line; + adds one more (`addCartLine`).</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>The cart</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Offers applied</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">The offers the cart already carries (`Cart.discountTotal`): promotions apply on their own, nothing is pressed (CHG-R1S-022).</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getCart · addCartLine · checkoutCart · evaluatePromotions</div>
+          <div><b>OPERATIONS</b> &middot; getCart · checkoutCart</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; cartId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#ksk-001">KSK-001</a> <br><a href="#ksk-002">KSK-002</a> <br><a href="#ksk-003">KSK-003</a> <br><a href="#ksk-007">KSK-007</a>  &mdash; <i>Pays at the terminal</i><br><a href="#ksk-008">KSK-008</a>  &mdash; <i>The payment does not resolve</i> <span class="car">paymentId</span></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCheckoutCart &middot; <i>Pay</i> &middot; <b>Pay</b> &middot; Back</div></div>
         </div>
       </div>
       <div id="ksk-007" class="scr">
@@ -5336,12 +5336,12 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><b>The order</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Search</b><div class="chip">Search</div><span class="why">A search that returns nothing must say so differently from a search not yet run.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>The order</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Scan your booking QR</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The booking&#x27;s QR carries the order; scanning it opens the booking. Shop-and-drop collection is staff-only and not here (CHG-R1S-022).</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; lookupShopAndDrop · getOrder</div>
+          <div><b>OPERATIONS</b> &middot; getOrder</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#ksk-001">KSK-001</a> <br><a href="#ksk-002">KSK-002</a> <br><a href="#ksk-003">KSK-003</a> <br><a href="#ksk-012">KSK-012</a>  &mdash; <i>Booking found</i> <span class="car">orderId</span></div>
@@ -5401,12 +5401,12 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; endKioskAssist</div>
+          <div><b>OPERATIONS</b> &middot; endKioskAssist · handoverToAgent</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; sessionId&larr;session</div>
+          <div><b>ARRIVES WITH</b> &middot; sessionId&larr;session, conversationId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#ksk-001">KSK-001</a> <br><a href="#ksk-002">KSK-002</a> <br><a href="#ksk-003">KSK-003</a> </div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formHandoverToAgent &middot; <i>Call a member of staff</i> &middot; <b>Call a member of staff</b> &middot; Back</div></div>
         </div>
       </div>
       <div id="ksk-014" class="scr">
@@ -5426,12 +5426,12 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Out of service</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">Shown while the tenant&#x27;s app status or this kiosk&#x27;s own health (its heartbeat, recordDeviceHeartbeat) says it cannot sell; polled, and the attract loop returns </span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>OPERATIONS</b> &middot; getTenantAppStatus</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · offline</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#ksk-001">KSK-001</a> <br><a href="#ksk-002">KSK-002</a> <br><a href="#ksk-003">KSK-003</a> </div>
@@ -5456,7 +5456,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><b>The guest menu</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Menu</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Photographs, because **a guest at a kiosk with a queue behind them is not reading descriptions**</span></div><div class="panel"><span class="kind">banner</span><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">Allergens shown on the card, not behind a tap. **contains and mayContain are different claims** and a fryer shared with breaded fish makes chips a fish risk</span></div></div><div class="side"><div class="panel"><b>Add to order</b><div class="chip cta">Add to order</div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>The guest menu</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Menu</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Photographs, because **a guest at a kiosk with a queue behind them is not reading descriptions**</span></div><div class="panel"><span class="kind">banner</span><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">Says *contains* and *may contain* apart, from each item&#x27;s `allergenDetail` (`Allergen.contains`, `Allergen.mayContain`) (CHG-R1S-022).</span></div></div><div class="side"><div class="panel"><b>Add to order</b><div class="chip cta">Add to order</div></div></div></div>
             </div>
           </div>
         </div>
@@ -5464,7 +5464,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; getGuestMenu · createGuestFnbOrder</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; outletId&larr;deepLink</div>
-          <div><b>GOES TO</b> &middot; <a href="#ksk-017">KSK-017</a>  &mdash; <i>Shop</i> <span class="car">outletId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#ksk-017">KSK-017</a>  &mdash; <i>Shop</i> <span class="car">outletId</span><br><a href="#ksk-007">KSK-007</a>  &mdash; <i>Pays for the food order</i> <span class="car">orderId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateGuestFnbOrder &middot; <i>Pay</i> &middot; <b>Pay</b> &middot; Cancel <span class="dis">discards id · lines · quotedTotal · recordedAt · locationSessionId · outletId · fulfilment · paymentMethod</span></div></div>
         </div>
@@ -5521,12 +5521,12 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; sendAiMessage · listProducts · getAvailability · handoverToAgent +2</div>
+          <div><b>OPERATIONS</b> &middot; sendAiMessage · listProducts · getAvailability · handoverToAgent +3</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; conversationId&larr;deepLink, messageId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; conversationId&larr;deepLink, messageId&larr;navigation, cartId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#ksk-001">KSK-001</a> </div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmHandover &middot; <i>Talk to a person</i> &middot; <b>Ask a person</b> &middot; Keep asking</div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmHandover &middot; <i>Talk to a person</i> &middot; <b>Ask a person</b> &middot; Keep asking</div><div class="ov"><b>modal</b> formAddCartLine &middot; <i>Add to basket</i> &middot; <b>Add to basket</b> &middot; Back</div></div>
         </div>
       </div></div>
   <div class="bottom">

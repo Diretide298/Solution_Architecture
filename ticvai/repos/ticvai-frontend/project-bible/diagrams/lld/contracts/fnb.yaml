@@ -1,5 +1,5 @@
 id: LLD-fnb
-title: fnb — 133 operations
+title: fnb — 135 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -22,6 +22,7 @@ operations:
   writes:
   - cache:idempotency
   - fnb.service_order
+  - platform.outbox
 - operation: amendFnbOrder
   verb: PATCH
   path: /fnb-orders/{orderId}
@@ -314,6 +315,7 @@ operations:
   - fnb.kitchen_ticket
   - fnb.order_fulfilment
   - fnb.service_order
+  - platform.outbox
 - operation: createMenu
   verb: POST
   path: /menus
@@ -408,6 +410,7 @@ operations:
   - inventory.movement
   writes:
   - cache:idempotency
+  - inventory.count_line
 - operation: escalateCorrectiveAction
   verb: POST
   path: /food-safety/corrective-actions/{actionId}/escalate
@@ -592,7 +595,8 @@ operations:
   audience:
   - staff
   offline: true
-  reads: []
+  reads:
+  - fnb.kitchen_sla
   writes: []
 - operation: getMenu
   verb: GET
@@ -711,7 +715,8 @@ operations:
   offline: false
   reads:
   - fnb.waitlist_entry
-  writes: []
+  writes:
+  - fnb.waitlist_entry
 - operation: list86Events
   verb: GET
   path: /outlets/{outletId}/86-events
@@ -733,6 +738,18 @@ operations:
   - guest
   offline: false
   reads: []
+  writes: []
+- operation: listCombos
+  verb: GET
+  path: /combos
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - fnb.combo
+  - fnb.combo_slot
   writes: []
 - operation: listDeliveryLocations
   verb: GET
@@ -928,6 +945,17 @@ operations:
   reads:
   - fnb.recipe
   - fnb.recipe_ingredient
+  writes: []
+- operation: listSubstitutionRules
+  verb: GET
+  path: /substitution-rules
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - fnb.substitution_rule
   writes: []
 - operation: listTableReservations
   verb: GET
@@ -1193,6 +1221,7 @@ operations:
   - fnb.table_visit
   writes:
   - cache:idempotency
+  - fnb.waitlist_entry
 - operation: reassignServer
   verb: PUT
   path: /table-visits/{visitId}/server
@@ -1350,6 +1379,7 @@ operations:
   - cache:idempotency
   writes:
   - cache:idempotency
+  - inventory.count_line
 - operation: resolveBookingConflict
   verb: GET
   path: /table-reservations/conflicts
@@ -1577,9 +1607,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - fnb.kitchen_sla
   writes:
   - cache:idempotency
   - cache:resolution
+  - fnb.kitchen_sla
 - operation: setKitchenStations
   verb: PUT
   path: /kitchen/stations
@@ -1620,7 +1652,8 @@ operations:
   offline: false
   reads:
   - fnb.menu_item
-  writes: []
+  writes:
+  - fnb.menu_item
 - operation: setMenuSections
   verb: PUT
   path: /menus/{menuId}/sections
@@ -1649,7 +1682,8 @@ operations:
   offline: false
   reads:
   - fnb.outlet_template
-  writes: []
+  writes:
+  - fnb.outlet_template
 - operation: setPrepSheetTemplate
   verb: PUT
   path: /prep-sheet-template
@@ -1811,6 +1845,7 @@ operations:
   writes:
   - cache:idempotency
   - fnb.bill_split
+  - fnb.sub_bill
 - operation: transferOrderItems
   verb: POST
   path: /table-visits/{visitId}/transfer-items
@@ -1826,11 +1861,11 @@ operations:
   - fnb.service_order
   - fnb.service_order_line
   - fnb.table_visit
-  - orders.order_line
   writes:
   - cache:idempotency
+  - fnb.service_order
+  - fnb.service_order_line
   - fnb.table_visit
-  - orders.order_line
 - operation: transferTableVisit
   verb: POST
   path: /table-visits/{visitId}/transfer
@@ -1947,4 +1982,5 @@ operations:
   - fnb.modifier_group
   - fnb.recipe
   - fnb.substitution_rule
-  writes: []
+  writes:
+  - fnb.allergen_verdict

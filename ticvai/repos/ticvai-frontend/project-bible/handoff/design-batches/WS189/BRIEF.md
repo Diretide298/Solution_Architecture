@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-1113` | Shared Wallet Command Center | B–D | 0 | 28 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-1114` | Shared Wallet Model Configuration | B–D | 11 | 18 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-1115` | Family & Household Structure Configuration | B–D | 11 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-1116` | Parent–Child Stored Value Distribution | B–D | 14 | 24 | 6 | 4 | 2 | 6 | — | notStarted (—) |
-| `BO-1117` | Allowance & Budget Allocation Engine | B–D | 12 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-1118` | Member Spending Controls & Permissions | B–D | 23 | 18 | 6 | 0 | 1 | 5 | — | notStarted (—) |
-| `BO-1119` | Corporate Wallet & Organizational Hierarchy | B–D | 11 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-1120` | Corporate Budget, Policy & Approval Rules | B–D | 9 | 38 | 6 | 49 | 1 | 3 | — | notStarted (—) |
-| `BO-1121` | Shared Wallet Transfers & Balance Reallocation | B–D | 11 | 6 | 6 | 4 | 1 | 6 | — | notStarted (—) |
-| `BO-1122` | Shared Wallet Simulator, Monitoring & Audit | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-1113` | Shared Wallet Command Center | C | 0 | 28 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-1114` | Shared Wallet Model Configuration | C | 11 | 18 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-1115` | Family & Household Structure Configuration | C | 11 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-1116` | Parent–Child Stored Value Distribution | C | 14 | 24 | 6 | 4 | 2 | 6 | — | notStarted (—) |
+| `BO-1117` | Allowance & Budget Allocation Engine | C | 12 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-1118` | Member Spending Controls & Permissions | C | 23 | 18 | 6 | 0 | 1 | 5 | — | notStarted (—) |
+| `BO-1119` | Corporate Wallet & Organizational Hierarchy | C | 11 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-1120` | Corporate Budget, Policy & Approval Rules | C | 9 | 38 | 6 | 49 | 1 | 3 | — | notStarted (—) |
+| `BO-1121` | Shared Wallet Transfers & Balance Reallocation | C | 11 | 6 | 6 | 4 | 1 | 6 | — | notStarted (—) |
+| `BO-1122` | Shared Wallet Simulator, Monitoring & Audit | C | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

@@ -175,6 +175,25 @@
   "requestBody": null,
   "responds": "Cart"
  },
+ "extendSeatHold": {
+  "method": "POST",
+  "path": "/seat-holds/{holdId}/extend",
+  "contract": "seating",
+  "summary": "Extend a hold",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatHold"
+ },
  "getCart": {
   "method": "GET",
   "path": "/carts/{cartId}",

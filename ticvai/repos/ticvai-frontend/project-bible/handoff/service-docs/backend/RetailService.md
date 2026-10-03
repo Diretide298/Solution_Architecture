@@ -28,7 +28,7 @@ Merchandise, wallets and gift cards. Modest at 35 operations, and separate becau
 | floor | [`collectShopAndDrop`](#collectshopanddrop) | POST | `/shop-and-drop/{dropId}/collect` | core | 1 | POS-012 |
 | floor | [`createShopAndDrop`](#createshopanddrop) | POST | `/shop-and-drop` | core | 1 | POS-005 |
 | floor | [`lookupMerchandise`](#lookupmerchandise) | GET | `/merchandise/lookup` | core | 1 | BO-114, EMP-062, EMP-069, GST-026, KSK-017, POS-002 … |
-| floor | [`lookupShopAndDrop`](#lookupshopanddrop) | GET | `/shop-and-drop/lookup` | core | 1 | BO-143, GST-062, KSK-011, POS-012, WEB-042 |
+| floor | [`lookupShopAndDrop`](#lookupshopanddrop) | GET | `/shop-and-drop/lookup` | core | 1 | BO-143, GST-062, POS-012, WEB-042 |
 | floor | [`reserveMerchandise`](#reservemerchandise) | POST | `/outlets/{outletId}/reserve` | core | 1 | EMP-068, GST-026, KSK-017, POS-012 |
 | merchandise | [`createMerchandise`](#createmerchandise) | POST | `/merchandise` | setup | 1 | BO-007, BO-048 |
 | merchandise | [`listMerchandise`](#listmerchandise) | GET | `/merchandise` | core | 1 | BO-007, BO-048, BO-116, GST-026, KSK-017, POS-002 … |
@@ -270,7 +270,7 @@ Scanned at the collection point. Accepts the entitlement, the drop reference, or
 | Read routing | primary |
 | Reads | `retail.shop_and_drop`, `retail.shop_and_drop_line` |
 | Writes | - |
-| Called by | BO-143, GST-062, KSK-011, POS-012, WEB-042 |
+| Called by | BO-143, GST-062, POS-012, WEB-042 |
 
 **Parameters**
 

@@ -18,6 +18,19 @@
   "requestBody": null,
   "responds": null
  },
+ "getVirtualTicketIdentity": {
+  "method": "GET",
+  "path": "/virtual-ticket-identity",
+  "contract": "access",
+  "summary": "The virtual ticket identity configuration as saved",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "VirtualTicketIdentityMasterRecordConfigurationView"
+ },
  "listCredentialIdentityToken": {
   "method": "GET",
   "path": "/credential-identity-token",

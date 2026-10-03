@@ -137,6 +137,25 @@
   "requestBody": null,
   "responds": "ApiUsageSummary"
  },
+ "getDeveloperAccount": {
+  "method": "GET",
+  "path": "/developers/{developerId}",
+  "contract": "public-api",
+  "summary": "A registered developer organisation",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "developerId",
+    "in": "path",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "DeveloperAccount"
+ },
  "listApiAnomalies": {
   "method": "GET",
   "path": "/api-anomalies",
@@ -171,6 +190,30 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listApiAnomalyRules": {
+  "method": "GET",
+  "path": "/api-anomaly-rules",
+  "contract": "public-api",
+  "summary": "The rules that flag abnormal API traffic",
+  "permission": "DEVELOPER_ADMIN",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listApiClients": {
   "method": "GET",
   "path": "/api-clients",
@@ -183,6 +226,54 @@
   "parameters": [],
   "requestBody": null,
   "responds": "ApiClient"
+ },
+ "listApiLicences": {
+  "method": "GET",
+  "path": "/api-licensing",
+  "contract": "public-api",
+  "summary": "The API licences granted, per client",
+  "permission": "DEVELOPER_ADMIN",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listApiQuotas": {
+  "method": "GET",
+  "path": "/api-quotas",
+  "contract": "public-api",
+  "summary": "The rate limits and quotas set per client",
+  "permission": "DEVELOPER_ADMIN",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listApiScopes": {
   "method": "GET",

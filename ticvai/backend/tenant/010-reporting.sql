@@ -1,4 +1,4 @@
--- reporting — 23 tables
+-- reporting — 24 tables
 -- **Derived. Do not hand-edit.**
 
 -- A rule that fired. Acknowledged rather than dismissed — an alert that disappears when clicked
@@ -42,10 +42,23 @@ CREATE TABLE IF NOT EXISTS reporting.alert_rule (
     scope_path                        ltree NOT NULL
 );
 
+-- Holds 8 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS reporting.analytics_governance_policy (
+    masking                           jsonb,
+    export                            jsonb,
+    retention                         jsonb,
+    sharing                           jsonb,
+    ai_and_api_access                 jsonb,
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS reporting.anomaly (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     kpi_id                            uuid,
     metric                            text,
     scope_path                        ltree NOT NULL,
@@ -87,7 +100,7 @@ CREATE TABLE IF NOT EXISTS reporting.dashboard_tile (
 -- Holds 5 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS reporting.dashboard_view (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     dashboard_id                      uuid NOT NULL,
     viewed_by_principal_id            uuid NOT NULL,
     venue_id                          uuid,
@@ -97,7 +110,7 @@ CREATE TABLE IF NOT EXISTS reporting.dashboard_view (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS reporting.delivery (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     subscription_id                   uuid,
     report_id                         uuid,
     attempted_at                      timestamptz,
@@ -146,7 +159,7 @@ CREATE TABLE IF NOT EXISTS reporting.export (
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS reporting.kpi_definition (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text NOT NULL,
     description                       text,
@@ -190,7 +203,7 @@ CREATE TABLE IF NOT EXISTS reporting.natural_language_query (
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS reporting.pipeline (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     name                              text,
     source_kind                       text,
     datasets                          text[],
@@ -208,13 +221,19 @@ CREATE TABLE IF NOT EXISTS reporting.pipeline (
 -- One column of a definition, with its aggregation
 CREATE TABLE IF NOT EXISTS reporting.report_column (
     report_definition_id              uuid NOT NULL,
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     field                             text NOT NULL,
     label                             text,
     aggregation                       text DEFAULT 'none',
     sort_order                        integer,
     sort_direction                    text CONSTRAINT report_column_sort_direction_chk CHECK (sort_direction IN ('asc', 'desc')),
-    format                            text
+    format                            text,
+    role                              text CONSTRAINT report_column_role_chk CHECK (role IN ('dimension', 'measure')),
+    encoding                          text CONSTRAINT report_column_encoding_chk CHECK (encoding IN ('category', 'x', 'y', 'series', 'value', 'size', 'colour', 'location', 'stage', 'source', 'target', 'row', 'column', 'hierarchyLevel', 'label', 'tooltip')),
+    axis                              text CONSTRAINT report_column_axis_chk CHECK (axis IN ('primary', 'secondary')),
+    series_type                       text CONSTRAINT report_column_series_type_chk CHECK (series_type IN ('bar', 'line', 'area')),
+    hierarchy_level                   integer,
+    unit_label                        text CONSTRAINT report_column_unit_label_chk CHECK (char_length(unit_label) <= 40)
 );
 
 -- A saved question, not its answer. Columns, filters and parameters are children; a run is an
@@ -225,7 +244,7 @@ CREATE TABLE IF NOT EXISTS reporting.report_definition (
     category                          text NOT NULL CONSTRAINT report_definition_category_chk CHECK (category IN ('sales', 'admission', 'financial', 'inventory', 'guest', 'operations', 'marketing', 'workforce', 'compliance', 'custom')),
     data_source                       text NOT NULL CONSTRAINT report_definition_data_source_chk CHECK (data_source IN ('orders', 'orderLines', 'payments', 'refunds', 'shifts', 'scanEvents', 'entitlements', 'products', 'inventory', 'stockMovements', 'stockCounts', 'waste', 'workstations', 'devices', 'principals', 'loyalty', 'reviews', 'queueEntries', 'guests', 'campaigns', 'cases', 'ledgerEntries', 'workOrders', 'approvals', 'purchaseOrders', 'receipts', 'requisitions', 'stockBatches', 'resourceBookings', 'delegations', 'forms', 'challenges', 'wallets', 'resaleListings', 'accreditationApplications', 'accreditationHolders', 'accreditationCredentials', 'forecastPoints')),
     group_by                          text[],
-    required_permission               text NOT NULL CONSTRAINT report_definition_required_permission_chk CHECK (required_permission IN ('SESSION_FORCE_LOGOUT', 'USER_MANAGE', 'ROLE_MANAGE', 'PERMISSION_GRANT', 'PERMISSION_VIEW', 'PERMISSION_MANAGE', 'PLATFORM_TENANT_VIEW', 'PLATFORM_TENANT_MANAGE', 'PLATFORM_TENANT_TERMINATE', 'PLATFORM_PLAN_MANAGE', 'PLATFORM_CELL_VIEW', 'PLATFORM_CELL_MANAGE', 'PLATFORM_BILLING_VIEW', 'PLATFORM_AI_MANAGE', 'PLATFORM_BILLING_MANAGE', 'PLATFORM_RELEASE_VIEW', 'PLATFORM_RELEASE_MANAGE', 'PLATFORM_RELEASE_PROMOTE', 'PLATFORM_MIGRATION_VIEW', 'PLATFORM_MIGRATION_APPLY', 'PLATFORM_TENANT_ACCESS', 'TENANT_CONFIGURE', 'TENANT_VIEW', 'TENANT_PUBLISH', 'SCOPE_VIEW', 'SCOPE_MANAGE', 'REGION_CONFIGURE', 'WORKSTATION_CONFIGURE', 'PRODUCT_VIEW', 'PRODUCT_CONFIGURE', 'PRODUCT_APPROVE', 'PRODUCT_PUBLISH', 'PRICE_VIEW', 'PRICE_CONFIGURE', 'EVENT_CONFIGURE', 'PERFORMANCE_CONFIGURE', 'CAPACITY_CONFIGURE', 'ORDER_VIEW', 'ORDER_VIEW_OTHER', 'ORDER_CREATE', 'ORDER_MODIFY', 'ORDER_DISCOUNT', 'ORDER_CANCEL', 'ORDER_VOID', 'ORDER_REFUND', 'ORDER_REFUND_APPROVE', 'ORDER_REFUND_BULK', 'ORDER_EXCHANGE', 'ORDER_RESCHEDULE', 'ORDER_REPRINT', 'PRICE_OVERRIDE', 'DISCOUNT_APPLY', 'CREDIT_MANAGE', 'CREDIT_OVERRIDE', 'WALLET_VIEW', 'WALLET_OPERATE', 'WALLET_CONFIGURE', 'PAYMENT_VIEW', 'PAYMENT_CONFIGURE', 'PAYMENT_PROVIDER_MANAGE', 'PAYMENT_DISPUTE', 'SHIFT_OPEN', 'SHIFT_CLOSE', 'SHIFT_SUSPEND', 'SHIFT_CLOSE_OTHER', 'SHIFT_APPROVE_OPEN', 'SHIFT_APPROVE_CLOSE', 'SHIFT_REOPEN', 'CASH_LIFT', 'CASH_ADD', 'CASH_NO_SALE', 'DEPOSIT_BOX_MODIFY_OWN', 'DEPOSIT_BOX_MODIFY_OTHER', 'OVERSHORT_ACCEPT', 'ACCESS_VALIDATE', 'ACCESS_OVERRIDE', 'ACCESS_POINT_CONFIGURE', 'TURNSTILE_MODE_SET', 'TICKET_LOOKUP', 'ACCREDITATION_VIEW', 'ACCREDITATION_APPLY', 'ACCREDITATION_APPROVE', 'ACCREDITATION_ISSUE', 'ACCREDITATION_MANAGE', 'ACCREDITATION_CONFIGURE', 'REPORT_VIEW_OWN', 'REPORT_VIEW_WORKSTATION', 'REPORT_VIEW_VENUE', 'REPORT_VIEW_REGION', 'REPORT_VIEW_TENANT', 'REPORT_EXPORT', 'REPORT_EXPORT_PII', 'REPORT_MANAGE', 'REPORT_SCHEDULE', 'LEDGER_VIEW', 'LEDGER_POST', 'LEDGER_APPROVE', 'TAX_CONFIGURE', 'ACCOUNT_CONFIGURE', 'SETTLEMENT_VIEW', 'SETTLEMENT_RECONCILE', 'GUEST_VIEW', 'GUEST_VIEW_PII', 'GUEST_MANAGE', 'VENUE_MAP_VIEW', 'VENUE_MAP_MANAGE', 'VENUE_MAP_PUBLISH', 'RESOURCE_VIEW', 'RESOURCE_BOOK', 'RESOURCE_MANAGE', 'RESOURCE_CONFIGURE', 'RENTAL_VIEW', 'RENTAL_BOOK', 'RENTAL_OPERATE', 'RENTAL_MANAGE', 'RENTAL_CONFIGURE', 'RENTAL_PRICE', 'RENTAL_APPROVE', 'RENTAL_OVERRIDE', 'DEVELOPER_VIEW', 'DEVELOPER_MANAGE', 'DEVELOPER_ADMIN', 'LOYALTY_ACCRUE', 'LOYALTY_REDEEM', 'LOYALTY_ADJUST', 'MARKETING_VIEW', 'MARKETING_MANAGE', 'MARKETING_SEND', 'CASE_VIEW', 'CASE_MANAGE', 'ASSET_LIBRARY_VIEW', 'ASSET_LIBRARY_MANAGE', 'ASSET_LIBRARY_APPROVE', 'ASSET_LIBRARY_SHARE', 'QUEUE_VIEW', 'QUEUE_MANAGE', 'QUEUE_REDEEM', 'QUEUE_OVERRIDE', 'TRANSPORT_VIEW', 'TRANSPORT_MANAGE', 'TRANSPORT_PRICE', 'ASSET_VIEW', 'ASSET_MANAGE', 'WORK_ORDER_VIEW', 'WORK_ORDER_MANAGE', 'WORK_ORDER_VERIFY', 'INSPECTION_VIEW', 'INSPECTION_SUBMIT', 'INSPECTION_MANAGE', 'INCIDENT_REPORT', 'INCIDENT_VIEW', 'INCIDENT_MANAGE', 'KIOSK_ATTEND', 'DEVICE_VIEW', 'DEVICE_CONFIGURE', 'DEVICE_MANAGE', 'APPROVAL_ACT', 'APPROVAL_DELEGATE', 'AI_USE', 'AI_CONFIGURE', 'AI_APPROVE', 'AI_AUDIT_VIEW', 'RISK_REVIEW', 'RISK_INVESTIGATE', 'AUDIT_VIEW', 'APPROVAL_VIEW', 'APPROVAL_REQUEST', 'APPROVAL_DECIDE', 'APPROVAL_CONFIGURE', 'MAINTENANCE_EXECUTE', 'MAINTENANCE_APPROVE', 'WORKFORCE_VIEW', 'WORKFORCE_MANAGE', 'ATTENDANCE_RECORD', 'ANNOUNCEMENT_PUBLISH', 'ANNOUNCEMENT_EMERGENCY', 'PARTNER_VIEW', 'PARTNER_MANAGE', 'PARKING_CONFIGURE', 'PAYMENT_VOID', 'PROCUREMENT_VIEW', 'PROCUREMENT_REQUEST', 'PROCUREMENT_MANAGE', 'PROCUREMENT_RECEIVE')),
+    required_permission               text NOT NULL CONSTRAINT report_definition_required_permission_chk CHECK (required_permission IN ('SESSION_FORCE_LOGOUT', 'USER_MANAGE', 'ROLE_MANAGE', 'PERMISSION_GRANT', 'PERMISSION_VIEW', 'PERMISSION_MANAGE', 'PLATFORM_TENANT_VIEW', 'PLATFORM_TENANT_MANAGE', 'PLATFORM_TENANT_TERMINATE', 'PLATFORM_PLAN_MANAGE', 'PLATFORM_CELL_VIEW', 'PLATFORM_CELL_MANAGE', 'PLATFORM_BILLING_VIEW', 'PLATFORM_AI_MANAGE', 'PLATFORM_BILLING_MANAGE', 'PLATFORM_RELEASE_VIEW', 'PLATFORM_RELEASE_MANAGE', 'PLATFORM_RELEASE_PROMOTE', 'PLATFORM_MIGRATION_VIEW', 'PLATFORM_MIGRATION_APPLY', 'PLATFORM_TENANT_ACCESS', 'TENANT_CONFIGURE', 'TENANT_VIEW', 'TENANT_PUBLISH', 'SCOPE_VIEW', 'SCOPE_MANAGE', 'REGION_CONFIGURE', 'WORKSTATION_CONFIGURE', 'PRODUCT_VIEW', 'PRODUCT_CONFIGURE', 'PRODUCT_APPROVE', 'PRODUCT_PUBLISH', 'PRICE_VIEW', 'PRICE_CONFIGURE', 'EVENT_CONFIGURE', 'PERFORMANCE_CONFIGURE', 'CAPACITY_CONFIGURE', 'ORDER_VIEW', 'ORDER_VIEW_OTHER', 'ORDER_CREATE', 'ORDER_MODIFY', 'ORDER_DISCOUNT', 'ORDER_CANCEL', 'ORDER_VOID', 'ORDER_REFUND', 'ORDER_REFUND_APPROVE', 'ORDER_REFUND_BULK', 'ORDER_EXCHANGE', 'ORDER_RESCHEDULE', 'ORDER_REPRINT', 'PRICE_OVERRIDE', 'DISCOUNT_APPLY', 'CREDIT_MANAGE', 'CREDIT_OVERRIDE', 'WALLET_VIEW', 'WALLET_OPERATE', 'WALLET_CONFIGURE', 'PAYMENT_VIEW', 'PAYMENT_CONFIGURE', 'PAYMENT_PROVIDER_MANAGE', 'PAYMENT_DISPUTE', 'SHIFT_OPEN', 'SHIFT_CLOSE', 'SHIFT_SUSPEND', 'SHIFT_CLOSE_OTHER', 'SHIFT_APPROVE_OPEN', 'SHIFT_APPROVE_CLOSE', 'SHIFT_REOPEN', 'CASH_LIFT', 'CASH_ADD', 'CASH_NO_SALE', 'DEPOSIT_BOX_MODIFY_OWN', 'DEPOSIT_BOX_MODIFY_OTHER', 'OVERSHORT_ACCEPT', 'ACCESS_VALIDATE', 'ACCESS_OVERRIDE', 'ACCESS_POINT_CONFIGURE', 'TURNSTILE_MODE_SET', 'TICKET_LOOKUP', 'ACCREDITATION_VIEW', 'ACCREDITATION_APPLY', 'ACCREDITATION_APPROVE', 'ACCREDITATION_ISSUE', 'ACCREDITATION_MANAGE', 'ACCREDITATION_CONFIGURE', 'REPORT_VIEW_OWN', 'REPORT_VIEW_WORKSTATION', 'REPORT_VIEW_VENUE', 'REPORT_VIEW_REGION', 'REPORT_VIEW_TENANT', 'REPORT_EXPORT', 'REPORT_EXPORT_PII', 'REPORT_MANAGE', 'REPORT_SCHEDULE', 'LEDGER_VIEW', 'LEDGER_POST', 'LEDGER_APPROVE', 'TAX_CONFIGURE', 'ACCOUNT_CONFIGURE', 'SETTLEMENT_VIEW', 'SETTLEMENT_RECONCILE', 'GUEST_VIEW', 'GUEST_VIEW_PII', 'GUEST_MANAGE', 'VENUE_MAP_VIEW', 'VENUE_MAP_MANAGE', 'VENUE_MAP_PUBLISH', 'RESOURCE_VIEW', 'RESOURCE_BOOK', 'RESOURCE_MANAGE', 'RESOURCE_CONFIGURE', 'RENTAL_VIEW', 'RENTAL_BOOK', 'RENTAL_OPERATE', 'RENTAL_MANAGE', 'RENTAL_CONFIGURE', 'RENTAL_PRICE', 'RENTAL_APPROVE', 'RENTAL_OVERRIDE', 'DEVELOPER_VIEW', 'DEVELOPER_MANAGE', 'DEVELOPER_ADMIN', 'LOYALTY_ACCRUE', 'LOYALTY_REDEEM', 'LOYALTY_ADJUST', 'MARKETING_VIEW', 'MARKETING_MANAGE', 'MARKETING_SEND', 'CASE_VIEW', 'CASE_MANAGE', 'ASSET_LIBRARY_VIEW', 'ASSET_LIBRARY_MANAGE', 'ASSET_LIBRARY_APPROVE', 'ASSET_LIBRARY_SHARE', 'QUEUE_VIEW', 'QUEUE_MANAGE', 'QUEUE_REDEEM', 'QUEUE_OVERRIDE', 'TRANSPORT_VIEW', 'TRANSPORT_MANAGE', 'TRANSPORT_PRICE', 'ASSET_VIEW', 'ASSET_MANAGE', 'WORK_ORDER_VIEW', 'WORK_ORDER_MANAGE', 'WORK_ORDER_VERIFY', 'INSPECTION_VIEW', 'INSPECTION_SUBMIT', 'INSPECTION_MANAGE', 'INCIDENT_REPORT', 'INCIDENT_VIEW', 'INCIDENT_MANAGE', 'KIOSK_ATTEND', 'DEVICE_VIEW', 'DEVICE_CONFIGURE', 'DEVICE_MANAGE', 'APPROVAL_ACT', 'APPROVAL_DELEGATE', 'AI_USE', 'AI_CONFIGURE', 'AI_APPROVE', 'AI_AUDIT_VIEW', 'RISK_REVIEW', 'RISK_INVESTIGATE', 'AUDIT_VIEW', 'APPROVAL_VIEW', 'APPROVAL_REQUEST', 'APPROVAL_DECIDE', 'APPROVAL_CONFIGURE', 'MAINTENANCE_EXECUTE', 'MAINTENANCE_APPROVE', 'WORKFORCE_VIEW', 'WORKFORCE_MANAGE', 'ATTENDANCE_RECORD', 'ANNOUNCEMENT_PUBLISH', 'ANNOUNCEMENT_EMERGENCY', 'PARTNER_VIEW', 'PARTNER_MANAGE', 'PARKING_CONFIGURE', 'PAYMENT_VOID', 'PROCUREMENT_VIEW', 'PROCUREMENT_REQUEST', 'PROCUREMENT_MANAGE', 'PROCUREMENT_RECEIVE', 'CORE_AI_PUBLISH', 'TICKETING_AI_PUBLISH', 'ACCESS_AI_PUBLISH', 'FNB_AI_PUBLISH', 'RETAIL_AI_PUBLISH', 'INVENTORY_AI_PUBLISH', 'SEATING_AI_PUBLISH', 'MEMBERSHIP_AI_PUBLISH', 'MARKETING_AI_PUBLISH', 'RESOURCES_AI_PUBLISH', 'QUEUE_AI_PUBLISH', 'TRANSPORT_AI_PUBLISH', 'GAMES_AI_PUBLISH', 'MAINTENANCE_AI_PUBLISH', 'ACCREDITATION_AI_PUBLISH', 'PARTNER_AI_PUBLISH', 'ANALYTICS_AI_PUBLISH', 'BIOMETRIC_IMAGE_VIEW', 'ACCESS_DIRECTION_SET', 'REPORT_GOVERNANCE_MANAGE')),
     max_date_range_days               integer DEFAULT 366,
     id                                uuid PRIMARY KEY NOT NULL,
     version                           text NOT NULL,
@@ -255,7 +274,7 @@ CREATE TABLE IF NOT EXISTS reporting.report_definition_version (
 -- Reached by: 7 operations read it and 4 write it.
 CREATE TABLE IF NOT EXISTS reporting.report_filter (
     report_definition_id              uuid NOT NULL,
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     field                             text NOT NULL,
     operator                          text NOT NULL CONSTRAINT report_filter_operator_chk CHECK (operator IN ('equals', 'notEquals', 'greaterThan', 'lessThan', 'between', 'in', 'notIn', 'contains', 'isNull', 'isNotNull')),
     value                             text,
@@ -318,7 +337,7 @@ CREATE TABLE IF NOT EXISTS reporting.semantic_model (
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS reporting.site_normalisation_basis (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     scope_path                        ltree NOT NULL,
     period_start                      date NOT NULL,
     period_end                        date NOT NULL,
@@ -331,7 +350,7 @@ CREATE TABLE IF NOT EXISTS reporting.site_normalisation_basis (
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS reporting.subscription (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     report_id                         uuid NOT NULL,
     schedule_id                       uuid,
     channel                           text CONSTRAINT subscription_channel_chk CHECK (channel IN ('email', 'sftp', 'webhook', 'inPlatform')),

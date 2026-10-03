@@ -158,16 +158,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-444` | Redemption Operations Dashboard | B–D | 2 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-445` | Redemption Credit Rule Configuration | B–D | 7 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-446` | Ticket-Based Redemption / Ticket-Eater Integration | B–D | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-447` | Ticketless Redemption Game Integration | B–D | 0 | 17 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-448` | Redemption Wallet & Balance View | B–D | 0 | 0 | 6 | 16 | 0 | 6 | — | notStarted (—) |
-| `BO-449` | Redemption Counter / Prize Checkout | B–D | 0 | 4 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-450` | Prize Catalogue & Credit Cost Configuration | B–D | 19 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-451` | Prize Inventory Integration | B–D | 0 | 15 | 6 | 12 | 0 | 4 | — | notStarted (—) |
-| `BO-452` | Direct-Pay / Crane & Prize Machine Configuration | B–D | 23 | 56 | 6 | 13 | 0 | 0 | — | notStarted (—) |
-| `BO-453` | Redemption Transaction Ledger, Reconciliation & Audit | B–D | 0 | 41 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `BO-444` | Redemption Operations Dashboard | B | 2 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-445` | Redemption Credit Rule Configuration | D | 7 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-446` | Ticket-Based Redemption / Ticket-Eater Integration | D | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-447` | Ticketless Redemption Game Integration | D | 0 | 17 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-448` | Redemption Wallet & Balance View | C | 0 | 0 | 6 | 16 | 0 | 6 | — | notStarted (—) |
+| `BO-449` | Redemption Counter / Prize Checkout | D | 0 | 4 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-450` | Prize Catalogue & Credit Cost Configuration | D | 19 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-451` | Prize Inventory Integration | D | 0 | 15 | 6 | 12 | 0 | 4 | — | notStarted (—) |
+| `BO-452` | Direct-Pay / Crane & Prize Machine Configuration | D | 23 | 56 | 6 | 13 | 0 | 0 | — | notStarted (—) |
+| `BO-453` | Redemption Transaction Ledger, Reconciliation & Audit | D | 0 | 41 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -187,7 +187,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-444 |
 | Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
@@ -327,7 +327,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-445 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configuration) and no display directory — it is settings, not a population |
@@ -504,7 +504,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-446 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Customer identifies wallet/card) and no metric row |
@@ -672,7 +672,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-447 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Guest taps card) and no metric row |
@@ -869,7 +869,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-448 |
 | Who uses it | venue staff holding `WALLET_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -990,7 +990,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-449 |
 | Who uses it | venue staff holding `ORDER_CREATE`, `PRODUCT_VIEW` (1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Scan / Tap Customer Card; Display) and no metric row |
@@ -1184,7 +1184,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-450 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1396,7 +1396,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-451 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1605,7 +1605,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-452 |
 | Who uses it | venue staff holding `DEVICE_VIEW`, `PRICE_CONFIGURE`, `PRODUCT_VIEW` (2 read, 1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1858,7 +1858,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-453 |
 | Who uses it | venue staff holding `PRODUCT_VIEW`, `WALLET_VIEW` (2 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Compare; Redemption Counter / Prize Machine) and no metric row |

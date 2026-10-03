@@ -2590,6 +2590,7 @@
    "wave": 1,
    "operations": [
     "createAiConversation",
+    "listAiConversations",
     "recordAnswerFeedback",
     "sendAiMessage"
    ]
@@ -2807,7 +2808,9 @@
    "platformName": "Venue Management",
    "wave": 1,
    "operations": [
-    "proposeVenueLabels"
+    "listProposedActions",
+    "proposeVenueLabels",
+    "proposeWalkways"
    ]
   },
   {
@@ -4555,7 +4558,7 @@
    "name": "Executive Command Center",
    "platform": "P16",
    "platformName": "Venue Analytics",
-   "wave": 3,
+   "wave": 1,
    "operations": [
     "listAiInsights",
     "requestSuggestion"
@@ -4787,7 +4790,8 @@
    "name": "A venue maps its site",
    "wave": 2,
    "operations": [
-    "proposeVenueLabels"
+    "proposeVenueLabels",
+    "proposeWalkways"
    ]
   },
   {
@@ -5210,6 +5214,12 @@
    "mentions": 1
   },
   {
+   "file": "docs\\adr\\0069-in-park-3d-navigation-is-built-natively.md",
+   "title": "ADR-0069: In-park 3D navigation is built natively, from a venue model, a pathway file and GPS",
+   "status": "Accepted \u00b7 30 September 2026 \u00b7 agreed with the client in the",
+   "mentions": 3
+  },
+  {
    "file": "docs\\architecture\\ai-credentials.md",
    "title": "AI provider credentials \u2014 where the key lives and who can reach it",
    "status": "",
@@ -5219,7 +5229,7 @@
    "file": "docs\\architecture\\ai-system-design.md",
    "title": "TICVAI AI subsystem: system design",
    "status": "",
-   "mentions": 162
+   "mentions": 163
   },
   {
    "file": "docs\\architecture\\data-model.md",
@@ -5419,7 +5429,7 @@
   "tables": 138,
   "screens": 194,
   "flows": 11,
-  "documents": 66,
+  "documents": 67,
   "openConflicts": 1
  }
 }

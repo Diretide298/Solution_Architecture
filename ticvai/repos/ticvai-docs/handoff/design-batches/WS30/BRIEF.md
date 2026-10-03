@@ -130,16 +130,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-294` | Member Operations Command Center | B–D | 2 | 264 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-295` | Member 360° Membership Account Workspace | B–D | 0 | 48 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-296` | Membership Activation, Assignment & Credential Management | B–D | 5 | 12 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-297` | Visit, Admission & Entitlement Usage Monitor | B–D | 0 | 182 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-298` | Membership Freeze, Suspension & Reactivation Management | B–D | 7 | 0 | 5 | 4 | 1 | 0 | — | notStarted (generated) |
-| `BO-299` | Membership Upgrade, Downgrade & Product Migration Operations | B–D | 4 | 0 | 6 | 2 | 1 | 0 | — | notStarted (generated) |
-| `BO-300` | Renewal Operations & Auto-Renewal Management | B–D | 0 | 20 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
-| `BO-301` | Member Exceptions, Overrides & Service Recovery | B–D | 6 | 0 | 6 | 7 | 0 | 0 | — | notStarted (generated) |
-| `BO-302` | Member Lifecycle History, Audit & Case Timeline | B–D | 0 | 8 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-303` | Membership Analytics, Renewal Intelligence & AI Retention Center | B–D | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-294` | Member Operations Command Center | B | 2 | 264 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-295` | Member 360° Membership Account Workspace | B | 0 | 48 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-296` | Membership Activation, Assignment & Credential Management | B | 5 | 12 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-297` | Visit, Admission & Entitlement Usage Monitor | B | 0 | 182 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-298` | Membership Freeze, Suspension & Reactivation Management | B | 7 | 0 | 5 | 4 | 1 | 0 | — | notStarted (generated) |
+| `BO-299` | Membership Upgrade, Downgrade & Product Migration Operations | B | 4 | 0 | 6 | 2 | 1 | 0 | — | notStarted (generated) |
+| `BO-300` | Renewal Operations & Auto-Renewal Management | B | 0 | 20 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
+| `BO-301` | Member Exceptions, Overrides & Service Recovery | B | 6 | 0 | 6 | 7 | 0 | 0 | — | notStarted (generated) |
+| `BO-302` | Member Lifecycle History, Audit & Case Timeline | B | 0 | 8 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-303` | Membership Analytics, Renewal Intelligence & AI Retention Center | B | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

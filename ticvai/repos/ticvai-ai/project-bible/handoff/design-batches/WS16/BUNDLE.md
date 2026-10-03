@@ -130,16 +130,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-374` | Approval Decision Workspace | B–D | 5 | 20 | 6 | 13 | 2 | 3 | — | notStarted (—) |
-| `BO-375` | Business Context & Evidence Viewer | B–D | 6 | 20 | 6 | 14 | 1 | 0 | — | notStarted (—) |
-| `BO-376` | Approval Timeline & Decision Chain | B–D | 0 | 6 | 6 | 0 | 2 | 3 | — | notStarted (—) |
-| `BO-377` | Approve & Sensitive Action Confirmation | B–D | 0 | 0 | 6 | 6 | 1 | 0 | — | notStarted (—) |
-| `BO-378` | Reject / Return / Request Information | B–D | 5 | 0 | 6 | 6 | 1 | 0 | — | notStarted (—) |
-| `BO-379` | Requester Modification & Resubmission | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-380` | Withdrawal, Cancellation, Expiration & Reopening | B–D | 0 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
-| `BO-381` | Segregation of Duties & Four-Eyes Control | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-382` | Approved Action Execution & Status | B–D | 3 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-383` | Decision Record & Immutable Audit View | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-374` | Approval Decision Workspace | B | 5 | 20 | 6 | 13 | 2 | 3 | — | notStarted (—) |
+| `BO-375` | Business Context & Evidence Viewer | B | 6 | 20 | 6 | 14 | 1 | 0 | — | notStarted (—) |
+| `BO-376` | Approval Timeline & Decision Chain | B | 0 | 6 | 6 | 0 | 2 | 3 | — | notStarted (—) |
+| `BO-377` | Approve & Sensitive Action Confirmation | B | 0 | 0 | 6 | 6 | 1 | 0 | — | notStarted (—) |
+| `BO-378` | Reject / Return / Request Information | B | 5 | 0 | 6 | 6 | 1 | 0 | — | notStarted (—) |
+| `BO-379` | Requester Modification & Resubmission | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-380` | Withdrawal, Cancellation, Expiration & Reopening | B | 0 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
+| `BO-381` | Segregation of Duties & Four-Eyes Control | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-382` | Approved Action Execution & Status | B | 3 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-383` | Decision Record & Immutable Audit View | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -159,7 +159,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Venue Operations · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-374 |
 | Who uses it | venue staff holding `APPROVAL_DECIDE`, `APPROVAL_VIEW` (1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -363,7 +363,7 @@ Also apply: 1 for P08 · Venue Operations, 24 for all of P08, 29 for every app (
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Venue Operations · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-375 |
 | Who uses it | venue staff holding `APPROVAL_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -549,7 +549,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Venue Operations · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-376 |
 | Who uses it | venue staff holding `APPROVAL_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -691,7 +691,7 @@ Also apply: 1 for P08 · Venue Operations, 24 for all of P08, 29 for every app (
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Venue Operations · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-377 |
 | Who uses it | venue staff holding `APPROVAL_CONFIGURE`, `APPROVAL_DECIDE` (1 configure, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -839,7 +839,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Venue Operations · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-378 |
 | Who uses it | venue staff holding `APPROVAL_DECIDE` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -978,7 +978,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Venue Operations · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-379 |
 | Who uses it | venue staff holding `APPROVAL_REQUEST` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1087,7 +1087,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Venue Operations · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-380 |
 | Who uses it | venue staff holding `APPROVAL_REQUEST` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1206,7 +1206,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Venue Operations · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-381 |
 | Who uses it | venue staff holding `APPROVAL_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1319,7 +1319,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Venue Operations · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-382 |
 | Who uses it | venue staff holding `APPROVAL_ACT`, `APPROVAL_VIEW` (1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1464,7 +1464,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Venue Operations · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-383 |
 | Who uses it | venue staff holding `APPROVAL_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |

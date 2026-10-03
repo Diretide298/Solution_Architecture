@@ -4,7 +4,7 @@
   "name": "Transport Stations",
   "module": "Transport",
   "requiresModule": "transport",
-  "wave": 2,
+  "wave": 1,
   "implementation": {
    "app": "venue-management-web",
    "route": "/transport/stations",
@@ -258,7 +258,7 @@
   "name": "Transport Routes & Stops",
   "module": "Transport",
   "requiresModule": "transport",
-  "wave": 2,
+  "wave": 1,
   "implementation": {
    "app": "venue-management-web",
    "route": "/transport/routes",
@@ -606,7 +606,7 @@
   "name": "Transport Fares & Passenger Types",
   "module": "Transport",
   "requiresModule": "transport",
-  "wave": 2,
+  "wave": 1,
   "implementation": {
    "app": "venue-management-web",
    "route": "/transport/fares",
@@ -839,7 +839,7 @@
   "name": "Transport Timetables",
   "module": "Transport",
   "requiresModule": "transport",
-  "wave": 2,
+  "wave": 1,
   "implementation": {
    "app": "venue-management-web",
    "route": "/transport/timetables",
@@ -1418,7 +1418,7 @@
   "name": "Transport Pass Types",
   "module": "Transport",
   "requiresModule": "transport",
-  "wave": 2,
+  "wave": 1,
   "implementation": {
    "app": "venue-management-web",
    "route": "/transport/pass-types",
@@ -1654,7 +1654,7 @@
   "name": "Transport Network Import",
   "module": "Transport",
   "requiresModule": "transport",
-  "wave": 2,
+  "wave": 1,
   "implementation": {
    "app": "venue-management-web",
    "route": "/transport/import",

@@ -27,7 +27,7 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: MarketingService
-  operationCalls: 60
+  operationCalls: 61
 - service: IdentityService
   operationCalls: 11
 - service: ReportingService
@@ -111,6 +111,7 @@ screens:
   - createCase
   - escalateCase
   - getCase
+  - listAgentWorkloadAvailability
   - listCases
   - listConversations
   - reopenCase

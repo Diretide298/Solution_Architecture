@@ -188,16 +188,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-584` | Rental Executive Command Center | B–D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-585` | Rental Revenue & Commercial Analytics | B–D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-586` | Utilization & Capacity Analytics | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-587` | Inventory & Equipment Performance Analytics | B–D | 0 | 12 | 6 | 0 | 1 | 4 | — | notStarted (—) |
-| `BO-588` | Rental Duration, Extension & Return Analytics | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-589` | Damage, Loss, Deposit & Exception Analytics | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-590` | Location & Channel Performance | B–D | 3 | 16 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-591` | Rental Forecasting & Demand Intelligence | B–D | 0 | 0 | 6 | 3 | 1 | 6 | — | notStarted (—) |
-| `BO-592` | Audit, Governance & Operational Control | B–D | 0 | 32 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-593` | AI Rental Management Copilot & Action Center | B–D | 0 | 0 | 6 | 1 | 1 | 6 | — | notStarted (—) |
+| `BO-584` | Rental Executive Command Center | D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-585` | Rental Revenue & Commercial Analytics | D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-586` | Utilization & Capacity Analytics | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-587` | Inventory & Equipment Performance Analytics | B | 0 | 12 | 6 | 0 | 1 | 4 | — | notStarted (—) |
+| `BO-588` | Rental Duration, Extension & Return Analytics | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-589` | Damage, Loss, Deposit & Exception Analytics | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-590` | Location & Channel Performance | D | 3 | 16 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-591` | Rental Forecasting & Demand Intelligence | B | 0 | 0 | 6 | 3 | 1 | 6 | — | notStarted (—) |
+| `BO-592` | Audit, Governance & Operational Control | D | 0 | 32 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-593` | AI Rental Management Copilot & Action Center | D | 0 | 0 | 6 | 1 | 1 | 6 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

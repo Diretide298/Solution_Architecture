@@ -586,7 +586,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "ADM-409"
+    "ADM-409",
+    "ADM-002"
    ],
    "exitTo": [
     "ADM-409"
@@ -645,6 +646,21 @@
     {
      "name": "contentBody",
      "components": [
+      {
+       "kind": "cardList",
+       "label": "Show the payment providers as configured",
+       "operation": "listPaymentProviders",
+       "bindsTo": "PaymentProvider",
+       "columns": [
+        "PaymentProvider.name",
+        "PaymentProvider.kind",
+        "PaymentProvider.supportsTokenisation",
+        "PaymentProvider.supportsPartialCapture",
+        "PaymentProvider.supports3ds",
+        "PaymentProvider.scopeLevel"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
       {
        "kind": "selectField",
        "label": "Tenant",
@@ -760,6 +776,13 @@
     "purpose": "The picked tenant's venues, to pick the venue the payment provider is set for",
     "trigger": "onLoad",
     "provenance": "design-note correction, 2 October 2026 (ADM-412)"
+   },
+   {
+    "operationId": "listPaymentProviders",
+    "contract": "orders",
+    "purpose": "Show the payment providers as configured",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "wireframe": {

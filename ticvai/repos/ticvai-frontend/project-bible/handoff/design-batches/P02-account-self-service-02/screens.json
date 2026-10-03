@@ -46,6 +46,20 @@
      "slot": "rowActions",
      "components": [
       {
+       "kind": "detailPanel",
+       "label": "Load the order a refund or resale is asked for",
+       "operation": "getOrder",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.orderNumber",
+        "Order.status",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.holdLabel"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
+      {
        "kind": "primaryButton",
        "label": "Create refund request",
        "operation": "createRefundRequest",
@@ -81,6 +95,13 @@
     "contract": "orders",
     "purpose": "List an entitlement for resale",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getOrder",
+    "contract": "orders",
+    "purpose": "Load the order a refund or resale is asked for",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "entryState": {
@@ -88,6 +109,10 @@
     {
      "name": "subjectId",
      "from": "session"
+    },
+    {
+     "name": "orderId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**Resolves from the session.** A guest arriving cold is asked to sign in and returned here afterwards — never a 404, and never a screen that silently shows somebody else's data (ADR-0030)."
@@ -914,7 +939,7 @@
    "provenance": "designed",
    "board": "wireframes/P02 Guest App.dc.html#gst-073",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
     "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-073.html, and #GST-073 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → Security & sign-in (partial). What v2 did differently: Prototype offers two-step verification and a trusted-device skip, but the YAML says guests have no second factor (R167). Either remove the toggle from the prototype or reopen the decision."

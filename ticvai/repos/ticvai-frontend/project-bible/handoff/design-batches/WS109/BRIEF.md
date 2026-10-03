@@ -97,16 +97,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-625` | Accreditation Holder Directory | B–D | 0 | 50 | 6 | 3 | 1 | 6 | — | notStarted (—) |
-| `BO-626` | Accreditation Holder Profile | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-627` | Identity Details & Verification | B–D | 0 | 18 | 6 | 2 | 2 | 0 | — | notStarted (—) |
-| `BO-628` | Photo Management | B–D | 0 | 18 | 6 | 2 | 0 | 0 | — | notStarted (—) |
-| `BO-629` | Document Repository | B–D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
-| `BO-630` | Document Verification Queue | B–D | 0 | 0 | 6 | 2 | 0 | 6 | — | notStarted (—) |
-| `BO-631` | Duplicate & Identity Conflict Detection | B–D | 3 | 0 | 6 | 0 | 2 | 2 | — | notStarted (—) |
-| `BO-632` | Organization & Affiliation Management | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `BO-633` | Profile Completeness & Compliance Monitor | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-634` | Profile History & Audit Timeline | B–D | 7 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `BO-625` | Accreditation Holder Directory | D | 0 | 50 | 6 | 3 | 1 | 6 | — | notStarted (—) |
+| `BO-626` | Accreditation Holder Profile | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-627` | Identity Details & Verification | D | 0 | 18 | 6 | 2 | 2 | 0 | — | notStarted (—) |
+| `BO-628` | Photo Management | D | 0 | 18 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `BO-629` | Document Repository | D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `BO-630` | Document Verification Queue | D | 0 | 0 | 6 | 2 | 0 | 6 | — | notStarted (—) |
+| `BO-631` | Duplicate & Identity Conflict Detection | D | 3 | 0 | 6 | 0 | 2 | 2 | — | notStarted (—) |
+| `BO-632` | Organization & Affiliation Management | D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `BO-633` | Profile Completeness & Compliance Monitor | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-634` | Profile History & Audit Timeline | D | 7 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

@@ -53,6 +53,8 @@ CREATE INDEX IF NOT EXISTS attraction_access_zone_id_idx ON access.attraction_ac
 CREATE INDEX IF NOT EXISTS biometric_audit_event_access_point_id_idx ON access.biometric_audit_event (access_point_id);
 -- convention, not declared: access.biometric_audit_event.biometric_profile_id -> access.biometric_profile
 CREATE INDEX IF NOT EXISTS biometric_audit_event_biometric_profile_id_idx ON access.biometric_audit_event (biometric_profile_id);
+-- convention, not declared: access.biometric_audit_event.device_id -> platform.device
+CREATE INDEX IF NOT EXISTS biometric_audit_event_device_id_idx ON access.biometric_audit_event (device_id);
 -- convention, not declared: access.biometric_audit_event.entitlement_id -> access.entitlement
 CREATE INDEX IF NOT EXISTS biometric_audit_event_entitlement_id_idx ON access.biometric_audit_event (entitlement_id);
 -- convention, not declared: access.biometric_audit_event.gate_group_id -> access.group_admission_rule
@@ -119,6 +121,8 @@ CREATE INDEX IF NOT EXISTS credential_event_actor_principal_id_idx ON access.cre
 CREATE INDEX IF NOT EXISTS credential_event_approval_request_id_idx ON access.credential_event (approval_request_id);
 -- convention, not declared: access.credential_event.credential_binding_id -> access.credential_binding
 CREATE INDEX IF NOT EXISTS credential_event_credential_binding_id_idx ON access.credential_event (credential_binding_id);
+-- convention, not declared: access.credential_event.device_id -> platform.device
+CREATE INDEX IF NOT EXISTS credential_event_device_id_idx ON access.credential_event (device_id);
 -- convention, not declared: access.credential_event.entitlement_id -> access.entitlement
 CREATE INDEX IF NOT EXISTS credential_event_entitlement_id_idx ON access.credential_event (entitlement_id);
 -- convention, not declared: access.credential_event.from_media_type_id -> access.media_type
@@ -165,10 +169,14 @@ CREATE INDEX IF NOT EXISTS credential_policy_venue_id_idx ON access.credential_p
 CREATE INDEX IF NOT EXISTS credential_security_profile_venue_id_idx ON access.credential_security_profile (venue_id);
 -- convention, not declared: access.credential_sharing_case.entitlement_id -> access.entitlement
 CREATE INDEX IF NOT EXISTS credential_sharing_case_entitlement_id_idx ON access.credential_sharing_case (entitlement_id);
+-- convention, not declared: access.credential_sharing_case.primary_device_id -> platform.device
+CREATE INDEX IF NOT EXISTS credential_sharing_case_primary_device_id_idx ON access.credential_sharing_case (primary_device_id);
 -- convention, not declared: access.credential_sharing_case.venue_id -> platform.scope
 CREATE INDEX IF NOT EXISTS credential_sharing_case_venue_id_idx ON access.credential_sharing_case (venue_id);
 -- convention, not declared: access.device_binding.credential_binding_id -> access.credential_binding
 CREATE INDEX IF NOT EXISTS device_binding_credential_binding_id_idx ON access.device_binding (credential_binding_id);
+-- convention, not declared: access.device_binding.device_id -> platform.device
+CREATE INDEX IF NOT EXISTS device_binding_device_id_idx ON access.device_binding (device_id);
 -- convention, not declared: access.device_binding.entitlement_id -> access.entitlement
 CREATE INDEX IF NOT EXISTS device_binding_entitlement_id_idx ON access.device_binding (entitlement_id);
 -- convention, not declared: access.device_binding.subject_id -> pii.subject
@@ -247,6 +255,10 @@ CREATE INDEX IF NOT EXISTS gate_mode_policy_venue_id_idx ON access.gate_mode_pol
 CREATE INDEX IF NOT EXISTS gate_outcome_profile_venue_id_idx ON access.gate_outcome_profile (venue_id);
 -- convention, not declared: access.group_admission_rule.venue_id -> platform.scope
 CREATE INDEX IF NOT EXISTS group_admission_rule_venue_id_idx ON access.group_admission_rule (venue_id);
+-- convention, not declared: access.hardware_certification.certified_by_principal_id -> identity.principal
+CREATE INDEX IF NOT EXISTS hardware_certification_certified_by_principal_id_idx ON access.hardware_certification (certified_by_principal_id);
+-- convention, not declared: access.hardware_certification.model_id -> access.hardware_model
+CREATE INDEX IF NOT EXISTS hardware_certification_model_id_idx ON access.hardware_certification (model_id);
 -- convention, not declared: access.hardware_deployment.device_group_id -> access.group_admission_rule
 CREATE INDEX IF NOT EXISTS hardware_deployment_device_group_id_idx ON access.hardware_deployment (device_group_id);
 -- convention, not declared: access.hardware_deployment.requested_by_principal_id -> identity.principal
@@ -311,8 +323,6 @@ CREATE INDEX IF NOT EXISTS offline_policy_venue_id_idx ON access.offline_policy 
 CREATE INDEX IF NOT EXISTS operating_calendar_entry_venue_id_idx ON access.operating_calendar_entry (venue_id);
 -- convention, not declared: access.podium.venue_id -> platform.scope
 CREATE INDEX IF NOT EXISTS podium_venue_id_idx ON access.podium (venue_id);
--- convention, not declared: access.podium_shift.access_device_id -> access.device_placement
-CREATE INDEX IF NOT EXISTS podium_shift_access_device_id_idx ON access.podium_shift (access_device_id);
 -- convention, not declared: access.podium_shift.operator_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS podium_shift_operator_principal_id_idx ON access.podium_shift (operator_principal_id);
 -- convention, not declared: access.podium_shift.podium_id -> access.podium
@@ -325,12 +335,16 @@ CREATE INDEX IF NOT EXISTS policy_scope_assignment_dynamic_policy_id_idx ON acce
 CREATE INDEX IF NOT EXISTS policy_scope_assignment_scope_id_idx ON access.policy_scope_assignment (scope_id);
 -- convention, not declared: access.reason_code.venue_id -> platform.scope
 CREATE INDEX IF NOT EXISTS reason_code_venue_id_idx ON access.reason_code (venue_id);
+-- convention, not declared: access.scan_event.device_id -> platform.device
+CREATE INDEX IF NOT EXISTS scan_event_device_id_idx ON access.scan_event (device_id);
 -- convention, not declared: access.scan_event.dynamic_policy_id -> access.dynamic_policy
 CREATE INDEX IF NOT EXISTS scan_event_dynamic_policy_id_idx ON access.scan_event (dynamic_policy_id);
 -- convention, not declared: access.security_alert.access_point_id -> access.access_point
 CREATE INDEX IF NOT EXISTS security_alert_access_point_id_idx ON access.security_alert (access_point_id);
 -- convention, not declared: access.security_alert.acknowledged_by_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS security_alert_acknowledged_by_principal_id_idx ON access.security_alert (acknowledged_by_principal_id);
+-- convention, not declared: access.security_alert.device_id -> platform.device
+CREATE INDEX IF NOT EXISTS security_alert_device_id_idx ON access.security_alert (device_id);
 -- convention, not declared: access.security_alert.entitlement_id -> access.entitlement
 CREATE INDEX IF NOT EXISTS security_alert_entitlement_id_idx ON access.security_alert (entitlement_id);
 -- convention, not declared: access.security_alert.face_reenrolment_attempt_id -> access.face_reenrolment_attempt
@@ -481,8 +495,6 @@ CREATE INDEX IF NOT EXISTS rec_event_order_id_idx ON ai.rec_event (order_id);
 CREATE INDEX IF NOT EXISTS rec_event_product_id_idx ON ai.rec_event (product_id);
 -- convention, not declared: ai.rec_event.subject_id -> pii.subject
 CREATE INDEX IF NOT EXISTS rec_event_subject_id_idx ON ai.rec_event (subject_id);
--- convention, not declared: ai.rec_event.tracking_id -> marketing.tracking_technology
-CREATE INDEX IF NOT EXISTS rec_event_tracking_id_idx ON ai.rec_event (tracking_id);
 -- convention, not declared: ai.risk_alert.assessment_id -> ai.risk_assessment
 CREATE INDEX IF NOT EXISTS risk_alert_assessment_id_idx ON ai.risk_alert (assessment_id);
 -- convention, not declared: ai.risk_assessment.decision_record_id -> ai.decision_record
@@ -527,6 +539,8 @@ CREATE INDEX IF NOT EXISTS external_dispatch_provider_id_idx ON approvals.extern
 CREATE INDEX IF NOT EXISTS external_dispatch_request_id_idx ON approvals.external_dispatch (request_id);
 -- convention, not declared: approvals.external_provider.api_client_id -> control.api_client
 CREATE INDEX IF NOT EXISTS external_provider_api_client_id_idx ON approvals.external_provider (api_client_id);
+-- convention, not declared: approvals.request.assigned_to_principal_id -> identity.principal
+CREATE INDEX IF NOT EXISTS request_assigned_to_principal_id_idx ON approvals.request (assigned_to_principal_id);
 -- convention, not declared: approvals.rule.external_provider_id -> approvals.external_provider
 CREATE INDEX IF NOT EXISTS rule_external_provider_id_idx ON approvals.rule (external_provider_id);
 -- convention, not declared: approvals.signature.request_id -> approvals.request
@@ -945,6 +959,10 @@ CREATE INDEX IF NOT EXISTS sales_channel_scope_id_idx ON catalogue.sales_channel
 CREATE INDEX IF NOT EXISTS sales_channel_technical_owner_principal_id_idx ON catalogue.sales_channel (technical_owner_principal_id);
 -- convention, not declared: catalogue.sales_channel.venue_id -> platform.scope
 CREATE INDEX IF NOT EXISTS sales_channel_venue_id_idx ON catalogue.sales_channel (venue_id);
+-- convention, not declared: catalogue.seat_pricing_rule.performance_id -> catalogue.performance
+CREATE INDEX IF NOT EXISTS seat_pricing_rule_performance_id_idx ON catalogue.seat_pricing_rule (performance_id);
+-- convention, not declared: catalogue.seat_pricing_rule.seat_map_id -> seating.seat_map
+CREATE INDEX IF NOT EXISTS seat_pricing_rule_seat_map_id_idx ON catalogue.seat_pricing_rule (seat_map_id);
 -- convention, not declared: catalogue.signal_registry.owner_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS signal_registry_owner_principal_id_idx ON catalogue.signal_registry (owner_principal_id);
 -- convention, not declared: catalogue.space.parent_space_id -> catalogue.space
@@ -967,6 +985,8 @@ CREATE INDEX IF NOT EXISTS tax_rule_product_category_id_idx ON catalogue.tax_rul
 CREATE INDEX IF NOT EXISTS tax_rule_product_id_idx ON catalogue.tax_rule (product_id);
 -- convention, not declared: catalogue.tax_rule.venue_id -> platform.scope
 CREATE INDEX IF NOT EXISTS tax_rule_venue_id_idx ON catalogue.tax_rule (venue_id);
+-- convention, not declared: catalogue.waiting_room_setting.venue_id -> platform.scope
+CREATE INDEX IF NOT EXISTS waiting_room_setting_venue_id_idx ON catalogue.waiting_room_setting (venue_id);
 -- convention, not declared: fnb.allergen_verdict.menu_item_id -> fnb.menu_item
 CREATE INDEX IF NOT EXISTS allergen_verdict_menu_item_id_idx ON fnb.allergen_verdict (menu_item_id);
 -- convention, not declared: fnb.cold_chain_event.corrective_action_id -> fnb.corrective_action
@@ -1001,6 +1021,12 @@ CREATE INDEX IF NOT EXISTS kitchen_exception_raised_by_principal_id_idx ON fnb.k
 CREATE INDEX IF NOT EXISTS kitchen_exception_station_id_idx ON fnb.kitchen_exception (station_id);
 -- convention, not declared: fnb.kitchen_exception.ticket_id -> fnb.kitchen_ticket
 CREATE INDEX IF NOT EXISTS kitchen_exception_ticket_id_idx ON fnb.kitchen_exception (ticket_id);
+-- convention, not declared: fnb.kitchen_routing_rule.default_station_id -> fnb.kitchen_station
+CREATE INDEX IF NOT EXISTS kitchen_routing_rule_default_station_id_idx ON fnb.kitchen_routing_rule (default_station_id);
+-- convention, not declared: fnb.kitchen_routing_rule.fallback_station_id -> fnb.kitchen_station
+CREATE INDEX IF NOT EXISTS kitchen_routing_rule_fallback_station_id_idx ON fnb.kitchen_routing_rule (fallback_station_id);
+-- convention, not declared: fnb.kitchen_routing_rule.outlet_id -> platform.outlet
+CREATE INDEX IF NOT EXISTS kitchen_routing_rule_outlet_id_idx ON fnb.kitchen_routing_rule (outlet_id);
 -- convention, not declared: fnb.kitchen_ticket.order_id -> fnb.service_order
 CREATE INDEX IF NOT EXISTS kitchen_ticket_order_id_idx ON fnb.kitchen_ticket (order_id);
 -- convention, not declared: fnb.menu_item.menu_section_id -> fnb.menu_section
@@ -1063,6 +1089,8 @@ CREATE INDEX IF NOT EXISTS table_combination_outlet_id_idx ON fnb.table_combinat
 CREATE INDEX IF NOT EXISTS table_reservation_cart_line_id_idx ON fnb.table_reservation (cart_line_id);
 -- convention, not declared: fnb.table_reservation.group_id -> fnb.modifier_group
 CREATE INDEX IF NOT EXISTS table_reservation_group_id_idx ON fnb.table_reservation (group_id);
+-- convention, not declared: fnb.table_reservation.taken_by_principal_id -> identity.principal
+CREATE INDEX IF NOT EXISTS table_reservation_taken_by_principal_id_idx ON fnb.table_reservation (taken_by_principal_id);
 -- convention, not declared: fnb.table_reservation.variant_id -> catalogue.variant
 CREATE INDEX IF NOT EXISTS table_reservation_variant_id_idx ON fnb.table_reservation (variant_id);
 -- convention, not declared: fnb.table_visit.merged_into_visit_id -> fnb.table_visit
@@ -1327,6 +1355,10 @@ CREATE INDEX IF NOT EXISTS incident_involved_party_incident_id_idx ON maintenanc
 CREATE INDEX IF NOT EXISTS incident_involved_party_principal_id_idx ON maintenance.incident_involved_party (principal_id);
 -- convention, not declared: maintenance.incident_involved_party.subject_id -> pii.subject
 CREATE INDEX IF NOT EXISTS incident_involved_party_subject_id_idx ON maintenance.incident_involved_party (subject_id);
+-- convention, not declared: maintenance.incident_media.incident_id -> maintenance.incident
+CREATE INDEX IF NOT EXISTS incident_media_incident_id_idx ON maintenance.incident_media (incident_id);
+-- convention, not declared: maintenance.incident_media.uploaded_by_principal_id -> identity.principal
+CREATE INDEX IF NOT EXISTS incident_media_uploaded_by_principal_id_idx ON maintenance.incident_media (uploaded_by_principal_id);
 -- convention, not declared: maintenance.inspection.template_id -> maintenance.inspection_template
 CREATE INDEX IF NOT EXISTS inspection_template_id_idx ON maintenance.inspection (template_id);
 -- convention, not declared: maintenance.inspection_item.template_item_id -> maintenance.inspection_template_item
@@ -1625,6 +1657,8 @@ CREATE INDEX IF NOT EXISTS review_response_responded_by_principal_id_idx ON mark
 CREATE INDEX IF NOT EXISTS review_response_review_id_idx ON marketing.review_response (review_id);
 -- convention, not declared: marketing.reward_assignment.reward_id -> marketing.reward
 CREATE INDEX IF NOT EXISTS reward_assignment_reward_id_idx ON marketing.reward_assignment (reward_id);
+-- convention, not declared: marketing.segment.owner_principal_id -> identity.principal
+CREATE INDEX IF NOT EXISTS segment_owner_principal_id_idx ON marketing.segment (owner_principal_id);
 -- convention, not declared: marketing.sender_identity.legal_entity_id -> ledger.legal_entity
 CREATE INDEX IF NOT EXISTS sender_identity_legal_entity_id_idx ON marketing.sender_identity (legal_entity_id);
 -- convention, not declared: marketing.sender_identity.provider_id -> marketing.communication_provider
@@ -1829,6 +1863,8 @@ CREATE INDEX IF NOT EXISTS payment_link_issued_by_principal_id_idx ON orders.pay
 CREATE INDEX IF NOT EXISTS payment_link_reservation_id_idx ON orders.payment_link (reservation_id);
 -- convention, not declared: orders.pos_shift.closed_by_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS pos_shift_closed_by_principal_id_idx ON orders.pos_shift (closed_by_principal_id);
+-- convention, not declared: orders.pos_shift.recount_requested_by_principal_id -> identity.principal
+CREATE INDEX IF NOT EXISTS pos_shift_recount_requested_by_principal_id_idx ON orders.pos_shift (recount_requested_by_principal_id);
 -- convention, not declared: orders.pos_shift_approval.principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS pos_shift_approval_principal_id_idx ON orders.pos_shift_approval (principal_id);
 -- convention, not declared: orders.pos_shift_incident.principal_id -> identity.principal
@@ -1879,6 +1915,10 @@ CREATE INDEX IF NOT EXISTS reservation_line_recommendation_id_idx ON orders.rese
 CREATE INDEX IF NOT EXISTS reservation_line_resource_hold_id_idx ON orders.reservation_line (resource_hold_id);
 -- convention, not declared: orders.reservation_line.variant_id -> catalogue.variant
 CREATE INDEX IF NOT EXISTS reservation_line_variant_id_idx ON orders.reservation_line (variant_id);
+-- convention, not declared: orders.sales_order.charge_fx_rate_id -> ledger.fx_rate
+CREATE INDEX IF NOT EXISTS sales_order_charge_fx_rate_id_idx ON orders.sales_order (charge_fx_rate_id);
+-- convention, not declared: orders.till_shift_policy.venue_id -> platform.scope
+CREATE INDEX IF NOT EXISTS till_shift_policy_venue_id_idx ON orders.till_shift_policy (venue_id);
 -- convention, not declared: orders.upgrade.new_order_line_id -> orders.order_line
 CREATE INDEX IF NOT EXISTS upgrade_new_order_line_id_idx ON orders.upgrade (new_order_line_id);
 -- convention, not declared: orders.upgrade.original_order_line_id -> orders.order_line
@@ -1965,14 +2005,24 @@ CREATE INDEX IF NOT EXISTS audit_record_platform_staff_grant_id_idx ON platform.
 CREATE INDEX IF NOT EXISTS audit_record_workstation_id_idx ON platform.audit_record (workstation_id);
 -- convention, not declared: platform.dead_letter.outbox_id -> platform.outbox
 CREATE INDEX IF NOT EXISTS dead_letter_outbox_id_idx ON platform.dead_letter (outbox_id);
+-- convention, not declared: platform.device.approved_by_principal_id -> identity.principal
+CREATE INDEX IF NOT EXISTS device_approved_by_principal_id_idx ON platform.device (approved_by_principal_id);
 -- convention, not declared: platform.device.configuration_profile_id -> platform.configuration_profile
 CREATE INDEX IF NOT EXISTS device_configuration_profile_id_idx ON platform.device (configuration_profile_id);
+-- convention, not declared: platform.device.hardware_model_id -> access.hardware_model
+CREATE INDEX IF NOT EXISTS device_hardware_model_id_idx ON platform.device (hardware_model_id);
+-- convention, not declared: platform.device.tested_by_principal_id -> identity.principal
+CREATE INDEX IF NOT EXISTS device_tested_by_principal_id_idx ON platform.device (tested_by_principal_id);
 -- convention, not declared: platform.idempotency_record.principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS idempotency_record_principal_id_idx ON platform.idempotency_record (principal_id);
 -- convention, not declared: platform.outbox.event_id -> catalogue.event
 CREATE INDEX IF NOT EXISTS outbox_event_id_idx ON platform.outbox (event_id);
 -- convention, not declared: platform.outbox.tenant_id -> platform.tenant
 CREATE INDEX IF NOT EXISTS outbox_tenant_id_idx ON platform.outbox (tenant_id);
+-- convention, not declared: platform.outlet.department_id -> platform.scope
+CREATE INDEX IF NOT EXISTS outlet_department_id_idx ON platform.outlet (department_id);
+-- convention, not declared: platform.outlet.sale_board_id -> platform.sale_board
+CREATE INDEX IF NOT EXISTS outlet_sale_board_id_idx ON platform.outlet (sale_board_id);
 -- convention, not declared: platform.profile_deployment.profile_id -> platform.configuration_profile
 CREATE INDEX IF NOT EXISTS profile_deployment_profile_id_idx ON platform.profile_deployment (profile_id);
 -- convention, not declared: platform.wallet_authorisation.authorisation_id -> games.authorisation
@@ -1983,6 +2033,8 @@ CREATE INDEX IF NOT EXISTS wallet_authorisation_fx_rate_id_idx ON platform.walle
 CREATE INDEX IF NOT EXISTS workstation_configuration_profile_id_idx ON platform.workstation (configuration_profile_id);
 -- convention, not declared: platform.workstation.edge_node_id -> access.edge_node
 CREATE INDEX IF NOT EXISTS workstation_edge_node_id_idx ON platform.workstation (edge_node_id);
+-- convention, not declared: platform.workstation.outlet_id -> platform.outlet
+CREATE INDEX IF NOT EXISTS workstation_outlet_id_idx ON platform.workstation (outlet_id);
 -- convention, not declared: pricing.dynamic_price_action.dynamic_price_rule_id -> pricing.dynamic_price_rule
 CREATE INDEX IF NOT EXISTS dynamic_price_action_dynamic_price_rule_id_idx ON pricing.dynamic_price_action (dynamic_price_rule_id);
 -- convention, not declared: pricing.dynamic_price_action.rule_id -> approvals.rule
@@ -2311,7 +2363,7 @@ CREATE INDEX IF NOT EXISTS go_live_readiness_tenant_id_idx ON subscription.go_li
 CREATE INDEX IF NOT EXISTS membership_eligibility_rule_membership_product_id_idx ON subscription.membership_eligibility_rule (membership_product_id);
 -- convention, not declared: subscription.membership_entitlement.membership_product_id -> subscription.membership_product
 CREATE INDEX IF NOT EXISTS membership_entitlement_membership_product_id_idx ON subscription.membership_entitlement (membership_product_id);
--- convention, not declared: subscription.membership_entitlement.pricing_rule_id -> approvals.rule
+-- convention, not declared: subscription.membership_entitlement.pricing_rule_id -> catalogue.seat_pricing_rule
 CREATE INDEX IF NOT EXISTS membership_entitlement_pricing_rule_id_idx ON subscription.membership_entitlement (pricing_rule_id);
 -- convention, not declared: subscription.membership_household_policy.membership_product_id -> subscription.membership_product
 CREATE INDEX IF NOT EXISTS membership_household_policy_membership_product_id_idx ON subscription.membership_household_policy (membership_product_id);
@@ -2501,10 +2553,16 @@ CREATE INDEX IF NOT EXISTS app_build_store_account_id_idx ON whitelabel.app_buil
 CREATE INDEX IF NOT EXISTS booking_flow_venue_id_idx ON whitelabel.booking_flow (venue_id);
 -- convention, not declared: whitelabel.booking_flow_step.booking_flow_id -> whitelabel.booking_flow
 CREATE INDEX IF NOT EXISTS booking_flow_step_booking_flow_id_idx ON whitelabel.booking_flow_step (booking_flow_id);
+-- convention, not declared: whitelabel.config_version.approval_request_id -> approvals.request
+CREATE INDEX IF NOT EXISTS config_version_approval_request_id_idx ON whitelabel.config_version (approval_request_id);
 -- convention, not declared: whitelabel.custom_domain.tenant_id -> platform.tenant
 CREATE INDEX IF NOT EXISTS custom_domain_tenant_id_idx ON whitelabel.custom_domain (tenant_id);
 -- convention, not declared: whitelabel.guided_choice.venue_id -> platform.scope
 CREATE INDEX IF NOT EXISTS guided_choice_venue_id_idx ON whitelabel.guided_choice (venue_id);
+-- convention, not declared: whitelabel.site_package.platform_staff_grant_id -> identity.platform_staff_grant
+CREATE INDEX IF NOT EXISTS site_package_platform_staff_grant_id_idx ON whitelabel.site_package (platform_staff_grant_id);
+-- convention, not declared: whitelabel.site_package.requested_by_principal_id -> identity.principal
+CREATE INDEX IF NOT EXISTS site_package_requested_by_principal_id_idx ON whitelabel.site_package (requested_by_principal_id);
 -- convention, not declared: whitelabel.store_account.developer_account_id -> control.developer_account
 CREATE INDEX IF NOT EXISTS store_account_developer_account_id_idx ON whitelabel.store_account (developer_account_id);
 -- convention, not declared: workforce.announcement.published_by_principal_id -> identity.principal
@@ -2593,6 +2651,8 @@ CREATE INDEX IF NOT EXISTS access_change_order_id_idx ON access.access_change (o
 CREATE INDEX IF NOT EXISTS access_point_venue_id_idx ON access.access_point (venue_id);
 -- declared: access.blacklist.added_by_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS blacklist_added_by_principal_id_idx ON access.blacklist (added_by_principal_id);
+-- declared: access.device_placement.device_id -> platform.device
+CREATE INDEX IF NOT EXISTS device_placement_device_id_idx ON access.device_placement (device_id);
 -- declared: access.entitlement.order_id -> orders.sales_order
 CREATE INDEX IF NOT EXISTS entitlement_order_id_idx ON access.entitlement (order_id);
 -- declared: access.entitlement.product_id -> catalogue.product
@@ -2609,6 +2669,8 @@ CREATE INDEX IF NOT EXISTS parking_entitlement_order_id_idx ON access.parking_en
 CREATE INDEX IF NOT EXISTS parking_entitlement_subject_id_idx ON access.parking_entitlement (subject_id);
 -- declared: access.parking_facility.venue_id -> platform.scope
 CREATE INDEX IF NOT EXISTS parking_facility_venue_id_idx ON access.parking_facility (venue_id);
+-- declared: access.podium_shift.access_device_id -> platform.device
+CREATE INDEX IF NOT EXISTS podium_shift_access_device_id_idx ON access.podium_shift (access_device_id);
 -- declared: access.scan_event.access_point_id -> access.access_point
 CREATE INDEX IF NOT EXISTS scan_event_access_point_id_idx ON access.scan_event (access_point_id);
 -- declared: access.scan_event.operator_principal_id -> identity.principal
@@ -2893,6 +2955,10 @@ CREATE INDEX IF NOT EXISTS space_venue_id_idx ON catalogue.space (venue_id);
 CREATE INDEX IF NOT EXISTS variant_product_id_idx ON catalogue.variant (product_id);
 -- declared: catalogue.variant_dimension.product_id -> catalogue.product
 CREATE INDEX IF NOT EXISTS variant_dimension_product_id_idx ON catalogue.variant_dimension (product_id);
+-- declared: catalogue.waiting_room_setting.performance_id -> catalogue.performance
+CREATE INDEX IF NOT EXISTS waiting_room_setting_performance_id_idx ON catalogue.waiting_room_setting (performance_id);
+-- declared: catalogue.waiting_room_setting.updated_by_principal_id -> identity.principal
+CREATE INDEX IF NOT EXISTS waiting_room_setting_updated_by_principal_id_idx ON catalogue.waiting_room_setting (updated_by_principal_id);
 -- declared: catalogue.waitlist_entry.performance_id -> catalogue.performance
 CREATE INDEX IF NOT EXISTS waitlist_entry_performance_id_idx ON catalogue.waitlist_entry (performance_id);
 -- declared: catalogue.waitlist_entry.subject_id -> pii.subject
@@ -3067,6 +3133,8 @@ CREATE INDEX IF NOT EXISTS principal_primary_role_id_idx ON identity.principal (
 CREATE INDEX IF NOT EXISTS principal_credential_principal_id_idx ON identity.principal_credential (principal_id);
 -- declared: identity.role_permission.role_id -> identity.role
 CREATE INDEX IF NOT EXISTS role_permission_role_id_idx ON identity.role_permission (role_id);
+-- declared: identity.session.principal_id -> identity.principal
+CREATE INDEX IF NOT EXISTS session_principal_id_idx ON identity."session" (principal_id);
 -- declared: identity.sso_group_mapping.provider_id -> identity.sso_provider
 CREATE INDEX IF NOT EXISTS sso_group_mapping_provider_id_idx ON identity.sso_group_mapping (provider_id);
 -- declared: identity.sso_group_mapping.role_id -> identity.role
@@ -3249,6 +3317,8 @@ CREATE INDEX IF NOT EXISTS incident_corrective_work_order_id_idx ON maintenance.
 CREATE INDEX IF NOT EXISTS incident_reported_by_principal_id_idx ON maintenance.incident (reported_by_principal_id);
 -- declared: maintenance.incident.venue_id -> platform.scope
 CREATE INDEX IF NOT EXISTS incident_venue_id_idx ON maintenance.incident (venue_id);
+-- declared: maintenance.incident_media.asset_ref -> assets.media_asset
+CREATE INDEX IF NOT EXISTS incident_media_asset_ref_idx ON maintenance.incident_media (asset_ref);
 -- declared: maintenance.inspection.asset_id -> maintenance.asset
 CREATE INDEX IF NOT EXISTS inspection_asset_id_idx ON maintenance.inspection (asset_id);
 -- declared: maintenance.inspection.performed_by_principal_id -> identity.principal
@@ -3339,6 +3409,8 @@ CREATE INDEX IF NOT EXISTS conversation_message_ai_interaction_id_idx ON marketi
 CREATE INDEX IF NOT EXISTS conversation_message_conversation_id_idx ON marketing.conversation_message (conversation_id);
 -- declared: marketing.conversation_message_attachment.conversation_message_id -> marketing.conversation_message
 CREATE INDEX IF NOT EXISTS conversation_message_attachment_conversation_message_id_idx ON marketing.conversation_message_attachment (conversation_message_id);
+-- declared: marketing.cookie_scan_finding.scan_run_id -> marketing.cookie_scan_run
+CREATE INDEX IF NOT EXISTS cookie_scan_finding_scan_run_id_idx ON marketing.cookie_scan_finding (scan_run_id);
 -- declared: marketing.device_consent_category.device_consent_id -> marketing.device_consent
 CREATE INDEX IF NOT EXISTS device_consent_category_device_consent_id_idx ON marketing.device_consent_category (device_consent_id);
 -- declared: marketing.form_definition_field.form_definition_id -> marketing.form_definition
@@ -4037,6 +4109,8 @@ CREATE INDEX IF NOT EXISTS footer_config_column_footer_config_id_idx ON whitelab
 CREATE INDEX IF NOT EXISTS footer_config_social_link_footer_config_id_idx ON whitelabel.footer_config_social_link (footer_config_id);
 -- declared: whitelabel.guided_choice_answer.guided_choice_id -> whitelabel.guided_choice
 CREATE INDEX IF NOT EXISTS guided_choice_answer_guided_choice_id_idx ON whitelabel.guided_choice_answer (guided_choice_id);
+-- declared: whitelabel.guided_choice_answer.guided_choice_question_id -> whitelabel.guided_choice_question
+CREATE INDEX IF NOT EXISTS guided_choice_answer_guided_choice_question_id_idx ON whitelabel.guided_choice_answer (guided_choice_question_id);
 -- declared: whitelabel.guided_choice_question.guided_choice_id -> whitelabel.guided_choice
 CREATE INDEX IF NOT EXISTS guided_choice_question_guided_choice_id_idx ON whitelabel.guided_choice_question (guided_choice_id);
 -- declared: whitelabel.homepage_section.content_page_id -> whitelabel.content_page
@@ -4160,6 +4234,7 @@ CREATE INDEX IF NOT EXISTS ai_finding_scope_path_idx ON catalogue.ai_finding USI
 CREATE INDEX IF NOT EXISTS alert_rule_scope_path_idx ON reporting.alert_rule USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS alert_scope_path_idx ON reporting.alert USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS allocation_policy_scope_path_idx ON resources.allocation_policy USING gist (scope_path);
+CREATE INDEX IF NOT EXISTS analytics_governance_policy_scope_path_idx ON reporting.analytics_governance_policy USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS analytics_provider_scope_path_idx ON whitelabel.analytics_provider USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS anomaly_detector_scope_path_idx ON ai.anomaly_detector USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS anomaly_scope_path_idx ON reporting.anomaly USING gist (scope_path);
@@ -4252,6 +4327,7 @@ CREATE INDEX IF NOT EXISTS control_scope_path_idx ON ai.control USING gist (scop
 CREATE INDEX IF NOT EXISTS control_test_scope_path_idx ON ai.control_test USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS conversation_scope_path_idx ON ai.conversation USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS cookie_banner_design_scope_path_idx ON marketing.cookie_banner_design USING gist (scope_path);
+CREATE INDEX IF NOT EXISTS cookie_scan_finding_scope_path_idx ON marketing.cookie_scan_finding USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS cookie_scan_policy_scope_path_idx ON marketing.cookie_scan_policy USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS cookie_scan_run_scope_path_idx ON marketing.cookie_scan_run USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS corrective_action_scope_path_idx ON fnb.corrective_action USING gist (scope_path);
@@ -4327,6 +4403,7 @@ CREATE INDEX IF NOT EXISTS equipment_assignment_scope_path_idx ON rental.equipme
 CREATE INDEX IF NOT EXISTS eval_run_scope_path_idx ON ai.eval_run USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS eval_suite_scope_path_idx ON ai.eval_suite USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS event_capacity_profile_scope_path_idx ON catalogue.event_capacity_profile USING gist (scope_path);
+CREATE INDEX IF NOT EXISTS event_change_treatment_policy_scope_path_idx ON catalogue.event_change_treatment_policy USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS event_registration_scope_path_idx ON catalogue.event_registration USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS event_reschedule_scope_path_idx ON catalogue.event_reschedule USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS event_resource_plan_scope_path_idx ON catalogue.event_resource_plan USING gist (scope_path);
@@ -4385,6 +4462,7 @@ CREATE INDEX IF NOT EXISTS guest_match_policy_scope_path_idx ON marketing.guest_
 CREATE INDEX IF NOT EXISTS guest_relationship_scope_path_idx ON marketing.guest_relationship USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS guest_verification_policy_scope_path_idx ON identity.guest_verification_policy USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS guided_choice_suggestion_scope_path_idx ON ai.guided_choice_suggestion USING gist (scope_path);
+CREATE INDEX IF NOT EXISTS hardware_certification_scope_path_idx ON access.hardware_certification USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS hardware_deployment_scope_path_idx ON access.hardware_deployment USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS hardware_model_scope_path_idx ON access.hardware_model USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS history_import_scope_path_idx ON ai.history_import USING gist (scope_path);
@@ -4418,6 +4496,7 @@ CREATE INDEX IF NOT EXISTS journey_scope_path_idx ON marketing.journey USING gis
 CREATE INDEX IF NOT EXISTS journey_sequence_rule_scope_path_idx ON access.journey_sequence_rule USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS kiosk_config_scope_path_idx ON games.kiosk_config USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS kit_component_scope_path_idx ON inventory.kit_component USING gist (scope_path);
+CREATE INDEX IF NOT EXISTS kitchen_routing_rule_scope_path_idx ON fnb.kitchen_routing_rule USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS knowledge_collection_scope_path_idx ON ai.knowledge_collection USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS knowledge_document_scope_path_idx ON ai.knowledge_document USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS knowledge_gap_scope_path_idx ON ai.knowledge_gap USING gist (scope_path);
@@ -4496,6 +4575,7 @@ CREATE INDEX IF NOT EXISTS policy_scope_assignment_scope_path_idx ON access.poli
 CREATE INDEX IF NOT EXISTS policy_scope_path_idx ON ai.policy USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS policy_scope_path_idx ON whitelabel.policy USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS pos_shift_scope_path_idx ON orders.pos_shift USING gist (scope_path);
+CREATE INDEX IF NOT EXISTS prep_sheet_template_scope_path_idx ON fnb.prep_sheet_template USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS prepaid_minutes_scope_path_idx ON catalogue.prepaid_minutes USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS price_assignment_scope_path_idx ON catalogue.price_assignment USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS price_category_scope_path_idx ON catalogue.price_category USING gist (scope_path);
@@ -4542,6 +4622,7 @@ CREATE INDEX IF NOT EXISTS provider_cost_scope_path_idx ON payments.provider_cos
 CREATE INDEX IF NOT EXISTS provider_event_scope_path_idx ON payments.provider_event USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS provider_scope_path_idx ON ai.provider USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS provider_scope_path_idx ON payments.provider USING gist (scope_path);
+CREATE INDEX IF NOT EXISTS publish_review_policy_scope_path_idx ON whitelabel.publish_review_policy USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS purchase_order_scope_path_idx ON inventory.purchase_order USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS qualification_scope_path_idx ON resources.qualification USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS quality_evaluation_scope_path_idx ON marketing.quality_evaluation USING gist (scope_path);
@@ -4614,6 +4695,7 @@ CREATE INDEX IF NOT EXISTS sales_order_scope_path_idx ON orders.sales_order USIN
 CREATE INDEX IF NOT EXISTS scan_event_scope_path_idx ON access.scan_event USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS scope_path_idx ON platform.scope USING gist (path);
 CREATE INDEX IF NOT EXISTS seat_block_scope_path_idx ON seating.seat_block USING gist (scope_path);
+CREATE INDEX IF NOT EXISTS seat_pricing_rule_scope_path_idx ON catalogue.seat_pricing_rule USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS seat_rules_scope_path_idx ON seating.seat_rules USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS section_scope_path_idx ON seating.section USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS security_alert_scope_path_idx ON access.security_alert USING gist (scope_path);
@@ -4636,10 +4718,12 @@ CREATE INDEX IF NOT EXISTS signal_registry_scope_path_idx ON catalogue.signal_re
 CREATE INDEX IF NOT EXISTS signal_source_scope_path_idx ON ai.signal_source USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS signature_scope_path_idx ON approvals.signature USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS site_normalisation_basis_scope_path_idx ON reporting.site_normalisation_basis USING gist (scope_path);
+CREATE INDEX IF NOT EXISTS site_package_scope_path_idx ON whitelabel.site_package USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS site_setup_progress_scope_path_idx ON whitelabel.site_setup_progress USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS sla_policy_scope_path_idx ON approvals.sla_policy USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS sla_policy_scope_path_idx ON marketing.sla_policy USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS space_scope_path_idx ON catalogue.space USING gist (scope_path);
+CREATE INDEX IF NOT EXISTS spend_ceiling_scope_path_idx ON ai.spend_ceiling USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS sso_group_mapping_scope_path_idx ON identity.sso_group_mapping USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS sso_provider_scope_path_idx ON identity.sso_provider USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS staff_conversation_scope_path_idx ON workforce.staff_conversation USING gist (scope_path);
@@ -4666,7 +4750,9 @@ CREATE INDEX IF NOT EXISTS temperature_checkpoint_scope_path_idx ON fnb.temperat
 CREATE INDEX IF NOT EXISTS terminal_certification_scope_path_idx ON payments.terminal_certification USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS terminal_scope_path_idx ON payments.terminal USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS ticket_status_transition_scope_path_idx ON access.ticket_status_transition USING gist (scope_path);
+CREATE INDEX IF NOT EXISTS till_shift_policy_scope_path_idx ON orders.till_shift_policy USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS tool_scope_path_idx ON ai.tool USING gist (scope_path);
+CREATE INDEX IF NOT EXISTS tracking_technology_catalogue_scope_path_idx ON marketing.tracking_technology_catalogue USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS tracking_technology_scope_path_idx ON marketing.tracking_technology USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS training_run_scope_path_idx ON ai.training_run USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS transfer_rules_scope_path_idx ON wallet.transfer_rules USING gist (scope_path);
@@ -4695,6 +4781,7 @@ CREATE INDEX IF NOT EXISTS waiver_verification_scope_path_idx ON marketing.waive
 CREATE INDEX IF NOT EXISTS waiver_version_control_scope_path_idx ON marketing.waiver_version_control USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS wallet_pass_scope_path_idx ON orders.wallet_pass USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS wallet_type_scope_path_idx ON wallet.wallet_type USING gist (scope_path);
+CREATE INDEX IF NOT EXISTS waste_approval_policy_scope_path_idx ON fnb.waste_approval_policy USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS work_assignment_scope_path_idx ON workforce.work_assignment USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS workflow_definition_scope_path_idx ON approvals.workflow_definition USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS workflow_exception_scope_path_idx ON approvals.workflow_exception USING gist (scope_path);

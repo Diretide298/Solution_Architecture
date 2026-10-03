@@ -1,5 +1,5 @@
 id: LLD-AccessService
-title: AccessService — 250 operations, 78 tables
+title: AccessService — 256 operations, 78 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 deployable: access
@@ -10,9 +10,9 @@ scale: Read-heavy, extreme latency sensitivity, edge-cached. **`frozenDays` is h
   precisely because the gate cannot afford the arithmetic.
 ifDown: Down means the gates stop. Runs at the edge with a local decision cache.
 coverage:
-  operations: 250
+  operations: 256
   inAFlow: 157
-  percent: 63%
+  percent: 61%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -23,7 +23,7 @@ schemas:
   largestTable: access.media_type
 operationsByContract:
 - contract: access
-  count: 250
+  count: 256
   operations:
   - operation: addBlacklistEntry
     verb: POST
@@ -193,6 +193,22 @@ operationsByContract:
     offline: false
     reads: 6
     writes: 0
+  - operation: getBiometricVerificationProfile
+    verb: GET
+    path: /biometric-verification-profile
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: getBleBeaconGeofence
+    verb: GET
+    path: /ble-beacon-geofence
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: getCredentialIssuanceRetryPolicy
     verb: GET
     path: /credential-issuance-retry-policy
@@ -225,6 +241,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 0
+  - operation: getFacePassEnrollmentConfiguration
+    verb: GET
+    path: /face-pass-enrollment
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: getFacePassEnrolment
     verb: GET
     path: /face-pass/enrolments/{enrolmentId}
@@ -256,6 +280,30 @@ operationsByContract:
     permission: ACCESS_VALIDATE
     offline: false
     reads: 6
+    writes: 0
+  - operation: getParkingEntitlement
+    verb: GET
+    path: /parking-entitlements/{entitlementId}
+    scope: venue
+    permission: null
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getPdfPrintablePos
+    verb: GET
+    path: /pdf-printable-pos
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: getVirtualTicketIdentity
+    verb: GET
+    path: /virtual-ticket-identity
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
     writes: 0
   - operation: issueOrderEntitlements
     verb: POST
@@ -1232,7 +1280,7 @@ operationsByContract:
     permission: ACCESS_POINT_CONFIGURE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: publishMediaCompatibilityTesting
     verb: PUT
     path: /media-compatibility-testing
@@ -1368,7 +1416,7 @@ operationsByContract:
     permission: ACCESS_DIRECTION_SET
     offline: false
     reads: 2
-    writes: 0
+    writes: 1
   - operation: setAccessPointGeofence
     verb: PUT
     path: /access-points/{accessPointId}/geofence
@@ -1408,7 +1456,7 @@ operationsByContract:
     permission: ACCESS_POINT_CONFIGURE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: setBiometricVerificationProfile
     verb: PUT
     path: /biometric-verification-profile
@@ -2852,7 +2900,7 @@ writesOutside:
     tables:
     - pii.subject_biometric
 - service: TenancyService
-  operations: 3
+  operations: 4
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -2863,6 +2911,9 @@ writesOutside:
     tables:
     - platform.idempotency_record
     - platform.outbox
+  - operation: setBiometricLifecycleRetention
+    tables:
+    - tenancy.data_retention_setting
   - operation: syncScans
     tables:
     - platform.outbox

@@ -97,16 +97,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-454` | Card Lifecycle Command Center | B–D | 2 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
-| `BO-455` | Card / Credential Profile | B–D | 0 | 18 | 6 | 2 | 1 | 0 | — | notStarted (—) |
-| `BO-456` | Card Expiry Rule Configuration | B–D | 4 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-457` | Last Recharge & Last Activity Tracking | B–D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
-| `BO-458` | Expiry Monitoring & Upcoming Expiration | B–D | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-459` | Card Expiry Runtime Validation | B–D | 7 | 2 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-460` | Card Block, Suspend & Reactivation Control | B–D | 0 | 8 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-461` | Card Replacement & Wallet Relinking | B–D | 0 | 4 | 6 | 0 | 2 | 6 | — | notStarted (—) |
-| `BO-462` | Customer Balance & Credential Status View | B–D | 0 | 6 | 6 | 2 | 0 | 0 | — | notStarted (—) |
-| `BO-463` | Card Lifecycle Audit & History | B–D | 0 | 4 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-454` | Card Lifecycle Command Center | D | 2 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `BO-455` | Card / Credential Profile | D | 0 | 18 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `BO-456` | Card Expiry Rule Configuration | D | 4 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-457` | Last Recharge & Last Activity Tracking | D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `BO-458` | Expiry Monitoring & Upcoming Expiration | B | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-459` | Card Expiry Runtime Validation | D | 7 | 2 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-460` | Card Block, Suspend & Reactivation Control | D | 0 | 8 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-461` | Card Replacement & Wallet Relinking | D | 0 | 4 | 6 | 0 | 2 | 6 | — | notStarted (—) |
+| `BO-462` | Customer Balance & Credential Status View | D | 0 | 6 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `BO-463` | Card Lifecycle Audit & History | D | 0 | 4 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -126,7 +126,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-454 |
 | Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
@@ -339,7 +339,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-455 |
 | Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Card Information) and no metric row |
@@ -521,7 +521,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-456 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Rule Configuration; Configure) and no display directory — it is settings, not a population |
@@ -673,7 +673,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-457 |
 | Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -828,7 +828,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-458 |
 | Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -982,7 +982,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-459 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§CARD VALID; CARD EXPIRED) and no metric row |
@@ -1147,7 +1147,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-460 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Blocked Card Tap) and no metric row |
@@ -1329,7 +1329,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-461 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `WALLET_OPERATE` (1 configure, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Old Card) and no metric row |
@@ -1498,7 +1498,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-462 |
 | Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Card Information) and no metric row |
@@ -1657,7 +1657,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-463 |
 | Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Card Issued; Card Blocked) and no metric row |

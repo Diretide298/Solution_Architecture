@@ -1,6 +1,6 @@
 # P02-account-self-service-02 — P02 · Account & Self-Service (2 of 2)
 
-**4 screens · 23 operations · 21 schemas · 7 permissions**
+**4 screens · 24 operations · 27 schemas · 7 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -51,7 +51,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 7 permissions apply here:
   `GUEST_MANAGE, GUEST_VIEW, LOYALTY_REDEEM, ORDER_CREATE, ORDER_VIEW, WALLET_OPERATE, WALLET_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **1 of these operations work offline**: getGuestSession
+- **2 of these operations work offline**: getGuestSession, getOrder
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -145,7 +145,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-067` | Refunds & Resale | A | 6 | 0 | 6 | 10 | 7 | 6 | guest | notStarted (client-verified) |
+| `GST-067` | Refunds & Resale | A | 6 | 5 | 6 | 14 | 7 | 6 | guest | notStarted (client-verified) |
 | `GST-069` | Face Pass | A | 14 | 5 | 7 | 36 | 5 | 6 | guest | notStarted (client-verified) |
 | `GST-071` | Payment Methods | A | 9 | 9 | 6 | 7 | 1 | 0 | guest | notStarted (client-verified) |
 | `GST-073` | Security & Sign-in | A | 5 | 15 | 5 | 3 | 2 | 0 | guest | notStarted (designed) |

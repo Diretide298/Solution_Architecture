@@ -1,6 +1,6 @@
 # WS60 — Ticket Media   Credential Management board 2
 
-**10 screens · 18 operations · 27 schemas · 5 permissions**
+**10 screens · 19 operations · 27 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -131,16 +131,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-344` | Media Design Studio Command Center | B–D | 8 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-345` | Digital QR & Barcode Ticket Designer | B–D | 15 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-346` | PDF, Printable & POS Ticket Designer | A | 20 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-347` | Apple Wallet Pass Designer | B–D | 24 | 0 | 5 | 0 | 2 | 6 | — | notStarted (generated) |
-| `BO-348` | Google Wallet Pass Designer | B–D | 18 | 0 | 5 | 0 | 2 | 6 | — | notStarted (generated) |
-| `BO-349` | RFID, NFC, Card & Wristband Media Designer | B–D | 20 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-350` | Digital Card, Membership & Wearable Designer | B–D | 11 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-351` | Dynamic Fields, Data Mapping & Content Builder | B–D | 7 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-352` | Branding, Localization & Template Inheritance | B–D | 16 | 12 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
-| `BO-353` | Multi-Media Preview, Testing, Approval & Publication | B–D | 0 | 0 | 6 | 0 | 1 | 3 | — | notStarted (generated) |
+| `BO-344` | Media Design Studio Command Center | C | 8 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-345` | Digital QR & Barcode Ticket Designer | C | 15 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-346` | PDF, Printable & POS Ticket Designer | A | 20 | 8 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-347` | Apple Wallet Pass Designer | C | 24 | 0 | 5 | 0 | 2 | 6 | — | notStarted (generated) |
+| `BO-348` | Google Wallet Pass Designer | C | 18 | 0 | 5 | 0 | 2 | 6 | — | notStarted (generated) |
+| `BO-349` | RFID, NFC, Card & Wristband Media Designer | C | 20 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-350` | Digital Card, Membership & Wearable Designer | C | 11 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-351` | Dynamic Fields, Data Mapping & Content Builder | C | 7 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-352` | Branding, Localization & Template Inheritance | C | 16 | 12 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `BO-353` | Multi-Media Preview, Testing, Approval & Publication | C | 0 | 0 | 6 | 0 | 1 | 3 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

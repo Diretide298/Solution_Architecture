@@ -129,14 +129,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-1043` | Revenue Command Center | B–D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `BO-1044` | Dynamic Seat Pricing | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-1045` | Price Bands & Categories | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1046` | Inventory Forecasting | B–D | 0 | 0 | 6 | 3 | 0 | 4 | — | notStarted (—) |
-| `BO-1047` | Section Revenue Forecast | B–D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
-| `BO-1048` | Seat Upsell Recommendations | B–D | 0 | 0 | 6 | 40 | 0 | 6 | — | notStarted (—) |
-| `BO-1049` | Scenario & What-If Planning | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1050` | Revenue Analytics & Audit | B–D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `BO-1043` | Revenue Command Center | B | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `BO-1044` | Dynamic Seat Pricing | B | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-1045` | Price Bands & Categories | A | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1046` | Inventory Forecasting | B | 0 | 0 | 6 | 3 | 0 | 4 | — | notStarted (—) |
+| `BO-1047` | Section Revenue Forecast | B | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `BO-1048` | Seat Upsell Recommendations | D | 0 | 0 | 6 | 40 | 0 | 6 | — | notStarted (—) |
+| `BO-1049` | Scenario & What-If Planning | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1050` | Revenue Analytics & Audit | B | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

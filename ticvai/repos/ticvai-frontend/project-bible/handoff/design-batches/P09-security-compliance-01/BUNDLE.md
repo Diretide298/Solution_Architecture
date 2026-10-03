@@ -126,7 +126,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-031` | Security & Compliance Dashboard | A | 42 | 26 | 7 | 19 | 0 | 0 | — | notStarted (generated) |
+| `ADM-031` | Security & Compliance Dashboard | D | 42 | 26 | 7 | 19 | 0 | 0 | — | notStarted (generated) |
 | `ADM-032` | WAF & Security Policy View | B | 9 | 6 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
@@ -147,7 +147,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Security & Compliance · wave 1 · needs the `core` module |
-| Block | Block A · task APP-SETUP-ADM-031 |
+| Block | Block D · task APP-CONSOLE-ADM-031 |
 | Who uses it | ticvai staff holding `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`, `REPORT_MANAGE`, `REPORT_VIEW_VENUE` (2 operate, 1 read, 1 configure); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listDashboards` reads the population and `getDashboard` reads one of them — list, select, act |

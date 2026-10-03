@@ -131,11 +131,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-096` | Resource Calendar | B–D | 10 | 11 | 6 | 27 | 3 | 0 | — | notStarted (generated) |
-| `BO-097` | Check Out & Check In | B–D | 24 | 20 | 5 | 25 | 0 | 0 | — | notStarted (generated) |
-| `BO-098` | Qualifications | B–D | 15 | 7 | 5 | 9 | 0 | 0 | — | notStarted (generated) |
-| `BO-099` | Performance Manifest | B–D | 2 | 8 | 6 | 7 | 0 | 0 | — | notStarted (generated) |
-| `BO-103` | Access & Venue | B–D | 2 | 22 | 6 | 13 | 0 | 0 | — | notStarted (generated) |
+| `BO-096` | Resource Calendar | A | 10 | 11 | 6 | 27 | 3 | 0 | — | notStarted (generated) |
+| `BO-097` | Check Out & Check In | A | 24 | 20 | 5 | 25 | 0 | 0 | — | notStarted (generated) |
+| `BO-098` | Qualifications | D | 15 | 7 | 5 | 9 | 0 | 0 | — | notStarted (generated) |
+| `BO-099` | Performance Manifest | D | 2 | 8 | 6 | 7 | 0 | 0 | — | notStarted (generated) |
+| `BO-103` | Access & Venue | C | 2 | 22 | 6 | 13 | 0 | 0 | — | notStarted (generated) |
 
 ---
 
@@ -151,7 +151,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block A · task VM-BO-096 |
 | Who uses it | venue staff holding `RESOURCE_BOOK`, `RESOURCE_VIEW` (1 operate, 1 read); in the flows as guest |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | statusTracker (compact density): `getResourceAvailability` reads one record and nothing reads a population — the screen is about that one thing |
@@ -354,7 +354,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block A · task VM-BO-097 |
 | Who uses it | venue staff holding `ORDER_CREATE`, `RENTAL_VIEW`, `RESOURCE_BOOK` (2 operate, 1 read); in the flows as guest |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the screen declares only writes (`checkOutResource`, `checkInResource`, `authoriseStoredValue`) and no read of a population — it is settings, not a list |
@@ -592,7 +592,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 2 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-098 |
 | Who uses it | venue staff holding `RESOURCE_MANAGE`, `RESOURCE_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the screen declares only writes (`setResourceQualifications`) and no read of a population — it is settings, not a list |
@@ -770,7 +770,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 2 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-099 |
 | Who uses it | venue staff holding `RESOURCE_BOOK`, `RESOURCE_VIEW` (1 operate, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | statusTracker (compact density): `getPerformanceManifest` reads one record and nothing reads a population — the screen is about that one thing |
@@ -939,7 +939,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-103 |
 | Who uses it | venue staff holding `REPORT_VIEW_VENUE`, `SCOPE_VIEW` (1 operate, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listAccessPoints` reads the population and `getVenueSettings` reads one of them — list, select, act |
@@ -1064,6 +1064,23 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - → `BO-097` Check Out & Check In: *Check Out & Check In*
 - → `BO-098` Qualifications: *Qualifications*
 - → `BO-099` Performance Manifest: *Performance Manifest*
+- → `BO-1045` Price Bands & Categories: *Opens Price Bands & Categories*
+- → `BO-1062` Tenant & Brand Context: *Opens Tenant & Brand Context*
+- → `BO-151` Access Location Grouping: *Opens Access Location Grouping*
+- → `BO-155` Visual Access Rule Builder: *Opens Visual Access Rule Builder*
+- → `BO-161` Guest, Companion & Eligibility Rules: *Opens Guest, Companion & Eligibility Rules*
+- → `BO-166` Credential Activation & Display Rules: *Opens Credential Activation & Display Rules*
+- → `BO-167` Device Binding & Session Security: *Opens Device Binding & Session Security*
+- → `BO-168` BLE Beacon & Geofence Configuration: *Opens BLE Beacon & Geofence Configuration*
+- → `BO-185` Biometric Verification Profile Builder: *Opens Biometric Verification Profile Builder*
+- → `BO-186` Face Pass Enrollment Configuration: *Opens Face Pass Enrollment Configuration*
+- → `BO-188` Face Tag Temporary Enrollment: *Opens Face Tag Temporary Enrollment*
+- → `BO-189` Face Matching & Verification Thresholds: *Opens Face Matching & Verification Thresholds*
+- → `BO-201` Gate Modes, Free Spin & Emergency Controls: *Opens Gate Modes, Free Spin & Emergency Controls*
+- → `BO-230` Live Gate Mode & Lane Control: *Opens Live Gate Mode & Lane Control*; carries `accessPointId`
+- → `BO-335` Virtual Ticket Identity & Master Record Configuration: *Opens Virtual Ticket Identity & Master Record Configuration*
+- → `BO-346` PDF, Printable & POS Ticket Designer: *Opens PDF, Printable & POS Ticket Designer*
+- → `BO-618` Accreditation Form Builder: *Opens Accreditation Form Builder*
 
 #### States
 
@@ -1143,7 +1160,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-103?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `BO-001`, `BO-002`, `BO-003`, `BO-004`, `BO-005`, `BO-006`, `BO-030`, `BO-032`, `BO-033`, `BO-038`, `BO-069`, `BO-071`, `BO-072`, `BO-093`, `BO-094`, `BO-096`, `BO-097`, `BO-098`, `BO-099`.
+- [ ] Every transition is wired: `BO-001`, `BO-002`, `BO-003`, `BO-004`, `BO-005`, `BO-006`, `BO-030`, `BO-032`, `BO-033`, `BO-038`, `BO-069`, `BO-071`, `BO-072`, `BO-093`, `BO-094`, `BO-096`, `BO-097`, `BO-098`, `BO-099`, `BO-1045`, `BO-1062`, `BO-151`, `BO-155`, `BO-161`, `BO-166`, `BO-167`, `BO-168`, `BO-185`, `BO-186`, `BO-188`, `BO-189`, `BO-201`, `BO-230`, `BO-335`, `BO-346`, `BO-618`.
 - [ ] Every gated control is gated: `REPORT_VIEW_VENUE`, `SCOPE_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.

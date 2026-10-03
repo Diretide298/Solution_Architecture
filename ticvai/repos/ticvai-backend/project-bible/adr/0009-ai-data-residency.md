@@ -1,9 +1,24 @@
 # ADR-0009: AI Data Residency
 
-**Status:** Accepted · section 2 amended by [ADR-0049](0049-vectors-live-in-qdrant-one-collection-per-tenant.md), 30 September 2026: Qdrant on every tier, one collection per tenant with a collection-scoped token; the shared tier no longer uses pgvector · sections 1 and 3 amended 2 October 2026 (Chinmay): **a residency class per tenant**, UAE-only by default through Core42 Compass (see the amendment below); the vendor terms are still to be had in writing
+**Status:** Accepted · section 2 amended by [ADR-0049](0049-vectors-live-in-qdrant-one-collection-per-tenant.md), 30 September 2026: Qdrant on every tier, one collection per tenant with a collection-scoped token; the shared tier no longer uses pgvector · sections 1 and 3 amended 2 October 2026 (Chinmay): **a residency class per tenant**, UAE-only by default through Core42 Compass (see the amendment below); the vendor terms are still to be had in writing · amended 3 October 2026 (Chinmay): **no in-cell model**, the UAE-only fallback is OpenAI UAE only, and the guard is the provider's content-safety service (see the amendment of 3 October)
 **Date:** 13 August 2026
 **Closes:** CF-20
 **Supersedes:** the working assumption that UAE law mandates domestic AI data storage
+
+---
+
+## Amended 3 October 2026: no in-cell model
+
+**Decided by Chinmay, 3 October 2026** (`docs/active/decisions/answers-3-october-gate-and-hosting.md`; change
+entry CHG-R1S-002): *"We are not hosting anything unless client asks it."* The UAE-only fallback is **OpenAI's
+UAE region only**: the in-cell open model (gpt-oss-120b) is dropped, and the cell has no GPU node pool. Item 4
+of the 2 October amendment changes: **the guard is the provider's content-safety service** (ADR-0020 as amended
+the same day), not a model in the cell; PII detection (Presidio, a CPU library in our worker) stays in the cell.
+**Embeddings are the provider's too** (Chinmay, later the same evening; CHG-R1S-026): OpenAI UAE
+`text-embedding-3-large` or Core42 on the UAE route, chosen by the residency class and scrubbed like any call;
+no embedding model is hosted by us. The vectors stay in the cell, in Qdrant (ADR-0049), so the table below
+still holds for embeddings as stored data. The on-premise class runs models only on a client's own estate,
+when the client asks for it.
 
 ---
 

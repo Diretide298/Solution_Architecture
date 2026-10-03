@@ -1,6 +1,6 @@
 {
  "generatedBy": "tools/audit-guest-parity.py",
- "generated": "2026-10-03",
+ "generated": "2026-10-04",
  "screens": {
   "P01": 50,
   "P02": 77
@@ -12,10 +12,10 @@
   "appOnly": 6
  },
  "severity": {
-  "high": 27,
-  "medium": 161,
+  "high": 28,
+  "medium": 163,
   "low": 223,
-  "info": 2
+  "info": 3
  },
  "findings": [
   {
@@ -29,7 +29,7 @@
    "severity": "high",
    "dimension": "coverage",
    "where": "reserve-table-or-cabana",
-   "detail": "GST-070 Reserve a Table has no web screen; its operations are on WEB-031, WEB-036, WEB-040; **not callable on the web at all: listBookableOutlets, listMyTableReservations**",
+   "detail": "GST-070 Reserve a Table has no web screen; its operations are on WEB-031, WEB-036, WEB-040; **not callable on the web at all: listBookableOutlets**",
    "fix": "draw the screen on the other shell, or record the fold as the decision"
   },
   {
@@ -120,7 +120,7 @@
    "severity": "high",
    "dimension": "operations",
    "where": "app only",
-   "detail": "bindCredentialDevice, claimTicketTransfer, enrolFacePass, getOrderCalendarEvent, getVisitReminder, grantDelegation, listBookableOutlets, listCatalogueBundles, listMyTableReservations, registerGuestDevice, reserveMerchandise, setVisitReminder",
+   "detail": "bindCredentialDevice, claimTicketTransfer, enrolFacePass, getOrderCalendarEvent, getTransportDeparture, getVisitReminder, grantDelegation, listBookableOutlets, listCatalogueBundles, listTicketTransfers, registerGuestDevice, reserveMerchandise, setVisitReminder",
    "fix": ""
   },
   {
@@ -128,6 +128,13 @@
    "dimension": "operations",
    "where": "cart (WEB-010 ↔ GST-041)",
    "detail": "the web calls createCart, evaluatePromotions and the app cannot call it anywhere",
+   "fix": ""
+  },
+  {
+   "severity": "high",
+   "dimension": "operations",
+   "where": "checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009)",
+   "detail": "the web calls extendSeatHold and the app cannot call it anywhere",
    "fix": ""
   },
   {
@@ -190,7 +197,7 @@
    "severity": "high",
    "dimension": "operations",
    "where": "ticket-transfer (WEB-030 ↔ GST-014/GST-045)",
-   "detail": "the app calls claimTicketTransfer and the web cannot call it anywhere",
+   "detail": "the app calls claimTicketTransfer, listTicketTransfers and the web cannot call it anywhere",
    "fix": ""
   },
   {
@@ -204,14 +211,14 @@
    "severity": "high",
    "dimension": "operations",
    "where": "web only",
-   "detail": "createCart, evaluatePromotions, getMyChallenges, getMyIdentityVerification, getResourceAvailability, getWaiverStatus, submitGuestIdentityDocument, updateGuestPreferences",
+   "detail": "createCart, evaluatePromotions, extendSeatHold, getMyChallenges, getMyIdentityVerification, getResourceAvailability, getWaiverStatus, submitGuestIdentityDocument, updateGuestPreferences",
    "fix": ""
   },
   {
    "severity": "medium",
    "dimension": "bindings",
    "where": "add-ons (WEB-008 ↔ GST-048/GST-056)",
-   "detail": "web shows ['BookingFlow'] only, app shows — only",
+   "detail": "web shows ['BookingFlow'] only, app shows ['Cart'] only",
    "fix": "bind both twins to the same schemas"
   },
   {
@@ -254,6 +261,13 @@
    "dimension": "bindings",
    "where": "detail (WEB-004 ↔ GST-004/GST-006)",
    "detail": "web shows — only, app shows ['VenuePoint'] only",
+   "fix": "bind both twins to the same schemas"
+  },
+  {
+   "severity": "medium",
+   "dimension": "bindings",
+   "where": "fnb-order (WEB-036 ↔ GST-024)",
+   "detail": "web shows ['MyTableBooking'] only, app shows — only",
    "fix": "bind both twins to the same schemas"
   },
   {
@@ -309,7 +323,7 @@
    "severity": "medium",
    "dimension": "bindings",
    "where": "reservations (WEB-031 ↔ GST-016/GST-017)",
-   "detail": "web shows ['GroupBooking', 'GroupPackageDefinition', 'ResourceAvailability'] only, app shows — only",
+   "detail": "web shows ['GroupBooking', 'GroupPackageDefinition', 'MyTableBooking', 'ResourceAvailability'] only, app shows — only",
    "fix": "bind both twins to the same schemas"
   },
   {
@@ -345,6 +359,13 @@
    "dimension": "bindings",
    "where": "ticket-selection (WEB-005 ↔ GST-008)",
    "detail": "web shows ['PromotionEvaluation'] only, app shows ['Product'] only",
+   "fix": "bind both twins to the same schemas"
+  },
+  {
+   "severity": "medium",
+   "dimension": "bindings",
+   "where": "ticket-transfer (WEB-030 ↔ GST-014/GST-045)",
+   "detail": "web shows — only, app shows ['TicketTransfer'] only",
    "fix": "bind both twins to the same schemas"
   },
   {
@@ -526,7 +547,7 @@
    "severity": "medium",
    "dimension": "entry parameters",
    "where": "checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009)",
-   "detail": "web opens with ['cartId', 'orderId', 'paymentId', 'subjectId', 'token', 'venueId'], app with ['cartId', 'orderId', 'paymentId', 'token', 'venueId'] — one shared link cannot open both",
+   "detail": "web opens with ['cartId', 'holdId', 'orderId', 'paymentId', 'subjectId', 'token', 'venueId'], app with ['cartId', 'orderId', 'paymentId', 'token', 'venueId'] — one shared link cannot open both",
    "fix": "one deep-link shape per capability"
   },
   {
@@ -645,7 +666,7 @@
    "severity": "medium",
    "dimension": "entry parameters",
    "where": "ticket-selection (WEB-005 ↔ GST-008)",
-   "detail": "web opens with ['productId', 'venueId'], app with ['cartId', 'performanceId', 'productId', 'venueId'] — one shared link cannot open both",
+   "detail": "web opens with ['cartId', 'productId', 'venueId'], app with ['cartId', 'performanceId', 'productId', 'venueId'] — one shared link cannot open both",
    "fix": "one deep-link shape per capability"
   },
   {
@@ -805,8 +826,15 @@
   {
    "severity": "medium",
    "dimension": "operations",
+   "where": "add-ons (WEB-008 ↔ GST-048/GST-056)",
+   "detail": "the app calls getCart here; the web calls getCart on WEB-006/WEB-010/WEB-011",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
    "where": "ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033)",
-   "detail": "the app calls addCartLine, checkoutCart, createGuestFnbOrder, getCart, getGuestOrderStatus here; the web calls addCartLine on WEB-006/WEB-008/WEB-010/WEB-033/WEB-036/WEB-041/WEB-042/WEB-047/WEB-048/WEB-049; checkoutCart on WEB-010/WEB-033; createGuestFnbOrder on WEB-036; getCart on WEB-006/WEB-010/WEB-011; getGuestOrderStatus on WEB-036/WEB-038",
+   "detail": "the app calls addCartLine, checkoutCart, createGuestFnbOrder, getCart, getGuestOrderStatus here; the web calls addCartLine on WEB-005/WEB-006/WEB-008/WEB-010/WEB-033/WEB-036/WEB-041/WEB-042/WEB-047/WEB-048/WEB-049; checkoutCart on WEB-010/WEB-033; createGuestFnbOrder on WEB-036; getCart on WEB-006/WEB-010/WEB-011; getGuestOrderStatus on WEB-036/WEB-038",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
@@ -827,7 +855,7 @@
    "severity": "medium",
    "dimension": "operations",
    "where": "checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009)",
-   "detail": "the web calls getMyProfile, getOrder, listConsentPurposes, recordConsentAnswers, updateMyProfile here; the app calls getMyProfile on GST-001/GST-039; getOrder on GST-010/GST-018/GST-019/GST-028; listConsentPurposes on GST-039/GST-065/GST-066; recordConsentAnswers on GST-007; updateMyProfile on GST-039",
+   "detail": "the web calls getMyProfile, getOrder, listConsentPurposes, recordConsentAnswers, updateMyProfile here; the app calls getMyProfile on GST-001/GST-039; getOrder on GST-010/GST-018/GST-019/GST-028/GST-067; listConsentPurposes on GST-039/GST-065/GST-066; recordConsentAnswers on GST-007; updateMyProfile on GST-039",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
@@ -862,7 +890,7 @@
    "severity": "medium",
    "dimension": "operations",
    "where": "fnb-order (WEB-036 ↔ GST-024)",
-   "detail": "the web calls addCartLine, createTableReservation, joinRestaurantWaitlist, leaveRestaurantWaitlist, updateTableReservation here; the app calls addCartLine on GST-007/GST-008/GST-026/GST-027/GST-032/GST-048/GST-050/GST-056/GST-070/GST-074/GST-075/GST-077/GST-078; createTableReservation on GST-070; joinRestaurantWaitlist on GST-070; leaveRestaurantWaitlist on GST-070; updateTableReservation on GST-070",
+   "detail": "the web calls addCartLine, createTableReservation, joinRestaurantWaitlist, leaveRestaurantWaitlist, listMyTableReservations, updateTableReservation here; the app calls addCartLine on GST-007/GST-008/GST-026/GST-027/GST-032/GST-048/GST-050/GST-056/GST-070/GST-074/GST-075/GST-077/GST-078; createTableReservation on GST-070; joinRestaurantWaitlist on GST-070; leaveRestaurantWaitlist on GST-070; listMyTableReservations on GST-070; updateTableReservation on GST-070",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
@@ -960,7 +988,7 @@
    "severity": "medium",
    "dimension": "operations",
    "where": "reservations (WEB-031 ↔ GST-016/GST-017)",
-   "detail": "the web calls getGroupBooking, getGroupPackageDefinition, listGroupPackages, requestGroupBooking, updateTableReservation here; the app calls getGroupBooking on GST-072; getGroupPackageDefinition on GST-072; listGroupPackages on GST-072; requestGroupBooking on GST-072; updateTableReservation on GST-070",
+   "detail": "the web calls getGroupBooking, getGroupPackageDefinition, listGroupPackages, listMyTableReservations, requestGroupBooking, updateTableReservation here; the app calls getGroupBooking on GST-072; getGroupPackageDefinition on GST-072; listGroupPackages on GST-072; listMyTableReservations on GST-070; requestGroupBooking on GST-072; updateTableReservation on GST-070",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
@@ -996,13 +1024,6 @@
    "dimension": "operations",
    "where": "sign-in (WEB-016 ↔ GST-042)",
    "detail": "the web calls claimCart here; the app calls claimCart on GST-041",
-   "fix": "same operations on the same capability, so a guest finds it in the same place"
-  },
-  {
-   "severity": "medium",
-   "dimension": "operations",
-   "where": "ticket-selection (WEB-005 ↔ GST-008)",
-   "detail": "the app calls addCartLine here; the web calls addCartLine on WEB-006/WEB-008/WEB-010/WEB-033/WEB-036/WEB-041/WEB-042/WEB-047/WEB-048/WEB-049",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
@@ -1632,14 +1653,14 @@
    "severity": "low",
    "dimension": "components",
    "where": "add-ons (WEB-008 ↔ GST-048/GST-056)",
-   "detail": "web only ['progressIndicator'], app only — (4 vs 4 components)",
+   "detail": "web only ['progressIndicator'], app only — (4 vs 5 components)",
    "fix": ""
   },
   {
    "severity": "low",
    "dimension": "components",
    "where": "ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033)",
-   "detail": "web only —, app only ['detailPanel'] (7 vs 19 components)",
+   "detail": "web only —, app only ['dataTable'] (8 vs 22 components)",
    "fix": ""
   },
   {
@@ -1660,7 +1681,7 @@
    "severity": "low",
    "dimension": "components",
    "where": "checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009)",
-   "detail": "web only ['cartPanel', 'secondaryButton', 'textField'], app only — (22 vs 11 components)",
+   "detail": "web only ['cartPanel', 'secondaryButton', 'textField'], app only — (23 vs 11 components)",
    "fix": ""
   },
   {
@@ -1688,7 +1709,7 @@
    "severity": "low",
    "dimension": "components",
    "where": "fnb-order (WEB-036 ↔ GST-024)",
-   "detail": "web only ['destructiveButton', 'secondaryButton'], app only — (14 vs 10 components)",
+   "detail": "web only ['destructiveButton', 'secondaryButton'], app only — (15 vs 10 components)",
    "fix": ""
   },
   {
@@ -1765,7 +1786,7 @@
    "severity": "low",
    "dimension": "components",
    "where": "reservations (WEB-031 ↔ GST-016/GST-017)",
-   "detail": "web only ['confirmDialog', 'primaryButton', 'secondaryButton', 'selectField'], app only — (11 vs 5 components)",
+   "detail": "web only ['confirmDialog', 'primaryButton', 'secondaryButton', 'selectField'], app only — (12 vs 5 components)",
    "fix": ""
   },
   {
@@ -1800,7 +1821,7 @@
    "severity": "low",
    "dimension": "components",
    "where": "ticket-transfer (WEB-030 ↔ GST-014/GST-045)",
-   "detail": "web only ['secondaryButton'], app only ['banner', 'textField'] (3 vs 7 components)",
+   "detail": "web only ['secondaryButton'], app only ['banner', 'dataTable', 'textField'] (3 vs 8 components)",
    "fix": ""
   },
   {
@@ -1834,7 +1855,7 @@
   {
    "severity": "low",
    "dimension": "documents",
-   "where": "contracts/spine/catalogue.yaml:1157",
+   "where": "contracts/spine/catalogue.yaml:1159",
    "detail": "\"browses by category and cannot search\" — GST-063 Search exists since 17 August",
    "fix": "rewrite to the 12 September rule"
   },
@@ -2907,6 +2928,13 @@
    "dimension": "coverage",
    "where": "face-pass",
    "detail": "GST-069 Face Pass — app only (deliberate). enrolFacePass needs a camera and a liveness check (apply-web-parity.py). Viewing and revoking an enrolment are on the web's Devices, Wishlist & Consent. Not callable on the web: enrolFacePass.",
+   "fix": ""
+  },
+  {
+   "severity": "info",
+   "dimension": "operations",
+   "where": "transport (WEB-049 ↔ GST-076/GST-077/GST-078/GST-079)",
+   "detail": "the app calls getTransportDeparture and the web cannot call it anywhere — sanctioned: CHG-GTRB-007 - GST-077 is a screen of its own, opened on one departure, so it reloads that departure (getTransportDeparture, CHG-R1S-004); WEB-049 draws the departures beside the route from searchTransportDepartures and never opens one by id. The two shells read the same records through different operations.",
    "fix": ""
   }
  ]

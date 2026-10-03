@@ -1,6 +1,6 @@
 # P01-ticketing-01 — P01 · Ticketing
 
-**3 screens · 14 operations · 32 schemas · 6 permissions**
+**3 screens · 15 operations · 34 schemas · 6 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
@@ -126,7 +126,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `WEB-030` | Ticket Transfer | A | 8 | 6 | 6 | 5 | 3 | 0 | guest | review (client-verified) |
-| `WEB-031` | My Reservations | A | 27 | 37 | 6 | 35 | 9 | 0 | guest | review (client-verified) |
+| `WEB-031` | My Reservations | A | 27 | 41 | 6 | 35 | 9 | 0 | guest | review (client-verified) |
 | `WEB-035` | Multi-Currency & Pricing | A | 1 | 27 | 6 | 12 | 3 | 4 | guest | review (client-verified) |
 
 ## Thin screens in this batch

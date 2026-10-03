@@ -128,20 +128,20 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-615` | Accreditation Command Center | B–D | 0 | 38 | 6 | 6 | 1 | 6 | — | notStarted (—) |
-| `BO-616` | Accreditation Application Directory | B–D | 0 | 24 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-617` | New Accreditation Application | B–D | 0 | 0 | 6 | 1 | 1 | 6 | — | notStarted (—) |
-| `BO-618` | Accreditation Form Builder | A | 1 | 40 | 6 | 75 | 1 | 6 | — | notStarted (—) |
-| `BO-619` | Accreditation Category Management | B–D | 25 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-620` | Accreditation Program Setup | B–D | 0 | 0 | 6 | 4 | 1 | 6 | — | notStarted (—) |
-| `BO-621` | Applicant Type Configuration | B–D | 0 | 0 | 6 | 7 | 1 | 0 | — | notStarted (—) |
-| `BO-622` | Application Requirements Matrix | B–D | 0 | 0 | 6 | 7 | 1 | 0 | — | notStarted (—) |
-| `BO-623` | Accreditation Intake Monitor | B–D | 0 | 29 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-624` | Registration Rules & Publication | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-615` | Accreditation Command Center | D | 0 | 38 | 6 | 6 | 1 | 6 | — | notStarted (—) |
+| `BO-616` | Accreditation Application Directory | D | 0 | 24 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-617` | New Accreditation Application | D | 0 | 0 | 6 | 1 | 1 | 6 | — | notStarted (—) |
+| `BO-618` | Accreditation Form Builder | A | 1 | 46 | 6 | 75 | 1 | 6 | — | notStarted (—) |
+| `BO-619` | Accreditation Category Management | D | 25 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-620` | Accreditation Program Setup | D | 0 | 0 | 6 | 4 | 1 | 6 | — | notStarted (—) |
+| `BO-621` | Applicant Type Configuration | D | 0 | 0 | 6 | 7 | 1 | 0 | — | notStarted (—) |
+| `BO-622` | Application Requirements Matrix | D | 0 | 0 | 6 | 7 | 1 | 0 | — | notStarted (—) |
+| `BO-623` | Accreditation Intake Monitor | D | 0 | 29 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-624` | Registration Rules & Publication | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
-**BO-616, BO-617, BO-618, BO-619, BO-620, BO-621, BO-622, BO-623, BO-624 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-616, BO-617, BO-619, BO-620, BO-621, BO-622, BO-623, BO-624 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -157,7 +157,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `accreditation` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-615 |
 | Who uses it | venue staff holding `ACCREDITATION_MANAGE`, `ACCREDITATION_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -424,7 +424,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `accreditation` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-616 |
 | Who uses it | venue staff holding `ACCREDITATION_APPLY`, `ACCREDITATION_VIEW` (1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Each application record shall display) and no metric row |
@@ -631,7 +631,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `accreditation` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-617 |
 | Who uses it | venue staff holding `ACCREDITATION_APPLY` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -795,7 +795,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `accreditation` module |
 | Block | Block A · task APP-SETUP-BO-618 |
-| Who uses it | venue staff holding `ACCREDITATION_CONFIGURE`, `GUEST_VIEW`, `MARKETING_MANAGE`, `MARKETING_VIEW` (2 configure, 2 read); in the flows as venue manager |
+| Who uses it | venue staff holding `ACCREDITATION_CONFIGURE`, `ACCREDITATION_VIEW`, `GUEST_VIEW`, `MARKETING_MANAGE`, `MARKETING_VIEW` (2 configure, 3 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Fields may be configured as) and no display directory — it is settings, not a population |
 | Offline | online only |
@@ -821,6 +821,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
 | Kind | select | — | Waiver · Survey · Data capture · Consent form · Incident report · Registration | `listForms` ?kind |
+| Is template | toggle | — | — | `listAccreditationProgrammes` ?isTemplate |
 
 **Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
@@ -831,6 +832,17 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 #### Outputs: what the screen shows and produces
 
 **Shown**
+
+**Show the programmes, the one being changed among them** (card list, from `listAccreditationProgrammes`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Code | text | — |
+| Name | text | — |
+| Applications open at | 1 Oct 2026, 14:30 | — |
+| Applications close at | 1 Oct 2026, 14:30 | — |
+| Is template | yes / no (icon or chip) | 12.1.56. A reusable programme template: never opened for applications, and what `cloneAccreditationProgramme` copies its categories … |
+| Status | chip: Draft, Open, Closed, Archived | — |
 
 **Forms** (data table, from `listForms`)
 
@@ -890,7 +902,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 - **Link to programme**: Sets the programme's form; the programme's requirements matrix (not the form) decides what blocks submission and approval. *(source: contracts/satellite/accreditation.yaml#updateAccreditationProgramme)*
 
-**Data it reads**: `listForms` (onLoad, The builder's list of forms)
+**Data it reads**: `listForms` (onLoad, The builder's list of forms); `listAccreditationProgrammes` (onLoad, Show the programmes, the one being changed among them)
 
 **Where the user goes next**
 
@@ -932,6 +944,7 @@ fields:
 - `updateAccreditationProgramme` → `ACCREDITATION_CONFIGURE` (configure) · staff
 - `listForms` → `MARKETING_VIEW` (read) · staff
 - `getForm` → `GUEST_VIEW` (read) · staff, guest
+- `listAccreditationProgrammes` → `ACCREDITATION_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -982,11 +995,11 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (1), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (40 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (46 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-618?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-615`.
-- [ ] Every gated control is gated: `ACCREDITATION_CONFIGURE`, `GUEST_VIEW`, `MARKETING_MANAGE`, `MARKETING_VIEW`.
+- [ ] Every gated control is gated: `ACCREDITATION_CONFIGURE`, `ACCREDITATION_VIEW`, `GUEST_VIEW`, `MARKETING_MANAGE`, `MARKETING_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1000,7 +1013,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `accreditation` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-619 |
 | Who uses it | venue staff holding `ACCREDITATION_CONFIGURE`, `ACCREDITATION_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1207,7 +1220,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `accreditation` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-620 |
 | Who uses it | venue staff holding `ACCREDITATION_CONFIGURE`, `ACCREDITATION_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1394,7 +1407,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `accreditation` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-621 |
 | Who uses it | venue staff holding `ACCREDITATION_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1555,7 +1568,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `accreditation` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-622 |
 | Who uses it | venue staff holding `ACCREDITATION_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1725,7 +1738,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `accreditation` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-623 |
 | Who uses it | venue staff holding `ACCREDITATION_MANAGE`, `ACCREDITATION_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§The screen shall show) and no metric row |
@@ -1933,7 +1946,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `accreditation` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-624 |
 | Who uses it | venue staff holding `ACCREDITATION_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |

@@ -149,6 +149,19 @@
   "requestBody": null,
   "responds": "GuestOrderStatus"
  },
+ "getParkingEntitlement": {
+  "method": "GET",
+  "path": "/parking-entitlements/{entitlementId}",
+  "contract": "access",
+  "summary": "One of the guest's parking entitlements",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ParkingEntitlement"
+ },
  "getVenueMap": {
   "method": "GET",
   "path": "/venue-maps/{mapId}",
@@ -402,6 +415,40 @@
     "name": "date",
     "in": "query",
     "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listMyTableReservations": {
+  "method": "GET",
+  "path": "/me/table-reservations",
+  "contract": "fnb",
+  "summary": "The guest's own table bookings and waitlist places",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "include",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "upcomingOnly",
+    "in": "query",
+    "required": null
    },
    {
     "name": null,

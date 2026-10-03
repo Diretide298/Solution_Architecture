@@ -1,6 +1,6 @@
 # P02-account-self-service-01 — P02 · Account & Self-Service (1 of 2)
 
-**10 screens · 45 operations · 50 schemas · 5 permissions**
+**10 screens · 46 operations · 51 schemas · 5 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -213,7 +213,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `GST-020` | Saved Items / Wishlist | A | 0 | 15 | 4 | 1 | 1 | 0 | guest | notStarted (client-verified) |
 | `GST-039` | Profile | A | 9 | 47 | 5 | 14 | 1 | 0 | guest | notStarted (designed) |
 | `GST-042` | Simple Registration & OTP | A | 35 | 5 | 6 | 13 | 8 | 0 | guest | notStarted (designed) |
-| `GST-045` | Ticket Delivery & Sharing | A | 7 | 12 | 5 | 5 | 3 | 0 | guest | notStarted (client-verified) |
+| `GST-045` | Ticket Delivery & Sharing | A | 7 | 16 | 5 | 5 | 3 | 0 | guest | notStarted (client-verified) |
 | `GST-055` | Dynamic QR Ticket | A | 5 | 19 | 5 | 2 | 10 | 0 | guest | notStarted (client-verified) |
 | `GST-066` | Privacy & My Data | A | 3 | 12 | 6 | 23 | 2 | 4 | guest | notStarted (designed) |
 
@@ -1199,7 +1199,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### References
 
 - Wireframe frame: `wireframes/P02 Guest App.dc.html#gst-019` · status **notStarted** · provenance designed · **Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no …
-- Prototype (Mobile App v4, 29 September 2026, verified —, match none): `sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html`, view **
+- Prototype (Mobile App v4, 29 September 2026, verified —, match none): `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, view **
 - Drawn by: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
@@ -1611,7 +1611,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### References
 
 - Wireframe frame: `wireframes/P02 Guest App.dc.html#gst-039` · status **notStarted** · provenance designed · **Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no …
-- Prototype (Mobile App v4, 29 September 2026, verified —, match none): `sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html`, view **
+- Prototype (Mobile App v4, 29 September 2026, verified —, match none): `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, view **
 - Drawn by: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
 - Flow F56 *A guest registers, verifies and sets preferences*, step 4: They set a profile. → Name, language, accessibility needs.
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
@@ -1810,7 +1810,7 @@ Errors to draw in the form: 403 Contact detail on the order does not match the v
 | Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025), and this is the screen a guest who is not signed in is sent to, so it has no no-access case of its own. A session that has expired lands here with the screen it came from kept, and returns to it after sign-in. |
 | Sign in refused (`?state=signInRefused`) | **One message for every refusal of a password sign-in**: `guestPasswordLogin` answers 401 alike for a wrong password, an unknown identifier, an account with no password and a locked account, and the screen never says which. Too many attempts (429, or the lockout after `PasswordPolicy.lockoutAfterAttempts`) says to try again later and offers **Send me a code** instead (decided 28 September, audit R073 (a)). |
 | Offline (`?state=offline`) | **Not available, and the offline banner says why.** Signing in, registering and verifying a code need the server. |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Identifier already registered. Deliberately indistinguishable in timing from success — a registration endpoint that reveals which addresses exist is an account …; 409 The key is already claimed by another subject (`already-claimed`) |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Identifier already registered. Deliberately indistinguishable in timing from success — a registration endpoint that reveals which addresses exist is an account …; 409 The key is already claimed by another subject (`already-claimed`); 422 A wrong code, attempts one to four (CHG-R1S-025; the r1 gate found only the fifth failure specified). |
 
 #### Edge cases to draw
 
@@ -1917,7 +1917,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### References
 
 - Wireframe frame: `wireframes/P02 Guest App.dc.html#gst-042` · status **notStarted** · provenance designed · **Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no …
-- Prototype (Mobile App v4, 29 September 2026, verified —, match none): `sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html`, view **
+- Prototype (Mobile App v4, 29 September 2026, verified —, match none): `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, view **
 - Drawn by: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
 - Flow F56 *A guest registers, verifies and sets preferences*, step 1: They register — social, UAE Pass, or an email (with a password if they want one). → **Three doors, one subject.** UAE Pass is the one that matters locally, and it arrives verified in a way an email never is.
 - Flow F56 *A guest registers, verifies and sets preferences*, step 2: They prove the contact with a one-time code, and sign in with it or with their password later. → **No enterprise SSO for guests** (decided 28 September, audit R167 part 1): a guest signs in with a one-time code, a password (audit R073 (a)), a social provider or UAE Pass. **A second factor …
@@ -1928,7 +1928,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (35), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every input above is drawn (35), with its required mark, default, format and its error state (400, 403, 404, 409, 410, 422).
 - [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-042?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, signInRefused, offline.
 - [ ] Every action is wired with its success and its failure: Send me a code, Sign in with the code, Sign in with password, Continue with Apple or Google, Continue with UAE Pass, Create an account, Sign out, Link an order I placed as a guest.
@@ -1976,6 +1976,13 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Send to | text field | — | — | — | — | A channel (email, SMS or WhatsApp), then the address. | — |
 | Message | text field | — | — | — | — | — | — |
 
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Direction | segmented control | — | Sent · Received | `listTicketTransfers` ?direction |
+| Status | radio group | — | Offered · Claimed · Expired · Cancelled | `listTicketTransfers` ?status |
+
 **Sent by *Send tickets*** (`transferOrderTickets`; no form is declared, so these are filled from the screen or collected inline)
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
@@ -1993,6 +2000,15 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Outputs: what the screen shows and produces
 
 **Shown**
+
+**Show the tickets the guest has sent and received** (data table, from `listTicketTransfers`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Status | chip: Offered, Claimed, Expired, Cancelled | — |
+| Offered at | 1 Oct 2026, 14:30 | — |
+| Claimed at | 1 Oct 2026, 14:30 | — |
+| Expires at | 1 Oct 2026, 14:30 | An unclaimed transfer expires and the tickets return. A transfer to a mistyped address must not strand a ticket somewhere nobody can reach. |
 
 **Tickets to send** (card list, from `transferOrderTickets`): The guest's tickets as cards; ticking a card picks it.
 
@@ -2016,6 +2032,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Send tickets (primary button) | `transferOrderTickets` POST `/orders/{orderId}/transfer` | inline | TicketTransfer | 409 Ticket already redeemed (`alreadyRedeemed`), already offered (`alreadyOffered`), or the product forbids transfer (`transferNotAllowed`). (TicketTransferProblem) | produces a document or message: Transfer tickets to another guest |
+
+**Data it reads**: `listTicketTransfers` (onLoad, Show the tickets the guest has sent and received)
 
 **Where the user goes next**
 
@@ -2047,6 +2065,7 @@ ticket: 2 park ticket · Adult · Fri 2 Oct
 #### Permissions
 
 - `transferOrderTickets` → no permission · guest
+- `listTicketTransfers` → no permission · guest
 
 #### Requirements it meets
 
@@ -2088,7 +2107,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (7), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-045?state=<state>`: loading, error, emptyFirstRun, offline, emptyNoResults.
 - [ ] Every action is wired with its success and its failure: Send tickets.
 - [ ] Every transition is wired: `GST-001`.
@@ -2559,7 +2578,7 @@ Also set there, as content the tenant writes: theme, buttons, links.
 #### References
 
 - Wireframe frame: `wireframes/P02 Guest App.dc.html#gst-066` · status **notStarted** · provenance designed · **Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no …
-- Prototype (Mobile App v4, 29 September 2026, verified —, match none): `sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html`, view **
+- Prototype (Mobile App v4, 29 September 2026, verified —, match none): `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, view **
 - Drawn by: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0033 *Every asynchronous handoff has an outbox and a place to fail* (`docs/adr/0033-outbox-and-dead-letters.md`)
@@ -2598,7 +2617,7 @@ Every guest screen in this batch is white-label. These elements are set by the t
 | Show loading indicator (`brand.showLoadingIndicator`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | — | on | — |
 | Intro video (`brand.introVideoAssetRef`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | The optional intro video (decided 29 September, MOB-5). A video `MediaAsset` from the media library (CMS-010). |
 | Intro video mode (`brand.introVideoMode`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | Off · First launch · Every launch; Anything but `off` needs `introVideoAssetRef`, or 400. | Off | When GST-001 plays it full screen. "Skip introduction" is always shown. |
-| Powered by TICVAI credit (`brand.showPoweredBy`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | — | on | the *Powered by TICVAI* credit on the launch screen, at the foot of Account and in the web footer; on by default, and switching it off needs the licence add-on (403 … |
+| Powered by TICVAI credit (`brand.showPoweredBy`) | `CMS-104`, `ADM-016` | — | on | the *Powered by TICVAI* credit on the launch screen, at the foot of Account and in the web footer; on by default, and switching it off needs the licence add-on (403 … |
 | Primary colour (`theme.primaryColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | the brand colour (the `accentSolid` token): primary buttons (Book, Continue, Add to cart, Pay), the active step of the step indicator, selected date and time chips, focus rings |
 | Secondary colour (`theme.secondaryColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | secondary buttons and secondary emphasis: unselected chips, secondary tabs |
 | Accent colour (`theme.accentColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | highlights: badges (LIMITED, NEW, BESTSELLER), availability counts, sale prices |
@@ -2816,6 +2835,7 @@ Method, path, parameters, request and response for every operation these screens
 "listMyOrders": {"method":"GET","path":"/my/orders","contract":"orders","summary":"The orders this guest placed","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":"since","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listPublishedTrackingTechnologies": {"method":"GET","path":"/storefront/cookie-consent/technologies","contract":"marketing-crm","summary":"The approved cookie registry, as the preference centre shows it","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"channel","in":"query","required":true},{"name":"category","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listTaxInvoices": {"method":"GET","path":"/tax-invoices","contract":"finance","summary":"Tax invoices issued, newest first","permission":"LEDGER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":"orderId","in":"query","required":null},{"name":"legalEntityId","in":"query","required":null},{"name":"invoiceType","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":"issuedFrom","in":"query","required":null},{"name":"issuedTo","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listTicketTransfers": {"method":"GET","path":"/ticket-transfers","contract":"orders","summary":"The ticket transfers this guest sent or received","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"direction","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "recordConsent": {"method":"POST","path":"/guests/{subjectId}/consents","contract":"marketing-crm","summary":"Record a consent decision","permission":null,"offlineCapable":false,"conflictPolicy":"append","scopeLevel":"subject","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RecordConsentRequest","responds":"ConsentState"},
 "recordDeviceConsent": {"method":"POST","path":"/consent/device","contract":"marketing-crm","summary":"Record a visitor's cookie decision, before anyone is known","permission":null,"offlineCapable":false,"conflictPolicy":"append","scopeLevel":"subject","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RecordDeviceConsentRequest","responds":"DeviceConsent"},
 "refreshToken": {"method":"POST","path":"/auth/refresh","contract":"identity","summary":"Rotate the access token","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"TokenPair"},
@@ -2881,6 +2901,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "RecordDeviceConsentRequest": {"type":"object","x-ticvai-persistence":"none — request only","description":"What the banner or preference centre sends to `recordDeviceConsent`.","required":["channel","action","noticeVersion","decidedAt"],"properties":{"consentKey":{"type":"string","maxLength":64,"nullable":true,"description":"The key the browser or app already holds; omitted on a first decision, and one is minted."},"channel":{"$ref":"#/components/schemas/CookieConsentChannel"},"brandId":{"type":"string","format":"uuid","nullable":true},"bannerDesignId":{"type":"string","format":"uuid","nullable":true},"action":{"$ref":"#/components/schemas/DeviceConsentAction"},"categories":{"type":"array","description":"Required for `savePreferences`; ignored for the other actions, which decide every category themselves.","items":{"type":"object","required":["category","decision"],"properties":{"category":{"$ref":"#/components/schemas/CookieCategory"},"decision":{"type":"string","enum":["granted","declined"]}}}},"noticeVersion":{"type":"string"},"language":{"type":"string","maxLength":10,"nullable":true},"globalPrivacyControl":{"type":"boolean","default":false},"source":{"$ref":"#/components/schemas/ConsentSource"},"decidedAt":{"type":"string","format":"date-time"}}},
 "RegisterGuestRequest": {"type":"object","required":["identifier","channel"],"properties":{"identifier":{"type":"string","maxLength":256,"description":"Email address or mobile number in E.164."},"channel":{"type":"string","enum":["email","sms","whatsapp"]},"displayName":{"type":"string","maxLength":200},"password":{"type":"string","minLength":8,"maxLength":256,"writeOnly":true,"description":"Optional. OTP-only accounts are supported and are the default."},"preferredLanguage":{"type":"string","pattern":"^[a-z]{2}$"},"consents":{"type":"array","description":"Consent captured at registration, recorded with the notice version.","items":{"type":"object","properties":{"purpose":{"type":"string"},"granted":{"type":"boolean"},"noticeVersion":{"type":"string"}}}}}},
 "Session": {"type":"object","required":["sessionId","principalId","roleId","scope","effectivePermissions"],"properties":{"sessionId":{"type":"string","format":"uuid"},"principalId":{"type":"string","format":"uuid"},"roleId":{"type":"string","format":"uuid"},"displayName":{"type":"string"},"scope":{"type":"array","description":"Scope nodes this session may act within, resolved once at login from the ltree hierarchy with deny-overrides-allow. Clients filter navigation against this — they never compute it.\n","items":{"$ref":"../shared/common.yaml#/components/schemas/ScopeRef"}},"effectivePermissions":{"allOf":[{"$ref":"../shared/permissions.yaml#/components/schemas/PermissionSet"}],"description":"Flattened set across all granted scopes, after deny resolution. Convenience for coarse checks. Anything scope-sensitive must use `permissionsByScope`.\n"},"permissionsByScope":{"type":"array","description":"Permissions effective at each granted scope path. Clients filter navigation on this and never compute permissions themselves.\n","items":{"$ref":"../shared/permissions.yaml#/components/schemas/ScopedPermissions"}},"saleBoardId":{"type":"string","format":"uuid","description":"Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). Ticketing, F&B or Retail board.\n\n**Optional since 2 October 2026: only a till session carries it** (Chinmay, door follow-ups; CHG-CSP-002; breaking change against r1 approved as BC-001 to BC-005 in `docs/active/breaking-changes.yaml`). A browser door (ADM-001, SUP-001, PTR-001) and a staff handheld (EMP-001) sign in with no workstation since CHG-DOOR-001, so they have no board to land on and the field is absent. On a till it is the workstation's effective board: the outlet's board unless the till overrides it (`tenancy.Workstation.saleBoardSource`; CHG-CSP-006). A client reads its landing from this field when present and from its own platform otherwise.\n"},"workstation":{"$ref":"#/components/schemas/WorkstationContext"},"openedAt":{"type":"string","format":"date-time"},"expiresAt":{"type":"string","format":"date-time"}}},
+"TicketTransfer": {"x-ticvai-persistence":"orders.ticket_transfer","type":"object","required":["id","orderId","ticketIds","status","offeredAt","expiresAt"],"properties":{"id":{"type":"string","format":"uuid"},"orderId":{"type":"string","format":"uuid"},"ticketIds":{"type":"array","description":"The entitlements offered — `Entitlement.id` values, since a ticket is an entitlement. Each points at `access.entitlement`.","items":{"type":"string","format":"uuid"}},"fromSubjectId":{"type":"string","format":"uuid"},"toSubjectId":{"type":"string","format":"uuid","nullable":true,"description":"Set only on claim. Ownership moves then, not at offer."},"recipientAddressMasked":{"type":"string"},"status":{"type":"string","enum":["offered","claimed","expired","cancelled"]},"claimUrl":{"type":"string","nullable":true},"claimToken":{"type":"string","format":"password","writeOnly":true,"description":"**What `claimTicketTransfer` checks the presented `claimToken` against.** Carried to the recipient inside `claimUrl` and never returned — the sender reading their transfer must not be able to claim it on the recipient's behalf.\n"},"offeredAt":{"type":"string","format":"date-time"},"claimedAt":{"type":"string","format":"date-time","nullable":true},"expiresAt":{"type":"string","format":"date-time","description":"An unclaimed transfer expires and the tickets return. A transfer to a mistyped address must not strand a ticket somewhere nobody can reach.\n"}}},
 "TokenPair": {"x-ticvai-persistence":"none — transient","type":"object","required":["accessToken","refreshToken","expiresIn"],"properties":{"accessToken":{"type":"string","description":"JWT carrying `sid`, validated per request against the session registry."},"refreshToken":{"type":"string"},"expiresIn":{"type":"integer","description":"Seconds"}}},
 "VisitReminder": {"type":"object","x-ticvai-persistence":"orders.visit_reminder","description":"**One reminder per booking, set by the guest.** Not a marketing message: it is sent only for a booking the guest holds, and only on channels they still consent to.\n**One per booking per guest** (decided 28 September, audit R123 (8)): unique on `orderId` and `subjectId`. Two guests sharing a booking each keep their own reminder, and `setVisitReminder` replaces the caller's own rather than adding a second.\n","required":["enabled"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"orderId":{"type":"string","format":"uuid","readOnly":true},"subjectId":{"type":"string","format":"uuid","readOnly":true,"description":"The guest who set it. A booking shared with others reminds only the guest who asked."},"enabled":{"type":"boolean"},"leadTimeMinutes":{"type":"integer","minimum":15,"maximum":10080,"default":1440,"description":"How long before each session starts. A day by default; a week at most."},"channels":{"type":"array","items":{"type":"string","enum":["push","email","sms"]},"default":["push"]},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Operations write it at `venue` scope."}}},
 "WalletPass": {"type":"object","x-ticvai-persistence":"orders.wallet_pass","description":"BL-029. **`appleWallet` and `googlePay` are feature toggles on the native apps** — there is no pass generation, no update push, no serial and no authentication token.\n**A wallet pass is a live object, not a download.** The value over a PDF is that it updates: a changed gate, a cancelled performance, a time that moved. **A pass that cannot be pushed to is a screenshot with better rounding.**\n","required":["id","entitlementId","platform","serialNumber","status"],"properties":{"id":{"type":"string","format":"uuid"},"entitlementId":{"type":"string","format":"uuid"},"platform":{"type":"string","enum":["apple","google"]},"serialNumber":{"type":"string"},"authenticationToken":{"type":"string","format":"password","writeOnly":true,"description":"**Write-only.** How the device proves it may fetch an update, and the reason a leaked serial alone is not enough to read somebody's ticket.\n"},"status":{"type":"string","enum":["issued","updated","voided","expired"]},"lastPushedAt":{"type":"string","format":"date-time","nullable":true},"deviceRegistrations":{"type":"integer","description":"How many devices hold it. **A guest with the pass on a phone and a watch is one entitlement and two registrations**, and both need the update.\n"},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},

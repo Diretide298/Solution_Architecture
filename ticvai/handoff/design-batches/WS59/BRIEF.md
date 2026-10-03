@@ -1,6 +1,6 @@
 # WS59 — Ticket Media   Credential Management board 1
 
-**10 screens · 16 operations · 18 schemas · 3 permissions**
+**10 screens · 17 operations · 18 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -97,16 +97,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-334` | Virtual Ticket Command Center | B–D | 2 | 26 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-335` | Virtual Ticket Identity & Master Record Configuration | A | 9 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-336` | Virtual Ticket Status & Lifecycle Model | B–D | 7 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-337` | Media Type & Credential Technology Registry | B–D | 18 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-338` | Multi-Media Binding & Association Rules | B–D | 36 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-339` | Credential Identity, Token & Reference Mapping | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-340` | Entitlement & Cross-Media Synchronization Rules | B–D | 7 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-341` | Media Activation, Priority & Fallback Rules | B–D | 6 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-342` | Media Replacement, Revocation & Rebinding Rules | B–D | 22 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-343` | Virtual Ticket Architecture Testing, Governance & Audit | B–D | 9 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-334` | Virtual Ticket Command Center | C | 2 | 26 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-335` | Virtual Ticket Identity & Master Record Configuration | A | 9 | 8 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-336` | Virtual Ticket Status & Lifecycle Model | C | 7 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-337` | Media Type & Credential Technology Registry | C | 18 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-338` | Multi-Media Binding & Association Rules | C | 36 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-339` | Credential Identity, Token & Reference Mapping | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-340` | Entitlement & Cross-Media Synchronization Rules | C | 7 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-341` | Media Activation, Priority & Fallback Rules | C | 6 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-342` | Media Replacement, Revocation & Rebinding Rules | C | 22 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-343` | Virtual Ticket Architecture Testing, Governance & Audit | C | 9 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

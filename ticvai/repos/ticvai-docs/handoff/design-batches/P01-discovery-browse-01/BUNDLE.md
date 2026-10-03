@@ -529,7 +529,7 @@ Also set there, as content the tenant writes: theme, buttons, links.
 #### References
 
 - Wireframe frame: `wireframes/P01 Guest Web.dc.html#web-001` · status **review** · provenance client-verified
-- Prototype (rev 3, verified 2026-09-28, match partial): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html`, view *Header 'Discover' (default view on load)*. Differences: No first-open venue picker remembered on the device and no 'Change venue' in the header (YAML R267); the prototype shows 'Browse by venue' tiles instead and switches venue from the Config drawer. Prototype adds a resume-booking card, a video 'Tonight in the city' panel, live queue times on cards and footer links to Contact / Accessibility / Service status. YAML emptyNoAccess/offline states are not drawn on Home (offline exists only as a demo tweak).
+- Prototype (rev 3 (pointer moved to the 30 September build, CHG-R1S-015), verified 2026-09-28, match partial): `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, view *Header 'Discover' (default view on load)*. Differences: No first-open venue picker remembered on the device and no 'Change venue' in the header (YAML R267); the prototype shows 'Browse by venue' tiles instead and switches venue from the Config drawer. Prototype adds a resume-booking card, a video 'Tonight in the city' panel, live queue times on cards and footer links to Contact / Accessibility / Service status. YAML emptyNoAccess/offline states are not drawn on Home (offline exists only as a demo tweak).
 - Flow F01 *Guest buys a ticket online*, step 1: Lands and orients → Sees what is on, in the tenant's branding
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
@@ -911,7 +911,7 @@ Also set there, as content the tenant writes: answers: target, answers: filter, 
 #### References
 
 - Wireframe frame: `wireframes/P01 Guest Web.dc.html#web-002` · status **review** · provenance client-verified
-- Prototype (rev 3 (29 September build), verified 2026-09-29, match exact): `sources/designs/guest-rev3-29-september/TICVAI Guest Booking v2.dc.html`, view *Header 'What's on'*
+- Prototype (rev 3 (30 September build; the view as verified on the 29 September build, CHG-R1S-015), verified 2026-09-29, match exact): `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, view *Header 'What's on'*
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
 
@@ -1118,7 +1118,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### References
 
 - Wireframe frame: `wireframes/P01 Guest Web.dc.html#web-003` · status **review** · provenance client-verified
-- Prototype (rev 3, verified 2026-09-28, match partial): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html`, view *Discover → search box in the hero (opens the search panel) → Enter lands on What's on filtered by the query*. Differences: No separate results page: results render as a type-ahead overlay and then in the WEB-002 listing with the query applied. Recent and popular searches are prototype additions not in the YAML.
+- Prototype (rev 3 (pointer moved to the 30 September build, CHG-R1S-015), verified 2026-09-28, match partial): `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, view *Discover → search box in the hero (opens the search panel) → Enter lands on What's on filtered by the query*. Differences: No separate results page: results render as a type-ahead overlay and then in the WEB-002 listing with the query applied. Recent and popular searches are prototype additions not in the YAML.
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
 
@@ -1457,7 +1457,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### References
 
 - Wireframe frame: `wireframes/P01 Guest Web.dc.html#web-004` · status **review** · provenance client-verified
-- Prototype (rev 3 (29 September build), verified 2026-09-29, match partial): `sources/designs/guest-rev3-29-september/TICVAI Guest Booking v2.dc.html`, view *Config → Marketing layer → 'Single-event page' on, then Book; or any product card → 'Read more' dialog; or a listing card's preview aside*. Differences: No standing attraction-detail page in the default flow: details are a banner above the booking step (behind a Config toggle), a pop-up per product, or the listing preview. Eligibility rule display (getProductEligibilityRule) appears only as tags. Prototype labels it WEB-003b, not WEB-004. **Handoff: the screen id is WEB-004**; the prototype's "WEB-003b" label is not an id (CHG-SGU-020).
+- Prototype (rev 3 (30 September build; the view as verified on the 29 September build, CHG-R1S-015), verified 2026-09-29, match partial): `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, view *Config → Marketing layer → 'Single-event page' on, then Book; or any product card → 'Read more' dialog; or a listing card's preview aside*. Differences: No standing attraction-detail page in the default flow: details are a banner above the booking step (behind a Config toggle), a pop-up per product, or the listing preview. Eligibility rule display (getProductEligibilityRule) appears only as tags. Prototype labels it WEB-003b, not WEB-004. **Handoff: the screen id is WEB-004**; the prototype's "WEB-003b" label is not an id (CHG-SGU-020).
 - Flow F01 *Guest buys a ticket online*, step 2: Opens a product and decides → Understands what is included and roughly when it is available
 - Flow F01 branch at step 2 (recoverable): when The product's published booking flow orders the steps differently (e.g. a workshop is chosen before the date, or a …, Steps 3 and 4 follow the published flow (`getPublishedBookingFlow`, W12): a product-first flow (workshop, experience) picks the product on WEB-005 and then the date and time on WEB-006 (W8); surf …
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
@@ -1846,7 +1846,7 @@ Every guest screen in this batch is white-label. These elements are set by the t
 | Show loading indicator (`brand.showLoadingIndicator`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | — | on | — |
 | Intro video (`brand.introVideoAssetRef`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | The optional intro video (decided 29 September, MOB-5). A video `MediaAsset` from the media library (CMS-010). |
 | Intro video mode (`brand.introVideoMode`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | Off · First launch · Every launch; Anything but `off` needs `introVideoAssetRef`, or 400. | Off | When GST-001 plays it full screen. "Skip introduction" is always shown. |
-| Powered by TICVAI credit (`brand.showPoweredBy`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | — | on | the *Powered by TICVAI* credit on the launch screen, at the foot of Account and in the web footer; on by default, and switching it off needs the licence add-on (403 … |
+| Powered by TICVAI credit (`brand.showPoweredBy`) | `CMS-104`, `ADM-016` | — | on | the *Powered by TICVAI* credit on the launch screen, at the foot of Account and in the web footer; on by default, and switching it off needs the licence add-on (403 … |
 | Primary colour (`theme.primaryColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | the brand colour (the `accentSolid` token): primary buttons (Book, Continue, Add to cart, Pay), the active step of the step indicator, selected date and time chips, focus rings |
 | Secondary colour (`theme.secondaryColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | secondary buttons and secondary emphasis: unselected chips, secondary tabs |
 | Accent colour (`theme.accentColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | highlights: badges (LIMITED, NEW, BESTSELLER), availability counts, sale prices |

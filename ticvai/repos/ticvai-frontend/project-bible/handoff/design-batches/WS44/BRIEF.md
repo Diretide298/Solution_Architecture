@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-128` | Product Governance Command Center | B–D | 6 | 228 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
-| `ADM-129` | Approval Workflow Designer | B–D | 18 | 20 | 5 | 0 | 2 | 3 | — | notStarted (generated) |
-| `ADM-130` | Approval Review & Decision Workspace | B–D | 0 | 20 | 6 | 7 | 1 | 3 | — | notStarted (generated) |
-| `ADM-131` | Product Version Management | B–D | 0 | 0 | 6 | 4 | 2 | 0 | — | notStarted (generated) |
-| `ADM-132` | Rollback & Recovery Management | B–D | 21 | 0 | 6 | 1 | 2 | 0 | — | notStarted (generated) |
-| `ADM-133` | Change Impact Analysis | B–D | 6 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-134` | Change Propagation & Dependency Control | B–D | 6 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-135` | Product Retirement, Suspension & Archive | B–D | 9 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-136` | Product Audit Trail & Change History | B–D | 16 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-137` | Governance Risk, AI Monitoring & Control Center | B–D | 4 | 18 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-128` | Product Governance Command Center | B | 6 | 228 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
+| `ADM-129` | Approval Workflow Designer | B | 18 | 20 | 5 | 0 | 2 | 3 | — | notStarted (generated) |
+| `ADM-130` | Approval Review & Decision Workspace | B | 0 | 20 | 6 | 7 | 1 | 3 | — | notStarted (generated) |
+| `ADM-131` | Product Version Management | B | 0 | 0 | 6 | 4 | 2 | 0 | — | notStarted (generated) |
+| `ADM-132` | Rollback & Recovery Management | B | 21 | 0 | 6 | 1 | 2 | 0 | — | notStarted (generated) |
+| `ADM-133` | Change Impact Analysis | B | 6 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-134` | Change Propagation & Dependency Control | B | 6 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-135` | Product Retirement, Suspension & Archive | B | 9 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-136` | Product Audit Trail & Change History | B | 16 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-137` | Governance Risk, AI Monitoring & Control Center | B | 4 | 18 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

@@ -96,14 +96,14 @@ BEGIN
 END
 $$;
 
--- **80 tables carry `venue_id` and no `scope_path`, and a policy set built on `scope_path`
+-- **81 tables carry `venue_id` and no `scope_path`, and a policy set built on `scope_path`
 -- alone leaves every one of them open.** `check-migrations` has said so since it was written --
 -- checking only scope_path missed the tables that carry venue_id instead, and they would have
 -- passed with no policy at all -- and the hand-written baseline never closed it because it
 -- protected three tables in total.
 --
 -- A venue id is resolved to its path through the scope tree rather than assumed. **The subquery is
--- the price of not carrying a redundant `scope_path` column on those 80 tables**, and
+-- the price of not carrying a redundant `scope_path` column on those 81 tables**, and
 -- `platform.scope` is small, cached and indexed on `id` and, with GiST, on `path`.
 --
 -- **A null `venue_id` is a tenant-level row, and until 24 September nobody could see it** — not
@@ -228,7 +228,7 @@ BEGIN
 END
 $$;
 
--- **1010 tables: 571 scoped by `scope_path`, 80 by `venue_id`, 151 through the parent that owns them, 27 by subject, 180 to the tenant root only, 0 with no policy.**
+-- **1027 tables: 584 scoped by `scope_path`, 81 by `venue_id`, 151 through the parent that owns them, 28 by subject, 182 to the tenant root only, 0 with no policy.**
 -- A table with no policy is listed at the end of this file with the reason. It is not
 -- claimed to be reference data: for most of them that is a scoping decision nobody has
 -- made yet, and they stay readable by every connection to this database until it is.
@@ -290,6 +290,7 @@ SELECT platform.apply_scope_rls('access.gate_mode_change'::regclass);
 SELECT platform.apply_scope_rls('access.gate_mode_policy'::regclass);
 SELECT platform.apply_scope_rls('access.gate_outcome_profile'::regclass);
 SELECT platform.apply_scope_rls('access.group_admission_rule'::regclass);
+SELECT platform.apply_scope_rls('access.hardware_certification'::regclass);
 SELECT platform.apply_scope_rls('access.hardware_deployment'::regclass);
 SELECT platform.apply_scope_rls('access.hardware_model'::regclass);
 SELECT platform.apply_scope_rls('access.identity_lock'::regclass);
@@ -390,6 +391,7 @@ SELECT platform.apply_scope_rls('ai.risk_register'::regclass);
 SELECT platform.apply_scope_rls('ai.risk_strategy'::regclass);
 SELECT platform.apply_scope_rls('ai.signal_observation'::regclass);
 SELECT platform.apply_scope_rls('ai.signal_source'::regclass);
+SELECT platform.apply_scope_rls('ai.spend_ceiling'::regclass);
 SELECT platform.apply_scope_rls('ai.suggestion'::regclass);
 SELECT platform.apply_scope_rls('ai.suggestion_outcome'::regclass);
 SELECT platform.apply_scope_rls('ai.tool'::regclass);
@@ -446,6 +448,7 @@ SELECT platform.apply_scope_rls('catalogue.dynamic_pricing_strategy'::regclass);
 SELECT platform.apply_scope_rls('catalogue.entitlement_template'::regclass);
 SELECT platform.apply_scope_rls('catalogue.event'::regclass);
 SELECT platform.apply_scope_rls('catalogue.event_capacity_profile'::regclass);
+SELECT platform.apply_scope_rls('catalogue.event_change_treatment_policy'::regclass);
 SELECT platform.apply_scope_rls('catalogue.event_registration'::regclass);
 SELECT platform.apply_scope_rls('catalogue.event_reschedule'::regclass);
 SELECT platform.apply_scope_rls('catalogue.event_resource_plan'::regclass);
@@ -483,6 +486,7 @@ SELECT platform.apply_scope_rls('catalogue.rate'::regclass);
 SELECT platform.apply_scope_rls('catalogue.rollback_action'::regclass);
 SELECT platform.apply_scope_rls('catalogue.rounding_profile'::regclass);
 SELECT platform.apply_scope_rls('catalogue.sales_channel'::regclass);
+SELECT platform.apply_scope_rls('catalogue.seat_pricing_rule'::regclass);
 SELECT platform.apply_scope_rls('catalogue.signal_registry'::regclass);
 SELECT platform.apply_scope_rls('catalogue.space'::regclass);
 SELECT platform.apply_scope_rls('catalogue.tax_profile'::regclass);
@@ -491,16 +495,19 @@ SELECT platform.apply_scope_rls('catalogue.waiting_room_setting'::regclass);
 SELECT platform.apply_scope_rls('fnb.corrective_action'::regclass);
 SELECT platform.apply_scope_rls('fnb.course_rule'::regclass);
 SELECT platform.apply_scope_rls('fnb.delivery_policy'::regclass);
+SELECT platform.apply_scope_rls('fnb.kitchen_routing_rule'::regclass);
 SELECT platform.apply_scope_rls('fnb.menu_schedule'::regclass);
 SELECT platform.apply_scope_rls('fnb.menu_version'::regclass);
 SELECT platform.apply_scope_rls('fnb.modifier_group'::regclass);
 SELECT platform.apply_scope_rls('fnb.order_fulfilment'::regclass);
 SELECT platform.apply_scope_rls('fnb.outlet_template'::regclass);
+SELECT platform.apply_scope_rls('fnb.prep_sheet_template'::regclass);
 SELECT platform.apply_scope_rls('fnb.product_recommendation'::regclass);
 SELECT platform.apply_scope_rls('fnb.reservation_policy'::regclass);
 SELECT platform.apply_scope_rls('fnb.service_charge_policy'::regclass);
 SELECT platform.apply_scope_rls('fnb.table_combination'::regclass);
 SELECT platform.apply_scope_rls('fnb.temperature_checkpoint'::regclass);
+SELECT platform.apply_scope_rls('fnb.waste_approval_policy'::regclass);
 SELECT platform.apply_scope_rls('games.attraction_type'::regclass);
 SELECT platform.apply_scope_rls('games.authorisation'::regclass);
 SELECT platform.apply_scope_rls('games.card_expiry_rules'::regclass);
@@ -566,6 +573,7 @@ SELECT platform.apply_scope_rls('marketing.consent_capture_point'::regclass);
 SELECT platform.apply_scope_rls('marketing.consent_question'::regclass);
 SELECT platform.apply_scope_rls('marketing.contact_automation'::regclass);
 SELECT platform.apply_scope_rls('marketing.cookie_banner_design'::regclass);
+SELECT platform.apply_scope_rls('marketing.cookie_scan_finding'::regclass);
 SELECT platform.apply_scope_rls('marketing.cookie_scan_policy'::regclass);
 SELECT platform.apply_scope_rls('marketing.cookie_scan_run'::regclass);
 SELECT platform.apply_scope_rls('marketing.device_consent'::regclass);
@@ -604,6 +612,7 @@ SELECT platform.apply_scope_rls('marketing.service_queue'::regclass);
 SELECT platform.apply_scope_rls('marketing.sla_policy'::regclass);
 SELECT platform.apply_scope_rls('marketing.suppression'::regclass);
 SELECT platform.apply_scope_rls('marketing.tracking_technology'::regclass);
+SELECT platform.apply_scope_rls('marketing.tracking_technology_catalogue'::regclass);
 SELECT platform.apply_scope_rls('marketing.waiver_association'::regclass);
 SELECT platform.apply_scope_rls('marketing.waiver_exception'::regclass);
 SELECT platform.apply_scope_rls('marketing.waiver_form_layout'::regclass);
@@ -641,6 +650,7 @@ SELECT platform.apply_scope_rls('orders.reservation_hold_policy'::regclass);
 SELECT platform.apply_scope_rls('orders.sales_order'::regclass);
 SELECT platform.apply_scope_rls('orders.status_transition_rule'::regclass);
 SELECT platform.apply_scope_rls('orders.stored_value_authorisation'::regclass);
+SELECT platform.apply_scope_rls('orders.till_shift_policy'::regclass);
 SELECT platform.apply_scope_rls('orders.upgrade_rule'::regclass);
 SELECT platform.apply_scope_rls('orders.visit_reminder'::regclass);
 SELECT platform.apply_scope_rls('orders.wallet_pass'::regclass);
@@ -709,6 +719,7 @@ SELECT platform.apply_scope_rls('rental.quote'::regclass);
 SELECT platform.apply_scope_rls('rental.settlement'::regclass);
 SELECT platform.apply_scope_rls('reporting.alert'::regclass);
 SELECT platform.apply_scope_rls('reporting.alert_rule'::regclass);
+SELECT platform.apply_scope_rls('reporting.analytics_governance_policy'::regclass);
 SELECT platform.apply_scope_rls('reporting.anomaly'::regclass);
 SELECT platform.apply_scope_rls('reporting.delivery'::regclass);
 SELECT platform.apply_scope_rls('reporting.kpi_definition'::regclass);
@@ -800,6 +811,8 @@ SELECT platform.apply_scope_rls('whitelabel.faq_category'::regclass);
 SELECT platform.apply_scope_rls('whitelabel.footer_config'::regclass);
 SELECT platform.apply_scope_rls('whitelabel.policy'::regclass);
 SELECT platform.apply_scope_rls('whitelabel.promo_block'::regclass);
+SELECT platform.apply_scope_rls('whitelabel.publish_review_policy'::regclass);
+SELECT platform.apply_scope_rls('whitelabel.site_package'::regclass);
 SELECT platform.apply_scope_rls('whitelabel.site_setup_progress'::regclass);
 SELECT platform.apply_scope_rls('whitelabel.store_account'::regclass);
 SELECT platform.apply_scope_rls('workforce.field_ownership'::regclass);
@@ -833,6 +846,7 @@ SELECT platform.apply_venue_rls('games.card'::regclass);
 SELECT platform.apply_venue_rls('games.game'::regclass);
 SELECT platform.apply_venue_rls('games.prize'::regclass);
 SELECT platform.apply_venue_rls('games.redemption'::regclass);
+SELECT platform.apply_venue_rls('identity."session"'::regclass);
 SELECT platform.apply_venue_rls('inventory.item'::regclass);
 SELECT platform.apply_venue_rls('inventory.location'::regclass);
 SELECT platform.apply_venue_rls('inventory.requisition'::regclass);
@@ -1071,6 +1085,7 @@ SELECT platform.apply_subject_rls('marketing.privacy_audit_event'::regclass);
 SELECT platform.apply_subject_rls('marketing.subscription'::regclass);
 SELECT platform.apply_subject_rls('marketing.touch_point'::regclass);
 SELECT platform.apply_subject_rls('marketing.wishlist_item'::regclass);
+SELECT platform.apply_subject_rls('orders.guest_credit_account'::regclass);
 SELECT platform.apply_subject_rls('orders.membership_activation_action'::regclass);
 SELECT platform.apply_subject_rls('payments.token'::regclass);
 SELECT platform.apply_subject_rls('pii.subject_contact'::regclass);
@@ -1105,6 +1120,7 @@ SELECT platform.apply_tenant_rls('fnb.delivery_location_outlet'::regclass);  -- 
 SELECT platform.apply_tenant_rls('fnb.dining_table'::regclass);  -- was: only nullable references (outlet_id -> platform.outlet)
 SELECT platform.apply_tenant_rls('fnb.ingredient_substitute'::regclass);  -- was: no scope column and no declared owner
 SELECT platform.apply_tenant_rls('fnb.kitchen_exception'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('fnb.kitchen_sla'::regclass);  -- was: no scope column and no declared owner
 SELECT platform.apply_tenant_rls('fnb.kitchen_station'::regclass);  -- was: only nullable references (outlet_id -> platform.outlet)
 SELECT platform.apply_tenant_rls('fnb.menu_item_modifier'::regclass);  -- was: no scope column and no declared owner
 SELECT platform.apply_tenant_rls('fnb.production_plan'::regclass);  -- was: no scope column and no declared owner
@@ -1145,6 +1161,7 @@ SELECT platform.apply_tenant_rls('maintenance.asset_document'::regclass);  -- wa
 SELECT platform.apply_tenant_rls('maintenance.asset_status_change'::regclass);  -- was: no scope column and no declared owner
 SELECT platform.apply_tenant_rls('maintenance.incident_authority_notification'::regclass);  -- was: no scope column and no declared owner
 SELECT platform.apply_tenant_rls('maintenance.incident_investigation_note'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('maintenance.incident_media'::regclass);  -- was: only nullable references (asset_ref -> assets.media_asset)
 SELECT platform.apply_tenant_rls('marketing.agent_availability'::regclass);  -- was: its owner identity.principal has no policy either
 SELECT platform.apply_tenant_rls('marketing.badge'::regclass);  -- was: no scope column and no declared owner
 SELECT platform.apply_tenant_rls('marketing.campaign_target'::regclass);  -- was: no scope column and no declared owner

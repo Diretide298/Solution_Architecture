@@ -127,16 +127,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-883` | Workforce Roster Command Center | B–D | 0 | 0 | 6 | 10 | 1 | 0 | — | notStarted (—) |
-| `BO-884` | Attraction & Operational Staffing Roster | B–D | 0 | 77 | 6 | 11 | 1 | 0 | — | notStarted (—) |
-| `BO-885` | Minimum Staffing & Coverage Rule Configuration | B–D | 5 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-886` | Staffing Gap & Coverage Control Center | B–D | 4 | 22 | 6 | 1 | 2 | 0 | — | notStarted (—) |
-| `BO-887` | Shift Marketplace & Workforce Requests | B–D | 0 | 8 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-888` | Attendance & Live Workforce Command Center | B–D | 0 | 22 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `BO-889` | Staff Check-In, Check-Out & Attendance Exceptions | B–D | 19 | 5 | 6 | 4 | 1 | 0 | — | notStarted (—) |
-| `BO-890` | Workforce Compliance Validation Center | B–D | 0 | 12 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-891` | Labor Cost & Staffing Budget Control | B–D | 10 | 17 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-892` | AI Workforce Planner & Roster Optimization | B–D | 4 | 15 | 6 | 1 | 1 | 1 | — | notStarted (—) |
+| `BO-883` | Workforce Roster Command Center | D | 0 | 0 | 6 | 10 | 1 | 0 | — | notStarted (—) |
+| `BO-884` | Attraction & Operational Staffing Roster | D | 0 | 77 | 6 | 11 | 1 | 0 | — | notStarted (—) |
+| `BO-885` | Minimum Staffing & Coverage Rule Configuration | D | 5 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-886` | Staffing Gap & Coverage Control Center | D | 4 | 22 | 6 | 1 | 2 | 0 | — | notStarted (—) |
+| `BO-887` | Shift Marketplace & Workforce Requests | D | 0 | 8 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-888` | Attendance & Live Workforce Command Center | D | 0 | 22 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `BO-889` | Staff Check-In, Check-Out & Attendance Exceptions | D | 19 | 5 | 6 | 4 | 1 | 0 | — | notStarted (—) |
+| `BO-890` | Workforce Compliance Validation Center | D | 0 | 12 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-891` | Labor Cost & Staffing Budget Control | D | 10 | 17 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-892` | AI Workforce Planner & Roster Optimization | D | 4 | 15 | 6 | 1 | 1 | 1 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

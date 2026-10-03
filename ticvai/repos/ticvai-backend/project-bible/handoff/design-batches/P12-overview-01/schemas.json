@@ -52,6 +52,125 @@
    }
   }
  },
+ "AgentWorkloadAvailabilityWorkforceControlView": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over marketing.agent_service_profile (new), marketing.agent_availability, marketing.case, marketing.conversation, marketing.service_queue (new) and workforce.shift",
+  "description": "One agent's live status and workload. Rates are over the period since the agent's current shift started, or the venue's current day when no shift is rostered.",
+  "required": [
+   "principalId",
+   "agentName",
+   "status",
+   "activeCases"
+  ],
+  "properties": {
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "agentName": {
+    "type": "string",
+    "description": "The agent's display name."
+   },
+   "team": {
+    "type": "string",
+    "nullable": true
+   },
+   "skills": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "languages": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "available",
+     "busy",
+     "onCall",
+     "chatting",
+     "afterCallWork",
+     "break",
+     "training",
+     "offline"
+    ]
+   },
+   "activeCases": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "chats": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Conversations the agent holds now."
+   },
+   "calls": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Voice conversations in progress (0 or 1)."
+   },
+   "queues": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "queueId",
+      "queueName"
+     ],
+     "properties": {
+      "queueId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "queueName": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "slaRiskCases": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "The agent's open cases at risk or breached."
+   },
+   "averageHandleSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true
+   },
+   "resolutionRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true,
+    "description": "Cases resolved over cases handled."
+   },
+   "utilization": {
+    "type": "number",
+    "minimum": 0,
+    "description": "Active cases and conversations over `maxConcurrentCases`; above 1 means overloaded."
+   },
+   "workloadBand": {
+    "type": "string",
+    "enum": [
+     "available",
+     "normal",
+     "overloaded"
+    ],
+    "description": "`overloaded` at utilization 0.9 or above, `available` below 0.5."
+   },
+   "availabilityExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
  "Case": {
   "x-ticvai-persistence": "marketing.case",
   "x-ticvai-retired-columns": [

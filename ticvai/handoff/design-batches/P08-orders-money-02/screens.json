@@ -2704,7 +2704,23 @@
     {
      "name": "contentBody",
      "slot": "collection",
-     "components": []
+     "components": [
+      {
+       "kind": "cardList",
+       "label": "Show the delivery locations and the outlets mapped to them",
+       "operation": "listDeliveryLocations",
+       "bindsTo": "DeliveryLocation",
+       "columns": [
+        "DeliveryLocation.kind",
+        "DeliveryLocation.label",
+        "DeliveryLocation.zone",
+        "DeliveryLocation.isServiceable",
+        "DeliveryLocation.unserviceableReason",
+        "DeliveryLocation.walkTimeMinutes"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      }
+     ]
     },
     {
      "name": "contextPanel",
@@ -2843,6 +2859,13 @@
     "purpose": "Set the rules every till in the venue opens and closes to",
     "trigger": "onAction",
     "provenance": "design-note correction, 2 October 2026 (BO-065)"
+   },
+   {
+    "operationId": "listDeliveryLocations",
+    "contract": "fnb",
+    "purpose": "Show the delivery locations and the outlets mapped to them",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "entryState": {

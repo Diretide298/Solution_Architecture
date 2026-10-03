@@ -97,16 +97,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-424` | Gameplay Validation Command Center | B–D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-425` | Gameplay Validation Rule Configuration | B–D | 0 | 6 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-426` | Deduction Priority & Funding Source Rules | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-427` | All Games & Rides Pass Configuration | B–D | 11 | 15 | 6 | 0 | 2 | 6 | — | notStarted (—) |
-| `BO-428` | Specific Game/Ride Unlimited Entitlement | B–D | 9 | 0 | 6 | 0 | 2 | 6 | — | notStarted (—) |
-| `BO-429` | Specific Game/Ride Limited Entitlement | B–D | 1 | 0 | 6 | 0 | 2 | 6 | — | notStarted (—) |
-| `BO-430` | Game Package Builder | B–D | 0 | 0 | 6 | 0 | 2 | 6 | — | notStarted (—) |
-| `BO-431` | Entitlement Validity & Activation Rules | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-432` | Real-Time Gameplay Authorization | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-433` | Validation Simulator & Exception Analysis | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-424` | Gameplay Validation Command Center | D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-425` | Gameplay Validation Rule Configuration | D | 0 | 6 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-426` | Deduction Priority & Funding Source Rules | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-427` | All Games & Rides Pass Configuration | D | 11 | 15 | 6 | 0 | 2 | 6 | — | notStarted (—) |
+| `BO-428` | Specific Game/Ride Unlimited Entitlement | D | 9 | 0 | 6 | 0 | 2 | 6 | — | notStarted (—) |
+| `BO-429` | Specific Game/Ride Limited Entitlement | D | 1 | 0 | 6 | 0 | 2 | 6 | — | notStarted (—) |
+| `BO-430` | Game Package Builder | D | 0 | 0 | 6 | 0 | 2 | 6 | — | notStarted (—) |
+| `BO-431` | Entitlement Validity & Activation Rules | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-432` | Real-Time Gameplay Authorization | B | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-433` | Validation Simulator & Exception Analysis | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

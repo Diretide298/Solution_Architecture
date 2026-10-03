@@ -294,7 +294,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|
 | Sign in (primary button) | `login` POST `/auth/login` | LoginRequest | LoginResponse | 400 Validation failed; 409 An active session already exists for this principal on another device. Per §3.1.3 the new login is refused. | — |
 | Continue with your organisation (secondary button) | `startSsoAuthorization` GET `/auth/sso/{providerId}/authorize` | — | inline | — | — |
-| Verify (primary button) | `verifyMfaChallenge` POST `/auth/mfa/challenge/{challengeId}/verify` | inline | inline | — | — |
+| Verify (primary button) | `verifyMfaChallenge` POST `/auth/mfa/challenge/{challengeId}/verify` | inline | inline | 410 The challenge has expired or was voided (by a fifth wrong code, or a newer challenge for the same purpose).; 422 A wrong code, attempts one to four (CHG-R1S-025; the r1 gate found only the fifth failure specified). | — |
 | Email me a code instead (secondary button) | `createMfaChallenge` POST `/auth/mfa/challenge` | inline | inline | — | — |
 | Set up the authenticator app (secondary button) | `enrolMfaMethod` POST `/auth/mfa/methods` | inline | MfaEnrolment | 403 A guest caller while no venue of the tenant has guest two-step verification on (rev 3 GAP-B1, per venue).; 422 A kind the caller may not enrol. Staff use `totp`, with `emailOtp` as the fallback (audit R126); a guest … | — |
 | Choose role (secondary button) | `selectRole` POST `/auth/select-role` | inline | Session | 403 Authenticated but not permitted at the requested scope | — |
@@ -334,7 +334,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | MFA required (`?state=mfaRequired`) | **Signed in, not yet through.** The principal holds a permission that requires MFA (ROLE_MANAGE, LEDGER_APPROVE, any PLATFORM_* permission, or one the tenant added), so the screen calls `createMfaChallenge` (`action: signIn`) and asks for the authentication code; `verifyMfaChallenge` completes the sign-in. **Email me a code instead** is the fallback. Five wrong codes lock step-up for the policy's lockout minutes and the screen says until when (audit R135, R126). A person without such a … |
 | MFA enrolment required (`?state=mfaEnrolmentRequired`) | **First sign-in, no method yet.** A person who requires MFA and has no active method enrols the authenticator app (email as the fallback) with `enrolMfaMethod`, confirms it with the first code (`verifyMfaEnrolment`), sees the recovery codes once, then continues to the code step (audit R135, R126 (5)). |
 | Offline (`?state=offline`) | Not available, and the offline banner says why: signing in needs a connection. |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 An active session already exists for this principal on another device. Per §3.1.3 the new login is refused.; 422 A kind the caller may not enrol. Staff use `totp`, with `emailOtp` as the fallback (audit R126); a guest the same (rev 3 GAP-B1).; 422 The new credential fails the password policy, or matches the current one or any of the previous … |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 An active session already exists for this principal on another device. Per §3.1.3 the new login is refused.; 422 A kind the caller may not enrol. Staff use `totp`, with `emailOtp` as the fallback (audit R126); a guest the same (rev 3 GAP-B1).; 422 A wrong code, attempts one to four (CHG-R1S-025; the r1 gate found only the fifth failure specified). |
 
 #### Edge cases to draw
 
@@ -416,7 +416,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (16), with its required mark, default, format and its error state (400, 403, 409, 422).
+- [ ] Every input above is drawn (16), with its required mark, default, format and its error state (400, 403, 409, 410, 422).
 - [ ] Every output is drawn (51 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#SUP-001?state=<state>`: loading, emptyFirstRun, error, denied, emptyNoAccess, emptyNoResults, sessionHeld, mfaRequired, mfaEnrolmentRequired, offline.
 - [ ] Every action is wired with its success and its failure: Sign in, Continue with your organisation, Verify, Email me a code instead, Set up the authenticator app, Choose role.

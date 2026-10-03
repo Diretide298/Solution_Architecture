@@ -1061,6 +1061,44 @@
    "createdAt"
   ],
   "properties": {
+   "scrubAudit": {
+    "type": "object",
+    "readOnly": true,
+    "x-ticvai-persistence-kind": "valueObject",
+    "x-ticvai-persistence-column": "jsonb",
+    "description": "**The audit of one call's scrubbing and routing** (3 October 2026, CHG-R1S-016; the legal research `docs/active/research/openai-key-uae-3-october.md`, item 9). Counts of the entities found by type, **never the values**; the residency class, endpoint and region; the scrubber version; whether the call was allowed or blocked; and a hash of the outbound payload. Exportable to the tenant as controller.",
+    "properties": {
+     "entityCounts": {
+      "type": "object",
+      "additionalProperties": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "description": "Per entity type, e.g. emiratesId 1 and uaePhone 2. Counts only, never values."
+     },
+     "residencyClass": {
+      "$ref": "../shared/common.yaml#/components/schemas/AiResidencyClass"
+     },
+     "endpointRegion": {
+      "type": "string",
+      "description": "Where the call went, e.g. `uaeNorth`, `ae.api.openai.com`, `global`."
+     },
+     "scrubberVersion": {
+      "type": "string"
+     },
+     "decision": {
+      "type": "string",
+      "enum": [
+       "allowed",
+       "blocked"
+      ]
+     },
+     "outboundPayloadHash": {
+      "type": "string",
+      "description": "SHA-256 of the prompt as sent (after scrubbing), so a dispute can be checked without keeping the text."
+     }
+    }
+   },
    "id": {
     "type": "string",
     "format": "uuid"

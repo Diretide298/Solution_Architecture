@@ -147,21 +147,21 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="body">
             <div class="top">
               <div><h2>Attract Loop</h2>
-                <small>Guest Kiosk &middot; wave 2 &middot; touchLarge</small></div>
+                <small>Guest Kiosk &middot; wave 1 &middot; touchLarge</small></div>
               <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
             </div>
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>What&#x27;s on</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Published products only, primary media first; a touch opens the language choice (CHG-R1S-022).</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>OPERATIONS</b> &middot; listProducts</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · offline</span></div>
           
-          <div><b>GOES TO</b> &middot; entry point · <a href="#ksk-002">KSK-002</a>  &mdash; <i>Chooses a language</i><br><a href="#ksk-003">KSK-003</a>  &mdash; <i>What are you buying</i><br><a href="#ksk-004">KSK-004</a>  &mdash; <i>Choose tickets</i><br><a href="#ksk-014">KSK-014</a>  &mdash; <i>Out of service</i></div>
+          <div><b>GOES TO</b> &middot; entry point · <a href="#ksk-002">KSK-002</a>  &mdash; <i>Chooses a language</i><br><a href="#ksk-003">KSK-003</a>  &mdash; <i>What are you buying</i><br><a href="#ksk-004">KSK-004</a>  &mdash; <i>Choose tickets</i> <span class="car">productId</span><br><a href="#ksk-014">KSK-014</a>  &mdash; <i>Out of service</i><br><a href="#ksk-015">KSK-015</a>  &mdash; <i>Opens Assistant</i></div>
           
           
         </div>
@@ -303,17 +303,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><b>The cart</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Offers applied</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">The promotions that apply and the near misses, evaluated by themselves (`evaluatePromotions`) and shown before payment (F75 step 4).</span></div><div class="panel"><b>Quantity</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">A large stepper per line; + adds one more (`addCartLine`).</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>The cart</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Offers applied</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">The offers the cart already carries (`Cart.discountTotal`): promotions apply on their own, nothing is pressed (CHG-R1S-022).</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getCart · addCartLine · checkoutCart · evaluatePromotions</div>
+          <div><b>OPERATIONS</b> &middot; getCart · checkoutCart</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; cartId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#ksk-001">KSK-001</a> <br><a href="#ksk-002">KSK-002</a> <br><a href="#ksk-003">KSK-003</a> <br><a href="#ksk-007">KSK-007</a>  &mdash; <i>Pays at the terminal</i><br><a href="#ksk-008">KSK-008</a>  &mdash; <i>The payment does not resolve</i> <span class="car">paymentId</span></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCheckoutCart &middot; <i>Pay</i> &middot; <b>Pay</b> &middot; Back</div></div>
         </div>
       </div>
       <div id="ksk-007" class="scr">
@@ -453,12 +453,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><b>The order</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Search</b><div class="chip">Search</div><span class="why">A search that returns nothing must say so differently from a search not yet run.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>The order</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Scan your booking QR</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The booking&#x27;s QR carries the order; scanning it opens the booking. Shop-and-drop collection is staff-only and not here (CHG-R1S-022).</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; lookupShopAndDrop · getOrder</div>
+          <div><b>OPERATIONS</b> &middot; getOrder</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#ksk-001">KSK-001</a> <br><a href="#ksk-002">KSK-002</a> <br><a href="#ksk-003">KSK-003</a> <br><a href="#ksk-012">KSK-012</a>  &mdash; <i>Booking found</i> <span class="car">orderId</span></div>
@@ -518,12 +518,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; endKioskAssist</div>
+          <div><b>OPERATIONS</b> &middot; endKioskAssist · handoverToAgent</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; sessionId&larr;session</div>
+          <div><b>ARRIVES WITH</b> &middot; sessionId&larr;session, conversationId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#ksk-001">KSK-001</a> <br><a href="#ksk-002">KSK-002</a> <br><a href="#ksk-003">KSK-003</a> </div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formHandoverToAgent &middot; <i>Call a member of staff</i> &middot; <b>Call a member of staff</b> &middot; Back</div></div>
         </div>
       </div>
       <div id="ksk-014" class="scr">
@@ -543,12 +543,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Out of service</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">Shown while the tenant&#x27;s app status or this kiosk&#x27;s own health (its heartbeat, recordDeviceHeartbeat) says it cannot sell; polled, and the attract loop returns </span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>OPERATIONS</b> &middot; getTenantAppStatus</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · offline</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#ksk-001">KSK-001</a> <br><a href="#ksk-002">KSK-002</a> <br><a href="#ksk-003">KSK-003</a> </div>
@@ -573,7 +573,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><b>The guest menu</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Menu</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Photographs, because **a guest at a kiosk with a queue behind them is not reading descriptions**</span></div><div class="panel"><span class="kind">banner</span><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">Allergens shown on the card, not behind a tap. **contains and mayContain are different claims** and a fryer shared with breaded fish makes chips a fish risk</span></div></div><div class="side"><div class="panel"><b>Add to order</b><div class="chip cta">Add to order</div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>The guest menu</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Menu</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Photographs, because **a guest at a kiosk with a queue behind them is not reading descriptions**</span></div><div class="panel"><span class="kind">banner</span><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">Says *contains* and *may contain* apart, from each item&#x27;s `allergenDetail` (`Allergen.contains`, `Allergen.mayContain`) (CHG-R1S-022).</span></div></div><div class="side"><div class="panel"><b>Add to order</b><div class="chip cta">Add to order</div></div></div></div>
             </div>
           </div>
         </div>
@@ -581,7 +581,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; getGuestMenu · createGuestFnbOrder</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; outletId&larr;deepLink</div>
-          <div><b>GOES TO</b> &middot; <a href="#ksk-017">KSK-017</a>  &mdash; <i>Shop</i> <span class="car">outletId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#ksk-017">KSK-017</a>  &mdash; <i>Shop</i> <span class="car">outletId</span><br><a href="#ksk-007">KSK-007</a>  &mdash; <i>Pays for the food order</i> <span class="car">orderId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateGuestFnbOrder &middot; <i>Pay</i> &middot; <b>Pay</b> &middot; Cancel <span class="dis">discards id · lines · quotedTotal · recordedAt · locationSessionId · outletId · fulfilment · paymentMethod</span></div></div>
         </div>
@@ -638,12 +638,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; sendAiMessage · listProducts · getAvailability · handoverToAgent +2</div>
+          <div><b>OPERATIONS</b> &middot; sendAiMessage · listProducts · getAvailability · handoverToAgent +3</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; conversationId&larr;deepLink, messageId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; conversationId&larr;deepLink, messageId&larr;navigation, cartId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#ksk-001">KSK-001</a> </div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmHandover &middot; <i>Talk to a person</i> &middot; <b>Ask a person</b> &middot; Keep asking</div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmHandover &middot; <i>Talk to a person</i> &middot; <b>Ask a person</b> &middot; Keep asking</div><div class="ov"><b>modal</b> formAddCartLine &middot; <i>Add to basket</i> &middot; <b>Add to basket</b> &middot; Back</div></div>
         </div>
       </div></div>
   <div class="bottom">

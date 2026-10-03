@@ -157,7 +157,7 @@
    "provenance": "designed",
    "board": "wireframes/P02 Guest App.dc.html#gst-059",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
     "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-059.html, and #GST-059 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 3 → Plan my day – in progress (exact). What v2 did differently: Mobile v4 draws no in-progress view of the plan; built from this definition in the v4 style."

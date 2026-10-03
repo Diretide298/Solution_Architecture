@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-098` | AI Pricing Intelligence Command Center | B–D | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-099` | Internal Demand & Booking Signal Hub | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
-| `ADM-100` | Weather Intelligence & Demand Impact Configuration | B–D | 24 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-101` | Nearby Event, Exhibition & Local Demand Intelligence | B–D | 46 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-102` | Competitor Pricing & Market Position Intelligence | B–D | 24 | 18 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-103` | Market, Tourism, Holiday & Contextual Signal Hub | B–D | 24 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-104` | AI Demand Forecasting & Booking Curve Studio | B–D | 0 | 12 | 6 | 3 | 1 | 6 | — | notStarted (generated) |
-| `ADM-105` | Price Elasticity & Revenue Response Intelligence | B–D | 0 | 20 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
-| `ADM-106` | AI Pricing Recommendation & Explainability Center | B–D | 5 | 0 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
-| `ADM-107` | AI Signal Registry, Data Quality & Model Governance | B–D | 18 | 48 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-098` | AI Pricing Intelligence Command Center | B | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-099` | Internal Demand & Booking Signal Hub | B | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `ADM-100` | Weather Intelligence & Demand Impact Configuration | B | 24 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-101` | Nearby Event, Exhibition & Local Demand Intelligence | B | 46 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-102` | Competitor Pricing & Market Position Intelligence | B | 24 | 18 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-103` | Market, Tourism, Holiday & Contextual Signal Hub | B | 24 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-104` | AI Demand Forecasting & Booking Curve Studio | B | 0 | 12 | 6 | 3 | 1 | 6 | — | notStarted (generated) |
+| `ADM-105` | Price Elasticity & Revenue Response Intelligence | B | 0 | 20 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
+| `ADM-106` | AI Pricing Recommendation & Explainability Center | B | 5 | 0 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
+| `ADM-107` | AI Signal Registry, Data Quality & Model Governance | B | 18 | 48 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

@@ -129,16 +129,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-679` | Personalization & NBO Command Center | B–D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
-| `ADM-680` | Customer Recommendation Profile | B–D | 0 | 0 | 6 | 6 | 0 | 0 | — | notStarted (—) |
-| `ADM-681` | Customer Feature & Signal Configuration | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-682` | Propensity Model & Customer Intent Manager | B–D | 0 | 14 | 6 | 3 | 0 | 0 | — | notStarted (—) |
-| `ADM-683` | Next-Best-Offer Decision Studio | B–D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-684` | Personalized Ranking & Decision Policy Builder | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-685` | Customer Preference, Fatigue & Suppression Intelligence | B–D | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-686` | Anonymous, Known & Identity-Transition Personalization.123 | B–D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-687` | AI Explainability, Confidence & Model Governance | B–D | 0 | 14 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-688` | Personalization Simulator & Next-Best-Offer Lab | B–D | 12 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-679` | Personalization & NBO Command Center | C | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `ADM-680` | Customer Recommendation Profile | D | 0 | 0 | 6 | 6 | 0 | 0 | — | notStarted (—) |
+| `ADM-681` | Customer Feature & Signal Configuration | C | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-682` | Propensity Model & Customer Intent Manager | C | 0 | 14 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `ADM-683` | Next-Best-Offer Decision Studio | C | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-684` | Personalized Ranking & Decision Policy Builder | C | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-685` | Customer Preference, Fatigue & Suppression Intelligence | C | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-686` | Anonymous, Known & Identity-Transition Personalization.123 | D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-687` | AI Explainability, Confidence & Model Governance | D | 0 | 14 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-688` | Personalization Simulator & Next-Best-Offer Lab | C | 12 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

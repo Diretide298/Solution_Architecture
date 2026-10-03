@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-168` | Advanced Offer Command Center | B–D | 2 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-168` | Advanced Offer Command Center | B | 2 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-169` | Buy X Get Y / BOGO Rule Builder | B–D | 15 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-170` | Multi-Buy & Quantity Offer Configurator | B–D | 3 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-171` | Cheapest / Lowest-Value Item Promotion | B–D | 7 | 0 | 5 | 0 | 1 | 2 | — | notStarted (generated) |
+| `ADM-170` | Multi-Buy & Quantity Offer Configurator | B | 3 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-171` | Cheapest / Lowest-Value Item Promotion | B | 7 | 0 | 5 | 0 | 1 | 2 | — | notStarted (generated) |
 | `ADM-172` | Fixed-Price & “N for X” Offer Builder | B–D | 8 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-173` | Gift, Free Product & Added-Value Offer Builder | B–D | 5 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-174` | Cross-Category Promotion Builder | B–D | 0 | 0 | 6 | 0 | 0 | 2 | — | notStarted (generated) |
-| `ADM-175` | Reward Selection, Substitution & Customer Choice | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-176` | Advanced Offer Guardrails & Conflict Controls | B–D | 6 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-177` | Offer Simulation, Basket Trace & AI Optimization | B–D | 15 | 0 | 6 | 18 | 0 | 0 | — | notStarted (generated) |
+| `ADM-175` | Reward Selection, Substitution & Customer Choice | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-176` | Advanced Offer Guardrails & Conflict Controls | C | 6 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-177` | Offer Simulation, Basket Trace & AI Optimization | C | 15 | 0 | 6 | 18 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

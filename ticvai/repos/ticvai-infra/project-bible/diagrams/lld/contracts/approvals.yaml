@@ -65,7 +65,7 @@ operations:
   verb: PUT
   path: /unified-decision
   scope: venue
-  permission: APPROVAL_REQUEST
+  permission: APPROVAL_DECIDE
   audience:
   - staff
   offline: false
@@ -109,7 +109,8 @@ operations:
   reads:
   - approvals.decision
   - approvals.request
-  writes: []
+  writes:
+  - approvals.request
 - operation: cancelApprovalRequest
   verb: POST
   path: /approval-requests/{requestId}/cancel
@@ -121,7 +122,8 @@ operations:
   reads:
   - approvals.decision
   - approvals.request
-  writes: []
+  writes:
+  - approvals.request
 - operation: createApprovalDelegation
   verb: POST
   path: /delegations
@@ -148,7 +150,8 @@ operations:
   offline: false
   reads:
   - approvals.evidence_package
-  writes: []
+  writes:
+  - approvals.evidence_package
 - operation: createApprovalRequest
   verb: POST
   path: /approval-requests
@@ -602,7 +605,8 @@ operations:
   reads:
   - approvals.decision
   - approvals.request
-  writes: []
+  writes:
+  - approvals.request
 - operation: resolveApprovedActionExecution
   verb: POST
   path: /approved-action-executions/{executionId}/resolve
@@ -613,7 +617,8 @@ operations:
   offline: false
   reads:
   - approvals.approved_action_execution
-  writes: []
+  writes:
+  - approvals.approved_action_execution
 - operation: resubmitApprovalRequest
   verb: POST
   path: /approval-requests/{requestId}/resubmit
@@ -792,7 +797,8 @@ operations:
   offline: false
   reads:
   - approvals.signature
-  writes: []
+  writes:
+  - approvals.signature
 - operation: simulateWorkflowTestingImpact
   verb: PUT
   path: /workflow-testing-impact

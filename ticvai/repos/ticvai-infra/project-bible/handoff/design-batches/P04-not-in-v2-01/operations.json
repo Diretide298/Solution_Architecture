@@ -75,6 +75,30 @@
   "requestBody": null,
   "responds": "Cart"
  },
+ "getGuestMenu": {
+  "method": "GET",
+  "path": "/outlets/{outletId}/guest-menu",
+  "contract": "fnb",
+  "summary": "The menu a guest sees",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "at",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "language",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestMenu"
+ },
  "getMediaAsset": {
   "method": "GET",
   "path": "/media/{mediaId}",

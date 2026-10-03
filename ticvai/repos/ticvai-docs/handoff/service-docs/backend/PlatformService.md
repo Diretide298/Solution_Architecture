@@ -7,7 +7,7 @@
 | Tier | platform: Provisioning, publishing, reporting, and the one cross-region path. |
 | Contracts | `subscription`, `platform-ops`, `public-api` |
 | Schemas owned | `control`, `subscription` |
-| Operations in the slice | 21 of 221 |
+| Operations in the slice | 22 of 225 |
 | Scale | Low volume, high consequence. Tenant provisioning and licensing. |
 | If it is down | Down blocks provisioning and the developer API. Trading is unaffected. |
 
@@ -37,6 +37,7 @@ Splitting them would give three services writing one schema, which is the arrang
 | publicApi | [`deprecateApiVersion`](#deprecateapiversion) | POST | `/api-versions/{version}/deprecate` | setup | 1 | ADM-026, DEV-008 |
 | publicApi | [`registerDeveloper`](#registerdeveloper) | POST | `/developers` | setup | 1 | DEV-002 |
 | publicApi | [`rotateApiCredential`](#rotateapicredential) | POST | `/api-clients/{clientId}/credentials` | setup | 1 | DEV-003, PTR-019 |
+| publicApi | [`setApiClientStatus`](#setapiclientstatus) | POST | `/api-clients/{clientId}/status` | setup | 1 | ADM-356, BO-1179 |
 | publicApi | [`setApiLicensing`](#setapilicensing) | PUT | `/api-licensing` | setup | 1 | DEV-008 |
 | publicApi | [`setDeveloperMembers`](#setdevelopermembers) | PUT | `/developers/{developerId}/members` | setup | 1 | DEV-002 |
 | subscription | [`listModuleCatalogue`](#listmodulecatalogue) | GET | `/module-catalogue` | core | 1 | ADM-386, ADM-401, ADM-402, ADM-403, ADM-404, ADM-423 … |
@@ -807,6 +808,69 @@ A developer account is **not a tenant and not a partner.** A partner resells tic
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Rotated |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### setApiClientStatus
+
+**`POST /api-clients/{clientId}/status`**: Suspend or reactivate an integration, reversibly
+
+Board 10, pp.115 and 122. **`revokeApiCredential` kills the secret; nothing paused a client reversibly.** An integration flooding the wallet with bad messages is suspended here: token issue is refused and issued tokens stop working while `suspended`, but the credentials, the webhook subscriptions and the mappings are kept, so `active` resumes it without re-onboarding.
+`reason` is required for `suspended` and is audited. A `revoked` client cannot be reactivated (409): revocation stays terminal (states/api-client.yaml). Decided 29 September, readiness close-out.
+
+|  |  |
+|---|---|
+| Permission | `DEVELOPER_MANAGE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `control.api_client` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `control.api_client` |
+| Writes | `control.api_client` |
+| Called by | ADM-356, BO-1179 |
+| State model | API client ([states/api-client.yaml](../../../states/api-client.yaml)): moves `active` -> `suspended`, `suspended` -> `active` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| clientId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| status | enum (active, suspended) | yes |  |
+| reason | string |  | Required with suspended. (max length 500) |
+
+**Response**: `ApiClient`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| developerId | string (uuid) | yes |  |
+| name | string | yes |  |
+| clientId | string |  | (read-only) |
+| environment | enum (sandbox, production) | yes | Bound to one, stated on the object rather than by naming convention. |
+| scopes | array of string | yes | Resolved against the tenant's licence at token issue (13.3.24). |
+| issuedBy | enum (partner, ticvai) |  | Who generated the key (M17-06): a developer for a sandbox key, TICVAI for a production key issued on an approved requestProductionAccess. (read-only) |
+| certificationListingId | string (uuid) |  | For a production client, the certified integration it was issued against. (nullable) |
+| credentialTtlDays | integer |  | Key lifetime. (min 1; max 730; nullable) |
+| expiresAt | string (date-time) |  | When the key stops working unless rotated. (read-only; nullable) |
+| allowedTenantIds | array of string (uuid) |  | 13.1.46. |
+| ipAllowList | array of string |  | 13.1.38. |
+| status | enum (active, suspended, revoked) | yes | (read-only) |
+| lastUsedAt | string (date-time) |  | A credential unused for a year is a credential nobody will notice being stolen. (read-only; nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Status set |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The client is revoked, which is terminal. |
+| 422 |  | suspended without a reason. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setApiLicensing
@@ -1717,7 +1781,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-200 operations, added to this service in later releases without changing any of the above.
+203 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -1725,6 +1789,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | cell | `cancelDecommission`, `decommissionCell`, `executeTenantMigration`, `getCell`, `getCellCapacity`, `getCellHealth`, `launchCellCluster`, `listCellClusters`, `listCellJobs`, `listTenantCells`, `listTenantMigrations`, `planTenantMigration`, `provisionCell`, `rollbackTenantMigration`, `updateCellTier` |
 | drafted | `approveBookingLimitCommercial`, `approveMembershipProductValidation`, `approvePartnerStatuLifecycle`, `listCommercialAgreement`, `listCommercialAgreementHealth`, `listCommercialAllocationQuota`, `listCommissionCalculationSettlement`, `listCommissionMarginIncentive`, `listCreditLimitExposure`, `listDepositGuaranteeFinancial`, `listMember`, `listMemberExceptionOverride`, `listMemberLifecycleCase`, `listMembershipActivationCredential`, `listMembershipAnnualPass`, `listMembershipCommercialPricing`, `listMembershipFreezeSuspension`, `listMembershipRenewalRetention`, `listMembershipUpgradeDowngrade`, `listMembershipUsageVisit`, `listPartner`, `listPartner2`, `listPartnerAccessRole`, `listPartnerCancellationRefund`, `listPartnerContactUser`, `listPartnerDisputeCase`, `listPartnerDocumentationCompliance`, `listPartnerOnboardingApplication`, `listPartnerOrderBooking`, `listPartnerPerformanceScorecard`, `listPartnerProfileReadiness`, `listPartnerReconciliationException`, `listPartnerRelationship`, `listPartnerStatementAccount`, `listRenewalAuto`, `listReservationHoldRelease`, `listTerritoryMarketDistribution`, `listVisitAdmissionEntitlement`, `setAgreementContractTerm`, `setFamilyHouseholdDependent`, `setMemberMembershipAccount`, `setMembershipEligibilityQualification`, `setMembershipEntitlementAdmission`, `setMembershipProductTier`, `setPartnerBrandVenue`, `setPartnerProfileOrganization`, `setPartnerRateNet`, `setPaymentTermBilling`, `setRenewalAutoMembership`, `setValidityActivationExpiry` |
 | environment | `listEnvironments`, `registerEnvironment` |
+| general | `getDeveloperAccount`, `listApiAnomalyRules`, `listApiLicences`, `listApiQuotas` |
 | licensing | `getEntitlementUsage`, `removeLicenceAddOn` |
 | metering | `getUsageMetering`, `recordUsage` |
 | migration | `applyConfigPackage`, `applyMigration`, `diffConfigPackage`, `exportConfigPackage`, `getMigrationRun`, `getVersionSkew`, `listMigrations`, `planMigration`, `rollbackMigrationRun` |
@@ -1733,7 +1798,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | plan | `getPlan`, `listPlans` |
 | platform | `getScalingPolicy`, `listArchivalJobs`, `listBackupRuns`, `listWafRules`, `setScalingPolicy`, `setWafPolicy` |
 | platform-ops | `cancelOutboxRepublish`, `getOutboxRepublish`, `listDeadLetters`, `listOutboxRepublishes`, `replayDeadLetter`, `republishOutbox`, `skipRolloutCell` |
-| publicApi | `createSandbox`, `createWebhookSubscription`, `getApiUsage`, `issueApiToken`, `listApiAnomalies`, `listApiClients`, `listApiScopes`, `listApiVersions`, `listIntegrationListings`, `listProductionAccessRequests`, `listSandboxes`, `listWebhookDeliveries`, `listWebhookEventTypes`, `listWebhookSubscriptions`, `replayEvents`, `requestProductionAccess`, `resetSandbox`, `revokeApiCredential`, `setApiAnomalyRule`, `setApiClientStatus`, `setApiQuota`, `submitIntegrationListing`, `testWebhookSubscription` |
+| publicApi | `createSandbox`, `createWebhookSubscription`, `getApiUsage`, `issueApiToken`, `listApiAnomalies`, `listApiClients`, `listApiScopes`, `listApiVersions`, `listIntegrationListings`, `listProductionAccessRequests`, `listSandboxes`, `listWebhookDeliveries`, `listWebhookEventTypes`, `listWebhookSubscriptions`, `replayEvents`, `requestProductionAccess`, `resetSandbox`, `revokeApiCredential`, `setApiAnomalyRule`, `setApiQuota`, `submitIntegrationListing`, `testWebhookSubscription` |
 | release | `createRelease`, `getRelease`, `getReleaseReadiness`, `listReleases`, `promoteRelease`, `rejectRelease`, `withdrawRelease` |
 | rollout | `getRollout`, `listRollouts`, `pauseRollout`, `rollbackRollout`, `startRollout` |
 | subscription | `actOnPartnerApplicationReview`, `actOnPartnerCase`, `actOnPartnerCommissionLine`, `actOnPartnerReconciliationException`, `actOnPartnerSettlementBatch`, `addCapacityPack`, `cancelSubscription`, `createPartnerAgreement`, `createPartnerCase`, `createPartnerChangeRequest`, `createPartnerUser`, `decommissionBurstEnvironment`, `drainBurstEnvironment`, `exportPartnerInvoice`, `getBillingReconciliation`, `getCommissionStatement`, `getGoLiveReadiness`, `getLicenceEnforcement`, `getPlanRecommendations`, `getPlanTiers`, `getSubscription`, `getVsiModel`, `listBurstEnvironments`, `listChannelListings`, `listLicensingModels`, `listPartnerAgreements`, `listPartnerUsers`, `listVenueTypeTemplates`, `previewSubscriptionChange`, `reconcileBurstEnvironment`, `registerPartner`, `requestBurstEnvironment`, `runGoLiveValidation`, `scoreVsiAssessment`, `setChannelListing`, `setLicenceEnforcementPolicy`, `setLicensingModel`, `setMembershipCommercialConfig`, `setMembershipUsagePolicy`, `setPartnerAllocations`, `setPartnerCapabilityGrants`, `setPartnerCommissionRules`, `setPartnerContact`, `setPartnerCreditProfile`, `setPartnerDistributionRights`, `setPartnerSecurity`, `setPlanTiers`, `setTrialConfiguration`, `setVsiModel`, `settleAiUsage`, `simulateCommercialPackage`, `submitOnboardingApplication`, `updatePartnerAgreement` |

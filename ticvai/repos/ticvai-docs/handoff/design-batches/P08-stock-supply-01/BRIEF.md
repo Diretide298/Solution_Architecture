@@ -99,16 +99,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-049` | Stock Levels | B–D | 18 | 23 | 6 | 34 | 2 | 4 | — | notStarted (generated) |
-| `BO-050` | Stock Position & Valuation | B–D | 0 | 12 | 5 | 12 | 2 | 4 | — | notStarted (generated) |
-| `BO-051` | Purchase Orders | B–D | 22 | 14 | 6 | 12 | 1 | 4 | — | notStarted (generated) |
-| `BO-052` | Goods Receipt | B–D | 19 | 19 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
-| `BO-078` | Requisitions | B–D | 23 | 26 | 6 | 16 | 3 | 0 | — | notStarted (generated) |
-| `BO-079` | Stock Count | B–D | 28 | 18 | 6 | 8 | 0 | 4 | — | notStarted (generated) |
-| `BO-080` | Stock Transfers | B–D | 18 | 12 | 6 | 8 | 2 | 4 | — | notStarted (generated) |
+| `BO-049` | Stock Levels | D | 18 | 23 | 6 | 34 | 2 | 4 | — | notStarted (generated) |
+| `BO-050` | Stock Position & Valuation | D | 0 | 12 | 5 | 12 | 2 | 4 | — | notStarted (generated) |
+| `BO-051` | Purchase Orders | D | 22 | 14 | 6 | 12 | 1 | 4 | — | notStarted (generated) |
+| `BO-052` | Goods Receipt | D | 19 | 19 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
+| `BO-078` | Requisitions | D | 23 | 26 | 6 | 16 | 3 | 0 | — | notStarted (generated) |
+| `BO-079` | Stock Count | D | 28 | 18 | 6 | 8 | 0 | 4 | — | notStarted (generated) |
+| `BO-080` | Stock Transfers | D | 18 | 12 | 6 | 8 | 2 | 4 | — | notStarted (generated) |
 | `BO-081` | Inventory Items | A | 33 | 18 | 6 | 33 | 2 | 4 | — | notStarted (generated) |
-| `BO-082` | Stock Movements | B–D | 14 | 16 | 6 | 18 | 0 | 4 | — | notStarted (generated) |
-| `BO-083` | Suppliers | B–D | 36 | 13 | 6 | 7 | 1 | 4 | — | notStarted (generated) |
+| `BO-082` | Stock Movements | D | 14 | 16 | 6 | 18 | 0 | 4 | — | notStarted (generated) |
+| `BO-083` | Suppliers | D | 36 | 13 | 6 | 7 | 1 | 4 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

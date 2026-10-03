@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 211 |
-| Operations | 269 |
+| Operations | 270 |
 | Contracts | 14 |
 | Modules | 13 |
 | Undrawn | 0 |
-| Operations with no screen | 110 |
+| Operations with no screen | 105 |
 | Waves | wave1 28 · wave2 13 · wave3 170 |
 
 ## Gaps
 
-### 110 operations with no screen here
+### 105 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -24,7 +24,6 @@
 | `generateVenueLayout` | ai | POST | Draft a seat map from an uploaded plan |
 | `listIndexJobs` | ai | GET | Indexing in flight and recently finished |
 | `listIndexSources` | ai | GET | What is indexed, and how current it is |
-| `proposeWalkways` | ai | POST | Find walkable space in a drawing that has no vectors |
 | `reindexSource` | ai | POST | Rebuild a source |
 | `removeIndexEntry` | ai | DELETE | Remove one record from the index |
 | `setAiTool` | ai | PUT | Register or change a tool (platform) |
@@ -40,7 +39,6 @@
 | `listAutomationExecutions` | approvals | GET | What automations ran, when, on whose rule, and the outcome |
 | `reopenApprovalRequest` | approvals | POST | Reopen an expired or cancelled request as a new one |
 | `submitApprovalRequest` | approvals | POST | Send a saved draft for approval |
-| `getCatalogueImportJob` | catalogue | GET | Progress and findings of a catalogue import |
 | `getEventChangeTreatmentPolicy` | catalogue | GET | What happens to tickets, reservations and guests when an event changes, by default |
 | `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
 | `getWaitingRoomStatus` | catalogue | GET | A performance's waiting room, its setting and how it is moving |
@@ -60,7 +58,9 @@
 | `getForeignTenderReport` | finance | GET | What was taken in which currency |
 | `listInterEntityObligations` | finance | GET | What one entity owes another |
 | `recordWriteOff` | finance | POST | Write off an uncollectable balance |
-| … | | | 70 more |
+| `resolveObligationDispute` | finance | POST | Agree what is actually owed |
+| `runFxRevaluation` | finance | POST | Revalue monetary balances at close |
+| … | | | 65 more |
 
 ### 8 modules split across waves
 
@@ -179,7 +179,7 @@
 | `ADM-409` | Purchase / Trial Journey Selection | Tenants & Licensing | 3 | 0 | yes |
 | `ADM-410` | Contract & Billing Cycle Selection | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-411` | Billing & Legal Entity Information | Tenants & Licensing | 3 | 6 | yes |
-| `ADM-412` | Payment Method & Settlement Setup | Tenants & Licensing | 1 | 5 | yes |
+| `ADM-412` | Payment Method & Settlement Setup | Tenants & Licensing | 1 | 6 | yes |
 | `ADM-413` | Trial Configuration & Conversion Rules | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-414` | Order & Commercial Pricing Review | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-415` | Commercial Agreement, Billable Definition & Customer Acceptance | Tenants & Licensing | 3 | 1 | yes |

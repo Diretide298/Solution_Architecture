@@ -1,6 +1,6 @@
 # P08-venue-operations-02 — P08 · Venue Operations (2 of 2)
 
-**5 screens · 19 operations · 28 schemas · 10 permissions**
+**5 screens · 20 operations · 28 schemas · 11 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 10 permissions apply here:
-  `AUDIT_VIEW, DEVICE_MANAGE, DEVICE_VIEW, ORDER_CREATE, ORDER_MODIFY, ORDER_VIEW, REPORT_MANAGE, REPORT_VIEW_VENUE, SCOPE_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 11 permissions apply here:
+  `AUDIT_VIEW, DEVICE_MANAGE, DEVICE_VIEW, ORDER_CREATE, ORDER_MODIFY, ORDER_VIEW, REPORT_MANAGE, REPORT_VIEW_VENUE, SCOPE_VIEW, TENANT_CONFIGURE, TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -160,10 +160,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-129` | Software, Configuration & Version Management | B–D | 16 | 12 | 6 | 5 | 4 | 0 | — | notStarted (generated) |
-| `BO-130` | Offline Policy & Rules Configuration | B–D | 14 | 13 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
-| `BO-131` | Connectivity & Auto-Switch Settings | B–D | 13 | 0 | 5 | 0 | 3 | 0 | — | notStarted (generated) |
-| `BO-132` | Offline Transaction Monitor & Sync Queue | B–D | 43 | 13 | 6 | 2 | 2 | 6 | — | notStarted (generated) |
+| `BO-129` | Software, Configuration & Version Management | B | 16 | 12 | 6 | 5 | 4 | 0 | — | notStarted (generated) |
+| `BO-130` | Offline Policy & Rules Configuration | A | 14 | 19 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
+| `BO-131` | Connectivity & Auto-Switch Settings | B | 13 | 0 | 5 | 0 | 3 | 0 | — | notStarted (generated) |
+| `BO-132` | Offline Transaction Monitor & Sync Queue | C | 43 | 13 | 6 | 2 | 2 | 6 | — | notStarted (generated) |
 | `BO-133` | Offline Alerts, Limits & Audit | A | 25 | 26 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings

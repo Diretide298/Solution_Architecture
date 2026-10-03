@@ -1,6 +1,6 @@
 # P02-in-venue-experience-01 — P02 · In-Venue Experience
 
-**2 screens · 2 operations · 4 schemas · 1 permissions**
+**2 screens · 2 operations · 5 schemas · 1 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·

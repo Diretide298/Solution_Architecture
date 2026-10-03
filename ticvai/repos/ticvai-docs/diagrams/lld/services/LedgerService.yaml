@@ -56,7 +56,7 @@ operationsByContract:
     scope: venue
     permission: LEDGER_VIEW
     offline: true
-    reads: 3
+    reads: 5
     writes: 1
   - operation: closeFiscalPeriod
     verb: POST
@@ -601,7 +601,7 @@ operationsByContract:
     permission: TAX_CONFIGURE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
 tables:
 - store: cache:idempotency
   kind: cache
@@ -917,7 +917,7 @@ readsFrom:
 - service: TenancyService
   operations: 3
 - service: CatalogueService
-  operations: 1
+  operations: 2
 - service: PlatformService
   operations: 1
 - service: WalletService

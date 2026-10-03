@@ -128,16 +128,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-674` | Accreditation Communications Command Center | B–D | 0 | 5 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-675` | Notification Rule Management | B–D | 9 | 0 | 6 | 5 | 1 | 0 | — | notStarted (—) |
-| `BO-676` | Expiry & Renewal Notification Scheduler | B–D | 6 | 0 | 6 | 5 | 0 | 0 | — | notStarted (—) |
-| `BO-677` | Communication Template Library | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-678` | Channel, Language & Branding Configuration | B–D | 9 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-679` | Manual & Bulk Communication Center | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-680` | Accreditation Bulk Import | B–D | 0 | 0 | 6 | 1 | 1 | 6 | — | notStarted (—) |
-| `BO-681` | Import Validation & Processing Monitor | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-682` | Accreditation Export & Data Extract Center | B–D | 7 | 0 | 6 | 4 | 0 | 6 | — | notStarted (—) |
-| `BO-683` | Delivery, Batch & Operational History | B–D | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `BO-674` | Accreditation Communications Command Center | B | 0 | 5 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-675` | Notification Rule Management | D | 9 | 0 | 6 | 5 | 1 | 0 | — | notStarted (—) |
+| `BO-676` | Expiry & Renewal Notification Scheduler | D | 6 | 0 | 6 | 5 | 0 | 0 | — | notStarted (—) |
+| `BO-677` | Communication Template Library | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-678` | Channel, Language & Branding Configuration | B | 9 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-679` | Manual & Bulk Communication Center | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-680` | Accreditation Bulk Import | D | 0 | 0 | 6 | 1 | 1 | 6 | — | notStarted (—) |
+| `BO-681` | Import Validation & Processing Monitor | B | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-682` | Accreditation Export & Data Extract Center | D | 7 | 0 | 6 | 4 | 0 | 6 | — | notStarted (—) |
+| `BO-683` | Delivery, Batch & Operational History | D | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

@@ -106,9 +106,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-700` | Venue & Space Command Center | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-701` | Venue Master Configuration | B–D | 0 | 13 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-702` | Space Access Rules Configuration | B–D | 0 | 17 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-700` | Venue & Space Command Center | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-701` | Venue Master Configuration | B | 0 | 13 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-702` | Space Access Rules Configuration | B | 0 | 17 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

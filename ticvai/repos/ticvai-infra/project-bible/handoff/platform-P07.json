@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "handheld",
  "offlineCapable": true,
- "generated": "2026-10-03",
+ "generated": "2026-10-04",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 11,
@@ -15,7 +15,7 @@
   "contracts": 5,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 47
+  "operationsWithNoScreen": 44
  },
  "waves": {
   "wave1": 11
@@ -179,12 +179,6 @@
     "summary": "Entry, Exit & Re-entry Rules"
    },
    {
-    "operation": "listEntryRulePoints",
-    "contract": "access",
-    "verb": "GET",
-    "summary": "Which access points an admission rule covers"
-   },
-   {
     "operation": "listEntryTemporaryExit",
     "contract": "access",
     "verb": "GET",
@@ -341,12 +335,6 @@
     "summary": "Rename a role or change its description"
    },
    {
-    "operation": "cancelPaymentLink",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Cancel a live payment link"
-   },
-   {
     "operation": "convertToTermProduct",
     "contract": "orders",
     "verb": "POST",
@@ -381,12 +369,6 @@
     "contract": "orders",
     "verb": "GET",
     "summary": "Fees charged on an order"
-   },
-   {
-    "operation": "listPaymentProviders",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "Gateways configured for this scope"
    },
    {
     "operation": "openGuestCreditAccount",

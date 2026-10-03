@@ -259,6 +259,35 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listEntryRulePoints": {
+  "method": "GET",
+  "path": "/admission-rules/{ruleId}/points",
+  "contract": "access",
+  "summary": "Which access points an admission rule covers",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "ruleId",
+    "in": "path",
+    "required": true
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listParkingFacilities": {
   "method": "GET",
   "path": "/parking-facilities",

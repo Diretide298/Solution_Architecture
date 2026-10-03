@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "kiosk",
  "offlineCapable": true,
- "generated": "2026-10-03",
+ "generated": "2026-10-04",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 10,
@@ -15,7 +15,7 @@
   "contracts": 2,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 9
+  "operationsWithNoScreen": 8
  },
  "waves": {
   "wave1": 10
@@ -150,12 +150,6 @@
     "contract": "fnb",
     "verb": "GET",
     "summary": "Upsell and pairing suggestions for F&B"
-   },
-   {
-    "operation": "listIngredientSubstitutes",
-    "contract": "fnb",
-    "verb": "GET",
-    "summary": "Approved substitutions for a recipe's ingredients"
    },
    {
     "operation": "sendOrderNotification",

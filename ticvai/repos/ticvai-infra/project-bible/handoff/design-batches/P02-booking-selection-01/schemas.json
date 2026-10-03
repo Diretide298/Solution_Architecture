@@ -3710,6 +3710,41 @@
      "partial"
     ],
     "description": "**Whether every public point can actually be reached.** Computed at publish.\n`disconnected` means a point has no path to it at all — a toilet nobody can walk to is a toilet that does not exist. `partial` means every point is reachable and at least one only by steps, which is a different and quieter failure: **the map works until a wheelchair user opens it.**\n"
+   },
+   "modelAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "assets.MediaAsset",
+    "description": "**The 3D layer of the working draft** (ADR-0069, contract item closed 3 October 2026): the GLB (`model3d` asset) the last `glbModel` import brought in. Set by `importVenueGeometry`, never by sending a value. Null for a 2D-only map, which is the default and needs nothing. The 3D model is a rendering of the map, never the source of its truth: routes come from the graph.\n"
+   },
+   "navigationFileAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "assets.MediaAsset",
+    "description": "The navigation file imported with the model, kept so the import can be re-run and audited."
+   },
+   "modelTransform": {
+    "readOnly": true,
+    "description": "**How the model's local frame sits on the earth** (ADR-0069 section 3): the navigation file's anchor, stored once and used both ways. Null without a model. It maps onto the plan's georeference as the ADR says, so a map with a model is georeferenced.\n",
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/VenueModelTransform"
+     }
+    ]
+   },
+   "model3dStatus": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "none",
+     "publishable",
+     "blocked"
+    ],
+    "description": "**Whether the next publish carries the 3D layer.** `none`: no model. `publishable`: the last model import had no `error` finding. `blocked`: it had one (over 300,000 triangles at LOD0, uncompressed textures, a control point more than 10 m out, an invalid navigation file), named in that job's `model.findings`; the 2D map still publishes and guests see 2D until a corrected model is imported (ADR-0069 sections 3 and 6).\n"
    }
   }
  },
@@ -3744,6 +3779,38 @@
     "items": {
      "$ref": "#/components/schemas/PlacedResource"
     }
+   },
+   "model3d": {
+    "nullable": true,
+    "description": "**The 3D layer of the version read** (ADR-0069; 3 October 2026, r1 additions). Null when that version has none, and then the guest app shows the 2D map with the same route, as it does on a phone that cannot hold 30 fps.\n",
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/VenueModel3d"
+     }
+    ]
+   }
+  }
+ },
+ "VenueModel3d": {
+  "type": "object",
+  "x-ticvai-persistence": "none — jsonb column",
+  "description": "**The 3D layer a guest app loads** (ADR-0069): the model and the transform of the version it read. The app downloads the GLB through the asset delivery rules (UAE-hosted for a UAE tenant, ADR-0069 section 7) and caches it with the graph.\n",
+  "required": [
+   "modelAssetId",
+   "transform"
+  ],
+  "properties": {
+   "modelAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "assets.MediaAsset"
+   },
+   "sizeBytes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "transform": {
+    "$ref": "#/components/schemas/VenueModelTransform"
    }
   }
  },

@@ -1,6 +1,6 @@
 # WS144 — Marketing CRM Configuration Reference v1.0 board 10
 
-**10 screens · 18 operations · 19 schemas · 5 permissions**
+**10 screens · 20 operations · 19 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -133,20 +133,20 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-824` | Gamification Command Center | B–D | 0 | 5 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-824` | Gamification Command Center | B | 0 | 5 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-825` | Challenge Builder | A | 15 | 35 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-826` | Achievement & Badge Engine | A | 0 | 10 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-827` | Points & Activity Rules | A | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-828` | Milestones & Reward Rules | A | 31 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
-| `BO-829` | Family, Team & Event Challenges | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-830` | Referral & Streak Management | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-831` | Progress, Leaderboards & Hub | B–D | 3 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-832` | AI Engagement Optimization | B–D | 0 | 0 | 6 | 9 | 0 | 0 | — | notStarted (—) |
-| `BO-833` | Gamification Analytics & Audit | B–D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `BO-827` | Points & Activity Rules | A | 0 | 26 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-828` | Milestones & Reward Rules | A | 31 | 10 | 6 | 5 | 0 | 0 | — | notStarted (—) |
+| `BO-829` | Family, Team & Event Challenges | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-830` | Referral & Streak Management | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-831` | Progress, Leaderboards & Hub | D | 3 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-832` | AI Engagement Optimization | D | 0 | 0 | 6 | 9 | 0 | 0 | — | notStarted (—) |
+| `BO-833` | Gamification Analytics & Audit | D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
-**BO-826, BO-827, BO-828, BO-829, BO-830, BO-832, BO-833 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-826, BO-829, BO-830, BO-832, BO-833 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -162,7 +162,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 3 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-824 |
 | Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -670,6 +670,13 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 #### Inputs: what the user enters or picks
 
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Programme | picker: choose a programme | — | — | `listLoyaltyCampaigns` ?programmeId |
+| Active on | date and time picker | — | — | `listLoyaltyCampaigns` ?activeOn |
+
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 **Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
@@ -681,6 +688,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 #### Outputs: what the screen shows and produces
 
 **Shown**
+
+**Show the loyalty campaigns** (card list, from `listLoyaltyCampaigns`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Code | text | — |
+| Name | text | — |
+| Start at | 1 Oct 2026, 14:30 | — |
+| End at | 1 Oct 2026, 14:30 | — |
+| Is active | yes / no (icon or chip) | — |
+| Created at | 1 Oct 2026, 14:30 | — |
 
 **Rules in force** (detail panel, from `getLoyaltyRules`)
 
@@ -722,7 +740,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 - **Save rules**: Replaces the programme's rule set as a whole, or not at all; the response is the new set. *(source: contracts/satellite/marketing-crm.yaml#setLoyaltyRules)*
 
-**Data it reads**: `getLoyaltyRules` (onLoad, Every rule the programme runs on)
+**Data it reads**: `getLoyaltyRules` (onLoad, Every rule the programme runs on); `listLoyaltyCampaigns` (onLoad, Show the loyalty campaigns)
 
 **Where the user goes next**
 
@@ -766,6 +784,7 @@ campaign: Ramadan double points - 1 Mar to 30 Mar 2027 - x2 on F&B
 - `setLoyaltyRules` → `MARKETING_MANAGE` (configure) · staff
 - `setLoyaltyCampaign` → `MARKETING_MANAGE` (configure) · staff
 - `getLoyaltyRules` → `MARKETING_VIEW` (read) · staff
+- `listLoyaltyCampaigns` → `MARKETING_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -793,7 +812,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-827?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save loyalty rules, Cancel.
 - [ ] Every transition is wired: `BO-824`.
@@ -814,7 +833,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 1 · needs the `marketing` module |
 | Block | Block A · task APP-SETUP-BO-828 |
-| Who uses it | venue staff holding `MARKETING_MANAGE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `MARKETING_MANAGE`, `MARKETING_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -828,6 +847,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 **Fixed on main** (the package already carries these; draw what it says): The primary action is "Create loyalty programme". (CHG-SBO-013).
 
 #### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Programme | picker: choose a programme | — | — | `listRewards` ?programmeId |
 
 **Form: Save milestones and rewards** (modal, opened by *Save milestones and rewards*; *Save milestones and rewards* calls `createLoyaltyProgramme`, *Cancel* sends nothing)
 
@@ -882,12 +907,36 @@ Errors to draw in the form: 409 A business code the request names is already use
 
 #### Outputs: what the screen shows and produces
 
+**Shown**
+
+**Show the rewards a milestone can give** (card list, from `listRewards`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Code | text | — |
+| Name | text | — |
+| Type | text | — |
+| Points cost | 1,234.5 | — |
+| Discount value | 1,234.5 | — |
+| Validity days | 1,234 | — |
+
+**Show the programmes and their milestones** (data table, from `listLoyaltyProgrammes`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Code | text | Unique per tenant (decided 28 September, audit R108). A code already used by any loyalty programme in the tenant, at any venue, is refused … |
+| Name | text | — |
+| Points expire after months | 1,234 | — |
+| Is active | yes / no (icon or chip) | — |
+
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Save milestones and rewards (primary button) | `createLoyaltyProgramme` POST `/loyalty/programmes` | LoyaltyProgramme | LoyaltyProgramme | 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … | opens modal first |
 | Save reward (secondary button) | `setReward` PUT `/loyalty/rewards` | MarketingReward | MarketingReward | — | opens modal first |
+
+**Data it reads**: `listLoyaltyProgrammes` (onLoad, Show the programmes and their milestones); `listRewards` (onLoad, Show the rewards a milestone can give)
 
 **Where the user goes next**
 
@@ -919,17 +968,22 @@ milestones:
 
 - `createLoyaltyProgramme` → `MARKETING_MANAGE` (configure) · staff
 - `setReward` → `MARKETING_MANAGE` (configure) · staff
+- `listLoyaltyProgrammes` → `MARKETING_VIEW` (read) · staff, guest
+- `listRewards` → `MARKETING_VIEW` (read) · staff, guest
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+5 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
 | 5.4.7 | The loyalty program options allow to create loyalty points for a certain type of transactions and to use these points as a form of payment. | F&B & Guest Management | CONTRACTED | `createLoyaltyProgramme` |
 | 5.4.28 | Support multiple brands and venues. | F&B & Guest Management | CONTRACTED | `createLoyaltyProgramme` |
+| 5.4.1 | The system should have the ability to integrate and exchange client information with a loyalty point system which will manage the loyalty points credited on to the loyalty account as per the … | F&B & Guest Management | CONTRACTED | `listLoyaltyProgrammes` |
+| 5.4.8 | Loyalty program data can be shared with a third party partner thanks to an API. For example, venue has an agreement with the airplane company Etihad allowing Etihad loyalty program members to spend … | F&B & Guest Management | CONTRACTED | `listLoyaltyProgrammes` |
+| 5.4.29 | Expose APIs for loyalty integrations. | F&B & Guest Management | CONTRACTED | `listLoyaltyProgrammes` |
 
 #### Client meeting inputs
 
@@ -947,15 +1001,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS79 Marketing CRM Configuration Reference v1.0 Board 10.dc.html#bo-828`
 - Workshop pack: Marketing_CRM_Configuration_Reference v1.0.pdf board 10
 - Flow F253 *Marketing CRM Configuration Reference v1.0 board 10: Gamification Command Center*, step 8: Works in Milestones & Reward Rules → Reward cumulative progress consistently. Define thresholds, tiers and immediate or delayed reward fulfillment. Support loyalty points, wallet credit, voucher, product offer, badge and membership …
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (31), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-828?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save milestones and rewards, Save reward.
 - [ ] Every transition is wired: `BO-824`.
-- [ ] Every gated control is gated: `MARKETING_MANAGE`.
+- [ ] Every gated control is gated: `MARKETING_MANAGE`, `MARKETING_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -969,7 +1024,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 3 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-829 |
 | Who uses it | venue staff holding `MARKETING_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1070,7 +1125,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 3 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-830 |
 | Who uses it | venue staff holding `MARKETING_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1177,7 +1232,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 3 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-831 |
 | Who uses it | venue staff holding `GUEST_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1318,7 +1373,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 3 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-832 |
 | Who uses it | venue staff holding `GUEST_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1429,7 +1484,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 3 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-833 |
 | Who uses it | venue staff holding `MARKETING_VIEW`, `REPORT_VIEW_VENUE` (1 read, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1663,7 +1718,9 @@ Method, path, parameters, request and response for every operation these screens
 "getLoyaltyRules": {"method":"GET","path":"/loyalty/programmes/{programmeId}/rules","contract":"marketing-crm","summary":"Every rule a loyalty programme runs on","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"programmeId","in":"path","required":true}],"requestBody":null,"responds":"LoyaltyRuleSet"},
 "listBadges": {"method":"GET","path":"/badges","contract":"marketing-crm","summary":"Badges a guest can be awarded","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listChallenges": {"method":"GET","path":"/challenges","contract":"marketing-crm","summary":"The venue's challenges","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listLoyaltyCampaigns": {"method":"GET","path":"/loyalty/campaigns","contract":"marketing-crm","summary":"Time-boxed campaigns inside a programme","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"programmeId","in":"query","required":null},{"name":"activeOn","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listLoyaltyProgrammes": {"method":"GET","path":"/loyalty/programmes","contract":"marketing-crm","summary":"List loyalty programmes","permission":"MARKETING_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listRewards": {"method":"GET","path":"/loyalty/rewards","contract":"marketing-crm","summary":"What points can be turned into","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"programmeId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "setBadge": {"method":"PUT","path":"/badges","contract":"marketing-crm","summary":"Define a badge","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"MarketingBadge","responds":"MarketingBadge"},
 "setLoyaltyCampaign": {"method":"PUT","path":"/loyalty/campaigns","contract":"marketing-crm","summary":"Define a loyalty campaign and its window","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"MarketingLoyaltyCampaign","responds":"MarketingLoyaltyCampaign"},
 "setLoyaltyRules": {"method":"PUT","path":"/loyalty/programmes/{programmeId}/rules","contract":"marketing-crm","summary":"Replace a programme's rules as one set","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"programmeId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"LoyaltyRuleSet","responds":"LoyaltyRuleSet"},

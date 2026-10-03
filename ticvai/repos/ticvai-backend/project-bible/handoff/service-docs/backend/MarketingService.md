@@ -7,7 +7,7 @@
 | Tier | engagement: Guests and intelligence. Nothing that takes money depends on these. |
 | Contracts | `marketing-crm` |
 | Schemas owned | `marketing` |
-| Operations in the slice | 72 of 274 |
+| Operations in the slice | 73 of 275 |
 | Scale | Bursty on send, read-heavy otherwise. The one to watch for a split. |
 | If it is down | Down stops campaigns and guest lookup. Neither stops trading. |
 
@@ -66,8 +66,8 @@
 | loyalty | [`getGuestLoyalty`](#getguestloyalty) | GET | `/guests/{subjectId}/loyalty` | core | 1 | BO-735, BO-737, BO-831, POS-002, POS-027 |
 | loyalty | [`listCustomerBadges`](#listcustomerbadges) | GET | `/customers/{customerId}/badges` | core | 1 | GST-036, WEB-043 |
 | loyalty | [`listLeaderboard`](#listleaderboard) | GET | `/loyalty/leaderboard` | core | 1 | GST-036, WEB-043 |
-| loyalty | [`listLoyaltyProgrammes`](#listloyaltyprogrammes) | GET | `/loyalty/programmes` | core | 1 | BO-833, GST-036, WEB-043 |
-| loyalty | [`listRewards`](#listrewards) | GET | `/loyalty/rewards` | core | 1 | GST-036, WEB-043 |
+| loyalty | [`listLoyaltyProgrammes`](#listloyaltyprogrammes) | GET | `/loyalty/programmes` | core | 1 | BO-828, BO-833, GST-036, WEB-043 |
+| loyalty | [`listRewards`](#listrewards) | GET | `/loyalty/rewards` | core | 1 | BO-828, GST-036, WEB-043 |
 | loyalty | [`setLeaderboardNickname`](#setleaderboardnickname) | PUT | `/loyalty/leaderboard-nickname` | core | 1 | GST-036, WEB-043 |
 | loyalty | [`setLoyaltyRules`](#setloyaltyrules) | PUT | `/loyalty/programmes/{programmeId}/rules` | setup | 1 | BO-827 |
 | loyalty | [`setReward`](#setreward) | PUT | `/loyalty/rewards` | setup | 1 | BO-828 |
@@ -77,13 +77,14 @@
 | marketing | [`createReferral`](#createreferral) | POST | `/referrals` | core | 1 | BO-830, GST-036, WEB-043 |
 | marketing | [`createUrlRedirect`](#createurlredirect) | POST | `/seo-redirects` | core | 1 | BO-842, CMS-013 |
 | marketing | [`getForm`](#getform) | GET | `/forms/{formId}` | core | 1 | BO-618, GST-035, WEB-026 |
+| marketing | [`getGuestConversation`](#getguestconversation) | GET | `/my/conversations/{conversationId}` | core | 1 | GST-031, GST-032, WEB-044 |
 | marketing | [`getLoyaltyPosition`](#getloyaltyposition) | GET | `/loyalty/position` | core | 1 | GST-036, WEB-017, WEB-043 |
 | marketing | [`getMarketingSubscription`](#getmarketingsubscription) | GET | `/marketing-subscriptions` | core | 1 | GST-065, WEB-027 |
 | marketing | [`getMyChallenges`](#getmychallenges) | GET | `/guests/me/challenges` | core | 1 | WEB-017 |
 | marketing | [`getMyProfile`](#getmyprofile) | GET | `/guests/me/profile` | core | 1 | GST-001, GST-039, WEB-011, WEB-020 |
 | marketing | [`getSeoMetadata`](#getseometadata) | GET | `/seo-metadata` | core | 1 | CMS-013 |
 | marketing | [`getWaiverStatus`](#getwaiverstatus) | GET | `/guests/{subjectId}/waiver-status` | core | 1 | BO-852, WEB-024 |
-| marketing | [`handoverToAgent`](#handovertoagent) | POST | `/conversations/{conversationId}/handover` | core | 1 | GST-031, GST-032, GST-033, KSK-015, WEB-044 |
+| marketing | [`handoverToAgent`](#handovertoagent) | POST | `/conversations/{conversationId}/handover` | core | 1 | GST-031, GST-032, GST-033, KSK-013, KSK-015, WEB-044 |
 | marketing | [`identifyGuest`](#identifyguest) | POST | `/guests/identify` | core | 1 | POS-002, POS-027 |
 | marketing | [`listMyCases`](#listmycases) | GET | `/my/cases` | core | 1 | GST-034, GST-040, GST-068, WEB-025, WEB-034 |
 | marketing | [`raiseMyCase`](#raisemycase) | POST | `/my/cases` | core | 1 | GST-034, GST-035, GST-040, GST-068, WEB-025, WEB-026 … |
@@ -1171,7 +1172,7 @@ Every record captures the notice version, the channel, the purpose, the source a
 | Conflict policy | append |
 | Guest callable | True |
 | Reads | `marketing.booking_consent_record` |
-| Writes | - |
+| Writes | `marketing.booking_consent_record` |
 | Called by | GST-007, WEB-006, WEB-011 |
 
 **Parameters**
@@ -2481,7 +2482,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 | Guest callable | True |
 | Reads | `marketing.loyalty_programme`, `marketing.points_earning_rule`, `marketing.programme_tier` |
 | Writes | - |
-| Called by | BO-833, GST-036, WEB-043 |
+| Called by | BO-828, BO-833, GST-036, WEB-043 |
 
 **Parameters**
 
@@ -2547,7 +2548,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 | Guest callable | True |
 | Reads | `marketing.reward` |
 | Writes | - |
-| Called by | GST-036, WEB-043 |
+| Called by | BO-828, GST-036, WEB-043 |
 
 **Parameters**
 
@@ -2600,7 +2601,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 | Config scope | subject |
 | Conflict policy | serverWins |
 | Reads | `marketing.loyalty_position` |
-| Writes | - |
+| Writes | `marketing.loyalty_position` |
 | Called by | GST-036, WEB-043 |
 
 **Parameters**
@@ -3257,6 +3258,61 @@ Absent `version` returns the `published` version to a guest and the latest to st
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### getGuestConversation
+
+**`GET /my/conversations/{conversationId}`**: The guest's own handed-over conversation, with the agent's replies and the queue position
+
+**How a guest reads the agent's replies** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-004). After `handoverToAgent` the guest chat (GST-031, GST-032, WEB-044) shows the thread, where the guest is in the queue and how long the wait is. `getConversation` is the agent's read under `CASE_VIEW` and carries the routing, the assistant's summary and the agents' ids; this is the guest's, with none of them.
+
+**Scoped to the caller, not filtered by it** (`x-ticvai-self-scoped: subject`): a conversation the guest is not the party to answers 404, exactly as one that does not exist. Staff notes and the assistant's internal summary are never in it.
+
+**The position and wait come from the live agent queue** (audit R149, as on `handoverToAgent`): `queuePosition` and `estimatedWaitSeconds` are computed on read, and both are null once an agent has claimed the conversation. Read from the primary, because a reply a replica has not seen yet reads to the guest as an agent who went quiet. The chat polls this with `afterMessageId` while it is open.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | - |
+| Writes | - |
+| Called by | GST-031, GST-032, WEB-044 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| conversationId | path | yes | string (uuid) |  |
+| afterMessageId | query |  | string (uuid) | Only the messages sent after this one, oldest first, so a polling chat fetches what is new |
+
+**Response**: `GuestConversation`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| state | ConversationState: enum (withAssistant, queued, withAgent, waitingOnGuest, resolved, abandoned, timedOut) | yes | withAssistant and queued are different, and the second has a person waiting. |
+| queuePosition | integer |  | Place among the unclaimed conversations in its queue, from the live agent queue (audit R149). (read-only; nullable) |
+| estimatedWaitSeconds | integer |  | From the live agent queue, the conversations ahead divided across that queue's agents online now (audit R149). (read-only; nullable) |
+| messages | array of GuestConversationMessage | yes | Oldest first; after afterMessageId when it was sent |
+| messages[].id | string (uuid) | yes |  |
+| messages[].sender | enum (guest, agent, assistant, system) | yes |  |
+| messages[].body | string | yes |  |
+| messages[].attachments | array of object |  |  |
+| messages[].attachments[].assetId | string (uuid) |  |  |
+| messages[].attachments[].kind | enum (image, video, document, ticket, qr, paymentLink) |  |  |
+| messages[].sentAt | string (date-time) | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The conversation as the guest sees it, messages oldest first |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### getLoyaltyPosition
 
 **`GET /loyalty/position`**: A guest's points, tier and what is within reach
@@ -3539,7 +3595,7 @@ Triggered by the guest asking, by the assistant refusing or failing, by sentimen
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `marketing.agent_availability`, `marketing.conversation`, `marketing.conversation_message`, `marketing.conversation_message_attachment` |
 | Writes | `cache:idempotency`, `marketing.conversation`, `platform.outbox` |
-| Called by | GST-031, GST-032, GST-033, KSK-015, WEB-044 |
+| Called by | GST-031, GST-032, GST-033, KSK-013, KSK-015, WEB-044 |
 | State model | Conversation ([states/conversation.yaml](../../../states/conversation.yaml)): moves `withAssistant` -> `queued` |
 
 **Parameters**
@@ -4106,7 +4162,7 @@ The reply is written as a `CaseMessage` with `authorKind: guest` and `isInternal
 |---|---|
 | Permission | `CASE_MANAGE` |
 | Scope level | tenant |
-| Part of slice | setup, makes `marketing.conversation_message`, `marketing.conversation_message_attachment` non-empty |
+| Part of slice | setup, makes `marketing.conversation_message_attachment` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | append |
@@ -4172,7 +4228,7 @@ The reply is written as a `CaseMessage` with `authorKind: guest` and `isInternal
 | Offline | no |
 | Conflict policy | append |
 | Reads | - |
-| Writes | - |
+| Writes | `marketing.conversation_message` |
 | Called by | GST-031, GST-032, WEB-044 |
 
 **Parameters**
@@ -5838,9 +5894,10 @@ Every table this service owns that the slice reads or writes, with its columns a
 | case | `addCaseMessage`, `createCase`, `createCaseClassificationIntelligent`, `escalateCase`, `getCase`, `getCaseInvestigationResolution`, `listAgentWorkloadAvailability`, `listCaseCategories`, `listCaseResolutionClosure`, `listCases`, `listContact`, `listContactAutomation`, `listCustomerService`, `listCustomerServiceProfile`, `listEscalationCollaborationInternal`, `listEscalationCriticalCase`, `listIntelligentRoutingSkills`, `listQualityAgentEvaluation`, `listServiceQueues`, `listServiceRootCause`, `listSlaPolicyService`, `listUnifiedInteractionCommunication`, `reopenCase`, `setAgentServiceProfile`, `setCaseCategoryDefinition`, `setCaseInternalRequest`, `setCaseInvestigationResolution`, `setCaseResolution`, `setContactAutomation`, `setCustomerServiceCopilot`, `setIntelligentRoutingSkill`, `setOrderBookingTicket`, `setQualityEvaluation`, `setRefundCompensationService`, `setServiceQueueDefinition`, `updateCase` |
 | consent | `actOnWaiverRequirements`, `addSuppression`, `approvePrivacyTesting`, `approveWaiverTesting`, `getConsentHistory`, `getDigitalWaiverForm`, `getLocalizationBrandingCustomer`, `getSignatorySignatureGuardian`, `getSuppressionList`, `getWaiverTesting`, `listComplianceEvidenceWaiver`, `listConsentEvidenceWithdrawal`, `listConsentPreferenceCommunication`, `listCookieBannerPreference`, `listCookieScanFindings`, `listCookieScanPolicies`, `listCookieScans`, `listCookieTrackingDigital`, `listCustomerPrivacyConsent`, `listDataProcessingPurpose`, `listDataRetentionExpiry`, `listDataSubjectCustomer`, `listDeletionAnonymizationRestriction`, `listDeviceConsents`, `listDigitalSigningCollection`, `listDynamicFieldQuestion`, `listMinorGuardianGroup`, `listMissingExpiredInvalid`, `listParticipantWaiverStatus`, `listPrivacy`, `listPrivacyCompliance`, `listPrivacyComplianceExceptions`, `listPrivacyConsent`, `listPrivacyEvidenceCompliance`, `listPrivacyNoticePolicy`, `listProductEventExperience`, `listSiteWaiverException`, `listTrackingTechnologyCatalogue`, `listVersioningEffectiveDate`, `listWaiver`, `listWaiverComplianceOperational`, `listWaiverComplianceRisk`, `listWaiverConsent`, `listWaiverTemplateMaster`, `listWaiverTriggerEligibility`, `listWaiverVerificationQueue`, `recordCheckoutConsents`, `recordCookieScan`, `setCommunicationPreferenceMarketing`, `setConsentCapturePoint`, `setCookieScanPolicy`, `setDataDiscoveryAccess`, `setDataProcessingPurpose`, `setDigitalWaiverForm`, `setLegalHold`, `setLocalizationBrandingCustomer`, `setMinorGuardianAge`, `setPrivacyAction`, `setPrivacyComplianceException`, `setPrivacyNoticePolicyGovernance`, `setPrivacyRequest`, `setPrivacyRequestTypes`, `setSignatorySignatureGuardian`, `setTrackingTechnologyCatalogueEntry`, `setWaiverAssociation`, `setWaiverException`, `setWaiverTemplateMaster`, `setWaiverTriggerRule`, `setWaiverVerificationValidation` |
 | feedback | `listCustomerSatisfactionFeedback`, `listReviews`, `respondToReview` |
+| general | `getCustomerServiceCopilot` |
 | guest | `getGuestProfile`, `mergeGuestProfiles`, `updateGuestProfile` |
 | guests | `activateAudience`, `checkGuestCheckoutMatch`, `decideDuplicateCandidate`, `decideGuestCheckoutMatch`, `getAudienceOverlap`, `getGuestAttributeModel`, `getGuestIntelligence`, `getGuestMatchPolicy`, `getGuestRelationships`, `getGuestTimeline`, `getIdentityResolutionRules`, `importAudienceList`, `listAudienceActivations`, `listAudienceLists`, `listDuplicateCandidates`, `runDataRetention`, `setDataRetentionPolicy`, `setGuestAttributeModel`, `setGuestMatchPolicy`, `setGuestRelationships`, `setIdentityResolutionRules` |
 | loyalty | `adjustLoyaltyPoints`, `getLoyaltyRules`, `issueReward`, `listBadges`, `listLoyaltyCampaigns`, `listLoyaltyPointEntries`, `listRewardAssignments`, `setBadge`, `setLoyaltyCampaign` |
-| marketing | `accrueLoyaltyPoints`, `activateChallenge`, `activateJourney`, `addGuestNote`, `claimConversation`, `closeConversation`, `createJourney`, `endKioskAssist`, `getChallenge`, `getConversation`, `getGuestConversation`, `getGuestExtraValues`, `getJourneyPerformance`, `getLostItemMatches`, `listChallenges`, `listConversations`, `listForms`, `listGuestExtraFields`, `listJourneys`, `listLostItems`, `listMessageDispatches`, `listMessageTriggers`, `listSlaPolicies`, `listWaiverSignatures`, `matchGuest`, `matchLostItem`, `mergeGuests`, `recordPrivacyIncident`, `recordTouchPoint`, `retryMessageDispatch`, `setCallDisposition`, `setGuestExtraFields`, `setGuestExtraValues`, `setMessageTrigger`, `setSlaPolicy`, `startKioskAssist`, `transferConversation` |
+| marketing | `accrueLoyaltyPoints`, `activateChallenge`, `activateJourney`, `addGuestNote`, `claimConversation`, `closeConversation`, `createJourney`, `endKioskAssist`, `getChallenge`, `getConversation`, `getGuestExtraValues`, `getJourneyPerformance`, `getLostItemMatches`, `listChallenges`, `listConversations`, `listForms`, `listGuestExtraFields`, `listJourneys`, `listLostItems`, `listMessageDispatches`, `listMessageTriggers`, `listSlaPolicies`, `listWaiverSignatures`, `matchGuest`, `matchLostItem`, `mergeGuests`, `recordPrivacyIncident`, `recordTouchPoint`, `retryMessageDispatch`, `setCallDisposition`, `setGuestExtraFields`, `setGuestExtraValues`, `setMessageTrigger`, `setSlaPolicy`, `startKioskAssist`, `transferConversation` |
 | message | `getMessageStatus`, `listBusinessEventNotification`, `listCommunicationService`, `listDeliveryCommunicationPlatform`, `listDeliveryQueueFailure`, `listMessageTemplates`, `listProviderHealthUsage`, `listRoutingPriorityThrottling`, `listSystemTransactionalTemplate`, `sendTransactionalMessage`, `setBusinessEventMapping`, `setChannelProvider`, `setCommunicationRoutingRule`, `setSenderIdentityDomain` |
 | segment | `listSegmentMembers`, `listSegments`, `previewSegment`, `previewSegmentDraft` |

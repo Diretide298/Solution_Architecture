@@ -902,6 +902,21 @@
      "slot": "fields",
      "components": [
       {
+       "kind": "dataTable",
+       "label": "Show the shift's cash in and cash out so far",
+       "operation": "listCashMovements",
+       "bindsTo": "CashMovement",
+       "columns": [
+        "CashMovement.kind",
+        "CashMovement.amount",
+        "CashMovement.reference",
+        "CashMovement.reason",
+        "CashMovement.recordedAt",
+        "CashMovement.syncedAt"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
+      {
        "kind": "selectField",
        "label": "Cash in or cash out",
        "bindsTo": "CreateCashMovementRequest.kind",
@@ -953,7 +968,7 @@
    "loading": "The saved cash cash out.",
    "error": "Could not load. Names which read failed and leaves the cash cash out untouched.",
    "emptyFirstRun": "No cash cash out configured. The form opens empty and `createCashMovement` saves the first one; it says what the platform does in the meantime.",
-   "emptyNoAccess": "Shown when the caller lacks `CASH_LIFT`, which `createCashMovement` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listCashMovements` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASH_LIFT` for `createCashMovement`.",
    "offline": "**Working from the local journal.** The till keeps taking money; this reconciles on sync."
   },
   "apis": [
@@ -962,6 +977,13 @@
     "contract": "shift",
     "purpose": "Record a cash lift or add",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listCashMovements",
+    "contract": "shift",
+    "purpose": "Show the shift's cash in and cash out so far",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "entryState": {
@@ -1594,7 +1616,10 @@
       {
        "kind": "multiSelect",
        "label": "86 an item",
-       "provenance": "carried from the previous definition"
+       "provenance": "carried from the previous definition",
+       "operation": "getGuestMenu",
+       "bindsTo": "GuestMenu.sections",
+       "notes": "Lists the outlet's menu items; ticking one sends `setItemAvailability` (r1 gate, CHG-R1S-004)."
       },
       {
        "kind": "primaryButton",
@@ -1675,6 +1700,13 @@
     "purpose": "The outlet's floor as it is laid out",
     "trigger": "onLoad",
     "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
+   },
+   {
+    "operationId": "getGuestMenu",
+    "contract": "fnb",
+    "purpose": "List the outlet's menu items for the '86 an item' picker",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "entryState": {

@@ -124,16 +124,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-574` | Maintenance Command Center | B–D | 2 | 0 | 6 | 1 | 0 | 2 | — | notStarted (—) |
-| `BO-575` | Maintenance Rule & Service Plan Configuration | B–D | 8 | 0 | 6 | 4 | 1 | 2 | — | notStarted (—) |
-| `BO-576` | Maintenance Calendar & Scheduling | B–D | 7 | 30 | 6 | 10 | 3 | 2 | — | notStarted (—) |
-| `BO-577` | Maintenance Work Order | B–D | 29 | 20 | 6 | 22 | 3 | 2 | — | notStarted (—) |
-| `BO-578` | Technician Repair Workspace | B–D | 8 | 0 | 6 | 5 | 1 | 0 | — | notStarted (—) |
-| `BO-579` | Parts, Cost & Maintenance Expense Tracking | B–D | 9 | 5 | 6 | 2 | 2 | 2 | — | notStarted (—) |
-| `BO-580` | Asset Maintenance History & Lifecycle | B–D | 0 | 0 | 6 | 5 | 1 | 2 | — | notStarted (—) |
-| `BO-581` | Return-to-Service Inspection & Approval | B–D | 5 | 0 | 6 | 3 | 1 | 3 | — | notStarted (—) |
-| `BO-582` | Asset Retirement, Write-Off & Replacement Recommendation | B–D | 0 | 0 | 6 | 5 | 1 | 0 | — | notStarted (—) |
-| `BO-583` | Maintenance Intelligence & Predictive AI | B–D | 0 | 18 | 6 | 1 | 2 | 2 | — | notStarted (—) |
+| `BO-574` | Maintenance Command Center | D | 2 | 0 | 6 | 1 | 0 | 2 | — | notStarted (—) |
+| `BO-575` | Maintenance Rule & Service Plan Configuration | D | 8 | 0 | 6 | 4 | 1 | 2 | — | notStarted (—) |
+| `BO-576` | Maintenance Calendar & Scheduling | D | 7 | 30 | 6 | 10 | 3 | 2 | — | notStarted (—) |
+| `BO-577` | Maintenance Work Order | D | 29 | 20 | 6 | 22 | 3 | 2 | — | notStarted (—) |
+| `BO-578` | Technician Repair Workspace | D | 8 | 0 | 6 | 5 | 1 | 0 | — | notStarted (—) |
+| `BO-579` | Parts, Cost & Maintenance Expense Tracking | D | 9 | 5 | 6 | 2 | 2 | 2 | — | notStarted (—) |
+| `BO-580` | Asset Maintenance History & Lifecycle | D | 0 | 0 | 6 | 5 | 1 | 2 | — | notStarted (—) |
+| `BO-581` | Return-to-Service Inspection & Approval | D | 5 | 0 | 6 | 3 | 1 | 3 | — | notStarted (—) |
+| `BO-582` | Asset Retirement, Write-Off & Replacement Recommendation | D | 0 | 0 | 6 | 5 | 1 | 0 | — | notStarted (—) |
+| `BO-583` | Maintenance Intelligence & Predictive AI | D | 0 | 18 | 6 | 1 | 2 | 2 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -153,7 +153,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-574 |
 | Who uses it | venue staff holding `ASSET_VIEW`, `WORK_ORDER_VIEW` (2 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
@@ -385,7 +385,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-575 |
 | Who uses it | venue staff holding `ASSET_MANAGE`, `ASSET_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -552,7 +552,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-576 |
 | Who uses it | venue staff holding `ASSET_VIEW`, `WORK_ORDER_MANAGE`, `WORK_ORDER_VIEW` (2 read, 1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -779,7 +779,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-577 |
 | Who uses it | venue staff holding `MAINTENANCE_EXECUTE`, `WORK_ORDER_MANAGE`, `WORK_ORDER_VIEW` (1 operate, 1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1098,7 +1098,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-578 |
 | Who uses it | venue staff holding `MAINTENANCE_EXECUTE`, `WORK_ORDER_MANAGE` (1 operate, 1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1294,7 +1294,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-579 |
 | Who uses it | venue staff holding `PROCUREMENT_REQUEST`, `PRODUCT_VIEW`, `WORK_ORDER_MANAGE` (1 operate, 1 read, 1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1468,7 +1468,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-580 |
 | Who uses it | venue staff holding `ASSET_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1627,7 +1627,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-581 |
 | Who uses it | venue staff holding `ASSET_MANAGE`, `INSPECTION_SUBMIT`, `WORK_ORDER_VERIFY` (1 configure, 2 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1804,7 +1804,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-582 |
 | Who uses it | venue staff holding `ASSET_MANAGE`, `ASSET_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1972,7 +1972,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-583 |
 | Who uses it | venue staff holding `ASSET_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |

@@ -14859,6 +14859,11 @@ screens:
       - transferId
       provenance: derived — BO-080 declares entryState.params transferId and BO-049 holds transferId,
         so an edge into it carries them
+    - to: BO-081
+      trigger: Inventory Items
+      provenance: flow F92 step 1→2
+      carries:
+      - itemId
     - to: EMP-065
       trigger: The delivery arrives
       provenance: flow F35 step 1→2
@@ -14866,11 +14871,6 @@ screens:
       back: false
       carries:
       - transferId
-    - to: BO-081
-      trigger: Inventory Items
-      provenance: flow F92 step 1→2
-      carries:
-      - itemId
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. **Improved 20
@@ -25166,18 +25166,18 @@ screens:
     - BO-093
     - BO-094
     transitions:
-    - to: BO-093
-      trigger: The plan is uploaded and read
-      provenance: flow F26 step 1→2
-      operation: createVenueMap
-      carries:
-      - mapId
     - to: BO-094
       trigger: Map Editor & Publish
       carries:
       - mapId
       provenance: derived — BO-094 declares entryState.params mapId, pathId and BO-092 holds mapId, so
         an edge into it carries them
+    - to: BO-093
+      trigger: The plan is uploaded and read
+      provenance: flow F26 step 1→2
+      operation: createVenueMap
+      carries:
+      - mapId
   notes: 'CF-123. **A venue may have several maps** — a park map and a floor plan per building are different
     maps, not layers of one, because a guest on the second floor should not be shown the ground floor
     toilets. **Drawn 26 August** — `Seat Board 2.dc.html` frame `seat-2e`. **The frame names this screen
@@ -25358,18 +25358,18 @@ screens:
       - kind: secondaryButton
         label: Propose walkways
         operation: proposeWalkways
-        notes: '**A raster plan or a scanned PDF only** (the AI contract refuses a map with vector geometry, 409).
-          On a plan with hand-marked paths it traces one segment per marked stretch (`basis: handMarked`);
+        notes: '**A raster plan or a scanned PDF only** (the AI contract refuses a map with vector geometry,
+          409). On a plan with hand-marked paths it traces one segment per marked stretch (`basis: handMarked`);
           otherwise it proposes what it can see. Proposes and stops (3 October 2026, r1 additions, CHG-RONEC-001).
           Hidden when AI is off; the operator then draws paths on BO-094.'
         provenance: contract ai.yaml POST /ai/venue-map/{mapId}/propose-walkways
       - kind: secondaryButton
         label: Accept or reject segment
         operation: acceptWalkwayProposals
-        notes: '**One segment at a time** (Chinmay, 3 October 2026: accepted segment by segment). Each proposed
-          segment is drawn over the plan with its confidence, low confidence shown, not hidden; Accept, Edit
-          (move the centreline) or Reject sends one decision, and the graph validation that comes back is shown
-          at once, so a rejected segment that strands a point says so. No accept-all.'
+        notes: '**One segment at a time** (Chinmay, 3 October 2026: accepted segment by segment). Each
+          proposed segment is drawn over the plan with its confidence, low confidence shown, not hidden;
+          Accept, Edit (move the centreline) or Reject sends one decision, and the graph validation that
+          comes back is shown at once, so a rejected segment that strands a point says so. No accept-all.'
         provenance: contract venue-map.yaml POST /venue-maps/{mapId}/walkway-proposals
     - name: contentBody
       slot: carried
@@ -25378,19 +25378,20 @@ screens:
         label: Plan, model or navigation file
         operation: createUpload
         notes: 'The file being imported, uploaded before `importVenueGeometry` is called: `assets.createUpload`
-          gives a signed URL (it refuses a GLB over 40 MB, or any file over the limit for its kind, before the
-          transfer starts), the file goes straight to storage, and `assets.completeUpload` returns the
-          `MediaAsset.id` sent as `sourceRef` (or `manifestRef`, `resourceManifestRef`). **The 3D model source
-          takes two files** (ADR-0069): the GLB ("GLB, at most 40 MB; about 300,000 triangles at LOD0") as
-          `sourceRef` and its navigation (pathway) JSON as `navigationFileRef`, each in its own slot of this
-          upload. Needs `ASSET_LIBRARY_MANAGE` as well as `VENUE_MAP_MANAGE` (3 October 2026, CHG-RONEC-001).'
+          gives a signed URL (it refuses a GLB over 40 MB, or any file over the limit for its kind, before
+          the transfer starts), the file goes straight to storage, and `assets.completeUpload` returns
+          the `MediaAsset.id` sent as `sourceRef` (or `manifestRef`, `resourceManifestRef`). **The 3D
+          model source takes two files** (ADR-0069): the GLB ("GLB, at most 40 MB; about 300,000 triangles
+          at LOD0") as `sourceRef` and its navigation (pathway) JSON as `navigationFileRef`, each in its
+          own slot of this upload. Needs `ASSET_LIBRARY_MANAGE` as well as `VENUE_MAP_MANAGE` (3 October
+          2026, CHG-RONEC-001).'
         provenance: contract assets.yaml POST /media/uploads and /media/uploads/{uploadId}/complete
       - kind: progressIndicator
         label: Upload progress
         operation: completeUpload
         notes: The transfer to storage, per file; when it ends the screen confirms it with `assets.completeUpload`
-          and holds the `MediaAsset.id` the import takes. A file refused at `createUpload` (too large for its kind)
-          says so before anything is sent.
+          and holds the `MediaAsset.id` the import takes. A file refused at `createUpload` (too large
+          for its kind) says so before anything is sent.
         provenance: contract assets.yaml POST /media/uploads/{uploadId}/complete
       - kind: progressIndicator
         notes: 'Import is long enough to leave the screen. **A spinner with no proportion is a screen
@@ -25401,10 +25402,11 @@ screens:
       - kind: selectField
         label: Format
         operation: importVenueGeometry
-        notes: 'Required. Four source kinds (3 October 2026, r1 additions): DWG or DXF (preferred); PDF (a vector
-          page by its layers, a scanned page through the OCR step); PNG or JPG, with or without hand-marked paths;
-          and a 3D model (GLB) with its navigation file. SVG stays accepted. The guidance beside it says what each
-          gives (native CAD keeps layer names; a scan gives hints and proposed paths, not geometry).'
+        notes: 'Required. Four source kinds (3 October 2026, r1 additions): DWG or DXF (preferred); PDF
+          (a vector page by its layers, a scanned page through the OCR step); PNG or JPG, with or without
+          hand-marked paths; and a 3D model (GLB) with its navigation file. SVG stays accepted. The guidance
+          beside it says what each gives (native CAD keeps layer names; a scan gives hints and proposed
+          paths, not geometry).'
         provenance: contract venue-map.yaml POST /venue-maps/{mapId}/import
       - kind: textField
         label: Source ref
@@ -25431,15 +25433,16 @@ screens:
         label: Read text on a scanned plan (OCR)
         bindsTo: VenueMapOcrOptions.mode
         operation: importVenueGeometry
-        notes: '`ocr.mode`, on (`auto`) by default for a scanned PDF or an image; off for a dimensioned drawing whose
-          text is noise. The text found becomes hints for the label proposals, never labels.'
+        notes: '`ocr.mode`, on (`auto`) by default for a scanned PDF or an image; off for a dimensioned
+          drawing whose text is noise. The text found becomes hints for the label proposals, never labels.'
         provenance: contract venue-map.yaml POST /venue-maps/{mapId}/import
       - kind: textField
         label: Paths marked by hand, marker colour
         bindsTo: VenueMapHandMarkedPaths.markColour
         operation: importVenueGeometry
-        notes: '`handMarkedPaths`, for a PNG, JPG or scanned PDF with the walkways drawn in marker: a tick that the
-          paths are marked, the marker colour if known (optional) and a note on what the marks mean.'
+        notes: '`handMarkedPaths`, for a PNG, JPG or scanned PDF with the walkways drawn in marker: a
+          tick that the paths are marked, the marker colour if known (optional) and a note on what the
+          marks mean.'
         provenance: contract venue-map.yaml POST /venue-maps/{mapId}/import
       - kind: textField
         label: Resource layer
@@ -25497,10 +25500,10 @@ screens:
         - VenueMapImportJob.handMarkedPaths
         - VenueMapImportJob.model
         operation: getVenueMapImportJob
-        notes: 'The text the OCR step read (with its confidence, offered to the label proposals as hints), the
-          hand-marked strokes found, and for a GLB the measured budget line by line with the model findings and
-          whether the 3D layer will publish (3 October 2026, CHG-RONEC-001). Each part shows only when the source
-          had it.'
+        notes: The text the OCR step read (with its confidence, offered to the label proposals as hints),
+          the hand-marked strokes found, and for a GLB the measured budget line by line with the model
+          findings and whether the 3D layer will publish (3 October 2026, CHG-RONEC-001). Each part shows
+          only when the source had it.
         provenance: contract venue-map.yaml GET /venue-maps/{mapId}/import/{jobId}
       - kind: cardList
         label: Open walkway proposals
@@ -25511,9 +25514,9 @@ screens:
         - ProposedAction.proposedAt
         - ProposedAction.expiresAt
         operation: listProposedActions
-        notes: 'The walkway segments `proposeWalkways` proposed and nobody has decided yet (one `ai.proposed_action`
-          each), read again when the operator comes back to the import; each is accepted or rejected on its own
-          with `acceptWalkwayProposals` (3 October 2026, CHG-RONEC-001).'
+        notes: The walkway segments `proposeWalkways` proposed and nobody has decided yet (one `ai.proposed_action`
+          each), read again when the operator comes back to the import; each is accepted or rejected on
+          its own with `acceptWalkwayProposals` (3 October 2026, CHG-RONEC-001).
         provenance: contract ai.yaml GET /proposed-actions
   states:
     loading: The saved map import labelling.
@@ -25552,7 +25555,8 @@ screens:
     - getVenueMapImportJob
   - operationId: createUpload
     contract: assets
-    purpose: 'Upload the plan, the GLB, the navigation file or a manifest before importVenueGeometry takes its id'
+    purpose: Upload the plan, the GLB, the navigation file or a manifest before importVenueGeometry takes
+      its id
     trigger: onAction
     provenance: decided 3 October 2026 (the lead, CHG-RONEC-001)
   - operationId: completeUpload
@@ -25562,12 +25566,14 @@ screens:
     provenance: decided 3 October 2026 (the lead, CHG-RONEC-001)
   - operationId: listProposedActions
     contract: ai
-    purpose: Re-read the walkway proposals still open (one per segment) to follow proposeWalkways, which answers 202
+    purpose: Re-read the walkway proposals still open (one per segment) to follow proposeWalkways, which
+      answers 202
     trigger: onAction
     provenance: decided 3 October 2026 (CHG-RONEC-001)
   - operationId: proposeWalkways
     contract: ai
-    purpose: Propose the path network of a raster or scanned plan, from hand-marked paths where there are any
+    purpose: Propose the path network of a raster or scanned plan, from hand-marked paths where there
+      are any
     trigger: onAction
     provenance: decided 3 October 2026, r1 additions (CHG-RONEC-001)
   entryState:
@@ -25583,6 +25589,10 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `importVenueGeometry`;
         a link or an edge that holds one opens it instead.'
+    - name: uploadId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen makes one with `createUpload`.'
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -25740,36 +25750,38 @@ screens:
       - kind: secondaryButton
         label: Export navigation file
         operation: getVenueNavigationFile
-        notes: 'Downloads the draft''s paths and points as a navigation file (ADR-0069 section 8, closed 3 October
-          2026, CHG-RONEC-001), the JSON a 3D studio builds the GLB around and BO-093 imports back with the model.
-          Codes, never ids.'
+        notes: Downloads the draft's paths and points as a navigation file (ADR-0069 section 8, closed
+          3 October 2026, CHG-RONEC-001), the JSON a 3D studio builds the GLB around and BO-093 imports
+          back with the model. Codes, never ids.
         provenance: contract venue-map.yaml GET /venue-maps/{mapId}/navigation-file
       - kind: fileUpload
         label: Guest map artwork
         bindsTo: VenueMap.baseAssetId
         operation: createUpload
-        notes: '**The illustrated map guests see** (input spec section 6; the F26 brief''s open item, closed
-          3 October 2026 here, CHG-RONEC-001): PNG or JPG up to about 12,000 px wide, uploaded through
-          `assets.createUpload` and `completeUpload`, then set with `setVenueMapArtwork`.'
+        notes: '**The illustrated map guests see** (input spec section 6; the F26 brief''s open item,
+          closed 3 October 2026 here, CHG-RONEC-001): PNG or JPG up to about 12,000 px wide, uploaded
+          through `assets.createUpload` and `completeUpload`, then set with `setVenueMapArtwork`.'
         provenance: contract assets.yaml POST /media/uploads and /media/uploads/{uploadId}/complete
       - kind: secondaryButton
         label: Save artwork and alignment
         operation: setVenueMapArtwork
-        notes: 'Sends the artwork''s `baseAssetId` and two to four alignment-point pairs (a pixel on the image
-          matched to a point on the plan; four recommended). Takes effect for guests at the next publish.'
+        notes: Sends the artwork's `baseAssetId` and two to four alignment-point pairs (a pixel on the
+          image matched to a point on the plan; four recommended). Takes effect for guests at the next
+          publish.
         provenance: contract venue-map.yaml POST /venue-maps/{mapId}/artwork
       - kind: progressIndicator
         label: Artwork upload
         operation: completeUpload
-        notes: The transfer to storage; when it ends the screen confirms it with `assets.completeUpload` and holds the
-          `MediaAsset.id` that `setVenueMapArtwork` takes.
+        notes: The transfer to storage; when it ends the screen confirms it with `assets.completeUpload`
+          and holds the `MediaAsset.id` that `setVenueMapArtwork` takes.
         provenance: contract assets.yaml POST /media/uploads/{uploadId}/complete
       - kind: banner
         label: 3D layer
         bindsTo: VenueMap.model3dStatus
         operation: getVenueMap
-        notes: 'None, publishable or blocked (ADR-0069 as amended 3 October 2026). Blocked names the import job''s
-          model findings on BO-093; the 2D map still publishes and guests see 2D until a corrected model is imported.'
+        notes: None, publishable or blocked (ADR-0069 as amended 3 October 2026). Blocked names the import
+          job's model findings on BO-093; the 2D map still publishes and guests see 2D until a corrected
+          model is imported.
         provenance: contract venue-map.yaml VenueMap.model3dStatus
     - name: contentBody
       slot: record
@@ -25882,7 +25894,7 @@ screens:
     - getVenueMap
   - operationId: createUpload
     contract: assets
-    purpose: 'Upload the guest map artwork before setVenueMapArtwork takes its id'
+    purpose: Upload the guest map artwork before setVenueMapArtwork takes its id
     trigger: onAction
     provenance: decided 3 October 2026 (the lead, CHG-RONEC-001)
   - operationId: completeUpload
@@ -25899,7 +25911,8 @@ screens:
     - getVenueMap
   - operationId: getVenueNavigationFile
     contract: venue-map
-    purpose: Export the draft's graph and points as a navigation file for a 3D studio (ADR-0069 section 8)
+    purpose: Export the draft's graph and points as a navigation file for a 3D studio (ADR-0069 section
+      8)
     trigger: onAction
     provenance: decided 3 October 2026, r1 additions (CHG-RONEC-001)
   entryState:
@@ -25911,6 +25924,10 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `setPathClosure` takes
         the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
+    - name: uploadId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen makes one with `createUpload`.'
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -25931,10 +25948,10 @@ screens:
   - id: formSetVenueMapArtwork
     component: modal
     trigger: Save artwork and alignment
-    body: '**Collects what `setVenueMapArtwork` sends before it is called.** Required: `baseAssetId` (the uploaded
-      artwork, or none to remove it) and, with an image, `baseImageAlignment`: the image size and two to four
-      alignment pairs, each a point clicked on the artwork and the same point clicked on the plan. Dismissing
-      sends nothing; the map keeps the artwork it had.'
+    body: '**Collects what `setVenueMapArtwork` sends before it is called.** Required: `baseAssetId` (the
+      uploaded artwork, or none to remove it) and, with an image, `baseImageAlignment`: the image size
+      and two to four alignment pairs, each a point clicked on the artwork and the same point clicked
+      on the plan. Dismissing sends nothing; the map keeps the artwork it had.'
     confirm:
       label: Save artwork and alignment
       operation: setVenueMapArtwork
@@ -27967,6 +27984,8 @@ screens:
       trigger: Opens Refund-to-Wallet Policy Configuration
       provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
         3 October 2026); its command centre is not in Block A'
+      carries:
+      - venueId
     - to: BO-1162
       trigger: Opens Security Governance, Audit & Rule Publication
       provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
@@ -28682,6 +28701,8 @@ screens:
       trigger: Opens Live Gate Mode & Lane Control
       provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
         3 October 2026); its command centre is not in Block A'
+      carries:
+      - accessPointId
     - to: BO-335
       trigger: Opens Virtual Ticket Identity & Master Record Configuration
       provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
@@ -29453,14 +29474,20 @@ screens:
       trigger: Opens Dynamic Segment Builder
       provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
         3 October 2026); its command centre is not in Block A'
+      carries:
+      - segmentId
     - to: BO-766
       trigger: Opens Campaign Builder
       provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
         3 October 2026); its command centre is not in Block A'
+      carries:
+      - campaignId
     - to: BO-772
       trigger: Opens A/B & AI Optimization
       provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
         3 October 2026); its command centre is not in Block A'
+      carries:
+      - campaignId
     - to: BO-785
       trigger: Opens Template Library
       provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
@@ -44958,18 +44985,6 @@ screens:
       trigger: Works in Family, Child, POD & Companion Journey
       provenance: flow F118 step 7→8
       operation: listGuestJourney
-    - to: BO-219
-      trigger: Works in Re-entry & Temporary Exit Journey
-      provenance: flow F118 step 9→10
-      operation: listGuestJourney
-      carries:
-      - profileId
-    - to: BO-220
-      trigger: Works in Multi-Park & Crossover Journey Orchestrator
-      provenance: flow F118 step 11→12
-      operation: listGuestJourney
-      carries:
-      - profileId
     - to: BO-221
       trigger: Works in Fast Pass & Attraction Access Journey
       provenance: flow F118 step 13→14
@@ -44982,6 +44997,18 @@ screens:
       trigger: Works in Journey Simulation, Audit & Publication
       provenance: flow F118 step 17→18
       operation: listGuestJourney
+    - to: BO-219
+      trigger: Works in Re-entry & Temporary Exit Journey
+      provenance: flow F118 step 9→10
+      operation: listGuestJourney
+      carries:
+      - profileId
+    - to: BO-220
+      trigger: Works in Multi-Park & Crossover Journey Orchestrator
+      provenance: flow F118 step 11→12
+      operation: listGuestJourney
+      carries:
+      - profileId
   density: compact
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
@@ -48624,12 +48651,6 @@ screens:
       trigger: Works in Fraud Detection Rule & Signal Library
       provenance: flow F121 step 1→2
       operation: listAccessSecurityFraud
-    - to: BO-247
-      trigger: Works in Unified Identity & Credential Lock Manager
-      provenance: flow F121 step 5→6
-      operation: listAccessSecurityFraud
-      carries:
-      - lockId
     - to: BO-249
       trigger: Works in Relationship & Companion Fraud Monitoring
       provenance: flow F121 step 9→10
@@ -48652,6 +48673,12 @@ screens:
       operation: listAccessSecurityFraud
       carries:
       - alertId
+    - to: BO-247
+      trigger: Works in Unified Identity & Credential Lock Manager
+      provenance: flow F121 step 5→6
+      operation: listAccessSecurityFraud
+      carries:
+      - lockId
     - to: BO-248
       trigger: Works in Biometric & Identity Integrity Monitoring
       provenance: flow F121 step 7→8
@@ -142353,33 +142380,35 @@ screens:
         - RegionSettings.aiResidencyClass
         - RegionSettings.allowedAiResidencies
         - RegionSettings.aiResidencyOptIn
-        notes: '**The residency section, real since 3 October 2026** (Chinmay, r1 additions: "The residency section
-          on BO-1065 is drawn and built in Block A"; CHG-RONEC-004). Where the AI engine may send this tenant''s
-          calls (ADR-0009 as amended 2 October; DEC-539): UAE only (the default, and mandatory for government,
-          bank and health tenants), global allowed (a private venue''s PDPL Article 23 opt-in) or on-premises.
-          Every call is scrubbed of personal data in-cell first, whatever the class (DEC-542); the panel says so.'
+        notes: '**The residency section, real since 3 October 2026** (Chinmay, r1 additions: "The residency
+          section on BO-1065 is drawn and built in Block A"; CHG-RONEC-004). Where the AI engine may send
+          this tenant''s calls (ADR-0009 as amended 2 October; DEC-539): UAE only (the default, and mandatory
+          for government, bank and health tenants), global allowed (a private venue''s PDPL Article 23
+          opt-in) or on-premises. Every call is scrubbed of personal data in-cell first, whatever the
+          class (DEC-542); the panel says so.'
         provenance: contract tenancy.yaml GET /regions/{regionId}/settings; decided 3 October 2026 (CHG-RONEC-004)
       - kind: selectField
         label: AI residency class
         bindsTo: RegionSettings.aiResidencyClass
         operation: updateRegionSettings
-        notes: 'UAE only, Global allowed, On-premises. Moving from UAE only to Global allowed without the opt-in
-          evidence below is refused (`422 residency-opt-in-required`) and the form says which reference is missing.'
+        notes: UAE only, Global allowed, On-premises. Moving from UAE only to Global allowed without the
+          opt-in evidence below is refused (`422 residency-opt-in-required`) and the form says which reference
+          is missing.
         provenance: contract tenancy.yaml PUT /regions/{regionId}/settings (aiResidencyClass)
       - kind: multiSelect
         label: Allowed AI residencies
         bindsTo: RegionSettings.allowedAiResidencies
         operation: updateRegionSettings
-        notes: Narrows the class further where the region needs it; never widens it. Empty means the class alone
-          decides. `ai.setAiProvider` refuses a provider outside it (`409 residency-refused`).
+        notes: Narrows the class further where the region needs it; never widens it. Empty means the class
+          alone decides. `ai.setAiProvider` refuses a provider outside it (`409 residency-refused`).
         provenance: contract tenancy.yaml PUT /regions/{regionId}/settings (allowedAiResidencies)
       - kind: textField
         label: Opt-in evidence (PDPL Article 23)
         bindsTo: RegionSettings.aiResidencyOptIn
         operation: updateRegionSettings
-        notes: 'Shown only for Global allowed: the vendor contract, DPIA and guest notice references
-          (`vendorContractReference`, `dpiaReference`, `guestNoticeReference`, up to 200 characters each). Who
-          confirmed it and when are the server''s and shown read-only.'
+        notes: 'Shown only for Global allowed: the vendor contract, DPIA and guest notice references (`vendorContractReference`,
+          `dpiaReference`, `guestNoticeReference`, up to 200 characters each). Who confirmed it and when
+          are the server''s and shown read-only.'
         provenance: contract tenancy.yaml PUT /regions/{regionId}/settings (aiResidencyOptIn)
     - name: actionBar
       slot: rowActions
@@ -142395,9 +142424,9 @@ screens:
       - kind: secondaryButton
         label: Save AI residency
         operation: updateRegionSettings
-        notes: 'Saves the residency section with `updateRegionSettings`. PUT semantics (audit R103): the request
-          carries the region''s settings in force from `getRegionSettings` with only the residency fields changed,
-          so saving the residency never resets the currency or the time zone.'
+        notes: 'Saves the residency section with `updateRegionSettings`. PUT semantics (audit R103): the
+          request carries the region''s settings in force from `getRegionSettings` with only the residency
+          fields changed, so saving the residency never resets the currency or the time zone.'
         provenance: contract tenancy.yaml PUT /regions/{regionId}/settings; decided 3 October 2026 (CHG-RONEC-004)
   states:
     loading: The currency timezone channels list.
@@ -142420,8 +142449,8 @@ screens:
     - listDenominations
   - operationId: updateRegionSettings
     contract: tenancy
-    purpose: Currency, timezone and channels, and the AI residency section (class, allowed residencies, opt-in
-      evidence; Block A, decided 3 October 2026, CHG-RONEC-004)
+    purpose: Currency, timezone and channels, and the AI residency section (class, allowed residencies,
+      opt-in evidence; Block A, decided 3 October 2026, CHG-RONEC-004)
     trigger: onAction
     provenance: board reading, 19 September 2026; residency section 3 October 2026 (CHG-RONEC-004)
     invalidates:
@@ -142477,11 +142506,11 @@ screens:
   - id: formUpdateAiResidency
     component: modal
     trigger: Save AI residency
-    body: '**Collects the residency section before `updateRegionSettings` is called** (3 October 2026, CHG-RONEC-004).
-      Asks for `aiResidencyClass`, `allowedAiResidencies` and, for `globalAllowed`, the three `aiResidencyOptIn`
-      references; every other field is sent as `getRegionSettings` returned it. A move to a wider class says
-      what changes for guests (calls may leave the UAE) and asks the operator to confirm. Dismissing sends
-      nothing; the screen behind is unchanged.'
+    body: '**Collects the residency section before `updateRegionSettings` is called** (3 October 2026,
+      CHG-RONEC-004). Asks for `aiResidencyClass`, `allowedAiResidencies` and, for `globalAllowed`, the
+      three `aiResidencyOptIn` references; every other field is sent as `getRegionSettings` returned it.
+      A move to a wider class says what changes for guests (calls may leave the UAE) and asks the operator
+      to confirm. Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
       label: Save AI residency
       operation: updateRegionSettings
@@ -145621,7 +145650,7 @@ screens:
     purpose: Digital credentials
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id035
+    invalidates: &id033
     - getWallet
   - operationId: listWalletTypes
     contract: wallet
@@ -146937,7 +146966,7 @@ screens:
     purpose: Reverse or correct a top-up
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id036
+    invalidates: &id034
     - listWalletTransactions
     - listCreditLots
   - operationId: adjustWallet
@@ -147578,7 +147607,7 @@ screens:
     purpose: Change one
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id030
+    invalidates: &id029
     - listCreditTypes
   - operationId: listCreditTypes
     contract: wallet
@@ -147697,7 +147726,7 @@ screens:
     purpose: How this credit is issued
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id030
+    invalidates: *id029
   - operationId: listCreditTypes
     contract: wallet
     purpose: The kinds of value that may sit in a wallet
@@ -148038,7 +148067,7 @@ screens:
     purpose: Expiry and validity
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id030
+    invalidates: *id029
   - operationId: listCreditTypes
     contract: wallet
     purpose: The kinds of value that may sit in a wallet
@@ -148938,7 +148967,7 @@ screens:
     purpose: Household members and roles
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id031
+    invalidates: &id030
     - listSharedWallets
   - operationId: listSharedWallets
     contract: wallet
@@ -149065,13 +149094,13 @@ screens:
     purpose: Parent and child distribution
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id031
+    invalidates: *id030
   - operationId: transferWalletBalance
     contract: wallet
     purpose: Move value between them
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id032
+    invalidates: &id031
     - getWallet
     - listWalletTransactions
   - operationId: listSharedWallets
@@ -149196,7 +149225,7 @@ screens:
     purpose: Allowance and budget
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id031
+    invalidates: *id030
   - operationId: listSharedWallets
     contract: wallet
     purpose: Family, household and corporate structures
@@ -149344,7 +149373,7 @@ screens:
     purpose: Spending controls per member
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id031
+    invalidates: *id030
   - operationId: listSharedWallets
     contract: wallet
     purpose: Family, household and corporate structures
@@ -149573,7 +149602,7 @@ screens:
     purpose: Corporate budget and policy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id031
+    invalidates: *id030
   - operationId: setApprovalMatrix
     contract: approvals
     purpose: Set how corporate wallet spend is approved (levels, mode, thresholds)
@@ -149696,7 +149725,7 @@ screens:
     purpose: Reallocate balance
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id032
+    invalidates: *id031
   - operationId: getWalletBalance
     contract: wallet
     purpose: A wallet's balance
@@ -151647,7 +151676,7 @@ screens:
     purpose: Channel configuration
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id034
+    invalidates: &id032
     - getWalletFundingRules
   wireframe:
     status: notStarted
@@ -151763,7 +151792,7 @@ screens:
     purpose: Payment and redemption policy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id034
+    invalidates: *id032
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1135
@@ -151906,7 +151935,7 @@ screens:
     purpose: Credential kinds accepted
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id034
+    invalidates: *id032
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1136
@@ -152051,7 +152080,7 @@ screens:
     purpose: Bind a wearable to a wallet
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id035
+    invalidates: *id033
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1137
@@ -152155,7 +152184,7 @@ screens:
     purpose: NFC, RFID and QR rules
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id034
+    invalidates: *id032
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1138
@@ -152272,7 +152301,7 @@ screens:
     purpose: Authentication and PIN policy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id034
+    invalidates: *id032
   - operationId: setWalletAuthenticationPolicy
     contract: wallet
     purpose: Save authentication policy
@@ -152407,7 +152436,7 @@ screens:
     purpose: Offline and degraded mode
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id034
+    invalidates: *id032
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1140
@@ -153502,7 +153531,7 @@ screens:
     purpose: Reverse a transaction
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id036
+    invalidates: *id034
   - operationId: listWalletTransactions
     contract: wallet
     purpose: Wallet transaction history
@@ -155850,7 +155879,7 @@ screens:
     purpose: Credit types to ledger accounts
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id037
+    invalidates: &id035
     - getWalletLiability
   wireframe:
     status: notStarted
@@ -156517,7 +156546,7 @@ screens:
     purpose: Breakage recognition policy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id037
+    invalidates: *id035
   entryState:
     preloaded:
     - Original value → AED 500
@@ -157528,7 +157557,7 @@ screens:
     purpose: Integration profile
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id034
+    invalidates: *id032
   - operationId: setWalletIntegrationMapping
     contract: wallet
     purpose: Save mapping
@@ -198765,7 +198794,7 @@ screens:
     purpose: Its payment configuration
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id038
+    invalidates: &id036
     - listPaymentTerminals
   wireframe:
     status: notStarted
@@ -199340,7 +199369,7 @@ screens:
     purpose: Store-and-forward limits
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id038
+    invalidates: *id036
   entryState:
     preloaded:
     - Terminal
@@ -200227,12 +200256,12 @@ screens:
       - kind: destructiveButton
         label: Cancel link
         operation: cancelPaymentLink
-        notes: '**Withdraws a live link** (Chinmay, 3 October 2026: cancelPaymentLink bound on the screen that
-          manages payment links; CHG-RUL-021, CHG-RONEC-005). Shown on an `issued` or `viewed` link only; asks for
-          a reason (kept in the audit trail, never shown to the guest). The token stops working at once and a
-          guest holding it is told it was withdrawn; a hold the link kept is released. The order stays: a new
-          link can be created straight after on ADM-592. A link that is no longer live answers `409
-          payment-link-not-live`, and the screen refreshes its state.'
+        notes: '**Withdraws a live link** (Chinmay, 3 October 2026: cancelPaymentLink bound on the screen
+          that manages payment links; CHG-RUL-021, CHG-RONEC-005). Shown on an `issued` or `viewed` link
+          only; asks for a reason (kept in the audit trail, never shown to the guest). The token stops
+          working at once and a guest holding it is told it was withdrawn; a hold the link kept is released.
+          The order stays: a new link can be created straight after on ADM-592. A link that is no longer
+          live answers `409 payment-link-not-live`, and the screen refreshes its state.'
         provenance: contract orders.yaml POST /payment-links/{linkId}/cancel; decided 3 October 2026 (CHG-RONEC-005)
     - name: contentBody
       components:
@@ -200298,9 +200327,9 @@ screens:
   - id: formCancelPaymentLink
     component: modal
     trigger: Cancel link
-    body: '**Collects what `cancelPaymentLink` sends before it is called.** Required: `reason` (3 to 500 characters,
-      kept in the audit trail, never shown to the guest). Says that the guest''s link stops working at once and that
-      the order is not cancelled. Dismissing sends nothing; the link stays live.'
+    body: '**Collects what `cancelPaymentLink` sends before it is called.** Required: `reason` (3 to 500
+      characters, kept in the audit trail, never shown to the guest). Says that the guest''s link stops
+      working at once and that the order is not cancelled. Dismissing sends nothing; the link stays live.'
     confirm:
       label: Cancel link
       operation: cancelPaymentLink
@@ -201190,7 +201219,7 @@ screens:
     purpose: Which combinations are allowed
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id039
+    invalidates: &id037
     - getMixedTenderRules
   - operationId: getMixedTenderRules
     contract: payments
@@ -201787,7 +201816,7 @@ screens:
     purpose: Sequence and restrictions
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id039
+    invalidates: *id037
   - operationId: getMixedTenderRules
     contract: payments
     purpose: Which tenders may be combined, and in what order
@@ -206360,7 +206389,7 @@ screens:
     purpose: Declare them
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id040
+    invalidates: &id038
     - listProductRelationships
   wireframe:
     status: notStarted
@@ -207277,7 +207306,7 @@ screens:
     purpose: Order it
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id040
+    invalidates: *id038
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-650
@@ -208430,7 +208459,7 @@ screens:
     purpose: Build the relationships
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id041
+    invalidates: &id039
     - listProductRelationships
   - operationId: listProductRelationships
     contract: promotions
@@ -208728,7 +208757,7 @@ screens:
     purpose: Across categories
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id041
+    invalidates: *id039
   - operationId: listProductRelationships
     contract: promotions
     purpose: The product relationships already declared
@@ -208825,7 +208854,7 @@ screens:
     purpose: Across attractions and partners
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id041
+    invalidates: *id039
   - operationId: listProductRelationships
     contract: promotions
     purpose: The product relationships already declared
@@ -214196,7 +214225,7 @@ screens:
     purpose: Create the workflow
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id042
+    invalidates: &id040
     - listWorkflow
   wireframe:
     status: notStarted
@@ -214277,7 +214306,7 @@ screens:
     purpose: Stages and approvers
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id042
+    invalidates: *id040
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-322
@@ -214498,7 +214527,7 @@ screens:
     purpose: Sequence and parallel routing
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id042
+    invalidates: *id040
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-324
@@ -214587,7 +214616,7 @@ screens:
     purpose: What happens on each outcome
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id045
+    invalidates: &id043
     - listCrossModuleOrchestration
   wireframe:
     status: notStarted
@@ -214764,7 +214793,7 @@ screens:
     purpose: Publish
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id042
+    invalidates: *id040
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-327
@@ -215081,7 +215110,7 @@ screens:
     purpose: Authority by role and value
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id043
+    invalidates: &id041
     - listApprovalMatrices
   wireframe:
     status: notStarted
@@ -215170,7 +215199,7 @@ screens:
     purpose: Route up the hierarchy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id043
+    invalidates: *id041
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-331
@@ -215249,7 +215278,7 @@ screens:
     purpose: By department
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id043
+    invalidates: *id041
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-332
@@ -215338,7 +215367,7 @@ screens:
     purpose: By venue and tenant
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id043
+    invalidates: *id041
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-333
@@ -215427,7 +215456,7 @@ screens:
     purpose: By value threshold
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id043
+    invalidates: *id041
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-334
@@ -215515,7 +215544,7 @@ screens:
     purpose: By risk and condition
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id043
+    invalidates: *id041
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-335
@@ -215603,7 +215632,7 @@ screens:
     purpose: Approver groups and decision policy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id044
+    invalidates: &id042
     - listApprovalControlPolicies
   wireframe:
     status: notStarted
@@ -216111,7 +216140,7 @@ screens:
     purpose: Four-eyes and dual control
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id044
+    invalidates: *id042
   - operationId: listApprovalControlPolicies
     contract: approvals
     purpose: What is already required
@@ -217332,7 +217361,7 @@ screens:
     purpose: Workflow events
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id045
+    invalidates: *id043
   - operationId: listWebhookEventTypes
     contract: public-api
     purpose: Workflow events published through the event framework (publisher=approvals)
@@ -217672,7 +217701,7 @@ screens:
     purpose: Map external data onto a request
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id045
+    invalidates: *id043
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-355

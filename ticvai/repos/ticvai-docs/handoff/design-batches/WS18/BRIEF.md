@@ -96,16 +96,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-339` | Governance & Compliance Command Center | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-340` | Segregation of Duties Policy Manager | B–D | 9 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-341` | Four-Eyes & Dual-Control Policy | B–D | 7 | 0 | 5 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-339` | Governance & Compliance Command Center | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-340` | Segregation of Duties Policy Manager | B | 9 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-341` | Four-Eyes & Dual-Control Policy | B | 7 | 0 | 5 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-342` | Authentication & MFA Policy Manager | A | 27 | 28 | 6 | 11 | 2 | 0 | — | notStarted (—) |
-| `ADM-343` | Sensitive Action Confirmation | B–D | 6 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-344` | Digital Signature Management | B–D | 7 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-345` | Immutable Approval Record & Tamper Detection | B–D | 0 | 18 | 6 | 0 | 0 | 3 | — | notStarted (—) |
-| `ADM-346` | Approval Record Retention Policy | B–D | 8 | 0 | 5 | 2 | 1 | 3 | — | notStarted (—) |
-| `ADM-347` | Regulatory Audit & Evidence Center | B–D | 2 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-348` | Governance Risk & AI Compliance Advisor | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-343` | Sensitive Action Confirmation | B | 6 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-344` | Digital Signature Management | B | 7 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-345` | Immutable Approval Record & Tamper Detection | B | 0 | 18 | 6 | 0 | 0 | 3 | — | notStarted (—) |
+| `ADM-346` | Approval Record Retention Policy | B | 8 | 0 | 5 | 2 | 1 | 3 | — | notStarted (—) |
+| `ADM-347` | Regulatory Audit & Evidence Center | B | 2 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-348` | Governance Risk & AI Compliance Advisor | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

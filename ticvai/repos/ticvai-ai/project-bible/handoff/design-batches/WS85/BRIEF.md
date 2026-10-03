@@ -131,15 +131,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-464` | Game & Ride Operations Control Center | B–D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-465` | Live Gameplay Transaction Monitor | B–D | 0 | 24 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-466` | Reader & Device Health Monitor | B–D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
-| `BO-467` | Tap Validation & Decision Trace | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-468` | Rejected Transaction & Reason Analysis | B–D | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-469` | Wallet & Deduction Transaction Monitor | B–D | 0 | 0 | 6 | 3 | 0 | 6 | — | notStarted (—) |
-| `BO-470` | Entitlement & Free-Play Consumption Monitor | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-471` | Offline, Synchronization & Recovery Monitor | B–D | 14 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-473` | Operational Analytics & Reconciliation Dashboard | B–D | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-464` | Game & Ride Operations Control Center | D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-465` | Live Gameplay Transaction Monitor | D | 0 | 24 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-466` | Reader & Device Health Monitor | D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `BO-467` | Tap Validation & Decision Trace | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-468` | Rejected Transaction & Reason Analysis | D | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-469` | Wallet & Deduction Transaction Monitor | C | 0 | 0 | 6 | 3 | 0 | 6 | — | notStarted (—) |
+| `BO-470` | Entitlement & Free-Play Consumption Monitor | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-471` | Offline, Synchronization & Recovery Monitor | D | 14 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-473` | Operational Analytics & Reconciliation Dashboard | D | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

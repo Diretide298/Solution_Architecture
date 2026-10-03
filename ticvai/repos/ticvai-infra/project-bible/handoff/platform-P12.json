@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-10-03",
+ "generated": "2026-10-04",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 28,
@@ -15,7 +15,7 @@
   "contracts": 8,
   "modules": 5,
   "undrawn": 0,
-  "operationsWithNoScreen": 89
+  "operationsWithNoScreen": 85
  },
  "waves": {
   "wave1": 4,
@@ -82,15 +82,15 @@
    "operations": 2
   },
   {
+   "contract": "finance",
+   "operations": 1
+  },
+  {
    "contract": "white-label",
    "operations": 1
   },
   {
    "contract": "orders",
-   "operations": 1
-  },
-  {
-   "contract": "finance",
    "operations": 1
   }
  ],
@@ -110,7 +110,7 @@
    "module": "Overview",
    "wave": 1,
    "route": "/general/agent-dashboard",
-   "operations": 9,
+   "operations": 10,
    "drawn": true
   },
   {
@@ -375,12 +375,6 @@
     "summary": "What is indexed, and how current it is"
    },
    {
-    "operation": "proposeWalkways",
-    "contract": "ai",
-    "verb": "POST",
-    "summary": "Find walkable space in a drawing that has no vectors"
-   },
-   {
     "operation": "reindexSource",
     "contract": "ai",
     "verb": "POST",
@@ -609,12 +603,6 @@
     "summary": "List case routing rules"
    },
    {
-    "operation": "listLoyaltyCampaigns",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Time-boxed campaigns inside a programme"
-   },
-   {
     "operation": "listLoyaltyPointEntries",
     "contract": "marketing-crm",
     "verb": "GET",
@@ -777,12 +765,6 @@
     "summary": "Store a guest photo, ID or signed document"
    },
    {
-    "operation": "cancelPaymentLink",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Cancel a live payment link"
-   },
-   {
     "operation": "convertToTermProduct",
     "contract": "orders",
     "verb": "POST",
@@ -817,12 +799,6 @@
     "contract": "orders",
     "verb": "GET",
     "summary": "Fees charged on an order"
-   },
-   {
-    "operation": "listPaymentProviders",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "Gateways configured for this scope"
    },
    {
     "operation": "openGuestCreditAccount",

@@ -103,16 +103,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-038` | Communication Service Command Center | B–D | 0 | 18 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `ADM-039` | Channel & Provider Configuration | B–D | 6 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-040` | Sender Identity, Domain & Brand Configuration | B–D | 19 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
-| `ADM-041` | System Transactional Template Registry | B–D | 9 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-042` | Business Event & Notification Trigger Mapping | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-043` | Routing, Priority, Throttling & Fallback Rules | B–D | 14 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-044` | Consent, Preference & Communication Policy Enforcement | B–D | 0 | 0 | 6 | 0 | 1 | 4 | — | notStarted (generated) |
-| `ADM-045` | Delivery Queue, Failure & Retry Management | B–D | 0 | 24 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `ADM-046` | Provider Health, Usage & Cost Monitoring | B–D | 2 | 20 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-047` | AI Delivery Optimization & Communication Platform Diagnostics | B–D | 0 | 12 | 6 | 11 | 0 | 0 | — | notStarted (generated) |
+| `ADM-038` | Communication Service Command Center | D | 0 | 18 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `ADM-039` | Channel & Provider Configuration | D | 6 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-040` | Sender Identity, Domain & Brand Configuration | D | 19 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
+| `ADM-041` | System Transactional Template Registry | D | 9 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-042` | Business Event & Notification Trigger Mapping | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-043` | Routing, Priority, Throttling & Fallback Rules | D | 14 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-044` | Consent, Preference & Communication Policy Enforcement | D | 0 | 0 | 6 | 0 | 1 | 4 | — | notStarted (generated) |
+| `ADM-045` | Delivery Queue, Failure & Retry Management | D | 0 | 24 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `ADM-046` | Provider Health, Usage & Cost Monitoring | D | 2 | 20 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-047` | AI Delivery Optimization & Communication Platform Diagnostics | D | 0 | 12 | 6 | 11 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

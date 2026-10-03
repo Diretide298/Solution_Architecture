@@ -762,7 +762,17 @@
    "exitTo": [
     "BO-068",
     "BO-073",
-    "BO-091"
+    "BO-091",
+    "BO-755",
+    "BO-766",
+    "BO-772",
+    "BO-785",
+    "BO-798",
+    "BO-799",
+    "BO-825",
+    "BO-826",
+    "BO-827",
+    "BO-828"
    ],
    "transitions": [
     {
@@ -774,6 +784,65 @@
      "to": "BO-091",
      "trigger": "AI Policy & Spend",
      "provenance": "derived — BO-091 declares entryState.params profileKey, tenantId and BO-107 holds none of them. The edge carries nothing: profileKey only pre-selects (deep link or optional); BO-091 opens on listIndexFailures, and tenantId has no source on BO-091 yet (a gap in BO-091, not in this edge)"
+    },
+    {
+     "to": "BO-755",
+     "trigger": "Opens Dynamic Segment Builder",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A",
+     "carries": [
+      "segmentId"
+     ]
+    },
+    {
+     "to": "BO-766",
+     "trigger": "Opens Campaign Builder",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A",
+     "carries": [
+      "campaignId"
+     ]
+    },
+    {
+     "to": "BO-772",
+     "trigger": "Opens A/B & AI Optimization",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A",
+     "carries": [
+      "campaignId"
+     ]
+    },
+    {
+     "to": "BO-785",
+     "trigger": "Opens Template Library",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-798",
+     "trigger": "Opens Intent & Knowledge Management",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-799",
+     "trigger": "Opens Agent Workspace",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-825",
+     "trigger": "Opens Challenge Builder",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-826",
+     "trigger": "Opens Achievement & Badge Engine",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-827",
+     "trigger": "Opens Points & Activity Rules",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-828",
+     "trigger": "Opens Milestones & Reward Rules",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
     }
    ]
   },

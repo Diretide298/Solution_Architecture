@@ -5,11 +5,11 @@
   "operator": "guest",
   "counts": {
    "screens": 50,
-   "operations": 210,
+   "operations": 214,
    "contracts": 19,
    "modules": 14,
    "undrawn": 0,
-   "operationsWithNoScreen": 18
+   "operationsWithNoScreen": 16
   },
   "waves": {
    "wave1": 50
@@ -21,11 +21,11 @@
   "operator": "guest",
   "counts": {
    "screens": 77,
-   "operations": 214,
+   "operations": 218,
    "contracts": 19,
    "modules": 17,
    "undrawn": 0,
-   "operationsWithNoScreen": 18
+   "operationsWithNoScreen": 16
   },
   "waves": {
    "wave1": 77
@@ -37,11 +37,11 @@
   "operator": "venue",
   "counts": {
    "screens": 32,
-   "operations": 151,
+   "operations": 152,
    "contracts": 19,
    "modules": 4,
    "undrawn": 0,
-   "operationsWithNoScreen": 161
+   "operationsWithNoScreen": 153
   },
   "waves": {
    "wave1": 32
@@ -53,15 +53,15 @@
   "operator": "guest",
   "counts": {
    "screens": 17,
-   "operations": 24,
-   "contracts": 8,
+   "operations": 22,
+   "contracts": 7,
    "modules": 2,
    "undrawn": 0,
-   "operationsWithNoScreen": 15
+   "operationsWithNoScreen": 11
   },
   "waves": {
-   "wave1": 1,
-   "wave2": 16
+   "wave1": 2,
+   "wave2": 15
   }
  },
  "P06": {
@@ -74,7 +74,7 @@
    "contracts": 21,
    "modules": 4,
    "undrawn": 0,
-   "operationsWithNoScreen": 147
+   "operationsWithNoScreen": 139
   },
   "waves": {
    "wave1": 30,
@@ -92,7 +92,7 @@
    "contracts": 5,
    "modules": 1,
    "undrawn": 0,
-   "operationsWithNoScreen": 47
+   "operationsWithNoScreen": 44
   },
   "waves": {
    "wave1": 11
@@ -104,16 +104,16 @@
   "operator": "venue",
   "counts": {
    "screens": 1661,
-   "operations": 1837,
+   "operations": 1860,
    "contracts": 31,
    "modules": 19,
    "undrawn": 0,
-   "operationsWithNoScreen": 198
+   "operationsWithNoScreen": 189
   },
   "waves": {
-   "wave1": 125,
-   "wave2": 64,
-   "wave3": 1472
+   "wave1": 139,
+   "wave2": 58,
+   "wave3": 1464
   }
  },
  "P09": {
@@ -122,11 +122,11 @@
   "operator": "ticvai",
   "counts": {
    "screens": 211,
-   "operations": 269,
+   "operations": 270,
    "contracts": 14,
    "modules": 13,
    "undrawn": 0,
-   "operationsWithNoScreen": 110
+   "operationsWithNoScreen": 105
   },
   "waves": {
    "wave1": 28,
@@ -178,7 +178,7 @@
    "contracts": 8,
    "modules": 5,
    "undrawn": 0,
-   "operationsWithNoScreen": 89
+   "operationsWithNoScreen": 85
   },
   "waves": {
    "wave1": 4,
@@ -195,7 +195,7 @@
    "contracts": 8,
    "modules": 3,
    "undrawn": 0,
-   "operationsWithNoScreen": 104
+   "operationsWithNoScreen": 98
   },
   "waves": {
    "wave1": 25,
@@ -208,15 +208,15 @@
   "operator": "partner",
   "counts": {
    "screens": 8,
-   "operations": 28,
+   "operations": 32,
    "contracts": 1,
    "modules": 1,
    "undrawn": 0,
    "operationsWithNoScreen": 1
   },
   "waves": {
-   "wave1": 3,
-   "wave2": 4,
+   "wave1": 4,
+   "wave2": 3,
    "wave3": 1
   }
  },
@@ -230,7 +230,7 @@
    "contracts": 2,
    "modules": 1,
    "undrawn": 0,
-   "operationsWithNoScreen": 9
+   "operationsWithNoScreen": 8
   },
   "waves": {
    "wave1": 10
@@ -246,11 +246,11 @@
    "contracts": 10,
    "modules": 1,
    "undrawn": 0,
-   "operationsWithNoScreen": 124
+   "operationsWithNoScreen": 118
   },
   "waves": {
-   "wave1": 3,
-   "wave3": 68
+   "wave1": 4,
+   "wave3": 67
   }
  },
  "P17": {

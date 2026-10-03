@@ -181,16 +181,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-595` | AI Setup Command Center | B–D | 0 | 15 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-596` | Guided Setup Plan | B–D | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-597` | AI Configuration Workspace | B–D | 0 | 0 | 6 | 19 | 1 | 0 | — | notStarted (—) |
-| `BO-598` | AI Draft Review & Approval | B–D | 2 | 0 | 6 | 20 | 1 | 3 | — | notStarted (—) |
-| `BO-599` | Manual Configuration Center | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-600` | Venue, Calendar & Operational Setup | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-601` | Product, Pricing & Sales Channel Setup | B–D | 16 | 8 | 6 | 5 | 0 | 0 | — | notStarted (—) |
-| `BO-602` | POS, Payment & Access Setup | B–D | 13 | 0 | 6 | 10 | 0 | 0 | — | notStarted (—) |
-| `BO-603` | Configuration Health & AI Review | B–D | 1 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-604` | Setup Completion & Handoff to Go-Live | B–D | 3 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-595` | AI Setup Command Center | B | 0 | 15 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-596` | Guided Setup Plan | B | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-597` | AI Configuration Workspace | D | 0 | 0 | 6 | 19 | 1 | 0 | — | notStarted (—) |
+| `BO-598` | AI Draft Review & Approval | D | 2 | 0 | 6 | 20 | 1 | 3 | — | notStarted (—) |
+| `BO-599` | Manual Configuration Center | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-600` | Venue, Calendar & Operational Setup | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-601` | Product, Pricing & Sales Channel Setup | B | 16 | 8 | 6 | 5 | 0 | 0 | — | notStarted (—) |
+| `BO-602` | POS, Payment & Access Setup | B | 13 | 0 | 6 | 10 | 0 | 0 | — | notStarted (—) |
+| `BO-603` | Configuration Health & AI Review | B | 1 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-604` | Setup Completion & Handoff to Go-Live | B | 3 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -210,7 +210,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Setup & Go-Live · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-595 |
 | Who uses it | venue staff holding `PLATFORM_TENANT_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Setup Progress) and no display directory — it is settings, not a population |
@@ -360,7 +360,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Setup & Go-Live · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-596 |
 | Who uses it | venue staff holding `PLATFORM_TENANT_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Each Task Shows) and no metric row |
@@ -506,7 +506,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Setup & Go-Live · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-597 |
 | Who uses it | venue staff holding `AI_USE` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -642,7 +642,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Setup & Go-Live · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-598 |
 | Who uses it | venue staff holding `AI_USE` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -789,7 +789,7 @@ Also apply: 3 for P08 · Setup & Go-Live, 24 for all of P08, 29 for every app (s
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Setup & Go-Live · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-599 |
 | Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -896,7 +896,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Setup & Go-Live · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-600 |
 | Who uses it | venue staff holding `TENANT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1014,7 +1014,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Setup & Go-Live · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-601 |
 | Who uses it | venue staff holding `PRICE_CONFIGURE`, `PRICE_VIEW`, `PRODUCT_CONFIGURE` (2 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configuration) and no display directory — it is settings, not a population |
@@ -1178,7 +1178,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Setup & Go-Live · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-602 |
 | Who uses it | venue staff holding `WORKSTATION_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configured; Configure) and no display directory — it is settings, not a population |
@@ -1319,7 +1319,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Setup & Go-Live · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-603 |
 | Who uses it | venue staff holding `PLATFORM_TENANT_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configuration Health) and no display directory — it is settings, not a population |
@@ -1429,7 +1429,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Setup & Go-Live · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-604 |
 | Who uses it | venue staff holding `PLATFORM_TENANT_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Export Configuration Summary; AI Creates Configuration Proposal; Configuration Saved) and no display directory — it is settings, not a population |

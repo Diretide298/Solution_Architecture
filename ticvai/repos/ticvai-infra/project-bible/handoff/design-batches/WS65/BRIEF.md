@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-308` | Upgrade & Conversion Command Center | B–D | 2 | 24 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `ADM-309` | Upgrade & Conversion Path Builder | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-310` | Upgrade Eligibility & Qualification Rules | B–D | 7 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-311` | Upgrade Timing, Usage & Ticket Status Rules | B–D | 13 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-312` | Upgrade Financial Treatment & Price Difference Rules | B–D | 10 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
-| `ADM-313` | Pro-Rata, Residual Value & Entitlement Credit Configuration | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-314` | Person-Type, Product & Entitlement Conversion Rules | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-315` | Bulk, Group & Assisted Upgrade Operations | B–D | 9 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
-| `ADM-316` | Upgrade Execution, Credential Regeneration & Channel Controls | B–D | 8 | 17 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-317` | Upgrade History, Exception Management & Audit Explorer | B–D | 2 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-308` | Upgrade & Conversion Command Center | C | 2 | 24 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `ADM-309` | Upgrade & Conversion Path Builder | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-310` | Upgrade Eligibility & Qualification Rules | C | 7 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-311` | Upgrade Timing, Usage & Ticket Status Rules | C | 13 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-312` | Upgrade Financial Treatment & Price Difference Rules | C | 10 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
+| `ADM-313` | Pro-Rata, Residual Value & Entitlement Credit Configuration | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-314` | Person-Type, Product & Entitlement Conversion Rules | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-315` | Bulk, Group & Assisted Upgrade Operations | C | 9 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
+| `ADM-316` | Upgrade Execution, Credential Regeneration & Channel Controls | C | 8 | 17 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-317` | Upgrade History, Exception Management & Audit Explorer | C | 2 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

@@ -360,7 +360,7 @@
    "localLlm",
    "openaiCompatible"
   ],
-  "description": "`openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). Any other protocol needs an adapter.\n**Core42 Compass is reached through `openaiCompatible`** (Chinmay, 2 October: the AI residency decision, amending AI-D02; CHG-CSA-002). Compass is the provider of the `uaeOnly` residency class (common `AiResidencyClass`): Small tier Compass GPT-4.1 mini (or Seraj), Strong tier Compass GPT-5, with OpenAI UAE and then the in-cell open-weights model as the fallback chain. OpenAI UAE is `openai` with a UAE `endpoint`; the in-cell model is `localLlm`.\n**A kind is a protocol, not a vendor** (Chinmay, 2 October, contract follow-ups: BYOK accepts any provider; CHG-FUP-008). Any vendor is accepted, named in `AiProvider.vendor`: Mistral, Cohere or any other is reached through `openaiCompatible` where its API speaks it, which the compatibility test confirms before activation (`AiProviderCompatibility`). A new native adapter is a new value here, a breaking change for a client built earlier that goes out with an approval (`docs/active/breaking-changes.yaml`); until then a vendor without either protocol is refused `422 provider-protocol-unsupported`.\n"
+  "description": "`openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). Any other protocol needs an adapter.\n**Core42 Compass is reached through `openaiCompatible`** (Chinmay, 2 October: the AI residency decision, amending AI-D02; CHG-CSA-002). Compass is the provider of the `uaeOnly` residency class (common `AiResidencyClass`): Small tier Compass GPT-4.1 mini (or Seraj), Strong tier Compass GPT-5, with OpenAI UAE as the fallback. OpenAI UAE is `openai` with a UAE `endpoint`: OpenAI's UAE-region API project, `ae.api.openai.com` (in-country processing, on OpenAI sales approval), allowed under `uaeOnly` and the only endpoint a `uaeOnly` BYOK OpenAI key may use (CHG-R1S-016). **We host no model** (Chinmay, 3 October, CHG-R1S-002): there is no in-cell open-weights fallback; `localLlm` is used only where a client asks for self-hosting and runs the model on the client's estate (`onPrem`).\n**A kind is a protocol, not a vendor** (Chinmay, 2 October, contract follow-ups: BYOK accepts any provider; CHG-FUP-008). Any vendor is accepted, named in `AiProvider.vendor`: Mistral, Cohere or any other is reached through `openaiCompatible` where its API speaks it, which the compatibility test confirms before activation (`AiProviderCompatibility`). A new native adapter is a new value here, a breaking change for a client built earlier that goes out with an approval (`docs/active/breaking-changes.yaml`); until then a vendor without either protocol is refused `422 provider-protocol-unsupported`.\n"
  },
  "AiSourceList": {
   "type": "array",
@@ -369,6 +369,37 @@
   "description": "**The sources an answer was grounded in, stored with the answer** (8.3.70). One `jsonb` column on the row that carries it — `ai.message.sources` and `ai.activity.sources` — because the grounding audit reads the list as it was when the answer was given, and a source is never queried on its own.\n",
   "items": {
    "$ref": "#/components/schemas/AiSource"
+  }
+ },
+ "Allergen": {
+  "type": "object",
+  "description": "BL-127. **Fourteen declarable allergens is a legal list in most jurisdictions, not a preference.** A menu item with no allergen data is one a venue cannot serve to somebody who asks.\n**`contains` and `mayContain` are different claims.** The first is a recipe fact; the second is a kitchen fact about shared equipment, and conflating them either over-warns everybody or under-warns the person it matters to.\n",
+  "properties": {
+   "contains": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AllergenCode"
+    }
+   },
+   "mayContain": {
+    "type": "array",
+    "description": "**Cross-contamination, which is about the kitchen rather than the recipe.** A fryer shared with breaded fish makes chips a fish risk and nothing in the recipe says so.\n",
+    "items": {
+     "$ref": "#/components/schemas/AllergenCode"
+    }
+   },
+   "isVegetarian": {
+    "type": "boolean",
+    "default": false
+   },
+   "isVegan": {
+    "type": "boolean",
+    "default": false
+   },
+   "isHalal": {
+    "type": "boolean",
+    "default": false
+   }
   }
  },
  "AllergenCode": {
@@ -1725,6 +1756,46 @@
    }
   }
  },
+ "GuestConversation": {
+  "x-ticvai-persistence": "none — a guest view of marketing.conversation and its guest-visible messages",
+  "description": "**A handed-over conversation as the guest sees it** (`getGuestConversation`; Chinmay, 3 October 2026, Pattern 4; CHG-GCF-004). The thread, where the guest is in the queue and the wait; no agent ids, no routing, no assistant summary, which are the agent's (`Conversation`).\n",
+  "type": "object",
+  "required": [
+   "id",
+   "state",
+   "messages"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "state": {
+    "$ref": "#/components/schemas/ConversationState"
+   },
+   "queuePosition": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "Place among the unclaimed conversations in its queue, from the live agent queue (audit R149). Null once claimed."
+   },
+   "estimatedWaitSeconds": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "From the live agent queue, the conversations ahead divided across that queue's agents online now (audit R149). Null once claimed."
+   },
+   "messages": {
+    "type": "array",
+    "description": "Oldest first; after `afterMessageId` when it was sent",
+    "items": {
+     "$ref": "#/components/schemas/GuestConversationMessage"
+    }
+   }
+  }
+ },
  "GuestConversationMessage": {
   "x-ticvai-persistence": "none — a guest view of marketing.conversation_message",
   "description": "**One message as the guest sees it.** `sender` says whether a person, the assistant or the system wrote it, so the assistant is never taken for a person; which agent wrote it is not shown.\n",
@@ -1793,7 +1864,7 @@
  },
  "GuestMenu": {
   "type": "object",
-  "x-ticvai-persistence": "none — projection over menu, item and availability",
+  "x-ticvai-persistence": "none — projection over fnb.menu, fnb.menu_item and availability",
   "required": [
    "outletId",
    "menuId",
@@ -1881,6 +1952,14 @@
           "items": {
            "$ref": "#/components/schemas/AllergenCode"
           }
+         },
+         "allergenDetail": {
+          "allOf": [
+           {
+            "$ref": "#/components/schemas/Allergen"
+           }
+          ],
+          "description": "**What the dish contains and what it may contain, told apart** (3 October 2026, CHG-R1S-022: the kiosk and guest menus promise the difference and the flat list cannot carry it). `allergens` stays the flat list."
          },
          "preparationMinutes": {
           "type": "integer",

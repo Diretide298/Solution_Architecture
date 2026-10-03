@@ -154,8 +154,8 @@
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-030",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (pointer moved to the 30 September build, CHG-R1S-015)",
     "verified": "2026-09-28",
     "match": "partial",
     "view": "Account → 'Transfer & resale'; My tickets → Manage → 'Transfer ticket'; Confirmation → 'Transfer tickets'",
@@ -292,6 +292,19 @@
      "name": "contentBody",
      "slot": "collection",
      "components": [
+      {
+       "kind": "cardList",
+       "label": "Show the guest's own reservations, the one being changed among them",
+       "operation": "listMyTableReservations",
+       "bindsTo": "MyTableBooking",
+       "columns": [
+        "MyTableBooking.kind",
+        "MyTableBooking.outletName",
+        "MyTableBooking.reservation",
+        "MyTableBooking.waitlistEntry"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
       {
        "kind": "cardList",
        "label": "Your reservations",
@@ -553,6 +566,13 @@
     "contract": "fnb",
     "purpose": "Change or cancel it",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listMyTableReservations",
+    "contract": "fnb",
+    "purpose": "Show the guest's own reservations, the one being changed among them",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "entryState": {
@@ -598,8 +618,8 @@
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-031",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (pointer moved to the 30 September build, CHG-R1S-015)",
     "verified": "2026-09-28",
     "match": "partial",
     "view": "Account → 'Reservations'",
@@ -786,8 +806,8 @@
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-035",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (pointer moved to the 30 September build, CHG-R1S-015)",
     "verified": "2026-09-28",
     "match": "exact",
     "view": "Discover → 'Prices in your currency'",

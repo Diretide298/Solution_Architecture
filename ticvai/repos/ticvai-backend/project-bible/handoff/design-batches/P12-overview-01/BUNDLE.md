@@ -1,6 +1,6 @@
 # P12-overview-01 — P12 · Overview
 
-**2 screens · 18 operations · 31 schemas · 4 permissions**
+**2 screens · 19 operations · 32 schemas · 4 permissions**
 
 Platform P12 Venue Support · ships as **venue-management** ·
 staff audience · web ·
@@ -133,7 +133,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `SUP-002` | Agent Dashboard | A | 35 | 27 | 6 | 17 | 1 | 0 | — | notStarted (generated) |
+| `SUP-002` | Agent Dashboard | A | 35 | 33 | 6 | 17 | 1 | 0 | — | notStarted (generated) |
 | `SUP-008` | Agent Performance & SLA View | D | 76 | 25 | 6 | 97 | 0 | 0 | — | notStarted (generated) |
 
 ---
@@ -186,6 +186,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | State | select | — | With assistant · Queued · With agent · Waiting on guest · Resolved · Abandoned · Timed out | `listConversations` ?state |
 | Assigned to me | toggle | — | — | `listConversations` ?assignedToMe |
 | Channel | select | — | Web chat · In app chat · Whatsapp · SMS · Email · Kiosk · Voice | `listConversations` ?channel |
+| Queue | picker: choose a queue | — | — | `listAgentWorkloadAvailability` ?queueId |
+| Team | text field | — | max length 100 | `listAgentWorkloadAvailability` ?team |
+| Status | select | — | Available · Busy · On call · Chatting · After call work · Break · Training · Offline | `listAgentWorkloadAvailability` ?status |
+| Skill | text field | — | max length 60 | `listAgentWorkloadAvailability` ?skill |
+| Language | text field | — | max length 10 | `listAgentWorkloadAvailability` ?language |
 
 **Form: Add case message** (modal, opened by *Add case message*; *Add case message* calls `addCaseMessage`, *Cancel* sends nothing)
 
@@ -273,6 +278,17 @@ Errors to draw in the form: 400 Resolving without a resolution note
 
 **Shown**
 
+**Show the agents' availability as saved** (card list, from `listAgentWorkloadAvailability`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Agent name | text | The agent's display name. |
+| Team | text | — |
+| Status | chip: Available, Busy, On call, Chatting, After call work, Break… | — |
+| Average handle seconds | 1,234 | — |
+| Resolution rate | 12.5% | Cases resolved over cases handled. |
+| Availability expires at | 1 Oct 2026, 14:30 | — |
+
 **Every case** (data table, from `listCases`)
 
 | Shows | Format | Notes |
@@ -342,7 +358,7 @@ Errors to draw in the form: 400 Resolving without a resolution note
 - **Reply or add a note**: The composer requires choosing "Reply to guest" or "Internal note" each time and shows who will see it. *(source: contracts/satellite/marketing-crm.yaml#addCaseMessage; F05 step 2)*
 - **Escalate**: Needs a reason; may reassign and raise priority. *(source: contracts/satellite/marketing-crm.yaml#escalateCase)*
 
-**Data it reads**: `listCases` (onLoad, from page inventory); `listConversations` (onLoad, The omnichannel inbox)
+**Data it reads**: `listCases` (onLoad, from page inventory); `listConversations` (onLoad, The omnichannel inbox); `listAgentWorkloadAvailability` (onLoad, Show the agents' availability as saved)
 
 **Where the user goes next**
 
@@ -410,6 +426,7 @@ conversations:
 - `updateCase` → `CASE_MANAGE` (configure) · staff, partner
 - `listConversations` → `CASE_VIEW` (read) · staff
 - `setAgentAvailability` → `CASE_MANAGE` (configure) · staff
+- `listAgentWorkloadAvailability` → `CASE_VIEW` (read) · staff
 
 **A refused user sees:** Shown when the caller lacks `CASE_VIEW`, which `listCases` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASE_MANAGE` for `addCaseMessage`, `createCase`, `escalateCase`, `reopenCase` and 2 more.
 
@@ -453,8 +470,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (35), with its required mark, default, format and its error state (400, 404, 409).
-- [ ] Every output is drawn (27 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (35), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every output is drawn (33 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#SUP-002?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Add case message, Create case, Escalate case, Reopen case, Save case, Save agent availability.
 - [ ] Every transition is wired: `SUP-001`, `SUP-004`.
@@ -867,6 +884,7 @@ Method, path, parameters, request and response for every operation these screens
 "getCase": {"method":"GET","path":"/cases/{caseId}","contract":"marketing-crm","summary":"Read a case with its thread","permission":"CASE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"CaseDetail"},
 "getFinancialReport": {"method":"GET","path":"/reports/financial","contract":"finance","summary":"Financial statements, revenue and tax summaries","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"report","in":"query","required":true},{"name":"fiscalPeriodId","in":"query","required":true},{"name":"legalEntityId","in":"query","required":null},{"name":"venueId","in":"query","required":null},{"name":"costCenterId","in":"query","required":null}],"requestBody":null,"responds":"FinancialReport"},
 "getReport": {"method":"GET","path":"/reports/{reportId}","contract":"reporting","summary":"Read a report definition","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"ReportDefinition"},
+"listAgentWorkloadAvailability": {"method":"GET","path":"/agent-workload-availability","contract":"marketing-crm","summary":"Agent Workload, Availability & Workforce Control","permission":"CASE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":false},{"name":"queueId","in":"query","required":false},{"name":"team","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":"skill","in":"query","required":false},{"name":"language","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listCases": {"method":"GET","path":"/cases","contract":"marketing-crm","summary":"List service cases","permission":"CASE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":"assignedToPrincipalId","in":"query","required":null},{"name":"breachedSla","in":"query","required":null},{"name":"priority","in":"query","required":null},{"name":"membershipId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listConversations": {"method":"GET","path":"/conversations","contract":"marketing-crm","summary":"The omnichannel inbox","permission":"CASE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"state","in":"query","required":null},{"name":"assignedToMe","in":"query","required":null},{"name":"channel","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listReports": {"method":"GET","path":"/reports","contract":"reporting","summary":"List available report definitions","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"category","in":"query","required":null},{"name":"search","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
@@ -886,6 +904,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 ```json
 {
 "AgentAvailability": {"type":"object","x-ticvai-persistence":"marketing.agent_availability","required":["principalId","state"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"principalId":{"type":"string","format":"uuid","readOnly":true,"description":"The caller."},"state":{"type":"string","enum":["available","busy","away","offline"]},"maxConcurrent":{"type":"integer","nullable":true},"queueIds":{"type":"array","items":{"type":"string","format":"uuid"}},"expiresAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When this state lapses on its own — **availability expires** rather than persisting through a closed laptop."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
+"AgentWorkloadAvailabilityWorkforceControlView": {"type":"object","x-ticvai-persistence":"none — projection over marketing.agent_service_profile (new), marketing.agent_availability, marketing.case, marketing.conversation, marketing.service_queue (new) and workforce.shift","description":"One agent's live status and workload. Rates are over the period since the agent's current shift started, or the venue's current day when no shift is rostered.","required":["principalId","agentName","status","activeCases"],"properties":{"principalId":{"type":"string","format":"uuid"},"agentName":{"type":"string","description":"The agent's display name."},"team":{"type":"string","nullable":true},"skills":{"type":"array","items":{"type":"string"}},"languages":{"type":"array","items":{"type":"string"}},"status":{"type":"string","enum":["available","busy","onCall","chatting","afterCallWork","break","training","offline"]},"activeCases":{"type":"integer","minimum":0},"chats":{"type":"integer","minimum":0,"description":"Conversations the agent holds now."},"calls":{"type":"integer","minimum":0,"description":"Voice conversations in progress (0 or 1)."},"queues":{"type":"array","items":{"type":"object","required":["queueId","queueName"],"properties":{"queueId":{"type":"string","format":"uuid"},"queueName":{"type":"string"}}}},"slaRiskCases":{"type":"integer","minimum":0,"description":"The agent's open cases at risk or breached."},"averageHandleSeconds":{"type":"integer","minimum":0,"nullable":true},"resolutionRate":{"type":"number","minimum":0,"maximum":1,"nullable":true,"description":"Cases resolved over cases handled."},"utilization":{"type":"number","minimum":0,"description":"Active cases and conversations over `maxConcurrentCases`; above 1 means overloaded."},"workloadBand":{"type":"string","enum":["available","normal","overloaded"],"description":"`overloaded` at utilization 0.9 or above, `available` below 0.5."},"availabilityExpiresAt":{"type":"string","format":"date-time","nullable":true}}},
 "Case": {"x-ticvai-persistence":"marketing.case","x-ticvai-retired-columns":["guest_name","subject","is_sla_breached"],"type":"object","required":["id","caseNumber","subject","status","priority","createdAt"],"properties":{"id":{"type":"string","format":"uuid","description":"Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7."},"caseNumber":{"type":"string","readOnly":true,"description":"**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity. Assigned when the case reaches the server, so a retry with the same `id` keeps its number.\n"},"subjectId":{"type":"string","format":"uuid","nullable":true},"guestName":{"type":"string","nullable":true,"readOnly":true,"x-ticvai-persisted":false,"description":"**Resolved from `pii.subject` when the case is read, never stored on the case.** A name copied onto a case row is personal data outside the erasable store (ADR-0023), and it had no source anyway — no request carries it. Returned only to callers holding `GUEST_VIEW_PII`, as `searchGuests` does.\n"},"subject":{"type":"string","x-ticvai-column":"title","description":"**The case's one-line title**, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps `subject` because screens bind it.\n"},"kind":{"allOf":[{"$ref":"#/components/schemas/CaseKind"}],"nullable":true,"description":"What the guest said it was about, where the guest raised it."},"channel":{"allOf":[{"$ref":"#/components/schemas/MessageChannel"}],"description":"How the guest reached the venue — `CreateCaseRequest.channel`, or `inApp` for a case raised through `raiseMyCase`."},"recordedAt":{"type":"string","format":"date-time","description":"Device time the case was raised — the start of the SLA clock."},"syncedAt":{"type":"string","format":"date-time","readOnly":true,"description":"Server time the case arrived. Equal to `recordedAt` for a case raised online."},"categoryId":{"type":"string","format":"uuid","nullable":true},"queueId":{"type":"string","format":"uuid","nullable":true,"description":"The `ServiceQueue` the case waits in, set by routing (`CaseRoutingRule.queueId`). Null once routed straight to an agent. (decided 29 September, data model for the agreed operations)"},"membershipId":{"type":"string","format":"uuid","nullable":true,"description":"The identity membership this case concerns (`identity.customer_membership`); member case notes are cases with this set. (decided 29 September, coordinator decision DM4, writers pass)"},"status":{"$ref":"#/components/schemas/CaseStatus"},"priority":{"$ref":"#/components/schemas/CasePriority"},"assignedToPrincipalId":{"type":"string","format":"uuid","nullable":true},"venueId":{"type":"string","format":"uuid","nullable":true},"relatedOrderId":{"type":"string","nullable":true},"slaDueAt":{"type":"string","format":"date-time","nullable":true},"isSlaBreached":{"type":"boolean","readOnly":true,"x-ticvai-persisted":false,"description":"**Computed when read, never stored.** True once the case has been open longer than its SLA allows — the time from `recordedAt` to `resolvedAt` (or to now, while unresolved), less `slaPausedSeconds`, is past the target that set `slaDueAt`. A stored flag would need a job to flip it at the moment of breach, and no such job is designed; `listCases?breachedSla` filters on the same computation.\n"},"slaPausedSeconds":{"type":"integer","description":"Accrued only while awaiting the guest. Waiting on an internal team does not pause the clock.\n"},"escalationCount":{"type":"integer"},"createdAt":{"type":"string","format":"date-time"},"resolvedAt":{"type":"string","format":"date-time","nullable":true}}},
 "CaseDetail": {"x-ticvai-persistence":"marketing.case","allOf":[{"$ref":"#/components/schemas/Case"},{"type":"object","properties":{"description":{"type":"string"},"resolutionNote":{"type":"string","nullable":true},"messages":{"type":"array","items":{"$ref":"#/components/schemas/CaseMessage"}}}}]},
 "CaseKind": {"type":"string","description":"**What the guest says the case is about**, in their words rather than the venue's taxonomy — `raiseMyCase` asks for it and `categoryId` is what staff file it under. Stored on the case, because a lost-property report that forgets it was one cannot be routed to the lost and found desk.\n**`other` only with a note (decided 28 September, audit R222).** A case raised as `other` must carry a non-empty `detail` (`raiseMyCase`), or it is refused with 400; the notes are reviewed quarterly to add the real kinds they reveal.\n","enum":["lostProperty","complaint","question","accessibility","refundRequest","other"]},

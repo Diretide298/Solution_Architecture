@@ -1,6 +1,6 @@
 # WS60 — Ticket Media   Credential Management board 2
 
-**10 screens · 18 operations · 27 schemas · 5 permissions**
+**10 screens · 19 operations · 27 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -131,16 +131,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-344` | Media Design Studio Command Center | B–D | 8 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-345` | Digital QR & Barcode Ticket Designer | B–D | 15 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-346` | PDF, Printable & POS Ticket Designer | A | 20 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-347` | Apple Wallet Pass Designer | B–D | 24 | 0 | 5 | 0 | 2 | 6 | — | notStarted (generated) |
-| `BO-348` | Google Wallet Pass Designer | B–D | 18 | 0 | 5 | 0 | 2 | 6 | — | notStarted (generated) |
-| `BO-349` | RFID, NFC, Card & Wristband Media Designer | B–D | 20 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-350` | Digital Card, Membership & Wearable Designer | B–D | 11 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-351` | Dynamic Fields, Data Mapping & Content Builder | B–D | 7 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-352` | Branding, Localization & Template Inheritance | B–D | 16 | 12 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
-| `BO-353` | Multi-Media Preview, Testing, Approval & Publication | B–D | 0 | 0 | 6 | 0 | 1 | 3 | — | notStarted (generated) |
+| `BO-344` | Media Design Studio Command Center | C | 8 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-345` | Digital QR & Barcode Ticket Designer | C | 15 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-346` | PDF, Printable & POS Ticket Designer | A | 20 | 8 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-347` | Apple Wallet Pass Designer | C | 24 | 0 | 5 | 0 | 2 | 6 | — | notStarted (generated) |
+| `BO-348` | Google Wallet Pass Designer | C | 18 | 0 | 5 | 0 | 2 | 6 | — | notStarted (generated) |
+| `BO-349` | RFID, NFC, Card & Wristband Media Designer | C | 20 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-350` | Digital Card, Membership & Wearable Designer | C | 11 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-351` | Dynamic Fields, Data Mapping & Content Builder | C | 7 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-352` | Branding, Localization & Template Inheritance | C | 16 | 12 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `BO-353` | Multi-Media Preview, Testing, Approval & Publication | C | 0 | 0 | 6 | 0 | 1 | 3 | — | notStarted (generated) |
 
 ---
 
@@ -156,7 +156,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-344 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `SCOPE_VIEW` (2 configure, 2 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each template should show) — counts over a population, then the population |
@@ -388,7 +388,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-345 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; Barcode Configuration) and no display directory — it is settings, not a population |
@@ -602,6 +602,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Outputs: what the screen shows and produces
 
+**Shown**
+
+**Load the design as saved** (detail panel, from `getPdfPrintablePos`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Output format | chip: Pdf, A4, A5, Custom dimensions, POS receipt, Thermal ticket… | Print output this template produces |
+| Page size | text | Page size |
+| Orientation | text | Orientation |
+| Margins | text | Margins |
+| Header | text | Header |
+| Footer | text | Footer |
+| QR barcode | text | QR/barcode |
+| Paper stock type | text | Paper/stock type |
+
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
@@ -614,7 +629,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - **Print proof**: Produces a sample clearly marked PROOF on the artefact itself, so it can never be presented at a gate. *(source: contracts/spine/orders.yaml#printTicketProof)*
 - **Retire template**: Sets it inactive rather than deleting; tickets already issued keep it. *(source: contracts/spine/orders.yaml#updateTicketTemplate)*
 
-**Data it reads**: `listTicketTemplates` (onLoad, The templates this venue issues from)
+**Data it reads**: `listTicketTemplates` (onLoad, The templates this venue issues from); `getPdfPrintablePos` (onLoad, Load the design as saved)
 
 **Where the user goes next**
 
@@ -661,6 +676,7 @@ templates:
 - `updateTicketTemplate` → `PRODUCT_CONFIGURE` (configure) · staff
 - `printTicketProof` → `ORDER_REPRINT` (operate) · staff
 - `setPdfPrintablePos` → `ACCESS_POINT_CONFIGURE` (configure) · staff
+- `getPdfPrintablePos` → `ACCESS_POINT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -691,7 +707,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (20), with its required mark, default, format and its error state (400, 403, 404, 409, 412).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-346?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: POS receipt, Thermal ticket.
 - [ ] Every transition is wired: `BO-344`.
@@ -709,7 +725,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-347 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Pass Configuration; Configure the appropriate; Configure/reference) and no display directory — it is settings, not a population |
@@ -891,7 +907,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-348 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure supported; Configure) and no display directory — it is settings, not a population |
@@ -1058,7 +1074,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-349 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; Configure/reference) and no display directory — it is settings, not a population |
@@ -1228,7 +1244,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-350 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -1380,7 +1396,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-351 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Custom Fields; Configure) and no display directory — it is settings, not a population |
@@ -1536,7 +1552,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-352 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Track) and no metric row |
@@ -1727,7 +1743,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-353 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1982,6 +1998,7 @@ Method, path, parameters, request and response for every operation these screens
 "archiveMediaTemplate": {"method":"POST","path":"/media-templates/{templateId}/archive","contract":"access","summary":"Archive a media template","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AccessMediaTemplate"},
 "cloneTicketTemplate": {"method":"POST","path":"/ticket-templates/{templateId}/clone","contract":"orders","summary":"Create a ticket template from an existing one","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CloneTicketTemplateInput","responds":"TicketTemplate"},
 "createTicketTemplate": {"method":"POST","path":"/ticket-templates","contract":"orders","summary":"Create a ticket template","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"TicketTemplateRequest","responds":"TicketTemplate"},
+"getPdfPrintablePos": {"method":"GET","path":"/pdf-printable-pos","contract":"access","summary":"The printable ticket design as saved","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"PdfPrintablePosTicketDesignerView"},
 "importTicketTemplate": {"method":"POST","path":"/ticket-templates/imports","contract":"orders","summary":"Import a ticket template definition","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"TicketTemplateImportInput","responds":"TicketTemplate"},
 "listBrandingLocalizationTemplate": {"method":"GET","path":"/branding-localization-template","contract":"access","summary":"Branding, Localization & Template Inheritance","permission":"SCOPE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"BrandingLocalizationTemplateInheritanceView"},
 "listMediaDesign": {"method":"GET","path":"/media-design","contract":"access","summary":"Media Design Studio Command Center","permission":"SCOPE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"mediaType","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":"brand","in":"query","required":false},{"name":"venue","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},

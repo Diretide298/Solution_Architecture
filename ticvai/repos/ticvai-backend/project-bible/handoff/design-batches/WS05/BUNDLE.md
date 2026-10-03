@@ -1,6 +1,6 @@
 # WS05 — Access Control board 5
 
-**10 screens · 19 operations · 22 schemas · 7 permissions**
+**10 screens · 21 operations · 22 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -98,15 +98,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-184` | Biometric Access Command Center | C | 0 | 240 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `BO-185` | Biometric Verification Profile Builder | A | 8 | 0 | 5 | 0 | 0 | 6 | — | notStarted (generated) |
-| `BO-186` | Face Pass Enrollment Configuration | A | 19 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
-| `BO-187` | Biometric Consent & Guardian Management | B–D | 84 | 20 | 5 | 17 | 1 | 6 | — | notStarted (generated) |
+| `BO-185` | Biometric Verification Profile Builder | A | 8 | 4 | 5 | 0 | 0 | 6 | — | notStarted (generated) |
+| `BO-186` | Face Pass Enrollment Configuration | A | 19 | 8 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
+| `BO-187` | Biometric Consent & Guardian Management | B | 84 | 20 | 5 | 17 | 1 | 6 | — | notStarted (generated) |
 | `BO-188` | Face Tag Temporary Enrollment | A | 10 | 17 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
 | `BO-189` | Face Matching & Verification Thresholds | A | 21 | 0 | 5 | 0 | 0 | 6 | — | notStarted (generated) |
-| `BO-190` | Face Change, Re-enrollment & Identity Protection | B–D | 2 | 16 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `BO-191` | Biometric Validation at Gate | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `BO-192` | Biometric Lifecycle, Retention & Deletion | B–D | 9 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
-| `BO-193` | Biometric Simulation, Audit & Publication | B–D | 7 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `BO-190` | Face Change, Re-enrollment & Identity Protection | C | 2 | 16 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `BO-191` | Biometric Validation at Gate | C | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `BO-192` | Biometric Lifecycle, Retention & Deletion | C | 9 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
+| `BO-193` | Biometric Simulation, Audit & Publication | C | 7 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -126,7 +126,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | Block C · task APP-SETUP-BO-184 |
+| Block | Block C · task VM-BO-184 |
 | Who uses it | venue staff holding `SCOPE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -622,6 +622,17 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 #### Outputs: what the screen shows and produces
 
+**Shown**
+
+**Load the profile as saved** (detail panel, from `getBiometricVerificationProfile`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Face requirement | chip: Not used, Optional, Required | Whether face verification is not used, allowed, or required at this location (e.g. |
+| Biometric type | chip: Face pass, Face tag, Other provider | Biometric model this profile uses |
+| Select type | chip: Ticket product, Ticket type, Membership, Annual pass, Multi day ticket, Multi … | Vocabulary listed under Select. |
+| Name | text | — |
+
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
@@ -635,6 +646,8 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 **What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
 - **Save profile**: One upsert per place row (whole rows, VO-R04); confirmation "Face required at 2 places, optional at 1; applies at the next package". *(source: contracts/spine/access.yaml#setBiometricVerificationProfile)*
+
+**Data it reads**: `getBiometricVerificationProfile` (onLoad, Load the profile as saved)
 
 **Where the user goes next**
 
@@ -683,6 +696,7 @@ matrix:
 #### Permissions
 
 - `setBiometricVerificationProfile` → `ACCESS_POINT_CONFIGURE` (configure) · staff
+- `getBiometricVerificationProfile` → `ACCESS_POINT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -714,8 +728,8 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (8), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (8), with its required mark, default, format and its error state (403, 404).
+- [ ] Every output is drawn (4 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-185?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save changes.
 - [ ] Every transition is wired: `BO-184`.
@@ -803,6 +817,21 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 #### Outputs: what the screen shows and produces
 
+**Shown**
+
+**Load the configuration as saved** (detail panel, from `getFacePassEnrollmentConfiguration`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Enrollment channels | list or chips (count when long) | Channels where Face Pass enrolment is enabled. The app, the staffed counters and a self-service kiosk that shows the consent form; never … |
+| Account login required | yes / no (icon or chip) | Account login required |
+| Valid ticket pass required | yes / no (icon or chip) | Valid ticket/pass required |
+| Identity check required | yes / no (icon or chip) | Identity check required |
+| Number of capture attempts | 1,234 | Number of capture attempts |
+| Minimum image quality | text | minimum image quality |
+| Operator verification | yes / no (icon or chip) | An operator must verify the capture |
+| Enrollment expiry | 1,234 | Days an enrolment stays valid before re-enrolment is needed |
+
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
@@ -817,6 +846,8 @@ Answered questions: draw the decision, not the old default. Where a decision and
 **What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
 - **Save enrolment configuration**: Whole-record upsert for the venue (VO-R04); applies to enrolments started after the save. *(source: contracts/spine/access.yaml#setFacePassEnrollment)*
+
+**Data it reads**: `getFacePassEnrollmentConfiguration` (onLoad, Load the configuration as saved)
 
 **Where the user goes next**
 
@@ -863,6 +894,7 @@ config:
 #### Permissions
 
 - `setFacePassEnrollment` → `ACCESS_POINT_CONFIGURE` (configure) · staff
+- `getFacePassEnrollmentConfiguration` → `ACCESS_POINT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -896,8 +928,8 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (19), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (19), with its required mark, default, format and its error state (403, 404).
+- [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-186?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save Face Pass enrolment.
 - [ ] Every transition is wired: `BO-184`.
@@ -917,7 +949,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-187 |
 | Who uses it | venue staff holding `SCOPE_VIEW`, `TENANT_CONFIGURE`, `TENANT_VIEW` (2 read, 1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure by) and no display directory — it is settings, not a population |
@@ -1546,7 +1578,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-190 |
 | Who uses it | venue staff holding `BIOMETRIC_IMAGE_VIEW`, `GUEST_MANAGE`, `SCOPE_VIEW` (2 read, 1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
@@ -1752,7 +1784,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-191 |
 | Who uses it | venue staff holding `SCOPE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1906,7 +1938,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-192 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW`, `TENANT_VIEW` (1 configure, 2 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure separately for) and no display directory — it is settings, not a population |
@@ -2084,7 +2116,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-193 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `AUDIT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -2354,6 +2386,8 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+"getBiometricVerificationProfile": {"method":"GET","path":"/biometric-verification-profile","contract":"access","summary":"The biometric verification profile as saved","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"BiometricVerificationProfileBuilderView"},
+"getFacePassEnrollmentConfiguration": {"method":"GET","path":"/face-pass-enrollment","contract":"access","summary":"The FacePass enrolment configuration as saved","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"FacePassEnrollmentConfigurationView"},
 "getFaceReenrolmentImages": {"method":"GET","path":"/face-reenrolment-attempts/{attemptId}/images","contract":"access","summary":"View the images behind a face re-enrolment review (logged)","permission":"BIOMETRIC_IMAGE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"reason","in":"query","required":true}],"requestBody":null,"responds":null},
 "getVenueSettings": {"method":"GET","path":"/venues/{venueId}/settings","contract":"tenancy","summary":"Operational settings for this venue","permission":"TENANT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"VenueSettings"},
 "listBiometric": {"method":"GET","path":"/biometric","contract":"access","summary":"Biometric Simulation, Audit & Publication","permission":"AUDIT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"guest","in":"query","required":false},{"name":"credential","in":"query","required":false},{"name":"faceProfileReference","in":"query","required":false},{"name":"gate","in":"query","required":false},{"name":"device","in":"query","required":false},{"name":"operator","in":"query","required":false},{"name":"date","in":"query","required":false},{"name":"result","in":"query","required":false},{"name":"reasonCode","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},

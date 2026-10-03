@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `access` |
 | Schemas owned | `access` |
-| Operations in the slice | 33 of 250 |
+| Operations in the slice | 35 of 256 |
 | Scale | Read-heavy, extreme latency sensitivity, edge-cached. `frozenDays` is held rather than replayed precisely because the gate cannot afford the arithmetic. |
 | If it is down | Down means the gates stop. Runs at the edge with a local decision cache. |
 
@@ -56,10 +56,12 @@
 | accessPoint | [`addBlacklistEntry`](#addblacklistentry) | POST | `/blacklist` | setup | 1 | BO-033 |
 | accessPoint | [`createAccessPoint`](#createaccesspoint) | POST | `/access-points` | setup | 1 | BO-064, BO-148 |
 | accessPoint | [`createAdmissionRules`](#createadmissionrules) | POST | `/admission-rules` | setup | 1 | BO-032, BO-154, BO-222 |
+| accessPoint | [`setAccessPointDirection`](#setaccesspointdirection) | PUT | `/access-points/{accessPointId}/direction` | setup | 1 | BO-230, SCN-016 |
 | accessPoint | [`setAccessPointGeofence`](#setaccesspointgeofence) | PUT | `/access-points/{accessPointId}/geofence` | setup | 1 | BO-064 |
 | accessPoint | [`setTurnstileMode`](#setturnstilemode) | PUT | `/access-points/{accessPointId}/mode` | setup | 1 | BO-230, SCN-016 |
 | accessPoint | [`updateAccessPoint`](#updateaccesspoint) | PATCH | `/access-points/{accessPointId}` | setup | 1 | BO-064, BO-147, BO-148 |
 | accessPoint | [`updateAdmissionRules`](#updateadmissionrules) | PUT | `/admission-rules/{profileId}` | setup | 1 | BO-032, BO-156, BO-158, BO-160, BO-219, BO-220 |
+| general | [`getParkingEntitlement`](#getparkingentitlement) | GET | `/parking-entitlements/{entitlementId}` | core | 1 | GST-027, WEB-041 |
 
 ## Group: access
 
@@ -2029,6 +2031,85 @@ Denies outright regardless of entitlement state. Included in the offline package
 | 201 |  | Created |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### setAccessPointDirection
+
+**`PUT /access-points/{accessPointId}/direction`**: Switch a gate's direction live
+
+**A gate's direction can be switched live, by a holder of the permission, and the switch is logged** (decided 2 October 2026, Chinmay, critical set 1, BO-230: "Live direction switch with permission, logged; R221 amended"; DEC-255; CHG-CSP-032; DI-648, the client on 2 September: more entry gates in the morning, more exit gates in the evening). Until then direction was fixed per access point and changed only by editing the access point in the back office (audit R221).
+
+**The permission** is `ACCESS_DIRECTION_SET`, the dedicated gate-direction permission (joined the vocabulary 2 October, CHG-FUP-006), not the podium's `TURNSTILE_MODE_SET`: a steward who may switch a lane to free flow may not turn it round, and the live switch is a narrower right than `ACCESS_POINT_CONFIGURE`, which edits the access point itself. **Logged** twice: one `access.gate_mode_change` row (from and to direction, operator, reason, effective time), which Live Gate Mode & Lane Control and the shift handover read, and one `access.configuration_change` row. Takes effect at once, or at a future `effectiveAt` (then `202`, cancelled with `cancelGateModeChange`). Devices pick it up from the next push; an offline device keeps its old direction until it reconnects, and the response's `AccessPoint` says so through its device status.
+
+|  |  |
+|---|---|
+| Permission | `ACCESS_DIRECTION_SET` |
+| Scope level | venue |
+| Part of slice | setup, makes `access.access_point` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `access.access_point`, `access.gate_mode_change` |
+| Writes | `access.access_point` |
+| Called by | BO-230, SCN-016 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| accessPointId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| direction | Direction: enum (entry, exit, reentry, crossover) | yes |  |
+| reason | string | yes | Why the gate is turned round, kept on the log. (min length 3; max length 200) |
+| effectiveAt | string (date-time) |  | Absent or not in the future, at once; in the future, held pending until then. (nullable) |
+
+**Response**: `AccessPoint`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| code | string | yes |  |
+| name | string | yes |  |
+| venueId | string (uuid) | yes |  |
+| scopePath | string |  |  |
+| externalCredentialSources | object |  | BL-108. |
+| scanAnomalyRules | object |  | BL-104. |
+| operatingMode | object | yes | Set by the podium with setTurnstileMode, and it wins (audit R221). (default normal) |
+| vehicleLocationCapture | boolean |  | BL-023. (default False) |
+| mode | object |  | Narrows operatingMode only: freeRotation or closed within normal or podium, null otherwise and whenever the turnstile validates in its fixed direction (audit R221). (nullable) |
+| direction | object |  | Fixed per access point (audit R221): set in the back office by createAccessPoint and updateAccessPoint, never by the podium. |
+| temporaryClosure | object |  | What the access point does while its attraction is temporarily closed (decided 2 October 2026, Chinmay, batch 6 set 9, BO-147: "Deny + reopening time + a virtual-queue return window where enabled"; D… (nullable) |
+| temporaryClosure.isClosed | boolean |  | (default False) |
+| temporaryClosure.reason | string |  | Shown to staff; the guest sees "Attraction temporarily closed". (max length 200; nullable) |
+| temporaryClosure.reopensAt | string (date-time) |  | When it is expected to reopen; shown to the guest when known. (nullable) |
+| temporaryClosure.offerVirtualQueueReturn | boolean |  | Offer a virtual-queue return window at the denied scan, where the attraction has a queue. (default False) |
+| temporaryClosure.queueId | string (uuid) |  | The virtual queue the return window is taken in. (nullable) |
+| antiPassbackEnabled | boolean |  |  |
+| requiresExitBeforeReentry | boolean |  | Written by createAccessPoint and updateAccessPoint, and returned so the edit form reads back what it wrote. (default False) |
+| driver | string |  | Driver identifier for the controller behind this access point, as written by createAccessPoint and updateAccessPoint. (nullable) |
+| geofence | object |  | Written by setAccessPointGeofence; null until one is set. (nullable) |
+| geofence.latitude | number |  |  |
+| geofence.longitude | number |  |  |
+| geofence.radiusMetres | integer |  | (min 5; max 5000) |
+| geofence.enforcement | enum (off, warn, deny) | yes | off keeps the fence on record and checks nothing; warn lets a validation from outside the fence through with a warning; deny refuses it. |
+| geofence.allowProximityBeacon | boolean |  | Accept a BLE proximity assertion in place of GPS. |
+| isActive | boolean | yes |  |
+| lastHeartbeatAt | string (date-time) |  | (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Direction switched |
+| 202 |  | Scheduled: a future effectiveAt was sent and the switch is held pending |
+| 400 | BadRequest | Validation failed |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### setAccessPointGeofence
 
 **`PUT /access-points/{accessPointId}/geofence`**: Set a geofence for handheld validation
@@ -2403,6 +2484,60 @@ Changes take effect at terminals after the next offline package refresh, not imm
 | 200 |  | Updated |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 422 |  | A count missing for an n* entry mode, days missing for a relative validity anchor, or validity.to before validity.from |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+
+## Group: general
+
+### getParkingEntitlement
+
+**`GET /parking-entitlements/{entitlementId}`**: One of the guest's parking entitlements
+
+**Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.** WEB-041 and GST-027 change a parking entitlement with `updateParkingEntitlement` and never read it, so the plate and the dates they edit came from nowhere. Self-scoped, as the update is. Returns what the write stores, in the write's own shape.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `access.parking_entitlement` |
+| Writes | - |
+| Called by | GST-027, WEB-041 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| entitlementId | path | yes | string (uuid) |  |
+
+**Response**: `ParkingEntitlement`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| facilityId | string (uuid) | yes |  |
+| orderId | string (uuid) | yes | The order's id, a UUIDv7 as in /orders/{orderId} (orders.sales_order.id). |
+| subjectId | string (uuid) |  | (nullable) |
+| plateNumber | string |  | Required in plateWhitelist mode, meaningless in the others. (nullable) |
+| plateCountry | string |  | (nullable) |
+| mediaCode | string |  | The code presented in none and qrHandoff modes. (nullable) |
+| status | object |  | Server-owned. (read-only) |
+| pushedAt | string (date-time) |  | (read-only; nullable) |
+| pushFailureReason | string |  | (read-only; nullable) |
+| validFrom | string (date-time) | yes |  |
+| validTo | string (date-time) | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | One of the guest's parking entitlements |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ## Tables
@@ -2828,12 +2963,13 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-217 operations, added to this service in later releases without changing any of the above.
+221 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | access | `approveMultiMediaPreview`, `archiveMediaTemplate`, `cancelGateModeChange`, `createParkingEntitlement`, `deleteJourneySequenceRule`, `deleteMediaBindingRule`, `deleteOperatingCalendarEntry`, `deletePodium`, `deleteReasonCode`, `deliverCredential`, `endPodiumShift`, `getAccessRiskScore`, `getCredentialIssuanceRetryPolicy`, `getFaceReenrolmentImages`, `getHardwareModelCertification`, `listAccess`, `listAccessAttributeCatalog`, `listAccessChanges`, `listAccessExecutiveInsight`, `listAccessLocationGrouping`, `listAccessMonitoring`, `listAccessReportScheduled`, `listAccessRiskScoring`, `listAccessRule`, `listAccessSecurityFraud`, `listAccessValidityTime`, `listAntiPassbackJourney`, `listAttendanceAdmission`, `listAuthorizationGovernanceTemporary`, `listBiometric`, `listBiometricAccess`, `listBiometricIdentityIntegrity`, `listBiometricValidationGate`, `listBrandingLocalizationTemplate`, `listConnectivityFailureDegraded`, `listCredential`, `listCredentialActivationDisplay`, `listCredentialDeliveryDistribution`, `listCredentialDisableBlacklist`, `listCredentialGenerationIssuance`, `listCredentialIdentityToken`, `listCredentialReplacementReissue`, `listCredentialRevocationLifecycle`, `listCredentialSecurity`, `listCredentialSecurityOperational`, `listCredentialSharingConcurrent`, `listCredentialTransferRebinding`, `listCredentialUsageCross`, `listDeviceBindingSession`, `listDeviceGate`, `listDeviceTypeHardware`, `listDigitalCredentialSecurity`, `listDynamicAccessPolicy`, `listDynamicPolicyEffectiveness`, `listEdgePackageData`, `listEdgeSecurityDeployment`, `listEntitlementConsumption`, `listEntitlementCrossMedia`, `listEntryExitCrossover`, `listEntryExitRule`, `listEntryRulePoints`, `listEntryTemporaryExit`, `listExternalPartnerCredential`, `listFaceChangeEnrollment`, `listFaceMatchingVerification`, `listFaceTagTemporary`, `listFailedGenerationDelivery`, `listFamilyChildPod`, `listFastPassAttraction`, `listFraudDetectionRule`, `listGateModeFree`, `listGraphicalAccessMap`, `listGroupAdmissionQuantity`, `listGroupAttendancePartial`, `listGroupLeaderFast`, `listGuestCompanionEligibility`, `listGuestDwellTime`, `listGuestJourney`, `listHardwareCompatibilityHealth`, `listHotelWalletExternal`, `listIdentityMembershipAccreditation`, `listLiveAccess`, `listLiveGateMode`, `listLiveVenueOccupancy`, `listMediaActivationPriority`, `listMediaCredential`, `listMediaDesign`, `listMediaIssuanceEncoding`, `listMediaReplacementRevocation`, `listMediaSwapReplacement`, `listMediaTypeCredential`, `listMediaTypeTechnology`, `listMultiMediaBinding`, `listMultiParkCrossover`, `listMultiParkCrossover2`, `listOfflineCredentialRevocation`, `listOfflineCryptographicValidation`, `listOfflineEdge`, `listOfflineEntitlementUsage`, `listOperatingCalendarSpecial`, `listPhysicalDeviceRegistration`, `listPodiumConsole`, `listPolicyEvaluationArchitecture`, `listPolicyScopeHierarchy`, `listQueueThroughputLane`, `listReconnectionSynchronizationConflict`, `listRelationshipCompanionFraud`, `listSecurityDetectionGovernance`, `listShiftHandoverSummary`, `listSpecialEventFree`, `listThroughputQueueValidation`, `listTicketCredentialInvestigation`, `listTicketMedia`, `listUnifiedIdentityCredential`, `listValidationExceptionReason`, `listValidationOutcomeRejection`, `listVenueParkAccess`, `listVerificationMethodSelection`, `listVirtualCredentialMedia`, `listVirtualTicket`, `listVirtualTicketArchitecture`, `listVirtualTicketStatus`, `lockIdentity`, `placeAccessDevice`, `publishHardwareDeployment`, `publishMediaCompatibilityTesting`, `publishRuleConflictCheck`, `publishTopologyValidation`, `releaseCredentialDevice`, `releaseIdentityLock`, `replaceCredential`, `resolveCredentialException`, `retryCredentialGeneration`, `reviewFaceReenrolment`, `rollbackAccessPolicy`, `rollbackConfigurationVersion`, `setAccessAreaZone`, `setAccessAttributeCatalog`, `setAccessGraphicalMap`, `setAppleWalletPass`, `setAttractionAccess`, `setBiometricLifecycleRetention`, `setBrandingLocalizationTemplate`, `setContextTimeEvent`, `setCredentialEventPropagationRule`, `setCredentialIssuanceRetryPolicy`, `setDeviceSoftwareContent`, `setDigitalBarcodeTicket`, `setDigitalCardMembership`, `setDynamicFieldData`, `setDynamicSecurityProfile`, `setEdgeNodeLocal`, `setEmbeddedEntitlementPayload`, `setEntitlementConsumption`, `setEntryRulePoints`, `setFastPassProfile`, `setFraudDetectionRule`, `setGateLane`, `setGateOfflinePolicy`, `setGoogleWalletPass`, `setGroupAdmissionProfile`, `setGuestCompanionEligibility`, `setHandheldMobileAccess`, `setHardwareModel`, `setHardwareModelCertification`, `setHotelWalletExternal`, `setJourneyProfile`, `setJourneySequenceRule`, `setMediaBindingActivation`, `setMediaBindingRule`, `setMediaIssuanceEncoding`, `setMediaReplacementRevocation`, `setMediaTypeTechnology`, `setOperatingCalendarEntry`, `setOperationalIncidentException`, `setPdfPrintablePos`, `setPodium`, `setPolicyEvaluationSetting`, `setPolicyScopeHierarchy`, `setReaderScannerPeripheral`, `setRealTimeSecurity`, `setReasonCode`, `setRelationshipFraudRule`, `setRfidNfc`, `setRfidNfcCard`, `setRiskScoringConfig`, `setSecurityInvestigationEvidence`, `setTicketStatusTransition`, `setTurnstileLaneBehavior`, `setValidationOutcomeGuest`, `setVerificationMethodPolicy`, `setVirtualTicketCredential`, `setVisualDynamicPolicy`, `simulateBiometricConfiguration`, `simulateGuestJourney`, `simulateOfflineResilienceTesting`, `simulatePolicyConflictImpact`, `startPodiumShift`, `updateAccessDevicePlacement`, `updateSecurityAlert`, `verifyIdentity` |
-| accessPoint | `getAccessPoint`, `listAccessPoints`, `listAdmissionRules`, `listBlacklist`, `removeBlacklistEntry`, `setAccessPointDirection` |
+| accessPoint | `getAccessPoint`, `listAccessPoints`, `listAdmissionRules`, `listBlacklist`, `removeBlacklistEntry` |
 | drafted | `listBiometricConsentGuardian`, `listBiometricLifecycleRetention` |
+| general | `getBiometricVerificationProfile`, `getBleBeaconGeofence`, `getFacePassEnrollmentConfiguration`, `getPdfPrintablePos`, `getVirtualTicketIdentity` |
 | sync | `getOfflinePackage`, `listScans`, `syncScans` |
 | validation | `issueOrderEntitlements`, `lookupTicket`, `overrideAccess`, `validateAccess`, `validateGroupAccess` |

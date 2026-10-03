@@ -103,16 +103,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-814` | Voice of Customer Center | B–D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
-| `BO-815` | Survey Builder | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-816` | Survey Triggers & Distribution | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-817` | NPS, CSAT & CES Configuration | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-818` | Survey Responses & Insights | B–D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
-| `BO-819` | Review Collection & Rating Rules | B–D | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
-| `BO-820` | Moderation & Publishing | B–D | 0 | 0 | 6 | 3 | 0 | 6 | — | notStarted (—) |
-| `BO-821` | AI Sentiment & Topic Analysis | B–D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
-| `BO-822` | Service Recovery Automation | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-823` | VOC Analytics & Audit | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-814` | Voice of Customer Center | D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `BO-815` | Survey Builder | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-816` | Survey Triggers & Distribution | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-817` | NPS, CSAT & CES Configuration | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-818` | Survey Responses & Insights | D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `BO-819` | Review Collection & Rating Rules | D | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `BO-820` | Moderation & Publishing | D | 0 | 0 | 6 | 3 | 0 | 6 | — | notStarted (—) |
+| `BO-821` | AI Sentiment & Topic Analysis | D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `BO-822` | Service Recovery Automation | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-823` | VOC Analytics & Audit | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

@@ -136,15 +136,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-620` | Reconciliation Source & Import Manager | B–D | 0 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-621` | Transaction Matching & Reconciliation Engine | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-622` | Reconciliation Exception & Investigation Center | B–D | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-623` | Settlement & Payout Manager | B–D | 0 | 32 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-624` | Fees, Commission, FX & Settlement Economics | B–D | 0 | 10 | 6 | 0 | 0 | 4 | — | notStarted (—) |
-| `ADM-625` | Merchant Account & Settlement Calendar Manager | B–D | 2 | 16 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-626` | Settlement Posting, Finance Handoff & Close Manager | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-627` | Reconciliation Audit, Trace & Evidence Center | B–D | 7 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-628` | Reconciliation Simulator, Forecast & AI Operations Advisor | B–D | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-620` | Reconciliation Source & Import Manager | C | 0 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-621` | Transaction Matching & Reconciliation Engine | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-622` | Reconciliation Exception & Investigation Center | C | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-623` | Settlement & Payout Manager | C | 0 | 32 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-624` | Fees, Commission, FX & Settlement Economics | C | 0 | 10 | 6 | 0 | 0 | 4 | — | notStarted (—) |
+| `ADM-625` | Merchant Account & Settlement Calendar Manager | C | 2 | 16 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-626` | Settlement Posting, Finance Handoff & Close Manager | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-627` | Reconciliation Audit, Trace & Evidence Center | C | 7 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-628` | Reconciliation Simulator, Forecast & AI Operations Advisor | C | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -164,7 +164,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-ADM-620 |
 | Who uses it | venue staff holding `PAYMENT_CONFIGURE`, `PAYMENT_VIEW`, `SETTLEMENT_RECONCILE` (1 configure, 1 read, 1 operate); in the flows as platform admin |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -299,7 +299,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-ADM-621 |
 | Who uses it | venue staff holding `PAYMENT_CONFIGURE` (1 configure); in the flows as platform admin |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§Display) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
@@ -414,7 +414,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-ADM-622 |
 | Who uses it | venue staff holding `SETTLEMENT_RECONCILE`, `SETTLEMENT_VIEW` (1 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
@@ -573,7 +573,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-ADM-623 |
 | Who uses it | venue staff holding `SETTLEMENT_VIEW` (1 read); in the flows as platform admin |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -739,7 +739,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-ADM-624 |
 | Who uses it | venue staff holding `PAYMENT_VIEW` (1 read); in the flows as platform admin |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Compare) and no metric row |
@@ -892,7 +892,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-ADM-625 |
 | Who uses it | venue staff holding `PAYMENT_CONFIGURE`, `PAYMENT_VIEW` (1 configure, 1 read); in the flows as platform admin |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row Rendered on the calendar template (M17-03, 29 September). |
@@ -1040,7 +1040,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-ADM-626 |
 | Who uses it | venue staff holding `LEDGER_POST` (1 operate); in the flows as platform admin |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1165,7 +1165,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-ADM-627 |
 | Who uses it | venue staff holding `LEDGER_VIEW` (1 read); in the flows as platform admin |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population |
@@ -1289,7 +1289,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-ADM-628 |
 | Who uses it | venue staff holding `LEDGER_VIEW` (1 read); in the flows as platform admin |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Forecast) and no metric row |

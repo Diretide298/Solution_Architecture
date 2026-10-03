@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-659` | Cross-Sell Command Center | B–D | 0 | 2 | 6 | 3 | 0 | 0 | — | notStarted (—) |
-| `ADM-660` | Cross-Sell Relationship Builder | B–D | 0 | 21 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-661` | Product Affinity Matrix & Relationship Map | B–D | 2 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `ADM-662` | Frequently Bought Together & Basket Pattern Engine | B–D | 0 | 14 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-663` | Cross-Category Recommendation Manager | B–D | 0 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-664` | Multi-Attraction, Destination & Partner Cross-Sell | B–D | 0 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-665` | Basket-Aware Cross-Sell & Duplicate Prevention | B–D | 0 | 20 | 6 | 0 | 0 | 2 | — | notStarted (—) |
-| `ADM-666` | Availability, Inventory & Capacity-Aware Cross-Sell | B–D | 4 | 20 | 6 | 0 | 0 | 4 | — | notStarted (—) |
-| `ADM-667` | AI Cross-Sell Discovery, Scoring & Ranking Engine | B–D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-668` | Cross-Sell Simulator & AI Opportunity Advisor | B–D | 0 | 46 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-659` | Cross-Sell Command Center | C | 0 | 2 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `ADM-660` | Cross-Sell Relationship Builder | C | 0 | 21 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-661` | Product Affinity Matrix & Relationship Map | C | 2 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `ADM-662` | Frequently Bought Together & Basket Pattern Engine | C | 0 | 14 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-663` | Cross-Category Recommendation Manager | C | 0 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-664` | Multi-Attraction, Destination & Partner Cross-Sell | C | 0 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-665` | Basket-Aware Cross-Sell & Duplicate Prevention | C | 0 | 20 | 6 | 0 | 0 | 2 | — | notStarted (—) |
+| `ADM-666` | Availability, Inventory & Capacity-Aware Cross-Sell | C | 4 | 20 | 6 | 0 | 0 | 4 | — | notStarted (—) |
+| `ADM-667` | AI Cross-Sell Discovery, Scoring & Ranking Engine | C | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-668` | Cross-Sell Simulator & AI Opportunity Advisor | C | 0 | 46 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

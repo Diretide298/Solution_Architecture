@@ -685,6 +685,66 @@ screens:
     - to: ADM-699
       trigger: My account & security
       provenance: new screen, 2 October 2026 (CHG-SBO-022)
+    - to: ADM-412
+      trigger: Opens Payment Method & Settlement Setup
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+      carries:
+      - tenantId
+    - to: ADM-424
+      trigger: Opens Module Activation & Dependency Validation
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+      carries:
+      - tenantId
+    - to: ADM-500
+      trigger: Opens Forecast Configuration & Forecasting Strategy
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+      carries:
+      - tenantId
+    - to: ADM-506
+      trigger: Opens Forecast Drivers, Confidence & Explainability
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+      carries:
+      - tenantId
+    - to: ADM-508
+      trigger: Opens Forecast Accuracy, Review & Publication Center
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+      carries:
+      - tenantId
+    - to: ADM-523
+      trigger: Opens AI Action & Permission Policy Builder
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+      carries:
+      - tenantId
+    - to: ADM-527
+      trigger: Opens AI Policy Testing & Governance Simulation
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+      carries:
+      - tenantId
+    - to: ADM-528
+      trigger: Opens AI Governance Policy Publication & Effective Policy Map
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+      carries:
+      - tenantId
+    - to: ADM-554
+      trigger: Opens AI Quality, Behavior & Governance Drift Monitoring
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+      carries:
+      - tenantId
+    - to: ADM-556
+      trigger: Opens AI Incident & Remediation Management
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+      carries:
+      - tenantId
     - to: ADM-020
       trigger: Creates the first principal and grants it the role
       provenance: flow F109 step 4→5
@@ -696,46 +756,6 @@ screens:
       provenance: flow F109 step 2→3
       carries:
       - tenantId
-    - to: ADM-412
-      trigger: Opens Payment Method & Settlement Setup
-      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
-        3 October 2026); its command centre is not in Block A'
-    - to: ADM-424
-      trigger: Opens Module Activation & Dependency Validation
-      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
-        3 October 2026); its command centre is not in Block A'
-    - to: ADM-500
-      trigger: Opens Forecast Configuration & Forecasting Strategy
-      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
-        3 October 2026); its command centre is not in Block A'
-    - to: ADM-506
-      trigger: Opens Forecast Drivers, Confidence & Explainability
-      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
-        3 October 2026); its command centre is not in Block A'
-    - to: ADM-508
-      trigger: Opens Forecast Accuracy, Review & Publication Center
-      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
-        3 October 2026); its command centre is not in Block A'
-    - to: ADM-523
-      trigger: Opens AI Action & Permission Policy Builder
-      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
-        3 October 2026); its command centre is not in Block A'
-    - to: ADM-527
-      trigger: Opens AI Policy Testing & Governance Simulation
-      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
-        3 October 2026); its command centre is not in Block A'
-    - to: ADM-528
-      trigger: Opens AI Governance Policy Publication & Effective Policy Map
-      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
-        3 October 2026); its command centre is not in Block A'
-    - to: ADM-554
-      trigger: Opens AI Quality, Behavior & Governance Drift Monitoring
-      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
-        3 October 2026); its command centre is not in Block A'
-    - to: ADM-556
-      trigger: Opens AI Incident & Remediation Management
-      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
-        3 October 2026); its command centre is not in Block A'
     entryFrom: []
   notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **Removed 24 August**: generateInvoice, getSubscription, getUsageMetering, listSubscriptionInvoices,

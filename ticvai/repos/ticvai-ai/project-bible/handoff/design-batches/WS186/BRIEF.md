@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-1083` | Wallet Command Center | B–D | 26 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-1084` | Wallet Type Library | B–D | 30 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-1085` | Wallet Creation & Provisioning Rules | B–D | 17 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-1086` | Wallet Ownership & Account Association | B–D | 6 | 0 | 6 | 16 | 1 | 6 | — | notStarted (—) |
-| `BO-1087` | Wallet Currency & Monetary Configuration | B–D | 16 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-1088` | Credit & Balance Type Configuration | B–D | 30 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-1089` | Wallet Feature Profile | B–D | 0 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-1090` | Wallet Lifecycle Configuration | B–D | 11 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-1091` | Wallet Numbering, Identity & Digital Credentials | B–D | 17 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-1092` | Wallet Configuration Preview, Validation & Publication | B–D | 18 | 10 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-1083` | Wallet Command Center | C | 26 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-1084` | Wallet Type Library | C | 30 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-1085` | Wallet Creation & Provisioning Rules | C | 17 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-1086` | Wallet Ownership & Account Association | C | 6 | 0 | 6 | 16 | 1 | 6 | — | notStarted (—) |
+| `BO-1087` | Wallet Currency & Monetary Configuration | C | 16 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-1088` | Credit & Balance Type Configuration | C | 30 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-1089` | Wallet Feature Profile | C | 0 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-1090` | Wallet Lifecycle Configuration | C | 11 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-1091` | Wallet Numbering, Identity & Digital Credentials | C | 17 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-1092` | Wallet Configuration Preview, Validation & Publication | C | 18 | 10 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

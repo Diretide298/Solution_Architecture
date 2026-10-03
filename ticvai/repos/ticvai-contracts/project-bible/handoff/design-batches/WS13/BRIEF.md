@@ -96,16 +96,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-364` | Approval Command Center Dashboard | B–D | 1 | 158 | 6 | 14 | 1 | 3 | — | notStarted (—) |
-| `BO-365` | My Approval Inbox | B–D | 0 | 22 | 6 | 0 | 1 | 3 | — | notStarted (—) |
-| `BO-366` | Team / Shared Approval Queue | B–D | 0 | 0 | 6 | 7 | 1 | 6 | — | notStarted (—) |
-| `BO-367` | Approval Request Detail | B–D | 0 | 0 | 6 | 13 | 2 | 3 | — | notStarted (—) |
-| `BO-368` | AI Decision Support | B–D | 0 | 16 | 6 | 7 | 1 | 0 | — | notStarted (—) |
-| `BO-369` | High Priority & Risk Queue | B–D | 0 | 0 | 6 | 7 | 0 | 6 | — | notStarted (—) |
-| `BO-370` | Escalated Approval Center | B–D | 0 | 16 | 6 | 2 | 0 | 3 | — | notStarted (—) |
-| `BO-371` | Completed Approval History | B–D | 2 | 0 | 6 | 7 | 0 | 3 | — | notStarted (—) |
-| `BO-372` | Approval SLA & Workload Monitor | B–D | 0 | 44 | 6 | 0 | 2 | 3 | — | notStarted (—) |
-| `BO-373` | Approval Activity & Notification Center | B–D | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
+| `BO-364` | Approval Command Center Dashboard | B | 1 | 158 | 6 | 14 | 1 | 3 | — | notStarted (—) |
+| `BO-365` | My Approval Inbox | B | 0 | 22 | 6 | 0 | 1 | 3 | — | notStarted (—) |
+| `BO-366` | Team / Shared Approval Queue | B | 0 | 0 | 6 | 7 | 1 | 6 | — | notStarted (—) |
+| `BO-367` | Approval Request Detail | B | 0 | 0 | 6 | 13 | 2 | 3 | — | notStarted (—) |
+| `BO-368` | AI Decision Support | B | 0 | 16 | 6 | 7 | 1 | 0 | — | notStarted (—) |
+| `BO-369` | High Priority & Risk Queue | B | 0 | 0 | 6 | 7 | 0 | 6 | — | notStarted (—) |
+| `BO-370` | Escalated Approval Center | B | 0 | 16 | 6 | 2 | 0 | 3 | — | notStarted (—) |
+| `BO-371` | Completed Approval History | B | 2 | 0 | 6 | 7 | 0 | 3 | — | notStarted (—) |
+| `BO-372` | Approval SLA & Workload Monitor | B | 0 | 44 | 6 | 0 | 2 | 3 | — | notStarted (—) |
+| `BO-373` | Approval Activity & Notification Center | B | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

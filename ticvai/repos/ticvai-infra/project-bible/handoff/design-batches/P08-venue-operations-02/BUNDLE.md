@@ -1,6 +1,6 @@
 # P08-venue-operations-02 — P08 · Venue Operations (2 of 2)
 
-**5 screens · 19 operations · 28 schemas · 10 permissions**
+**5 screens · 20 operations · 28 schemas · 11 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 10 permissions apply here:
-  `AUDIT_VIEW, DEVICE_MANAGE, DEVICE_VIEW, ORDER_CREATE, ORDER_MODIFY, ORDER_VIEW, REPORT_MANAGE, REPORT_VIEW_VENUE, SCOPE_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 11 permissions apply here:
+  `AUDIT_VIEW, DEVICE_MANAGE, DEVICE_VIEW, ORDER_CREATE, ORDER_MODIFY, ORDER_VIEW, REPORT_MANAGE, REPORT_VIEW_VENUE, SCOPE_VIEW, TENANT_CONFIGURE, TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -160,10 +160,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-129` | Software, Configuration & Version Management | B–D | 16 | 12 | 6 | 5 | 4 | 0 | — | notStarted (generated) |
-| `BO-130` | Offline Policy & Rules Configuration | B–D | 14 | 13 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
-| `BO-131` | Connectivity & Auto-Switch Settings | B–D | 13 | 0 | 5 | 0 | 3 | 0 | — | notStarted (generated) |
-| `BO-132` | Offline Transaction Monitor & Sync Queue | B–D | 43 | 13 | 6 | 2 | 2 | 6 | — | notStarted (generated) |
+| `BO-129` | Software, Configuration & Version Management | B | 16 | 12 | 6 | 5 | 4 | 0 | — | notStarted (generated) |
+| `BO-130` | Offline Policy & Rules Configuration | A | 14 | 19 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
+| `BO-131` | Connectivity & Auto-Switch Settings | B | 13 | 0 | 5 | 0 | 3 | 0 | — | notStarted (generated) |
+| `BO-132` | Offline Transaction Monitor & Sync Queue | C | 43 | 13 | 6 | 2 | 2 | 6 | — | notStarted (generated) |
 | `BO-133` | Offline Alerts, Limits & Audit | A | 25 | 26 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
 
 ---
@@ -180,7 +180,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Venue Operations · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-129 |
 | Who uses it | venue staff holding `DEVICE_MANAGE`, `DEVICE_VIEW`, `SCOPE_VIEW`, `TENANT_CONFIGURE` (2 configure, 2 read); in the flows as technician |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listWorkstations` reads the population and `getWorkstationHealth` reads one of them — list, select, act |
@@ -404,8 +404,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Venue Operations · wave 1 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `ORDER_MODIFY`, `ORDER_VIEW`, `TENANT_CONFIGURE` (1 operate, 1 read, 1 configure); in the flows as cashier, technician |
+| Block | Block A · task VM-BO-130 |
+| Who uses it | venue staff holding `ORDER_MODIFY`, `ORDER_VIEW`, `TENANT_CONFIGURE`, `TENANT_VIEW` (1 operate, 2 read, 1 configure); in the flows as cashier, technician |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listSyncRejections` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
 | Offline | online only |
@@ -430,6 +430,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Kind | radio group | optional | — | Order · Payment · Refund · Void · Scan | — | Sends `?kind=` to `listSyncRejections`. | `listSyncRejections` ?kind |
 | Resolved | toggle | optional | — | — | — | Sends `?resolved=` to `listSyncRejections`. | `listSyncRejections` ?resolved |
 | Search offline policy | search field | — | — | — | — | — | — |
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Scope path | text field | — | pattern `^[a-z0-9_]+(\.[a-z0-9_]+)*$` | `getOfflinePolicy` ?scopePath |
 
 **Form: Save offline policy** (modal, opened by *Save offline policy*; *Save offline policy* calls `setOfflinePolicy`, *Cancel* sends nothing)
 
@@ -469,6 +475,17 @@ Errors to draw in the form: 409 Already resolved, differently (`alreadyResolved`
 
 **Shown**
 
+**Load the offline policy saved at this scope** (card list, from `getOfflinePolicy`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Max offline hours | 1,234 | After which the workstation refuses to sell rather than keep journalling. A till three days offline holding 900 unsynced sales is a … |
+| Allowed offline | list or chips (count when long) | What may happen with no network, by data class. Selling from a cached catalogue is safe; issuing a refund is not, because the original sale … |
+| Offline value ceiling | AED 1,234.50 | Above zero, and in the currency of the venue the policy resolves to; a ceiling in another currency is refused `400` (decided 28 September … |
+| Offline transaction ceiling | 1,234 | A ceiling on count as well as value. Nine hundred small sales and one large one are different risks, and a value ceiling alone catches only … |
+| On ceiling breach | chip: Warn, Block new sales, Block all | — |
+| Requires manager to extend | yes / no (icon or chip) | — |
+
 **Every sync rejection** (data table, from `listSyncRejections`)
 
 | Shows | Format | Notes |
@@ -507,7 +524,7 @@ Errors to draw in the form: 409 Already resolved, differently (`alreadyResolved`
 
 - **Resolve rejection**: Posts the sale against the retired product at the price the guest paid (the catalogue moved, the transaction did not) and removes it from the unresolved view. *(source: F33 step 8)*
 
-**Data it reads**: `listSyncRejections` (onLoad, Entries the server refused)
+**Data it reads**: `listSyncRejections` (onLoad, Entries the server refused); `getOfflinePolicy` (onLoad, Load the offline policy saved at this scope)
 
 **Where the user goes next**
 
@@ -551,6 +568,7 @@ rejection:
 - `setOfflinePolicy` → `TENANT_CONFIGURE` (configure) · staff
 - `listSyncRejections` → `ORDER_VIEW` (read) · staff
 - `resolveSyncRejection` → `ORDER_MODIFY` (operate) · staff
+- `getOfflinePolicy` → `TENANT_VIEW` (read) · staff
 
 **A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_MODIFY` for `resolveSyncRejection`; `TENANT_CONFIGURE` for `setOfflinePolicy`.
 
@@ -588,11 +606,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (14), with its required mark, default, format and its error state (403, 404, 409).
-- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (19 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-130?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save offline policy, Resolve rejection.
 - [ ] Every transition is wired: `BO-108`, `BO-129`, `BO-131`.
-- [ ] Every gated control is gated: `ORDER_MODIFY`, `ORDER_VIEW`, `TENANT_CONFIGURE`.
+- [ ] Every gated control is gated: `ORDER_MODIFY`, `ORDER_VIEW`, `TENANT_CONFIGURE`, `TENANT_VIEW`.
 - [ ] The 3 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -606,7 +624,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Venue Operations · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-131 |
 | Who uses it | venue staff holding `TENANT_CONFIGURE` (1 configure); in the flows as technician |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the screen declares only writes (`setConnectivityThresholds`) and no read of a population — it is settings, not a list |
@@ -742,7 +760,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Venue Operations · wave 2 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-132 |
 | Who uses it | venue staff holding `ORDER_CREATE`, `ORDER_VIEW` (1 operate, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listSyncRejections` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1307,6 +1325,7 @@ Method, path, parameters, request and response for every operation these screens
 "createDeviceFirmware": {"method":"POST","path":"/device-firmware","contract":"tenancy","summary":"Register a firmware or software release before it is deployed","permission":"DEVICE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"DeviceFirmware","responds":"DeviceFirmware"},
 "deployConfigurationProfile": {"method":"POST","path":"/configuration-profiles/{profileId}/deploy","contract":"tenancy","summary":"Push a version to a fleet, in stages","permission":"TENANT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ProfileDeployment","responds":null},
 "getDeviceFirmware": {"method":"GET","path":"/device-firmware/{firmwareId}","contract":"tenancy","summary":"Read one firmware release, and how much of the fleet is on it","permission":"DEVICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"DeviceFirmware"},
+"getOfflinePolicy": {"method":"GET","path":"/offline-policy","contract":"tenancy","summary":"The offline policy saved at one scope node","permission":"TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"scopePath","in":"query","required":true}],"requestBody":null,"responds":"OfflinePolicy"},
 "getWorkstationHealth": {"method":"GET","path":"/workstations/{workstationId}/health","contract":"tenancy","summary":"A score a manager can sort by, and what is dragging it down","permission":"DEVICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":null},
 "listAlerts": {"method":"GET","path":"/alerts","contract":"reporting","summary":"What is currently wrong","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":"severity","in":"query","required":null},{"name":"workstationId","in":"query","required":null},{"name":"shiftId","in":"query","required":null},{"name":"itemId","in":"query","required":null}],"requestBody":null,"responds":"Alert"},
 "listAuditRecords": {"method":"GET","path":"/audit-records","contract":"tenancy","summary":"Who did what, where, and when","permission":"AUDIT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"orgUnitId","in":"query","required":null},{"name":"principalId","in":"query","required":null},{"name":"workstationId","in":"query","required":null},{"name":"action","in":"query","required":null},{"name":"subjectRef","in":"query","required":null},{"name":"platformStaffGrantId","in":"query","required":null},{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},

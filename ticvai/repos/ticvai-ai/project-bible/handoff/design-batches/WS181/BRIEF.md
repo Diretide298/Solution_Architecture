@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-649` | Upsell & Upgrade Command Center | B–D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
-| `ADM-650` | Upgrade Path & Product Ladder Builder | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-651` | Upsell Eligibility & Qualification Rules | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-652` | Upgrade Price Difference & Value Proposition Manager | B–D | 9 | 9 | 6 | 11 | 0 | 0 | — | notStarted (—) |
-| `ADM-653` | Ticket, Experience & Bundle Upgrade Manager | B–D | 0 | 19 | 6 | 11 | 0 | 0 | — | notStarted (—) |
-| `ADM-654` | Membership & Pass Upgrade Engine | B–D | 0 | 9 | 6 | 11 | 0 | 0 | — | notStarted (—) |
-| `ADM-655` | Pre-Purchase, Cart & Checkout Upsell Manager | B–D | 6 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `ADM-656` | Post-Purchase & In-Journey Upgrade Manager | B–D | 5 | 20 | 6 | 11 | 0 | 6 | — | notStarted (—) |
-| `ADM-657` | Upsell Ranking, Propensity & AI Opportunity Engine | B–D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
-| `ADM-658` | Upgrade Simulator, Comparison & AI Advisor | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-649` | Upsell & Upgrade Command Center | C | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `ADM-650` | Upgrade Path & Product Ladder Builder | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-651` | Upsell Eligibility & Qualification Rules | C | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-652` | Upgrade Price Difference & Value Proposition Manager | C | 9 | 9 | 6 | 11 | 0 | 0 | — | notStarted (—) |
+| `ADM-653` | Ticket, Experience & Bundle Upgrade Manager | C | 0 | 19 | 6 | 11 | 0 | 0 | — | notStarted (—) |
+| `ADM-654` | Membership & Pass Upgrade Engine | C | 0 | 9 | 6 | 11 | 0 | 0 | — | notStarted (—) |
+| `ADM-655` | Pre-Purchase, Cart & Checkout Upsell Manager | C | 6 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `ADM-656` | Post-Purchase & In-Journey Upgrade Manager | C | 5 | 20 | 6 | 11 | 0 | 6 | — | notStarted (—) |
+| `ADM-657` | Upsell Ranking, Propensity & AI Opportunity Engine | C | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `ADM-658` | Upgrade Simulator, Comparison & AI Advisor | C | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

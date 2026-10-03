@@ -38,7 +38,7 @@
   "redis": 9,
   "qdrant": 1
  },
- "generated": "2026-10-03",
+ "generated": "2026-10-04",
  "note": "Derived by closure from the contract, not listed. See handoff/README.md \u2014 the hand-maintained version of this drifted four times in one day.",
  "counts": {
   "operations": 146,
@@ -48,7 +48,7 @@
   "tables": 138,
   "screens": 194,
   "flows": 11,
-  "documents": 66,
+  "documents": 67,
   "openConflicts": 1
  },
  "metrics": {
@@ -69,9 +69,9 @@
    },
    {
     "name": "Operations reaching a screen",
-    "done": 130,
+    "done": 131,
     "total": 144,
-    "percent": 90,
+    "percent": 91,
     "note": "This domain's own operations that a screen calls. Jobs and internal operations legitimately reach none."
    },
    {
@@ -97,9 +97,9 @@
   "build": 0
  },
  "waves": {
-  "wave1": 47,
+  "wave1": 48,
   "wave2": 6,
-  "wave3": 141
+  "wave3": 140
  },
  "reachedOutsideTheContract": [
   {
@@ -620,6 +620,11 @@
    "file": "docs\\adr\\0064-per-tenant-limits.md",
    "title": "ADR-0064: Every tenant has a request budget, and a busy tenant cannot starve the others",
    "status": "Accepted \u00b7 1 October 2026 \u00b7 Chinmay Parab"
+  },
+  {
+   "file": "docs\\adr\\0069-in-park-3d-navigation-is-built-natively.md",
+   "title": "ADR-0069: In-park 3D navigation is built natively, from a venue model, a pathway file and GPS",
+   "status": "Accepted \u00b7 30 September 2026 \u00b7 agreed with the client in the"
   },
   {
    "file": "docs\\architecture\\ai-credentials.md",

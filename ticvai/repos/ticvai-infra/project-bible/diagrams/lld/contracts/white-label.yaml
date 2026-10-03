@@ -229,7 +229,8 @@ operations:
   offline: false
   reads:
   - whitelabel.site_package
-  writes: []
+  writes:
+  - whitelabel.site_package
 - operation: getAppBuild
   verb: GET
   path: /tenant-config/app-builds/{appBuildId}
@@ -770,6 +771,7 @@ operations:
   - whitelabel.tenant_config
   writes:
   - cache:idempotency
+  - platform.outbox
   - whitelabel.config_version
 - operation: recordStorefrontSessionEvents
   verb: POST
@@ -795,7 +797,8 @@ operations:
   offline: false
   reads:
   - whitelabel.custom_domain
-  writes: []
+  writes:
+  - whitelabel.custom_domain
 - operation: relinquishCustomDomain
   verb: DELETE
   path: /tenant-domains/{domainId}
@@ -1085,7 +1088,8 @@ operations:
   offline: false
   reads:
   - whitelabel.custom_domain
-  writes: []
+  writes:
+  - whitelabel.custom_domain
 - operation: setPublishReviewPolicy
   verb: PUT
   path: /publish-review-policy
@@ -1152,7 +1156,8 @@ operations:
   - whitelabel.guided_choice
   - whitelabel.guided_choice_answer
   - whitelabel.guided_choice_question
-  writes: []
+  writes:
+  - whitelabel.guided_choice
 - operation: updateBanner
   verb: PATCH
   path: /tenant-config/banners/{bannerId}
@@ -1205,10 +1210,14 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - whitelabel.guided_choice
   - whitelabel.guided_choice_answer
   - whitelabel.guided_choice_question
   writes:
+  - cache:idempotency
+  - whitelabel.guided_choice
+  - whitelabel.guided_choice_answer
   - whitelabel.guided_choice_question
 - operation: updatePromoBlock
   verb: PATCH

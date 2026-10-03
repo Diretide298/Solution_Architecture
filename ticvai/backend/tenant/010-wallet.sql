@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS wallet.accounting_mapping (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS wallet.adjustment (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     wallet_id                         uuid,
     kind                              text CONSTRAINT adjustment_kind_chk CHECK (kind IN ('reversal', 'chargeback', 'goodwill', 'correction', 'writeOff')),
     amount                            numeric(18,4),
@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS wallet.configuration_version (
 -- Holds 6 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS wallet.configuration_version_snapshot (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     configuration_version_id          uuid NOT NULL,
     area                              text NOT NULL CONSTRAINT configuration_version_snapshot_area_chk CHECK (area IN ('walletTypes', 'creditTypes', 'consumptionPolicy', 'fundingRules', 'channelRules', 'authenticationPolicy', 'transferRules', 'refundPolicy', 'riskRules', 'accountingMapping', 'reconciliationSources', 'integrationMappings')),
     values                            jsonb NOT NULL,
@@ -113,7 +113,7 @@ CREATE TABLE IF NOT EXISTS wallet.consumption_policy (
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS wallet.credential (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     wallet_id                         uuid NOT NULL,
     kind                              text NOT NULL CONSTRAINT credential_kind_chk CHECK (kind IN ('card', 'wristband', 'nfc', 'rfid', 'qr', 'mobileApp', 'digitalKey')),
     identifier                        text NOT NULL,
@@ -160,7 +160,7 @@ CREATE TABLE IF NOT EXISTS wallet.credit_lot (
 -- Holds 15 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS wallet.credit_type (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text NOT NULL,
     category                          text CONSTRAINT credit_type_category_chk CHECK (category IN ('cash', 'refund', 'bonus', 'promotional', 'giftCard', 'membership', 'loyalty', 'ride', 'attraction', 'redemption', 'fnb', 'retail', 'parking', 'event', 'other')),
@@ -180,7 +180,7 @@ CREATE TABLE IF NOT EXISTS wallet.credit_type (
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS wallet.dispute (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     wallet_id                         uuid NOT NULL,
     transaction_ids                   text[],
     amount                            numeric(18,4),
@@ -250,7 +250,7 @@ CREATE TABLE IF NOT EXISTS wallet.gift_card (
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS wallet.gift_card_product (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text,
     name                              text,
     is_open_amount_allowed            boolean DEFAULT false,
@@ -306,6 +306,7 @@ CREATE TABLE IF NOT EXISTS wallet.refund_policy (
     restore_to_original_lots          boolean DEFAULT true,
     restore_original_expiry           boolean DEFAULT true,
     wallet_refund_bonus_percent       numeric(18,4),
+    destinations_by_source            jsonb,
     scope_path                        ltree NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL
 );
@@ -313,7 +314,7 @@ CREATE TABLE IF NOT EXISTS wallet.refund_policy (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS wallet.restriction (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     wallet_id                         uuid NOT NULL,
     kind                              text NOT NULL CONSTRAINT restriction_kind_chk CHECK (kind IN ('freeze', 'block', 'restrict', 'none')),
     blocked_channels                  text[],
@@ -335,7 +336,7 @@ CREATE TABLE IF NOT EXISTS wallet.risk_rules (
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS wallet.shared_wallet (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     wallet_id                         uuid NOT NULL,
     kind                              text NOT NULL CONSTRAINT shared_wallet_kind_chk CHECK (kind IN ('family', 'household', 'corporate', 'school', 'group')),
     owner_principal_id                uuid,
@@ -378,7 +379,7 @@ CREATE TABLE IF NOT EXISTS wallet.transfer_rules (
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS wallet.voucher_type (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text NOT NULL,
     benefit_kind                      text CONSTRAINT voucher_type_benefit_kind_chk CHECK (benefit_kind IN ('freeItem', 'percentDiscount', 'fixedDiscount', 'upgrade', 'accessEntitlement', 'companionEntry')),
@@ -395,7 +396,7 @@ CREATE TABLE IF NOT EXISTS wallet.voucher_type (
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS wallet.wallet (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     subject_id                        uuid NOT NULL,
     balance                           numeric(18,4) NOT NULL,
     bonus_balance                     numeric(18,4),
@@ -426,7 +427,8 @@ CREATE TABLE IF NOT EXISTS wallet.wallet_transaction (
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS wallet.wallet_type (
-    id                                uuid PRIMARY KEY,
+    is_auto_reload_allowed            boolean DEFAULT true,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text NOT NULL,
     owner_kind                        text CONSTRAINT wallet_type_owner_kind_chk CHECK (owner_kind IN ('guest', 'registeredCustomer', 'family', 'parent', 'child', 'corporate', 'school', 'employee')),

@@ -473,7 +473,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "BO-164"
+    "BO-164",
+    "BO-103"
    ],
    "exitTo": [
     "BO-164"
@@ -642,7 +643,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "BO-164"
+    "BO-164",
+    "BO-103"
    ],
    "exitTo": [
     "BO-164"
@@ -879,7 +881,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "BO-164"
+    "BO-164",
+    "BO-103"
    ],
    "exitTo": [
     "BO-164"
@@ -907,6 +910,23 @@
      "name": "contentBody",
      "slot": "fields",
      "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Load the configuration as saved",
+       "operation": "getBleBeaconGeofence",
+       "bindsTo": "BleBeaconGeofenceConfigurationView",
+       "columns": [
+        "BleBeaconGeofenceConfigurationView.beaconName",
+        "BleBeaconGeofenceConfigurationView.venue",
+        "BleBeaconGeofenceConfigurationView.zone",
+        "BleBeaconGeofenceConfigurationView.gate",
+        "BleBeaconGeofenceConfigurationView.proximityThreshold",
+        "BleBeaconGeofenceConfigurationView.activeInactive",
+        "BleBeaconGeofenceConfigurationView.health",
+        "BleBeaconGeofenceConfigurationView.lastDetected"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
       {
        "kind": "textField",
        "label": "Beacon name",
@@ -999,6 +1019,13 @@
     "contract": "access",
     "purpose": "BLE Beacon & Geofence Configuration",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getBleBeaconGeofence",
+    "contract": "access",
+    "purpose": "Load the configuration as saved",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "wireframe": {

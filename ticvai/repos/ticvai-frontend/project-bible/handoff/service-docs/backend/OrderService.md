@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `orders`, `shift`, `payments` |
 | Schemas owned | `orders`, `payments` |
-| Operations in the slice | 93 of 298 |
+| Operations in the slice | 97 of 298 |
 | Scale | Write-heavy, spiky, latency-critical. The one that autoscales. |
 | If it is down | Down means no sales. Highest availability target in the platform. |
 
@@ -44,7 +44,7 @@
 | cart | [`claimCart`](#claimcart) | POST | `/carts/{cartId}/claim` | core | 1 | GST-041, WEB-016 |
 | cart | [`createCart`](#createcart) | POST | `/carts` | core | 1 | WEB-010 |
 | cart | [`extendCart`](#extendcart) | POST | `/carts/{cartId}/extend` | core | 1 | GST-041, WEB-010 |
-| cart | [`getCart`](#getcart) | GET | `/carts/{cartId}` | core | 1 | GST-007, GST-009, GST-032, GST-041, GST-053, KSK-006 … |
+| cart | [`getCart`](#getcart) | GET | `/carts/{cartId}` | core | 1 | GST-007, GST-009, GST-032, GST-041, GST-048, GST-053 … |
 | cart | [`removeCartLine`](#removecartline) | DELETE | `/carts/{cartId}/lines/{lineId}` | core | 1 | GST-041, PTR-010, WEB-010 |
 | cart | [`updateCartLine`](#updatecartline) | PATCH | `/carts/{cartId}/lines/{lineId}` | core | 1 | GST-041, PTR-010, WEB-010 |
 | cash | [`createCashMovement`](#createcashmovement) | POST | `/shifts/{shiftId}/cash-movements` | core | 1 | BO-041, BO-042, POS-017, POS-018 |
@@ -64,6 +64,7 @@
 | order | [`getVisitReminder`](#getvisitreminder) | GET | `/orders/{orderId}/reminder` | core | 1 | GST-018 |
 | order | [`holdOrder`](#holdorder) | POST | `/orders/{orderId}/hold` | core | 1 | BO-022, BO-026, BO-047, EMP-034, POS-002, POS-006 … |
 | order | [`listOrders`](#listorders) | GET | `/orders` | core | 1 | ANL-009, BO-022, BO-023, BO-026, BO-047, BO-101 … |
+| order | [`listTicketTransfers`](#listtickettransfers) | GET | `/ticket-transfers` | core | 1 | GST-045 |
 | order | [`modifyOrder`](#modifyorder) | POST | `/orders/{orderId}/modify` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-281, BO-315 … |
 | order | [`reprintOrder`](#reprintorder) | POST | `/orders/{orderId}/reprints` | core | 1 | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034 … |
 | order | [`rescheduleOrder`](#rescheduleorder) | POST | `/orders/{orderId}/reschedule` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-281, BO-315 … |
@@ -71,11 +72,13 @@
 | order | [`setVisitReminder`](#setvisitreminder) | PUT | `/orders/{orderId}/reminder` | core | 1 | GST-018 |
 | order | [`transferOrderTickets`](#transferordertickets) | POST | `/orders/{orderId}/transfer` | core | 1 | GST-012, GST-013, GST-014, GST-045, WEB-018, WEB-030 |
 | order | [`voidOrder`](#voidorder) | POST | `/orders/{orderId}/voids` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-319, EMP-034 … |
+| orders | [`cloneTicketTemplate`](#clonetickettemplate) | POST | `/ticket-templates/{templateId}/clone` | setup | 1 | BO-344 |
 | orders | [`createResaleListing`](#createresalelisting) | POST | `/resale-listings` | core | 1 | GST-067, WEB-030 |
 | orders | [`createTicketTemplate`](#createtickettemplate) | POST | `/ticket-templates` | setup | 1 | BO-346 |
 | orders | [`getBillingStatement`](#getbillingstatement) | GET | `/billing-statements/{statementId}` | core | 1 | GST-015, WEB-023 |
 | orders | [`getGroupBooking`](#getgroupbooking) | GET | `/group-bookings/{groupBookingId}` | core | 1 | BO-026, BO-273, GST-072, POS-031, WEB-031 |
 | orders | [`getPaymentLink`](#getpaymentlink) | GET | `/payment-links/{token}` | core | 1 | ADM-593, GST-009, WEB-014 |
+| orders | [`importTicketTemplate`](#importtickettemplate) | POST | `/ticket-templates/imports` | setup | 1 | BO-344 |
 | orders | [`issueWalletPass`](#issuewalletpass) | POST | `/wallet-passes` | core | 1 | GST-018, WEB-018 |
 | orders | [`listBillingStatements`](#listbillingstatements) | GET | `/billing-statements` | core | 1 | GST-015, WEB-023 |
 | orders | [`listMyOrders`](#listmyorders) | GET | `/my/orders` | core | 1 | GST-014, GST-019, GST-035, WEB-017, WEB-019, WEB-026 … |
@@ -109,6 +112,7 @@
 | reservation | [`listReservations`](#listreservations) | GET | `/reservations` | core | 1 | GST-016, POS-031, WEB-031 |
 | shift | [`acceptShiftVariance`](#acceptshiftvariance) | POST | `/shifts/{shiftId}/accept-variance` | core | 1 | BO-040, BO-043, EMP-009, POS-007 |
 | shift | [`allocateDepositBox`](#allocatedepositbox) | POST | `/deposit-boxes` | core | 1 | POS-016 |
+| shift | [`approveShiftClose`](#approveshiftclose) | POST | `/shifts/{shiftId}/approve-close` | setup | 1 |  |
 | shift | [`approveShiftOpen`](#approveshiftopen) | POST | `/shifts/{shiftId}/approve-open` | core | 1 | POS-001 |
 | shift | [`closeShift`](#closeshift) | POST | `/shifts/{shiftId}/close` | core | 1 | BO-040, BO-043, POS-007 |
 | shift | [`getCurrentShift`](#getcurrentshift) | GET | `/shifts/current` | core | 1 | EMP-008, EMP-009, POS-001, POS-007, POS-012 |
@@ -198,7 +202,7 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 | Conflict policy | serverWins |
 | Reads | `catalogue.channel_capacity`, `catalogue.performance`, `catalogue.variant`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line` |
 | Writes | `orders.cart`, `orders.cart_line`, `platform.idempotency_record` |
-| Called by | GST-007, GST-008, GST-026, GST-027, GST-032, GST-048, GST-050, GST-056, GST-070, GST-074, GST-075, GST-077, GST-078, KSK-005, KSK-006, KSK-017, POS-002, POS-021, POS-023, POS-030, PTR-010, WEB-006, WEB-008, WEB-010, WEB-033, WEB-036, WEB-041, WEB-042, WEB-047, WEB-048, WEB-049 |
+| Called by | GST-007, GST-008, GST-026, GST-027, GST-032, GST-048, GST-050, GST-056, GST-070, GST-074, GST-075, GST-077, GST-078, KSK-005, KSK-015, KSK-017, POS-002, POS-021, POS-023, POS-030, PTR-010, WEB-005, WEB-006, WEB-008, WEB-010, WEB-033, WEB-036, WEB-041, WEB-042, WEB-047, WEB-048, WEB-049 |
 | State model | Cart ([states/cart.yaml](../../../states/cart.yaml)): moves `expiring` -> `active`, `expired` -> `active` |
 
 **Parameters**
@@ -1052,7 +1056,7 @@ Returns the conflicts (2.9.5) and the leases with their remaining time, so the i
 | Read routing | primary |
 | Reads | `catalogue.channel_capacity`, `catalogue.inventory_hold`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line`, `promotions.promotion` |
 | Writes | - |
-| Called by | GST-007, GST-009, GST-032, GST-041, GST-053, KSK-006, POS-010, PTR-010, WEB-006, WEB-010, WEB-011 |
+| Called by | GST-007, GST-009, GST-032, GST-041, GST-048, GST-053, KSK-006, POS-010, PTR-010, WEB-006, WEB-010, WEB-011 |
 
 **Parameters**
 
@@ -1526,7 +1530,7 @@ A lift removes cash from an open float mid-shift without closing it — the supe
 | Read routing | primary |
 | Reads | `orders.cash_count_line`, `orders.cash_movement` |
 | Writes | - |
-| Called by | BO-039, BO-040, BO-041, EMP-008, EMP-009, POS-007, POS-015 |
+| Called by | BO-039, BO-040, BO-041, EMP-008, EMP-009, POS-007, POS-015, POS-017 |
 
 **Parameters**
 
@@ -2186,7 +2190,7 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | Conflict policy | append |
 | Guest callable | True |
 | Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
-| Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.payment`, `orders.sales_order`, `promotions.promotion_evaluation_trace` |
+| Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.payment`, `orders.sales_order`, `platform.outbox`, `promotions.promotion_evaluation_trace` |
 | Called by | BO-022, BO-026, BO-047, EMP-034, GST-009, POS-002, POS-004, POS-005, POS-006, POS-013, PTR-002, PTR-008, PTR-015, WEB-012 |
 | State model | Order ([states/order.yaml](../../../states/order.yaml)): created as `pending`<br/>Resource hold ([states/resource-hold.yaml](../../../states/resource-hold.yaml)): moves `held` -> `converted`<br/>Seat hold ([states/seat-hold.yaml](../../../states/seat-hold.yaml)): moves `held` -> `converted` |
 
@@ -2560,7 +2564,7 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | Read routing | primary |
 | Reads | `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | - |
-| Called by | BO-022, BO-023, BO-026, BO-047, BO-1147, BO-305, BO-315, EMP-014, EMP-034, GST-010, GST-018, GST-019, GST-028, KSK-009, KSK-011, POS-002, POS-006, POS-030, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016, WEB-012, WEB-013, WEB-019 |
+| Called by | BO-022, BO-023, BO-026, BO-047, BO-1147, BO-305, BO-315, EMP-014, EMP-034, GST-010, GST-018, GST-019, GST-028, GST-067, KSK-009, KSK-011, POS-002, POS-006, POS-014, POS-030, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016, WEB-012, WEB-013, WEB-019 |
 
 **Parameters**
 
@@ -3122,6 +3126,62 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 |---|---|---|
 | 200 |  | Orders, newest first — createdAt descending, id as the tiebreak. |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### listTicketTransfers
+
+**`GET /ticket-transfers`**: The ticket transfers this guest sent or received
+
+**`TicketTransfer` was only ever the answer to a POST.** A guest who sent tickets had no way to see them again — whether the recipient claimed, whether the offer lapsed and the tickets came back — and `WEB-030` and `GST-014` bound their *every ticket transfer* table to the order list, which carries no transfer at all.
+**Scoped to the caller, not filtered by them** — the same shape as `listMyOrders`. A transfer appears where the caller is its sender (`fromSubjectId`) or, once claimed, its recipient (`toSubjectId`).
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `orders.ticket_transfer` |
+| Writes | - |
+| Called by | GST-045 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| direction | query |  | enum (sent, received) | sent for transfers the caller offered, received for those they claimed. |
+| status | query |  | enum (offered, claimed, expired, cancelled) | Exact match on TicketTransfer.status. |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of TicketTransfer | yes |  |
+| items[].id | string (uuid) | yes |  |
+| items[].orderId | string (uuid) | yes |  |
+| items[].ticketIds | array of string (uuid) | yes | The entitlements offered — Entitlement.id values, since a ticket is an entitlement. |
+| items[].fromSubjectId | string (uuid) |  |  |
+| items[].toSubjectId | string (uuid) |  | Set only on claim. (nullable) |
+| items[].recipientAddressMasked | string |  |  |
+| items[].status | enum (offered, claimed, expired, cancelled) | yes |  |
+| items[].claimUrl | string |  | (nullable) |
+| items[].claimToken | string (password) |  | What claimTicketTransfer checks the presented claimToken against. |
+| items[].offeredAt | string (date-time) | yes |  |
+| items[].claimedAt | string (date-time) |  | (nullable) |
+| items[].expiresAt | string (date-time) | yes | An unclaimed transfer expires and the tickets return. |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Transfers, newest offer first — offeredAt descending, id as the tiebreak. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### modifyOrder
@@ -3901,6 +3961,67 @@ Only before settlement and only within the same shift. After that it is a refund
 
 ## Group: orders
 
+### cloneTicketTemplate
+
+**`POST /ticket-templates/{templateId}/clone`**: Create a ticket template from an existing one
+
+**Starts a template from one that already exists** (decided 29 September, readiness close-out). `source` says what the template in the path is: an `existingTemplate` of this venue, a `venueTemplate` of another venue in the tenant (named by `venueId`), or a `productTemplate` - the one a product issues from (named by `productId`, whose product kind the copy then applies to). A source missing the id it needs is a 422 (`clone-source-incomplete`).
+**The copy is created inactive**, so it cannot clash with the original's selection priority.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `orders.ticket_template` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Reads | `orders.ticket_template`, `orders.ticket_template_channel` |
+| Writes | `orders.ticket_template`, `orders.ticket_template_channel` |
+| Called by | BO-344 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| templateId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `CloneTicketTemplateInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| name | string | yes | (max length 120) |
+| source | enum (existingTemplate, venueTemplate, productTemplate) | yes | What the template in the path is (decided 29 September, readiness close-out). |
+| venueId | string (uuid) |  | The venue whose template is copied. (nullable) |
+| productId | string (uuid) |  | The product the template issues for. (nullable) |
+
+**Response**: `TicketTemplate`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| name | string | yes |  |
+| isRecyclable | boolean |  | BL-103. (default False) |
+| recycleAfterDays | integer |  | A quarantine before reissue. (nullable) |
+| mediaType | enum (thermalTicket, a4Pdf, wristband, rfidCard, walletPass, qrOnly, sms) | yes |  |
+| appliesToProductKinds | array of string |  |  |
+| appliesToChannels | array of SalesChannel: enum (pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice, …) |  |  |
+| selectionPriority | integer |  | 2.16.x. (default 100) |
+| layoutRef | string |  |  |
+| localeVariants | object |  |  |
+| isActive | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Cloned |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 422 |  | venueTemplate with no venueId, or productTemplate with no productId (clone-source-incomplete). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### createResaleListing
 
 **`POST /resale-listings`**: List an entitlement for resale
@@ -4286,6 +4407,63 @@ Returns the lines, the total and the deadline. **Never the guest's other orders*
 |---|---|---|
 | 200 |  | What is owed, and until when |
 | 410 |  | Expired, paid, superseded or cancelled — and it says which (linkExpired, linkPaid, linkSuperseded, linkCancelled, the four terminal states of PaymentLink.status). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### importTicketTemplate
+
+**`POST /ticket-templates/imports`**: Import a ticket template definition
+
+**Creates a ticket template from a supported definition file** (decided 29 September, readiness close-out). The file is uploaded first and named here by `fileRef`. An unsupported `format`, or a file that does not parse as one, is a 422 (`unsupported-template-format`, `template-definition-invalid`).
+**The imported template is created inactive**, so it cannot clash with an active template's selection priority; check it with `printTicketProof` and activate it with `updateTicketTemplate`.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `orders.ticket_template` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `orders.ticket_template`, `orders.ticket_template_channel` |
+| Writes | `orders.ticket_template`, `orders.ticket_template_channel` |
+| Called by | BO-344 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `TicketTemplateImportInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| format | string | yes | The definition format of the file. (max length 30) |
+| fileRef | string (uuid) | yes | The uploaded definition file. |
+| name | string | yes | (max length 120) |
+
+**Response**: `TicketTemplate`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| name | string | yes |  |
+| isRecyclable | boolean |  | BL-103. (default False) |
+| recycleAfterDays | integer |  | A quarantine before reissue. (nullable) |
+| mediaType | enum (thermalTicket, a4Pdf, wristband, rfidCard, walletPass, qrOnly, sms) | yes |  |
+| appliesToProductKinds | array of string |  |  |
+| appliesToChannels | array of SalesChannel: enum (pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice, …) |  |  |
+| selectionPriority | integer |  | 2.16.x. (default 100) |
+| layoutRef | string |  |  |
+| localeVariants | object |  |  |
+| isActive | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Imported |
+| 422 |  | The format is not one the service reads (unsupported-template-format), or the file does not parse as that format (template-definition-invalid). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### issueWalletPass
@@ -5379,7 +5557,7 @@ A card payment returns `pendingConfirmation` when the terminal has been instruct
 | Reads | `catalogue.inventory_hold`, `ledger.fx_rate`, `orders.order_line`, `orders.payment`, `orders.sales_order`, `payments.provider_connection` |
 | Writes | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.inventory_hold`, `ledger.journal_entry`, `ledger.journal_line`, `orders.order_event`, `orders.payment`, `payments.payment_attempt`, `platform.idempotency_record`, `platform.outbox` |
 | Called by | EMP-035, EMP-059, GST-009, KSK-007, POS-002, POS-004, POS-005, PTR-012, WEB-012, WEB-033 |
-| State model | Order ([states/order.yaml](../../../states/order.yaml)): moves `pending` -> `paid`, `pending` -> `partiallyPaid`, `partiallyPaid` -> `paid`, `pending` -> `failed`<br/>PaymentLink ([states/payment-link.yaml](../../../states/payment-link.yaml)): moves `issued` -> `paid`, `viewed` -> `paid`<br/>Payment ([states/payment.yaml](../../../states/payment.yaml)): created as `authorised` or `pendingConfirmation`<br/>Seat ([states/seat.yaml](../../../states/seat.yaml)): moves `held` -> `sold`<br/>SubBill ([states/sub-bill.yaml](../../../states/sub-bill.yaml)): moves `open` -> `paid`<br/>Table ([states/table.yaml](../../../states/table.yaml)): moves `billRequested` -> `needsClearing` |
+| State model | Order ([states/order.yaml](../../../states/order.yaml)): moves `pending` -> `paid`, `pending` -> `partiallyPaid`, `partiallyPaid` -> `paid`, `pending` -> `failed`<br/>PaymentLink ([states/payment-link.yaml](../../../states/payment-link.yaml)): moves `issued` -> `paid`, `viewed` -> `paid`<br/>Payment ([states/payment.yaml](../../../states/payment.yaml)): created as `authorised` or `pendingConfirmation`<br/>SubBill ([states/sub-bill.yaml](../../../states/sub-bill.yaml)): moves `open` -> `paid`<br/>Table ([states/table.yaml](../../../states/table.yaml)): moves `billRequested` -> `needsClearing` |
 
 **Parameters**
 
@@ -6942,6 +7120,117 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 | 201 |  | Allocated |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### approveShiftClose
+
+**`POST /shifts/{shiftId}/approve-close`**: Release a shift held for close approval
+
+26 September, pull audit R207. **`ShiftStatus.pendingClosure` said "awaiting SHIFT_APPROVE_CLOSE where configured" and no operation carried that permission**, so a venue that configured approval on close had shifts that could never leave `pendingClosure`.
+Where the venue requires approval on close, the counted shift waits here for a supervisor. Approval moves it to `closed` when the variance is within the configured threshold, and to `pendingVariance` when it is beyond it — **approving the close is not accepting the over/short**, which still needs `acceptShiftVariance` (OVERSHORT_ACCEPT). The approving principal is recorded in `Shift.approvals` as kind `close`.
+**This never accepts a variance** (decided 28 September, audit R080 (e)): it releases a close the venue chose to supervise, and a variance above the threshold still goes to `acceptShiftVariance`, the only path for one.
+
+|  |  |
+|---|---|
+| Permission | `SHIFT_APPROVE_CLOSE` |
+| Scope level | venue |
+| Part of slice | setup, changes rows of `orders.pos_shift_approval` that another operation creates |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident` |
+| Writes | `orders.pos_shift`, `orders.pos_shift_approval`, `platform.outbox` |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| shiftId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| reason | string | yes | (min length 3; max length 300) |
+
+**Response**: `Shift`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | Client-generated UUIDv7. |
+| workstationId | string (uuid) | yes |  |
+| venueId | string (uuid) | yes |  |
+| scopePath | string | yes |  |
+| principalId | string (uuid) | yes | Who opened it. |
+| principalDisplayName | string |  |  |
+| incidents | array of object |  | BL-097. |
+| incidents[].kind | enum (noSale, drawerOpen, override, voidAfterPayment, guestDispute, tillJam, priceQuery, other) |  |  |
+| incidents[].at | string (date-time) |  |  |
+| incidents[].principalId | string (uuid) |  |  |
+| incidents[].note | string |  | (nullable) |
+| status | ShiftStatus: enum (pendingApproval, open, suspended, pendingVariance, pendingClosure, closed, autoClosed) | yes |  |
+| currency | string | yes | Resolved from the region, not stored (ADR-0018, 24 August). (pattern ^[A-Z]{3}$) |
+| currencyScale | integer | yes | Resolved from the region, not stored (ADR-0018, 24 August). (min 0; max 4) |
+| depositBoxCode | string |  | (nullable) |
+| bagNumber | string |  | (nullable) |
+| openingFloat | Money |  | On the wire this is three fields; in the database it is one column. |
+| openingFloat.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| openingFloat.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| openingFloat.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| salesTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| salesTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| salesTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| salesTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| refundsTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| refundsTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| refundsTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| refundsTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| liftsTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| liftsTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| liftsTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| liftsTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| expectedCash | object |  | 26 September, pull audit R207. (read-only; nullable) |
+| expectedCash.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| expectedCash.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| expectedCash.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| countedCash | object |  | What the close count found. (read-only; nullable) |
+| countedCash.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| countedCash.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| countedCash.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| variance | object |  | Counted minus expected, as ShiftCloseResult.variance. (read-only; nullable) |
+| variance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| variance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| variance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| cashierReason | enum (tillError, unrecordedRefund, miscount, other) |  | What the cashier said went wrong, given with the blind count (CloseShiftRequest.cashierReason, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003). (read-only; nullable) |
+| cashierNote | string |  | The cashier's note with the count (CloseShiftRequest.notes; CHG-FIN-003). (max length 1000; read-only; nullable) |
+| heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
+| openedAt | string (date-time) | yes |  |
+| recordedAt | string (date-time) |  | When the device recorded the open. |
+| suspendedAt | string (date-time) |  | (nullable) |
+| suspendReason | string |  | The reason given to suspendShift. (max length 200; nullable) |
+| closedAt | string (date-time) |  | (nullable) |
+| closedByPrincipalId | string (uuid) |  | Who submitted the close count. (nullable) |
+| recountRequestedAt | string (date-time) |  | Set by rejectShiftVariance, cleared by the cashier's recount (decided 2 October 2026, Chinmay; DEC-175; CHG-CSP-013; DI-804). (read-only; nullable) |
+| recountRequestedByPrincipalId | string (uuid) |  | The supervisor who sent the count back (CHG-CSP-013). (read-only; nullable) |
+| recountReason | string |  | The supervisor's reason, shown to the cashier; never an amount (CHG-CSP-013, CHG-FIN-003). (max length 500; read-only; nullable) |
+| countNumber | integer |  | How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). (min 0; read-only) |
+| syncedAt | string (date-time) |  | Null while the shift has unsynced operations. (nullable) |
+| approvals | array of object |  |  |
+| approvals[].kind | enum (open, close, variance) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance. |
+| approvals[].principalId | string (uuid) | yes |  |
+| approvals[].at | string (date-time) | yes |  |
+| approvals[].reason | string |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Released — closed, or pendingVariance where the variance needs acceptance |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | Shift is not pendingClosure (problem type shift-not-pending-closure) |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### approveShiftOpen
 
 **`POST /shifts/{shiftId}/approve-open`**: Approve a shift opening outside tolerance
@@ -7075,7 +7364,7 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | Conflict policy | append |
 | Step-up auth | pin |
 | Reads | `cache:idempotency`, `ledger.fx_rate`, `orders.cash_count_line`, `orders.cash_movement`, `orders.payment`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident`, `platform.venue_settings` |
-| Writes | `cache:idempotency`, `ledger.journal_entry`, `orders.cash_count_line`, `orders.pos_shift` |
+| Writes | `cache:idempotency`, `ledger.journal_entry`, `orders.cash_count_line`, `orders.pos_shift`, `platform.outbox` |
 | Called by | BO-040, BO-043, POS-007 |
 | State model | Shift ([states/shift.yaml](../../../states/shift.yaml)): moves `open` -> `pendingClosure` |
 
@@ -7946,7 +8235,7 @@ From `pendingVariance` only. The shift **stays `pendingVariance`** with `recount
 | Conflict policy | append |
 | Step-up auth | pin |
 | Reads | `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident` |
-| Writes | - |
+| Writes | `orders.pos_shift`, `orders.pos_shift_incident` |
 | Called by | BO-040, BO-043, POS-007 |
 
 **Parameters**
@@ -8415,7 +8704,7 @@ Online only, as `closeShift`: the expected figure is the server's.
 | Offline | no |
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `ledger.fx_rate`, `orders.cash_count_line`, `orders.cash_movement`, `orders.payment`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident`, `platform.venue_settings` |
-| Writes | `cache:idempotency`, `ledger.journal_entry`, `orders.cash_count_line`, `orders.pos_shift` |
+| Writes | `cache:idempotency`, `ledger.journal_entry`, `orders.cash_count_line`, `orders.pos_shift`, `platform.outbox` |
 | Called by | EMP-009, POS-007 |
 | State model | Shift ([states/shift.yaml](../../../states/shift.yaml)): moves `pendingVariance` -> `closed`, `open` -> `pendingClosure`, `suspended` -> `pendingClosure` |
 
@@ -9626,17 +9915,17 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-205 operations, added to this service in later releases without changing any of the above.
+201 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | b2b | `getB2bCredit`, `overrideCreditLimit`, `setB2bCreditLimit` |
 | cart | `listAbandonedCarts` |
 | drafted | `approveExceptionServiceRecovery`, `approveGroupDiscountException`, `approveListingModeration`, `createListingSeller`, `createOrderSourceChannel`, `createUpgradeCredentialRegeneration`, `listAmendmentAfterSale`, `listAmendmentAfterSale2`, `listBulkGroupAssisted`, `listBuyerCheckoutInventory`, `listBuyerPurchaseResale`, `listCapacityInventoryReconciliation`, `listCapacityReservationInventory`, `listCreateListingResale`, `listCredentialRevocationRegeneration`, `listDepositPartialPayment`, `listExternalPaymentPartner`, `listFeeSellerProceed`, `listFinancialTraceability`, `listGroupAmendmentCancellation`, `listGroupBooking`, `listGroupBookingReconciliation`, `listGroupCustomerOrganization`, `listGroupEnquiryOpportunity`, `listGroupPaymentDeposit`, `listGroupRequirementAvailability`, `listGroupSale`, `listGroupSale2`, `listGroupTicketFulfillment`, `listGroupTicketSeat`, `listListingLifecycleExpiry`, `listOfficialResaleMarketplace`, `listOrderFinancialReconciliation`, `listOrderLifecycleTimeline`, `listOrderLineProduct`, `listOrderPaymentDetail`, `listOrderReservation`, `listOrderSplitMerge`, `listParticipantGuestList`, `listPaymentOrderFinancial`, `listPaymentReconciliationException`, `listPersonTypeProduct`, `listQuoteBookingConversion`, `listQuoteRevisionNegotiation`, `listRefundDisputeResale`, `listRelatedOrderTransaction`, `listResale`, `listResale2`, `listResaleConfirmationOwnership`, `listResaleEligibilityTicket`, `listResaleFeeCommission`, `listResaleFraudDuplicate`, `listResaleInventoryAvailability`, `listResaleListingSeller`, `listResaleMarketplace`, `listResaleOwnership`, `listResalePolicyMarketplace`, `listResalePricingPrice`, `listResaleTicketDetail`, `listReservationConfirmationExpiry`, `listSellerSettlementPayout`, `listTicketOwnershipTransfer`, `listTicketReissueFulfillment`, `listTicketResaleMarketplace`, `listUpgradeConversion`, `listUpgradeEligibilityQualification`, `listUpgradeException`, `listUpgradeFinancialTreatment`, `listUpgradeTimingUsage`, `listVoidReversalSame`, `listWhiteLabelMarketplace`, `setAfterSaleFinancial`, `setAmendmentEligibilityPolicy`, `setCancellationPartialPolicy`, `setCustomerGuestAccount`, `setGroupBookingHandover`, `setGroupOperationalPlanning`, `setGroupPackageExperience`, `setGroupQuotationProposal`, `setMultiPaymentSplit`, `setOrderAmendment`, `setOrderDetailTransaction`, `setOrderReservationStatus`, `setProRataResidual`, `setResaleEligibilityRule`, `setResaleMarketplaceRecommendation`, `setReservationHoldPolicy`, `setUpgradeConversionPath` |
-| order | `getDepositPolicy`, `listTicketTransfers`, `setDepositPolicy` |
-| orders | `assignChargeback`, `authoriseStoredValue`, `cancelPaymentLink`, `captureStoredValue`, `cleanupFailedPayment`, `cloneTicketTemplate`, `convertToTermProduct`, `createGroupBooking`, `createGroupEnquiry`, `createMemberException`, `createPaymentLink`, `getChargebackAnalytics`, `getResaleFeePolicy`, `getResaleMarketplaceConfig`, `holdResaleSettlement`, `importTicketTemplate`, `issueInvitation`, `listChargebacks`, `listDeposits`, `listExternalReferenceMappings`, `listFraudRules`, `listInvitationAllowances`, `listMembershipRenewals`, `listOrderDiscounts`, `listOrderFees`, `listPaymentAllocationRules`, `listPaymentProviders`, `listTicketTemplates`, `listUpgrades`, `mergeOrders`, `migrateMembership`, `openGuestCreditAccount`, `printTicketProof`, `pushWalletPassUpdate`, `quoteUpgrade`, `recordChargeback`, `recordChargebackOutcome`, `recordExternalReference`, `releaseResaleSettlementHold`, `relinquishStoredValue`, `renewMembership`, `resendPaymentLink`, `resolveMembershipActivation`, `respondToChargeback`, `revokeEntitlementShare`, `setFraudRules`, `setGroupCustomerOrganization`, `setGroupPaymentSchedule`, `setGroupTicketAllocation`, `setGroupTicketFulfillment`, `setParticipantGuestList`, `setResaleFeePolicy`, `setResaleMarketplaceConfig`, `splitOrder`, `updateGroupBooking`, `voidEntitlement`, `voidPayment` |
+| order | `getDepositPolicy`, `setDepositPolicy` |
+| orders | `assignChargeback`, `authoriseStoredValue`, `cancelPaymentLink`, `captureStoredValue`, `cleanupFailedPayment`, `convertToTermProduct`, `createGroupBooking`, `createGroupEnquiry`, `createMemberException`, `createPaymentLink`, `getChargebackAnalytics`, `getResaleFeePolicy`, `getResaleMarketplaceConfig`, `holdResaleSettlement`, `issueInvitation`, `listChargebacks`, `listDeposits`, `listExternalReferenceMappings`, `listFraudRules`, `listInvitationAllowances`, `listMembershipRenewals`, `listOrderDiscounts`, `listOrderFees`, `listPaymentAllocationRules`, `listPaymentProviders`, `listTicketTemplates`, `listUpgrades`, `mergeOrders`, `migrateMembership`, `openGuestCreditAccount`, `printTicketProof`, `pushWalletPassUpdate`, `quoteUpgrade`, `recordChargeback`, `recordChargebackOutcome`, `recordExternalReference`, `releaseResaleSettlementHold`, `relinquishStoredValue`, `renewMembership`, `resendPaymentLink`, `resolveMembershipActivation`, `respondToChargeback`, `revokeEntitlementShare`, `setFraudRules`, `setGroupCustomerOrganization`, `setGroupPaymentSchedule`, `setGroupTicketAllocation`, `setGroupTicketFulfillment`, `setParticipantGuestList`, `setResaleFeePolicy`, `setResaleMarketplaceConfig`, `splitOrder`, `updateGroupBooking`, `voidEntitlement`, `voidPayment` |
 | payments | `createB2bCreditAccount`, `createPaymentMethod`, `getB2bPaymentTerms`, `getDunningPolicy`, `getInstalmentPolicy`, `getMixedTenderRules`, `getPaymentPerformance`, `getPaymentProviderEconomics`, `getPaymentProviderHealth`, `getPaymentRules`, `listB2bCreditAccounts`, `listDepositActivity`, `listDunningCases`, `listMerchantAccounts`, `listPaymentMethods`, `listPaymentProviderConnections`, `listPaymentRoutingRules`, `listPaymentTerminalCertifications`, `listPaymentTerminals`, `listReconciliationSources`, `listStoredForwardTransactions`, `receivePaymentProviderWebhook`, `recordDepositActivity`, `recordPaymentTerminalCertification`, `resolveDunningCase`, `setB2bPaymentTerms`, `setDunningPolicy`, `setHostedCheckoutConfiguration`, `setMerchantAccount`, `setMixedTenderRules`, `setPaymentAuthenticationPolicy`, `setPaymentFailoverPolicy`, `setPaymentRiskRules`, `setPaymentRoutingRules`, `setPaymentRules`, `setPaymentTerminalConfiguration`, `setReconciliationMatchingRules`, `setReconciliationSource`, `simulatePaymentConfiguration`, `simulatePaymentRouting`, `submitChargebackEvidence`, `testPaymentProviderConnection`, `updatePaymentMethod` |
 | policy | `getRefundPolicy`, `setRefundCalculationPolicy` |
 | refund | `approveRefund`, `createBulkRefund`, `simulateRefund` |
-| shift | `adjustDepositBoxFloat`, `approveShiftClose`, `closeDepositBoxes`, `getShift` |
+| shift | `adjustDepositBoxFloat`, `closeDepositBoxes`, `getShift` |
 | sync | `resolveSyncRejection` |

@@ -50,6 +50,25 @@
   "requestBody": null,
   "responds": "DeviceFirmware"
  },
+ "getOfflinePolicy": {
+  "method": "GET",
+  "path": "/offline-policy",
+  "contract": "tenancy",
+  "summary": "The offline policy saved at one scope node",
+  "permission": "TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "OfflinePolicy"
+ },
  "getWorkstationHealth": {
   "method": "GET",
   "path": "/workstations/{workstationId}/health",

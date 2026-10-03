@@ -1,5 +1,5 @@
 id: LLD-marketing-crm
-title: marketing-crm — 274 operations
+title: marketing-crm — 275 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -62,7 +62,8 @@ operations:
   offline: false
   reads:
   - marketing.challenge
-  writes: []
+  writes:
+  - marketing.challenge
 - operation: activateJourney
   verb: POST
   path: /journeys/{journeyId}/activate
@@ -107,6 +108,7 @@ operations:
   - marketing.guest_profile
   writes:
   - cache:idempotency
+  - marketing.guest_note
 - operation: addSuppression
   verb: POST
   path: /consent/suppression-list
@@ -161,7 +163,8 @@ operations:
   offline: false
   reads:
   - marketing.privacy_change_set
-  writes: []
+  writes:
+  - marketing.privacy_change_set
 - operation: approveWaiverTesting
   verb: PUT
   path: /waiver-testing
@@ -172,7 +175,8 @@ operations:
   offline: false
   reads:
   - marketing.waiver_version_control
-  writes: []
+  writes:
+  - marketing.waiver_version_control
 - operation: awardBadge
   verb: POST
   path: /customers/{customerId}/badges
@@ -308,6 +312,7 @@ operations:
   - marketing.sla_policy
   writes:
   - cache:idempotency
+  - marketing.case
 - operation: createChallenge
   verb: POST
   path: /challenges
@@ -479,7 +484,8 @@ operations:
   offline: false
   reads:
   - marketing.duplicate_candidate
-  writes: []
+  writes:
+  - marketing.duplicate_candidate
 - operation: decideGuestCheckoutMatch
   verb: POST
   path: /guest-checkout/profile-match/decision
@@ -646,6 +652,17 @@ operations:
   - marketing.device_consent
   - marketing.device_consent_category
   - marketing.tracking_technology
+  writes: []
+- operation: getCustomerServiceCopilot
+  verb: GET
+  path: /customer-service-copilot
+  scope: venue
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.service_copilot_config
   writes: []
 - operation: getDeviceConsentHistory
   verb: GET
@@ -2467,7 +2484,8 @@ operations:
   offline: false
   reads:
   - marketing.booking_consent_record
-  writes: []
+  writes:
+  - marketing.booking_consent_record
 - operation: recordCookieScan
   verb: POST
   path: /cookie-tracking-digital/scans
@@ -2750,7 +2768,8 @@ operations:
   - guest
   offline: false
   reads: []
-  writes: []
+  writes:
+  - marketing.conversation_message
 - operation: sendTransactionalMessage
   verb: POST
   path: /messages
@@ -2914,7 +2933,8 @@ operations:
   offline: false
   reads:
   - marketing.communication_preference_type
-  writes: []
+  writes:
+  - marketing.communication_preference_type
 - operation: setCommunicationRoutingRule
   verb: PUT
   path: /routing-priority-throttling
@@ -2937,7 +2957,8 @@ operations:
   offline: false
   reads:
   - marketing.consent_capture_point
-  writes: []
+  writes:
+  - marketing.consent_capture_point
 - operation: setConsentPurposes
   verb: PUT
   path: /consent-purposes
@@ -3165,7 +3186,8 @@ operations:
   offline: false
   reads:
   - marketing.loyalty_position
-  writes: []
+  writes:
+  - marketing.loyalty_position
 - operation: setLegalHold
   verb: PUT
   path: /data-retention-expiry
@@ -3255,7 +3277,8 @@ operations:
   offline: false
   reads:
   - marketing.minor_privacy_rule
-  writes: []
+  writes:
+  - marketing.minor_privacy_rule
 - operation: setOrderBookingTicket
   verb: PUT
   path: /order-booking-ticket

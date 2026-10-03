@@ -99,8 +99,8 @@
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-029",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (pointer moved to the 30 September build, CHG-R1S-015)",
     "verified": "2026-09-28",
     "match": "exact",
     "view": "Footer 'Service status', or Discover → 'Service status'",

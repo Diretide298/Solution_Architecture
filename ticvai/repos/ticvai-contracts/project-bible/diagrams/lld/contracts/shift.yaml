@@ -72,7 +72,10 @@ operations:
   - orders.pos_shift
   - orders.pos_shift_approval
   - orders.pos_shift_incident
-  writes: []
+  writes:
+  - orders.pos_shift
+  - orders.pos_shift_approval
+  - platform.outbox
 - operation: approveShiftOpen
   verb: POST
   path: /shifts/{shiftId}/approve-open
@@ -132,6 +135,7 @@ operations:
   - ledger.journal_entry
   - orders.cash_count_line
   - orders.pos_shift
+  - platform.outbox
 - operation: createCashMovement
   verb: POST
   path: /shifts/{shiftId}/cash-movements
@@ -307,7 +311,9 @@ operations:
   - orders.pos_shift
   - orders.pos_shift_approval
   - orders.pos_shift_incident
-  writes: []
+  writes:
+  - orders.pos_shift
+  - orders.pos_shift_incident
 - operation: reopenShift
   verb: POST
   path: /shifts/{shiftId}/reopen
@@ -389,6 +395,7 @@ operations:
   - ledger.journal_entry
   - orders.cash_count_line
   - orders.pos_shift
+  - platform.outbox
 - operation: suspendShift
   verb: POST
   path: /shifts/{shiftId}/suspend

@@ -398,14 +398,14 @@
     "format": "password",
     "writeOnly": true,
     "nullable": true,
-    "description": "The credential TICVAI presents to the provider. Write-only, never returned, kept on a replace that omits it."
+    "description": "The credential TICVAI presents to the provider. Write-only, never returned, kept on a replace that omits it. **Held in Key Vault**; the row's `outbound_credential` column keeps the secret's reference, never the value (CHG-R1S-020)."
    },
    "signingSecret": {
     "type": "string",
     "format": "password",
     "writeOnly": true,
     "nullable": true,
-    "description": "Signs every request TICVAI sends, as webhook deliveries are signed, so the provider can tell it came from TICVAI. Write-only.\n"
+    "description": "Signs every request TICVAI sends, as webhook deliveries are signed, so the provider can tell it came from TICVAI. Write-only. **Held in Key Vault**; the `signing_secret` column keeps the secret's reference, never the value (CHG-R1S-020).\n"
    },
    "apiClientId": {
     "type": "string",
@@ -414,7 +414,9 @@
    },
    "requestMapping": {
     "type": "array",
-    "description": "Which request fields go to the provider, under which names. **Only mapped fields leave TICVAI** — a provider receives the amount and the subject it needs, not the whole request.\n",
+    "x-ticvai-persistence-kind": "valueObject",
+    "x-ticvai-persistence-column": "jsonb",
+    "description": "Stored whole on the provider row (`request_mapping`, jsonb; 3 October 2026, CHG-R1S-020: the r1 gate found no column held it). Which request fields go to the provider, under which names. **Only mapped fields leave TICVAI** — a provider receives the amount and the subject it needs, not the whole request.\n",
     "items": {
      "type": "object",
      "required": [
@@ -436,7 +438,9 @@
    "decisionMapping": {
     "type": "array",
     "minItems": 2,
-    "description": "The provider's outcome values and the decision each means. At least one maps to `approve` and one to `reject`.",
+    "x-ticvai-persistence-kind": "valueObject",
+    "x-ticvai-persistence-column": "jsonb",
+    "description": "The provider's outcome values and the decision each means. At least one maps to `approve` and one to `reject`. Stored whole on the provider row (`decision_mapping`, jsonb; CHG-R1S-020).",
     "items": {
      "type": "object",
      "required": [

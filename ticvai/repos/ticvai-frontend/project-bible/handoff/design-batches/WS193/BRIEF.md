@@ -129,16 +129,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-1153` | Wallet Security & Risk Command Center | B–D | 2 | 30 | 6 | 2 | 0 | 6 | — | notStarted (—) |
-| `BO-1154` | Wallet Risk Policy Configuration | B–D | 11 | 0 | 6 | 2 | 0 | 6 | — | notStarted (—) |
-| `BO-1155` | Transaction Risk Scoring Engine | B–D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
-| `BO-1156` | Velocity & Behavioral Rule Configuration | B–D | 14 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
-| `BO-1157` | Device, Credential & Account Security | B–D | 0 | 54 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1158` | AI Fraud & Anomaly Detection Studio | B–D | 0 | 2 | 6 | 2 | 0 | 0 | — | notStarted (—) |
-| `BO-1159` | Automated Security Action Orchestration | B–D | 12 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
-| `BO-1160` | Fraud Alert & Investigation Case Management | B–D | 0 | 90 | 6 | 15 | 1 | 0 | — | notStarted (—) |
-| `BO-1161` | Security Rules Testing, Simulation & AI Sandbox | B–D | 0 | 24 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1162` | Security Governance, Audit & Rule Publication | B–D | 4 | 22 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1153` | Wallet Security & Risk Command Center | C | 2 | 30 | 6 | 2 | 0 | 6 | — | notStarted (—) |
+| `BO-1154` | Wallet Risk Policy Configuration | C | 11 | 0 | 6 | 2 | 0 | 6 | — | notStarted (—) |
+| `BO-1155` | Transaction Risk Scoring Engine | C | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `BO-1156` | Velocity & Behavioral Rule Configuration | C | 14 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `BO-1157` | Device, Credential & Account Security | C | 0 | 54 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1158` | AI Fraud & Anomaly Detection Studio | C | 0 | 2 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `BO-1159` | Automated Security Action Orchestration | C | 12 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `BO-1160` | Fraud Alert & Investigation Case Management | D | 0 | 90 | 6 | 15 | 1 | 0 | — | notStarted (—) |
+| `BO-1161` | Security Rules Testing, Simulation & AI Sandbox | B | 0 | 24 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1162` | Security Governance, Audit & Rule Publication | A | 4 | 22 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

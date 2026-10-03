@@ -33,15 +33,15 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: OrderService
-  operationCalls: 89
-- service: CatalogueService
-  operationCalls: 26
+  operationCalls: 91
 - service: FnbService
+  operationCalls: 27
+- service: CatalogueService
   operationCalls: 26
 - service: RetailService
   operationCalls: 19
 - service: TenancyService
-  operationCalls: 14
+  operationCalls: 15
 - service: IdentityService
   operationCalls: 9
 - service: MarketingService
@@ -60,7 +60,7 @@ servicesCalled:
   operationCalls: 1
 coverage:
   screens: 32
-  inAFlow: 20
+  inAFlow: 21
   drawn: 32
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
@@ -96,7 +96,8 @@ screens:
   - POS-025
   boardFrames: null
   wireframe: wireframes/P04 Venue POS.dc.html#pos-000
-  inFlows: null
+  inFlows:
+  - F32 A till opens, trades and settles
 - screen: POS-001
   name: Begin Shift
   module: Shift
@@ -342,6 +343,7 @@ screens:
   - POS-001
   - POS-002
   - POS-010
+  - POS-011
   - POS-022
   - POS-023
   - POS-026
@@ -426,9 +428,10 @@ screens:
   - shiftId<-session
   - boxId<-session
   goesTo:
-  - POS-001
+  - POS-000
   - POS-008
   - POS-009
+  - POS-025
   boardFrames:
   - POS Board 3.dc.html#pos-3f
   - TICVAI Boards v2.dc.html#pos-2f
@@ -644,6 +647,7 @@ screens:
   density: touchLarge
   operations:
   - applyManualDiscount
+  - getOrder
   - recordNoSale
   - voidOrder
   states:
@@ -699,6 +703,7 @@ screens:
   operations:
   - allocateDepositBox
   - configureWorkstation
+  - getDeviceAssignment
   - listDevices
   - setDeviceAssignment
   states:
@@ -727,6 +732,7 @@ screens:
   density: touchLarge
   operations:
   - createCashMovement
+  - listCashMovements
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -941,6 +947,7 @@ screens:
   wave: 1
   density: touchLarge
   operations:
+  - getGuestMenu
   - getTableMap
   - setItemAvailability
   - setTableCombinations
@@ -988,9 +995,12 @@ screens:
   - workstationId<-session
   - shiftId<-session
   goesTo:
+  - BO-024
+  - POS-000
   - POS-002
   - POS-006
   - POS-007
+  - POS-018
   - POS-021
   - POS-023
   - POS-026
@@ -1002,6 +1012,7 @@ screens:
   boardFrames: null
   wireframe: wireframes/P04 Venue POS.dc.html#pos-025
   inFlows:
+  - F32 A till opens, trades and settles
   - F81 A retail sale runs from overview to tender
 - screen: POS-026
   name: Receipt & Reprint

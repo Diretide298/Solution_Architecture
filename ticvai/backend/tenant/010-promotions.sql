@@ -4,7 +4,7 @@
 -- One component’s share, fixed or proportional
 CREATE TABLE IF NOT EXISTS promotions.allocation_component (
     allocation_split_id               uuid NOT NULL,
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     variant_id                        uuid NOT NULL,
     percentage                        numeric(18,4),
     fixed_amount                      numeric(18,4),
@@ -65,10 +65,10 @@ CREATE TABLE IF NOT EXISTS promotions.bundle_capacity_policy (
 
 -- Pick n from a set. The bundle price does not move with the choice (ADR-0019) — the allocation
 -- does Hangs off: a child of promotions.bundle; reaches promotions.promotion through its keys;
--- references promotions.bundle. Reached by: 9 operations read it and 2 write it; 1 tables
+-- references promotions.bundle. Reached by: 8 operations read it and 1 write it; 1 tables
 -- reference it.
 CREATE TABLE IF NOT EXISTS promotions.bundle_choice_group (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     label                             text NOT NULL,
     choose                            integer NOT NULL,
     allow_duplicates                  boolean DEFAULT false,
@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS promotions.bundle_choice_group (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS promotions.bundle_choice_option (
     bundle_choice_group_id            uuid NOT NULL,
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     variant_id                        uuid NOT NULL,
     quantity                          integer,
     is_default                        boolean
@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS promotions.bundle_choice_option (
 -- One product inside a bundle, with its quantity
 CREATE TABLE IF NOT EXISTS promotions.bundle_component (
     bundle_id                         uuid NOT NULL,
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     variant_id                        uuid NOT NULL,
     component_kind                    text DEFAULT 'admission' CONSTRAINT bundle_component_component_kind_chk CHECK (component_kind IN ('admission', 'fnbMenuItem', 'retail', 'addOn', 'other')),
     menu_item_id                      uuid,
@@ -121,7 +121,7 @@ CREATE TABLE IF NOT EXISTS promotions.campaign (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS promotions.campaign_budget (
     campaign_id                       uuid NOT NULL,
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     budget_type                       text NOT NULL CONSTRAINT campaign_budget_budget_type_chk CHECK (budget_type IN ('total', 'discount', 'reward', 'freeProduct')),
     funding_source                    text CONSTRAINT campaign_budget_funding_source_chk CHECK (funding_source IN ('venue', 'department', 'marketing', 'partner')),
     amount                            numeric(18,4) NOT NULL,
@@ -211,7 +211,7 @@ CREATE TABLE IF NOT EXISTS promotions.partner_bundle_product (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS promotions.product_relationship (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     from_product_id                   uuid NOT NULL,
     to_product_id                     uuid NOT NULL,
     kind                              text NOT NULL CONSTRAINT product_relationship_kind_chk CHECK (kind IN ('upgradesTo', 'downgradesTo', 'crossSell', 'accessory', 'substitute', 'requires', 'incompatibleWith')),
@@ -351,7 +351,7 @@ CREATE TABLE IF NOT EXISTS promotions.promotion_rule (
 -- Holds 5 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS promotions.promotion_variant (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     promotion_id                      uuid,
     label                             text NOT NULL,
     traffic_percent                   integer NOT NULL,
@@ -361,7 +361,7 @@ CREATE TABLE IF NOT EXISTS promotions.promotion_variant (
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS promotions.recommendation_experiment (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text,
     placement                         text,
@@ -391,7 +391,7 @@ CREATE TABLE IF NOT EXISTS promotions.recommendation_outcome (
 -- Holds 17 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS promotions.recommendation_strategy (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text NOT NULL,
     objective                         text NOT NULL CONSTRAINT recommendation_strategy_objective_chk CHECK (objective IN ('attachRevenue', 'averageOrderValue', 'upgradeRate', 'visitFrequency', 'inventoryBalance', 'guestSatisfaction')),

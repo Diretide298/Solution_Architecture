@@ -32,7 +32,7 @@ modulesUsed:
   screens: 8
 servicesCalled:
 - service: PlatformService
-  operationCalls: 31
+  operationCalls: 35
 coverage:
   screens: 8
   inAFlow: 8
@@ -44,7 +44,7 @@ screens:
   name: API Reference
   module: Developer & API
   requiresModule: developerApi
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - listApiScopes
@@ -72,6 +72,7 @@ screens:
   wave: 1
   density: compact
   operations:
+  - getDeveloperAccount
   - registerDeveloper
   - setDeveloperMembers
   states:
@@ -235,6 +236,9 @@ screens:
   - certifyIntegration
   - decideProductionAccess
   - deprecateApiVersion
+  - listApiAnomalyRules
+  - listApiLicences
+  - listApiQuotas
   - listProductionAccessRequests
   - setApiAnomalyRule
   - setApiLicensing

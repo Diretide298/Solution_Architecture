@@ -37,6 +37,25 @@
   "requestBody": null,
   "responds": "GraphValidation"
  },
+ "completeUpload": {
+  "method": "POST",
+  "path": "/media/uploads/{uploadId}/complete",
+  "contract": "assets",
+  "summary": "Confirm an upload and create the asset",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MediaAsset"
+ },
  "createAsset": {
   "method": "POST",
   "path": "/assets",
@@ -93,6 +112,25 @@
   ],
   "requestBody": "Resource",
   "responds": "Resource"
+ },
+ "createUpload": {
+  "method": "POST",
+  "path": "/media/uploads",
+  "contract": "assets",
+  "summary": "Request a signed upload URL",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "UploadTicket"
  },
  "createVenueMap": {
   "method": "POST",
@@ -262,6 +300,25 @@
   "parameters": [],
   "requestBody": null,
   "responds": "VenueMapImportJob"
+ },
+ "getVenueNavigationFile": {
+  "method": "GET",
+  "path": "/venue-maps/{mapId}/navigation-file",
+  "contract": "venue-map",
+  "summary": "The map's graph and points as a navigation file",
+  "permission": "VENUE_MAP_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "version",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "VenueNavigationFile"
  },
  "importVenueGeometry": {
   "method": "POST",
@@ -520,6 +577,19 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listProposedActions": {
+  "method": "GET",
+  "path": "/proposed-actions",
+  "contract": "ai",
+  "summary": "What the assistant has proposed and nobody has decided",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ProposedAction"
+ },
  "listResources": {
   "method": "GET",
   "path": "/resources",
@@ -703,6 +773,25 @@
   "path": "/ai/venue-map/{mapId}/propose-labels",
   "contract": "ai",
   "summary": "Suggest what each extracted shape is",
+  "permission": "VENUE_MAP_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "proposeWalkways": {
+  "method": "POST",
+  "path": "/ai/venue-map/{mapId}/propose-walkways",
+  "contract": "ai",
+  "summary": "Find walkable space in a drawing that has no vectors",
   "permission": "VENUE_MAP_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -908,6 +997,25 @@
   ],
   "requestBody": "SetPlacedResourceRequest",
   "responds": "PlacedResource"
+ },
+ "setVenueMapArtwork": {
+  "method": "POST",
+  "path": "/venue-maps/{mapId}/artwork",
+  "contract": "venue-map",
+  "summary": "Set the illustrated map guests see, and how it lines up with the plan",
+  "permission": "VENUE_MAP_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "VenueMap"
  },
  "setVenuePoint": {
   "method": "POST",

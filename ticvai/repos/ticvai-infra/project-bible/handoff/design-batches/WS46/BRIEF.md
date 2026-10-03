@@ -107,15 +107,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-148` | Promotion Rule Builder | B–D | 0 | 0 | 6 | 0 | 1 | 2 | — | notStarted (generated) |
-| `ADM-149` | Percentage & Fixed Discount Configurator | B–D | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-150` | Cart & Transaction Threshold Rules | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
-| `ADM-151` | Volume, Bulk & Tier Discount Configurator | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-152` | Time-Based & Seasonal Discount Rules | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-153` | Customer, Membership & Segment Discount Rules | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
-| `ADM-154` | Payment Method, Bank & Partner Discount Rules | B–D | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-155` | Special Price & Guest Offer Configurator | B–D | 12 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-156` | Discount Limits, Guardrails & Commercial Controls | B–D | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-157` | Rule Test, Simulation & AI Recommendation Workspace | B–D | 15 | 0 | 6 | 18 | 0 | 0 | — | notStarted (generated) |
+| `ADM-149` | Percentage & Fixed Discount Configurator | B | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-150` | Cart & Transaction Threshold Rules | B | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `ADM-151` | Volume, Bulk & Tier Discount Configurator | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-152` | Time-Based & Seasonal Discount Rules | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-153` | Customer, Membership & Segment Discount Rules | B | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `ADM-154` | Payment Method, Bank & Partner Discount Rules | B | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-155` | Special Price & Guest Offer Configurator | B | 12 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-156` | Discount Limits, Guardrails & Commercial Controls | B | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-157` | Rule Test, Simulation & AI Recommendation Workspace | B | 15 | 0 | 6 | 18 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

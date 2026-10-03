@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-1133` | Wallet Usage & Channel Command Center | B–D | 2 | 28 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-1134` | Wallet Channel Configuration | B–D | 30 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-1135` | Wallet Payment & Redemption Policy | B–D | 16 | 0 | 6 | 0 | 2 | 6 | — | notStarted (—) |
-| `BO-1136` | Wearable & Credential Type Configuration | B–D | 18 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1137` | Wearable Linking & Wallet Association Rules | B–D | 24 | 0 | 6 | 0 | 2 | 6 | — | notStarted (—) |
-| `BO-1138` | NFC, RFID & QR Interaction Rules | B–D | 11 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1139` | Digital Key & Wallet Authentication Policy | B–D | 15 | 0 | 6 | 1 | 0 | 6 | — | notStarted (—) |
-| `BO-1140` | Offline Wallet & Degraded Mode Configuration | B–D | 20 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-1141` | Device, Terminal & Acceptance Point Mapping | B–D | 14 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1142` | Wallet Transaction Simulator, Monitoring & Channel Audit | B–D | 0 | 0 | 6 | 3 | 1 | 6 | — | notStarted (—) |
+| `BO-1133` | Wallet Usage & Channel Command Center | B | 2 | 28 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-1134` | Wallet Channel Configuration | C | 30 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-1135` | Wallet Payment & Redemption Policy | C | 16 | 0 | 6 | 0 | 2 | 6 | — | notStarted (—) |
+| `BO-1136` | Wearable & Credential Type Configuration | C | 18 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1137` | Wearable Linking & Wallet Association Rules | C | 24 | 0 | 6 | 0 | 2 | 6 | — | notStarted (—) |
+| `BO-1138` | NFC, RFID & QR Interaction Rules | C | 11 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1139` | Digital Key & Wallet Authentication Policy | C | 15 | 0 | 6 | 1 | 0 | 6 | — | notStarted (—) |
+| `BO-1140` | Offline Wallet & Degraded Mode Configuration | C | 20 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-1141` | Device, Terminal & Acceptance Point Mapping | C | 14 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1142` | Wallet Transaction Simulator, Monitoring & Channel Audit | C | 0 | 0 | 6 | 3 | 1 | 6 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

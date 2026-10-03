@@ -99,16 +99,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-544` | Rental Checkout Command Center | B–D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-545` | Voucher Scan & Reservation Retrieval | B–D | 0 | 0 | 6 | 0 | 1 | 2 | — | notStarted (—) |
-| `BO-546` | Checkout Readiness Validation | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-547` | Equipment Assignment Workspace | B–D | 0 | 11 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-548` | Equipment Scan & Validation | B–D | 1 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
-| `BO-549` | Pre-Rental Condition Inspection | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-550` | Safety & Handover Checklist | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-551` | Deposit & Financial Handover Validation | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-552` | Group & Multi-Item Checkout | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-553` | Checkout Confirmation & Rental Activation | B–D | 2 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-544` | Rental Checkout Command Center | D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-545` | Voucher Scan & Reservation Retrieval | D | 0 | 0 | 6 | 0 | 1 | 2 | — | notStarted (—) |
+| `BO-546` | Checkout Readiness Validation | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-547` | Equipment Assignment Workspace | D | 0 | 11 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-548` | Equipment Scan & Validation | D | 1 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
+| `BO-549` | Pre-Rental Condition Inspection | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-550` | Safety & Handover Checklist | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-551` | Deposit & Financial Handover Validation | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-552` | Group & Multi-Item Checkout | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-553` | Checkout Confirmation & Rental Activation | D | 2 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

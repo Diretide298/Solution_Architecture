@@ -75,6 +75,19 @@
   "requestBody": "TicketTemplateRequest",
   "responds": "TicketTemplate"
  },
+ "getPdfPrintablePos": {
+  "method": "GET",
+  "path": "/pdf-printable-pos",
+  "contract": "access",
+  "summary": "The printable ticket design as saved",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PdfPrintablePosTicketDesignerView"
+ },
  "importTicketTemplate": {
   "method": "POST",
   "path": "/ticket-templates/imports",

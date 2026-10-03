@@ -430,8 +430,8 @@
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-001",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (pointer moved to the 30 September build, CHG-R1S-015)",
     "verified": "2026-09-28",
     "match": "partial",
     "view": "Header 'Discover' (default view on load)",
@@ -687,8 +687,8 @@
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-002",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3 (29 September build)",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (30 September build; the view as verified on the 29 September build, CHG-R1S-015)",
     "verified": "2026-09-29",
     "match": "exact",
     "view": "Header 'What's on'"
@@ -850,8 +850,8 @@
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-003",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (pointer moved to the 30 September build, CHG-R1S-015)",
     "verified": "2026-09-28",
     "match": "partial",
     "view": "Discover → search box in the hero (opens the search panel) → Enter lands on What's on filtered by the query",
@@ -1180,8 +1180,8 @@
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-004",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3 (29 September build)",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (30 September build; the view as verified on the 29 September build, CHG-R1S-015)",
     "verified": "2026-09-29",
     "match": "partial",
     "view": "Config → Marketing layer → 'Single-event page' on, then Book; or any product card → 'Read more' dialog; or a listing card's preview aside",

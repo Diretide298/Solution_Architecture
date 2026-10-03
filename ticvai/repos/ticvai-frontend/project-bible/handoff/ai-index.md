@@ -13,7 +13,7 @@
 | **Tables** | 138 |
 | **Screens** | 194 |
 | **Flows** | 11 |
-| **Documents** | 66 |
+| **Documents** | 67 |
 | **Open conflicts** | 1 |
 
 ## Reached outside the contract
@@ -347,7 +347,7 @@
 - `GST-001` Home — wave 1, 2 operations
 - `GST-031` AI Concierge – Home — wave 1, 5 operations
 - `GST-032` AI Concierge – Chat — wave 1, 2 operations
-- `GST-033` AI Concierge – Contextual Help — wave 1, 3 operations
+- `GST-033` AI Concierge – Contextual Help — wave 1, 4 operations
 - `GST-036` Loyalty & Rewards — wave 1, 2 operations
 - `GST-048` Upsell / Cross-Sell — wave 1, 2 operations
 - `GST-054` AI Planner — wave 1, 3 operations
@@ -390,7 +390,7 @@
 - `BO-060` Attendance & Footfall — wave 2, 2 operations
 - `BO-084` Approval Inbox — wave 1, 1 operation
 - `BO-091` AI Policy & Spend — wave 1, 11 operations
-- `BO-093` Map Import & Labelling — wave 1, 1 operation
+- `BO-093` Map Import & Labelling — wave 1, 3 operations
 - `BO-102` Sell — wave 1, 1 operation
 - `BO-1048` Seat Upsell Recommendations — wave 3, 1 operation
 - `BO-1160` Fraud Alert & Investigation Case Management — wave 3, 5 operations
@@ -549,7 +549,7 @@
 
 **P16 Venue Analytics**
 
-- `ANL-001` Executive Command Center — wave 3, 2 operations
+- `ANL-001` Executive Command Center — wave 1, 2 operations
 - `ANL-006` Inventory & Waste Intelligence — wave 3, 1 operation
 - `ANL-008` Demand Forecasting — wave 3, 2 operations
 - `ANL-009` AI Assistant & Action Center — wave 3, 4 operations
@@ -645,8 +645,9 @@
 | [ADR-0061: Replica floors are set per deployable and per zone](..\docs\adr\0061-replica-floors-per-deployable.md) | Accepted · 1 October 2026 · Chinmay Parab | 1 |
 | [ADR-0063: Encryption and keys, and biometric templates stay with the biometric vendor](..\docs\adr\0063-encryption-keys-and-biometric-templates.md) | Accepted in part · 2 October 2026: the biometric consent, en | 1 |
 | [ADR-0064: Every tenant has a request budget, and a busy tenant cannot starve the others](..\docs\adr\0064-per-tenant-limits.md) | Accepted · 1 October 2026 · Chinmay Parab | 1 |
+| [ADR-0069: In-park 3D navigation is built natively, from a venue model, a pathway file and GPS](..\docs\adr\0069-in-park-3d-navigation-is-built-natively.md) | Accepted · 30 September 2026 · agreed with the client in the | 3 |
 | [AI provider credentials — where the key lives and who can reach it](..\docs\architecture\ai-credentials.md) |  | 3 |
-| [TICVAI AI subsystem: system design](..\docs\architecture\ai-system-design.md) |  | 162 |
+| [TICVAI AI subsystem: system design](..\docs\architecture\ai-system-design.md) |  | 163 |
 | [Data Model](..\docs\architecture\data-model.md) |  | 1 |
 | [Architecture](..\docs\architecture\README.md) |  | 1 |
 

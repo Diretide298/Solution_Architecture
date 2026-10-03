@@ -57,28 +57,28 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: CatalogueService
-  operationCalls: 810
+  operationCalls: 817
 - service: VenueOpsService
-  operationCalls: 519
+  operationCalls: 527
 - service: TenancyService
-  operationCalls: 483
+  operationCalls: 486
 - service: OrderService
-  operationCalls: 422
+  operationCalls: 423
 - service: AccessService
-  operationCalls: 291
+  operationCalls: 297
 - service: MarketingService
-  operationCalls: 221
+  operationCalls: 225
 - service: WalletService
   operationCalls: 219
 - service: AiService
-  operationCalls: 112
+  operationCalls: 114
 - service: PlatformService
   operationCalls: 97
+- service: FnbService
+  operationCalls: 93
 - service: LedgerService
   operationCalls: 88
 - service: ReportingService
-  operationCalls: 87
-- service: FnbService
   operationCalls: 87
 - service: InventoryService
   operationCalls: 81
@@ -291,6 +291,7 @@ screens:
   - createMerchandise
   - createProduct
   - getProduct
+  - getProductAttributes
   - listAlternativeCodes
   - listBookingFlows
   - listMenus
@@ -337,6 +338,7 @@ screens:
   - assessProductChange
   - cloneProduct
   - getProduct
+  - getProductAttributes
   - listBookingFlows
   - listConsentQuestions
   - listProductVariants
@@ -476,9 +478,12 @@ screens:
   operations:
   - createBundle
   - createCombo
+  - getBundle
   - getGroupPackageDefinition
   - getLatestBundle
+  - getPackagePricingDefinition
   - listCatalogueBundles
+  - listCombos
   - listCommercialCampaigns
   - listMenus
   - setComboSlots
@@ -517,6 +522,7 @@ screens:
   - createEntitlementTemplate
   - createProduct
   - getProduct
+  - getProductAttributes
   - listAlternativeCodes
   - listEntitlementTemplates
   - listProductVariants
@@ -1151,6 +1157,7 @@ screens:
   operations:
   - createAdmissionRules
   - listAdmissionRules
+  - listEntryRulePoints
   - setEntryRulePoints
   - updateAdmissionRules
   states:
@@ -1484,6 +1491,7 @@ screens:
   - getHaccpStatus
   - getReturnPolicy
   - getTableMap
+  - listDeliveryLocations
   - listOutlets
   - recordCorrectiveAction
   - setDeliveryLocationOutletMapping
@@ -2157,6 +2165,7 @@ screens:
   - getRefundPolicy
   - getTillShiftPolicy
   - getVenueSettings
+  - listDeliveryLocations
   - setDeliveryLocationOutletMapping
   - setRefundPolicy
   - setTillShiftPolicy
@@ -3022,9 +3031,13 @@ screens:
   operations:
   - acceptVenueLabelProposals
   - acceptWalkwayProposals
+  - completeUpload
+  - createUpload
   - getVenueMapImportJob
   - importVenueGeometry
+  - listProposedActions
   - proposeVenueLabels
+  - proposeWalkways
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -3050,14 +3063,18 @@ screens:
   wave: 1
   density: compact
   operations:
+  - completeUpload
+  - createUpload
   - getVenueMap
   - getVenueMapGraph
+  - getVenueNavigationFile
   - listCatalogueBundles
   - listProducts
   - publishVenueMap
   - searchMedia
   - setPathClosure
   - setPlacedResource
+  - setVenueMapArtwork
   - setVenuePoint
   - validateVenueMapGraph
   states:
@@ -3251,6 +3268,7 @@ screens:
   - ADM-218
   - ADM-228
   - ADM-238
+  - ADM-243
   - ADM-248
   - ADM-258
   - ADM-268
@@ -3261,7 +3279,9 @@ screens:
   - ADM-319
   - ADM-329
   - ADM-339
+  - ADM-342
   - ADM-349
+  - ADM-354
   - ADM-359
   - ADM-559
   - ADM-569
@@ -3298,6 +3318,7 @@ screens:
   - BO-1051
   - BO-106
   - BO-1061
+  - BO-1065
   - BO-107
   - BO-1071
   - BO-108
@@ -3462,6 +3483,11 @@ screens:
   - BO-077
   - BO-089
   - BO-090
+  - BO-1094
+  - BO-1111
+  - BO-1146
+  - BO-1162
+  - BO-1179
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-101
   inFlows: null
@@ -3485,6 +3511,9 @@ screens:
   entryParams:
   - venueId<-session
   goesTo:
+  - ADM-164
+  - ADM-570
+  - ADM-603
   - BO-007
   - BO-009
   - BO-010
@@ -3520,6 +3549,7 @@ screens:
   - BO-126
   - BO-142
   - BO-143
+  - BO-696
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-102
   inFlows: null
@@ -3566,6 +3596,23 @@ screens:
   - BO-097
   - BO-098
   - BO-099
+  - BO-1045
+  - BO-1062
+  - BO-151
+  - BO-155
+  - BO-161
+  - BO-166
+  - BO-167
+  - BO-168
+  - BO-185
+  - BO-186
+  - BO-188
+  - BO-189
+  - BO-201
+  - BO-230
+  - BO-335
+  - BO-346
+  - BO-618
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-103
   inFlows: null
@@ -3694,6 +3741,16 @@ screens:
   - BO-068
   - BO-073
   - BO-091
+  - BO-755
+  - BO-766
+  - BO-772
+  - BO-785
+  - BO-798
+  - BO-799
+  - BO-825
+  - BO-826
+  - BO-827
+  - BO-828
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-107
   inFlows: null
@@ -3734,6 +3791,15 @@ screens:
   - BO-131
   - BO-132
   - BO-133
+  - BO-395
+  - BO-857
+  - BO-861
+  - BO-866
+  - BO-870
+  - BO-877
+  - BO-911
+  - BO-919
+  - BO-927
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-108
   inFlows: null
@@ -3795,7 +3861,9 @@ screens:
   density: compact
   operations:
   - getAllergenVerification
+  - listIngredientSubstitutes
   - listRecipes
+  - listSubstitutionRules
   - setIngredientSubstitutes
   - setRecipe
   - setSubstitutionRules
@@ -3967,6 +4035,7 @@ screens:
   operations:
   - commitCatalogueImport
   - generateConfiguration
+  - getCatalogueImportJob
   - importProductCatalogue
   states:
   - emptyFirstRun
@@ -4304,6 +4373,7 @@ screens:
   wave: 1
   density: compact
   operations:
+  - getOfflinePolicy
   - listSyncRejections
   - resolveSyncRejection
   - setOfflinePolicy
@@ -4467,6 +4537,7 @@ screens:
   wave: 1
   density: compact
   operations:
+  - getCourseRules
   - getVenueSettings
   - setCourseRules
   - setVenueSettings
@@ -5275,6 +5346,7 @@ screens:
   wave: 1
   density: compact
   operations:
+  - getBleBeaconGeofence
   - setBleBeaconGeofence
   states:
   - emptyFirstRun
@@ -5670,6 +5742,7 @@ screens:
   wave: 1
   density: compact
   operations:
+  - getBiometricVerificationProfile
   - setBiometricVerificationProfile
   states:
   - emptyFirstRun
@@ -5691,6 +5764,7 @@ screens:
   wave: 1
   density: compact
   operations:
+  - getFacePassEnrollmentConfiguration
   - setFacePassEnrollment
   states:
   - emptyFirstRun
@@ -9241,6 +9315,7 @@ screens:
   wave: 1
   density: compact
   operations:
+  - getVirtualTicketIdentity
   - setVirtualTicketIdentity
   states:
   - emptyFirstRun
@@ -9498,6 +9573,7 @@ screens:
   density: compact
   operations:
   - createTicketTemplate
+  - getPdfPrintablePos
   - listTicketTemplates
   - printTicketProof
   - setPdfPrintablePos
@@ -15987,6 +16063,7 @@ screens:
   operations:
   - createForm
   - getForm
+  - listAccreditationProgrammes
   - listForms
   - updateAccreditationProgramme
   states:
@@ -20364,6 +20441,7 @@ screens:
   wave: 1
   density: compact
   operations:
+  - getCustomerServiceCopilot
   - ingestKnowledgeDocument
   - listKnowledgeCollections
   - listKnowledgeGaps
@@ -20387,7 +20465,7 @@ screens:
   name: Agent Workspace
   module: Engagement & Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - claimConversation
@@ -21059,6 +21137,7 @@ screens:
   density: compact
   operations:
   - getLoyaltyRules
+  - listLoyaltyCampaigns
   - setLoyaltyCampaign
   - setLoyaltyRules
   states:
@@ -21084,6 +21163,8 @@ screens:
   density: compact
   operations:
   - createLoyaltyProgramme
+  - listLoyaltyProgrammes
+  - listRewards
   - setReward
   states:
   - emptyFirstRun
@@ -22281,6 +22362,8 @@ screens:
   wave: 1
   density: compact
   operations:
+  - getExperienceResourceRequirements
+  - listResources
   - setExperienceResourceRequirements
   - suggestResources
   states:
@@ -26397,7 +26480,7 @@ screens:
   name: Price Bands & Categories
   module: Access & Venue
   requiresModule: seating
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - createSeatCategory
@@ -26798,7 +26881,7 @@ screens:
   name: Tenant & Brand Context
   module: Access & Venue
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - getOrgUnit
@@ -26872,7 +26955,7 @@ screens:
   name: Currency, Timezone & Channels
   module: Setup
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - getRegionSettings
@@ -27598,7 +27681,7 @@ screens:
   name: Funding Method Configuration
   module: Orders & Money
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - getWalletFundingRules
@@ -28005,7 +28088,7 @@ screens:
   name: Credit Expiry, Extension & Forfeiture Operations
   module: Orders & Money
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - expireCreditLots
@@ -28856,7 +28939,7 @@ screens:
   name: Refund-to-Wallet Policy Configuration
   module: Orders & Money
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - getRefundPolicy
@@ -29246,7 +29329,7 @@ screens:
   name: Security Governance, Audit & Rule Publication
   module: Orders & Money
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - diffWalletConfigurationVersion
@@ -29769,7 +29852,7 @@ screens:
   name: Transport Stations
   module: Transport
   requiresModule: transport
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - createTransportStation
@@ -29796,7 +29879,7 @@ screens:
   name: Transport Routes & Stops
   module: Transport
   requiresModule: transport
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - createTransportRoute
@@ -29831,7 +29914,7 @@ screens:
   name: Transport Fares & Passenger Types
   module: Transport
   requiresModule: transport
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - getTransportFareTable
@@ -29858,7 +29941,7 @@ screens:
   name: Transport Timetables
   module: Transport
   requiresModule: transport
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - createTransportTimetable
@@ -29918,7 +30001,7 @@ screens:
   name: Transport Pass Types
   module: Transport
   requiresModule: transport
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - createTransportPassType
@@ -29945,7 +30028,7 @@ screens:
   name: Transport Network Import
   module: Transport
   requiresModule: transport
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - applyTransportNetworkImport
@@ -30467,6 +30550,7 @@ screens:
   wave: 1
   density: compact
   operations:
+  - getTaxProfileJurisdiction
   - listEInvoicingProviders
   - listTaxInvoiceTemplates
   - setEInvoicingProvider
@@ -34551,6 +34635,7 @@ screens:
   operations:
   - createApprovalDelegation
   - listApprovalDelegations
+  - listApprovalMatrices
   - setApprovalMatrix
   states:
   - emptyFirstRun
@@ -37130,6 +37215,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - cancelPaymentLink
   - getPaymentLink
   - resendPaymentLink
   states:

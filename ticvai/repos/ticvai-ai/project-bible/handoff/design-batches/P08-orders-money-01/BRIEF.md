@@ -163,16 +163,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-022` | Order Detail | B–D | 127 | 39 | 6 | 72 | 1 | 0 | — | notStarted (generated) |
-| `BO-023` | Refunds & Exchanges | B–D | 95 | 43 | 6 | 60 | 3 | 6 | — | notStarted (generated) |
-| `BO-024` | Payment Exceptions | B–D | 29 | 28 | 5 | 2 | 0 | 0 | — | notStarted (generated) |
-| `BO-025` | Chargebacks & Disputes | B–D | 10 | 27 | 6 | 5 | 0 | 0 | — | notStarted (generated) |
-| `BO-026` | Group Bookings | B–D | 158 | 47 | 6 | 77 | 2 | 6 | — | notStarted (generated) |
-| `BO-027` | Reissue & Media Replacement | B–D | 13 | 7 | 6 | 22 | 0 | 0 | — | notStarted (generated) |
-| `BO-028` | Refund Approval Queue | B–D | 2 | 0 | 4 | 1 | 5 | 6 | — | notStarted (generated) |
+| `BO-022` | Order Detail | C | 127 | 39 | 6 | 72 | 1 | 0 | — | notStarted (generated) |
+| `BO-023` | Refunds & Exchanges | A | 95 | 43 | 6 | 60 | 3 | 6 | — | notStarted (generated) |
+| `BO-024` | Payment Exceptions | A | 29 | 28 | 5 | 2 | 0 | 0 | — | notStarted (generated) |
+| `BO-025` | Chargebacks & Disputes | C | 10 | 27 | 6 | 5 | 0 | 0 | — | notStarted (generated) |
+| `BO-026` | Group Bookings | C | 158 | 47 | 6 | 77 | 2 | 6 | — | notStarted (generated) |
+| `BO-027` | Reissue & Media Replacement | C | 13 | 7 | 6 | 22 | 0 | 0 | — | notStarted (generated) |
+| `BO-028` | Refund Approval Queue | C | 2 | 0 | 4 | 1 | 5 | 6 | — | notStarted (generated) |
 | `BO-029` | Report Builder | A | 76 | 13 | 6 | 88 | 1 | 0 | — | notStarted (generated) |
-| `BO-039` | Shift Directory | B–D | 4 | 21 | 6 | 1 | 2 | 6 | — | notStarted (generated) |
-| `BO-040` | Variance Approval | B–D | 26 | 34 | 6 | 5 | 1 | 3 | — | notStarted (generated) |
+| `BO-039` | Shift Directory | C | 4 | 21 | 6 | 1 | 2 | 6 | — | notStarted (generated) |
+| `BO-040` | Variance Approval | C | 26 | 34 | 6 | 5 | 1 | 3 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Marketing & CRM
   version: 0.1.0
-  x-ticvai-screen-count: 232
+  x-ticvai-screen-count: 233
   x-ticvai-tier: satellite
   x-ticvai-module: 22 — Marketing & CRM
   x-ticvai-requirements: 319
@@ -312,6 +312,10 @@ paths:
         format: uuid
     get:
       operationId: getGuestConversation
+      x-ticvai-consumed-by:
+        - "P01 WEB-044 AI Concierge – Home"
+        - "P02 GST-031 AI Concierge – Home"
+        - "P02 GST-032 AI Concierge – Chat"
       security:
       - guestAuth: []
       summary: The guest's own handed-over conversation, with the agent's replies and the queue position

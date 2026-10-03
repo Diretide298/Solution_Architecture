@@ -266,7 +266,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|
 | Sign in (primary button) | `login` POST `/auth/login` | LoginRequest | LoginResponse | 400 Validation failed; 409 An active session already exists for this principal on another device. Per §3.1.3 the new login is refused. | — |
 | Continue with your organisation (secondary button) | `startSsoAuthorization` GET `/auth/sso/{providerId}/authorize` | — | inline | — | — |
-| Verify (primary button) | `verifyMfaChallenge` POST `/auth/mfa/challenge/{challengeId}/verify` | inline | inline | — | — |
+| Verify (primary button) | `verifyMfaChallenge` POST `/auth/mfa/challenge/{challengeId}/verify` | inline | inline | 410 The challenge has expired or was voided (by a fifth wrong code, or a newer challenge for the same purpose).; 422 A wrong code, attempts one to four (CHG-R1S-025; the r1 gate found only the fifth failure specified). | — |
 | Email me a code instead (secondary button) | `createMfaChallenge` POST `/auth/mfa/challenge` | inline | inline | — | — |
 | Set up the authenticator app (secondary button) | `enrolMfaMethod` POST `/auth/mfa/methods` | inline | MfaEnrolment | 403 A guest caller while no venue of the tenant has guest two-step verification on (rev 3 GAP-B1, per venue).; 422 A kind the caller may not enrol. Staff use `totp`, with `emailOtp` as the fallback (audit R126); a guest … | — |
 | Choose role (secondary button) | `selectRole` POST `/auth/select-role` | inline | Session | 403 Authenticated but not permitted at the requested scope | — |
@@ -297,7 +297,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | MFA required (`?state=mfaRequired`) | **Signed in, not yet through.** The principal holds a permission that requires MFA (ROLE_MANAGE, LEDGER_APPROVE, any PLATFORM_* permission, or one the tenant added), so the screen calls `createMfaChallenge` (`action: signIn`) and asks for the authentication code; `verifyMfaChallenge` completes the sign-in. **Email me a code instead** is the fallback. Five wrong codes lock step-up for the policy's lockout minutes and the screen says until when (audit R135, R126). A person without such a … |
 | MFA enrolment required (`?state=mfaEnrolmentRequired`) | **First sign-in, no method yet.** A person who requires MFA and has no active method enrols the authenticator app (email as the fallback) with `enrolMfaMethod`, confirms it with the first code (`verifyMfaEnrolment`), sees the recovery codes once, then continues to the code step (audit R135, R126 (5)). |
 | Offline (`?state=offline`) | Not available, and the offline banner says why: signing in needs a connection. |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 An active session already exists for this principal on another device. Per §3.1.3 the new login is refused.; 422 A kind the caller may not enrol. Staff use `totp`, with `emailOtp` as the fallback (audit R126); a guest the same (rev 3 GAP-B1).; 422 The new credential fails the password policy, or matches the current one or any of the previous … |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 An active session already exists for this principal on another device. Per §3.1.3 the new login is refused.; 422 A kind the caller may not enrol. Staff use `totp`, with `emailOtp` as the fallback (audit R126); a guest the same (rev 3 GAP-B1).; 422 A wrong code, attempts one to four (CHG-R1S-025; the r1 gate found only the fifth failure specified). |
 
 #### Edge cases to draw
 
@@ -380,7 +380,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (16), with its required mark, default, format and its error state (400, 403, 409, 422).
+- [ ] Every input above is drawn (16), with its required mark, default, format and its error state (400, 403, 409, 410, 422).
 - [ ] Every output is drawn (51 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-001?state=<state>`: loading, emptyFirstRun, error, denied, emptyNoAccess, emptyNoResults, sessionHeld, mfaRequired, mfaEnrolmentRequired, offline.
 - [ ] Every action is wired with its success and its failure: Sign in, Continue with your organisation, Verify, Email me a code instead, Set up the authenticator app, Choose role.
@@ -886,6 +886,8 @@ Names the device and when the session started, then asks for the authentication 
 |---|---|---|---|---|---|---|---|
 | Code `code` | text field | required | — | — | — | — | `verifyMfaChallenge` body |
 
+Errors to draw in the form: 410 The challenge has expired or was voided (by a fifth wrong code, or a newer challenge for the same purpose).; 422 A wrong code, attempts one to four (CHG-R1S-025; the r1 gate found only the fifth failure specified).
+
 **Form: Remove method** (confirmDialog, opened by *Remove method*; *Send the code* calls `createMfaChallenge`, *Cancel* sends nothing)
 
 Names the method, asks for the authentication code first (`createMfaChallenge`), and is refused for the last method.
@@ -904,8 +906,8 @@ Names the method, asks for the authentication code first (`createMfaChallenge`),
 
 | Shows | Format | Notes |
 |---|---|---|
-| Principal name | text | — |
-| Role name | text | — |
+| Principal name | text | Read from `identity.principal` with the row. |
+| Role name | text | Read from `identity.role` with the row. |
 | Started at | 1 Oct 2026, 14:30 | — |
 | Last seen at | 1 Oct 2026, 14:30 | — |
 
@@ -999,7 +1001,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (10), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
+- [ ] Every input above is drawn (10), with its required mark, default, format and its error state (400, 403, 404, 409, 410, 422).
 - [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-699?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, stepUp, offline.
 - [ ] Every action is wired with its success and its failure: Add a method, Confirm the code, Remove method, Change password, Sign this session out.
@@ -1116,7 +1118,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"ActiveSession": {"x-ticvai-persistence":"none — Redis session registry","type":"object","required":["sessionId","principalId","status","startedAt","lastSeenAt"],"properties":{"status":{"allOf":[{"$ref":"#/components/schemas/SessionStatus"}],"description":"**A registry that only holds live sessions cannot answer why one ended.** Kept on the record so a supervisor asking *what happened to till 4* gets `terminated` or `expired` rather than an absence.\n"},"sessionId":{"type":"string"},"principalId":{"type":"string","format":"uuid"},"principalName":{"type":"string"},"roleId":{"type":"string","format":"uuid","nullable":true},"roleName":{"type":"string","nullable":true},"workstationId":{"type":"string","format":"uuid","nullable":true},"workstationName":{"type":"string","nullable":true},"venueId":{"type":"string","format":"uuid","nullable":true},"ipAddress":{"type":"string","nullable":true},"deviceInfo":{"type":"string","nullable":true},"hasOpenShift":{"type":"boolean","description":"Revoking this session leaves cash unreconciled."},"mfaSatisfied":{"type":"boolean"},"startedAt":{"type":"string","format":"date-time"},"lastSeenAt":{"type":"string","format":"date-time"}}},
+"ActiveSession": {"x-ticvai-persistence":"identity.session","description":"**The session record, in `identity.session`** (3 October 2026, CHG-R1S-008; the HLD/LLD cross-check and the r1 gate). Until then it was \"none — Redis session registry\", and 11 operations wrote a session no SQL created: nothing defined its columns, so `listActiveSessions` could not page, filter by workstation or venue, or run under row-level security. The row is the record of record, tenant-scoped and under RLS like every identity table; Redis stays the token cache in front of it (ADR-0004: a session is a token with a validity window, and the cache answers that check). The names and `hasOpenShift` are read with it, not stored.","type":"object","required":["sessionId","principalId","status","startedAt","lastSeenAt"],"properties":{"status":{"allOf":[{"$ref":"#/components/schemas/SessionStatus"}],"description":"**A registry that only holds live sessions cannot answer why one ended.** Kept on the record so a supervisor asking *what happened to till 4* gets `terminated` or `expired` rather than an absence.\n"},"sessionId":{"type":"string"},"principalId":{"type":"string","format":"uuid"},"principalName":{"type":"string","x-ticvai-persisted":false,"description":"Read from `identity.principal` with the row."},"roleId":{"type":"string","format":"uuid","nullable":true},"roleName":{"type":"string","nullable":true,"x-ticvai-persisted":false,"description":"Read from `identity.role` with the row."},"workstationId":{"type":"string","format":"uuid","nullable":true},"workstationName":{"type":"string","nullable":true,"x-ticvai-persisted":false,"description":"Read from the workstation with the row."},"venueId":{"type":"string","format":"uuid","nullable":true},"ipAddress":{"type":"string","nullable":true},"deviceInfo":{"type":"string","nullable":true},"hasOpenShift":{"type":"boolean","x-ticvai-persisted":false,"x-ticvai-derived":"onRead","description":"Revoking this session leaves cash unreconciled. **Computed on read** from the shift the principal holds open at the workstation (`orders.pos_shift`), never stored here."},"mfaSatisfied":{"type":"boolean"},"startedAt":{"type":"string","format":"date-time"},"lastSeenAt":{"type":"string","format":"date-time"}}},
 "ChangeCredentialRequest": {"type":"object","description":"Request only. The credential itself is stored hashed in `identity.principal_credential` and is never returned by any operation (`handoff/schema-storage-only.md`).\n","required":["method","currentCredential","newCredential"],"properties":{"method":{"type":"string","enum":["password","pin"],"description":"Which credential is being changed. Card, RFID and SSO are not secrets the principal holds, so they are not changed here."},"currentCredential":{"type":"string","maxLength":512,"writeOnly":true},"newCredential":{"type":"string","maxLength":512,"writeOnly":true}}},
 "CreatePrincipalRequest": {"type":"object","required":["username","displayName"],"properties":{"username":{"type":"string","maxLength":256},"displayName":{"type":"string","maxLength":200},"initialCredential":{"type":"string","maxLength":512,"writeOnly":true},"mustChangeCredential":{"type":"boolean","default":true},"validTo":{"type":"string","format":"date-time"},"roleIds":{"type":"array","items":{"type":"string","format":"uuid"}}}},
 "LocalisedText": {"x-ticvai-persistence":"none — jsonb column","type":"object","additionalProperties":{"type":"string"}},

@@ -97,16 +97,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-454` | Card Lifecycle Command Center | B–D | 2 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
-| `BO-455` | Card / Credential Profile | B–D | 0 | 18 | 6 | 2 | 1 | 0 | — | notStarted (—) |
-| `BO-456` | Card Expiry Rule Configuration | B–D | 4 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-457` | Last Recharge & Last Activity Tracking | B–D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
-| `BO-458` | Expiry Monitoring & Upcoming Expiration | B–D | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-459` | Card Expiry Runtime Validation | B–D | 7 | 2 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-460` | Card Block, Suspend & Reactivation Control | B–D | 0 | 8 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-461` | Card Replacement & Wallet Relinking | B–D | 0 | 4 | 6 | 0 | 2 | 6 | — | notStarted (—) |
-| `BO-462` | Customer Balance & Credential Status View | B–D | 0 | 6 | 6 | 2 | 0 | 0 | — | notStarted (—) |
-| `BO-463` | Card Lifecycle Audit & History | B–D | 0 | 4 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-454` | Card Lifecycle Command Center | D | 2 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `BO-455` | Card / Credential Profile | D | 0 | 18 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `BO-456` | Card Expiry Rule Configuration | D | 4 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-457` | Last Recharge & Last Activity Tracking | D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `BO-458` | Expiry Monitoring & Upcoming Expiration | B | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-459` | Card Expiry Runtime Validation | D | 7 | 2 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-460` | Card Block, Suspend & Reactivation Control | D | 0 | 8 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-461` | Card Replacement & Wallet Relinking | D | 0 | 4 | 6 | 0 | 2 | 6 | — | notStarted (—) |
+| `BO-462` | Customer Balance & Credential Status View | D | 0 | 6 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `BO-463` | Card Lifecycle Audit & History | D | 0 | 4 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

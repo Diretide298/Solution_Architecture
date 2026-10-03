@@ -47,7 +47,8 @@ operations:
   offline: false
   reads:
   - resources.booking
-  writes: []
+  writes:
+  - resources.booking
 - operation: checkInResource
   verb: POST
   path: /resource-bookings/{bookingId}/check-in
@@ -93,7 +94,8 @@ operations:
   offline: false
   reads:
   - resources.resource
-  writes: []
+  writes:
+  - resources.resource
 - operation: createResource
   verb: POST
   path: /resources
@@ -171,7 +173,8 @@ operations:
   offline: false
   reads:
   - resources.resource_hold
-  writes: []
+  writes:
+  - resources.resource_hold
 - operation: createResourcePackage
   verb: POST
   path: /resource-packages
@@ -224,7 +227,8 @@ operations:
   offline: false
   reads:
   - resources.resource_hold
-  writes: []
+  writes:
+  - resources.resource_hold
 - operation: getExperienceResourceRequirements
   verb: GET
   path: /experiences/{experienceId}/resource-requirements
@@ -541,7 +545,8 @@ operations:
   offline: true
   reads:
   - resources.resource_request
-  writes: []
+  writes:
+  - resources.resource_request
 - operation: releaseResourceBlock
   verb: DELETE
   path: /resource-blocks/{blockId}
@@ -595,7 +600,8 @@ operations:
   offline: false
   reads:
   - resources.booking
-  writes: []
+  writes:
+  - resources.booking
 - operation: setExperienceResourceRequirements
   verb: PUT
   path: /experiences/{experienceId}/resource-requirements
@@ -630,7 +636,8 @@ operations:
   offline: true
   reads:
   - resources.booking
-  writes: []
+  writes:
+  - resources.booking
 - operation: setResourceDependencies
   verb: PUT
   path: /resources/{resourceId}/dependencies
@@ -665,7 +672,8 @@ operations:
   offline: false
   reads:
   - resources.resource
-  writes: []
+  writes:
+  - resources.resource
 - operation: setResourceQualifications
   verb: PUT
   path: /resources/{resourceId}/qualifications
@@ -754,7 +762,8 @@ operations:
   offline: false
   reads:
   - resources.booking
-  writes: []
+  writes:
+  - resources.booking
 - operation: updateResourceCategory
   verb: PUT
   path: /resource-categories/{categoryId}

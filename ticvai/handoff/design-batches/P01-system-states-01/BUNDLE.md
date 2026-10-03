@@ -301,7 +301,7 @@ Also set there, as content the tenant writes: is in maintenance, minimum app ver
 #### References
 
 - Wireframe frame: `wireframes/P01 Guest Web.dc.html#web-029` · status **review** · provenance client-verified
-- Prototype (rev 3, verified 2026-09-28, match exact): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html`, view *Footer 'Service status', or Discover → 'Service status'*. Differences: Prototype has 'Maintenance' where YAML has 'closed'; sold-out offers 'Join the waitlist' (holds a returned place for 15 minutes), which the YAML screen (getTenantAppStatus only) cannot call. **Do not draw "Join the waitlist" on the sold-out page**: this screen calls no waitlist operation; a sold-out performance waitlist belongs to the event booking screens (CHG-SGU-022).
+- Prototype (rev 3 (pointer moved to the 30 September build, CHG-R1S-015), verified 2026-09-28, match exact): `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, view *Footer 'Service status', or Discover → 'Service status'*. Differences: Prototype has 'Maintenance' where YAML has 'closed'; sold-out offers 'Join the waitlist' (holds a returned place for 15 minutes), which the YAML screen (getTenantAppStatus only) cannot call. **Do not draw "Join the waitlist" on the sold-out page**: this screen calls no waitlist operation; a sold-out performance waitlist belongs to the event booking screens (CHG-SGU-022).
 
 #### Acceptance for the design
 
@@ -334,7 +334,7 @@ Every guest screen in this batch is white-label. These elements are set by the t
 | Show loading indicator (`brand.showLoadingIndicator`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | — | on | — |
 | Intro video (`brand.introVideoAssetRef`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | The optional intro video (decided 29 September, MOB-5). A video `MediaAsset` from the media library (CMS-010). |
 | Intro video mode (`brand.introVideoMode`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | Off · First launch · Every launch; Anything but `off` needs `introVideoAssetRef`, or 400. | Off | When GST-001 plays it full screen. "Skip introduction" is always shown. |
-| Powered by TICVAI credit (`brand.showPoweredBy`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | — | on | the *Powered by TICVAI* credit on the launch screen, at the foot of Account and in the web footer; on by default, and switching it off needs the licence add-on (403 … |
+| Powered by TICVAI credit (`brand.showPoweredBy`) | `CMS-104`, `ADM-016` | — | on | the *Powered by TICVAI* credit on the launch screen, at the foot of Account and in the web footer; on by default, and switching it off needs the licence add-on (403 … |
 | Primary colour (`theme.primaryColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | the brand colour (the `accentSolid` token): primary buttons (Book, Continue, Add to cart, Pay), the active step of the step indicator, selected date and time chips, focus rings |
 | Secondary colour (`theme.secondaryColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | secondary buttons and secondary emphasis: unselected chips, secondary tabs |
 | Accent colour (`theme.accentColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | highlights: badges (LIMITED, NEW, BESTSELLER), availability counts, sale prices |

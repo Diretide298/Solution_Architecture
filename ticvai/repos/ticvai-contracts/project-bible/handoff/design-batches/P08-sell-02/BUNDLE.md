@@ -1,6 +1,6 @@
 # P08-sell-02 — P08 · Sell (2 of 4)
 
-**10 screens · 53 operations · 67 schemas · 14 permissions**
+**10 screens · 55 operations · 67 schemas · 14 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -156,16 +156,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-017` | Capacity Management | B–D | 24 | 20 | 6 | 14 | 7 | 0 | — | notStarted (generated) |
-| `BO-018` | Allocation & Holds | B–D | 4 | 14 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-019` | Closures & Blackouts | B–D | 44 | 31 | 6 | 38 | 1 | 0 | — | notStarted (generated) |
-| `BO-037` | Offline Package Status | B–D | 52 | 32 | 6 | 3 | 0 | 0 | — | notStarted (generated) |
-| `BO-063` | Opening Hours & Calendar | B–D | 16 | 9 | 6 | 17 | 2 | 0 | — | notStarted (generated) |
-| `BO-102` | Sell | B–D | 2 | 37 | 6 | 57 | 0 | 0 | — | notStarted (generated) |
-| `BO-109` | Menu Builder & POS Layout Designer | B–D | 49 | 7 | 6 | 8 | 2 | 2 | — | notStarted (generated) |
+| `BO-017` | Capacity Management | B | 24 | 20 | 6 | 14 | 7 | 0 | — | notStarted (generated) |
+| `BO-018` | Allocation & Holds | B | 4 | 14 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-019` | Closures & Blackouts | B | 44 | 31 | 6 | 38 | 1 | 0 | — | notStarted (generated) |
+| `BO-037` | Offline Package Status | B | 52 | 32 | 6 | 3 | 0 | 0 | — | notStarted (generated) |
+| `BO-063` | Opening Hours & Calendar | B | 16 | 9 | 6 | 17 | 2 | 0 | — | notStarted (generated) |
+| `BO-102` | Sell | B | 2 | 37 | 6 | 57 | 0 | 0 | — | notStarted (generated) |
+| `BO-109` | Menu Builder & POS Layout Designer | A | 49 | 7 | 6 | 8 | 2 | 2 | — | notStarted (generated) |
 | `BO-110` | Recipe & BOM Management | B | 0 | 0 | 6 | 0 | 2 | 2 | — | notStarted (generated) |
-| `BO-111` | Ingredient Substitution, Allergen & Nutrition | B–D | 21 | 29 | 5 | 6 | 1 | 0 | — | notStarted (generated) |
-| `BO-112` | Production Planning & Production Sheets | B–D | 35 | 18 | 5 | 17 | 1 | 0 | — | notStarted (generated) |
+| `BO-111` | Ingredient Substitution, Allergen & Nutrition | A | 21 | 38 | 5 | 6 | 1 | 0 | — | notStarted (generated) |
+| `BO-112` | Production Planning & Production Sheets | A | 35 | 18 | 5 | 17 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -185,7 +185,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 1 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-017 |
 | Who uses it | venue staff holding `CAPACITY_CONFIGURE`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listChannelCapacities` reads the population and `getChannelAllocations` reads one of them — list, select, act |
@@ -444,7 +444,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 2 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-018 |
 | Who uses it | venue staff holding `CAPACITY_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listInventoryHolds` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -609,7 +609,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 2 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-019 |
 | Who uses it | venue staff holding `EVENT_CONFIGURE`, `PERFORMANCE_CONFIGURE`, `PRODUCT_VIEW`, `VENUE_MAP_MANAGE` (3 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listPerformances` reads the population and `getEvent` reads one of them — list, select, act |
@@ -939,7 +939,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 1 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-037 |
 | Who uses it | venue staff holding `ORDER_CREATE`, `ORDER_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `SCOPE_VIEW`, `TENANT_CONFIGURE` (1 operate, 3 read, 2 configure); in the flows as technician |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listCatalogueBundles` reads the population and `getLatestBundle` reads one of them — list, select, act |
@@ -1238,7 +1238,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 1 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-063 |
 | Who uses it | venue staff holding `REGION_CONFIGURE`, `TENANT_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listPerformances` reads the population and `getPerformance` reads one of them — list, select, act |
@@ -1412,7 +1412,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 1 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-102 |
 | Who uses it | venue staff holding `AI_USE`, `PRODUCT_VIEW`, `TENANT_VIEW` (1 operate, 2 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listUpsellRules` reads the population and `getVenueSettings` reads one of them — list, select, act |
@@ -1549,6 +1549,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - → `BO-142` Store Rules, Controls & Permissions: *Store Rules, Controls & Permissions*
 - → `BO-143` Retail Global Settings & Controls: *Retail Global Settings & Controls*
 - → `BO-1190` Donation Campaigns: *Donation Campaigns*
+- → `ADM-164` Code Distribution & Assignment Manager: *Opens Code Distribution & Assignment Manager*
+- → `ADM-570` Gateway, PSP & Acquirer Directory: *Opens Gateway, PSP & Acquirer Directory*
+- → `ADM-603` B2B Invoice, On-Account & Payment Terms Configuration: *Opens B2B Invoice, On-Account & Payment Terms Configuration*
+- → `BO-696` Event Duplication & Clone Configuration: *Opens Event Duplication & Clone Configuration*
 
 #### States
 
@@ -1639,7 +1643,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (37 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-102?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `BO-007`, `BO-009`, `BO-010`, `BO-011`, `BO-012`, `BO-013`, `BO-014`, `BO-015`, `BO-016`, `BO-017`, `BO-018`, `BO-019`, `BO-037`, `BO-063`, `BO-109`, `BO-110`, `BO-111`, `BO-112`, `BO-113`, `BO-114`, `BO-115`, `BO-116`, `BO-117`, `BO-118`, `BO-119`, `BO-120`, `BO-121`, `BO-122`, `BO-123`, `BO-124`, `BO-125`, `BO-126`, `BO-142`, `BO-143`, `BO-1190`.
+- [ ] Every transition is wired: `BO-007`, `BO-009`, `BO-010`, `BO-011`, `BO-012`, `BO-013`, `BO-014`, `BO-015`, `BO-016`, `BO-017`, `BO-018`, `BO-019`, `BO-037`, `BO-063`, `BO-109`, `BO-110`, `BO-111`, `BO-112`, `BO-113`, `BO-114`, `BO-115`, `BO-116`, `BO-117`, `BO-118`, `BO-119`, `BO-120`, `BO-121`, `BO-122`, `BO-123`, `BO-124`, `BO-125`, `BO-126`, `BO-142`, `BO-143`, `BO-1190`, `ADM-164`, `ADM-570`, `ADM-603`, `BO-696`.
 - [ ] Every gated control is gated: `AI_USE`, `PRODUCT_VIEW`, `TENANT_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -1654,7 +1658,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 1 · needs the `fnb` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block A · task APP-SETUP-BO-109 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `SCOPE_VIEW`, `WORKSTATION_CONFIGURE` (2 configure, 2 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listMenus` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1947,7 +1951,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 2 · needs the `fnb` module |
-| Block | Block B · task APP-SETUP-BO-110 |
+| Block | Block B · task VM-BO-110 |
 | Who uses it | venue |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listRecipes` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -2102,7 +2106,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 1 · needs the `fnb` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block A · task APP-SETUP-BO-111-REST |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the screen declares only writes (`setRecipe`, `updateMenu`, `setSubstitutionRules`) and no read of a population — it is settings, not a list |
@@ -2194,6 +2198,25 @@ Errors to draw in the form: 412 The row changed since the `If-Match` version was
 
 **Shown**
 
+**Show the substitution rules before they are replaced** (card list, from `listSubstitutionRules`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Ratio | 1,234.5 | Not always one to one. Fresh herbs to dried is roughly three to one, and a rule that assumes parity produces a dish nobody would serve. |
+| Requires approval | yes / no (icon or chip) | True where the swap changes an allergen. A chef may substitute freely within a claim; changing the claim is somebody else's decision. |
+| Is active | yes / no (icon or chip) | — |
+
+**Show the recipe's approved substitutions** (card list, from `listIngredientSubstitutes`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Substitution ratio | 1,234.5 | — |
+| Conditions json | text | — |
+| Allergens added json | text | — |
+| Allergens removed json | text | — |
+| Requires approval | yes / no (icon or chip) | — |
+| Is active | yes / no (icon or chip) | — |
+
 **Last allergen verdict** (detail panel, from `getAllergenVerification`)
 
 | Shows | Format | Notes |
@@ -2262,7 +2285,7 @@ Errors to draw in the form: 412 The row changed since the `If-Match` version was
 - **Re-check allergens**: Manual re-check; same panel, trigger "manual". *(source: R241 / contracts/satellite/fnb.yaml#verifyAllergens)*
 - **Fix the label**: Takes the user to the dish on the menu to update its declared allergens (the claim is part of the menu item); then the next publish carries it. *(source: contracts/satellite/fnb.yaml#/components/schemas/MenuItem / contracts/satellite/fnb.yaml#setMenuSections)*
 
-**Data it reads**: `getAllergenVerification` (onLoad, The last automatic allergen verdict for the dish); `listRecipes` (onLoad, List recipes)
+**Data it reads**: `getAllergenVerification` (onLoad, The last automatic allergen verdict for the dish); `listRecipes` (onLoad, List recipes); `listIngredientSubstitutes` (onLoad, Show the recipe's approved substitutions); `listSubstitutionRules` (onLoad, Show the substitution rules before they are replaced)
 
 **Where the user goes next**
 
@@ -2327,6 +2350,8 @@ declared:
 - `setIngredientSubstitutes` → `PRODUCT_CONFIGURE` (configure) · staff
 - `getAllergenVerification` → `PRODUCT_VIEW` (read) · staff
 - `listRecipes` → `PRODUCT_VIEW` (read) · staff
+- `listIngredientSubstitutes` → `PRODUCT_VIEW` (read) · staff
+- `listSubstitutionRules` → `PRODUCT_VIEW` (read) · staff
 
 **A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getAllergenVerification` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setRecipe`, `setSubstitutionRules`, `setIngredientSubstitutes`.
 
@@ -2367,8 +2392,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (21), with its required mark, default, format and its error state (400, 404, 412).
-- [ ] Every output is drawn (29 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (21), with its required mark, default, format and its error state (400, 403, 404, 412).
+- [ ] Every output is drawn (38 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-111?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save recipe, Save substitution rules, Re-check allergens (manual).
 - [ ] Every transition is wired: `BO-102`, `BO-045`.
@@ -2388,7 +2413,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 1 · needs the `fnb` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block A · task APP-SETUP-BO-112 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as supervisor |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the screen declares only writes (`planProductionRun`) and no read of a population — it is settings, not a list |
@@ -2808,11 +2833,13 @@ Method, path, parameters, request and response for every operation these screens
 "listCatalogueBundles": {"method":"GET","path":"/catalogue/bundles","contract":"catalogue","summary":"List published catalogue bundles","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"BundleSummary"},
 "listChannelCapacities": {"method":"GET","path":"/channel-capacities","contract":"catalogue","summary":"List channel capacities","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"performanceId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listEvents": {"method":"GET","path":"/events","contract":"catalogue","summary":"List events","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listIngredientSubstitutes": {"method":"GET","path":"/recipes/{recipeId}/substitutes","contract":"fnb","summary":"Approved substitutions for a recipe's ingredients","permission":"PRODUCT_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"recipeId","in":"path","required":true},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listInventoryHolds": {"method":"GET","path":"/inventory-holds","contract":"catalogue","summary":"List inventory holds","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"channelCapacityId","in":"query","required":null},{"name":"holderWorkstationId","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listPerformances": {"method":"GET","path":"/events/{eventId}/performances","contract":"catalogue","summary":"List performances of an event","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null},{"name":"categoryId","in":"query","required":null},{"name":"language","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listProductionRuns": {"method":"GET","path":"/production-runs","contract":"fnb","summary":"What is being made, and what was","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":"locationKind","in":"query","required":null},{"name":"from","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listRecipes": {"method":"GET","path":"/recipes","contract":"fnb","summary":"List recipes","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"search","in":"query","required":null},{"name":"menuItemId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listSaleBoards": {"method":"GET","path":"/sale-boards","contract":"tenancy","summary":"List sale boards","permission":"SCOPE_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"kind","in":"query","required":null}],"requestBody":null,"responds":"SaleBoard"},
+"listSubstitutionRules": {"method":"GET","path":"/substitution-rules","contract":"fnb","summary":"What may replace what, as saved","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listSyncRejections": {"method":"GET","path":"/sync/rejections","contract":"orders","summary":"Entries the server refused","permission":"ORDER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"workstationId","in":"query","required":null},{"name":"kind","in":"query","required":null},{"name":"resolved","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listUpsellRules": {"method":"GET","path":"/upsell-rules","contract":"promotions","summary":"List upsell and cross-sell rules","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"placement","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listWaitlistEntries": {"method":"GET","path":"/waitlist-entries","contract":"catalogue","summary":"Who is waiting for capacity","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"performanceId","in":"query","required":null}],"requestBody":null,"responds":"WaitlistEntry"},

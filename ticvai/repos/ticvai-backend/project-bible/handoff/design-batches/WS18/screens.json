@@ -504,7 +504,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "ADM-339"
+    "ADM-339",
+    "BO-100"
    ],
    "exitTo": [
     "ADM-339"

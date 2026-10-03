@@ -1,6 +1,6 @@
 # P01-cart-checkout-01 — P01 · Cart & Checkout
 
-**5 screens · 27 operations · 47 schemas · 6 permissions**
+**5 screens · 28 operations · 48 schemas · 6 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
@@ -127,7 +127,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `WEB-010` | Shopping Cart | A | 13 | 70 | 5 | 35 | 12 | 6 | guest | review (client-verified) |
-| `WEB-011` | Guest Details & Attendee Forms | A | 12 | 21 | 6 | 7 | 15 | 0 | guest | review (client-verified) |
+| `WEB-011` | Guest Details & Attendee Forms | A | 12 | 21 | 6 | 9 | 15 | 0 | guest | review (client-verified) |
 | `WEB-012` | Checkout — Payment | A | 14 | 32 | 5 | 24 | 17 | 6 | guest | review (client-verified) |
 | `WEB-013` | Booking Confirmation | A | 7 | 10 | 5 | 11 | 4 | 6 | guest | review (client-verified) |
 | `WEB-014` | Pay for a Booking | A | 3 | 3 | 5 | 0 | 2 | 6 | guest | review (designed) |
@@ -342,7 +342,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 - → `WEB-013` Booking Confirmation: *Booking Confirmation*; carries `orderId`
 - → `WEB-016` Login / Register: *Login / Register*; carries `subjectId`
 - → `WEB-012` Checkout — Payment: *Guest code proved or signed in: straight to payment (details skipped)*; carries `orderId`, `paymentId`
-- → `WEB-011` Guest Details & Attendee Forms: *Answers attendee forms and consent, only where the cart needs them*
+- → `WEB-011` Guest Details & Attendee Forms: *Answers attendee forms and consent, only where the cart needs them*; carries `holdId`
 - → `WEB-030` Ticket Transfer: *They transfer three tickets*; carries `orderId`; calls `checkoutCart`
 
 **What opens over it**
@@ -519,7 +519,7 @@ Also set there, as content the tenant writes: settings.
 #### References
 
 - Wireframe frame: `wireframes/P01 Guest Web.dc.html#web-010` · status **review** · provenance client-verified
-- Prototype (rev 3, verified 2026-09-28, match partial): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html`, view *Visible on every booking step as the cart sidebar (Config → Layout & locale → 'Cart & summary' changes it to slide-in, bottom sheet, floating icon or single …*. Differences: Not a separate screen: a persistent sidebar/drawer through the stepper, with a Rev 3 option to mirror it in Arabic. No 'extend hold' action (extendCart) — only hold timers on the seat step. Exit-intent dialog (exit.open) is a prototype addition. **Draw the countdown with More time (`extendCart`) on the basket**, although the prototype has no extend action and times only the seat step (CHG-SGU-020).
+- Prototype (rev 3 (pointer moved to the 30 September build, CHG-R1S-015), verified 2026-09-28, match partial): `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, view *Visible on every booking step as the cart sidebar (Config → Layout & locale → 'Cart & summary' changes it to slide-in, bottom sheet, floating icon or single …*. Differences: Not a separate screen: a persistent sidebar/drawer through the stepper, with a Rev 3 option to mirror it in Arabic. No 'extend hold' action (extendCart) — only hold timers on the seat step. Exit-intent dialog (exit.open) is a prototype addition. **Draw the countdown with More time (`extendCart`) on the basket**, although the prototype has no extend action and times only the seat step (CHG-SGU-020).
 - Flow F01 *Guest buys a ticket online*, step 5: Reviews the cart and may enter a promotion code → Final price, with any rejected code explained rather than silently ignored
 - Flow F02 *Guest buys seated tickets*, step 3: Reviews the cart → Held seats itemised with the countdown still visible
 - Flow F55 *A guest buys on the web and transfers to a friend*, step 1: They build a cart. → **`extendCart` exists because a cart with a timed-entry lease expires.** A guest deciding for ten minutes should not lose the slot silently.
@@ -561,7 +561,7 @@ Also set there, as content the tenant writes: settings.
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act |
 | Offline | **Not available, and the offline banner says why.** A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice. |
-| Opens with | `subjectId` (session), `cartId` (session), `venueId` (session) · cold entry: **A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation … |
+| Opens with | `subjectId` (session), `cartId` (session), `venueId` (session), `holdId` (navigation) · cold entry: **A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation … |
 | Route | `/cart-and-checkout/guest-details-and-attendee-forms` |
 
 **What the spec says about it.** **Wired 24 August from review**: updateMyProfile. **The operations existed and this screen could not call them** — reviewers reported them as missing APIs, which is what an unreachable operation looks like from a wireframe. **Rev 3 (decided 29 September).** Booking consent questions not yet answered are asked here (REV3-26). The sign-in gate may already have been passed at the Add-ons exit (`signInAt` `afterAddOns`, REV3-3); a guest who signed in there arrives with their details filled. **The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`. **29 September (W1).** **Skipped after the guest code, and when signed in**, unless the cart needs attendee forms or unanswered consent questions: no name, email or phone is asked again. The profile is created and completed later (WEB-020).
@@ -663,6 +663,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 |---|---|---|---|---|---|
 | Save my profile (secondary button) | `updateMyProfile` PATCH `/guests/me/profile` | inline | GuestProfile | — | opens modal first |
 | Continue to payment (primary button) | navigation or local | — | — | — | — |
+| Keep my seats longer (secondary button) | `extendSeatHold` POST `/seat-holds/{holdId}/extend` | — | SeatHold | 409 Already expired, or `VenueSettings.seating.seatHoldMaxExtensions` is reached (proposed default 2, audit R094). (SeatHoldExtendProblem) | — |
 
 **Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
@@ -682,7 +683,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 - → `WEB-016` Login / Register: *Chooses to sign in rather than continue as a guest*; carries `cartId`; only when no verified guest session — this is the fork of matrix 2.6.1 §2.4, offered here rather than in front of the cart
 - → `WEB-012` Checkout — Payment: *Pays*
 - → `WEB-012` Checkout — Payment: *Skipped: nothing to ask (guest code proved, or signed in, and no attendee forms)*
-- → `WEB-010` Shopping Cart: *They check out*; carries `cartId`, `lineId`, `performanceId`
+- → `WEB-010` Shopping Cart: *They check out*; carries `cartId`, `holdId`, `lineId`, `performanceId`
 
 #### States
 
@@ -694,7 +695,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listGuestDevices` takes no filter, so an empty list is always the first-run state above. |
 | Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the … |
 | Offline (`?state=offline`) | **Not available, and the offline banner says why.** A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice. |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 The question has changed since the cart was read (`questionVersionSuperseded`); the client re-reads the cart and asks the current version. (ConsentAnswerProblem); 422 A `perPerson` question answered without a person (`personRequired`), a question this cart does not ask (`questionNotAsked`), or a retired one … (ConsentAnswerProblem) |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 Already expired, or `VenueSettings.seating.seatHoldMaxExtensions` is reached (proposed default 2, audit R094). (SeatHoldExtendProblem); 409 The question has changed since the cart was read (`questionVersionSuperseded`); the client re-reads the cart and asks the current version. (ConsentAnswerProblem); 422 A `perPerson` question answered without a person (`personRequired`), a question this … |
 
 #### Edge cases to draw
 
@@ -736,12 +737,13 @@ optIns:
 - `recordConsentAnswers` → `ORDER_CREATE` (operate) · guest, staff
 - `getPublishedBookingFlow` → no permission · guest, staff
 - `getMyProfile` → `GUEST_VIEW` (read) · guest
+- `extendSeatHold` → `ORDER_CREATE` (operate) · staff, guest
 
 **A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the …
 
 #### Requirements it meets
 
-7 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+9 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -751,6 +753,8 @@ optIns:
 | 22.13.13 | Right to Rectification | Marketing & CRM | CONTRACTED | `updateMyProfile` |
 | 2.9.2 | The system should provide a service to enable the dynamic composition of the shop cart. The system must provide back all the information in real time, such as the performance availabilities of an … | Ticketing Sales | CONTRACTED | `getCart` |
 | 2.9.5 | The system should highlight conflicting times at different attractions when trying to purchase tickets in the same time-slot for one guest. For example, if a ticket for Golf 1 to 2 pm has been added … | Ticketing Sales | CONTRACTED | `getCart` |
+| 21.5.14 | Seat Locking | Seat Management & Venue Mapping | CONTRACTED | `extendSeatHold` |
+| 21.5.15 | Seat Lock Timeout | Seat Management & Venue Mapping | CONTRACTED | `extendSeatHold` |
 | 2.6.1 | B2C website should support: 1.Home page 1) Banners display packages, upgrades, and discounts 2) All available products are shown by category: Packages, Tickets, Experiences, Annual Passes, Others 3) … | Ticketing Sales | CONTRACTED | data `BookingFlow` |
 
 #### Client meeting inputs
@@ -844,7 +848,7 @@ Also set there, as content the tenant writes: settings.
 #### References
 
 - Wireframe frame: `wireframes/P01 Guest Web.dc.html#web-011` · status **review** · provenance client-verified
-- Prototype (rev 3, verified 2026-09-28, match exact): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html`, view *Book → 'Your details' step (after Extras)*. Differences: Sections are driven by the flow's requires list; prototype adds a signature, diving certification and vehicle plate fields. Wishlist/device operations listed in the YAML apis have no counterpart here. Saved guests prefill is described in Account but not shown on this step.
+- Prototype (rev 3 (pointer moved to the 30 September build, CHG-R1S-015), verified 2026-09-28, match exact): `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, view *Book → 'Your details' step (after Extras)*. Differences: Sections are driven by the flow's requires list; prototype adds a signature, diving certification and vehicle plate fields. Wishlist/device operations listed in the YAML apis have no counterpart here. Saved guests prefill is described in Account but not shown on this step.
 - Flow F01 *Guest buys a ticket online*, step 6: Answers attendee forms and consent, only where the cart needs them → Marketing consent unticked by default. Transactional consent presented as required for service, not as a choice dressed up as one. **Skipped for a guest who proved the contact with the code, or is …
 - Flow F02 *Guest buys seated tickets*, step 4: Enters contact details and answers consent → The hold is still counting down. The countdown stays visible through this step
 - Flow F55 *A guest buys on the web and transfers to a friend*, step 2: Attendee details are captured. → **Consent per attendee, not per purchase.** A guest buying for three friends cannot consent on their behalf (CF-160 again, and this is where it bites). The marketing opt-ins ticked here travel with …
@@ -858,7 +862,7 @@ Also set there, as content the tenant writes: settings.
 - [ ] Every input above is drawn (12), with its required mark, default, format and its error state (404, 409, 410, 422).
 - [ ] Every output is drawn (21 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-011?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Save my profile, Continue to payment.
+- [ ] Every action is wired with its success and its failure: Save my profile, Continue to payment, Keep my seats longer.
 - [ ] Every transition is wired: `WEB-016`, `WEB-012`, `WEB-012`, `WEB-010`.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 15 client meeting input(s) for this screen are applied; open questions are built to their default.
@@ -1190,7 +1194,7 @@ Also set there, as content the tenant writes: settings.
 #### References
 
 - Wireframe frame: `wireframes/P01 Guest Web.dc.html#web-012` · status **review** · provenance client-verified
-- Prototype (rev 3, verified 2026-09-28, match partial): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html`, view *Book → 'Payment' step; Config → Layout & locale → 'Payment outcome (demo)' = Interrupted / Declined for the failure states; Config → Steps & cards → 'Guest …*. Differences: Contradicts 28 Sep decisions: YAML allows card or wallet only (R080) — prototype offers Apple Pay, Tabby split-in-4, pay on arrival and invoice/PO; YAML removed the 'is this you?' match at checkout (R120 b) — prototype still asks the guest to link or keep separate. The unknown-outcome inquiry state matches the YAML ('We couldn't confirm this payment yet… you won't be charged twice'). **Draw card, Apple Pay, Google Pay and wallet only** (R080, 28 September); Tabby split-in-4, pay on arrival and …
+- Prototype (rev 3 (pointer moved to the 30 September build, CHG-R1S-015), verified 2026-09-28, match partial): `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, view *Book → 'Payment' step; Config → Layout & locale → 'Payment outcome (demo)' = Interrupted / Declined for the failure states; Config → Steps & cards → 'Guest …*. Differences: Contradicts 28 Sep decisions: YAML allows card or wallet only (R080) — prototype offers Apple Pay, Tabby split-in-4, pay on arrival and invoice/PO; YAML removed the 'is this you?' match at checkout (R120 b) — prototype still asks the guest to link or keep separate. The unknown-outcome inquiry state matches the YAML ('We couldn't confirm this payment yet… you won't be charged twice'). **Draw card, Apple Pay, Google Pay and wallet only** (R080, 28 September); Tabby split-in-4, pay on arrival and …
 - Flow F01 *Guest buys a ticket online*, step 7: Pays → Order created before payment, so an unknown payment outcome has an order to attach to. This ordering is the whole reason recovery is possible. **Payment converts the cart's holds**: in the paying …
 - Flow F02 *Guest buys seated tickets*, step 5: Pays → Hold converts to entitlements on payment
 - Flow F01 branch at step 7 (recoverable): when Payment declined, Retry reuses the same idempotency key. The order persists in an unpaid state rather than being torn down, so a second attempt does not rebuild the cart.
@@ -1404,7 +1408,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### References
 
 - Wireframe frame: `wireframes/P01 Guest Web.dc.html#web-013` · status **review** · provenance client-verified
-- Prototype (rev 3, verified 2026-09-28, match exact): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html`, view *Book → final step 'Confirmed' after paying*. Differences: Prototype adds editing attendee details after purchase ('Change your details', signed-in only) and Reissue QR. No 'unpaid — pay now' route to WEB-014. **Leave out** editing attendee details after purchase and Reissue QR: no operation on this screen declares them (CHG-SGU-020).
+- Prototype (rev 3 (pointer moved to the 30 September build, CHG-R1S-015), verified 2026-09-28, match exact): `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, view *Book → final step 'Confirmed' after paying*. Differences: Prototype adds editing attendee details after purchase ('Change your details', signed-in only) and Reissue QR. No 'unpaid — pay now' route to WEB-014. **Leave out** editing attendee details after purchase and Reissue QR: no operation on this screen declares them (CHG-SGU-020).
 - Flow F01 *Guest buys a ticket online*, step 8: Receives confirmation and tickets → Order number visible immediately, tickets delivered by the chosen channel
 - Flow F01 branch at step 8 (recoverable): when Payment succeeded but confirmation fails to load, Shows the order number and a support route. Never implies the purchase failed — a guest told their payment did not work will pay twice.
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
@@ -1571,7 +1575,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### References
 
 - Wireframe frame: `wireframes/P01 Guest Web.dc.html#web-014` · status **review** · provenance designed
-- Prototype (rev 3, verified —, match none): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html`, view **
+- Prototype (rev 3 (pointer moved to the 30 September build, CHG-R1S-015), verified —, match none): `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, view **
 - ADR-0027 *A payment link is a credential, and payment converts the reservation* (`docs/adr/0027-payment-links.md`)
 
 #### Acceptance for the design
@@ -1605,7 +1609,7 @@ Every guest screen in this batch is white-label. These elements are set by the t
 | Show loading indicator (`brand.showLoadingIndicator`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | — | on | — |
 | Intro video (`brand.introVideoAssetRef`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | The optional intro video (decided 29 September, MOB-5). A video `MediaAsset` from the media library (CMS-010). |
 | Intro video mode (`brand.introVideoMode`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | Off · First launch · Every launch; Anything but `off` needs `introVideoAssetRef`, or 400. | Off | When GST-001 plays it full screen. "Skip introduction" is always shown. |
-| Powered by TICVAI credit (`brand.showPoweredBy`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | — | on | the *Powered by TICVAI* credit on the launch screen, at the foot of Account and in the web footer; on by default, and switching it off needs the licence add-on (403 … |
+| Powered by TICVAI credit (`brand.showPoweredBy`) | `CMS-104`, `ADM-016` | — | on | the *Powered by TICVAI* credit on the launch screen, at the foot of Account and in the web footer; on by default, and switching it off needs the licence add-on (403 … |
 | Primary colour (`theme.primaryColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | the brand colour (the `accentSolid` token): primary buttons (Book, Continue, Add to cart, Pay), the active step of the step indicator, selected date and time chips, focus rings |
 | Secondary colour (`theme.secondaryColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | secondary buttons and secondary emphasis: unselected chips, secondary tabs |
 | Accent colour (`theme.accentColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | highlights: badges (LIMITED, NEW, BESTSELLER), availability counts, sale prices |
@@ -1797,6 +1801,7 @@ Method, path, parameters, request and response for every operation these screens
 "createPayment": {"method":"POST","path":"/payments","contract":"orders","summary":"Take a payment against an order","permission":"ORDER_CREATE","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"workstation","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreatePaymentRequest","responds":"Payment"},
 "evaluatePromotions": {"method":"POST","path":"/promotions/evaluate","contract":"promotions","summary":"Evaluate promotions against a cart","permission":"PRICE_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"EvaluatePromotionsRequest","responds":"PromotionEvaluation"},
 "extendCart": {"method":"POST","path":"/carts/{cartId}/extend","contract":"orders","summary":"Give the guest more time","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Cart"},
+"extendSeatHold": {"method":"POST","path":"/seat-holds/{holdId}/extend","contract":"seating","summary":"Extend a hold","permission":"ORDER_CREATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"SeatHold"},
 "getCart": {"method":"GET","path":"/carts/{cartId}","contract":"orders","summary":"The cart, priced and checked, right now","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Cart"},
 "getCouponCode": {"method":"GET","path":"/coupon-codes/{code}","contract":"promotions","summary":"Look up a code","permission":"PRICE_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"CouponCode"},
 "getMyProfile": {"method":"GET","path":"/guests/me/profile","contract":"marketing-crm","summary":"A guest reading their own details","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"subject","parameters":[],"requestBody":null,"responds":null},
@@ -1870,6 +1875,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "RecordConsentAnswersRequest": {"type":"object","x-ticvai-persistence":"none — request only","required":["cartId","answers","source","answeredAt"],"properties":{"cartId":{"type":"string","format":"uuid","description":"The cart the answers are given for. `checkoutCart` binds them to its order."},"answers":{"type":"array","minItems":1,"maxItems":200,"items":{"type":"object","required":["questionId","questionVersion","answer"],"properties":{"questionId":{"type":"string","format":"uuid"},"questionVersion":{"type":"integer","minimum":1,"description":"The version the guest was shown, from `Cart.consentQuestions`."},"answer":{"type":"string","enum":["yes","no"]},"cartLineId":{"type":"string","format":"uuid","nullable":true,"description":"For a `perPerson` question, the line the person is on."},"personIndex":{"type":"integer","minimum":0,"nullable":true,"description":"For a `perPerson` question, the person's row in that line's `eligibilityDeclaration`, counting from 0."},"personName":{"type":"string","maxLength":120,"nullable":true},"personSubjectId":{"type":"string","format":"uuid","nullable":true,"description":"Where the person is a known guest, such as the booker or a family member."}}}},"source":{"$ref":"#/components/schemas/ConsentSource"},"answeredAt":{"type":"string","format":"date-time"}}},
 "ResourceHold": {"x-ticvai-persistence":"resources.resource_hold","type":"object","description":"**A guest's pick on the map, held while they pay** (decided 29 September, rev 3 REV3-15). The resource counterpart of `seating.SeatHold`: named resources, short-lived, converted by the order rather than released. States in `states/resource-hold.yaml`.\n","required":["id","mapId","resourceIds","from","to","status","createdAt","expiresAt"],"properties":{"id":{"type":"string","format":"uuid"},"mapId":{"type":"string","format":"uuid"},"resourceIds":{"type":"array","items":{"type":"string","format":"uuid"}},"from":{"type":"string","format":"date-time"},"to":{"type":"string","format":"date-time"},"partySize":{"type":"integer","nullable":true},"status":{"type":"string","enum":["held","converted","released","expired"]},"totalPrice":{"x-ticvai-column":"gross_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"heldByPrincipalId":{"type":"string","format":"uuid","nullable":true},"subjectId":{"type":"string","format":"uuid","nullable":true},"orderId":{"type":"string","format":"uuid","nullable":true,"description":"Set when the order converts it."},"extensionCount":{"type":"integer","default":0},"createdAt":{"type":"string","format":"date-time"},"expiresAt":{"type":"string","format":"date-time"},"scopePath":{"type":"string","description":"The partition key (ADR-0005), written at `venue` scope."}}},
 "SalesChannel": {"type":"string","description":"**Where a sale came from.** Restored 24 August — this was lost in the `Money` rewrite and nine references across four contracts were pointing at nothing.\n**Not interchangeable with the local `Channel` enums.** `catalogue.Channel` and `orders.Channel` are byte-identical duplicates of each other listing `pos, kiosk, web, mobile, b2b, ota, callCentre`; `orders.OrderChannel` lists `guestApp, guestWeb, partner, api, backOffice` on top. **Pointing the nine at a local enum would silently narrow them** — and the duplication between the two `Channel` enums is the reason a shared one existed in the first place.\n**This is the reporting dimension**: attribution, promotion eligibility and settlement all group by it, which is why it has to mean the same thing in `orders`, `catalogue`, `subscription` and `marketing-crm` rather than four things that nearly line up.\n","enum":["pos","kiosk","guestApp","guestWeb","callCentre","partner","api","backOffice","b2b","ota"]},
+"SeatHold": {"x-ticvai-persistence":"seating.seat_hold","type":"object","required":["id","performanceId","seatIds","status","createdAt","expiresAt"],"properties":{"id":{"type":"string"},"performanceId":{"type":"string","format":"uuid"},"seatIds":{"type":"array","items":{"type":"string"}},"bufferedSeatIds":{"type":"array","items":{"type":"string"},"description":"Neighbours implicitly held by a seating rule."},"status":{"type":"string","enum":["held","converted","released","expired"]},"totalPrice":{"x-ticvai-column":"gross_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"heldByPrincipalId":{"type":"string","format":"uuid","nullable":true},"subjectId":{"type":"string","format":"uuid","nullable":true},"extensionCount":{"type":"integer"},"createdAt":{"type":"string","format":"date-time"},"expiresAt":{"type":"string","format":"date-time"}}},
 "TenderKind": {"type":"string","description":"`wallet` is a **digital wallet** (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside `card` (decided 28 September, audit R080 (a)). **The stored-value TICVAI wallet is a separate tender**: it is spent through `authoriseStoredValue` and `captureStoredValue` (`StoredValueKind` `wallet`), never as this value, so the client can see which of the two the decision meant.\n","enum":["cash","card","wallet","voucher","bankTransfer","hotelCharge","installment","giftCard","complimentary"]}
 }
 ```

@@ -1808,7 +1808,11 @@
     "BO-126",
     "BO-142",
     "BO-143",
-    "BO-1190"
+    "BO-1190",
+    "ADM-164",
+    "ADM-570",
+    "ADM-603",
+    "BO-696"
    ],
    "transitions": [
     {
@@ -1988,6 +1992,26 @@
      "to": "BO-1190",
      "trigger": "Donation Campaigns",
      "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+    },
+    {
+     "to": "ADM-164",
+     "trigger": "Opens Code Distribution & Assignment Manager",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "ADM-570",
+     "trigger": "Opens Gateway, PSP & Acquirer Directory",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "ADM-603",
+     "trigger": "Opens B2B Invoice, On-Account & Payment Terms Configuration",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-696",
+     "trigger": "Opens Event Duplication & Clone Configuration",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
     }
    ]
   },
@@ -2603,6 +2627,33 @@
      "slot": "fields",
      "components": [
       {
+       "kind": "cardList",
+       "label": "Show the substitution rules before they are replaced",
+       "operation": "listSubstitutionRules",
+       "bindsTo": "SubstitutionRule",
+       "columns": [
+        "SubstitutionRule.ratio",
+        "SubstitutionRule.requiresApproval",
+        "SubstitutionRule.isActive"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
+      {
+       "kind": "cardList",
+       "label": "Show the recipe's approved substitutions",
+       "operation": "listIngredientSubstitutes",
+       "bindsTo": "FnbIngredientSubstitute",
+       "columns": [
+        "FnbIngredientSubstitute.substitutionRatio",
+        "FnbIngredientSubstitute.conditionsJson",
+        "FnbIngredientSubstitute.allergensAddedJson",
+        "FnbIngredientSubstitute.allergensRemovedJson",
+        "FnbIngredientSubstitute.requiresApproval",
+        "FnbIngredientSubstitute.isActive"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
+      {
        "kind": "searchField",
        "label": "Search ingredient substitution, allergen",
        "provenance": "carried from the previous definition",
@@ -2751,6 +2802,20 @@
     "purpose": "List recipes",
     "trigger": "onLoad",
     "provenance": "merged from BO-110, 2 October 2026"
+   },
+   {
+    "operationId": "listIngredientSubstitutes",
+    "contract": "fnb",
+    "purpose": "Show the recipe's approved substitutions",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+   },
+   {
+    "operationId": "listSubstitutionRules",
+    "contract": "fnb",
+    "purpose": "Show the substitution rules before they are replaced",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "entryState": {

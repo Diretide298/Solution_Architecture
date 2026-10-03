@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `catalogue`, `promotions`, `seating` |
 | Schemas owned | `catalogue`, `pricing`, `promotions`, `seating` |
-| Operations in the slice | 64 of 443 |
+| Operations in the slice | 67 of 446 |
 | Scale | Read-heavy, bundle-published to tills. The catalogue bundle is this service's output (ADR-0013). |
 | If it is down | A bad publish reaches every workstation. Versioned and rollback-able for that reason. |
 
@@ -31,7 +31,7 @@
 |---|---|---|---|---|---|---|
 | availability | [`getSeatAvailability`](#getseatavailability) | GET | `/performances/{performanceId}/seat-availability` | core | 1 | BO-015, BO-019, BO-1000, BO-1001, BO-1002, BO-1039 … |
 | bundle | [`createBundle`](#createbundle) | POST | `/bundles` | setup | 1 | BO-011 |
-| bundle | [`getBundle`](#getbundle) | GET | `/bundles/{bundleId}` | core | 1 | ADM-180, ADM-181, ADM-187, GST-004, GST-056, WEB-008 |
+| bundle | [`getBundle`](#getbundle) | GET | `/bundles/{bundleId}` | core | 1 | ADM-180, ADM-181, ADM-187, BO-011, GST-004, GST-056 … |
 | bundle | [`getLatestBundle`](#getlatestbundle) | GET | `/catalogue/bundles/latest` | core | 1 | BO-011, BO-037, EMP-018, POS-002 |
 | bundle | [`listCatalogueBundles`](#listcataloguebundles) | GET | `/catalogue/bundles` | core | 1 | BO-011, BO-037, BO-094, EMP-018, GST-052 |
 | bundle | [`publishBundle`](#publishbundle) | POST | `/catalogue/bundles` | setup | 1 | BO-013, BO-014, BO-037 |
@@ -50,7 +50,8 @@
 | coupon | [`getCouponCode`](#getcouponcode) | GET | `/coupon-codes/{code}` | core | 1 | GST-037, WEB-010 |
 | drafted | [`setCodeDistributionManager`](#setcodedistributionmanager) | PUT | `/code-distribution-manager` | setup | 1 | ADM-164 |
 | entitlement | [`createEntitlementTemplate`](#createentitlementtemplate) | POST | `/entitlement-templates` | setup | 1 | BO-012, BO-288 |
-| evaluation | [`evaluatePromotions`](#evaluatepromotions) | POST | `/promotions/evaluate` | core | 1 | ADM-157, ADM-177, BO-010, KSK-006, POS-002, POS-021 … |
+| entitlement | [`setEntitlementTemplateBlackoutDates`](#setentitlementtemplateblackoutdates) | PUT | `/entitlement-templates/{templateId}/blackout-dates` | setup | 1 |  |
+| evaluation | [`evaluatePromotions`](#evaluatepromotions) | POST | `/promotions/evaluate` | core | 1 | ADM-157, ADM-177, BO-010, POS-002, POS-021, POS-023 … |
 | event | [`createEvent`](#createevent) | POST | `/events` | setup | 1 | BO-015, BO-019 |
 | event | [`createPerformances`](#createperformances) | POST | `/events/{eventId}/performances` | setup | 1 | BO-015, BO-019 |
 | event | [`enterWaitingRoom`](#enterwaitingroom) | POST | `/performances/{performanceId}/waiting-room/entries` | core | 1 | GST-046, WEB-015 |
@@ -63,6 +64,7 @@
 | events | [`cloneEvent`](#cloneevent) | POST | `/events/{eventId}/clone` | setup | 1 | BO-696 |
 | events | [`setEventLifecycleState`](#seteventlifecyclestate) | POST | `/events/{eventId}/lifecycle` | setup | 1 | BO-716, BO-717 |
 | hold | [`createSeatHold`](#createseathold) | POST | `/seat-holds` | core | 1 | BO-994, GST-049, POS-004, WEB-007 |
+| hold | [`extendSeatHold`](#extendseathold) | POST | `/seat-holds/{holdId}/extend` | core | 1 | WEB-011 |
 | hold | [`getSeatHold`](#getseathold) | GET | `/seat-holds/{holdId}` | core | 1 | BO-987, BO-999, POS-004 |
 | hold | [`relinquishSeatHold`](#relinquishseathold) | DELETE | `/seat-holds/{holdId}` | core | 1 | BO-999, GST-049, POS-004, WEB-007 |
 | lease | [`acquireInventoryHold`](#acquireinventoryhold) | POST | `/inventory-holds` | core | 1 | POS-003 |
@@ -84,6 +86,7 @@
 | product | [`setGroupPackageDefinition`](#setgrouppackagedefinition) | PUT | `/products/{productId}/group-package` | setup | 1 | BO-011 |
 | product | [`setProductEligibilityRule`](#setproducteligibilityrule) | PUT | `/products/{productId}/eligibility-rule` | setup | 1 | BO-161 |
 | product | [`updateProduct`](#updateproduct) | PATCH | `/products/{productId}` | core | 1 | BO-007, BO-008, BO-012, CMS-103 |
+| product | [`updateProductVariant`](#updateproductvariant) | PATCH | `/products/{productId}/variants/{variantId}` | setup | 1 | BO-008 |
 | promotion | [`analysePromotionConflicts`](#analysepromotionconflicts) | GET | `/promotions/{promotionId}/conflicts` | core | 1 | BO-010, POS-002 |
 | promotion | [`createPromotion`](#createpromotion) | POST | `/promotions` | setup | 1 | BO-010 |
 | promotion | [`getPromotion`](#getpromotion) | GET | `/promotions/{promotionId}` | core | 1 | ADM-140, BO-010, GST-037, POS-002, PTR-010, WEB-032 |
@@ -354,7 +357,7 @@ A bundle is a product whose price differs from the sum of its parts. **The alloc
 | Offline note | 24 August: servable from a local cache. |
 | Reads | `promotions.allocation_component`, `promotions.bundle`, `promotions.bundle_choice_group`, `promotions.bundle_choice_option`, `promotions.bundle_component` |
 | Writes | - |
-| Called by | ADM-180, ADM-181, ADM-187, GST-004, GST-056, WEB-008 |
+| Called by | ADM-180, ADM-181, ADM-187, BO-011, GST-004, GST-056, WEB-008 |
 
 **Parameters**
 
@@ -1727,6 +1730,102 @@ Outbound sending runs through the CRM/marketing communication services, not a se
 | 201 |  | Created |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### setEntitlementTemplateBlackoutDates
+
+**`PUT /entitlement-templates/{templateId}/blackout-dates`**: Set the dates a product's entitlement does not admit
+
+**Blackouts from the closures screen** (design-notes correction on BO-019, Block B: "No operation sets product blackout dates or a venue closure day; the screen only cancels performances and closes paths. Blackouts live on entitlement templates (blackoutDates) and are edited on BO-012; a closures screen needs a write for them"; DI-452; CHG-CSP-051). Replaces `EntitlementTemplate.blackoutDates` of one template, which until now could be set only when the template was created. An annual pass that excludes public holidays is the usual case. Applies to entitlements issued from the template from now on and to existing ones at their next validation; a date already admitted on is not undone. A whole-venue closure day is the access operating calendar's (`setOperatingCalendarEntry` with `venueClosed`).
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `catalogue.entitlement_template` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Reads | `catalogue.entitlement_template` |
+| Writes | `catalogue.entitlement_template` |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| templateId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| blackoutDates | array of string (date) | yes | The whole list; an empty list clears it. |
+| reason | string |  | (max length 300; nullable) |
+
+**Response**: `EntitlementTemplate`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| description | string |  | Validity, re-entry and transfer rules in prose. |
+| id | string (uuid) | yes | Assigned by the server on create; createEntitlementTemplate does not take it. (read-only) |
+| code | string | yes | (max length 64) |
+| name | string | yes | (max length 200) |
+| validityKind | enum (singleUse, dated, dateRange, rolling, unlimited, countLimited) | yes |  |
+| validFromOffsetDays | integer |  | (nullable) |
+| validForDays | integer |  | (nullable) |
+| daysOfWeek | array of enum (mon, tue, wed, thu, fri, sat, sun) |  | 1.1.7 and 1.1.82. (nullable) |
+| expiryAnchor | enum (offsetDays, endOfMonth, endOfQuarter, endOfYear, fixedDate, seasonEnd) |  | 1.1.90 to 1.1.92. (nullable) |
+| expiryDate | string (date) |  | Where expiryAnchor is fixedDate. (nullable) |
+| expiryNoticeDays | integer |  | How many days before validTo access raises entitlement.expiringSoon for an entitlement of this template still issued or partiallyConsumed (29 September, build pass, group G2; 5.5.30). (min 1; max 180; nullable) |
+| carriesStoredValue | boolean |  | BL-033. (default False) |
+| includedValue | Money |  | On the wire this is three fields; in the database it is one column. |
+| includedValue.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| includedValue.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| includedValue.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| validTimeWindows | array of object |  | BL-036, 1.1.81 and 1.1.83. (nullable) |
+| validTimeWindows[].from | string |  |  |
+| validTimeWindows[].to | string |  |  |
+| validTimeWindows[].daysOfWeek | array of string |  |  |
+| blackoutDates | array of string (date) |  | Calendar exceptions on the entitlement. (nullable) |
+| fastTrackTier | enum (none, priority, express, unlimited) |  | 19.2.20, BL-015. (nullable) |
+| entriesAllowed | integer |  | Null means unlimited. (nullable) |
+| transportRestriction | object |  | The journey a transport pass is good for (decided 29 September, rev 3 REV3-21). (nullable) |
+| transportRestriction.fromStationId | string (uuid) | yes | A transport.Station. |
+| transportRestriction.toStationId | string (uuid) | yes |  |
+| transportRestriction.bothDirections | boolean |  | Valid from either station to the other, as the prototype sells it. (default True) |
+| transportRestriction.routeIds | array of string (uuid) |  | The routes it may be used on. |
+| reentryAllowed | boolean |  | (default False) |
+| purchaseEligibility | object |  | 1.1.38, 1.1.121, 1.1.125, 1.1.126. (nullable) |
+| purchaseEligibility.minAgeYears | integer |  | (nullable) |
+| purchaseEligibility.maxAgeYears | integer |  | (nullable) |
+| purchaseEligibility.minHeightCm | integer |  | Height gates a ride and can gate a sale. (nullable) |
+| purchaseEligibility.residencyRequired | boolean |  | (default False) |
+| purchaseEligibility.nationalities | array of string |  | (nullable) |
+| purchaseEligibility.minLoyaltyTier | string |  | (nullable) |
+| purchaseEligibility.requiresVerification | boolean |  | Whether the claim is checked or taken on trust. (default False) |
+| personType | enum (adult, child, infant, senior, student, resident, staff) |  | 2.11.7. (nullable) |
+| admissionRulesId | string (uuid) |  | (nullable) |
+| isTransferable | boolean |  | (default True) |
+| canShareMedia | boolean |  | Whether this entitlement may be appended to media a guest already holds (CF-58). (default True) |
+| canClaimShopAndDrop | boolean |  | Whether this entitlement may be scanned to claim goods left under 4.4.7. (default False) |
+| isNameBound | boolean |  | True requires a holder name at sale. (default False) |
+| autoRenewDefault | boolean |  | Taken from their membership_plan, 20 September — the "take those" half of the TAKE BODY verdict. (default False) |
+| renewalTermDays | integer |  | What a renewal extends the membership by. (nullable) |
+| renewalGraceDays | integer |  | How long after expiry a membership can still be renewed rather than rejoined. (default 0) |
+| renewalVariantId | string (uuid) |  | What a renewal sells, which is usually not what joining sold. (nullable) |
+| crossesCells | boolean |  | True propagates a redemption right to other cells on issue (ADR-0010). (default False) |
+| isActive | boolean |  |  |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The template, with its blackout dates replaced |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 
 ## Group: evaluation
 
@@ -1751,7 +1850,7 @@ Terminals evaluate locally from the catalogue bundle. This endpoint serves onlin
 | Guest callable | True |
 | Reads | `cache:idempotency`, `catalogue.price_list`, `promotions.coupon_code`, `promotions.promotion`, `promotions.promotion_rule` |
 | Writes | `cache:idempotency`, `promotions.promotion_evaluation_trace` |
-| Called by | ADM-157, ADM-177, BO-010, KSK-006, POS-002, POS-021, POS-023, PTR-010, WEB-005, WEB-010 |
+| Called by | ADM-157, ADM-177, BO-010, POS-002, POS-021, POS-023, PTR-010, WEB-005, WEB-010 |
 | State model | Coupon code ([states/coupon.yaml](../../../states/coupon.yaml)): moves `issued` -> `redeemed`, `assigned` -> `redeemed` |
 
 **Parameters**
@@ -2484,6 +2583,62 @@ Where seating rules apply, holding a seat may implicitly buffer its neighbours �
 | 201 |  | Held |
 | 409 |  | One or more seats are no longer available, or the selection breaks a seating rule. |
 | 422 |  | More seats than one booking may take: above VenueSettings.seating.maxSeatsPerGuestOrder on a guest channel (decided 29 September, rev 3 REV3-7), or above 10 per sale on a staff channel (audit R080 (c… |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### extendSeatHold
+
+**`POST /seat-holds/{holdId}/extend`**: Extend a hold
+
+For a guest still completing payment. Bounded by the venue's maximum, so a hold cannot be renewed indefinitely against a busy performance.
+**The bounds are venue settings with a tenant default** (decided 28 September, audit R094): each extension adds `VenueSettings.seating.seatHoldExtensionSeconds` and a hold may be extended at most `VenueSettings.seating.seatHoldMaxExtensions` times. **Proposed defaults 300 seconds and 2 extensions, client to correct (audit R094).**
+
+**A guest extends their own hold within their own session** (3 October 2026, CHG-R1S-023; as `createSeatHold`, Chinmay, 3 October, Pattern 4 group 3: purchase actions are guest-callable within the guest's own session). WEB-011 offers it from the warning before the hold lapses; a guest needs no permission and extends only a hold of their own cart. `ORDER_CREATE` is what a staff caller holds to do it for a guest.
+
+|  |  |
+|---|---|
+| Permission | `ORDER_CREATE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Guest callable | True |
+| Reads | `cache:idempotency`, `seating.seat_hold` |
+| Writes | `cache:idempotency`, `seating.seat_hold` |
+| Called by | WEB-011 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| holdId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Response**: `SeatHold`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string | yes |  |
+| performanceId | string (uuid) | yes |  |
+| seatIds | array of string | yes |  |
+| bufferedSeatIds | array of string |  | Neighbours implicitly held by a seating rule. |
+| status | enum (held, converted, released, expired) | yes |  |
+| totalPrice | Money |  | On the wire this is three fields; in the database it is one column. |
+| totalPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| totalPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| totalPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| heldByPrincipalId | string (uuid) |  | (nullable) |
+| subjectId | string (uuid) |  | (nullable) |
+| extensionCount | integer |  |  |
+| createdAt | string (date-time) | yes |  |
+| expiresAt | string (date-time) | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Extended |
+| 409 |  | Already expired, or VenueSettings.seating.seatHoldMaxExtensions is reached (proposed default 2, audit R094). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getSeatHold
@@ -3457,7 +3612,7 @@ For guest, partner and back-office callers. **A point-of-sale terminal does not 
 | Offline note | 24 August: servable from a local cache. |
 | Reads | `catalogue.product`, `catalogue.product_category`, `catalogue.product_eligibility_rule`, `catalogue.product_media`, `whitelabel.guided_choice_answer` |
 | Writes | - |
-| Called by | ANL-004, BO-007, BO-012, BO-013, BO-014, BO-094, BO-125, CMS-101, CMS-103, EMP-034, GST-001, GST-002, GST-003, GST-005, GST-007, GST-008, GST-015, GST-021, GST-038, GST-044, GST-050, GST-051, GST-052, GST-053, GST-058, GST-075, KSK-003, KSK-015, POS-002, POS-003, PTR-006, WEB-001, WEB-002, WEB-003, WEB-005, WEB-022, WEB-035, WEB-048, WEB-050 |
+| Called by | ANL-004, BO-007, BO-012, BO-013, BO-014, BO-094, BO-125, CMS-101, CMS-103, EMP-034, GST-001, GST-002, GST-003, GST-005, GST-007, GST-008, GST-015, GST-021, GST-038, GST-044, GST-050, GST-051, GST-052, GST-053, GST-058, GST-075, KSK-001, KSK-003, KSK-015, POS-002, POS-003, PTR-006, WEB-001, WEB-002, WEB-003, WEB-005, WEB-022, WEB-035, WEB-048, WEB-050 |
 
 **Parameters**
 
@@ -3906,6 +4061,67 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 422 |  | A media asset that is not ready or whose kind does not match, a consentQuestionIds entry that names no active consent question of the tenant, or requiresTimeWindow on a product whose variants carry n… |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### updateProductVariant
+
+**`PATCH /products/{productId}/variants/{variantId}`**: Describe a variant
+
+**Only the words and codes a person reads or scans.** A variant's combination of values (`axisValues`) and its `sku` come from `setProductAttributes` and are not edited here; this sets the `name`, the `description` a guest reads behind the (i) on a ticket-type row (decided 29 September, 23SEP-6), the `barcode` and which variant is the default.
+Setting `isDefault` true clears it on the product's other variants. A retired variant is not edited: `409`.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, changes rows of `catalogue.variant` that another operation creates |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `catalogue.variant` |
+| Writes | `catalogue.variant` |
+| Called by | BO-008 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| productId | path | yes | string (uuid) |  |
+| variantId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| name | string |  | (max length 150; nullable) |
+| description | object |  | (nullable) |
+| barcode | string |  | (max length 64; nullable) |
+| isDefault | boolean |  |  |
+
+**Response**: `ProductVariant`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| productId | string (uuid) | yes |  |
+| sku | string | yes |  |
+| axisValues | object | yes |  |
+| name | string |  | Taken from their variant tables, 20 September. (max length 150; nullable) |
+| barcode | string |  | Taken from their variant tables, 20 September. (max length 64; nullable) |
+| isDefault | boolean |  | Taken from their variant tables. (default False) |
+| isActive | boolean | yes | False when retired. |
+| description | object |  | Who this ticket type is for and what it includes, shown behind the (i) on each Adult, Child, Senior or Infant row (decided 29 September, 23SEP-6). (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Updated. |
+| 400 |  | A description value longer than 300 characters. |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The variant is retired (isActive false), or is not a variant of this product. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -5422,14 +5638,14 @@ Every table this service owns that the slice reads or writes, with its columns a
 | category | `listSeatCategories`, `updateSeatCategory` |
 | coupon | `assignCoupon`, `getCouponCodeBatch`, `listCouponCampaigns`, `listCouponCodes`, `voidCouponCode` |
 | drafted | `approveCampaignWorkflow`, `approveDecision`, `approvePricingWorkflowAuthority`, `approveReviewDecision`, `approveWorkflow`, `createChannelProfile`, `createLiveDynamicPrice`, `decidePricingChangeRequest`, `decidePricingRecommendation`, `listAdvancedOffer`, `listAdvancedOfferGuardrail`, `listAudienceDiscoveryTargeting`, `listAudiencePreviewReach`, `listAutomationPolicyAutonomous`, `listBehavioralTransactionTargeting`, `listBestOfferCustomer`, `listBudgetConsumptionForecast`, `listBulkPricingUpdate`, `listBundleAvailabilityCapacity`, `listBundleAvailabilityChannel`, `listBundleAvailabilityForecast`, `listBundleBogoAdvanced`, `listBundleCombo`, `listBundlePricingCommercial`, `listBundleSellabilityDependency`, `listBundleValidityScheduling`, `listCalculationValidationReconciliation`, `listCampaignCalendarTimeline`, `listCampaignExperimentTest`, `listCampaignFinancialCommercial`, `listCampaignGovernanceBudget`, `listCampaignPromotionPerformance`, `listCapacityPoolReservation`, `listCartTransactionThreshold`, `listChangeImpactAnalysis`, `listChangePropagationDependency`, `listChannel`, `listChannel2`, `listChannelAllocationRebalancing`, `listChannelBasedPricing`, `listChannelConnectionIntegration`, `listChannelCustomerSegment`, `listChannelExceptionIncident`, `listChannelGovernanceSla`, `listChannelLogTransaction`, `listChannelPerformanceCommercial`, `listChannelSaleRule`, `listChannelSaleSchedule`, `listCheapestLowestValue`, `listCodeEligibilityRestriction`, `listCodeSecurityFraud`, `listCommercialPricing`, `listCommercialPricingStructure`, `listCompetitorPricingMarket`, `listComponentInventoryAvailability`, `listConflict`, `listConflictDetectionResolution`, `listContextLocationChannel`, `listCrmCustomerSegment`, `listCurrencyPrecisionRounding`, `listCustomerEligibilityRule`, `listCustomerMembershipSegment`, `listCustomerSegmentChannel`, `listCustomerSegmentProfile`, `listDemandBookingCurve`, `listDiscountCalculationApplication`, `listDiscountCapMaximum`, `listDiscountLimitGuardrail`, `listDiscountMarginProfitability`, `listDynamicBundle`, `listDynamicBundle2`, `listDynamicBundleRule`, `listDynamicComponentSubstitution`, `listDynamicPriceBand`, `listDynamicPricingAutomation`, `listDynamicPricingGuardrail`, `listDynamicPricingPerformance`, `listDynamicPricingStrategy`, `listEffectiveDateSeason`, `listExecutivePromotionReporting`, `listFeeSurcharge`, `listFeeWaiverTax`, `listGovernanceRiskLaunch`, `listGovernanceRiskMonitoring`, `listIncrementalityAttributionCannibalization`, `listInternalDemandBooking`, `listInventoryCapacityChannel`, `listLearningModelPerformance`, `listLocationVenueEvent`, `listMarketTourismHoliday`, `listMarketVenueCurrency`, `listMembershipLoyaltyGuest`, `listMembershipLoyaltyPricing`, `listMultiBuyQuantity`, `listNearbyEventExhibition`, `listNextBestAction`, `listOfferBasketTrace`, `listPackageBundleAdd`, `listPartnerExternalProduct`, `listPartnerPaymentEligibility`, `listPaymentMethodBank`, `listPercentageFixedDiscount`, `listPriceCalculationSequence`, `listPriceCategoryRate`, `listPriceElasticityRevenue`, `listPriceListTemplate`, `listPricing`, `listPricingChangeImpact`, `listPricingCompliance`, `listPricingDistributionSynchronization`, `listPricingGovernance`, `listPricingRecommendationExplainability`, `listPricingRollbackEmergency`, `listPricingRule`, `listPricingRulePriority`, `listPricingVersionBaseline`, `listProductApprovalWorkflows`, `listProductDuplicationTemplate`, `listProductGovernance`, `listProductImportExport`, `listProductLifecycle`, `listProductPriceAvailability`, `listProductRetirementSuspension`, `listProductTrailChange`, `listPromotionActivityVersion`, `listPromotionAlertException`, `listPromotionCampaign`, `listPromotionChannel`, `listPromotionDecisionTrace`, `listPromotionExclusionCompatibility`, `listPromotionHealthPerformance`, `listPromotionLifecycleStatus`, `listPromotionPerformance`, `listPromotionPriorityHierarchy`, `listQuantityGroupVolume`, `listRealTimeAvailability`, `listRealTimeChannel`, `listRecommendationReviewDecision`, `listRedemption`, `listRedemptionCodeLookup`, `listRedemptionConversionFunnel`, `listRedemptionDiscountExposure`, `listResidencyNationalityMarket`, `listRevenue`, `listRevenueAllocationCost`, `listRevenueDemandImpact`, `listRewardSelectionSubstitution`, `listRollbackRecovery`, `listRulePriorityConflict`, `listSaleChannel`, `listScenarioModelingWhat`, `listScheduledLifecycleActions`, `listSeasonalCalendarDay`, `listSeatPricingRules`, `listSignalDataQuality`, `listSpecialPriceGuest`, `listStackingConflict`, `listTargetingConflictFrequency`, `listTargetingEligibility`, `listTaxFeeCalculation`, `listThresholdActionAutomatic`, `listTimeBasedSeasonal`, `listTimeslotPerformanceTime`, `listUniqueCodeGeneration`, `listUpsellCrossSell`, `listUsageCapacityFrequency`, `listValidityDateTime`, `listVolumeBulkTier`, `listWeatherDemandImpact`, `publishActivationScheduler`, `publishChannelAvailability`, `publishChannelReadinessValidation`, `publishPricingEffectiveDate`, `setBookingVelocityTime`, `setCampaignBudgetFinancial`, `setCatalogueReview`, `setChannelFeePayment`, `setChannelPricingCommercial`, `setDemandOccupancyAvailability`, `setDynamicPricingStrategy`, `setFeeApplicabilityCharging`, `setLifecycleStatuWorkflow`, `setPriceHierarchyInheritance`, `setPricing`, `setPricingChangeRequest`, `setPricingExperiment`, `setProductCatalogue`, `setProductContextOwnership`, `setProductServicePrice`, `setPromotionStackingRule`, `setRulePriorityConflict`, `setRuleTestRecommendation`, `setSeatPricingRule`, `setTaxProfileJurisdiction`, `setTaxRuleTreatment`, `simulateBundlePreviewRecommendation`, `simulatePriceBreakdownCalculation`, `submitPricingChangeRequest`, `testPricingRule` |
-| entitlement | `listEntitlementTemplates`, `setEntitlementTemplateBlackoutDates`, `suspendEntitlement` |
+| entitlement | `listEntitlementTemplates`, `suspendEntitlement` |
 | event | `cancelPerformance`, `getEvent`, `getWaitingRoomStatus`, `setWaitingRoomSetting` |
 | events | `assignPerformanceMedia`, `estimateEventResourceCost`, `getEventChangeTreatmentPolicy`, `getEventResourcePlan`, `listEventTypes`, `listPerformanceTemplates`, `listSpaces`, `rescheduleEvent`, `setEventCapacityProfile`, `setEventChangeTreatmentPolicy`, `setEventRegistration`, `setEventResourcePlan`, `setEventSchedule`, `setEventType`, `setPerformanceTemplate`, `setPrepaidMinutePackage`, `setSpace` |
-| hold | `extendSeatHold` |
+| general | `getPackagePricingDefinition`, `getProductAttributes`, `getTaxProfileJurisdiction` |
 | import | `commitImportJob`, `getImportJob`, `importSeatGeometry`, `importSeatManifest` |
 | lease | `convertInventoryHold`, `forceReleaseInventoryHold`, `relinquishInventoryHold`, `renewInventoryHold` |
 | pricing | `getPriceList`, `listPriceLists`, `listPrices` |
-| product | `createProduct`, `setProductAttributes`, `transitionProductLifecycle`, `updateProductVariant` |
+| product | `createProduct`, `setProductAttributes`, `transitionProductLifecycle` |
 | promotion | `createCommercialCampaign`, `endPromotion`, `listCommercialCampaigns`, `pausePromotion`, `unschedulePromotion`, `updateCommercialCampaign` |
 | promotions | `getRecommendations`, `simulatePromotion`, `voidVoucher` |
 | recommendations | `concludeRecommendationExperiment`, `createRecommendationExperiment`, `createRecommendationStrategy`, `explainRecommendation`, `getProductAffinity`, `getRecommendationPerformance`, `listProductRelationships`, `listRecommendationExperiments`, `listRecommendationStrategies`, `recordRecommendationOutcome`, `setProductRelationships`, `setRecommendationSuppression`, `simulateRecommendationStrategy`, `updateRecommendationStrategy` |

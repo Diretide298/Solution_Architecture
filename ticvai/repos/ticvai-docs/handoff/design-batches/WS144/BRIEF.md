@@ -1,6 +1,6 @@
 # WS144 — Marketing CRM Configuration Reference v1.0 board 10
 
-**10 screens · 18 operations · 19 schemas · 5 permissions**
+**10 screens · 20 operations · 19 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -133,20 +133,20 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-824` | Gamification Command Center | B–D | 0 | 5 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-824` | Gamification Command Center | B | 0 | 5 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-825` | Challenge Builder | A | 15 | 35 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-826` | Achievement & Badge Engine | A | 0 | 10 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-827` | Points & Activity Rules | A | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-828` | Milestones & Reward Rules | A | 31 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
-| `BO-829` | Family, Team & Event Challenges | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-830` | Referral & Streak Management | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-831` | Progress, Leaderboards & Hub | B–D | 3 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-832` | AI Engagement Optimization | B–D | 0 | 0 | 6 | 9 | 0 | 0 | — | notStarted (—) |
-| `BO-833` | Gamification Analytics & Audit | B–D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `BO-827` | Points & Activity Rules | A | 0 | 26 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-828` | Milestones & Reward Rules | A | 31 | 10 | 6 | 5 | 0 | 0 | — | notStarted (—) |
+| `BO-829` | Family, Team & Event Challenges | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-830` | Referral & Streak Management | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-831` | Progress, Leaderboards & Hub | D | 3 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-832` | AI Engagement Optimization | D | 0 | 0 | 6 | 9 | 0 | 0 | — | notStarted (—) |
+| `BO-833` | Gamification Analytics & Audit | D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
-**BO-826, BO-827, BO-828, BO-829, BO-830, BO-832, BO-833 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-826, BO-829, BO-830, BO-832, BO-833 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

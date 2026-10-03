@@ -1523,7 +1523,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "ADM-549"
+    "ADM-549",
+    "ADM-002"
    ],
    "exitTo": [
     "ADM-549"
@@ -2135,7 +2136,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "ADM-549"
+    "ADM-549",
+    "ADM-002"
    ],
    "exitTo": [
     "ADM-549"

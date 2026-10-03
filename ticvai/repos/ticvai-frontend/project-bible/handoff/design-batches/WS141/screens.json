@@ -575,7 +575,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "BO-794"
+    "BO-794",
+    "BO-107"
    ],
    "exitTo": [
     "BO-794"
@@ -611,6 +612,18 @@
     {
      "name": "contentBody",
      "components": [
+      {
+       "kind": "cardList",
+       "label": "Load the copilot configuration as saved",
+       "operation": "getCustomerServiceCopilot",
+       "bindsTo": "AiCustomerServiceCopilotKnowledgeWorkspaceView",
+       "columns": [
+        "AiCustomerServiceCopilotKnowledgeWorkspaceView.configuration",
+        "AiCustomerServiceCopilotKnowledgeWorkspaceView.effective",
+        "AiCustomerServiceCopilotKnowledgeWorkspaceView.knowledgeCollections"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
       {
        "kind": "primaryButton",
        "derived": true,
@@ -682,6 +695,13 @@
     "purpose": "Add a document to a collection",
     "trigger": "onAction",
     "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
+   },
+   {
+    "operationId": "getCustomerServiceCopilot",
+    "contract": "marketing-crm",
+    "purpose": "Load the copilot configuration as saved",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "wireframe": {
@@ -744,7 +764,7 @@
   "name": "Agent Workspace",
   "module": "Engagement & Support",
   "requiresModule": "marketing",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "7",
@@ -759,7 +779,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "BO-794"
+    "BO-794",
+    "BO-107"
    ],
    "exitTo": [
     "BO-794"

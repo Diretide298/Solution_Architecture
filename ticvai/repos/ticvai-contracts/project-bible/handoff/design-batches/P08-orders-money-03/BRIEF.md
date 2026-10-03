@@ -127,11 +127,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-075` | Account Mapping | A | 31 | 43 | 6 | 16 | 2 | 0 | — | notStarted (generated) |
-| `BO-076` | Revenue Recognition | B–D | 16 | 18 | 6 | 74 | 2 | 0 | — | notStarted (generated) |
+| `BO-076` | Revenue Recognition | C | 16 | 18 | 6 | 74 | 2 | 0 | — | notStarted (generated) |
 | `BO-077` | FX Rates & Variances | A | 15 | 24 | 6 | 1 | 2 | 4 | — | notStarted (generated) |
-| `BO-089` | Journal Entries | B–D | 19 | 14 | 6 | 22 | 1 | 0 | — | notStarted (generated) |
-| `BO-090` | Period Close | B–D | 5 | 22 | 6 | 11 | 1 | 0 | — | notStarted (generated) |
-| `BO-101` | Orders & Money | B–D | 7 | 22 | 6 | 5 | 0 | 0 | — | notStarted (generated) |
+| `BO-089` | Journal Entries | C | 19 | 14 | 6 | 22 | 1 | 0 | — | notStarted (generated) |
+| `BO-090` | Period Close | C | 5 | 22 | 6 | 11 | 1 | 0 | — | notStarted (generated) |
+| `BO-101` | Orders & Money | C | 7 | 22 | 6 | 5 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

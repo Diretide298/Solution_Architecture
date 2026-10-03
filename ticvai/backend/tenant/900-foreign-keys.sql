@@ -3,7 +3,7 @@
 -- its use** — orders reaches catalogue, catalogue reaches platform, and something
 -- reaches back. Tables first, constraints last, is the only ordering that terminates.
 --
--- 769 of 800 declared references. The ones that reach the
+-- 777 of 810 declared references. The ones that reach the
 -- other database are in ../990-cross-database-references.sql and are not constraints
 -- any more.
 
@@ -27,6 +27,7 @@ ALTER TABLE platform.workstation ADD CONSTRAINT workstation_venue_id_id_uniq UNI
 ALTER TABLE access.access_change ADD CONSTRAINT access_change_order_id_fkey FOREIGN KEY (order_id) REFERENCES orders.sales_order(id);
 ALTER TABLE access.access_point ADD CONSTRAINT access_point_venue_id_fkey FOREIGN KEY (venue_id) REFERENCES platform.scope(id);
 ALTER TABLE access.blacklist ADD CONSTRAINT blacklist_added_by_principal_id_fkey FOREIGN KEY (added_by_principal_id) REFERENCES identity.principal(id);
+ALTER TABLE access.device_placement ADD CONSTRAINT device_placement_device_id_fkey FOREIGN KEY (device_id) REFERENCES platform.device(id);
 ALTER TABLE access.entitlement ADD CONSTRAINT entitlement_order_id_fkey FOREIGN KEY (order_id) REFERENCES orders.sales_order(id);
 ALTER TABLE access.entitlement ADD CONSTRAINT entitlement_product_id_fkey FOREIGN KEY (product_id) REFERENCES catalogue.product(id);
 ALTER TABLE access.entitlement ADD CONSTRAINT entitlement_venue_id_fkey FOREIGN KEY (venue_id) REFERENCES platform.scope(id);
@@ -35,6 +36,7 @@ ALTER TABLE access.parking_entitlement ADD CONSTRAINT parking_entitlement_facili
 ALTER TABLE access.parking_entitlement ADD CONSTRAINT parking_entitlement_order_id_fkey FOREIGN KEY (order_id) REFERENCES orders.sales_order(id);
 ALTER TABLE access.parking_entitlement ADD CONSTRAINT parking_entitlement_subject_id_fkey FOREIGN KEY (subject_id) REFERENCES pii.subject(id);
 ALTER TABLE access.parking_facility ADD CONSTRAINT parking_facility_venue_id_fkey FOREIGN KEY (venue_id) REFERENCES platform.scope(id);
+ALTER TABLE access.podium_shift ADD CONSTRAINT podium_shift_access_device_id_fkey FOREIGN KEY (access_device_id) REFERENCES platform.device(id);
 ALTER TABLE access.scan_event ADD CONSTRAINT scan_event_operator_principal_id_fkey FOREIGN KEY (operator_principal_id) REFERENCES identity.principal(id);
 ALTER TABLE access.scan_event ADD CONSTRAINT scan_event_overridden_by_principal_id_fkey FOREIGN KEY (overridden_by_principal_id) REFERENCES identity.principal(id);
 ALTER TABLE access.scan_event ADD CONSTRAINT scan_event_ticket_id_fkey FOREIGN KEY (ticket_id) REFERENCES access.entitlement(id);
@@ -177,6 +179,8 @@ ALTER TABLE catalogue.published_bundle ADD CONSTRAINT published_bundle_venue_id_
 ALTER TABLE catalogue.space ADD CONSTRAINT space_venue_id_fkey FOREIGN KEY (venue_id) REFERENCES platform.scope(id);
 ALTER TABLE catalogue.variant ADD CONSTRAINT variant_product_id_fkey FOREIGN KEY (product_id) REFERENCES catalogue.product(id);
 ALTER TABLE catalogue.variant_dimension ADD CONSTRAINT variant_dimension_product_id_fkey FOREIGN KEY (product_id) REFERENCES catalogue.product(id);
+ALTER TABLE catalogue.waiting_room_setting ADD CONSTRAINT waiting_room_setting_performance_id_fkey FOREIGN KEY (performance_id) REFERENCES catalogue.performance(id);
+ALTER TABLE catalogue.waiting_room_setting ADD CONSTRAINT waiting_room_setting_updated_by_principal_id_fkey FOREIGN KEY (updated_by_principal_id) REFERENCES identity.principal(id);
 ALTER TABLE catalogue.waitlist_entry ADD CONSTRAINT waitlist_entry_performance_id_fkey FOREIGN KEY (performance_id) REFERENCES catalogue.performance(id);
 ALTER TABLE catalogue.waitlist_entry ADD CONSTRAINT waitlist_entry_subject_id_fkey FOREIGN KEY (subject_id) REFERENCES pii.subject(id);
 ALTER TABLE catalogue.waitlist_entry ADD CONSTRAINT waitlist_entry_variant_id_fkey FOREIGN KEY (variant_id) REFERENCES catalogue.variant(id);
@@ -240,6 +244,7 @@ ALTER TABLE games.redemption ADD CONSTRAINT redemption_issued_by_principal_id_fk
 ALTER TABLE games.redemption ADD CONSTRAINT redemption_venue_id_fkey FOREIGN KEY (venue_id) REFERENCES platform.scope(id);
 ALTER TABLE games.redemption_line ADD CONSTRAINT redemption_line_prize_id_fkey FOREIGN KEY (prize_id) REFERENCES games.prize(id);
 ALTER TABLE games.redemption_line ADD CONSTRAINT redemption_line_redemption_id_fkey FOREIGN KEY (redemption_id) REFERENCES games.redemption(id);
+ALTER TABLE identity."session" ADD CONSTRAINT session_principal_id_fkey FOREIGN KEY (principal_id) REFERENCES identity.principal(id);
 ALTER TABLE identity.access_review_item ADD CONSTRAINT access_review_item_campaign_id_fkey FOREIGN KEY (campaign_id) REFERENCES identity.access_review_campaign(id);
 ALTER TABLE identity.access_review_item ADD CONSTRAINT access_review_item_delegated_access_id_fkey FOREIGN KEY (delegated_access_id) REFERENCES identity.delegated_access(id);
 ALTER TABLE identity.access_review_item ADD CONSTRAINT access_review_item_principal_id_fkey FOREIGN KEY (principal_id) REFERENCES identity.principal(id);
@@ -355,6 +360,7 @@ ALTER TABLE maintenance.incident ADD CONSTRAINT incident_reported_by_principal_i
 ALTER TABLE maintenance.incident ADD CONSTRAINT incident_venue_id_asset_id_fkey FOREIGN KEY (venue_id, asset_id) REFERENCES maintenance.asset(venue_id, id);
 ALTER TABLE maintenance.incident ADD CONSTRAINT incident_venue_id_corrective_work_order_id_fkey FOREIGN KEY (venue_id, corrective_work_order_id) REFERENCES maintenance.work_order(venue_id, id);
 ALTER TABLE maintenance.incident ADD CONSTRAINT incident_venue_id_fkey FOREIGN KEY (venue_id) REFERENCES platform.scope(id);
+ALTER TABLE maintenance.incident_media ADD CONSTRAINT incident_media_asset_ref_fkey FOREIGN KEY (asset_ref) REFERENCES assets.media_asset(id);
 ALTER TABLE maintenance.inspection ADD CONSTRAINT inspection_performed_by_principal_id_fkey FOREIGN KEY (performed_by_principal_id) REFERENCES identity.principal(id);
 ALTER TABLE maintenance.inspection ADD CONSTRAINT inspection_venue_id_asset_id_fkey FOREIGN KEY (venue_id, asset_id) REFERENCES maintenance.asset(venue_id, id);
 ALTER TABLE maintenance.inspection ADD CONSTRAINT inspection_venue_id_fkey FOREIGN KEY (venue_id) REFERENCES platform.scope(id);
@@ -400,6 +406,7 @@ ALTER TABLE marketing.conversation ADD CONSTRAINT conversation_venue_id_fkey FOR
 ALTER TABLE marketing.conversation_message ADD CONSTRAINT conversation_message_ai_interaction_id_fkey FOREIGN KEY (ai_interaction_id) REFERENCES ai.activity(id);
 ALTER TABLE marketing.conversation_message ADD CONSTRAINT conversation_message_conversation_id_fkey FOREIGN KEY (conversation_id) REFERENCES marketing.conversation(id);
 ALTER TABLE marketing.conversation_message_attachment ADD CONSTRAINT conversation_message_attachment_conversation_message_id_fkey FOREIGN KEY (conversation_message_id) REFERENCES marketing.conversation_message(id);
+ALTER TABLE marketing.cookie_scan_finding ADD CONSTRAINT cookie_scan_finding_scan_run_id_fkey FOREIGN KEY (scan_run_id) REFERENCES marketing.cookie_scan_run(id);
 ALTER TABLE marketing.device_consent_category ADD CONSTRAINT device_consent_category_device_consent_id_fkey FOREIGN KEY (device_consent_id) REFERENCES marketing.device_consent(id);
 ALTER TABLE marketing.form_definition_field ADD CONSTRAINT form_definition_field_form_definition_id_fkey FOREIGN KEY (form_definition_id) REFERENCES marketing.form_definition(id);
 ALTER TABLE marketing.form_submission ADD CONSTRAINT form_submission_subject_id_fkey FOREIGN KEY (subject_id) REFERENCES pii.subject(id);
@@ -749,6 +756,7 @@ ALTER TABLE whitelabel.feature_toggle ADD CONSTRAINT feature_toggle_tenant_confi
 ALTER TABLE whitelabel.footer_config_column ADD CONSTRAINT footer_config_column_footer_config_id_fkey FOREIGN KEY (footer_config_id) REFERENCES whitelabel.footer_config(id);
 ALTER TABLE whitelabel.footer_config_social_link ADD CONSTRAINT footer_config_social_link_footer_config_id_fkey FOREIGN KEY (footer_config_id) REFERENCES whitelabel.footer_config(id);
 ALTER TABLE whitelabel.guided_choice_answer ADD CONSTRAINT guided_choice_answer_guided_choice_id_fkey FOREIGN KEY (guided_choice_id) REFERENCES whitelabel.guided_choice(id);
+ALTER TABLE whitelabel.guided_choice_answer ADD CONSTRAINT guided_choice_answer_guided_choice_question_id_fkey FOREIGN KEY (guided_choice_question_id) REFERENCES whitelabel.guided_choice_question(id);
 ALTER TABLE whitelabel.guided_choice_question ADD CONSTRAINT guided_choice_question_guided_choice_id_fkey FOREIGN KEY (guided_choice_id) REFERENCES whitelabel.guided_choice(id);
 ALTER TABLE whitelabel.homepage_section ADD CONSTRAINT homepage_section_content_page_id_fkey FOREIGN KEY (content_page_id) REFERENCES whitelabel.content_page(id);
 ALTER TABLE whitelabel.module_enablement ADD CONSTRAINT module_enablement_tenant_config_id_fkey FOREIGN KEY (tenant_config_id) REFERENCES whitelabel.tenant_config(id);

@@ -1591,7 +1591,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "BO-194"
+    "BO-194",
+    "BO-103"
    ],
    "exitTo": [
     "BO-194"

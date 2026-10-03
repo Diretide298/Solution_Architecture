@@ -40,7 +40,8 @@ operations:
   reads:
   - rental.booking
   - rental.participant
-  writes: []
+  writes:
+  - rental.booking
 - operation: createRentalAgreement
   verb: POST
   path: /agreements
@@ -303,7 +304,8 @@ operations:
   offline: false
   reads:
   - rental.product
-  writes: []
+  writes:
+  - rental.product
 - operation: quoteRentalPrice
   verb: POST
   path: /rental-price
@@ -323,6 +325,7 @@ operations:
   - rental.quote
   writes:
   - cache:idempotency
+  - rental.quote
 - operation: recordRentalInspection
   verb: POST
   path: /rental-bookings/{bookingId}/inspection
@@ -512,7 +515,8 @@ operations:
   reads:
   - rental.booking
   - rental.participant
-  writes: []
+  writes:
+  - rental.booking
 - operation: updateRentalBooking
   verb: PATCH
   path: /rental-bookings/{bookingId}
@@ -524,7 +528,8 @@ operations:
   reads:
   - rental.booking
   - rental.participant
-  writes: []
+  writes:
+  - rental.booking
 - operation: updateRentalPricingProfile
   verb: PUT
   path: /rental-pricing-profiles/{profileId}

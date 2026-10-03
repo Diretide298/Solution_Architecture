@@ -1,4 +1,35 @@
 {
+ "Allergen": {
+  "type": "object",
+  "description": "BL-127. **Fourteen declarable allergens is a legal list in most jurisdictions, not a preference.** A menu item with no allergen data is one a venue cannot serve to somebody who asks.\n**`contains` and `mayContain` are different claims.** The first is a recipe fact; the second is a kitchen fact about shared equipment, and conflating them either over-warns everybody or under-warns the person it matters to.\n",
+  "properties": {
+   "contains": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AllergenCode"
+    }
+   },
+   "mayContain": {
+    "type": "array",
+    "description": "**Cross-contamination, which is about the kitchen rather than the recipe.** A fryer shared with breaded fish makes chips a fish risk and nothing in the recipe says so.\n",
+    "items": {
+     "$ref": "#/components/schemas/AllergenCode"
+    }
+   },
+   "isVegetarian": {
+    "type": "boolean",
+    "default": false
+   },
+   "isVegan": {
+    "type": "boolean",
+    "default": false
+   },
+   "isHalal": {
+    "type": "boolean",
+    "default": false
+   }
+  }
+ },
  "AllergenCode": {
   "type": "string",
   "description": "**The fourteen declarable allergens, as one closed list.** Every allergen field in this contract uses it — the menu claim, the ticket line, a substitution's delta, a modifier option, the label on a bag — so a declared set and an actual set compare without anybody normalising case or synonyms. It was the `Allergen.contains` enum; the other fields were free text.\n",
@@ -21,7 +52,7 @@
  },
  "GuestMenu": {
   "type": "object",
-  "x-ticvai-persistence": "none — projection over menu, item and availability",
+  "x-ticvai-persistence": "none — projection over fnb.menu, fnb.menu_item and availability",
   "required": [
    "outletId",
    "menuId",
@@ -109,6 +140,14 @@
           "items": {
            "$ref": "#/components/schemas/AllergenCode"
           }
+         },
+         "allergenDetail": {
+          "allOf": [
+           {
+            "$ref": "#/components/schemas/Allergen"
+           }
+          ],
+          "description": "**What the dish contains and what it may contain, told apart** (3 October 2026, CHG-R1S-022: the kiosk and guest menus promise the difference and the flat list cannot carry it). `allergens` stays the flat list."
          },
          "preparationMinutes": {
           "type": "integer",

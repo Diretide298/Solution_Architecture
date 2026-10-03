@@ -1,6 +1,6 @@
 # WS03 — Access Control board 3
 
-**10 screens · 16 operations · 23 schemas · 4 permissions**
+**10 screens · 17 operations · 23 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -98,15 +98,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-164` | Digital Credential Security Command Center | C | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-165` | Dynamic QR Security Profile Builder | B–D | 13 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-165` | Dynamic QR Security Profile Builder | C | 13 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
 | `BO-166` | Credential Activation & Display Rules | A | 6 | 4 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
 | `BO-167` | Device Binding & Session Security | A | 5 | 18 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-168` | BLE Beacon & Geofence Configuration | A | 21 | 13 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-169` | Credential Transfer & Rebinding | B–D | 9 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-170` | Credential Revocation & Lifecycle Events | B–D | 7 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-171` | Offline Cryptographic Validation Profile | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-172` | Embedded Entitlement Payload Designer | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-173` | Credential Security Simulation, Audit & Publication | B–D | 0 | 13 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-168` | BLE Beacon & Geofence Configuration | A | 21 | 21 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-169` | Credential Transfer & Rebinding | C | 9 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-170` | Credential Revocation & Lifecycle Events | C | 7 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-171` | Offline Cryptographic Validation Profile | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-172` | Embedded Entitlement Payload Designer | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-173` | Credential Security Simulation, Audit & Publication | C | 0 | 13 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -126,7 +126,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | Block C · task APP-SETUP-BO-164 |
+| Block | Block C · task VM-BO-164 |
 | Who uses it | venue staff holding `AUDIT_VIEW`, `SCOPE_VIEW` (2 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§KPI Cards) and a per-row directory (§Show) — counts over a population, then the population |
@@ -316,7 +316,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-165 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; Options; Configuration may include) and no display directory — it is settings, not a population |
@@ -937,6 +937,19 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Shown**
 
+**Load the configuration as saved** (detail panel, from `getBleBeaconGeofence`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Beacon name | text | Beacon Name |
+| Venue | text | Venue |
+| Zone | text | Zone |
+| Gate | text | Gate |
+| Proximity threshold | 1,234 | Metres |
+| Active inactive | chip: Active, Inactive | Active/Inactive |
+| Health | chip: Healthy, Degraded, Offline | Read-only, reported by the beacon |
+| Last detected | 1 Oct 2026, 14:30 | Last detected |
+
 **Health** (detail panel, from `setBleBeaconGeofence`): Read-only: reported by the beacon, never typed (with last detected).
 
 | Shows | Format | Notes |
@@ -968,6 +981,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 **What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
 - **Save beacon / Save zone**: Whole-record upsert (VO-R04). *(source: contracts/spine/access.yaml#setBleBeaconGeofence)*
+
+**Data it reads**: `getBleBeaconGeofence` (onLoad, Load the configuration as saved)
 
 **Where the user goes next**
 
@@ -1013,6 +1028,7 @@ geofences:
 #### Permissions
 
 - `setBleBeaconGeofence` → `ACCESS_POINT_CONFIGURE` (configure) · staff
+- `getBleBeaconGeofence` → `ACCESS_POINT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1041,8 +1057,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (21), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (21), with its required mark, default, format and its error state (403, 404).
+- [ ] Every output is drawn (21 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-168?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save beacon.
 - [ ] Every transition is wired: `BO-164`.
@@ -1061,7 +1077,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-169 |
 | Who uses it | venue staff holding `SCOPE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -1214,7 +1230,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-170 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
@@ -1384,7 +1400,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-171 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1535,7 +1551,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-172 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1677,7 +1693,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-173 |
 | Who uses it | venue staff holding `AUDIT_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
@@ -1937,6 +1953,7 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+"getBleBeaconGeofence": {"method":"GET","path":"/ble-beacon-geofence","contract":"access","summary":"The BLE beacon and geofence configuration as saved","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"BleBeaconGeofenceConfigurationView"},
 "listCredentialActivationDisplay": {"method":"GET","path":"/credential-activation-display","contract":"access","summary":"Credential Activation & Display Rules","permission":"SCOPE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"CredentialActivationDisplayRulesView"},
 "listCredentialRevocationLifecycle": {"method":"GET","path":"/credential-revocation-lifecycle","contract":"access","summary":"Credential Revocation & Lifecycle Events","permission":"SCOPE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"CredentialRevocationLifecycleEventsView"},
 "listCredentialSecurity": {"method":"GET","path":"/credential-security","contract":"access","summary":"Credential Security Simulation, Audit & Publication","permission":"AUDIT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},

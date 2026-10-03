@@ -1,7 +1,7 @@
 id: HLD
 title: TICVAI — seventeen modules in five tiers, five deployables
 generatedBy: tools/derive-diagrams.py
-about: '**What ships together.** 2,738 operations and 1,117 tables resolve into seventeen modules, deployed
+about: '**What ships together.** 2,758 operations and 1,119 tables resolve into seventeen modules, deployed
   as five units (ADR-0055), and **the data boundary decides where they split**: a module owns and migrates
   its schemas; another module reads them through published views and writes them only through the owner''s
   in-process API.
@@ -17,14 +17,15 @@ tiers:
     Identity and 289 tables anchor on `platform.scope`.
   services:
   - service: TenancyService
-    operations: 209
-    tables: 109
+    operations: 210
+    tables: 110
     schemas:
     - platform
     - workforce
     - approvals
     - accreditation
     - tenancy
+    - kernel
     contracts:
     - tenancy
     - workforce
@@ -50,7 +51,7 @@ tiers:
   meaning: The sale path. Highest availability and the highest write rate in the platform.
   services:
   - service: CatalogueService
-    operations: 443
+    operations: 446
     tables: 137
     schemas:
     - catalogue
@@ -68,7 +69,7 @@ tiers:
     ref: diagrams/lld/services/CatalogueService.yaml
   - service: OrderService
     operations: 298
-    tables: 115
+    tables: 116
     schemas:
     - orders
     - payments
@@ -81,13 +82,13 @@ tiers:
     ifDown: '**Down means no sales.** Highest availability target in the platform.'
     ref: diagrams/lld/services/OrderService.yaml
   - service: AccessService
-    operations: 250
+    operations: 256
     tables: 78
     schemas:
     - access
     contracts:
     - access
-    flowCoverage: 63%
+    flowCoverage: 61%
     scale: Read-heavy, extreme latency sensitivity, edge-cached. **`frozenDays` is held rather than
       replayed** precisely because the gate cannot afford the arithmetic.
     ifDown: Down means the gates stop. Runs at the edge with a local decision cache.
@@ -124,7 +125,7 @@ tiers:
     these runs none of them.
   services:
   - service: VenueOpsService
-    operations: 287
+    operations: 290
     tables: 124
     schemas:
     - queue
@@ -144,18 +145,18 @@ tiers:
     - games
     - rental
     - transport
-    flowCoverage: 18%
+    flowCoverage: 19%
     scale: Low and steady. Queue readings are the only frequent write.
     ifDown: Down degrades venue operations. Selling and admitting continue.
     ref: diagrams/lld/services/VenueOpsService.yaml
   - service: FnbService
-    operations: 133
-    tables: 52
+    operations: 135
+    tables: 53
     schemas:
     - fnb
     contracts:
     - fnb
-    flowCoverage: 49%
+    flowCoverage: 48%
     scale: Write-heavy during service, idle between. **Two peaks a day, sharply.**
     ifDown: Down means the kitchen falls back to paper. Offline-capable by design.
     ref: diagrams/lld/services/FnbService.yaml
@@ -186,7 +187,7 @@ tiers:
     property and one that should be tested rather than assumed.
   services:
   - service: MarketingService
-    operations: 274
+    operations: 275
     tables: 132
     schemas:
     - marketing
@@ -204,7 +205,7 @@ tiers:
     - qdrant
     contracts:
     - ai
-    flowCoverage: 12%
+    flowCoverage: 13%
     scale: Latency-tolerant, cost-sensitive, token-metered. Different hardware from everything else.
     ifDown: Down degrades suggestions and the concierge. **Nothing that takes money depends on it.**
     ref: diagrams/lld/services/AiService.yaml
@@ -212,7 +213,7 @@ tiers:
   meaning: Provisioning, publishing, reporting, and the one path that crosses a region.
   services:
   - service: PlatformService
-    operations: 221
+    operations: 225
     tables: 108
     schemas:
     - control
@@ -297,12 +298,12 @@ deployables:
 crossServiceWrites:
 - from: OrderService
   to: TenancyService
-  writes: 28
+  writes: 32
   reads: 11
   kind: strong
 - from: CatalogueService
   to: TenancyService
-  writes: 25
+  writes: 26
   reads: 1
   kind: strong
 - from: OrderService
@@ -337,24 +338,34 @@ crossServiceWrites:
   kind: strong
 - from: OrderService
   to: AccessService
-  writes: 9
+  writes: 10
   reads: 49
   kind: strong
 - from: WalletService
   to: TenancyService
-  writes: 7
+  writes: 9
   reads: 0
+  kind: strong
+- from: AccessService
+  to: TenancyService
+  writes: 5
+  reads: 1
+  kind: strong
+- from: FnbService
+  to: TenancyService
+  writes: 5
+  reads: 8
+  kind: strong
+- from: FnbService
+  to: InventoryService
+  writes: 5
+  reads: 7
   kind: strong
 - from: InventoryService
   to: TenancyService
   writes: 5
   reads: 0
   kind: strong
-- from: AccessService
-  to: TenancyService
-  writes: 4
-  reads: 1
-  kind: ordinary
 - from: AccessService
   to: IdentityService
   writes: 4
@@ -395,16 +406,6 @@ crossServiceWrites:
   writes: 3
   reads: 9
   kind: ordinary
-- from: FnbService
-  to: TenancyService
-  writes: 3
-  reads: 8
-  kind: ordinary
-- from: FnbService
-  to: InventoryService
-  writes: 3
-  reads: 7
-  kind: ordinary
 - from: MarketingService
   to: IdentityService
   writes: 3
@@ -419,11 +420,6 @@ crossServiceWrites:
   to: InventoryService
   writes: 3
   reads: 2
-  kind: ordinary
-- from: FnbService
-  to: OrderService
-  writes: 2
-  reads: 4
   kind: ordinary
 - from: FnbService
   to: CatalogueService
@@ -442,6 +438,11 @@ crossServiceWrites:
   kind: ordinary
 - from: MarketingService
   to: PlatformService
+  writes: 2
+  reads: 3
+  kind: ordinary
+- from: OrderService
+  to: CrossRegionService
   writes: 2
   reads: 3
   kind: ordinary
@@ -476,6 +477,11 @@ crossServiceWrites:
   reads: 3
   kind: ordinary
 - from: WhiteLabelService
+  to: TenancyService
+  writes: 2
+  reads: 0
+  kind: ordinary
+- from: WhiteLabelService
   to: PlatformService
   writes: 2
   reads: 9
@@ -489,6 +495,11 @@ crossServiceWrites:
   to: MarketingService
   writes: 1
   reads: 1
+  kind: ordinary
+- from: FnbService
+  to: OrderService
+  writes: 1
+  reads: 3
   kind: ordinary
 - from: IdentityService
   to: OrderService
@@ -509,11 +520,6 @@ crossServiceWrites:
   to: PlatformService
   writes: 1
   reads: 1
-  kind: ordinary
-- from: OrderService
-  to: CrossRegionService
-  writes: 1
-  reads: 3
   kind: ordinary
 - from: OrderService
   to: WalletService
@@ -548,12 +554,7 @@ crossServiceWrites:
 - from: VenueOpsService
   to: CatalogueService
   writes: 1
-  reads: 18
-  kind: ordinary
-- from: WhiteLabelService
-  to: TenancyService
-  writes: 1
-  reads: 0
+  reads: 21
   kind: ordinary
 deployOrder:
 - order: 1

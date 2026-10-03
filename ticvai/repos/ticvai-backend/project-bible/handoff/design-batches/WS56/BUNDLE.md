@@ -96,16 +96,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-248` | Workflow Operations Command Center | B–D | 0 | 254 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-249` | Unified Approval Inbox & Decision Workspace | B–D | 0 | 18 | 6 | 7 | 1 | 3 | — | notStarted (generated) |
-| `ADM-250` | Workflow Instance Monitor & Process Timeline | B–D | 9 | 20 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-251` | Workflow Exception, Failure & Recovery Center | B–D | 10 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-252` | SLA, Escalation & Bottleneck Monitor | B–D | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-253` | Automation Execution & Autonomous Action Monitor | B–D | 0 | 34 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-254` | Cross-Module Orchestration Monitor | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-255` | Workflow Analytics & Process Performance | B–D | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-256` | Process Optimization & Automation Opportunity Center | B–D | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-257` | AI Workflow Intelligence & Autonomous Governance Center | B–D | 0 | 22 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-248` | Workflow Operations Command Center | B | 0 | 254 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-249` | Unified Approval Inbox & Decision Workspace | B | 0 | 18 | 6 | 7 | 1 | 3 | — | notStarted (generated) |
+| `ADM-250` | Workflow Instance Monitor & Process Timeline | B | 9 | 20 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-251` | Workflow Exception, Failure & Recovery Center | B | 10 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-252` | SLA, Escalation & Bottleneck Monitor | B | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-253` | Automation Execution & Autonomous Action Monitor | B | 0 | 34 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-254` | Cross-Module Orchestration Monitor | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-255` | Workflow Analytics & Process Performance | B | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-256` | Process Optimization & Automation Opportunity Center | B | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-257` | AI Workflow Intelligence & Autonomous Governance Center | B | 0 | 22 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -125,7 +125,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-248 |
 | Who uses it | venue staff holding `APPROVAL_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -585,7 +585,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-249 |
 | Who uses it | venue |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -757,7 +757,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-250 |
 | Who uses it | venue staff holding `APPROVAL_ACT`, `APPROVAL_VIEW` (1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Display) and a per-row directory (§For each step show) — counts over a population, then the population |
@@ -960,7 +960,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-251 |
 | Who uses it | venue staff holding `APPROVAL_ACT`, `APPROVAL_VIEW` (1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -1139,7 +1139,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-252 |
 | Who uses it | venue |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display; Show) and no metric row |
@@ -1291,7 +1291,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-253 |
 | Who uses it | venue staff holding `APPROVAL_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -1444,7 +1444,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-254 |
 | Who uses it | venue staff holding `APPROVAL_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1560,7 +1560,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-255 |
 | Who uses it | venue staff holding `REPORT_VIEW_VENUE` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§Analyze; Measure; Compare) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a … |
@@ -1719,7 +1719,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-256 |
 | Who uses it | venue staff holding `REPORT_VIEW_VENUE` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Identify; Display) and no metric row |
@@ -1857,7 +1857,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-257 |
 | Who uses it | venue staff holding `APPROVAL_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Analyze) and no metric row |

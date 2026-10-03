@@ -9,12 +9,12 @@
 | Contracts | 10 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 124 |
-| Waves | wave1 3 · wave3 68 |
+| Operations with no screen | 118 |
+| Waves | wave1 4 · wave3 67 |
 
 ## Gaps
 
-### 124 operations with no screen here
+### 118 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -24,13 +24,11 @@
 | `generateVenueLayout` | ai | POST | Draft a seat map from an uploaded plan |
 | `listIndexJobs` | ai | GET | Indexing in flight and recently finished |
 | `listIndexSources` | ai | GET | What is indexed, and how current it is |
-| `proposeWalkways` | ai | POST | Find walkable space in a drawing that has no vectors |
 | `reindexSource` | ai | POST | Rebuild a source |
 | `removeIndexEntry` | ai | DELETE | Remove one record from the index |
 | `setAiTool` | ai | PUT | Register or change a tool (platform) |
 | `setIndexSource` | ai | PUT | Declare a source indexed |
 | `setSuggestionProvider` | ai | PUT |  |
-| `getCatalogueImportJob` | catalogue | GET | Progress and findings of a catalogue import |
 | `getEventChangeTreatmentPolicy` | catalogue | GET | What happens to tickets, reservations and guests when an event changes, by default |
 | `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
 | `getWaitingRoomStatus` | catalogue | GET | A performance's waiting room, its setting and how it is moving |
@@ -60,7 +58,9 @@
 | `getPrincipalModuleAccess` | identity | GET | What this person may do, as ticks |
 | `listAccessDecisions` | identity | GET | What was decided, for whom, where and why |
 | `listAuthorisationPolicyTemplates` | identity | GET | Reusable policy shapes |
-| … | | | 84 more |
+| `listCustomerMemberships` | identity | GET | Memberships a customer holds |
+| `listModuleCapabilities` | identity | GET | What a person can be allowed to do, per module |
+| … | | | 78 more |
 
 ### 1 modules split across waves
 
@@ -78,7 +78,7 @@
 
 | | Name | Module | Wave | Ops | Drawn |
 |---|---|---|---|---|---|
-| `ANL-001` | Executive Command Center | Analytics | 3 | 7 | yes |
+| `ANL-001` | Executive Command Center | Analytics | 1 | 7 | yes |
 | `ANL-002` | Sales, Revenue & Channel | Analytics | 3 | 3 | yes |
 | `ANL-003` | Operational Performance | Analytics | 3 | 6 | yes |
 | `ANL-004` | Product Performance | Analytics | 3 | 4 | yes |

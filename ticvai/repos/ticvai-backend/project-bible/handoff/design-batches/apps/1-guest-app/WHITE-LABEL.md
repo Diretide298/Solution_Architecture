@@ -105,7 +105,7 @@ Each line: the CMS field (input), the value an alternate tenant would set, and w
 - **Sections: card count**: in `CMS-007` Page Builder, the tenant sets *Sections: card count* to **6** (default —) → on GST-001, WEB-001: how many cards the section shows, the counts the approved wireframe offers.
 - **Sections: scroll animation**: in `CMS-007` Page Builder, the tenant sets *Sections: scroll animation* to **Slide** (default Rise) → on the guest home screens: how the section enters as the guest scrolls: rise, scale, slide, blur or none (none whenever the device asks for reduced motion).
 - **Landing-page template**: in `CMS-007` Page Builder, the tenant sets *Landing-page template* to **a TICVAI template, picked by its name and thumbnail** (default —) → on WEB-001: the landing-page template the home started from (listLandingPageTemplates); a tenant with no landing page of its own starts from one, and the sections it fills stay editable.
-- **Powered by TICVAI credit**: in `CMS-002` Brand Kit, the tenant sets *Powered by TICVAI credit* to **off, where the licence allows it** (default on) → on every guest screen (web, app and kiosk): the *Powered by TICVAI* credit on the launch screen, at the foot of Account and in the web footer; on by default, and switching it off needs the licence add-on (403 powered-by-locked).
+- **Powered by TICVAI credit**: in `CMS-104` App Build & Store Publishing, the tenant sets *Powered by TICVAI credit* to **off, where the licence allows it** (default on) → on every guest screen (web, app and kiosk): the *Powered by TICVAI* credit on the launch screen, at the foot of Account and in the web footer; on by default, and switching it off needs the licence add-on (403 powered-by-locked).
 
 ## The default theme and the alternate tenant theme
 
@@ -498,20 +498,20 @@ Set on `CMS-001` Tenant Workspace through `setMaintenanceMode`. Reaches the scre
 
 | Element | Control | Required | Allowed values and rules | Default | Reaches | What it changes | When it goes live |
 |---|---|---|---|---|---|---|---|
-| Is in maintenance `maintenance.isInMaintenance` | toggle | yes | — | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, WEB-001 … (12) | — | on publish (CMS-014): web at once, the app on its next launch |
-| Availability and maintenance message `maintenance.message` | text, one per language | no | English and Arabic (Arabic right to left) | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, WEB-001 … (12) | — | on publish (CMS-014): web at once, the app on its next launch |
-| Expected back at `maintenance.expectedBackAt` | date and time picker | no | 1 Oct 2026, 14:30 (venue time zone) | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, WEB-001 … (12) | — | on publish (CMS-014): web at once, the app on its next launch |
-| Minimum app version `maintenance.minimumAppVersion` | group | no | — | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, WEB-001 … (12) | The oldest guest app build still allowed to run (decided 28 September, audit R073). | on publish (CMS-014): web at once, the app on its next launch |
-| Minimum app version: ios `maintenance.minimumAppVersion.ios` | text field | no | pattern `^\d+\.\d+\.\d+$` | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, WEB-001 … (12) | — | on publish (CMS-014): web at once, the app on its next launch |
-| Minimum app version: android `maintenance.minimumAppVersion.android` | text field | no | pattern `^\d+\.\d+\.\d+$` | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, WEB-001 … (12) | — | on publish (CMS-014): web at once, the app on its next launch |
-| Contact `maintenance.contact` | group | no | — | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, WEB-001 … (13) | How a guest reaches the venue: WEB-028 Contact & Venue Information, and the screen shown on an error or when the app cannot help (decided 28 September, audit R073). | on publish (CMS-014): web at once, the app on its next launch |
-| Contact: phone `maintenance.contact.phone` | phone field | no | +971 5X XXX XXXX (E.164) | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, WEB-001 … (12) | — | on publish (CMS-014): web at once, the app on its next launch |
-| Contact: email `maintenance.contact.email` | email field | no | name@example.ae | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, WEB-001 … (12) | — | on publish (CMS-014): web at once, the app on its next launch |
-| Contact: whatsapp `maintenance.contact.whatsapp` | text field | no | — | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, WEB-001 … (12) | — | on publish (CMS-014): web at once, the app on its next launch |
-| Contact: address `maintenance.contact.address` | text, one per language | no | English and Arabic (Arabic right to left) | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, WEB-001 … (12) | — | on publish (CMS-014): web at once, the app on its next launch |
-| Contact: opening hours `maintenance.contact.openingHours` | text, one per language | no | English and Arabic (Arabic right to left) | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, WEB-001 … (12) | Prose, as the guest reads it. The bookable hours are the catalogue's. | on publish (CMS-014): web at once, the app on its next launch |
-| Availability `maintenance.availability` | segmented control | no | Open · Sold out · Closed | Open | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, WEB-001 … (12) | The sold-out or closed signal (decided 28 September, audit R073). `open` is the normal state. | on publish (CMS-014): web at once, the app on its next launch |
-| Availability message `maintenance.availabilityMessage` | text, one per language | no | English and Arabic (Arabic right to left) | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, WEB-001 … (12) | — | on publish (CMS-014): web at once, the app on its next launch |
+| Is in maintenance `maintenance.isInMaintenance` | toggle | yes | — | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13) | — | on publish (CMS-014): web at once, the app on its next launch |
+| Availability and maintenance message `maintenance.message` | text, one per language | no | English and Arabic (Arabic right to left) | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13) | — | on publish (CMS-014): web at once, the app on its next launch |
+| Expected back at `maintenance.expectedBackAt` | date and time picker | no | 1 Oct 2026, 14:30 (venue time zone) | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13) | — | on publish (CMS-014): web at once, the app on its next launch |
+| Minimum app version `maintenance.minimumAppVersion` | group | no | — | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13) | The oldest guest app build still allowed to run (decided 28 September, audit R073). | on publish (CMS-014): web at once, the app on its next launch |
+| Minimum app version: ios `maintenance.minimumAppVersion.ios` | text field | no | pattern `^\d+\.\d+\.\d+$` | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13) | — | on publish (CMS-014): web at once, the app on its next launch |
+| Minimum app version: android `maintenance.minimumAppVersion.android` | text field | no | pattern `^\d+\.\d+\.\d+$` | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13) | — | on publish (CMS-014): web at once, the app on its next launch |
+| Contact `maintenance.contact` | group | no | — | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (14) | How a guest reaches the venue: WEB-028 Contact & Venue Information, and the screen shown on an error or when the app cannot help (decided 28 September, audit R073). | on publish (CMS-014): web at once, the app on its next launch |
+| Contact: phone `maintenance.contact.phone` | phone field | no | +971 5X XXX XXXX (E.164) | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13) | — | on publish (CMS-014): web at once, the app on its next launch |
+| Contact: email `maintenance.contact.email` | email field | no | name@example.ae | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13) | — | on publish (CMS-014): web at once, the app on its next launch |
+| Contact: whatsapp `maintenance.contact.whatsapp` | text field | no | — | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13) | — | on publish (CMS-014): web at once, the app on its next launch |
+| Contact: address `maintenance.contact.address` | text, one per language | no | English and Arabic (Arabic right to left) | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13) | — | on publish (CMS-014): web at once, the app on its next launch |
+| Contact: opening hours `maintenance.contact.openingHours` | text, one per language | no | English and Arabic (Arabic right to left) | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13) | Prose, as the guest reads it. The bookable hours are the catalogue's. | on publish (CMS-014): web at once, the app on its next launch |
+| Availability `maintenance.availability` | segmented control | no | Open · Sold out · Closed | Open | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13) | The sold-out or closed signal (decided 28 September, audit R073). `open` is the normal state. | on publish (CMS-014): web at once, the app on its next launch |
+| Availability message `maintenance.availabilityMessage` | text, one per language | no | English and Arabic (Arabic right to left) | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13) | — | on publish (CMS-014): web at once, the app on its next launch |
 
 ### Custom domain
 
@@ -726,7 +726,7 @@ Every guest screen takes the shell-wide parts (brand, theme, fonts, header, navi
 | `KSK-011` Collect a booking | the shell only |
 | `KSK-012` Booking found | the shell only |
 | `KSK-013` Call staff | the shell only |
-| `KSK-014` Out of service | the shell only |
+| `KSK-014` Out of service | Availability and maintenance (14) |
 | `KSK-015` Assistant | the shell only |
 | `KSK-016` Order Food | the shell only |
 | `KSK-017` Shop | the shell only |

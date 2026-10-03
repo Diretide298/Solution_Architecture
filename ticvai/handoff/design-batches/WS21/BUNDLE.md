@@ -1164,6 +1164,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, first run (`?state=emptyFirstRun`) | Nothing waiting for approval: every partner is in a settled state. Offers no create action. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 422 A wrong code, attempts one to four (CHG-R1S-025; the r1 gate found only the fifth failure specified). |
 
 #### Sample data for the mock-up
 
@@ -1218,7 +1219,7 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (12), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (12), with its required mark, default, format and its error state (410, 422).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-030?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Approve, Email me a code instead.

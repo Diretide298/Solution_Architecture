@@ -1135,13 +1135,29 @@
      "onPrem"
     ],
     "default": "uaeOnly",
-    "description": "**The tenant's AI residency class** (decided 2 October 2026, Chinmay, \"AI residency: per-tenant residency class\"; DEC-539; CHG-CSP-009; amends AI-D02 and ADR-0009 section 1). Which AI endpoints the AI engine may route this tenant's calls to:\n- `uaeOnly` (the default, and mandatory for government, bank and health tenants): the small tier\n  is Core42 Compass GPT-4.1 mini (or Seraj if it wins the Arabic golden set), the strong tier\n  Compass GPT-5, reached through `AiProviderKind` `openaiCompatible`; fallback OpenAI UAE, then\n  the in-cell gpt-oss-120b. No call leaves the UAE.\n- `globalAllowed`: a private venue that opts in under PDPL Article 23, with a vendor contract, a\n  DPIA and a notice to guests (`aiResidencyOptIn`). Azure gpt-5-mini and gpt-6-sol Global, or\n  the tenant's BYOK provider; fallback the `uaeOnly` chain. The tenant is listed in ADR-0009's\n  transfer register.\n- `onPrem`: models in the tenant's own estate (Qwen3.5 or gpt-oss; strong tier Qwen3.5-122B,\n  Falcon-H1 Arabic or Jais 2).\n\n**Every LLM call is scrubbed of personal data in-cell first, whatever the class** (DEC-542): the class decides where a call may go, never whether personal data may travel. Moving from `uaeOnly` to `globalAllowed` without `aiResidencyOptIn` is refused `422 residency-opt-in-required`; on a tenant `aiResidencyClassLocked` holds, any change is refused `409 residency-class-locked`. The model choice per class is the AI engine's (ai `AiProvider`, ai-system-design 3.3), not a setting here.\n"
+    "description": "**The tenant's AI residency class** (decided 2 October 2026, Chinmay, \"AI residency: per-tenant residency class\"; DEC-539; CHG-CSP-009; amends AI-D02 and ADR-0009 section 1). Which AI endpoints the AI engine may route this tenant's calls to:\n- `uaeOnly` (the default, and mandatory for government, bank and health tenants): the small tier\n  is Core42 Compass GPT-4.1 mini (or Seraj if it wins the Arabic golden set), the strong tier\n  Compass GPT-5, reached through `AiProviderKind` `openaiCompatible`; fallback OpenAI UAE (no\n  in-cell model: we host none unless a client asks, CHG-R1S-002). No call leaves the UAE.\n- `globalAllowed`: a private venue that opts in under PDPL Article 23, with a vendor contract, a\n  DPIA and a notice to guests (`aiResidencyOptIn`). Azure gpt-5-mini and gpt-6-sol Global, or\n  the tenant's BYOK provider; fallback the `uaeOnly` chain. The tenant is listed in ADR-0009's\n  transfer register.\n- `onPrem`: models in the tenant's own estate (Qwen3.5 or gpt-oss; strong tier Qwen3.5-122B,\n  Falcon-H1 Arabic or Jais 2), only where the client asks for it (CHG-R1S-002).\n\n**Every LLM call is scrubbed of personal data in-cell first, whatever the class** (DEC-542): the class decides where a call may go, never whether personal data may travel. Moving from `uaeOnly` to `globalAllowed` without `aiResidencyOptIn` is refused `422 residency-opt-in-required`; on a tenant `aiResidencyClassLocked` holds, any change is refused `409 residency-class-locked`. The model choice per class is the AI engine's (ai `AiProvider`, ai-system-design 3.3), not a setting here.\n"
    },
    "aiResidencyClassLocked": {
     "type": "boolean",
     "readOnly": true,
     "default": false,
     "description": "**Set by TICVAI at onboarding for a government, bank or health tenant** (DEC-539), which must stay `uaeOnly`. Read-only to the tenant.\n"
+   },
+   "tenantCategory": {
+    "type": "string",
+    "readOnly": true,
+    "default": "private",
+    "enum": [
+     "private",
+     "semiGovernment",
+     "government",
+     "banking",
+     "payments",
+     "health",
+     "difc",
+     "adgm"
+    ],
+    "description": "**What kind of organisation the tenant is, for AI residency** (3 October 2026, CHG-R1S-016; the legal research `docs/active/research/openai-key-uae-3-october.md`, item 2, and Chinmay's per-tenant residency class, DEC-539). Recorded by TICVAI staff at onboarding, read-only to the tenant. **Only `private` may take `globalAllowed`**: a government or semi-government entity (DESC, ADISS and TDRA scope), a bank or payments firm, a health provider, or a DIFC or ADGM entity stays `uaeOnly` (or `onPrem` where it asks), and `updateRegionSettings` refuses the change `409 residency-category-refused`, naming the category. `aiResidencyClassLocked` stays as the per-tenant override TICVAI can set on any category.\n"
    },
    "aiResidencyOptIn": {
     "type": "object",

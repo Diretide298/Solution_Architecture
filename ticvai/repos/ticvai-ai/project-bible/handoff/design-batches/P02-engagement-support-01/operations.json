@@ -156,6 +156,25 @@
   "requestBody": null,
   "responds": "FormDefinition"
  },
+ "getGuestConversation": {
+  "method": "GET",
+  "path": "/my/conversations/{conversationId}",
+  "contract": "marketing-crm",
+  "summary": "The guest's own handed-over conversation, with the agent's replies and the queue position",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "afterMessageId",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestConversation"
+ },
  "getGuestMenu": {
   "method": "GET",
   "path": "/outlets/{outletId}/guest-menu",

@@ -32,7 +32,9 @@
     "CMS-071",
     "CMS-081",
     "CMS-091",
-    "CMS-102"
+    "CMS-102",
+    "CMS-025",
+    "CMS-026"
    ],
    "inferred": true,
    "isEntryPoint": true,
@@ -134,6 +136,16 @@
      "to": "CMS-003",
      "trigger": "Typography",
      "provenance": "flow F102 step 1→2"
+    },
+    {
+     "to": "CMS-025",
+     "trigger": "Opens Cookie, Tracking & Digital Technology Registry",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "CMS-026",
+     "trigger": "Opens Cookie Banner & Preference Center Designer",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
     }
    ]
   },
@@ -447,10 +459,12 @@
         "BrandIdentity.splashDurationSeconds",
         "BrandIdentity.splashBackgroundColour",
         "BrandIdentity.showLoadingIndicator",
-        "BrandIdentity.splashChangeScope"
+        "BrandIdentity.splashChangeScope",
+        "BrandIdentity.showPoweredBy"
        ],
        "operation": "getBrandIdentity",
-       "provenance": "contract white-label.yaml GET /tenant-config/brand"
+       "provenance": "contract white-label.yaml GET /tenant-config/brand",
+       "notes": "**The Powered-by credit is shown here read-only** and edited on CMS-104 (Chinmay, 3 October 2026, flow-brief defaults: \"Powered-by toggle on CMS-104, shown read-only on CMS-002\"; CHG-R1S-012)."
       },
       {
        "kind": "fileUpload",
@@ -528,7 +542,7 @@
     "id": "formSetBrandIdentity",
     "component": "modal",
     "trigger": "Save brand identity",
-    "body": "**Collects what `setBrandIdentity` sends before it is called.** Required: `logoAssetRef`. Optional: `logoVariant` (light, dark or duotone: which lockup sits in the nav bar and which colour reading of it drives the theme, decided 29 September, rev 3 CFG-4), `logoDarkAssetRef`, `faviconAssetRef`, `splashImageAssetRefs`, `splashDurationSeconds`, `splashBackgroundColour`, `showLoadingIndicator`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setBrandIdentity` sends before it is called.** Required: `logoAssetRef`. Optional: `logoVariant` (light, dark or duotone: which lockup sits in the nav bar and which colour reading of it drives the theme, decided 29 September, rev 3 CFG-4), `logoDarkAssetRef`, `faviconAssetRef`, `splashImageAssetRefs`, `splashDurationSeconds`, `splashBackgroundColour`, `showLoadingIndicator`. **`showPoweredBy` is not asked here**: it is sent as read, and changed only on CMS-104 (CHG-R1S-012). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "BrandIdentity",
     "confirm": {
      "label": "Save brand identity",
@@ -2306,7 +2320,25 @@
     {
      "name": "contentBody",
      "slot": "collection",
-     "components": []
+     "components": [
+      {
+       "kind": "cardList",
+       "label": "Load the working header and footer",
+       "operation": "getTenantConfig",
+       "bindsTo": "TenantConfig",
+       "columns": [
+        "TenantConfig.brand",
+        "TenantConfig.appIcons",
+        "TenantConfig.bookingFlow",
+        "TenantConfig.bookingFlows",
+        "TenantConfig.theme",
+        "TenantConfig.fonts",
+        "TenantConfig.footer",
+        "TenantConfig.expectedBackAt"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      }
+     ]
     },
     {
      "name": "contextPanel",
@@ -2434,6 +2466,13 @@
     "contract": "white-label",
     "purpose": "Build a deep link to a target for a tenant's own site (DEC-548)",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getTenantConfig",
+    "contract": "white-label",
+    "purpose": "Load the working header and footer",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "entryState": {

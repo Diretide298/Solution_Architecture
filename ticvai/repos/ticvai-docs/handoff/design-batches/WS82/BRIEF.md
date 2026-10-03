@@ -131,16 +131,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-434` | Game & Ride Pricing Command Center | B–D | 2 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-435` | Standard Game & Ride Price Configuration | B–D | 11 | 0 | 6 | 1 | 1 | 6 | — | notStarted (—) |
-| `BO-436` | Group Pricing Configuration | B–D | 12 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `BO-437` | Peak / Non-Peak Dynamic Pricing | B–D | 10 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `BO-438` | Pricing Calendar & Exception Dates | B–D | 8 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `BO-439` | Normal & VIP Pricing Configuration | B–D | 1 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `BO-440` | Retry Price Configuration | B–D | 0 | 2 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `BO-434` | Game & Ride Pricing Command Center | D | 2 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-435` | Standard Game & Ride Price Configuration | D | 11 | 0 | 6 | 1 | 1 | 6 | — | notStarted (—) |
+| `BO-436` | Group Pricing Configuration | D | 12 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `BO-437` | Peak / Non-Peak Dynamic Pricing | D | 10 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `BO-438` | Pricing Calendar & Exception Dates | D | 8 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `BO-439` | Normal & VIP Pricing Configuration | D | 1 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `BO-440` | Retry Price Configuration | D | 0 | 2 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `BO-441` | Price Priority & Conflict Rules | B | 20 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-442` | Effective Pricing & Reader Price Preview | B–D | 6 | 10 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `BO-443` | Pricing Audit, Approval & Publication | B–D | 16 | 0 | 6 | 11 | 0 | 3 | — | notStarted (—) |
+| `BO-442` | Effective Pricing & Reader Price Preview | D | 6 | 10 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `BO-443` | Pricing Audit, Approval & Publication | B | 16 | 0 | 6 | 11 | 0 | 3 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

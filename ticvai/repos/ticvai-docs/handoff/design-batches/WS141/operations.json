@@ -50,6 +50,19 @@
   "requestBody": null,
   "responds": "Conversation"
  },
+ "getCustomerServiceCopilot": {
+  "method": "GET",
+  "path": "/customer-service-copilot",
+  "contract": "marketing-crm",
+  "summary": "The customer-service copilot configuration as saved",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiCustomerServiceCopilotKnowledgeWorkspaceView"
+ },
  "getGuestTimeline": {
   "method": "GET",
   "path": "/guests/{guestId}/timeline",

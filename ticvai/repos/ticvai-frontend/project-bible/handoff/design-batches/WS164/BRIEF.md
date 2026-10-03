@@ -185,16 +185,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-943` | Resource Analytics Command Center | B–D | 0 | 30 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-944` | Resource Utilization & Capacity Analytics | B–D | 3 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-945` | Resource Cost, Revenue & Efficiency Analytics | B–D | 11 | 4 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-946` | Demand Forecast Accuracy & Planning Performance | B–D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
-| `BO-947` | Resource KPI, SLA & Performance Framework | B–D | 0 | 44 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-948` | Resource Governance & Policy Center | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-949` | Approval, Exception & Override Control Center | B–D | 0 | 20 | 6 | 0 | 0 | 3 | — | notStarted (—) |
-| `BO-950` | Audit Trail & Resource Decision History | B–D | 23 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-951` | Resource Integration & System Health Center | B–D | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-952` | Executive Resource Intelligence & AI Improvement Center | B–D | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-943` | Resource Analytics Command Center | D | 0 | 30 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-944` | Resource Utilization & Capacity Analytics | D | 3 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-945` | Resource Cost, Revenue & Efficiency Analytics | D | 11 | 4 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-946` | Demand Forecast Accuracy & Planning Performance | B | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `BO-947` | Resource KPI, SLA & Performance Framework | D | 0 | 44 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-948` | Resource Governance & Policy Center | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-949` | Approval, Exception & Override Control Center | B | 0 | 20 | 6 | 0 | 0 | 3 | — | notStarted (—) |
+| `BO-950` | Audit Trail & Resource Decision History | D | 23 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-951` | Resource Integration & System Health Center | D | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-952` | Executive Resource Intelligence & AI Improvement Center | D | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

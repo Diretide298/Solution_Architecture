@@ -4903,8 +4903,8 @@ screens:
     - to: EMP-003
       trigger: Home — on duty
       provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-032 holds none of them.
-        The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens
-        on its own'
+        The edge carries nothing: EMP-032 is opened from EMP-003, so this edge is the way back and EMP-003
+        keeps its own state'
     - to: BO-005
       trigger: Parties are called
       provenance: flow F21 step 4→5

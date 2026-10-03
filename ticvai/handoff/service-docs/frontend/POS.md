@@ -48,17 +48,17 @@
 | [POS-011](#pos-011-returns-refunds-exchanges) | Returns, Refunds & Exchanges | Sell | 1 | 7 |
 | [POS-012](#pos-012-omnichannel-order-fulfilment-center) | Omnichannel Order & Fulfilment Center | Sell | 1 | 6 |
 | [POS-013](#pos-013-mobile-pos-event-sales-offline-operations) | Mobile POS, Event Sales & Offline Operations | Sell | 1 | 3 |
-| [POS-014](#pos-014-sales-exceptions-controls-operational-actions) | Sales Exceptions, Controls & Operational Actions | Sell | 1 | 3 |
+| [POS-014](#pos-014-sales-exceptions-controls-operational-actions) | Sales Exceptions, Controls & Operational Actions | Sell | 1 | 4 |
 | [POS-015](#pos-015-cash-operations-dashboard) | Cash Operations Dashboard | Sell | 1 | 2 |
-| [POS-016](#pos-016-till-configuration) | Till Configuration | Sell | 1 | 4 |
-| [POS-017](#pos-017-cash-in-cash-out-operations) | Cash In / Cash Out Operations | Sell | 1 | 1 |
+| [POS-016](#pos-016-till-configuration) | Till Configuration | Sell | 1 | 5 |
+| [POS-017](#pos-017-cash-in-cash-out-operations) | Cash In / Cash Out Operations | Sell | 1 | 2 |
 | [POS-018](#pos-018-safe-drop-cash-transfer-management) | Safe Drop & Cash Transfer Management | Sell | 1 | 3 |
 | [POS-019](#pos-019-shift-templates-policies) | Shift Templates & Policies | Sell | 1 | 3 |
 | [POS-020](#pos-020-shift-exceptions-alerts) | Shift Exceptions & Alerts | Sell | 1 | 5 |
 | [POS-021](#pos-021-sell-food-drink) | Sell — Food & Drink | Sell | 1 | 4 |
 | [POS-022](#pos-022-send-to-kitchen) | Send to Kitchen | Sell | 1 | 5 |
 | [POS-023](#pos-023-sell-merchandise) | Sell — Merchandise | Sell | 1 | 4 |
-| [POS-024](#pos-024-outlet-setup) | Outlet Setup | Sell | 1 | 4 |
+| [POS-024](#pos-024-outlet-setup) | Outlet Setup | Sell | 1 | 5 |
 | [POS-025](#pos-025-till-home) | Till Home | Sell | 1 | 7 |
 | [POS-026](#pos-026-receipt-reprint) | Receipt & Reprint | Sell | 1 | 6 |
 | [POS-027](#pos-027-guest-lookup) | Guest Lookup | Sell | 1 | 5 |
@@ -110,7 +110,6 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| KIT-002 | Kitchen Display System (KDS) | ticketId |  |
 | KIT-003 | Order Firing & Course Management | ticketId |  |
 | KIT-004 | Active Order Management & Fulfilment Journey | orderId |  |
 | KIT-005 | Kitchen Station Workload & Dynamic Routing |  |  |
@@ -119,6 +118,7 @@
 | KIT-008 | Exceptions, Re-Fire & Unavailable Items | ticketId |  |
 | KIT-009 | SLA, Priority & Service Rules |  |  |
 | KIT-010 | Kitchen Performance, AI & Operational Optimization |  |  |
+| KIT-002 | Kitchen Display System (KDS) | ticketId |  |
 
 ## KIT-002 Kitchen Display System (KDS)
 
@@ -931,6 +931,7 @@
 | KIT-002 | The kitchen makes it and bumps it |  |  |
 | POS-026 | Receipt | entitlementId, orderId, saleId |  |
 | GST-062 | Guest tracks it in the app |  |  |
+| POS-011 | Return or exchange a sale (a later visit, from the receipt) | orderId, outletId |  |
 | POS-010 | The guest asks to add a locker to the ticket they just bought | orderId |  |
 
 ## POS-006 Held Orders
@@ -1042,10 +1043,11 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| POS-001 | Close and sign out | shiftId, countedCash | closeStep == 'summary' |
+| POS-000 | Close and sign out | shiftId, countedCash | closeStep == 'summary' |
 | POS-008 | The day is reported |  |  |
 | BO-024 | The supervisor reviews the shift and the deposit reconciles |  |  |
 | POS-009 | Staff Roster |  |  |
+| POS-025 | A shift was closed in error |  |  |
 
 ## POS-008 Reports
 
@@ -1372,6 +1374,7 @@
 | `recordNoSale` | [OrderService](../backend/OrderService.md#recordnosale) | onAction | Open the drawer without a sale | `CASH_NO_SALE` |
 | `voidOrder` | [OrderService](../backend/OrderService.md#voidorder) | onAction | Void an order | `ORDER_VOID` |
 | `applyManualDiscount` | [OrderService](../backend/OrderService.md#applymanualdiscount) | onAction | Apply a discount a cashier chose | `ORDER_DISCOUNT` |
+| `getOrder` | [OrderService](../backend/OrderService.md#getorder) | onLoad | Load the order the exception applies to | `ORDER_VIEW` |
 
 **States**
 
@@ -1380,7 +1383,7 @@
 | loading | The saved sales exceptions controls. |
 | error | Could not load. Names which read failed and leaves the sales exceptions controls untouched. |
 | emptyFirstRun | No sales exceptions controls configured. The form opens empty and `recordNoSale` saves the first one; it says what the platform does in the meantime. |
-| emptyNoAccess | Shown when the caller lacks `CASH_NO_SALE`, which `recordNoSale` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASH_NO_SALE` for `recordNoSale`; `ORDER_DISCOUNT` for `applyManualDiscount`; `ORDER_VOID` for `voidOrder`. |
 | offline | Working from the local journal. The till keeps taking money; this reconciles on sync. |
 | approvalRejected | The supervisor declined the no-sale or void; the drawer stays shut and the reason is shown. |
 
@@ -1463,6 +1466,7 @@
 | `configureWorkstation` | [TenancyService](../backend/TenancyService.md#configureworkstation) | onAction | Configure a workstation | `WORKSTATION_CONFIGURE` |
 | `listDevices` | [TenancyService](../backend/TenancyService.md#listdevices) | onLoad | The peripherals bound to this workstation | `DEVICE_VIEW` |
 | `setDeviceAssignment` | [TenancyService](../backend/TenancyService.md#setdeviceassignment) | onAction | Assign a reader, scanner or printer to this till | `DEVICE_MANAGE` |
+| `getDeviceAssignment` | [TenancyService](../backend/TenancyService.md#getdeviceassignment) | onLoad | Show where the selected device is assigned | `DEVICE_VIEW` |
 
 **States**
 
@@ -1506,6 +1510,7 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `createCashMovement` | [OrderService](../backend/OrderService.md#createcashmovement) | onAction | Record a cash lift or add | `CASH_LIFT` |
+| `listCashMovements` | [OrderService](../backend/OrderService.md#listcashmovements) | onLoad | Show the shift's cash in and cash out so far | `REPORT_VIEW_WORKSTATION` |
 
 **States**
 
@@ -1514,7 +1519,7 @@
 | loading | The saved cash cash out. |
 | error | Could not load. Names which read failed and leaves the cash cash out untouched. |
 | emptyFirstRun | No cash cash out configured. The form opens empty and `createCashMovement` saves the first one; it says what the platform does in the meantime. |
-| emptyNoAccess | Shown when the caller lacks `CASH_LIFT`, which `createCashMovement` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listCashMovements` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASH_LIFT` for `createCashMovement`. |
 | offline | Working from the local journal. The till keeps taking money; this reconciles on sync. |
 
 **Goes to**
@@ -1663,8 +1668,8 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| POS-007 | End of shift |  |  |
 | POS-002 | Sell — Ticket Catalogue |  |  |
+| POS-007 | End of shift |  |  |
 
 ## POS-021 Sell — Food & Drink
 
@@ -1849,6 +1854,7 @@
 | `setTableCombinations` | [FnbService](../backend/FnbService.md#settablecombinations) | onAction | Which tables can be pushed together, and to what capacity | `PRODUCT_CONFIGURE` |
 | `setItemAvailability` | [FnbService](../backend/FnbService.md#setitemavailability) | onAction | Mark an item available or eighty-sixed | `PRODUCT_CONFIGURE` |
 | `getTableMap` | [FnbService](../backend/FnbService.md#gettablemap) | onLoad | The outlet's floor as it is laid out | `ORDER_VIEW` |
+| `getGuestMenu` | [FnbService](../backend/FnbService.md#getguestmenu) | onLoad | List the outlet's menu items for the '86 an item' picker | `None` |
 
 **States**
 
@@ -1925,6 +1931,9 @@
 | POS-007 | Close Shift |  |  |
 | POS-030 | Sales journal (F7, or a KPI tile) |  |  |
 | POS-031 | Reservations (F5) |  |  |
+| POS-018 | Cash lift (the drawer is over its limit) | shiftId |  |
+| POS-000 | Sign out (back to the till door) |  |  |
+| BO-024 | The deposit boxes of the settled shifts close and the cash reaches the safe |  |  |
 
 ## POS-026 Receipt & Reprint
 

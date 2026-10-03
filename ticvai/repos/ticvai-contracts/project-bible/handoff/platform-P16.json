@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-10-03",
+ "generated": "2026-10-04",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 71,
@@ -15,11 +15,11 @@
   "contracts": 10,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 124
+  "operationsWithNoScreen": 118
  },
  "waves": {
-  "wave1": 3,
-  "wave3": 68
+  "wave1": 4,
+  "wave3": 67
  },
  "modules": [
   {
@@ -41,15 +41,15 @@
    "operations": 30
   },
   {
-   "contract": "finance",
-   "operations": 4
-  },
-  {
    "contract": "identity",
    "operations": 4
   },
   {
    "contract": "tenancy",
+   "operations": 4
+  },
+  {
+   "contract": "finance",
    "operations": 4
   },
   {
@@ -61,15 +61,15 @@
    "operations": 3
   },
   {
-   "contract": "orders",
-   "operations": 1
-  },
-  {
    "contract": "promotions",
    "operations": 1
   },
   {
    "contract": "catalogue",
+   "operations": 1
+  },
+  {
+   "contract": "orders",
    "operations": 1
   }
  ],
@@ -78,7 +78,7 @@
    "id": "ANL-001",
    "name": "Executive Command Center",
    "module": "Analytics",
-   "wave": 3,
+   "wave": 1,
    "route": "/analytics/executive-command-center",
    "operations": 7,
    "drawn": true
@@ -741,12 +741,6 @@
     "summary": "What is indexed, and how current it is"
    },
    {
-    "operation": "proposeWalkways",
-    "contract": "ai",
-    "verb": "POST",
-    "summary": "Find walkable space in a drawing that has no vectors"
-   },
-   {
     "operation": "reindexSource",
     "contract": "ai",
     "verb": "POST",
@@ -775,12 +769,6 @@
     "contract": "ai",
     "verb": "PUT",
     "summary": ""
-   },
-   {
-    "operation": "getCatalogueImportJob",
-    "contract": "catalogue",
-    "verb": "GET",
-    "summary": "Progress and findings of a catalogue import"
    },
    {
     "operation": "getEventChangeTreatmentPolicy",
@@ -1083,12 +1071,6 @@
     "summary": "List case routing rules"
    },
    {
-    "operation": "listLoyaltyCampaigns",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Time-boxed campaigns inside a programme"
-   },
-   {
     "operation": "listLoyaltyPointEntries",
     "contract": "marketing-crm",
     "verb": "GET",
@@ -1251,12 +1233,6 @@
     "summary": "Store a guest photo, ID or signed document"
    },
    {
-    "operation": "cancelPaymentLink",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Cancel a live payment link"
-   },
-   {
     "operation": "convertToTermProduct",
     "contract": "orders",
     "verb": "POST",
@@ -1291,12 +1267,6 @@
     "contract": "orders",
     "verb": "GET",
     "summary": "Fees charged on an order"
-   },
-   {
-    "operation": "listPaymentProviders",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "Gateways configured for this scope"
    },
    {
     "operation": "openGuestCreditAccount",
@@ -1417,12 +1387,6 @@
     "contract": "tenancy",
     "verb": "GET",
     "summary": "The connectivity thresholds saved at one scope node"
-   },
-   {
-    "operation": "getOfflinePolicy",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "The offline policy saved at one scope node"
    },
    {
     "operation": "getOutlet",

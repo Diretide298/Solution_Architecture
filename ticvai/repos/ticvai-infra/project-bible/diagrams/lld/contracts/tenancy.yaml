@@ -1,5 +1,5 @@
 id: LLD-tenancy
-title: tenancy — 56 operations
+title: tenancy — 57 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -15,7 +15,8 @@ operations:
   offline: false
   reads:
   - platform.device
-  writes: []
+  writes:
+  - platform.device
 - operation: configureWorkstation
   verb: PUT
   path: /workstations/{workstationId}
@@ -157,6 +158,17 @@ operations:
   reads:
   - platform.device
   writes: []
+- operation: getDeviceAssignment
+  verb: GET
+  path: /devices/{deviceId}/assignment
+  scope: venue
+  permission: DEVICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - tenancy.device_assignment
+  writes: []
 - operation: getDeviceFirmware
   verb: GET
   path: /device-firmware/{firmwareId}
@@ -286,7 +298,8 @@ operations:
   offline: false
   reads:
   - tenancy.device_credential
-  writes: []
+  writes:
+  - tenancy.device_credential
 - operation: listAuditRecords
   verb: GET
   path: /audit-records

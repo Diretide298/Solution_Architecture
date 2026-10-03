@@ -136,16 +136,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-1163` | Wallet Finance & Liability Command Center | B–D | 0 | 66 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-1164` | Wallet Financial Classification & Accounting Mapping | B–D | 23 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-1165` | Wallet Sub-Ledger & Balance Control | B–D | 2 | 25 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-1166` | Multi-Source Reconciliation Configuration | B–D | 32 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1167` | Reconciliation Exception & Resolution Workbench | B–D | 0 | 24 | 6 | 1 | 2 | 0 | — | notStarted (—) |
-| `BO-1168` | Gift Card Liability Management | B–D | 0 | 42 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-1169` | Breakage & Revenue Recognition Policy | B–D | 0 | 6 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1170` | Wallet Financial Period & Closing Controls | B–D | 18 | 18 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-1171` | Wallet Analytics & Management Reporting | B–D | 0 | 34 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-1172` | Finance Validation, Reporting & Audit Center | B–D | 0 | 10 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `BO-1163` | Wallet Finance & Liability Command Center | C | 0 | 66 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-1164` | Wallet Financial Classification & Accounting Mapping | C | 23 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-1165` | Wallet Sub-Ledger & Balance Control | C | 2 | 25 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-1166` | Multi-Source Reconciliation Configuration | C | 32 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1167` | Reconciliation Exception & Resolution Workbench | C | 0 | 24 | 6 | 1 | 2 | 0 | — | notStarted (—) |
+| `BO-1168` | Gift Card Liability Management | C | 0 | 42 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-1169` | Breakage & Revenue Recognition Policy | C | 0 | 6 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1170` | Wallet Financial Period & Closing Controls | C | 18 | 18 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-1171` | Wallet Analytics & Management Reporting | C | 0 | 34 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-1172` | Finance Validation, Reporting & Audit Center | C | 0 | 10 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

@@ -1,7 +1,7 @@
 $id: ticvai/roles-by-app.yaml
 title: Permissions each shipped app requires
 generatedBy: tools/derive-app-roles.py
-generated: '2026-10-03'
+generated: '2026-10-04'
 description: '**Derived from what each app''s screens call, not decided here.** For every app, the permissions
   its operations declare in `x-ticvai-permission`, tiered by what the key permits. Role names, headcounts
   and the approval hierarchy are deliberately absent: who at a venue may configure pricing is the client''s
@@ -10,7 +10,7 @@ theTwoVocabularies:
   onOperations: 174
   inRolesYaml: 43
   shared: 0
-  note: '**Zero shared keys.** The contracts carry 174 permission keys across 2578 operations; `roles.yaml`
+  note: '**Zero shared keys.** The contracts carry 174 permission keys across 2596 operations; `roles.yaml`
     grants 43, all of them POS. `check-screens` validates a screen''s `guard` against `roles.yaml`, so
     the only guards anyone could write were POS ones — and that is what the package shows: venue-pos declares
     every guard in it and the other four apps declare none. **Joining these two is the work; this file
@@ -30,7 +30,7 @@ apps:
     - P02
     - P05
     screens: 144
-    operations: 223
+    operations: 228
     permissions: 24
     tiers:
       read:
@@ -89,19 +89,19 @@ apps:
     - getDeviceConsentHistory
     - getGameCard
     - getGuestBill
+    - getGuestConversation
     - getGuestMenu
     - getGuestOrderStatus
     - getGuestSession
     - getLoyaltyPosition
     - getMyIdentityVerification
     - getNextTransportDeparture
+    - getParkingEntitlement
     - getPublishedBookingFlow
     - getPublishedGuidedChoice
     - getPublishedTenantConfig
     - getTenantAppStatus
-    - getTransportFareTable
-    - getTransportRoute
-    operationsWithNoPermissionCount: 108
+    operationsWithNoPermissionCount: 112
   ticvai-control:
     name: TICVAI Control
     platforms:
@@ -111,7 +111,7 @@ apps:
     - P14
     - P17
     screens: 294
-    operations: 400
+    operations: 405
     permissions: 63
     tiers:
       read:
@@ -212,7 +212,7 @@ apps:
     - P13
     - P16
     screens: 1863
-    operations: 2044
+    operations: 2067
     permissions: 149
     tiers:
       read:
@@ -379,6 +379,7 @@ apps:
     - getTransportFareTable
     - getTransportRoute
     - getWaitTimes
+    - listDeliveryLocations
     - listMfaMethods
     - listSsoProviders
     - listTransportRoutes
@@ -390,14 +391,14 @@ apps:
     - startSsoAuthorization
     - verifyMfaChallenge
     - verifyMfaEnrolment
-    operationsWithNoPermissionCount: 22
+    operationsWithNoPermissionCount: 23
   venue-pos:
     name: TICVAI POS
     platforms:
     - P04
     - P15
     screens: 42
-    operations: 170
+    operations: 171
     permissions: 42
     tiers:
       read:

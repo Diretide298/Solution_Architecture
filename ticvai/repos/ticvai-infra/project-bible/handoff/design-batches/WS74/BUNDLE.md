@@ -149,7 +149,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Kind | select | — | Image · Video · Audio · Document · Vector · Font · Archive | `searchMedia` ?kind |
+| Kind | select | — | Image · Video · Audio · Document · Vector · Font · Archive · Model3d; glb`) venue model, at most 40 MB. | `searchMedia` ?kind |
 | Tag | text field | — | — | `searchMedia` ?tag |
 | Collection | picker: choose a collection | — | — | `searchMedia` ?collectionId |
 | Search | text field | — | — | `searchMedia` ?search |
@@ -449,7 +449,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Kind | select | — | Image · Video · Audio · Document · Vector · Font · Archive | `searchMedia` ?kind |
+| Kind | select | — | Image · Video · Audio · Document · Vector · Font · Archive · Model3d; glb`) venue model, at most 40 MB. | `searchMedia` ?kind |
 | Tag | text field | — | — | `searchMedia` ?tag |
 | Collection | picker: choose a collection | — | — | `searchMedia` ?collectionId |
 | Search | text field | — | — | `searchMedia` ?search |
@@ -716,6 +716,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS44 Digital Asset Management DAM Board 1.dc.html#cms-063`
 - Workshop pack: Digital Asset Management DAM.pdf board 1
 - Flow F183 *Digital Asset Management DAM board 1: Digital Asset Management Command Center*, step 4: Works in Upload & Asset Ingestion Workspace → Provide a controlled process for adding digital assets into TICVAI. before or after upload.
+- ADR-0069 *In-park 3D navigation is built natively, from a venue model, a pathway file and GPS* (`docs/adr/0069-in-park-3d-navigation-is-built-natively.md`)
 
 #### Acceptance for the design
 
@@ -1165,7 +1166,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Kind | select | — | Image · Video · Audio · Document · Vector · Font · Archive | `searchMedia` ?kind |
+| Kind | select | — | Image · Video · Audio · Document · Vector · Font · Archive · Model3d; glb`) venue model, at most 40 MB. | `searchMedia` ?kind |
 | Tag | text field | — | — | `searchMedia` ?tag |
 | Collection | picker: choose a collection | — | — | `searchMedia` ?collectionId |
 | Search | text field | — | — | `searchMedia` ?search |
@@ -1840,7 +1841,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "MediaAssetDetail": {"x-ticvai-persistence":"assets.media_asset","allOf":[{"$ref":"#/components/schemas/MediaAsset"},{"type":"object","properties":{"derivatives":{"type":"array","description":"Generated from the original, never uploaded separately. A new breakpoint is a re-render rather than a re-upload of everything.\n","items":{"type":"object","properties":{"label":{"type":"string"},"width":{"type":"integer"},"height":{"type":"integer"},"sizeBytes":{"type":"integer"},"url":{"type":"string"}}}},"usage":{"type":"array","description":"Every place this asset is referenced.","items":{"$ref":"#/components/schemas/MediaUsage"}},"collections":{"type":"array","items":{"type":"object","properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string"}}}},"previousVersions":{"type":"array","items":{"type":"object","properties":{"version":{"type":"integer"},"replacedAt":{"type":"string","format":"date-time"},"replacedByPrincipalId":{"type":"string","format":"uuid"}}}}}}]},
 "MediaAssetVersion": {"type":"object","x-ticvai-persistence":"assets.asset_version","description":"Boards 2.6 and 2.7. **Usage impact belongs to the version read**, because replacing a logo is routine or an incident depending on where it appears.\n","properties":{"assetId":{"type":"string","format":"uuid"},"version":{"type":"integer"},"fileName":{"type":"string"},"sizeBytes":{"type":"integer"},"checksum":{"type":"string","nullable":true},"createdBy":{"type":"string","format":"uuid"},"createdAt":{"type":"string","format":"date-time"},"note":{"type":"string","nullable":true},"isCurrent":{"type":"boolean"},"usageImpact":{"type":"array","readOnly":true,"items":{"type":"object","properties":{"surface":{"type":"string","enum":["campaign","journey","ticketTemplate","screen","publishedPage","product","signage"]},"referenceId":{"type":"string","format":"uuid"},"label":{"type":"string"},"live":{"type":"boolean"}}}},"scopePath":{"type":"string"}}},
 "MediaDistribution": {"type":"object","description":"Boards 4.2 and 4.5. **The usage map that makes replacement safe.**","properties":{"assetId":{"type":"string","format":"uuid"},"deliveryUrls":{"type":"array","items":{"type":"object","properties":{"channel":{"type":"string"},"rendition":{"type":"string"},"url":{"type":"string"},"cdn":{"type":"string","nullable":true}}}},"usedBy":{"type":"array","items":{"type":"object","properties":{"surface":{"type":"string"},"referenceId":{"type":"string","format":"uuid"},"label":{"type":"string"},"live":{"type":"boolean"}}}},"lastDeliveredAt":{"type":"string","format":"date-time","nullable":true}}},
-"MediaKind": {"type":"string","enum":["image","video","audio","document","vector","font","archive"]},
+"MediaKind": {"type":"string","enum":["image","video","audio","document","vector","font","archive","model3d"],"description":"`model3d` added 3 October 2026 (r1 additions; ADR-0069 action item 4): a glTF binary (`model/gltf-binary`, `.glb`) venue model, at most 40 MB. No rendition or derivative is generated for it; the guest app downloads the file as uploaded.\n"},
 "MediaRights": {"x-ticvai-persistence":"none — embedded in asset","type":"object","description":"Licensing terms. Tracked because an expired licence on a live surface is a legal exposure, not a housekeeping item.\n","properties":{"licenceKind":{"type":"string","enum":["owned","royaltyFree","rightsManaged","creativeCommons","editorialOnly","unknown"]},"licensor":{"type":"string","nullable":true},"licenceReference":{"type":"string","nullable":true},"validFrom":{"type":"string","format":"date","nullable":true},"validTo":{"type":"string","format":"date","nullable":true},"permittedUses":{"type":"array","items":{"type":"string","enum":["web","print","socialMedia","inVenue","advertising","internal"]}},"attributionRequired":{"type":"boolean","default":false},"attributionText":{"type":"string","nullable":true},"permittedTerritories":{"type":"array","items":{"type":"string"},"description":"ISO country or region codes. **Empty means unrestricted, which is a claim rather than an absence** — an unknown territory and a worldwide licence are not the same thing, and `licenceKind: unknown` is how the second is said.\n"},"permittedChannels":{"type":"array","items":{"type":"string"},"description":"Distribution channel codes, checked by `setMediaDistributionChannels`. Narrower than `permittedUses`, which describes the medium rather than the route.\n"},"modelReleaseHeld":{"type":"boolean","default":false},"renewalOwner":{"type":"string","format":"uuid","nullable":true}}},
 "MediaStatus": {"type":"string","enum":["processing","ready","quarantined","failed","archived"]},
 "MediaTag": {"type":"object","x-ticvai-persistence":"assets.tag","description":"Board 2.2. **A tag carries its origin and confidence**, so machine labels can be filtered without being deleted.\n","required":["value"],"properties":{"value":{"type":"string"},"vocabulary":{"type":"string","nullable":true},"source":{"type":"string","enum":["human","autoTag","import","inherited"],"default":"human"},"confidence":{"type":"number","nullable":true},"accepted":{"type":"boolean","default":true,"description":"A proposed auto-tag below the promotion threshold sits here as false."},"addedBy":{"type":"string","format":"uuid","nullable":true},"addedAt":{"type":"string","format":"date-time"},"scopePath":{"type":"string"}}},

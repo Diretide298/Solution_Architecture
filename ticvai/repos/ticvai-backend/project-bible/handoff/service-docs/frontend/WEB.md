@@ -28,13 +28,13 @@
 | [WEB-002](#web-002-event-attraction-listing) | Event & Attraction Listing | Discovery & Browse | 1 | 6 |
 | [WEB-003](#web-003-search-results) | Search Results | Discovery & Browse | 1 | 2 |
 | [WEB-004](#web-004-attraction-details) | Attraction Details | Discovery & Browse | 1 | 5 |
-| [WEB-005](#web-005-ticket-type-selection) | Ticket Type Selection | Booking & Selection | 1 | 6 |
+| [WEB-005](#web-005-ticket-type-selection) | Ticket Type Selection | Booking & Selection | 1 | 7 |
 | [WEB-006](#web-006-date-performance-selection) | Date & Performance Selection | Booking & Selection | 1 | 8 |
 | [WEB-007](#web-007-interactive-seat-selection) | Interactive Seat Selection | Booking & Selection | 1 | 6 |
 | [WEB-008](#web-008-add-ons-upsell) | Add-ons & Upsell | Booking & Selection | 1 | 5 |
 | [WEB-009](#web-009-wishlist) | Wishlist | Booking & Selection | 1 | 3 |
 | [WEB-010](#web-010-shopping-cart) | Shopping Cart | Cart & Checkout | 1 | 14 |
-| [WEB-011](#web-011-guest-details-attendee-forms) | Guest Details & Attendee Forms | Cart & Checkout | 1 | 6 |
+| [WEB-011](#web-011-guest-details-attendee-forms) | Guest Details & Attendee Forms | Cart & Checkout | 1 | 7 |
 | [WEB-012](#web-012-checkout-payment) | Checkout — Payment | Cart & Checkout | 1 | 6 |
 | [WEB-013](#web-013-booking-confirmation) | Booking Confirmation | Cart & Checkout | 1 | 3 |
 | [WEB-014](#web-014-pay-for-a-booking) | Pay for a Booking | Cart & Checkout | 1 | 2 |
@@ -54,20 +54,20 @@
 | [WEB-028](#web-028-contact-venue-information) | Contact & Venue Information | Engagement & Support | 1 | 1 |
 | [WEB-029](#web-029-error-sold-out-maintenance) | Error / Sold Out / Maintenance | System States | 1 | 2 |
 | [WEB-030](#web-030-ticket-transfer) | Ticket Transfer | Ticketing | 1 | 3 |
-| [WEB-031](#web-031-my-reservations) | My Reservations | Ticketing | 1 | 9 |
+| [WEB-031](#web-031-my-reservations) | My Reservations | Ticketing | 1 | 10 |
 | [WEB-032](#web-032-offers-promotions) | Offers & Promotions | Promotions | 1 | 2 |
 | [WEB-033](#web-033-shop) | Shop | Retail | 1 | 5 |
 | [WEB-034](#web-034-lost-found) | Lost & Found | Support | 1 | 4 |
 | [WEB-035](#web-035-multi-currency-pricing) | Multi-Currency & Pricing | Ticketing | 1 | 2 |
-| [WEB-036](#web-036-f-b-browse-order) | F&B – Browse & Order | In-venue Services | 1 | 13 |
+| [WEB-036](#web-036-f-b-browse-order) | F&B – Browse & Order | In-venue Services | 1 | 14 |
 | [WEB-037](#web-037-menu-item-detail) | Menu Item Detail | In-venue Services | 1 | 1 |
 | [WEB-038](#web-038-f-b-order-tracking) | F&B – Order Tracking | In-venue Services | 1 | 2 |
 | [WEB-039](#web-039-venue-map-wait-times) | Venue Map & Wait Times | In-venue Services | 1 | 4 |
 | [WEB-040](#web-040-virtual-queue) | Virtual Queue | In-venue Services | 1 | 4 |
-| [WEB-041](#web-041-parking-reserve-pay) | Parking – Reserve & Pay | In-venue Services | 1 | 3 |
+| [WEB-041](#web-041-parking-reserve-pay) | Parking – Reserve & Pay | In-venue Services | 1 | 4 |
 | [WEB-042](#web-042-retail-shop-and-drop) | Retail & Shop and Drop | Retail | 1 | 3 |
 | [WEB-043](#web-043-loyalty-rewards) | Loyalty & Rewards | Membership, Loyalty & Value | 1 | 11 |
-| [WEB-044](#web-044-ai-concierge-home) | AI Concierge – Home | Engagement & Support | 1 | 8 |
+| [WEB-044](#web-044-ai-concierge-home) | AI Concierge – Home | Engagement & Support | 1 | 9 |
 | [WEB-045](#web-045-help-centre-accessibility) | Help Centre & Accessibility | Support | 1 | 4 |
 | [WEB-046](#web-046-in-venue-notifications) | In-Venue Notifications | Engagement & Support | 1 | 2 |
 | [WEB-047](#web-047-map-booking-cabanas-spots) | Map Booking — Cabanas & Spots | Booking & Selection | 1 | 8 |
@@ -313,6 +313,7 @@
 |---|---|
 | productId | WEB-004 |
 | venueId | session |
+| cartId | navigation |
 
 **Operations**
 
@@ -324,6 +325,7 @@
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | The tickets of a category or level (`categoryId`, `segmentTag`) | `PRODUCT_VIEW` |
 | `getPublishedGuidedChoice` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedguidedchoice) | onLoad | The venue's published Help me choose (404 = none) | `None` |
 | `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Continue adds the chosen tickets to the cart | `None` |
 
 **States**
 
@@ -343,7 +345,7 @@
 | WEB-006 | Change date or time (the dated flow picks them first) | eventId |  |
 | WEB-007 | Interactive Seat Selection | eventId |  |
 | WEB-008 | Add-ons & Upsell |  |  |
-| WEB-010 | Shopping Cart | code, lineId |  |
+| WEB-010 | Shopping Cart | cartId, code, lineId, performanceId |  |
 | WEB-016 | Continue, when sign-in is asked after add-ons and this booking has no add-ons step | cartId |  |
 | WEB-006 | Workshop chosen, then date and time (product-first flow) | productId |  |
 
@@ -501,7 +503,7 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| WEB-005 | Ticket Type Selection |  |  |
+| WEB-005 | Ticket Type Selection | cartId |  |
 | WEB-006 | Date & Performance Selection | cartId, performanceId |  |
 | WEB-010 | Shopping Cart | cartId, code, lineId, performanceId |  |
 | WEB-016 | Continue — sign in or use a guest code (when sign-in is asked after add-ons) | cartId | the guest is not signed in |
@@ -612,7 +614,7 @@
 | WEB-013 | Booking Confirmation | orderId |  |
 | WEB-016 | Login / Register | subjectId |  |
 | WEB-012 | Guest code proved or signed in: straight to payment (details skipped) | orderId, paymentId |  |
-| WEB-011 | Answers attendee forms and consent, only where the cart needs them |  |  |
+| WEB-011 | Answers attendee forms and consent, only where the cart needs them | holdId |  |
 | WEB-030 | They transfer three tickets | orderId |  |
 
 ## WEB-011 Guest Details & Attendee Forms
@@ -635,6 +637,7 @@
 | subjectId | session |
 | cartId | session |
 | venueId | session |
+| holdId | navigation |
 
 **Operations**
 
@@ -646,6 +649,7 @@
 | `recordConsentAnswers` | [MarketingService](../backend/MarketingService.md#recordconsentanswers) | onAction | Record answers to the booking's consent questions | `ORDER_CREATE` |
 | `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
 | `getMyProfile` | [MarketingService](../backend/MarketingService.md#getmyprofile) | onLoad | Prefill the buyer's contact from their own profile | `GUEST_VIEW` |
+| `extendSeatHold` | [CatalogueService](../backend/CatalogueService.md#extendseathold) | onAction | Extend the seat hold once, from the warning before it lapses | `ORDER_CREATE` |
 
 **States**
 
@@ -665,7 +669,7 @@
 | WEB-016 | Chooses to sign in rather than continue as a guest | cartId | no verified guest session — this is the fork of matrix 2.6.1 §2.4, offered here rather than in front of the cart |
 | WEB-012 | Pays |  |  |
 | WEB-012 | Skipped: nothing to ask (guest code proved, or signed in, and no attendee forms) |  |  |
-| WEB-010 | They check out | cartId, lineId, performanceId |  |
+| WEB-010 | They check out | cartId, holdId, lineId, performanceId |  |
 
 ## WEB-012 Checkout — Payment
 
@@ -1639,6 +1643,7 @@
 | `getGroupBooking` | [OrderService](../backend/OrderService.md#getgroupbooking) | onAction | A group booking this guest belongs to | `ORDER_VIEW` |
 | `getResourceAvailability` | [VenueOpsService](../backend/VenueOpsService.md#getresourceavailability) | onAction | What is free and when | `RESOURCE_VIEW` |
 | `updateTableReservation` | [FnbService](../backend/FnbService.md#updatetablereservation) | onAction | Change or cancel it | `None` |
+| `listMyTableReservations` | [FnbService](../backend/FnbService.md#listmytablereservations) | onLoad | Show the guest's own reservations, the one being changed among them | `None` |
 
 **States**
 
@@ -1866,6 +1871,7 @@
 | `leaveRestaurantWaitlist` | [FnbService](../backend/FnbService.md#leaverestaurantwaitlist) | onAction | Leave the restaurant waitlist; the entry returns cancelled (decided 28 September, audit R073 (d)) | `ORDER_MODIFY` |
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add a table deposit to the cart when the venue requires one | `None` |
 | `updateTableReservation` | [FnbService](../backend/FnbService.md#updatetablereservation) | onAction | Change or cancel the guest's own table booking (web and app parity with GST-070) | `None` |
+| `listMyTableReservations` | [FnbService](../backend/FnbService.md#listmytablereservations) | onLoad | Show the guest's own reservations, the one being changed among them | `None` |
 
 **States**
 
@@ -2067,6 +2073,7 @@
 | `listParkingFacilities` | [AccessService](../backend/AccessService.md#listparkingfacilities) | onLoad | Car parks at a venue, and how each integrates | `PARKING_CONFIGURE` |
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Put the car park's parking product in the cart; refused `soldOutForDay` when the car park is at capacity (decided 28 September, audit R166) | `None` |
 | `updateParkingEntitlement` | [AccessService](../backend/AccessService.md#updateparkingentitlement) | onAction | Change the plate, or revoke | `None` |
+| `getParkingEntitlement` | [AccessService](../backend/AccessService.md#getparkingentitlement) | onLoad | Load the parking entitlement being changed | `None` |
 
 **States**
 
@@ -2200,10 +2207,11 @@
 | `createAiConversation` | [AiService](../backend/AiService.md#createaiconversation) | background | Opened silently on the first message; the scope comes from the session, never a module the guest picks | `AI_USE` |
 | `sendAiMessage` | [AiService](../backend/AiService.md#sendaimessage) | onAction | Ask | `AI_USE` |
 | `handoverToAgent` | [MarketingService](../backend/MarketingService.md#handovertoagent) | onAction | One tap; reason guestRequested and Sahli's summary are set for the guest | `None` |
-| `requestSuggestion` | [AiService](../backend/AiService.md#requestsuggestion) | background | From the conversation only, kinds waitTime and upsell (prepPlan is the kitchen's production plan; an itinerary is asked on the Plan tab); never a kind picker | `AI_USE` |
+| `requestSuggestion` | [AiService](../backend/AiService.md#requestsuggestion) | background | From the conversation only, kinds waitTime and upsell (prepPlan is the kitchen's production plan; an itinerary is asked on the Plan tab); never a kind picker. Later (CHG-RONEP-010): the wait-time and upsell suggestions of the day-one suggestions (AI-ENGINE-SUGGESTIONS) ships in Block A2 (Chinmay, 3 October); until then the control shows 'Later'. | `AI_USE` |
 | `getGuestMenu` | [FnbService](../backend/FnbService.md#getguestmenu) | onAction | Optional "Order food" shortcut to the menu in force | `None` |
 | `listAiConversations` | [AiService](../backend/AiService.md#listaiconversations) | onLoad | Earlier conversations Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `AI_USE` |
 | `sendGuestConversationMessage` | [MarketingService](../backend/MarketingService.md#sendguestconversationmessage) | onAction | After a handover, the guest writes to the agent, as the guest: sendConversationMessage needs CASE_MANAGE (decided by Chinmay, 3 October 2026 (CHG-SPF-013)) | `None` |
+| `getGuestConversation` | [MarketingService](../backend/MarketingService.md#getguestconversation) | onInterval | The agent's replies, the queue position and the wait after a handover, polled every 5 s while the chat is on screen and every 30 s while hidden, with afterMessageId (decided by Chinmay, 3 October 2026, r1 additions; CHG-RONEC-003) | `None` |
 | `recordAnswerFeedback` | [AiService](../backend/AiService.md#recordanswerfeedback) | onAction | Say whether an answer helped | `AI_USE` |
 
 **States**

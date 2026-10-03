@@ -1,4 +1,35 @@
 {
+ "Allergen": {
+  "type": "object",
+  "description": "BL-127. **Fourteen declarable allergens is a legal list in most jurisdictions, not a preference.** A menu item with no allergen data is one a venue cannot serve to somebody who asks.\n**`contains` and `mayContain` are different claims.** The first is a recipe fact; the second is a kitchen fact about shared equipment, and conflating them either over-warns everybody or under-warns the person it matters to.\n",
+  "properties": {
+   "contains": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AllergenCode"
+    }
+   },
+   "mayContain": {
+    "type": "array",
+    "description": "**Cross-contamination, which is about the kitchen rather than the recipe.** A fryer shared with breaded fish makes chips a fish risk and nothing in the recipe says so.\n",
+    "items": {
+     "$ref": "#/components/schemas/AllergenCode"
+    }
+   },
+   "isVegetarian": {
+    "type": "boolean",
+    "default": false
+   },
+   "isVegan": {
+    "type": "boolean",
+    "default": false
+   },
+   "isHalal": {
+    "type": "boolean",
+    "default": false
+   }
+  }
+ },
  "AllergenCode": {
   "type": "string",
   "description": "**The fourteen declarable allergens, as one closed list.** Every allergen field in this contract uses it — the menu claim, the ticket line, a substitution's delta, a modifier option, the label on a bag — so a declared set and an actual set compare without anybody normalising case or synonyms. It was the `Allergen.contains` enum; the other fields were free text.\n",
@@ -1005,6 +1036,123 @@
    }
   }
  },
+ "GuestMenu": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over fnb.menu, fnb.menu_item and availability",
+  "required": [
+   "outletId",
+   "menuId",
+   "name",
+   "inForceUntil",
+   "sections"
+  ],
+  "properties": {
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "menuId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "inForceUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When this menu stops applying. The client shows it, because a guest browsing breakfast at 10:55 should know.\n"
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "currencyScale": {
+    "type": "integer"
+   },
+   "sections": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "sortOrder": {
+       "type": "integer"
+      },
+      "items": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "required": [
+         "menuItemId",
+         "name",
+         "price",
+         "isAvailable",
+         "allergens"
+        ],
+        "properties": {
+         "menuItemId": {
+          "type": "string",
+          "format": "uuid"
+         },
+         "name": {
+          "type": "string"
+         },
+         "description": {
+          "type": "string",
+          "nullable": true
+         },
+         "price": {
+          "$ref": "../shared/common.yaml#/components/schemas/Money"
+         },
+         "imageAssetRef": {
+          "type": "string",
+          "nullable": true
+         },
+         "isAvailable": {
+          "type": "boolean",
+          "description": "Marked, not removed. A guest who saw a dish yesterday and cannot find it today assumes the app is broken; \"sold out\" is an answer.\n"
+         },
+         "unavailableReason": {
+          "type": "string",
+          "nullable": true
+         },
+         "allergens": {
+          "type": "array",
+          "description": "Always present. Not a field a tenant may choose to omit.",
+          "items": {
+           "$ref": "#/components/schemas/AllergenCode"
+          }
+         },
+         "allergenDetail": {
+          "allOf": [
+           {
+            "$ref": "#/components/schemas/Allergen"
+           }
+          ],
+          "description": "**What the dish contains and what it may contain, told apart** (3 October 2026, CHG-R1S-022: the kiosk and guest menus promise the difference and the flat list cannot carry it). `allergens` stays the flat list."
+         },
+         "preparationMinutes": {
+          "type": "integer",
+          "nullable": true
+         },
+         "modifierGroups": {
+          "type": "array",
+          "items": {
+           "$ref": "#/components/schemas/ModifierGroup"
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ },
  "MediaAsset": {
   "x-ticvai-persistence": "assets.media_asset",
   "type": "object",
@@ -1456,6 +1604,81 @@
     "items": {
      "$ref": "#/components/schemas/AllergenCode"
     }
+   }
+  }
+ },
+ "ModifierGroup": {
+  "x-ticvai-persistence": "fnb.modifier_group + fnb.modifier_option",
+  "type": "object",
+  "description": "**An F&B modifier is a choice added to a dish at the moment of ordering** — *no onions*, *extra cheese*, *cooked medium*. **It is not an Attribute**, the axis that generates catalogue variants (naming-and-style §3 lists *Modifier* as a banned synonym for that), and the two must not be merged: a variant is a different product with its own stock, a modifier is an instruction on a line with at most a price delta.\n",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "minSelections",
+   "maxSelections",
+   "options"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "minSelections": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Greater than zero makes the group required."
+   },
+   "maxSelections": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "options": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "object",
+     "required": [
+      "id",
+      "name",
+      "priceDelta"
+     ],
+     "properties": {
+      "id": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
+      },
+      "priceDelta": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "isDefault": {
+       "type": "boolean"
+      },
+      "isAvailable": {
+       "type": "boolean"
+      },
+      "allergens": {
+       "type": "array",
+       "description": "What choosing this option adds to the dish. `attachModifierGroup` refuses a group that adds one the item does not declare, and `verifyAllergens` reports it as `via` `modifier`.",
+       "items": {
+        "$ref": "#/components/schemas/AllergenCode"
+       }
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
    }
   }
  },
@@ -1978,7 +2201,7 @@
    "salesTotal": {
     "x-ticvai-column": "gross_sales_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "What the till took in sales, as the guest paid it — tax included: the shift's takings, not Gross sales (CHG-FIN-002, CHG-FIN-010). **Never shown to the shift's own cashier before the count is in** (CHG-FIN-003): with the float and the lifts it gives away the expected cash.\n"
+    "description": "What the till took in sales, as the guest paid it — tax included: the shift's takings, not Gross sales (CHG-FIN-002, CHG-FIN-010). **Shown to the shift's own cashier only as one total across every tender** (\"Sales this shift\" on POS-025; the lead, 3 October 2026, CHG-RONEC-002): with no cash share it cannot be turned into the expected cash, so the blind close holds (CHG-FIN-003). The cash share, the tender split, `expectedCash` and `variance` stay with the supervisor.\n"
    },
    "refundsTotal": {
     "x-ticvai-column": "gross_refunded_amount",

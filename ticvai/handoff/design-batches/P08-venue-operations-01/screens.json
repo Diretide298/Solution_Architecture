@@ -518,6 +518,21 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "cardList",
+       "label": "Show the delivery locations and the outlets mapped to them",
+       "operation": "listDeliveryLocations",
+       "bindsTo": "DeliveryLocation",
+       "columns": [
+        "DeliveryLocation.kind",
+        "DeliveryLocation.label",
+        "DeliveryLocation.zone",
+        "DeliveryLocation.isServiceable",
+        "DeliveryLocation.unserviceableReason",
+        "DeliveryLocation.walkTimeMinutes"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
+      {
        "kind": "multiSelect",
        "label": "Kind",
        "operation": "listOutlets",
@@ -790,6 +805,13 @@
     "purpose": "Assign serving outlets to delivery locations",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listDeliveryLocations",
+    "contract": "fnb",
+    "purpose": "Show the delivery locations and the outlets mapped to them",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "entryState": {
@@ -3524,7 +3546,11 @@
     "PTR-037",
     "PTR-039",
     "PTR-047",
-    "PTR-048"
+    "PTR-048",
+    "ADM-243",
+    "ADM-342",
+    "ADM-354",
+    "BO-1065"
    ],
    "entryFrom": [
     "BO-108",
@@ -4492,6 +4518,26 @@
      "to": "PTR-048",
      "trigger": "Commission Calculation & Settlement Management",
      "provenance": "moved to Venue Management 2 October 2026 (CHG-CLN-004); its board's hub PTR-042 stays on the partner portal"
+    },
+    {
+     "to": "ADM-243",
+     "trigger": "Opens Roles, Authority, Delegation & Approval Limits",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "ADM-342",
+     "trigger": "Opens Authentication & MFA Policy Manager",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "ADM-354",
+     "trigger": "Opens External Workflow System Integration",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-1065",
+     "trigger": "Opens Currency, Timezone & Channels",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
     }
    ]
   },
@@ -4744,7 +4790,16 @@
     "BO-133",
     "BO-1184",
     "BO-1183",
-    "BO-070"
+    "BO-070",
+    "BO-395",
+    "BO-857",
+    "BO-861",
+    "BO-866",
+    "BO-870",
+    "BO-877",
+    "BO-911",
+    "BO-919",
+    "BO-927"
    ],
    "transitions": [
     {
@@ -4829,6 +4884,51 @@
      "carries": [
       "workOrderId"
      ]
+    },
+    {
+     "to": "BO-395",
+     "trigger": "Opens Game & Ride Directory",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-857",
+     "trigger": "Opens Resource Creation & Profile",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-861",
+     "trigger": "Opens Resource Package & Bundle Configuration",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-866",
+     "trigger": "Opens Resource Availability Schedule Configuration",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-870",
+     "trigger": "Opens Operational Time & Resource Blocking",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-877",
+     "trigger": "Opens Qualification & Assignment Rule Engine",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-911",
+     "trigger": "Opens Inspection, Condition & Compliance Management",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-919",
+     "trigger": "Opens AI Event Resource Forecasting",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-927",
+     "trigger": "Opens AI Staffing Requirement Forecast",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
     }
    ]
   },

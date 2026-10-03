@@ -29,7 +29,8 @@ operations:
   offline: true
   reads:
   - maintenance.incident_involved_party
-  writes: []
+  writes:
+  - maintenance.incident_involved_party
 - operation: attachWorkOrderEvidence
   verb: POST
   path: /work-orders/{workOrderId}/attachments
@@ -589,7 +590,8 @@ operations:
   offline: false
   reads:
   - maintenance.incident_media
-  writes: []
+  writes:
+  - maintenance.incident_media
 - operation: verifyWorkOrder
   verb: POST
   path: /work-orders/{workOrderId}/verify

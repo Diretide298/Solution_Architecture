@@ -2153,6 +2153,8 @@ Errors to draw in the form: 400 Validation failed
 | Lines `lineIds` | multi-picker: choose lines | required | — | — | — | — | `transferOrderItems` body |
 | Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | Device time of the act (offline-capable; replayed in this order). | `transferOrderItems` body |
 
+Errors to draw in the form: 409 The target visit is the source, or is settled, merged, cancelled or in another outlet.; 422 A line is not on the source visit, or is already paid, voided or comped (named in the problem's detail).
+
 **Sent by *Close table visit*** (`closeTableVisit`; no form is declared, so these are filled from the screen or collected inline)
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
@@ -2195,7 +2197,7 @@ Errors to draw in the form: 400 Validation failed
 | Create F&B order (secondary button) | `createFnbOrder` POST `/fnb-orders` | CreateFnbOrderRequest | FnbOrder | 400 Validation failed; 409 An item is unavailable, modifier constraints are unmet, a tracked item was ordered offline, or a line's `redeemEntitlementId` cannot be redeemed here … | emits `fnb.kitchenTicketCreated`; works offline; opens modal first |
 | Split bill (secondary button) | `splitBill` POST `/table-visits/{visitId}/bill/split` | SplitBillRequest | BillSplit | 400 Split does not sum to the bill total, or a line is assigned twice.; 409 Visit already settled | works offline; opens modal first |
 | Comp item (secondary button) | `compItem` POST `/table-visits/{visitId}/comp` | inline | TableVisit | 400 Validation failed | works offline; opens modal first |
-| Transfer order items (secondary button) | `transferOrderItems` POST `/table-visits/{visitId}/transfer-items` | inline | TableVisit | — | works offline; opens modal first |
+| Transfer order items (secondary button) | `transferOrderItems` POST `/table-visits/{visitId}/transfer-items` | inline | TableVisit | 409 The target visit is the source, or is settled, merged, cancelled or in another outlet.; 422 A line is not on the source visit, or is already paid, voided or comped (named in the problem's detail). | works offline; opens modal first |
 | Request bill (primary button) | `requestBill` POST `/table-visits/{visitId}/request-bill` | inline | TableVisit | — | works offline; opens modal first |
 
 **Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
@@ -2346,7 +2348,7 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (51), with its required mark, default, format and its error state (400, 402, 404, 409).
+- [ ] Every input above is drawn (51), with its required mark, default, format and its error state (400, 402, 404, 409, 422).
 - [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-059?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Close table visit, Create payment, Create F&B order, Split bill, Comp item, Transfer order items, Request bill.

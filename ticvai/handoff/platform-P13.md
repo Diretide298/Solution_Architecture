@@ -9,12 +9,12 @@
 | Contracts | 8 |
 | Modules | 3 |
 | Undrawn | 0 |
-| Operations with no screen | 104 |
+| Operations with no screen | 98 |
 | Waves | wave1 25 · wave3 78 |
 
 ## Gaps
 
-### 104 operations with no screen here
+### 98 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -24,13 +24,11 @@
 | `generateVenueLayout` | ai | POST | Draft a seat map from an uploaded plan |
 | `listIndexJobs` | ai | GET | Indexing in flight and recently finished |
 | `listIndexSources` | ai | GET | What is indexed, and how current it is |
-| `proposeWalkways` | ai | POST | Find walkable space in a drawing that has no vectors |
 | `reindexSource` | ai | POST | Rebuild a source |
 | `removeIndexEntry` | ai | DELETE | Remove one record from the index |
 | `setAiTool` | ai | PUT | Register or change a tool (platform) |
 | `setIndexSource` | ai | PUT | Declare a source indexed |
 | `setSuggestionProvider` | ai | PUT |  |
-| `getCatalogueImportJob` | catalogue | GET | Progress and findings of a catalogue import |
 | `getEventChangeTreatmentPolicy` | catalogue | GET | What happens to tickets, reservations and guests when an event changes, by default |
 | `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
 | `getWaitingRoomStatus` | catalogue | GET | A performance's waiting room, its setting and how it is moving |
@@ -60,7 +58,9 @@
 | `listSegregationViolations` | identity | GET | Who already holds a conflicting pair |
 | `setPrincipalModuleAccess` | identity | PUT | Tick what they may do |
 | `updateRole` | identity | PATCH | Rename a role or change its description |
-| … | | | 64 more |
+| `actOnWaiverRequirements` | marketing-crm | POST | Send, resend or correct participant waiver requirements, one or in bulk |
+| `createInvitationCampaign` | marketing-crm | POST | A quota-bounded, addressed invitation |
+| … | | | 58 more |
 
 ### 1 modules split across waves
 
@@ -88,7 +88,7 @@
 | `CMS-006` | Component Preview | White Label | 1 | 6 | yes |
 | `CMS-007` | Page Builder | White Label | 1 | 12 | yes |
 | `CMS-008` | Content Blocks | White Label | 1 | 10 | yes |
-| `CMS-009` | Navigation & Menus | White Label | 1 | 6 | yes |
+| `CMS-009` | Navigation & Menus | White Label | 1 | 7 | yes |
 | `CMS-010` | Media Library | White Label | 1 | 11 | yes |
 | `CMS-011` | Translations | White Label | 1 | 3 | yes |
 | `CMS-012` | RTL Preview | White Label | 1 | 2 | yes |

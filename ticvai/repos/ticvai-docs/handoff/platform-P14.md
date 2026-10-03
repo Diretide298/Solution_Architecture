@@ -5,12 +5,12 @@
 | | |
 |---|---|
 | Screens | 8 |
-| Operations | 28 |
+| Operations | 32 |
 | Contracts | 1 |
 | Modules | 1 |
 | Undrawn | 0 |
 | Operations with no screen | 1 |
-| Waves | wave1 3 · wave2 4 · wave3 1 |
+| Waves | wave1 4 · wave2 3 · wave3 1 |
 
 ## Gaps
 
@@ -38,12 +38,12 @@
 
 | | Name | Module | Wave | Ops | Drawn |
 |---|---|---|---|---|---|
-| `DEV-001` | API Reference | Developer & API | 2 | 2 | yes |
-| `DEV-002` | Register & Organisation | Developer & API | 1 | 2 | yes |
+| `DEV-001` | API Reference | Developer & API | 1 | 2 | yes |
+| `DEV-002` | Register & Organisation | Developer & API | 1 | 3 | yes |
 | `DEV-003` | Clients & Credentials | Developer & API | 1 | 6 | yes |
 | `DEV-004` | Sandbox | Developer & API | 2 | 5 | yes |
 | `DEV-005` | Webhooks | Developer & API | 2 | 5 | yes |
 | `DEV-006` | Usage & Limits | Developer & API | 2 | 2 | yes |
 | `DEV-007` | Marketplace Listing | Developer & API | 3 | 2 | yes |
-| `DEV-008` | Programme Administration | Developer & API | 1 | 7 | yes |
+| `DEV-008` | Programme Administration | Developer & API | 1 | 10 | yes |
 

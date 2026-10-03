@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-208` | Stacking & Conflict Command Center | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-209` | Promotion Priority & Hierarchy Manager | B–D | 0 | 0 | 6 | 0 | 0 | 2 | — | notStarted (generated) |
-| `ADM-210` | Promotion Stacking Rule Builder | B–D | 0 | 0 | 6 | 0 | 0 | 2 | — | notStarted (generated) |
-| `ADM-211` | Promotion Exclusion & Compatibility Matrix | B–D | 0 | 16 | 6 | 0 | 0 | 2 | — | notStarted (generated) |
-| `ADM-212` | Discount Calculation & Application Sequence | B–D | 6 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-213` | Best Offer & Customer Benefit Resolver | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-214` | Discount Cap & Maximum Benefit Controller | B–D | 9 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-215` | Conflict Detection & Resolution Center | B–D | 0 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-216` | Promotion Decision Trace & Transaction Explainer | B–D | 0 | 0 | 6 | 0 | 0 | 2 | — | notStarted (generated) |
-| `ADM-217` | Conflict Simulation & AI Optimization | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-208` | Stacking & Conflict Command Center | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-209` | Promotion Priority & Hierarchy Manager | C | 0 | 0 | 6 | 0 | 0 | 2 | — | notStarted (generated) |
+| `ADM-210` | Promotion Stacking Rule Builder | C | 0 | 0 | 6 | 0 | 0 | 2 | — | notStarted (generated) |
+| `ADM-211` | Promotion Exclusion & Compatibility Matrix | C | 0 | 16 | 6 | 0 | 0 | 2 | — | notStarted (generated) |
+| `ADM-212` | Discount Calculation & Application Sequence | C | 6 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-213` | Best Offer & Customer Benefit Resolver | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-214` | Discount Cap & Maximum Benefit Controller | C | 9 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-215` | Conflict Detection & Resolution Center | C | 0 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-216` | Promotion Decision Trace & Transaction Explainer | C | 0 | 0 | 6 | 0 | 0 | 2 | — | notStarted (generated) |
+| `ADM-217` | Conflict Simulation & AI Optimization | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

@@ -128,16 +128,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-214` | Guest Journey Command Center | B–D | 8 | 220 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `BO-215` | Group & B2B Admission Profile Builder | B–D | 7 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-216` | Group Leader & Fast B2B Validation | B–D | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-217` | Group Attendance & Partial Entry Manager | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-218` | Family, Child, POD & Companion Journey | B–D | 13 | 0 | 5 | 0 | 0 | 6 | — | notStarted (generated) |
-| `BO-219` | Re-entry & Temporary Exit Journey | B–D | 4 | 0 | 5 | 9 | 0 | 6 | — | notStarted (generated) |
-| `BO-220` | Multi-Park & Crossover Journey Orchestrator | B–D | 47 | 0 | 6 | 9 | 0 | 6 | — | notStarted (generated) |
-| `BO-221` | Fast Pass & Attraction Access Journey | B–D | 27 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
+| `BO-214` | Guest Journey Command Center | C | 8 | 220 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `BO-215` | Group & B2B Admission Profile Builder | C | 7 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-216` | Group Leader & Fast B2B Validation | C | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-217` | Group Attendance & Partial Entry Manager | C | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-218` | Family, Child, POD & Companion Journey | C | 13 | 0 | 5 | 0 | 0 | 6 | — | notStarted (generated) |
+| `BO-219` | Re-entry & Temporary Exit Journey | C | 4 | 0 | 5 | 9 | 0 | 6 | — | notStarted (generated) |
+| `BO-220` | Multi-Park & Crossover Journey Orchestrator | C | 47 | 0 | 6 | 9 | 0 | 6 | — | notStarted (generated) |
+| `BO-221` | Fast Pass & Attraction Access Journey | C | 27 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
 | `BO-222` | Special Event, Free View & Alternative Admission | C | 15 | 0 | 5 | 1 | 0 | 0 | — | notStarted (generated) |
-| `BO-223` | Journey Simulation, Audit & Publication | B–D | 8 | 26 | 6 | 9 | 0 | 6 | — | notStarted (generated) |
+| `BO-223` | Journey Simulation, Audit & Publication | C | 8 | 26 | 6 | 9 | 0 | 6 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

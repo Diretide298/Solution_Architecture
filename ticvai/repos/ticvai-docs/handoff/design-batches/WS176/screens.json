@@ -177,7 +177,7 @@
   "name": "Tenant & Brand Context",
   "module": "Access & Venue",
   "requiresModule": "core",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "12",
@@ -192,7 +192,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "BO-1061"
+    "BO-1061",
+    "BO-103"
    ],
    "exitTo": [
     "BO-1061"
@@ -668,7 +669,7 @@
   "name": "Currency, Timezone & Channels",
   "module": "Setup",
   "requiresModule": "core",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "12",
@@ -683,7 +684,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "BO-1061"
+    "BO-1061",
+    "BO-100"
    ],
    "exitTo": [
     "BO-1061"
@@ -700,7 +702,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Set the region's currency, rounding, date and number formats, time zone and fiscal year, and the notes and coins every till counts.",
+  "purpose": "Set the region's currency, rounding, date and number formats, time zone and fiscal year, the notes and coins every till counts, and the AI residency class the AI engine routes this tenant's calls by (the residency section, drawn and built in Block A; Chinmay, 3 October 2026, r1 additions).",
   "gaps": [
    {
     "operation": null,
@@ -740,6 +742,43 @@
        "label": "Notes and coins",
        "operation": "listDenominations",
        "provenance": "contract shift.yaml GET /denominations"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "AI residency",
+       "bindsTo": "RegionSettings",
+       "operation": "getRegionSettings",
+       "columns": [
+        "RegionSettings.aiResidencyClass",
+        "RegionSettings.allowedAiResidencies",
+        "RegionSettings.aiResidencyOptIn"
+       ],
+       "notes": "**The residency section, real since 3 October 2026** (Chinmay, r1 additions: \"The residency section on BO-1065 is drawn and built in Block A\"; CHG-RONEC-004). Where the AI engine may send this tenant's calls (ADR-0009 as amended 2 October; DEC-539): UAE only (the default, and mandatory for government, bank and health tenants), global allowed (a private venue's PDPL Article 23 opt-in) or on-premises. Every call is scrubbed of personal data in-cell first, whatever the class (DEC-542); the panel says so.",
+       "provenance": "contract tenancy.yaml GET /regions/{regionId}/settings; decided 3 October 2026 (CHG-RONEC-004)"
+      },
+      {
+       "kind": "selectField",
+       "label": "AI residency class",
+       "bindsTo": "RegionSettings.aiResidencyClass",
+       "operation": "updateRegionSettings",
+       "notes": "UAE only, Global allowed, On-premises. Moving from UAE only to Global allowed without the opt-in evidence below is refused (`422 residency-opt-in-required`) and the form says which reference is missing.",
+       "provenance": "contract tenancy.yaml PUT /regions/{regionId}/settings (aiResidencyClass)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Allowed AI residencies",
+       "bindsTo": "RegionSettings.allowedAiResidencies",
+       "operation": "updateRegionSettings",
+       "notes": "Narrows the class further where the region needs it; never widens it. Empty means the class alone decides. `ai.setAiProvider` refuses a provider outside it (`409 residency-refused`).",
+       "provenance": "contract tenancy.yaml PUT /regions/{regionId}/settings (allowedAiResidencies)"
+      },
+      {
+       "kind": "textField",
+       "label": "Opt-in evidence (PDPL Article 23)",
+       "bindsTo": "RegionSettings.aiResidencyOptIn",
+       "operation": "updateRegionSettings",
+       "notes": "Shown only for Global allowed: the vendor contract, DPIA and guest notice references (`vendorContractReference`, `dpiaReference`, `guestNoticeReference`, up to 200 characters each). Who confirmed it and when are the server's and shown read-only.",
+       "provenance": "contract tenancy.yaml PUT /regions/{regionId}/settings (aiResidencyOptIn)"
       }
      ]
     },
@@ -758,6 +797,13 @@
        "label": "Save notes and coins",
        "operation": "setDenominations",
        "provenance": "contract shift.yaml PUT /denominations"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save AI residency",
+       "operation": "updateRegionSettings",
+       "notes": "Saves the residency section with `updateRegionSettings`. PUT semantics (audit R103): the request carries the region's settings in force from `getRegionSettings` with only the residency fields changed, so saving the residency never resets the currency or the time zone.",
+       "provenance": "contract tenancy.yaml PUT /regions/{regionId}/settings; decided 3 October 2026 (CHG-RONEC-004)"
       }
      ]
     }
@@ -789,9 +835,12 @@
    {
     "operationId": "updateRegionSettings",
     "contract": "tenancy",
-    "purpose": "Currency, timezone and channels",
+    "purpose": "Currency, timezone and channels, and the AI residency section (class, allowed residencies, opt-in evidence; Block A, decided 3 October 2026, CHG-RONEC-004)",
     "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
+    "provenance": "board reading, 19 September 2026; residency section 3 October 2026 (CHG-RONEC-004)",
+    "invalidates": [
+     "getRegionSettings"
+    ]
    },
    {
     "operationId": "getRegionSettings",
@@ -845,6 +894,25 @@
      ]
     },
     "provenance": "contract tenancy.yaml PUT /regions/{regionId}/settings"
+   },
+   {
+    "id": "formUpdateAiResidency",
+    "component": "modal",
+    "trigger": "Save AI residency",
+    "body": "**Collects the residency section before `updateRegionSettings` is called** (3 October 2026, CHG-RONEC-004). Asks for `aiResidencyClass`, `allowedAiResidencies` and, for `globalAllowed`, the three `aiResidencyOptIn` references; every other field is sent as `getRegionSettings` returned it. A move to a wider class says what changes for guests (calls may leave the UAE) and asks the operator to confirm. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save AI residency",
+     "operation": "updateRegionSettings"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "aiResidencyClass",
+      "allowedAiResidencies",
+      "aiResidencyOptIn"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /regions/{regionId}/settings; decided 3 October 2026 (CHG-RONEC-004)"
    },
    {
     "id": "formSetDenominations",

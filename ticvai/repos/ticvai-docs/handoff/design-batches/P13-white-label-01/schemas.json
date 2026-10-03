@@ -1,4 +1,36 @@
 {
+ "AccessibilitySettings": {
+  "type": "object",
+  "description": "BL-065, 2.1.27. **POS and kiosk accessibility, which is a legal obligation in most jurisdictions and was unstated.**\n**A kiosk is the hard case.** A guest with low vision using a website brings their own assistive technology; a guest at a kiosk gets whatever the kiosk offers, so the settings have to be on the device rather than in the browser.\n",
+  "properties": {
+   "largeTextAvailable": {
+    "type": "boolean",
+    "default": true
+   },
+   "highContrastAvailable": {
+    "type": "boolean",
+    "default": true
+   },
+   "simplifiedNavigationAvailable": {
+    "type": "boolean",
+    "default": true
+   },
+   "screenReaderSupported": {
+    "type": "boolean",
+    "default": true
+   },
+   "reachableHeightModeAvailable": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Moves the interface to the lower half of the screen** for a guest using a wheelchair. A kiosk mounted at standing height is unusable otherwise, and no software setting fixes the mounting — this is the mitigation.\n"
+   },
+   "sessionTimeoutMultiplier": {
+    "type": "number",
+    "default": 1,
+    "description": "**Timeouts are an accessibility barrier nobody counts.** A guest who needs three times as long to read a screen should not lose their basket to a 90-second inactivity timer.\n"
+   }
+  }
+ },
  "AppAvailability": {
   "type": "string",
   "description": "**The sold-out or closed signal (decided 28 September, audit R073).** `open` is the normal state. `soldOut` shows WEB-029's sold-out state across the app while browsing still works; `closed` shows the closed state (a weather closure, a private event). Neither refuses a request on its own: it is what the guest is told, and a sale is still refused by availability where it applies. Set with `setMaintenanceMode`.\n",
@@ -133,6 +165,73 @@
    },
    "isActive": {
     "type": "boolean"
+   }
+  }
+ },
+ "BookingFlow": {
+  "x-ticvai-persistence": "whitelabel.booking_flow",
+  "type": "object",
+  "description": "**A venue's booking flow (decided 29 September, W12: operators pick their flows, see which steps are required, set their own order).** Made from a `BookingFlowType`; lives in the working draft and reaches guests with `publishTenantConfig`, which copies the venue's flows into the version's snapshot. A product or category names its flow (catalogue `bookingFlowId`); otherwise the venue's default for the type serving its kind applies.\n",
+  "required": [
+   "flowTypeKey",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "From the path of `createBookingFlowDefinition`."
+   },
+   "flowTypeKey": {
+    "$ref": "#/components/schemas/BookingFlowTypeKey"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 80,
+    "description": "Staff-facing, e.g. \"Day pass, date first\". Not shown to guests."
+   },
+   "isDefaultForType": {
+    "type": "boolean",
+    "default": false,
+    "description": "At most one per venue and type; setting it takes it from the previous default."
+   },
+   "isEnabled": {
+    "type": "boolean",
+    "default": true,
+    "description": "A disabled flow is kept and not published; products naming it fall back to the default."
+   },
+   "steps": {
+    "type": "array",
+    "maxItems": 30,
+    "description": "Every step of the type, in the venue's order. Filled from the type when left out on create.",
+    "items": {
+     "$ref": "#/components/schemas/BookingFlowStep"
+    }
+   },
+   "settings": {
+    "$ref": "#/components/schemas/BookingFlowLevelSettings"
+   },
+   "isValid": {
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "Whether the flow passes `validateBookingFlow`; worked out in the same transaction as each write. `publishTenantConfig` refuses a draft holding an invalid enabled flow."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The partition key (ADR-0005). Written at `venue` scope."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
@@ -1176,6 +1275,86 @@
    }
   }
  },
+ "LanguageConfig": {
+  "x-ticvai-persistence": "none — embedded in tenant_config",
+  "type": "object",
+  "required": [
+   "languages",
+   "defaultLanguage"
+  ],
+  "properties": {
+   "languages": {
+    "type": "array",
+    "description": "**A tenant may add or select interface languages beyond English and Arabic** (Chinmay, 2 October, workbook Q145; CHG-CSA-039). Any ISO 639-1 language. English and Arabic ship with complete interface strings; for any other, the interface strings come as a TICVAI string pack drafted by AI translation and reviewed (T03), and a string with no translation falls back to English. Content (pages, products, banners) is the tenant's to translate (`translationGaps`).",
+    "items": {
+     "type": "string",
+     "pattern": "^[a-z]{2}$"
+    }
+   },
+   "defaultLanguage": {
+    "type": "string",
+    "pattern": "^[a-z]{2}$"
+   },
+   "uiStringCoverage": {
+    "type": "array",
+    "readOnly": true,
+    "description": "How complete the interface strings are in each enabled language (CHG-CSA-039). English and Arabic are always complete.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "language": {
+       "type": "string"
+      },
+      "coveragePercent": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 100
+      },
+      "status": {
+       "type": "string",
+       "enum": [
+        "complete",
+        "draft",
+        "missing"
+       ]
+      }
+     }
+    }
+   },
+   "rtlLanguages": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "The enabled languages written right to left — those whose Unicode CLDR character order is `right-to-left` (Arabic, `ar`, among them). Not configured; it follows from `languages`.",
+    "items": {
+     "type": "string",
+     "pattern": "^[a-z]{2}$"
+    }
+   },
+   "translationGaps": {
+    "type": "array",
+    "readOnly": true,
+    "description": "Content lacking a version in an enabled language.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "language": {
+       "type": "string"
+      },
+      "missingCount": {
+       "type": "integer"
+      },
+      "areas": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      }
+     }
+    }
+   }
+  }
+ },
  "LinkTarget": {
   "x-ticvai-persistence": "none — embedded",
   "type": "object",
@@ -1457,8 +1636,10 @@
    "document",
    "vector",
    "font",
-   "archive"
-  ]
+   "archive",
+   "model3d"
+  ],
+  "description": "`model3d` added 3 October 2026 (r1 additions; ADR-0069 action item 4): a glTF binary (`model/gltf-binary`, `.glb`) venue model, at most 40 MB. No rendition or derivative is generated for it; the guest app downloads the file as uploaded.\n"
  },
  "MediaReplaceResult": {
   "x-ticvai-persistence": "none — computed",
@@ -2367,6 +2548,209 @@
       "at": {
        "type": "string",
        "format": "date-time"
+      }
+     }
+    }
+   }
+  }
+ },
+ "TenantConfig": {
+  "x-ticvai-persistence": "whitelabel.tenant_config",
+  "type": "object",
+  "description": "**The tenant's working draft**, one row per tenant (see the header). Published versions are `ConfigVersion.snapshot`, not further rows here.\n**Only `tenantId` and `version` are required**, because the draft is built one part at a time: the first `set*` call creates the row with that part alone. A part that is still unset is what `validateTenantConfig` reports (`missingRequiredAsset` and the like) and what blocks `publishTenantConfig` — a storage rule that every part exist would stop the first save.\n",
+  "required": [
+   "tenantId",
+   "version"
+  ],
+  "properties": {
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "version": {
+    "type": "string",
+    "description": "The draft's working version label; the published one is `ConfigVersion.version`."
+   },
+   "isDraft": {
+    "type": "boolean",
+    "readOnly": true,
+    "description": "True for the working draft, which is the only row."
+   },
+   "brand": {
+    "$ref": "#/components/schemas/BrandIdentity"
+   },
+   "appIcons": {
+    "$ref": "#/components/schemas/AppIcons"
+   },
+   "bookingFlow": {
+    "$ref": "#/components/schemas/BookingFlowConfig"
+   },
+   "bookingFlows": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "Every venue's booking flows in the draft (`whitelabel.booking_flow`), so a publish snapshots them with the rest (decided 29 September, W12).",
+    "items": {
+     "$ref": "#/components/schemas/BookingFlow"
+    }
+   },
+   "theme": {
+    "$ref": "#/components/schemas/Theme"
+   },
+   "fonts": {
+    "$ref": "#/components/schemas/FontConfig"
+   },
+   "footer": {
+    "$ref": "#/components/schemas/FooterConfig"
+   },
+   "notificationBranding": {
+    "type": "object",
+    "nullable": true,
+    "description": "BL-003. **`marketing-crm` holds the templates and nothing said whose identity they wear.** A message sent on behalf of a venue carries that venue's sender name, reply-to and logo — **an operational alert arriving from `noreply@ticvai.com` is one a guest marks as spam.**\nResolved on the template at send time rather than duplicated per template.\n",
+    "properties": {
+     "senderName": {
+      "type": "string"
+     },
+     "replyToEmail": {
+      "type": "string",
+      "format": "email"
+     },
+     "smsSenderId": {
+      "type": "string",
+      "nullable": true
+     },
+     "whatsappBusinessId": {
+      "type": "string",
+      "nullable": true
+     },
+     "logoAssetId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true
+     }
+    }
+   },
+   "enabledPaymentMethods": {
+    "type": "array",
+    "nullable": true,
+    "description": "BL-004. **`FeatureToggle` could turn Apple Pay on and could not say which cards a tenant accepts.** Resolved against `orders.PaymentProvider.supportedMethods` — the tenant's choice within what the gateway offers, and **a tenant enabling a method their provider does not support should fail here rather than at checkout.**\n",
+    "items": {
+     "type": "string"
+    }
+   },
+   "accessibility": {
+    "$ref": "#/components/schemas/AccessibilitySettings"
+   },
+   "header": {
+    "$ref": "#/components/schemas/HeaderConfig"
+   },
+   "navigation": {
+    "$ref": "#/components/schemas/NavigationConfig"
+   },
+   "homepage": {
+    "$ref": "#/components/schemas/HomepageLayout"
+   },
+   "modules": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ModuleEnablement"
+    }
+   },
+   "features": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/FeatureToggle"
+    }
+   },
+   "languages": {
+    "$ref": "#/components/schemas/LanguageConfig"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "isInMaintenance": {
+    "type": "boolean",
+    "default": false,
+    "description": "Written by `setMaintenanceMode`; read by `getTenantAppStatus`."
+   },
+   "maintenanceMessage": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "The message on the branded maintenance screen."
+   },
+   "expectedBackAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "minimumAppVersion": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MinimumAppVersion"
+     }
+    ],
+    "description": "Live state, written by `setMaintenanceMode` (audit R073)."
+   },
+   "contact": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/VenueContact"
+     }
+    ],
+    "description": "Live state, written by `setMaintenanceMode` (audit R073)."
+   },
+   "availability": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AppAvailability"
+     }
+    ],
+    "description": "Live state, written by `setMaintenanceMode` (audit R073)."
+   },
+   "availabilityMessage": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "Live state, written by `setMaintenanceMode` (audit R073)."
+   },
+   "venues": {
+    "type": "array",
+    "x-ticvai-derived": "onRead",
+    "description": "The tenant's active venues, for the guest venue picker on WEB-001 and GST-001 (decided 28 September, audit R267). Public: returned without a session and cached with the rest of the response. Read from `tenancy` venues; a closed or archived venue is left out.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "venueId",
+      "name"
+     ],
+     "properties": {
+      "venueId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "$ref": "#/components/schemas/LocalisedText"
+      },
+      "city": {
+       "type": "string",
+       "nullable": true
+      },
+      "openingHours": {
+       "allOf": [
+        {
+         "$ref": "#/components/schemas/LocalisedText"
+        }
+       ],
+       "nullable": true,
+       "description": "Today's hours as shown to a guest, e.g. \"10:00 to 22:00\"."
       }
      }
     }

@@ -1,6 +1,6 @@
 # WS141 — Marketing CRM Configuration Reference v1.0 board 7
 
-**10 screens · 20 operations · 27 schemas · 5 permissions**
+**10 screens · 21 operations · 27 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -103,16 +103,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-794` | Omnichannel Command Center | B–D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `BO-795` | Unified Inbox | B–D | 0 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
-| `BO-796` | Guest Conversation 360 | B–D | 0 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
-| `BO-797` | AI Chatbot Configuration | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-798` | Intent & Knowledge Management | A | 5 | 11 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `BO-799` | Agent Workspace | B–D | 0 | 0 | 6 | 7 | 0 | 0 | — | notStarted (—) |
-| `BO-800` | Routing & Queue Management | B–D | 8 | 13 | 6 | 0 | 2 | 6 | — | notStarted (—) |
-| `BO-801` | Sales & Service Actions | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-802` | Sentiment, Quality & Escalation | B–D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `BO-803` | Chat Analytics & Audit | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-794` | Omnichannel Command Center | D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `BO-795` | Unified Inbox | D | 0 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
+| `BO-796` | Guest Conversation 360 | D | 0 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
+| `BO-797` | AI Chatbot Configuration | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-798` | Intent & Knowledge Management | A | 5 | 14 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `BO-799` | Agent Workspace | A | 0 | 0 | 6 | 7 | 0 | 0 | — | notStarted (—) |
+| `BO-800` | Routing & Queue Management | D | 8 | 13 | 6 | 0 | 2 | 6 | — | notStarted (—) |
+| `BO-801` | Sales & Service Actions | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-802` | Sentiment, Quality & Escalation | D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `BO-803` | Chat Analytics & Audit | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -132,7 +132,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 3 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-794 |
 | Who uses it | venue staff holding `CASE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -268,7 +268,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 3 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-795 |
 | Who uses it | venue staff holding `CASE_MANAGE`, `CASE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -400,7 +400,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 3 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-796 |
 | Who uses it | venue staff holding `CASE_VIEW`, `GUEST_VIEW` (2 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -507,7 +507,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 3 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-797 |
 | Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -642,6 +642,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Shown**
 
+**Load the copilot configuration as saved** (card list, from `getCustomerServiceCopilot`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Configuration | grouped details | The customer-service copilot's configuration for one scope (pack 10.1.10). A field left out takes its default, not its old value. |
+| Effective | grouped details | The narrowest of this row, its tenant row and `getAiPolicy`. |
+| Knowledge collections | list or chips (count when long) | — |
+
 **Knowledge sources** (data table, from `listKnowledgeCollections`)
 
 | Shows | Format | Notes |
@@ -670,7 +678,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 - **Knowledge gaps**: Unanswered questions grouped and counted, newest first, each becoming a task for the content owner. *(source: contracts/satellite/ai.yaml#listKnowledgeGaps)*
 
-**Data it reads**: `listKnowledgeGaps` (onLoad, Questions the assistant could not answer); `listKnowledgeCollections` (onLoad, The knowledge collections the assistant answers from)
+**Data it reads**: `listKnowledgeGaps` (onLoad, Questions the assistant could not answer); `listKnowledgeCollections` (onLoad, The knowledge collections the assistant answers from); `getCustomerServiceCopilot` (onLoad, Load the copilot configuration as saved)
 
 **Where the user goes next**
 
@@ -704,6 +712,7 @@ gaps:
 - `listKnowledgeGaps` → `AI_USE` (operate) · staff
 - `listKnowledgeCollections` → `AI_CONFIGURE` (configure) · staff
 - `ingestKnowledgeDocument` → `AI_CONFIGURE` (configure) · staff
+- `getCustomerServiceCopilot` → `AI_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -735,8 +744,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (5), with its required mark, default, format and its error state (400, 403, 422).
-- [ ] Every output is drawn (11 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (5), with its required mark, default, format and its error state (400, 403, 404, 422).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-798?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save, Cancel, Add document.
 - [ ] Every transition is wired: `BO-794`.
@@ -753,8 +762,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Engagement & Support · wave 3 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Module | Engagement & Support · wave 1 · needs the `marketing` module |
+| Block | Block A · task APP-SETUP-BO-799 |
 | Who uses it | venue staff holding `CASE_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -873,7 +882,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 3 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-800 |
 | Who uses it | venue staff holding `CASE_MANAGE`, `CASE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1061,7 +1070,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 3 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-801 |
 | Who uses it | venue staff holding `CASE_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1162,7 +1171,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 3 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-802 |
 | Who uses it | venue staff holding `CASE_MANAGE`, `CASE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1285,7 +1294,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 3 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-803 |
 | Who uses it | venue staff holding `CASE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1490,6 +1499,7 @@ Method, path, parameters, request and response for every operation these screens
 "claimConversation": {"method":"POST","path":"/conversations/{conversationId}/claim","contract":"marketing-crm","summary":"An agent takes it","permission":"CASE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Conversation"},
 "escalateCase": {"method":"POST","path":"/cases/{caseId}/escalate","contract":"marketing-crm","summary":"Escalate a case","permission":"CASE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Case"},
 "getConversation": {"method":"GET","path":"/conversations/{conversationId}","contract":"marketing-crm","summary":"One conversation and everything before it","permission":"CASE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"Conversation"},
+"getCustomerServiceCopilot": {"method":"GET","path":"/customer-service-copilot","contract":"marketing-crm","summary":"The customer-service copilot configuration as saved","permission":"AI_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"AiCustomerServiceCopilotKnowledgeWorkspaceView"},
 "getGuestTimeline": {"method":"GET","path":"/guests/{guestId}/timeline","contract":"marketing-crm","summary":"Everything this guest did, in order, across the platform","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"from","in":"query","required":null},{"name":"kinds","in":"query","required":null},{"name":"venueId","in":"query","required":null}],"requestBody":null,"responds":"GuestTimelineEvent"},
 "ingestKnowledgeDocument": {"method":"POST","path":"/collections/{collectionId}/documents","contract":"ai","summary":"Add a document","permission":"AI_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"KnowledgeDocument","responds":null},
 "listAgentWorkloadAvailability": {"method":"GET","path":"/agent-workload-availability","contract":"marketing-crm","summary":"Agent Workload, Availability & Workforce Control","permission":"CASE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":false},{"name":"queueId","in":"query","required":false},{"name":"team","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":"skill","in":"query","required":false},{"name":"language","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},

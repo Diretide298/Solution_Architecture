@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-559` | Payment Command Center | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-560` | Payment Method Catalogue | B–D | 0 | 4 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-561` | Payment Method Configuration | B–D | 16 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-562` | Channel & Touchpoint Payment Configuration | B–D | 0 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-563` | Venue, Location & Business Unit Payment Assignment | B–D | 7 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-564` | Currency & Payment Currency Configuration | B–D | 5 | 20 | 6 | 0 | 0 | 4 | — | notStarted (—) |
-| `ADM-565` | Payment Eligibility & Availability Rule Builder | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-566` | Payment Fees, Surcharges & Commercial Rules | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-567` | Payment Policy, Governance & Approval Manager | B–D | 7 | 0 | 6 | 5 | 0 | 3 | — | notStarted (—) |
-| `ADM-568` | Payment Configuration Simulator & Validation Center | B–D | 0 | 28 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-559` | Payment Command Center | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-560` | Payment Method Catalogue | C | 0 | 4 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-561` | Payment Method Configuration | C | 16 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-562` | Channel & Touchpoint Payment Configuration | C | 0 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-563` | Venue, Location & Business Unit Payment Assignment | C | 7 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-564` | Currency & Payment Currency Configuration | C | 5 | 20 | 6 | 0 | 0 | 4 | — | notStarted (—) |
+| `ADM-565` | Payment Eligibility & Availability Rule Builder | C | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-566` | Payment Fees, Surcharges & Commercial Rules | C | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-567` | Payment Policy, Governance & Approval Manager | C | 7 | 0 | 6 | 5 | 0 | 3 | — | notStarted (—) |
+| `ADM-568` | Payment Configuration Simulator & Validation Center | C | 0 | 28 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

@@ -5,7 +5,7 @@
 -- banner design has record_ip_address on (ADR-0023). Held in pii and pointed at the decision,
 -- never beside it, so the consent log can be read and reported without reading personal data
 CREATE TABLE IF NOT EXISTS pii.consent_identifier (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     device_consent_id                 uuid NOT NULL,
     ip_address                        text CONSTRAINT consent_identifier_ip_address_chk CHECK (char_length(ip_address) <= 45),
     user_agent                        text CONSTRAINT consent_identifier_user_agent_chk CHECK (char_length(user_agent) <= 500),
@@ -41,6 +41,9 @@ CREATE TABLE IF NOT EXISTS pii.subject_biometric (
     kind                              text NOT NULL CONSTRAINT subject_biometric_kind_chk CHECK (kind IN ('facePass', 'faceTag')),
     retention_anchor                  text,
     source                            text NOT NULL CONSTRAINT subject_biometric_source_chk CHECK (source IN ('guestApp', 'ticketCounter', 'annualPassCounter', 'entryGate')),
+    enrolment_channel                 text CONSTRAINT subject_biometric_enrolment_channel_chk CHECK (enrolment_channel IN ('guestApp', 'ticketCounter', 'annualPassCounter', 'selfServiceKiosk', 'entryGate')),
+    consent_form_id                   uuid,
+    consent_form_version              integer,
     captured_at                       timestamptz NOT NULL,
     consent_purpose_id                uuid,
     consent_given_at                  timestamptz,

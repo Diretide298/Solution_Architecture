@@ -1,6 +1,6 @@
 # WS55 — Rules  Workflow  Approval   Automation Engine board 1
 
-**10 screens · 14 operations · 22 schemas · 3 permissions**
+**10 screens · 15 operations · 22 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -96,16 +96,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-238` | Rules & Workflow Command Center | B–D | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-239` | Visual Business Rule Builder | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-240` | Conditions, Decision Logic & Decision Tables | B–D | 0 | 0 | 6 | 0 | 0 | 1 | — | notStarted (generated) |
-| `ADM-241` | Visual Workflow Designer | B–D | 21 | 12 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-242` | Approval Matrix & Multi-Level Approval Configuration | B–D | 7 | 0 | 5 | 0 | 0 | 3 | — | notStarted (generated) |
-| `ADM-243` | Roles, Authority, Delegation & Approval Limits | A | 14 | 0 | 5 | 51 | 0 | 6 | — | notStarted (generated) |
-| `ADM-244` | SLA, Escalation, Reminder & Timeout Rules | B–D | 21 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-245` | Trigger, Action & Cross-Module Orchestration Configuration | B–D | 12 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-246` | Workflow Testing, Simulation & Impact Analysis | B–D | 0 | 16 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-247` | Versioning, Governance, Approval & Publication | B–D | 25 | 20 | 6 | 0 | 0 | 3 | — | notStarted (generated) |
+| `ADM-238` | Rules & Workflow Command Center | B | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-239` | Visual Business Rule Builder | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-240` | Conditions, Decision Logic & Decision Tables | B | 0 | 0 | 6 | 0 | 0 | 1 | — | notStarted (generated) |
+| `ADM-241` | Visual Workflow Designer | B | 21 | 12 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-242` | Approval Matrix & Multi-Level Approval Configuration | B | 7 | 0 | 5 | 0 | 0 | 3 | — | notStarted (generated) |
+| `ADM-243` | Roles, Authority, Delegation & Approval Limits | A | 14 | 3 | 5 | 51 | 0 | 6 | — | notStarted (generated) |
+| `ADM-244` | SLA, Escalation, Reminder & Timeout Rules | B | 21 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-245` | Trigger, Action & Cross-Module Orchestration Configuration | B | 12 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-246` | Workflow Testing, Simulation & Impact Analysis | B | 0 | 16 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-247` | Versioning, Governance, Approval & Publication | B | 25 | 20 | 6 | 0 | 0 | 3 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

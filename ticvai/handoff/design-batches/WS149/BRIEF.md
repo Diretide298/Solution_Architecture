@@ -130,16 +130,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-579` | Terminal & Card-Present Command Center | B–D | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-580` | Payment Terminal & Device Inventory | B–D | 0 | 0 | 6 | 8 | 0 | 4 | — | notStarted (—) |
-| `ADM-581` | Terminal Provisioning & Device Configuration | B–D | 9 | 0 | 6 | 6 | 0 | 0 | — | notStarted (—) |
-| `ADM-582` | POS, Kiosk & Terminal Assignment Manager | B–D | 0 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
-| `ADM-583` | EMV & Card-Present Processing Configuration | B–D | 8 | 17 | 6 | 2 | 0 | 0 | — | notStarted (—) |
-| `ADM-584` | Payment Server & Terminal Connectivity Manager | B–D | 0 | 8 | 6 | 2 | 0 | 0 | — | notStarted (—) |
-| `ADM-585` | Card-Present Transaction Monitor & Operations | B–D | 2 | 26 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-586` | Degraded, Offline & Store-and-Forward Manager | B–D | 0 | 14 | 6 | 2 | 0 | 0 | — | notStarted (—) |
-| `ADM-587` | Terminal Health, Maintenance & Incident Center | B–D | 0 | 0 | 6 | 14 | 0 | 2 | — | notStarted (—) |
-| `ADM-588` | Terminal Simulator, Certification & AI Operations Advisor | B–D | 16 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-579` | Terminal & Card-Present Command Center | C | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-580` | Payment Terminal & Device Inventory | C | 0 | 0 | 6 | 8 | 0 | 4 | — | notStarted (—) |
+| `ADM-581` | Terminal Provisioning & Device Configuration | B | 9 | 0 | 6 | 6 | 0 | 0 | — | notStarted (—) |
+| `ADM-582` | POS, Kiosk & Terminal Assignment Manager | B | 0 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
+| `ADM-583` | EMV & Card-Present Processing Configuration | C | 8 | 17 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `ADM-584` | Payment Server & Terminal Connectivity Manager | B | 0 | 8 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `ADM-585` | Card-Present Transaction Monitor & Operations | C | 2 | 26 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-586` | Degraded, Offline & Store-and-Forward Manager | C | 0 | 14 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `ADM-587` | Terminal Health, Maintenance & Incident Center | B | 0 | 0 | 6 | 14 | 0 | 2 | — | notStarted (—) |
+| `ADM-588` | Terminal Simulator, Certification & AI Operations Advisor | C | 16 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

@@ -97,16 +97,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-194` | Device & Gate Command Center | B–D | 0 | 294 | 6 | 0 | 6 | 0 | — | notStarted (generated) |
-| `BO-195` | Device Type & Hardware Library | B–D | 15 | 0 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
-| `BO-196` | Physical Device Registration & Provisioning | B–D | 74 | 0 | 5 | 45 | 5 | 0 | — | notStarted (generated) |
-| `BO-197` | Turnstile & Lane Behavior Configuration | B–D | 14 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-198` | Validation Outcome & Guest Feedback Designer | B–D | 11 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-199` | Reader, Scanner & Peripheral Configuration | B–D | 1 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-200` | Handheld & Mobile Access Device Configuration | B–D | 8 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-194` | Device & Gate Command Center | C | 0 | 294 | 6 | 0 | 6 | 0 | — | notStarted (generated) |
+| `BO-195` | Device Type & Hardware Library | C | 15 | 0 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
+| `BO-196` | Physical Device Registration & Provisioning | C | 74 | 0 | 5 | 45 | 5 | 0 | — | notStarted (generated) |
+| `BO-197` | Turnstile & Lane Behavior Configuration | C | 14 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-198` | Validation Outcome & Guest Feedback Designer | C | 11 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-199` | Reader, Scanner & Peripheral Configuration | C | 1 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-200` | Handheld & Mobile Access Device Configuration | C | 8 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-201` | Gate Modes, Free Spin & Emergency Controls | A | 15 | 0 | 5 | 0 | 1 | 2 | — | notStarted (generated) |
-| `BO-202` | Device Software, Content & Remote Configuration | B–D | 6 | 0 | 5 | 0 | 4 | 0 | — | notStarted (generated) |
-| `BO-203` | Hardware Compatibility, Health, Testing & Deployment | B–D | 10 | 0 | 6 | 0 | 8 | 0 | — | notStarted (generated) |
+| `BO-202` | Device Software, Content & Remote Configuration | C | 6 | 0 | 5 | 0 | 4 | 0 | — | notStarted (generated) |
+| `BO-203` | Hardware Compatibility, Health, Testing & Deployment | C | 10 | 0 | 6 | 0 | 8 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

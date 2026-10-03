@@ -377,7 +377,8 @@ operations:
   offline: false
   reads:
   - payments.dunning_case
-  writes: []
+  writes:
+  - payments.dunning_case
 - operation: retryMyDunningPayment
   verb: POST
   path: /dunning-cases/{caseId}/retry

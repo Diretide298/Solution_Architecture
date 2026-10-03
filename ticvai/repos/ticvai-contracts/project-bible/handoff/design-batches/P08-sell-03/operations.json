@@ -151,6 +151,19 @@
   "requestBody": null,
   "responds": "GeneratedConfiguration"
  },
+ "getCatalogueImportJob": {
+  "method": "GET",
+  "path": "/products/import/{jobId}",
+  "contract": "catalogue",
+  "summary": "Progress and findings of a catalogue import",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CatalogueImportJob"
+ },
  "importProductCatalogue": {
   "method": "POST",
   "path": "/products/import",

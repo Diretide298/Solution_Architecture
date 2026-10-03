@@ -66,24 +66,6 @@
      "operation": "listGuestJourney"
     },
     {
-     "to": "BO-219",
-     "trigger": "Works in Re-entry & Temporary Exit Journey",
-     "provenance": "flow F118 step 9→10",
-     "operation": "listGuestJourney",
-     "carries": [
-      "profileId"
-     ]
-    },
-    {
-     "to": "BO-220",
-     "trigger": "Works in Multi-Park & Crossover Journey Orchestrator",
-     "provenance": "flow F118 step 11→12",
-     "operation": "listGuestJourney",
-     "carries": [
-      "profileId"
-     ]
-    },
-    {
      "to": "BO-221",
      "trigger": "Works in Fast Pass & Attraction Access Journey",
      "provenance": "flow F118 step 13→14",
@@ -100,6 +82,24 @@
      "trigger": "Works in Journey Simulation, Audit & Publication",
      "provenance": "flow F118 step 17→18",
      "operation": "listGuestJourney"
+    },
+    {
+     "to": "BO-219",
+     "trigger": "Works in Re-entry & Temporary Exit Journey",
+     "provenance": "flow F118 step 9→10",
+     "operation": "listGuestJourney",
+     "carries": [
+      "profileId"
+     ]
+    },
+    {
+     "to": "BO-220",
+     "trigger": "Works in Multi-Park & Crossover Journey Orchestrator",
+     "provenance": "flow F118 step 11→12",
+     "operation": "listGuestJourney",
+     "carries": [
+      "profileId"
+     ]
     }
    ]
   },

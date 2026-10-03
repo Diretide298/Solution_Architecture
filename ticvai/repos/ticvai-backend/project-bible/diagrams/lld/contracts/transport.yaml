@@ -1,5 +1,5 @@
 id: LLD-transport
-title: transport — 31 operations
+title: transport — 32 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -100,6 +100,27 @@ operations:
   - public
   offline: false
   reads:
+  - catalogue.channel_capacity
+  - transport.departure
+  - transport.fare_matrix_cell
+  - transport.fare_passenger_type
+  - transport.fare_table
+  - transport.route
+  - transport.route_stop
+  - transport.station
+  - transport.timetable
+  writes: []
+- operation: getTransportDeparture
+  verb: GET
+  path: /transport/departures/{departureId}
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  - public
+  offline: false
+  reads:
+  - catalogue.channel_capacity
   - transport.departure
   - transport.fare_matrix_cell
   - transport.fare_passenger_type
@@ -319,6 +340,7 @@ operations:
   - public
   offline: false
   reads:
+  - catalogue.channel_capacity
   - transport.departure
   - transport.fare_matrix_cell
   - transport.fare_passenger_type
@@ -357,7 +379,8 @@ operations:
   - transport.route
   - transport.route_stop
   - transport.station
-  writes: []
+  writes:
+  - transport.route
 - operation: updateTransportDeparture
   verb: PATCH
   path: /transport/departures/{departureId}
@@ -368,7 +391,8 @@ operations:
   offline: false
   reads:
   - transport.departure
-  writes: []
+  writes:
+  - transport.departure
 - operation: updateTransportPassType
   verb: PATCH
   path: /transport/pass-types/{passTypeId}
@@ -379,7 +403,8 @@ operations:
   offline: false
   reads:
   - transport.pass_type
-  writes: []
+  writes:
+  - transport.pass_type
 - operation: updateTransportRoute
   verb: PATCH
   path: /transport/routes/{routeId}
@@ -405,7 +430,8 @@ operations:
   offline: false
   reads:
   - transport.station
-  writes: []
+  writes:
+  - transport.station
 - operation: updateTransportTimetable
   verb: PATCH
   path: /transport/timetables/{timetableId}
@@ -430,4 +456,5 @@ operations:
   reads:
   - transport.timetable
   - transport.timetable_run
-  writes: []
+  writes:
+  - transport.timetable

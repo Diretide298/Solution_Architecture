@@ -130,16 +130,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-579` | Terminal & Card-Present Command Center | B–D | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-580` | Payment Terminal & Device Inventory | B–D | 0 | 0 | 6 | 8 | 0 | 4 | — | notStarted (—) |
-| `ADM-581` | Terminal Provisioning & Device Configuration | B–D | 9 | 0 | 6 | 6 | 0 | 0 | — | notStarted (—) |
-| `ADM-582` | POS, Kiosk & Terminal Assignment Manager | B–D | 0 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
-| `ADM-583` | EMV & Card-Present Processing Configuration | B–D | 8 | 17 | 6 | 2 | 0 | 0 | — | notStarted (—) |
-| `ADM-584` | Payment Server & Terminal Connectivity Manager | B–D | 0 | 8 | 6 | 2 | 0 | 0 | — | notStarted (—) |
-| `ADM-585` | Card-Present Transaction Monitor & Operations | B–D | 2 | 26 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-586` | Degraded, Offline & Store-and-Forward Manager | B–D | 0 | 14 | 6 | 2 | 0 | 0 | — | notStarted (—) |
-| `ADM-587` | Terminal Health, Maintenance & Incident Center | B–D | 0 | 0 | 6 | 14 | 0 | 2 | — | notStarted (—) |
-| `ADM-588` | Terminal Simulator, Certification & AI Operations Advisor | B–D | 16 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-579` | Terminal & Card-Present Command Center | C | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-580` | Payment Terminal & Device Inventory | C | 0 | 0 | 6 | 8 | 0 | 4 | — | notStarted (—) |
+| `ADM-581` | Terminal Provisioning & Device Configuration | B | 9 | 0 | 6 | 6 | 0 | 0 | — | notStarted (—) |
+| `ADM-582` | POS, Kiosk & Terminal Assignment Manager | B | 0 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
+| `ADM-583` | EMV & Card-Present Processing Configuration | C | 8 | 17 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `ADM-584` | Payment Server & Terminal Connectivity Manager | B | 0 | 8 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `ADM-585` | Card-Present Transaction Monitor & Operations | C | 2 | 26 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-586` | Degraded, Offline & Store-and-Forward Manager | C | 0 | 14 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `ADM-587` | Terminal Health, Maintenance & Incident Center | B | 0 | 0 | 6 | 14 | 0 | 2 | — | notStarted (—) |
+| `ADM-588` | Terminal Simulator, Certification & AI Operations Advisor | C | 16 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -159,7 +159,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-ADM-579 |
 | Who uses it | venue staff holding `PAYMENT_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
@@ -313,7 +313,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-ADM-580 |
 | Who uses it | venue staff holding `DEVICE_VIEW`, `PAYMENT_PROVIDER_MANAGE`, `PAYMENT_VIEW` (2 read, 1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -457,7 +457,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-581 |
 | Who uses it | venue staff holding `DEVICE_MANAGE`, `PAYMENT_CONFIGURE` (2 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Select) and no display directory — it is settings, not a population |
@@ -600,7 +600,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-582 |
 | Who uses it | venue staff holding `DEVICE_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -708,7 +708,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-ADM-583 |
 | Who uses it | venue staff holding `PAYMENT_CONFIGURE`, `PAYMENT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -855,7 +855,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-584 |
 | Who uses it | venue staff holding `DEVICE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
@@ -1001,7 +1001,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-ADM-585 |
 | Who uses it | venue staff holding `PAYMENT_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -1154,7 +1154,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-ADM-586 |
 | Who uses it | venue staff holding `PAYMENT_CONFIGURE`, `PAYMENT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
@@ -1294,7 +1294,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-587 |
 | Who uses it | venue staff holding `DEVICE_MANAGE`, `DEVICE_VIEW`, `WORK_ORDER_MANAGE` (2 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1450,7 +1450,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-ADM-588 |
 | Who uses it | venue staff holding `PAYMENT_PROVIDER_MANAGE`, `PAYMENT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Select; Terminal Receipt Configuration) and no display directory — it is settings, not a population |

@@ -582,7 +582,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "BO-344"
+    "BO-344",
+    "BO-103"
    ],
    "exitTo": [
     "BO-344"
@@ -613,6 +614,23 @@
      "name": "contentBody",
      "slot": "fields",
      "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Load the design as saved",
+       "operation": "getPdfPrintablePos",
+       "bindsTo": "PdfPrintablePosTicketDesignerView",
+       "columns": [
+        "PdfPrintablePosTicketDesignerView.outputFormat",
+        "PdfPrintablePosTicketDesignerView.pageSize",
+        "PdfPrintablePosTicketDesignerView.orientation",
+        "PdfPrintablePosTicketDesignerView.margins",
+        "PdfPrintablePosTicketDesignerView.header",
+        "PdfPrintablePosTicketDesignerView.footer",
+        "PdfPrintablePosTicketDesignerView.qrBarcode",
+        "PdfPrintablePosTicketDesignerView.paperStockType"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
       {
        "kind": "selectField",
        "label": "Orientation",
@@ -775,6 +793,13 @@
     "contract": "access",
     "purpose": "PDF, Printable & POS Ticket Designer",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getPdfPrintablePos",
+    "contract": "access",
+    "purpose": "Load the design as saved",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "wireframe": {

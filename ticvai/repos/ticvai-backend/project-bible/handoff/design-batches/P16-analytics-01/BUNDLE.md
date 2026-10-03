@@ -149,7 +149,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
-| Module | Analytics · wave 3 · needs the `analytics` module |
+| Module | Analytics · wave 1 · needs the `analytics` module |
 | Block | Block D · task APP-ANALYTICS-ANL-001 |
 | Who uses it | venue staff holding `AI_USE`, `REPORT_VIEW_VENUE` (2 operate) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
@@ -329,6 +329,9 @@ Errors to draw in the form: 400 Required parameter missing, or the date range ex
 - → `ANL-017` Customer, Membership & Loyalty Pulse: *Customer, Membership & Loyalty Pulse*; carries `dashboardId`
 - → `ANL-018` Alerts & Exception Center: *Alerts & Exception Center*
 - → `ANL-019` AI Management Insights: *AI Management Insights*; carries `insightId`
+- → `ANL-023` Drag-and-Drop Dashboard Canvas: *Opens Drag-and-Drop Dashboard Canvas*; carries `dashboardId`, `reportId`
+- → `ANL-025` KPI Builder: *Opens KPI Builder*
+- → `ANL-066` Semantic Model & Business Data Catalogue: *Opens Semantic Model & Business Data Catalogue*
 
 #### States
 
@@ -437,7 +440,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (17 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-001?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Request suggestion, Run report.
-- [ ] Every transition is wired: `ANL-020`, `ANL-061`, `ANL-021`, `ANL-031`, `ANL-041`, `ANL-051`, `ANL-002`, `ANL-003`, `ANL-004`, `ANL-005`, `ANL-006`, `ANL-007`, `ANL-008`, `ANL-009`, `ANL-010`, `ANL-012`, `ANL-013`, `ANL-014`, `ANL-015`, `ANL-016`, `ANL-017`, `ANL-018`, `ANL-019`.
+- [ ] Every transition is wired: `ANL-020`, `ANL-061`, `ANL-021`, `ANL-031`, `ANL-041`, `ANL-051`, `ANL-002`, `ANL-003`, `ANL-004`, `ANL-005`, `ANL-006`, `ANL-007`, `ANL-008`, `ANL-009`, `ANL-010`, `ANL-012`, `ANL-013`, `ANL-014`, `ANL-015`, `ANL-016`, `ANL-017`, `ANL-018`, `ANL-019`, `ANL-023`, `ANL-025`, `ANL-066`.
 - [ ] Every gated control is gated: `AI_USE`, `REPORT_VIEW_VENUE`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 4 edge case(s) from the process notes are drawn.

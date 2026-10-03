@@ -43,11 +43,11 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: MarketingService
-  operationCalls: 60
+  operationCalls: 61
 - service: OrderService
-  operationCalls: 55
+  operationCalls: 56
 - service: CatalogueService
-  operationCalls: 43
+  operationCalls: 44
 - service: VenueOpsService
   operationCalls: 38
 - service: WhiteLabelService
@@ -55,9 +55,9 @@ servicesCalled:
 - service: IdentityService
   operationCalls: 23
 - service: FnbService
-  operationCalls: 17
+  operationCalls: 19
 - service: AccessService
-  operationCalls: 11
+  operationCalls: 12
 - service: AiService
   operationCalls: 11
 - service: WalletService
@@ -240,6 +240,7 @@ screens:
   wave: 1
   density: compact
   operations:
+  - addCartLine
   - evaluatePromotions
   - getPublishedBookingFlow
   - getPublishedGuidedChoice
@@ -257,6 +258,7 @@ screens:
   entryParams:
   - productId<-WEB-004
   - venueId<-session
+  - cartId<-navigation
   goesTo:
   - WEB-001
   - WEB-006
@@ -459,6 +461,7 @@ screens:
   wave: 1
   density: compact
   operations:
+  - extendSeatHold
   - getCart
   - getMyProfile
   - getPublishedBookingFlow
@@ -477,6 +480,7 @@ screens:
   - subjectId<-session
   - cartId<-session
   - venueId<-session
+  - holdId<-navigation
   goesTo:
   - WEB-001
   - WEB-010
@@ -1117,6 +1121,7 @@ screens:
   - getReservation
   - getResourceAvailability
   - listGroupPackages
+  - listMyTableReservations
   - listReservations
   - requestGroupBooking
   - updateTableReservation
@@ -1266,6 +1271,7 @@ screens:
   - listDeliveryLocations
   - listDiningOutlets
   - listFulfilmentSlots
+  - listMyTableReservations
   - updateTableReservation
   states:
   - emptyFirstRun
@@ -1400,6 +1406,7 @@ screens:
   density: compact
   operations:
   - addCartLine
+  - getParkingEntitlement
   - listParkingFacilities
   - updateParkingEntitlement
   states:
@@ -1489,6 +1496,7 @@ screens:
   density: compact
   operations:
   - createAiConversation
+  - getGuestConversation
   - getGuestMenu
   - handoverToAgent
   - listAiConversations

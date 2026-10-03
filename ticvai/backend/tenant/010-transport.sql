@@ -50,7 +50,8 @@ CREATE TABLE IF NOT EXISTS transport.fare_table (
     per_stop_fare                     numeric(18,4),
     effective_from                    timestamptz NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL,
-    route_id                          uuid NOT NULL
+    route_id                          uuid NOT NULL,
+    effective_to                      timestamptz
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing

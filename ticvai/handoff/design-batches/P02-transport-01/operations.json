@@ -76,6 +76,19 @@
   "requestBody": null,
   "responds": "DepartureOffer"
  },
+ "getTransportDeparture": {
+  "method": "GET",
+  "path": "/transport/departures/{departureId}",
+  "contract": "transport",
+  "summary": "One departure, as a guest books it",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "DepartureOffer"
+ },
  "getTransportFareTable": {
   "method": "GET",
   "path": "/transport/routes/{routeId}/fare-table",

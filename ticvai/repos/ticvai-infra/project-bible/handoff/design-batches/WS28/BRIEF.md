@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-274` | Group Booking Operations Command Center | B–D | 0 | 14 | 6 | 0 | 2 | 6 | — | notStarted (generated) |
-| `BO-275` | Group Operational Planning & Task Workspace | B–D | 18 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-276` | Participants, Guest Lists & Group Structure | B–D | 8 | 6 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-277` | Group Payment, Deposit & Balance Management | B–D | 5 | 16 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-278` | Group Ticket, Seat & Entitlement Allocation | B–D | 8 | 16 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `BO-279` | Group Ticket Fulfillment & Distribution | B–D | 3 | 16 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-280` | Group Arrival, Check-In & Admission Operations | B–D | 6 | 20 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-281` | Group Amendments, Cancellation & Refund Operations | B–D | 0 | 0 | 6 | 9 | 0 | 6 | — | notStarted (generated) |
-| `BO-282` | Group Booking Reconciliation, Closure & Performance | B–D | 0 | 12 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
-| `BO-283` | Group Sales Analytics & AI Intelligence Center | B–D | 2 | 28 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-274` | Group Booking Operations Command Center | C | 0 | 14 | 6 | 0 | 2 | 6 | — | notStarted (generated) |
+| `BO-275` | Group Operational Planning & Task Workspace | C | 18 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-276` | Participants, Guest Lists & Group Structure | C | 8 | 6 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-277` | Group Payment, Deposit & Balance Management | C | 5 | 16 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-278` | Group Ticket, Seat & Entitlement Allocation | C | 8 | 16 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `BO-279` | Group Ticket Fulfillment & Distribution | C | 3 | 16 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-280` | Group Arrival, Check-In & Admission Operations | C | 6 | 20 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-281` | Group Amendments, Cancellation & Refund Operations | C | 0 | 0 | 6 | 9 | 0 | 6 | — | notStarted (generated) |
+| `BO-282` | Group Booking Reconciliation, Closure & Performance | C | 0 | 12 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `BO-283` | Group Sales Analytics & AI Intelligence Center | C | 2 | 28 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

@@ -2135,6 +2135,19 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "cardList",
+       "label": "Load the outlet's course rules as saved",
+       "operation": "getCourseRules",
+       "bindsTo": "CourseRules",
+       "columns": [
+        "CourseRules.defaultCoursing",
+        "CourseRules.courseNames",
+        "CourseRules.autoFireMinutes",
+        "CourseRules.serviceModeOverrides"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
+      {
        "kind": "searchField",
        "label": "Search f",
        "provenance": "carried from the previous definition"
@@ -2203,6 +2216,13 @@
     "purpose": "How each outlet courses by default",
     "trigger": "onAction",
     "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
+   },
+   {
+    "operationId": "getCourseRules",
+    "contract": "fnb",
+    "purpose": "Load the outlet's course rules as saved",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "entryState": {

@@ -1,4 +1,4 @@
--- orders — 80 tables
+-- orders — 82 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 33 columns. No description has been written for this table — the name is the only thing
@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS orders.after_sale_request (
 
 -- A partner’s credit line, drawn against and settled periodically
 CREATE TABLE IF NOT EXISTS orders.b2b_credit (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     account_id                        uuid NOT NULL,
     account_name                      text,
     credit_limit                      numeric(18,4) NOT NULL,
@@ -155,10 +155,10 @@ CREATE TABLE IF NOT EXISTS orders.cart_line (
 );
 
 -- a denomination and a count from a blind till count Hangs off: reaches orders.sales_order through
--- its keys; references orders.cash_movement, orders.deposit_box, orders.pos_shift. Reached by: 5
--- operations read it and 4 write it.
+-- its keys; references orders.cash_movement, orders.deposit_box, orders.pos_shift. Reached by: 7
+-- operations read it and 5 write it.
 CREATE TABLE IF NOT EXISTS orders.cash_count_line (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     shift_id                          uuid NOT NULL,
     deposit_box_id                    uuid,
     count_kind                        text CONSTRAINT cash_count_line_count_kind_chk CHECK (count_kind IN ('openingFloat', 'close', 'movement')),
@@ -248,7 +248,7 @@ CREATE TABLE IF NOT EXISTS orders.credit_override (
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS orders.deposit (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     order_id                          uuid NOT NULL,
     customer_id                       uuid,
     rental_agreement_id               uuid,
@@ -271,7 +271,7 @@ CREATE TABLE IF NOT EXISTS orders.deposit (
 -- orders.sales_order through its keys; references identity.principal, orders.pos_shift,
 -- platform.scope. Reached by: 5 operations read it
 CREATE TABLE IF NOT EXISTS orders.deposit_box (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     cashier_principal_id              uuid NOT NULL,
     cashier_name                      text,
     venue_id                          uuid NOT NULL,
@@ -312,7 +312,7 @@ CREATE TABLE IF NOT EXISTS orders.deposit_box_opening_denomination (
 -- What a deposit booking takes now and when the balance is due, with the refund cut-off. Parties
 -- and some dining bookings; nothing said how much or when before this
 CREATE TABLE IF NOT EXISTS orders.deposit_policy (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     applies_to                        text[],
     dining                            jsonb,
     basis                             text NOT NULL CONSTRAINT deposit_policy_basis_chk CHECK (basis IN ('fixedPerBooking', 'fixedPerGuest', 'percentOfTotal', 'perBand')),
@@ -328,7 +328,7 @@ CREATE TABLE IF NOT EXISTS orders.deposit_policy (
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS orders.discount (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     order_id                          uuid NOT NULL,
     promotion_id                      uuid,
     coupon_code                       text CONSTRAINT discount_coupon_code_chk CHECK (char_length(coupon_code) <= 100),
@@ -639,6 +639,15 @@ CREATE TABLE IF NOT EXISTS orders.group_visit_plan (
     updated_at                        timestamptz
 );
 
+CREATE TABLE IF NOT EXISTS orders.guest_credit_account (
+    id                                uuid PRIMARY KEY NOT NULL,
+    subject_id                        uuid NOT NULL,
+    credit_limit                      numeric(18,4) NOT NULL,
+    settlement_days_before_visit      integer,
+    requires_approval                 boolean NOT NULL,
+    status                            text NOT NULL CONSTRAINT guest_credit_account_status_chk CHECK (status IN ('pendingApproval', 'active'))
+);
+
 -- A complimentary entitlement issued outside the order path (8.1.3–8.1.5). No payment is expected,
 -- so nothing waits for one. Hangs off: reaches orders.sales_order through its keys; references
 -- catalogue.performance, catalogue.product, identity.principal. Reached by: 2 operations read it
@@ -662,7 +671,7 @@ CREATE TABLE IF NOT EXISTS orders.invitation (
 -- venue gives away a season. Hangs off: reaches orders.sales_order through its keys; references
 -- identity.principal, identity.role. Reached by: 2 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS orders.invitation_allowance (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     principal_id                      uuid NOT NULL,
     role_id                           uuid,
     period_kind                       text NOT NULL CONSTRAINT invitation_allowance_period_kind_chk CHECK (period_kind IN ('perPerformance', 'monthly', 'quarterly', 'annual', 'unlimited')),
@@ -723,7 +732,7 @@ CREATE TABLE IF NOT EXISTS orders.membership_migration (
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS orders.membership_renewal (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     customer_membership_id            uuid NOT NULL,
     entitlement_template_id           uuid NOT NULL,
     order_id                          uuid,
@@ -774,7 +783,7 @@ CREATE TABLE IF NOT EXISTS orders.order_event (
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS orders.order_fee (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     order_id                          uuid NOT NULL,
     rule_id                           uuid,
     payment_method_id                 uuid,
@@ -913,7 +922,7 @@ CREATE TABLE IF NOT EXISTS orders.payment_allocation_rule (
 -- a guest holding one is anonymous, and a phone booking is exactly the case where they have not
 -- registered. The expiry releases the hold, not just the link. Hangs off: reaches
 -- orders.sales_order through its keys; references identity.principal, orders.reservation,
--- orders.sales_order. Reached by: 9 operati
+-- orders.sales_order. Reached by: 10 operat
 CREATE TABLE IF NOT EXISTS orders.payment_link (
     id                                uuid PRIMARY KEY NOT NULL,
     order_id                          uuid NOT NULL,
@@ -958,6 +967,8 @@ CREATE TABLE IF NOT EXISTS orders.pos_shift (
     expected_cash_amount              numeric(18,4),
     counted_cash_amount               numeric(18,4),
     variance_amount                   numeric(18,4),
+    cashier_reason                    text CONSTRAINT pos_shift_cashier_reason_chk CHECK (cashier_reason IN ('tillError', 'unrecordedRefund', 'miscount', 'other')),
+    cashier_note                      text CONSTRAINT pos_shift_cashier_note_chk CHECK (char_length(cashier_note) <= 1000),
     held_lease_count                  integer,
     opened_at                         timestamptz NOT NULL,
     recorded_at                       timestamptz,
@@ -965,6 +976,10 @@ CREATE TABLE IF NOT EXISTS orders.pos_shift (
     suspend_reason                    text CONSTRAINT pos_shift_suspend_reason_chk CHECK (char_length(suspend_reason) <= 200),
     closed_at                         timestamptz,
     closed_by_principal_id            uuid,
+    recount_requested_at              timestamptz,
+    recount_requested_by_principal_id uuid,
+    recount_reason                    text CONSTRAINT pos_shift_recount_reason_chk CHECK (char_length(recount_reason) <= 500),
+    count_number                      integer,
     synced_at                         timestamptz
 );
 
@@ -999,6 +1014,8 @@ CREATE TABLE IF NOT EXISTS orders.refund (
     tax_reversal_entry_id             uuid,
     settle_to                         text DEFAULT 'originalTender' CONSTRAINT refund_settle_to_chk CHECK (settle_to IN ('originalTender', 'advanceBalance', 'wireTransfer', 'storeCredit')),
     fx_variance                       numeric(18,4),
+    tender_currency                   text,
+    tender_amount                     numeric(18,4),
     amount                            numeric(18,4) NOT NULL,
     applied_percentage                numeric(18,4),
     status                            text NOT NULL CONSTRAINT refund_status_chk CHECK (status IN ('pendingApproval', 'pendingGateway', 'completed', 'declined', 'failed')),
@@ -1034,7 +1051,7 @@ CREATE TABLE IF NOT EXISTS orders.refund_batch (
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS orders.refund_calculation_policy (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     refund_types                      text[] NOT NULL,
     refund_destinations               text[] NOT NULL,
     percentage                        numeric(18,4),
@@ -1045,7 +1062,7 @@ CREATE TABLE IF NOT EXISTS orders.refund_calculation_policy (
 
 -- When a refund is allowed and what it costs. Scoped, so a venue may be stricter than its tenant
 CREATE TABLE IF NOT EXISTS orders.refund_policy (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     venue_id                          uuid NOT NULL,
     self_authorise_limit              numeric(18,4) NOT NULL,
     requires_second_user_above        numeric(18,4),
@@ -1098,7 +1115,7 @@ CREATE TABLE IF NOT EXISTS orders.resale_eligibility_rule (
 -- reason. The listing keeps its columns as the snapshot — the same rule-and-record split
 -- payments.fee_rule and orders.order_fee already u
 CREATE TABLE IF NOT EXISTS orders.resale_fee_policy (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     event_id                          uuid,
     product_id                        uuid,
     seller_fee_percent                numeric(18,4) NOT NULL,
@@ -1283,6 +1300,11 @@ CREATE TABLE IF NOT EXISTS orders.sales_order (
     tax_amount                        numeric(18,4) NOT NULL,
     net_amount                        numeric(18,4) NOT NULL,
     refunded_amount                   numeric(18,4),
+    charge_currency                   text,
+    charge_fx_rate                    numeric(18,6),
+    charge_fx_rate_id                 uuid,
+    charge_total                      numeric(18,4),
+    charge_rate_locked_until          timestamptz,
     total_price_variance              numeric(18,4),
     principal_id                      uuid,
     workstation_id                    uuid,
@@ -1370,10 +1392,26 @@ CREATE TABLE IF NOT EXISTS orders.ticket_transfer (
     expires_at                        timestamptz NOT NULL
 );
 
+-- Holds 11 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS orders.till_shift_policy (
+    id                                uuid PRIMARY KEY NOT NULL,
+    venue_id                          uuid NOT NULL,
+    scope_path                        ltree NOT NULL,
+    require_open_approval             boolean DEFAULT false,
+    opening_float_tolerance           numeric(18,4),
+    is_deposit_box_required           boolean DEFAULT true,
+    is_bag_number_required            boolean DEFAULT false,
+    require_close_approval            boolean DEFAULT false,
+    auto_close_after_hours            integer DEFAULT 14,
+    no_sale_alert_count               integer DEFAULT 10,
+    updated_at                        timestamptz
+);
+
 -- Holds 15 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS orders.upgrade (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     number                            text NOT NULL CONSTRAINT upgrade_number_chk CHECK (char_length(number) <= 50),
     order_id                          uuid NOT NULL,
     original_order_line_id            uuid NOT NULL,
@@ -1447,7 +1485,7 @@ CREATE TABLE IF NOT EXISTS orders.upgrade_rule (
 -- channels; the sender skips any channel the guest has since withdrawn consent for, because a
 -- reminder is not a reason to message somebody who said no
 CREATE TABLE IF NOT EXISTS orders.visit_reminder (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     order_id                          uuid,
     subject_id                        uuid,
     is_enabled                        boolean NOT NULL,

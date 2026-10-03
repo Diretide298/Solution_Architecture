@@ -7,15 +7,15 @@
  "audience": "guest",
  "formFactor": "mobileApp",
  "offlineCapable": true,
- "generated": "2026-10-03",
+ "generated": "2026-10-04",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 77,
-  "operations": 214,
+  "operations": 218,
   "contracts": 19,
   "modules": 17,
   "undrawn": 0,
-  "operationsWithNoScreen": 18
+  "operationsWithNoScreen": 16
  },
  "waves": {
   "wave1": 77
@@ -144,11 +144,11 @@
  "contracts": [
   {
    "contract": "marketing-crm",
-   "operations": 39
+   "operations": 40
   },
   {
    "contract": "orders",
-   "operations": 35
+   "operations": 36
   },
   {
    "contract": "identity",
@@ -164,11 +164,11 @@
   },
   {
    "contract": "transport",
-   "operations": 12
+   "operations": 13
   },
   {
    "contract": "access",
-   "operations": 11
+   "operations": 12
   },
   {
    "contract": "wallet",
@@ -199,11 +199,7 @@
    "operations": 5
   },
   {
-   "contract": "promotions",
-   "operations": 4
-  },
-  {
-   "contract": "payments",
+   "contract": "seating",
    "operations": 4
   },
   {
@@ -211,7 +207,11 @@
    "operations": 4
   },
   {
-   "contract": "seating",
+   "contract": "payments",
+   "operations": 4
+  },
+  {
+   "contract": "promotions",
    "operations": 4
   },
   {
@@ -460,7 +460,7 @@
    "module": "In-venue Services",
    "wave": 1,
    "route": "/general/parking-reserve-and-pay",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -496,7 +496,7 @@
    "module": "Engagement & Support",
    "wave": 1,
    "route": "/general/ai-concierge-home",
-   "operations": 8,
+   "operations": 9,
    "drawn": true
   },
   {
@@ -505,7 +505,7 @@
    "module": "Engagement & Support",
    "wave": 1,
    "route": "/general/ai-concierge-chat",
-   "operations": 9,
+   "operations": 10,
    "drawn": true
   },
   {
@@ -514,7 +514,7 @@
    "module": "Engagement & Support",
    "wave": 1,
    "route": "/general/ai-concierge-contextual-help",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -622,7 +622,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/general/ticket-delivery-and-sharing",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -649,7 +649,7 @@
    "module": "Booking & Selection",
    "wave": 1,
    "route": "/general/upsell-cross-sell",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -802,7 +802,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/account/refunds-resale",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -892,7 +892,7 @@
    "module": "Transport",
    "wave": 1,
    "route": "/transport/route-and-passengers",
-   "operations": 6,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -983,22 +983,10 @@
     "summary": "Use the existing profile or keep this booking separate"
    },
    {
-    "operation": "getGuestConversation",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "The guest's own handed-over conversation, with the agent's replies and the queue position"
-   },
-   {
     "operation": "uploadGuestDocument",
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Store a guest photo, ID or signed document"
-   },
-   {
-    "operation": "listTicketTransfers",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "The ticket transfers this guest sent or received"
    },
    {
     "operation": "revokeEntitlementShare",

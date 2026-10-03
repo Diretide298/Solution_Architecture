@@ -184,16 +184,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-764` | Campaign Command Center | B–D | 0 | 0 | 6 | 2 | 1 | 6 | — | notStarted (—) |
-| `BO-765` | Campaign Library & Calendar | B–D | 0 | 7 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-764` | Campaign Command Center | D | 0 | 0 | 6 | 2 | 1 | 6 | — | notStarted (—) |
+| `BO-765` | Campaign Library & Calendar | C | 0 | 7 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-766` | Campaign Builder | A | 44 | 0 | 6 | 21 | 0 | 6 | — | notStarted (—) |
-| `BO-767` | Audience & Offer Selection | B–D | 0 | 0 | 6 | 7 | 1 | 0 | — | notStarted (—) |
-| `BO-768` | Multichannel Composer | B–D | 0 | 14 | 6 | 2 | 0 | 0 | — | notStarted (—) |
-| `BO-769` | Schedule & Trigger Rules | B–D | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
-| `BO-770` | Campaign Approval Workflow | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-771` | Budget, Goals & Forecast | B–D | 0 | 0 | 6 | 7 | 1 | 0 | — | notStarted (—) |
+| `BO-767` | Audience & Offer Selection | D | 0 | 0 | 6 | 7 | 1 | 0 | — | notStarted (—) |
+| `BO-768` | Multichannel Composer | D | 0 | 14 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `BO-769` | Schedule & Trigger Rules | D | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `BO-770` | Campaign Approval Workflow | C | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-771` | Budget, Goals & Forecast | B | 0 | 0 | 6 | 7 | 1 | 0 | — | notStarted (—) |
 | `BO-772` | A/B & AI Optimization | A | 0 | 0 | 6 | 26 | 0 | 0 | — | notStarted (—) |
-| `BO-773` | Attribution & Audit | B–D | 0 | 0 | 6 | 6 | 1 | 0 | — | notStarted (—) |
+| `BO-773` | Attribution & Audit | D | 0 | 0 | 6 | 6 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

@@ -63,6 +63,23 @@
      "slot": "fields",
      "components": [
       {
+       "kind": "detailPanel",
+       "label": "Load the tax profile and jurisdiction as saved",
+       "operation": "getTaxProfileJurisdiction",
+       "bindsTo": "TaxProfileJurisdictionConfigurationView",
+       "columns": [
+        "TaxProfileJurisdictionConfigurationView.taxProfileName",
+        "TaxProfileJurisdictionConfigurationView.taxProfileCode",
+        "TaxProfileJurisdictionConfigurationView.country",
+        "TaxProfileJurisdictionConfigurationView.taxRegistrationNumber",
+        "TaxProfileJurisdictionConfigurationView.status",
+        "TaxProfileJurisdictionConfigurationView.ratePercent",
+        "TaxProfileJurisdictionConfigurationView.consumingProductCount",
+        "TaxProfileJurisdictionConfigurationView.consumingVenueCount"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
+      {
        "kind": "selectField",
        "label": "Tax Profile Name",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Configure"
@@ -218,6 +235,13 @@
     "purpose": "Configure the e-invoicing provider",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getTaxProfileJurisdiction",
+    "contract": "catalogue",
+    "purpose": "Load the tax profile and jurisdiction as saved",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "wireframe": {

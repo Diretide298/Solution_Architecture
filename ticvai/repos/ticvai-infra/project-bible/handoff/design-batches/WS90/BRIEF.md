@@ -158,16 +158,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-514` | Availability Command Center | B–D | 2 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-515` | Availability Rule Configuration | B–D | 10 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-516` | Operating Hours & Rental Windows | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-517` | Timeslot & Duration Availability Setup | B–D | 7 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-518` | Real-Time Availability Calendar | B–D | 0 | 3 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `BO-519` | Resource / Equipment Calendar | B–D | 5 | 25 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `BO-520` | Blackout, Closure & Capacity Blocking | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-521` | Overlap & Conflict Engine | B–D | 5 | 14 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-522` | Inventory Holds, Buffers & Release Rules | B–D | 0 | 0 | 6 | 0 | 1 | 4 | — | notStarted (—) |
-| `BO-523` | Availability Intelligence & AI Forecasting | B–D | 0 | 16 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-514` | Availability Command Center | D | 2 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-515` | Availability Rule Configuration | D | 10 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-516` | Operating Hours & Rental Windows | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-517` | Timeslot & Duration Availability Setup | D | 7 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-518` | Real-Time Availability Calendar | C | 0 | 3 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `BO-519` | Resource / Equipment Calendar | D | 5 | 25 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `BO-520` | Blackout, Closure & Capacity Blocking | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-521` | Overlap & Conflict Engine | D | 5 | 14 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-522` | Inventory Holds, Buffers & Release Rules | D | 0 | 0 | 6 | 0 | 1 | 4 | — | notStarted (—) |
+| `BO-523` | Availability Intelligence & AI Forecasting | D | 0 | 16 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

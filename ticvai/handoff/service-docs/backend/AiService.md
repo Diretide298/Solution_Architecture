@@ -41,7 +41,7 @@
 | ai | [`setSuggestionProvider`](#setsuggestionprovider) | PUT | `/ai/suggestion-providers` | setup | 1 |  |
 | ai | [`testAiProvider`](#testaiprovider) | POST | `/ai-providers/{providerId}/test` | core | 1 | ADM-037 |
 | assist | [`createAiConversation`](#createaiconversation) | POST | `/conversations` | core | 1 | BO-928, BO-932, CMS-104, EMP-019, EMP-020, GST-031 … |
-| assist | [`listAiConversations`](#listaiconversations) | GET | `/conversations` | core | 1 | BO-932, EMP-019, EMP-020, GST-031, GST-068, WEB-044 |
+| assist | [`listAiConversations`](#listaiconversations) | GET | `/conversations` | core | 1 | BO-932, EMP-019, EMP-020, GST-031, GST-033, GST-068 … |
 | assist | [`sendAiMessage`](#sendaimessage) | POST | `/conversations/{conversationId}/messages` | core | 1 | ADM-533, BO-928, BO-929, BO-932, CMS-104, EMP-019 … |
 | config | [`getAiByokEnablement`](#getaibyokenablement) | GET | `/tenants/{tenantId}/byok` | core | 1 | ADM-037, BO-091 |
 | config | [`getAiPolicy`](#getaipolicy) | GET | `/policy` | core | 1 | BO-091 |
@@ -268,6 +268,8 @@ BL-071, 2.6.34. **`setLanguages` already measures the gap** — `translationGaps
 **It does not parse the drawing.** Extraction is deterministic and lives in `venue-map`, carrying the four defects CF-122 found on the seat importer. **Two failure modes kept apart** — a mis-parsed layer and a bad suggestion look identical if one operation does both, and *"the map is wrong"* is then unactionable.
 **Lives here rather than in `venue-map` because it calls a model.** ADR-0020: only the AI contract writes AI tables, and the boundary caught `venue-map` trying to write `ai.proposed_action` on the day it was drafted.
 Proposes and stops. `venue-map.acceptVenueLabelProposals` is the human half.
+
+**Scanned text is a hint** (Chinmay, 3 October 2026, r1 additions: a PDF with an OCR step). Where the import read text off a scanned page (`venue-map.VenueMapImportJob.ocr`), the blocks near a shape ("WC", "First Aid", a ride's name in Arabic or English) inform the proposed kind and name, and the proposal says which text it used (`ocrHint`) so the operator can see why. Text alone never creates a point and never raises a proposal above what the shape supports.
 
 |  |  |
 |---|---|
@@ -574,7 +576,7 @@ Scoped to a module and a role, because the same question means different things 
 | Read routing | replica |
 | Reads | `ai.conversation` |
 | Writes | - |
-| Called by | BO-932, EMP-019, EMP-020, GST-031, GST-068, WEB-044 |
+| Called by | BO-932, EMP-019, EMP-020, GST-031, GST-033, GST-068, WEB-044 |
 
 **Parameters**
 
@@ -614,7 +616,7 @@ Scoped to a module and a role, because the same question means different things 
 Retrieval runs **as the calling principal**. The assistant can see exactly what that person could have read directly and nothing more — no service account, no elevated query. This is the difference between an assistant and a privilege escalation with a friendly interface.
 Every response carries a trace id, the model and provider that produced it, token counts and its sources. Not for the user's benefit: for cost attribution and for the grounding audit that 8.3.70 requires.
 **Where the answer proposes an action, it is a draft.** The response carries a `proposedAction` the caller may apply through the owning contract, and applying it is a separate, permissioned, audited step (8.3.61–8.3.64).
-**Every message is scrubbed before it leaves the cell** (Chinmay, 2 October; ADR-0020 amended; CHG-CSA-003): the offline scrubber replaces personal data with reversible placeholders, the guard model checks the input and the reply, and the reply is re-filled in the cell (`AiPolicy.scrubbing`). It applies whatever the tenant's residency class. With the scrubber or the guard down the call is refused `503 scrubber-unavailable`, never sent raw; a message or reply the guard blocks is refused `422 guard-refused`.
+**Every message is scrubbed before it leaves the cell** (Chinmay, 2 October; ADR-0020 amended; CHG-CSA-003): the offline scrubber replaces personal data with reversible placeholders, the guard checks the input and the reply, and the reply is re-filled in the cell (`AiPolicy.scrubbing`). It applies whatever the tenant's residency class. **The guard is the provider's content-safety service, not a model we host** (Chinmay, 3 October: "We are not hosting anything unless client asks it"; CHG-R1S-002): Azure AI Content Safety in UAE North for `uaeOnly`, the provider's own moderation for BYOK and `globalAllowed`. The Presidio scrubber stays a CPU library inside our worker. With the scrubber or the safety service down the call is refused `503 scrubber-unavailable`, never sent raw; a message or reply the guard blocks is refused `422 guard-refused`.
 
 **The answer streams** (Chinmay, 3 October 2026, Block A business rules: "stream answers"; CHG-RUL-002). A client that sends `Accept: text/event-stream` gets server-sent events in this order: `token` events carrying the answer text as it is produced (`{delta}`), then one `sources` event (`AiSourceList`), then a `proposedAction` event only where the answer proposes one (`ProposedAction`, still a draft), then `done` carrying the stored `AiMessage`, the same body the JSON answer returns. **What is stored does not change**: the full message is written once, when the answer is complete, and `done` and the JSON answer are that row. Text reaches the client only after the cell has re-filled the scrubber's placeholders and the guard has passed it, so the stream is released in short checked runs rather than raw tokens; where the guard blocks the reply part-way, an `error` event (`Problem`, `guard-refused`) ends the stream, the client discards the partial text, and nothing is stored as the answer. Refusals found before the first token (429, 503, 422) are ordinary HTTP answers, never a stream. A client that sends `Accept: application/json` (or no `Accept`) gets the whole `AiMessage` as before; clients built at r1 are unchanged.
 
@@ -695,7 +697,7 @@ Every response carries a trace id, the model and provider that produced it, toke
 | 200 |  | Answered. |
 | 429 |  | Usage limit reached (8.3.76). |
 | 503 |  | Every configured provider failed. |
-| 422 |  | The guard model blocked the message or the reply (guard-refused, CHG-CSA-003). |
+| 422 |  | The guard (the provider''s content-safety service, CHG-R1S-002) blocked the message or the reply (guard-refused, CHG-CSA-003). |
 
 
 ## Group: config
@@ -796,9 +798,15 @@ Read by ADM-037 beside the tenant's providers, and by the tenant's own staff wit
 | requiresApprovalFor | array of enum (pricing, promotion, operational, financial, configuration) |  | 8.3.61–8.3.64. |
 | scrubbing | object |  | Mandatory offline PII scrubbing and moderation on every LLM call (Chinmay, 2 October: "we may need to scrub personal info no matter what"; ADR-0020 amended; CHG-CSA-003). (read-only) |
 | scrubbing.mode | enum (mandatory) |  |  |
+| scrubbing.scrubberVersion | string |  | The pinned Presidio release (and recogniser set) in force, e.g. (read-only) |
+| scrubbing.residualPatternCheck | array of enum (emiratesId, uaePhone, cardPan, iban, email) |  | The deterministic patterns run after Presidio; a match blocks the call (fail closed, 503 scrubber-unavailable). (read-only) |
 | scrubbing.recognisers | array of string |  | The recogniser set in force, e.g. |
 | scrubbing.reversibleTokens | boolean |  | Always true; the placeholder map stays in the cell. |
-| scrubbing.guardModel | string |  | The input and output guard model in force, e.g. |
+| scrubbing.guardModel | string |  | The input and output guard in force, e.g. |
+| globalEndpointExclusions | object |  | What never goes to a global endpoint (3 October 2026, CHG-R1S-016; the legal research docs/active/research/openai-key-uae-3-october.md, item 6). (read-only) |
+| globalEndpointExclusions.fieldCategories | array of enum (allergy, accessibility, familyAndChildren, health, biometric, religion, payment) |  | Allergy, accessibility and family or children data in F&B and booking prompts, and health, biometric, religion and payment data anywhere. |
+| globalEndpointExclusions.fields | array of string |  | The schema fields held under those categories, e.g. |
+| globalEndpointExclusions.blockedMedia | array of enum (image, audio, file) |  | Images, audio and files are never sent to a global endpoint. |
 | monthlyTokenCeiling | integer |  | (nullable) |
 | ceilingBehaviour | enum (warn, warnThenDisable, block) |  | Decided 17 August: warn, and let the venue manager choose. (default warn) |
 | ceilingBehaviourByCapability | array of object |  | Ceiling behaviour per capability (AI design 5.9, AIC-227), so a budget never silently disables fraud scoring, which spends no tokens, or a critical capability. |
@@ -989,9 +997,15 @@ Masking is the part to get right. `maskedFields` names what is redacted before a
 | requiresApprovalFor | array of enum (pricing, promotion, operational, financial, configuration) |  | 8.3.61–8.3.64. |
 | scrubbing | object |  | Mandatory offline PII scrubbing and moderation on every LLM call (Chinmay, 2 October: "we may need to scrub personal info no matter what"; ADR-0020 amended; CHG-CSA-003). (read-only) |
 | scrubbing.mode | enum (mandatory) |  |  |
+| scrubbing.scrubberVersion | string |  | The pinned Presidio release (and recogniser set) in force, e.g. (read-only) |
+| scrubbing.residualPatternCheck | array of enum (emiratesId, uaePhone, cardPan, iban, email) |  | The deterministic patterns run after Presidio; a match blocks the call (fail closed, 503 scrubber-unavailable). (read-only) |
 | scrubbing.recognisers | array of string |  | The recogniser set in force, e.g. |
 | scrubbing.reversibleTokens | boolean |  | Always true; the placeholder map stays in the cell. |
-| scrubbing.guardModel | string |  | The input and output guard model in force, e.g. |
+| scrubbing.guardModel | string |  | The input and output guard in force, e.g. |
+| globalEndpointExclusions | object |  | What never goes to a global endpoint (3 October 2026, CHG-R1S-016; the legal research docs/active/research/openai-key-uae-3-october.md, item 6). (read-only) |
+| globalEndpointExclusions.fieldCategories | array of enum (allergy, accessibility, familyAndChildren, health, biometric, religion, payment) |  | Allergy, accessibility and family or children data in F&B and booking prompts, and health, biometric, religion and payment data anywhere. |
+| globalEndpointExclusions.fields | array of string |  | The schema fields held under those categories, e.g. |
+| globalEndpointExclusions.blockedMedia | array of enum (image, audio, file) |  | Images, audio and files are never sent to a global endpoint. |
 | monthlyTokenCeiling | integer |  | (nullable) |
 | ceilingBehaviour | enum (warn, warnThenDisable, block) |  | Decided 17 August: warn, and let the venue manager choose. (default warn) |
 | ceilingBehaviourByCapability | array of object |  | Ceiling behaviour per capability (AI design 5.9, AIC-227), so a budget never silently disables fraud scoring, which spends no tokens, or a critical capability. |
@@ -1041,9 +1055,15 @@ Masking is the part to get right. `maskedFields` names what is redacted before a
 | requiresApprovalFor | array of enum (pricing, promotion, operational, financial, configuration) |  | 8.3.61–8.3.64. |
 | scrubbing | object |  | Mandatory offline PII scrubbing and moderation on every LLM call (Chinmay, 2 October: "we may need to scrub personal info no matter what"; ADR-0020 amended; CHG-CSA-003). (read-only) |
 | scrubbing.mode | enum (mandatory) |  |  |
+| scrubbing.scrubberVersion | string |  | The pinned Presidio release (and recogniser set) in force, e.g. (read-only) |
+| scrubbing.residualPatternCheck | array of enum (emiratesId, uaePhone, cardPan, iban, email) |  | The deterministic patterns run after Presidio; a match blocks the call (fail closed, 503 scrubber-unavailable). (read-only) |
 | scrubbing.recognisers | array of string |  | The recogniser set in force, e.g. |
 | scrubbing.reversibleTokens | boolean |  | Always true; the placeholder map stays in the cell. |
-| scrubbing.guardModel | string |  | The input and output guard model in force, e.g. |
+| scrubbing.guardModel | string |  | The input and output guard in force, e.g. |
+| globalEndpointExclusions | object |  | What never goes to a global endpoint (3 October 2026, CHG-R1S-016; the legal research docs/active/research/openai-key-uae-3-october.md, item 6). (read-only) |
+| globalEndpointExclusions.fieldCategories | array of enum (allergy, accessibility, familyAndChildren, health, biometric, religion, payment) |  | Allergy, accessibility and family or children data in F&B and booking prompts, and health, biometric, religion and payment data anywhere. |
+| globalEndpointExclusions.fields | array of string |  | The schema fields held under those categories, e.g. |
+| globalEndpointExclusions.blockedMedia | array of enum (image, audio, file) |  | Images, audio and files are never sent to a global endpoint. |
 | monthlyTokenCeiling | integer |  | (nullable) |
 | ceilingBehaviour | enum (warn, warnThenDisable, block) |  | Decided 17 August: warn, and let the venue manager choose. (default warn) |
 | ceilingBehaviourByCapability | array of object |  | Ceiling behaviour per capability (AI design 5.9, AIC-227), so a budget never silently disables fraud scoring, which spends no tokens, or a critical capability. |
@@ -4572,6 +4592,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| scrub_audit | jsonb | no | The audit of one call's scrubbing and routing (3 October 2026, CHG-R1S-016; the legal research docs/active/research/openai-key-uae-3-october.md, item 9). |
 | id | uuid | yes |  |
 | conversation_id | uuid | no |  |
 | principal_id | uuid | yes |  |
@@ -5240,6 +5261,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | masked_fields | text[] | no | Redacted before a prompt leaves the platform (8.3.73). |
 | requires_approval_for | text[] | no | 8.3.61–8.3.64. |
 | scrubbing | jsonb | no | Mandatory offline PII scrubbing and moderation on every LLM call (Chinmay, 2 October: "we may need to scrub personal info no matter what"; ADR-0020 amended; CHG-CSA-003). |
+| global_endpoint_exclusions | jsonb | no | What never goes to a global endpoint (3 October 2026, CHG-R1S-016; the legal research docs/active/research/openai-key-uae-3-october.md, item 6). |
 | monthly_token_ceiling | integer | no |  |
 | ceiling_behaviour | text | no | Decided 17 August: warn, and let the venue manager choose. |
 | ceiling_behaviour_by_capability | jsonb | no | Ceiling behaviour per capability (AI design 5.9, AIC-227), so a budget never silently disables fraud scoring, which spends no tokens, or a critical capability. |
@@ -5327,6 +5349,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| is_stateless_only | boolean | no | True for every endpoint outside the UAE (3 October 2026, CHG-R1S-016; the legal research docs/active/research/openai-key-uae-3-october.md, item 8). |
 | id | uuid | yes | Assigned on create. |
 | kind | text | yes |  |
 | vendor | text | no | The provider company, any provider (Chinmay, 2 October, contract follow-ups: "As long as we get an API key it can be any model"; CHG-FUP-008), as a lower-case slug: mistral, cohere, core42, openai. |

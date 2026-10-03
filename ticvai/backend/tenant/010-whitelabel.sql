@@ -1,11 +1,11 @@
--- whitelabel — 25 tables
+-- whitelabel — 27 tables
 -- **Derived. Do not hand-edit.**
 
 -- An analytics platform a storefront or app reports to, per venue: which provider, its property or
 -- container id and which consent category gates it. The banner's consent-mode signals are what
 -- switch it on, so a provider with no category never loads
 CREATE TABLE IF NOT EXISTS whitelabel.analytics_provider (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     venue_id                          uuid,
     provider                          text NOT NULL CONSTRAINT analytics_provider_provider_chk CHECK (provider IN ('googleAnalytics4', 'googleTagManager', 'adobeAnalytics', 'metaPixel', 'matomo', 'other')),
     provider_label                    text CONSTRAINT analytics_provider_provider_label_chk CHECK (char_length(provider_label) <= 100),
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS whitelabel.banner (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS whitelabel.booking_flow (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     venue_id                          uuid,
     flow_type_key                     text NOT NULL CONSTRAINT booking_flow_flow_type_key_chk CHECK (flow_type_key IN ('datedDayPass', 'timedEntry', 'openDated', 'seatedFixedPerformance', 'seatedDateTimeSeatMap', 'experienceWorkshop', 'surfSession', 'meetingRoomHourly', 'cabanaMap', 'cabanaBySize', 'guidedTourByLanguage', 'transport', 'tableReservation', 'membership', 'giftCard', 'multiLocation')),
     name                              text NOT NULL CONSTRAINT booking_flow_name_chk CHECK (char_length(name) <= 80),
@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS whitelabel.booking_flow (
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS whitelabel.booking_flow_step (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     booking_flow_id                   uuid,
     step_key                          text NOT NULL CONSTRAINT booking_flow_step_step_key_chk CHECK (step_key IN ('location', 'helpMeChoose', 'product', 'date', 'time', 'performance', 'level', 'language', 'duration', 'route', 'partySize', 'resourceMap', 'resourceSize', 'seatMap', 'tickets', 'attendees', 'membershipPlan', 'giftCardValue', 'recipient', 'consent', 'extras', 'review', 'payment')),
     is_enabled                        boolean NOT NULL,
@@ -90,6 +90,8 @@ CREATE TABLE IF NOT EXISTS whitelabel.config_version (
     published_by_principal_id         uuid NOT NULL,
     published_by_name                 text,
     note                              text NOT NULL,
+    review_status                     text DEFAULT 'notRequired' CONSTRAINT config_version_review_status_chk CHECK (review_status IN ('notRequired', 'pending', 'approved', 'rejected')),
+    approval_request_id               uuid,
     is_current                        boolean NOT NULL,
     scheduled_for                     timestamptz,
     content_hash                      text,
@@ -116,7 +118,7 @@ CREATE TABLE IF NOT EXISTS whitelabel.content_page (
 -- A tenant's own hostname and its certificate (24 August). No domain or certificate operation
 -- existed anywhere in 1,010 — and ADM-017 Domain & Certificate Management declared 41 operations,
 -- none of them about a domain. Verification before issuance, always. Hangs off: reaches
--- whitelabel.footer_config through its keys; references platform.tenant. Reached by: 4 operations
+-- whitelabel.footer_config through its keys; references platform.tenant. Reached by: 6 operations
 -- read it and 3 write it.
 CREATE TABLE IF NOT EXISTS whitelabel.custom_domain (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -129,7 +131,13 @@ CREATE TABLE IF NOT EXISTS whitelabel.custom_domain (
     verification_record               jsonb,
     certificate_expires_at            timestamptz,
     last_checked_at                   timestamptz,
-    failure_reason                    text
+    failure_reason                    text,
+    routing                           text DEFAULT 'cname' CONSTRAINT custom_domain_routing_chk CHECK (routing IN ('cname', 'delegatedSubdomain', 'apex')),
+    dns_records                       jsonb,
+    revalidation                      text DEFAULT 'none' CONSTRAINT custom_domain_revalidation_chk CHECK (revalidation IN ('none', 'pendingRevalidation', 'timedOut')),
+    is_cname_lost                     boolean,
+    is_primary                        boolean,
+    readiness                         jsonb
 );
 
 -- A grouping of FAQ entries. Hangs off: reaches whitelabel.footer_config through its keys. Reached
@@ -210,18 +218,25 @@ CREATE TABLE IF NOT EXISTS whitelabel.guided_choice (
 -- Holds 4 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS whitelabel.guided_choice_answer (
-    guided_choice_id                  uuid NOT NULL,
-    id                                uuid PRIMARY KEY,
+    guided_choice_question_id         uuid NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     title                             jsonb NOT NULL,
-    kind                              text,
-    sort_order                        integer NOT NULL
+    body                              jsonb,
+    icon                              text,
+    badge                             jsonb,
+    sort_order                        integer NOT NULL,
+    target                            jsonb,
+    filter                            jsonb,
+    consent_prefill                   jsonb,
+    result                            jsonb,
+    guided_choice_id                  uuid NOT NULL
 );
 
 -- Holds 4 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS whitelabel.guided_choice_question (
     guided_choice_id                  uuid NOT NULL,
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     title                             jsonb NOT NULL,
     kind                              text,
     sort_order                        integer NOT NULL
@@ -229,7 +244,9 @@ CREATE TABLE IF NOT EXISTS whitelabel.guided_choice_question (
 
 -- A block on a tenant homepage, ordered. A section naming a disabled module must not render at all
 CREATE TABLE IF NOT EXISTS whitelabel.homepage_section (
-    id                                uuid PRIMARY KEY,
+    template_key                      text,
+    landing_source                    text DEFAULT 'storefront' CONSTRAINT homepage_section_landing_source_chk CHECK (landing_source IN ('storefront', 'ownSite')),
+    id                                uuid PRIMARY KEY NOT NULL,
     content_page_id                   uuid,
     homepage_section_id               uuid NOT NULL
 );
@@ -246,9 +263,9 @@ CREATE TABLE IF NOT EXISTS whitelabel.module_enablement (
 );
 
 -- One entry in a tenant’s own navigation. Hangs off: reaches whitelabel.footer_config through its
--- keys. Reached by: 4 operations read it and 2 write it; 1 tables reference it.
+-- keys. Reached by: 5 operations read it and 2 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS whitelabel.navigation_item (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     kind                              text NOT NULL CONSTRAINT navigation_item_kind_chk CHECK (kind IN ('bottomNavigation', 'drawer', 'tabs')),
     buy_button                        jsonb,
     navigation_item_id                uuid NOT NULL
@@ -284,10 +301,34 @@ CREATE TABLE IF NOT EXISTS whitelabel.promo_block (
     scope_path                        ltree NOT NULL
 );
 
+-- Holds 5 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS whitelabel.publish_review_policy (
+    is_enabled                        boolean NOT NULL DEFAULT false,
+    requires_reviewer_other_than_author boolean DEFAULT true,
+    applies_to                        text[],
+    scope_path                        ltree NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS whitelabel.site_package (
+    id                                uuid PRIMARY KEY NOT NULL,
+    version                           text,
+    status                            text NOT NULL CONSTRAINT site_package_status_chk CHECK (status IN ('building', 'ready', 'failed')),
+    download_url                      text,
+    expires_at                        timestamptz,
+    requested_by_principal_id         uuid,
+    platform_staff_grant_id           uuid,
+    created_at                        timestamptz,
+    scope_path                        ltree NOT NULL
+);
+
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS whitelabel.site_setup_progress (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     preset_key                        text CONSTRAINT site_setup_progress_preset_key_chk CHECK (preset_key IN ('themePark', 'waterPark', 'museum', 'theatreAndArena', 'singleAttraction', 'playCentre', 'multiVenue')),
     current_step                      text,
     steps                             jsonb,
@@ -299,7 +340,7 @@ CREATE TABLE IF NOT EXISTS whitelabel.site_setup_progress (
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS whitelabel.store_account (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     store                             text NOT NULL CONSTRAINT store_account_store_chk CHECK (store IN ('appleAppStore', 'googlePlay')),
     account_holder_name               text NOT NULL CONSTRAINT store_account_account_holder_name_chk CHECK (char_length(account_holder_name) <= 200),
     duns_number                       text,

@@ -1,6 +1,6 @@
 # P02-transport-01 — P02 · Transport
 
-**4 screens · 13 operations · 24 schemas · 0 permissions**
+**4 screens · 14 operations · 24 schemas · 0 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -97,7 +97,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `GST-076` | Intercity Trip — Route & Schedule | A | 5 | 4 | 6 | 0 | 5 | 0 | guest | review (client-verified) |
-| `GST-077` | Intercity Trip — Route & Passengers | A | 24 | 52 | 6 | 4 | 3 | 0 | guest | review (client-verified) |
+| `GST-077` | Intercity Trip — Route & Passengers | A | 24 | 57 | 6 | 4 | 3 | 0 | guest | review (client-verified) |
 | `GST-078` | Intercity Trip — Multi-trip Passes | A | 21 | 5 | 6 | 4 | 1 | 0 | guest | review (client-verified) |
 | `GST-079` | Intercity Trip — Favourite Routes | A | 0 | 3 | 6 | 0 | 1 | 0 | guest | review (client-verified) |
 

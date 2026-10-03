@@ -106,15 +106,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-314` | Amendment & After-Sales Command Center | B–D | 2 | 48 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-315` | Order Amendment Workspace | B–D | 60 | 30 | 6 | 32 | 0 | 0 | — | notStarted (generated) |
-| `BO-316` | Amendment Eligibility & Policy Rule Builder | B–D | 15 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-317` | Cancellation & Partial Cancellation Policy Configuration | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-318` | Refund Policy & Refund Calculation Configuration | B–D | 16 | 11 | 5 | 0 | 3 | 6 | — | notStarted (generated) |
-| `BO-319` | Void, Reversal & Same-Day Correction Management | B–D | 11 | 0 | 5 | 1 | 0 | 0 | — | notStarted (generated) |
-| `BO-321` | After-Sales Financial Settlement & Adjustment Workspace | B–D | 0 | 26 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-322` | Approval, Exception & Service Recovery Management | B–D | 9 | 0 | 5 | 0 | 0 | 3 | — | notStarted (generated) |
-| `BO-323` | Amendment History, Audit & After-Sales Analytics | B–D | 17 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-314` | Amendment & After-Sales Command Center | C | 2 | 48 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-315` | Order Amendment Workspace | C | 60 | 30 | 6 | 32 | 0 | 0 | — | notStarted (generated) |
+| `BO-316` | Amendment Eligibility & Policy Rule Builder | C | 15 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-317` | Cancellation & Partial Cancellation Policy Configuration | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-318` | Refund Policy & Refund Calculation Configuration | C | 16 | 11 | 5 | 0 | 3 | 6 | — | notStarted (generated) |
+| `BO-319` | Void, Reversal & Same-Day Correction Management | C | 11 | 0 | 5 | 1 | 0 | 0 | — | notStarted (generated) |
+| `BO-321` | After-Sales Financial Settlement & Adjustment Workspace | C | 0 | 26 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-322` | Approval, Exception & Service Recovery Management | C | 9 | 0 | 5 | 0 | 0 | 3 | — | notStarted (generated) |
+| `BO-323` | Amendment History, Audit & After-Sales Analytics | C | 17 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

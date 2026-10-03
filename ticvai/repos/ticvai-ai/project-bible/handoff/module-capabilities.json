@@ -5,7 +5,7 @@
   "access": {
    "title": "3 — Admission and Access",
    "capabilityCount": 20,
-   "unguardedOperations": 5,
+   "unguardedOperations": 6,
    "capabilities": [
     {
      "key": "ACCESS_DIRECTION_SET",
@@ -34,7 +34,7 @@
      "key": "ACCESS_POINT_CONFIGURE",
      "label": null,
      "group": "Access control",
-     "operationCount": 87,
+     "operationCount": 92,
      "operations": [
       "addBlacklistEntry",
       "approveMultiMediaPreview",
@@ -836,9 +836,10 @@
      "key": "PRICE_VIEW",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 5,
+     "operationCount": 6,
      "operations": [
       "getDynamicPriceRule",
+      "getPackagePricingDefinition",
       "getPriceList",
       "listDynamicPriceRules",
       "listPriceLists",
@@ -878,7 +879,7 @@
      "key": "PRODUCT_VIEW",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 114,
+     "operationCount": 116,
      "operations": [
       "checkBookingEligibility",
       "getAvailability",
@@ -1190,7 +1191,7 @@
      "key": "PRODUCT_VIEW",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 25,
+     "operationCount": 27,
      "operations": [
       "getAllergenVerification",
       "getCourseRules",
@@ -1840,8 +1841,9 @@
      "key": "AI_CONFIGURE",
      "label": null,
      "group": "Operations",
-     "operationCount": 2,
+     "operationCount": 3,
      "operations": [
+      "getCustomerServiceCopilot",
       "setContactAutomation",
       "setCustomerServiceCopilot"
      ],
@@ -2630,14 +2632,14 @@
      "key": "DEVELOPER_ADMIN",
      "label": "quotas, certification, licensing — TICVAI-side only",
      "group": "Guest engagement",
-     "operationCount": 6,
+     "operationCount": 9,
      "operations": [
       "certifyIntegration",
       "decideProductionAccess",
       "deprecateApiVersion",
-      "setApiAnomalyRule",
-      "setApiLicensing",
-      "setApiQuota"
+      "listApiAnomalyRules",
+      "listApiLicences",
+      "listApiQuotas"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -2662,14 +2664,14 @@
      "key": "DEVELOPER_VIEW",
      "label": null,
      "group": "Guest engagement",
-     "operationCount": 13,
+     "operationCount": 14,
      "operations": [
       "getApiUsage",
+      "getDeveloperAccount",
       "issueApiToken",
       "listApiAnomalies",
       "listApiClients",
-      "listApiScopes",
-      "listApiVersions"
+      "listApiScopes"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -3704,14 +3706,14 @@
      "key": "DEVICE_VIEW",
      "label": null,
      "group": "Operations",
-     "operationCount": 9,
+     "operationCount": 10,
      "operations": [
       "getDevice",
+      "getDeviceAssignment",
       "getDeviceFirmware",
       "getDeviceTelemetry",
       "getWorkstationHealth",
-      "listDeviceAuditRecords",
-      "listDeviceFirmware"
+      "listDeviceAuditRecords"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -3817,7 +3819,7 @@
   "transport": {
    "title": "1 — Ticketing Catalogue (Transport)",
    "capabilityCount": 3,
-   "unguardedOperations": 12,
+   "unguardedOperations": 13,
    "capabilities": [
     {
      "key": "TRANSPORT_MANAGE",
@@ -3873,7 +3875,7 @@
      "key": "VENUE_MAP_MANAGE",
      "label": "place points, import geometry, accept proposals",
      "group": "Guest engagement",
-     "operationCount": 8,
+     "operationCount": 9,
      "operations": [
       "acceptVenueLabelProposals",
       "acceptWalkwayProposals",
@@ -3900,14 +3902,14 @@
      "key": "VENUE_MAP_VIEW",
      "label": null,
      "group": "Guest engagement",
-     "operationCount": 6,
+     "operationCount": 7,
      "operations": [
       "getVenueMap",
       "getVenueMapGraph",
       "getVenueMapImportJob",
       "getVenueMapLive",
-      "listBookableVenueMaps",
-      "listVenueMaps"
+      "getVenueNavigationFile",
+      "listBookableVenueMaps"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -4176,9 +4178,9 @@
    ],
    "DEVELOPER_VIEW": [
     "getApiUsage",
+    "getDeveloperAccount",
     "issueApiToken",
-    "listApiAnomalies",
-    "listApiClients"
+    "listApiAnomalies"
    ],
    "DEVICE_CONFIGURE": [
     "cloneReaderConfiguration",
@@ -4188,9 +4190,9 @@
    ],
    "DEVICE_VIEW": [
     "getDevice",
+    "getDeviceAssignment",
     "getDeviceFirmware",
-    "getDeviceTelemetry",
-    "getHardwareModelCertification"
+    "getDeviceTelemetry"
    ],
    "EVENT_CONFIGURE": [
     "assignPerformanceMedia",

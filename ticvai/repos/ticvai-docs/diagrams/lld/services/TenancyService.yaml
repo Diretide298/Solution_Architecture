@@ -1,5 +1,5 @@
 id: LLD-TenancyService
-title: TenancyService — 209 operations, 109 tables
+title: TenancyService — 210 operations, 110 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 deployable: commerce
@@ -21,7 +21,7 @@ why: '**`platform.org_unit` is reached by 304 of 379 tables** — the tenancy sp
 scale: Read-heavy and highly cacheable. Config changes are rare.
 ifDown: Same as identity — nothing runs without a scope.
 coverage:
-  operations: 209
+  operations: 210
   inAFlow: 50
   percent: 24%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -52,6 +52,11 @@ schemas:
   stores:
   - postgres
   largestTable: tenancy.device_firmware
+- schema: kernel
+  tables: 1
+  stores:
+  - postgres
+  largestTable: kernel.inbox
 operationsByContract:
 - contract: approvals
   count: 57
@@ -84,7 +89,7 @@ operationsByContract:
     verb: PUT
     path: /unified-decision
     scope: venue
-    permission: APPROVAL_REQUEST
+    permission: APPROVAL_DECIDE
     offline: false
     reads: 6
     writes: 4
@@ -103,7 +108,7 @@ operationsByContract:
     permission: APPROVAL_DECIDE
     offline: false
     reads: 2
-    writes: 0
+    writes: 1
   - operation: cancelApprovalRequest
     verb: POST
     path: /approval-requests/{requestId}/cancel
@@ -111,7 +116,7 @@ operationsByContract:
     permission: APPROVAL_CONFIGURE
     offline: false
     reads: 2
-    writes: 0
+    writes: 1
   - operation: createApprovalDelegation
     verb: POST
     path: /delegations
@@ -127,7 +132,7 @@ operationsByContract:
     permission: APPROVAL_VIEW
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: createApprovalRequest
     verb: POST
     path: /approval-requests
@@ -375,7 +380,7 @@ operationsByContract:
     permission: APPROVAL_REQUEST
     offline: false
     reads: 2
-    writes: 0
+    writes: 1
   - operation: resolveApprovedActionExecution
     verb: POST
     path: /approved-action-executions/{executionId}/resolve
@@ -383,7 +388,7 @@ operationsByContract:
     permission: APPROVAL_ACT
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: resubmitApprovalRequest
     verb: POST
     path: /approval-requests/{requestId}/resubmit
@@ -487,7 +492,7 @@ operationsByContract:
     permission: APPROVAL_DECIDE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: simulateWorkflowTestingImpact
     verb: PUT
     path: /workflow-testing-impact
@@ -513,7 +518,7 @@ operationsByContract:
     reads: 3
     writes: 2
 - contract: tenancy
-  count: 56
+  count: 57
   operations:
   - operation: approveDevice
     verb: POST
@@ -522,7 +527,7 @@ operationsByContract:
     permission: DEVICE_MANAGE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: configureWorkstation
     verb: PUT
     path: /workstations/{workstationId}
@@ -598,6 +603,14 @@ operationsByContract:
   - operation: getDevice
     verb: GET
     path: /devices/{deviceId}
+    scope: venue
+    permission: DEVICE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getDeviceAssignment
+    verb: GET
+    path: /devices/{deviceId}/assignment
     scope: venue
     permission: DEVICE_VIEW
     offline: false
@@ -690,7 +703,7 @@ operationsByContract:
     permission: DEVICE_MANAGE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: listAuditRecords
     verb: GET
     path: /audit-records
@@ -997,7 +1010,7 @@ operationsByContract:
     permission: WORKFORCE_VIEW
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: createRotaAssignment
     verb: POST
     path: /rota-assignments
@@ -1253,7 +1266,7 @@ operationsByContract:
     permission: WORKFORCE_MANAGE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: sendStaffMessage
     verb: POST
     path: /staff-messages
@@ -1341,7 +1354,7 @@ operationsByContract:
     permission: WORKFORCE_MANAGE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: updateRotaAssignment
     verb: PATCH
     path: /rota-assignments/{assignmentId}
@@ -1728,7 +1741,7 @@ operationsByContract:
     permission: ACCREDITATION_APPROVE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: withdrawAccreditationApplication
     verb: POST
     path: /accreditation-applications/{applicationId}/withdraw
@@ -2053,7 +2066,8 @@ tables:
   columns: 14
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - approvals
   foreignWriters: null
 - table: approvals.approver_availability
   columns: 9
@@ -2132,7 +2146,8 @@ tables:
   columns: 11
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - approvals
   foreignWriters: null
 - table: approvals.external_dispatch
   columns: 14
@@ -2142,7 +2157,7 @@ tables:
   - approvals
   foreignWriters: null
 - table: approvals.external_provider
-  columns: 14
+  columns: 16
   store: postgres
   parent: null
   writtenBy:
@@ -2183,7 +2198,8 @@ tables:
   columns: 10
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - approvals
   foreignWriters: null
 - table: approvals.sla_policy
   columns: 13
@@ -2247,6 +2263,12 @@ tables:
   parent: null
   writtenBy:
   - approvals
+  foreignWriters: null
+- table: kernel.inbox
+  columns: 3
+  store: postgres
+  parent: null
+  writtenBy: []
   foreignWriters: null
 - table: platform.audit_read
   columns: 3
@@ -2432,7 +2454,7 @@ tables:
   - tenancy
   foreignWriters: null
 - table: platform.region_settings
-  columns: 18
+  columns: 19
   store: postgres
   parent: null
   writtenBy:
@@ -2507,8 +2529,10 @@ tables:
   store: postgres
   parent: null
   writtenBy:
+  - access
   - tenancy
-  foreignWriters: null
+  foreignWriters:
+  - access
 - table: tenancy.device_assignment
   columns: 12
   store: postgres
@@ -2654,7 +2678,8 @@ tables:
   columns: 16
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - workforce
   foreignWriters: null
 - table: workforce.position_requirement
   columns: 13
@@ -2723,13 +2748,15 @@ tables:
   columns: 13
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - workforce
   foreignWriters: null
 - table: workforce.sync_run
   columns: 12
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - workforce
   foreignWriters: null
 - table: workforce.training_record
   columns: 8

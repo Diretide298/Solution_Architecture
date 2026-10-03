@@ -4,7 +4,7 @@
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS tenancy.data_retention_setting (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     data_class                        text NOT NULL,
     retain_amount                     integer,
     retain_unit                       text CONSTRAINT data_retention_setting_retain_unit_chk CHECK (retain_unit IN ('days', 'months', 'years')),
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS tenancy.device_assignment (
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS tenancy.device_audit (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     device_id                         uuid,
     at                                timestamptz,
     kind                              text CONSTRAINT device_audit_kind_chk CHECK (kind IN ('administration', 'access', 'security')),
@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS tenancy.device_audit (
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS tenancy.device_credential (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     device_id                         uuid,
     kind                              text CONSTRAINT device_credential_kind_chk CHECK (kind IN ('clientCertificate', 'deviceToken', 'mutualTls')),
     fingerprint                       text,
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS tenancy.device_credential (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS tenancy.device_firmware (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     device_kind                       text NOT NULL,
     version                           text NOT NULL,
     vendor                            text,
@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS tenancy.device_firmware (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS tenancy.device_rollout (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     firmware_id                       uuid NOT NULL,
     target_scope_path                 ltree,
     target_device_ids                 text[],
@@ -99,7 +99,7 @@ CREATE TABLE IF NOT EXISTS tenancy.device_rollout (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS tenancy.device_tamper_event (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     device_id                         uuid NOT NULL,
     kind                              text NOT NULL CONSTRAINT device_tamper_event_kind_chk CHECK (kind IN ('enclosureOpened', 'locationAnomaly', 'credentialMismatch', 'firmwareUnsigned', 'clockSkew', 'physicalRemoval')),
     detected_at                       timestamptz,

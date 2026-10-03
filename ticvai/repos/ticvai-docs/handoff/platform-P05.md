@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 17 |
-| Operations | 24 |
-| Contracts | 8 |
+| Operations | 22 |
+| Contracts | 7 |
 | Modules | 2 |
 | Undrawn | 0 |
-| Operations with no screen | 15 |
-| Waves | wave1 1 · wave2 16 |
+| Operations with no screen | 11 |
+| Waves | wave1 2 · wave2 15 |
 
 ## Gaps
 
-### 15 operations with no screen here
+### 11 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -29,39 +29,41 @@
 | `claimTableSession` | fnb | POST | Identify which table a guest is sitting at |
 | `checkGuestCheckoutMatch` | marketing-crm | POST | Does this contact already have a profile here |
 | `decideGuestCheckoutMatch` | marketing-crm | POST | Use the existing profile or keep this booking separate |
-| `getGuestConversation` | marketing-crm | GET | The guest's own handed-over conversation, with the agent's replies and the queue position |
 | `uploadGuestDocument` | marketing-crm | POST | Store a guest photo, ID or signed document |
-| `listTicketTransfers` | orders | GET | The ticket transfers this guest sent or received |
 | `revokeEntitlementShare` | orders | POST | Take back a share |
-| `getUpsellSuggestions` | promotions | POST | Suggestions for a cart |
-| `recordRecommendationOutcome` | promotions | POST | Shown, clicked, accepted or dismissed |
+
+### 1 modules split across waves
+
+**A platform that sells in one wave and cannot refund until a later one can take money and not give it back.** Not always wrong — worth a look each time.
+
+- **Sell** — waves 1, 2
 
 ## Modules
 
 | Module | Screens | Waves |
 |---|---|---|
-| Sell | 16 | 2 |
+| Sell | 16 | 1, 2 |
 | AI | 1 | 1 |
 
 ## Screens
 
 | | Name | Module | Wave | Ops | Drawn |
 |---|---|---|---|---|---|
-| `KSK-001` | Attract Loop | Sell | 2 | 0 | yes |
+| `KSK-001` | Attract Loop | Sell | 1 | 1 | yes |
 | `KSK-002` | Language Select | Sell | 2 | 2 | yes |
 | `KSK-003` | What are you buying | Sell | 2 | 1 | yes |
 | `KSK-004` | Choose tickets | Sell | 2 | 2 | yes |
 | `KSK-005` | Choose a performance | Sell | 2 | 2 | yes |
-| `KSK-006` | Review | Sell | 2 | 4 | yes |
+| `KSK-006` | Review | Sell | 2 | 2 | yes |
 | `KSK-007` | Payment | Sell | 2 | 1 | yes |
 | `KSK-008` | Payment unresolved | Sell | 2 | 1 | yes |
 | `KSK-009` | Ticket issued | Sell | 2 | 2 | yes |
 | `KSK-010` | Print failure | Sell | 2 | 1 | yes |
-| `KSK-011` | Collect a booking | Sell | 2 | 2 | yes |
+| `KSK-011` | Collect a booking | Sell | 2 | 1 | yes |
 | `KSK-012` | Booking found | Sell | 2 | 1 | yes |
-| `KSK-013` | Call staff | Sell | 2 | 1 | yes |
-| `KSK-014` | Out of service | Sell | 2 | 0 | yes |
-| `KSK-015` | Assistant | AI | 1 | 6 | yes |
+| `KSK-013` | Call staff | Sell | 2 | 2 | yes |
+| `KSK-014` | Out of service | Sell | 2 | 1 | yes |
+| `KSK-015` | Assistant | AI | 1 | 7 | yes |
 | `KSK-016` | Order Food | Sell | 2 | 2 | yes |
 | `KSK-017` | Shop | Sell | 2 | 4 | yes |
 

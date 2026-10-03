@@ -52,10 +52,12 @@
      "to": "WEB-010",
      "trigger": "Shopping Cart",
      "carries": [
+      "cartId",
       "code",
-      "lineId"
+      "lineId",
+      "performanceId"
      ],
-     "provenance": "derived — WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId and WEB-005 holds code, lineId, so an edge into it carries them"
+     "provenance": "derived — WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId and WEB-005 holds cartId, code, lineId, performanceId, so an edge into it carries them"
     },
     {
      "to": "WEB-016",
@@ -170,7 +172,8 @@
       {
        "kind": "primaryButton",
        "label": "Continue",
-       "provenance": "carried from the previous definition"
+       "provenance": "carried from the previous definition",
+       "operation": "addCartLine"
       }
      ]
     }
@@ -224,6 +227,13 @@
     "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
     "trigger": "onLoad",
     "provenance": "decided 29 September 2026, W12"
+   },
+   {
+    "operationId": "addCartLine",
+    "contract": "orders",
+    "purpose": "Continue adds the chosen tickets to the cart",
+    "trigger": "onAction",
+    "provenance": "design cross-check, 3 October 2026 (CHG-R1S-023)"
    }
   ],
   "entryState": {
@@ -235,6 +245,12 @@
     {
      "name": "venueId",
      "from": "session"
+    },
+    {
+     "name": "cartId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `addCartLine` takes it, from the record the user acts on."
     }
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
@@ -692,7 +708,7 @@
     {
      "to": "WEB-005",
      "trigger": "Ticket Type Selection",
-     "provenance": "derived — WEB-005 declares entryState.params productId and WEB-007 holds none of them. The edge carries nothing: WEB-005 finds productId (listProducts) itself, and WEB-005 opens on its own"
+     "provenance": "derived — WEB-005 declares entryState.params cartId, productId and WEB-007 holds none of them. The edge carries nothing: cartId only pre-selects (deep link or optional); WEB-005 finds productId (listProducts) itself, and WEB-005 opens on its own"
     },
     {
      "to": "WEB-008",
@@ -888,8 +904,8 @@
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-007",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3 (29 September build)",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (30 September build; the view as verified on the 29 September build, CHG-R1S-015)",
     "verified": "2026-09-29",
     "match": "exact",
     "view": "Union Arena → 'Flow 1 · Fixed date → zone → seat map' or 'Flow 2 · Choose date & time → seat map'; Grand Playhouse → Flow 1 / Flow 2"
@@ -1003,7 +1019,10 @@
     {
      "to": "WEB-005",
      "trigger": "Ticket Type Selection",
-     "provenance": "derived — WEB-005 declares entryState.params productId and WEB-008 holds none of them. The edge carries nothing: WEB-005 finds productId (listProducts) itself, and WEB-005 opens on its own"
+     "carries": [
+      "cartId"
+     ],
+     "provenance": "derived — WEB-005 declares entryState.params cartId, productId and WEB-008 holds cartId, so an edge into it carries them"
     },
     {
      "to": "WEB-006",
@@ -1174,8 +1193,8 @@
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-008",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (pointer moved to the 30 September build, CHG-R1S-015)",
     "verified": "2026-09-28",
     "match": "exact",
     "view": "Book → 'Extras' step (e.g. Summit Peaks → Dated day pass → Continue)",
@@ -1266,7 +1285,7 @@
     {
      "to": "WEB-005",
      "trigger": "Ticket Type Selection",
-     "provenance": "derived — WEB-005 declares entryState.params productId and WEB-009 holds none of them. The edge carries nothing: WEB-005 finds productId (listProducts) itself, and WEB-005 opens on its own"
+     "provenance": "derived — WEB-005 declares entryState.params cartId, productId and WEB-009 holds none of them. The edge carries nothing: cartId only pre-selects (deep link or optional); WEB-005 finds productId (listProducts) itself, and WEB-005 opens on its own"
     },
     {
      "to": "WEB-006",
@@ -1393,8 +1412,8 @@
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-009",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (pointer moved to the 30 September build, CHG-R1S-015)",
     "verified": "2026-09-28",
     "match": "exact",
     "view": "Discover → 'Wishlist' link (discoverLinks)",
@@ -1698,8 +1717,8 @@
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-047",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (pointer moved to the 30 September build, CHG-R1S-015)",
     "verified": "2026-09-28",
     "match": "exact",
     "view": "Coastal Aqua → 'Cabana & locker rentals' → cabana map ('Remaining time' counter)"
@@ -1923,8 +1942,8 @@
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-048",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (pointer moved to the 30 September build, CHG-R1S-015)",
     "verified": "2026-09-28",
     "match": "exact",
     "view": "House of Pages → 'Meeting room by the hour'"

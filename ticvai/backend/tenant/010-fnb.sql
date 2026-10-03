@@ -1,4 +1,4 @@
--- fnb — 48 tables
+-- fnb — 52 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS fnb.allergen_verdict (
 
 -- How one table’s bill was divided. A party of six paying separately is the ordinary case
 CREATE TABLE IF NOT EXISTS fnb.bill_split (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     visit_id                          uuid NOT NULL,
     method                            text NOT NULL CONSTRAINT bill_split_method_chk CHECK (method IN ('byAmount', 'byCovers', 'byCategory', 'byLine', 'bySeat'))
 );
@@ -116,7 +116,7 @@ CREATE TABLE IF NOT EXISTS fnb.delivery_location_outlet (
 -- An outlet's takeaway and delivery rules: minimum order, fee, free-above threshold, radius, slot
 -- length. Enforced at order time rather than only shown, which is what the design did
 CREATE TABLE IF NOT EXISTS fnb.delivery_policy (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     outlet_id                         uuid NOT NULL,
     is_collection_enabled             boolean DEFAULT true,
     is_delivery_enabled               boolean DEFAULT false,
@@ -150,7 +150,7 @@ CREATE TABLE IF NOT EXISTS fnb.dining_table (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS fnb.ingredient_substitute (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     from_inventory_item_id            uuid NOT NULL,
     to_inventory_item_id              uuid NOT NULL,
     substitution_ratio                numeric(18,4) NOT NULL,
@@ -177,6 +177,23 @@ CREATE TABLE IF NOT EXISTS fnb.kitchen_exception (
     note                              text
 );
 
+-- Holds 6 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS fnb.kitchen_routing_rule (
+    outlet_id                         uuid,
+    category_rules                    jsonb,
+    default_station_id                uuid NOT NULL,
+    fallback_station_id               uuid,
+    scope_path                        ltree NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS fnb.kitchen_sla (
+    outlet_id                         uuid PRIMARY KEY NOT NULL,
+    targets                           jsonb,
+    priority_weights                  jsonb
+);
+
 -- Where a ticket is routed — grill, cold, bar, pass
 CREATE TABLE IF NOT EXISTS fnb.kitchen_station (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -186,6 +203,8 @@ CREATE TABLE IF NOT EXISTS fnb.kitchen_station (
     menu_item_ids                     text[],
     display_workstation_ids           text[],
     display_endpoint                  text,
+    printer_device_ids                text[],
+    serves_outlet_ids                 text[],
     is_active                         boolean
 );
 
@@ -262,6 +281,8 @@ CREATE TABLE IF NOT EXISTS fnb.menu_item (
     name                              text NOT NULL,
     description                       text,
     list_price                        numeric(18,4) NOT NULL,
+    daily_count                       integer,
+    remaining_count                   integer,
     sort_order                        integer,
     modifier_group_ids                text[],
     station_id                        uuid,
@@ -301,7 +322,7 @@ CREATE TABLE IF NOT EXISTS fnb.menu_schedule (
 -- A run of items on a menu, in the order the outlet set. Not alphabetical, or Desserts sits above
 -- Mains forever
 CREATE TABLE IF NOT EXISTS fnb.menu_section (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text NOT NULL,
     sort_order                        integer NOT NULL,
@@ -350,7 +371,7 @@ CREATE TABLE IF NOT EXISTS fnb.modifier_option (
 -- How a guest's order leaves the kitchen: collected at a time, delivered to an address in a
 -- window, or taken to a place in the venue. The address is here and nowhere else
 CREATE TABLE IF NOT EXISTS fnb.order_fulfilment (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     service_order_id                  uuid,
     mode                              text NOT NULL CONSTRAINT order_fulfilment_mode_chk CHECK (mode IN ('collection', 'delivery', 'inVenue')),
     collection_at                     timestamptz,
@@ -379,10 +400,22 @@ CREATE TABLE IF NOT EXISTS fnb.outlet_template (
     updated_at                        timestamptz
 );
 
+-- Holds 7 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS fnb.prep_sheet_template (
+    group_by                          text DEFAULT 'station' CONSTRAINT prep_sheet_template_group_by_chk CHECK (group_by IN ('station', 'item')),
+    browser_paper                     text DEFAULT 'a4' CONSTRAINT prep_sheet_template_browser_paper_chk CHECK (browser_paper IN ('a4', 'letter')),
+    printer_paper                     text DEFAULT 'thermal80mm' CONSTRAINT prep_sheet_template_printer_paper_chk CHECK (printer_paper IN ('thermal80mm', 'thermal58mm')),
+    columns                           text[],
+    header_text                       text CONSTRAINT prep_sheet_template_header_text_chk CHECK (char_length(header_text) <= 200),
+    scope_path                        ltree NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
 -- Holds 17 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS fnb.product_recommendation (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     scope_path                        ltree NOT NULL,
     source_product_id                 uuid NOT NULL,
     source_variant_id                 uuid,
@@ -465,11 +498,12 @@ CREATE TABLE IF NOT EXISTS fnb.recipe_ingredient (
 -- turn at the same speed. The booking keeps its own duration as the snapshot, so a turn time
 -- revised in March cannot shorten a reservation
 CREATE TABLE IF NOT EXISTS fnb.reservation_policy (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     outlet_id                         uuid,
     default_turn_minutes              integer NOT NULL,
     seating_buffer_minutes            integer DEFAULT 0,
     maximum_duration_minutes          integer,
+    reserved_lead_minutes             integer,
     is_active                         boolean NOT NULL,
     scope_path                        ltree NOT NULL
 );
@@ -489,7 +523,7 @@ CREATE TABLE IF NOT EXISTS fnb.reservation_table (
 -- is the field a regulator reads first: a charge a guest cannot decline is a price, and a price
 -- belongs in the displa
 CREATE TABLE IF NOT EXISTS fnb.service_charge_policy (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     basis                             text NOT NULL CONSTRAINT service_charge_policy_basis_chk CHECK (basis IN ('none', 'percentOfSubtotal', 'fixedPerCover', 'fixedPerBill')),
     rate_percent                      numeric(18,4),
     amount                            numeric(18,4),
@@ -512,6 +546,8 @@ CREATE TABLE IF NOT EXISTS fnb.service_order (
     id                                uuid PRIMARY KEY NOT NULL,
     order_number                      text NOT NULL,
     outlet_id                         uuid NOT NULL,
+    payment_timing                    text,
+    sent_to_kitchen_at                timestamptz,
     service_mode                      text NOT NULL CONSTRAINT service_order_service_mode_chk CHECK (service_mode IN ('quickService', 'tableService', 'roomService', 'collection', 'delivery')),
     table_visit_id                    uuid,
     status                            text NOT NULL CONSTRAINT service_order_status_chk CHECK (status IN ('ordered', 'accepted', 'inPreparation', 'ready', 'served', 'collected', 'delivered', 'cancelled', 'refunded')),
@@ -553,6 +589,7 @@ CREATE TABLE IF NOT EXISTS fnb.sold_out_item (
     reason                            text CONSTRAINT sold_out_item_reason_chk CHECK (reason IN ('ranOut', 'qualityIssue', 'equipmentDown', 'supplierFailure', 'seasonal', 'other')),
     note                              text CONSTRAINT sold_out_item_note_chk CHECK (char_length(note) <= 500),
     called_by_principal_id            uuid,
+    source                            text DEFAULT 'manual' CONSTRAINT sold_out_item_source_chk CHECK (source IN ('manual', 'dailyCount')),
     refused_order_count               integer DEFAULT 0
 );
 
@@ -592,7 +629,7 @@ CREATE TABLE IF NOT EXISTS fnb.substitution_rule (
 -- Holds 6 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS fnb.table_combination (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     outlet_id                         uuid,
     table_ids                         text[] NOT NULL,
     combined_covers                   integer NOT NULL,
@@ -602,10 +639,10 @@ CREATE TABLE IF NOT EXISTS fnb.table_combination (
 
 -- A booking with a time and a party size. Distinct from a table session, which is a guest already
 -- sitting down Hangs off: reaches fnb.service_order through its keys; references
--- catalogue.variant, fnb.modifier_group, fnb.table_visit. Reached by: 6 operations read it and 4
+-- catalogue.variant, fnb.modifier_group, fnb.table_visit. Reached by: 8 operations read it and 5
 -- write it; 3 tables reference it.
 CREATE TABLE IF NOT EXISTS fnb.table_reservation (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     outlet_id                         uuid NOT NULL,
     subject_id                        uuid,
     guest_name                        text,
@@ -616,6 +653,9 @@ CREATE TABLE IF NOT EXISTS fnb.table_reservation (
     status                            text CONSTRAINT table_reservation_status_chk CHECK (status IN ('awaitingDeposit', 'booked', 'confirmed', 'seated', 'completed', 'cancelled', 'noShow')),
     group_id                          uuid,
     notes                             text,
+    seating_preference                text CONSTRAINT table_reservation_seating_preference_chk CHECK (char_length(seating_preference) <= 64),
+    occasion                          text CONSTRAINT table_reservation_occasion_chk CHECK (occasion IN ('birthday', 'anniversary', 'business', 'celebration', 'other')),
+    taken_by_principal_id             uuid,
     actual_party_size                 integer,
     table_visit_id                    uuid,
     created_at                        timestamptz,
@@ -713,5 +753,16 @@ CREATE TABLE IF NOT EXISTS fnb.waitlist_entry (
     recorded_at                       timestamptz NOT NULL,
     synced_at                         timestamptz,
     hold_expires_at                   timestamptz
+);
+
+-- Holds 6 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS fnb.waste_approval_policy (
+    is_enabled                        boolean NOT NULL DEFAULT false,
+    bands                             jsonb,
+    photo_required_above              numeric(18,4),
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz,
+    id                                uuid PRIMARY KEY NOT NULL
 );
 

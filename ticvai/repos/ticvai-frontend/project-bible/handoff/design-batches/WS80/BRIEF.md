@@ -131,16 +131,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-414` | Wallet & Credit Management Dashboard | B–D | 2 | 2 | 6 | 19 | 1 | 6 | — | notStarted (—) |
-| `BO-415` | Wallet & Credit Type Configuration | B–D | 10 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-416` | Wallet Account & Balance View | B–D | 0 | 0 | 6 | 18 | 1 | 6 | — | notStarted (—) |
-| `BO-417` | Top-Up Configuration | B–D | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-418` | Top-Up Bonus Rule Configuration | B–D | 0 | 20 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `BO-419` | Bonus Usage Restrictions | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-420` | Bonus Validity & Expiry Configuration | B–D | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-421` | Free Game & Ride Credit Management | B–D | 8 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-422` | Refund, Adjustment & Manual Bonus Control | B–D | 0 | 15 | 6 | 28 | 1 | 6 | — | notStarted (—) |
-| `BO-423` | Wallet Credit Transaction Ledger & Audit | B–D | 0 | 0 | 6 | 3 | 1 | 6 | — | notStarted (—) |
+| `BO-414` | Wallet & Credit Management Dashboard | C | 2 | 2 | 6 | 19 | 1 | 6 | — | notStarted (—) |
+| `BO-415` | Wallet & Credit Type Configuration | C | 10 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-416` | Wallet Account & Balance View | C | 0 | 0 | 6 | 18 | 1 | 6 | — | notStarted (—) |
+| `BO-417` | Top-Up Configuration | C | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-418` | Top-Up Bonus Rule Configuration | C | 0 | 20 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `BO-419` | Bonus Usage Restrictions | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-420` | Bonus Validity & Expiry Configuration | C | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-421` | Free Game & Ride Credit Management | D | 8 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-422` | Refund, Adjustment & Manual Bonus Control | C | 0 | 15 | 6 | 28 | 1 | 6 | — | notStarted (—) |
+| `BO-423` | Wallet Credit Transaction Ledger & Audit | C | 0 | 0 | 6 | 3 | 1 | 6 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

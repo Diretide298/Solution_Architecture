@@ -1,6 +1,6 @@
 # WS03 — Access Control board 3
 
-**10 screens · 16 operations · 23 schemas · 4 permissions**
+**10 screens · 17 operations · 23 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -98,15 +98,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-164` | Digital Credential Security Command Center | C | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-165` | Dynamic QR Security Profile Builder | B–D | 13 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-165` | Dynamic QR Security Profile Builder | C | 13 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
 | `BO-166` | Credential Activation & Display Rules | A | 6 | 4 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
 | `BO-167` | Device Binding & Session Security | A | 5 | 18 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-168` | BLE Beacon & Geofence Configuration | A | 21 | 13 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-169` | Credential Transfer & Rebinding | B–D | 9 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-170` | Credential Revocation & Lifecycle Events | B–D | 7 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-171` | Offline Cryptographic Validation Profile | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-172` | Embedded Entitlement Payload Designer | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-173` | Credential Security Simulation, Audit & Publication | B–D | 0 | 13 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-168` | BLE Beacon & Geofence Configuration | A | 21 | 21 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-169` | Credential Transfer & Rebinding | C | 9 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-170` | Credential Revocation & Lifecycle Events | C | 7 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-171` | Offline Cryptographic Validation Profile | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-172` | Embedded Entitlement Payload Designer | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-173` | Credential Security Simulation, Audit & Publication | C | 0 | 13 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

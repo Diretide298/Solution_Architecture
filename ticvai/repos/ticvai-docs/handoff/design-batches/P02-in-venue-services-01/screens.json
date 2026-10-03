@@ -1130,6 +1130,20 @@
      "components": [
       {
        "kind": "cardList",
+       "label": "Load the parking entitlement being changed",
+       "operation": "getParkingEntitlement",
+       "bindsTo": "ParkingEntitlement",
+       "columns": [
+        "ParkingEntitlement.plateNumber",
+        "ParkingEntitlement.plateCountry",
+        "ParkingEntitlement.mediaCode",
+        "ParkingEntitlement.status",
+        "ParkingEntitlement.pushedAt"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
+      {
+       "kind": "cardList",
        "label": "Car parks",
        "bindsTo": "ParkingFacility",
        "columns": [
@@ -1208,6 +1222,13 @@
     "contract": "access",
     "purpose": "Car parks at a venue, and how each integrates",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "getParkingEntitlement",
+    "contract": "access",
+    "purpose": "Load the parking entitlement being changed",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "entryState": {

@@ -1,6 +1,6 @@
 # P08-access-venue-01 — P08 · Access & Venue (1 of 3)
 
-**10 screens · 27 operations · 36 schemas · 9 permissions**
+**10 screens · 28 operations · 36 schemas · 9 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -129,14 +129,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-001` | Queue Directory | A | 62 | 46 | 6 | 23 | 1 | 6 | — | notStarted (generated) |
-| `BO-002` | Queue Configuration | B–D | 59 | 18 | 6 | 21 | 4 | 6 | — | notStarted (generated) |
-| `BO-003` | Queue Integration Setup | B–D | 12 | 23 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `BO-004` | Manual Wait Time Entry | B–D | 6 | 32 | 6 | 6 | 2 | 6 | — | notStarted (generated) |
+| `BO-002` | Queue Configuration | D | 59 | 18 | 6 | 21 | 4 | 6 | — | notStarted (generated) |
+| `BO-003` | Queue Integration Setup | D | 12 | 23 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `BO-004` | Manual Wait Time Entry | D | 6 | 32 | 6 | 6 | 2 | 6 | — | notStarted (generated) |
 | `BO-005` | Queue Monitor | A | 55 | 38 | 6 | 34 | 3 | 6 | — | notStarted (generated) |
 | `BO-006` | Parking Configuration | A | 11 | 6 | 6 | 3 | 2 | 2 | — | notStarted (generated) |
-| `BO-030` | Work Order Verification | B–D | 7 | 22 | 6 | 10 | 0 | 2 | — | notStarted (generated) |
-| `BO-031` | Asset Register | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-032` | Admission Profiles | A | 94 | 14 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
+| `BO-030` | Work Order Verification | A | 7 | 22 | 6 | 10 | 0 | 2 | — | notStarted (generated) |
+| `BO-031` | Asset Register | B | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-032` | Admission Profiles | A | 94 | 16 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
 | `BO-033` | Blacklist Management | A | 5 | 10 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
@@ -553,7 +553,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `queue` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-002 |
 | Who uses it | venue staff holding `QUEUE_MANAGE`, `QUEUE_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listQueueEntries` reads the population and `getPerformance` reads one of them — list, select, act |
@@ -882,7 +882,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `queue` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-003 |
 | Who uses it | venue staff holding `QUEUE_MANAGE` (1 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listQueueFeeds` reads the population and `getQueueFeedHealth` reads one of them — list, select, act |
@@ -1104,7 +1104,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `queue` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-004 |
 | Who uses it | venue staff holding `QUEUE_MANAGE`, `QUEUE_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | approvalInbox (compact density): `approveRefund` decides items that `listQueues` queues — every row is waiting for a person, so the empty state is success |
@@ -1363,7 +1363,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `marketing` module |
-| Block | Block A · task APP-SETUP-BO-005 |
+| Block | Block A · task VM-BO-005 |
 | Who uses it | venue staff holding `AI_USE`, `QUEUE_MANAGE`, `QUEUE_VIEW`, `REPORT_VIEW_VENUE` (2 operate, 1 configure, 1 read); in the flows as guest |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listQueueEntries` reads the population and `getWaitTimes` reads one of them — list, select, act |
@@ -1892,7 +1892,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `maintenance` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block A · task VM-BO-030 |
 | Who uses it | venue staff holding `WORK_ORDER_VERIFY`, `WORK_ORDER_VIEW` (1 operate, 1 read); in the flows as technician |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listWorkOrders` reads the population and `getWorkOrder` reads one of them — list, select, act |
@@ -2114,7 +2114,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `maintenance` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-031 |
 | Who uses it | venue |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listAssets` reads the population and `getAsset` reads one of them — list, select, act |
@@ -2358,6 +2358,13 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 
 **Shown**
 
+**Show the rule's entry points before they are replaced** (card list, from `listEntryRulePoints`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Is active | yes / no (icon or chip) | — |
+| Created at | 1 Oct 2026, 14:30 | — |
+
 **Admission profiles** (data table, from `listAdmissionRules`)
 
 | Shows | Format | Notes |
@@ -2401,7 +2408,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 - **Save profile**: Sends the whole profile (per VO-R04). Confirmation names the products and access points affected ("Used by 6 products; applies at 14 access points after next package refresh"). 422 messages appear against the field (e.g. count missing for N per day; to-date before from-date). *(source: contracts/spine/access.yaml#updateAdmissionRules)*
 - **Test with a virtual scan**: Opens the in-screen simulation (pick a product, gate, date and time; shows Admitted or the deny reason) before publishing. *(source: DI-629 / DI-722)*
 
-**Data it reads**: `listAdmissionRules` (onLoad, List admission profiles)
+**Data it reads**: `listAdmissionRules` (onLoad, List admission profiles); `listEntryRulePoints` (onLoad, Show the rule's entry points before they are replaced)
 
 #### States
 
@@ -2468,6 +2475,7 @@ profiles:
 - `createAdmissionRules` → `ACCESS_POINT_CONFIGURE` (configure) · staff
 - `updateAdmissionRules` → `ACCESS_POINT_CONFIGURE` (configure) · staff
 - `setEntryRulePoints` → `ACCESS_POINT_CONFIGURE` (configure) · staff
+- `listEntryRulePoints` → `SCOPE_VIEW` (read) · staff
 
 **A refused user sees:** Shown when the caller lacks `SCOPE_VIEW`, which `listAdmissionRules` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCESS_POINT_CONFIGURE` for `createAdmissionRules`, `updateAdmissionRules`, `setEntryRulePoints`.
 
@@ -2509,7 +2517,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (94), with its required mark, default, format and its error state (404, 422).
-- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-032?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: New profile, Save profile.
 - [ ] No transition is declared; back returns where the user came from.
@@ -2808,6 +2816,7 @@ Method, path, parameters, request and response for every operation these screens
 "getWorkOrder": {"method":"GET","path":"/work-orders/{workOrderId}","contract":"maintenance","summary":"Read a work order","permission":"WORK_ORDER_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"WorkOrderDetail"},
 "listAdmissionRules": {"method":"GET","path":"/admission-rules","contract":"access","summary":"List admission profiles","permission":"SCOPE_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listBlacklist": {"method":"GET","path":"/blacklist","contract":"access","summary":"List blacklisted media","permission":"SCOPE_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listEntryRulePoints": {"method":"GET","path":"/admission-rules/{ruleId}/points","contract":"access","summary":"Which access points an admission rule covers","permission":"SCOPE_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"ruleId","in":"path","required":true},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listParkingFacilities": {"method":"GET","path":"/parking-facilities","contract":"access","summary":"Car parks at a venue, and how each integrates","permission":"PARKING_CONFIGURE","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listQueueEntries": {"method":"GET","path":"/queues/{queueId}/entries","contract":"queue","summary":"List entries in a queue","permission":"QUEUE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listQueueFeeds": {"method":"GET","path":"/queue-feeds","contract":"queue","summary":"List configured sensor feeds","permission":"QUEUE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"QueueFeed"},

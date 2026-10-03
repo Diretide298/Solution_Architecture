@@ -364,7 +364,7 @@ Also apply: 1 for P06 · Stock on the Floor, 12 for all of P06, 29 for every app
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Stock on the Floor · wave 2 · needs the `retail` module |
-| Block | Block C · task APP-SETUP-EMP-062 |
+| Block | Block C · task APP-STAFF-EMP-062 |
 | Who uses it | venue staff holding `PRODUCT_VIEW` (1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | statusTracker (comfortable density): `getStockPositions` reads one record and nothing reads a population — the screen is about that one thing |

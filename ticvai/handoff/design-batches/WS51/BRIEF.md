@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-198` | Targeting & Eligibility Command Center | B–D | 2 | 2 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-198` | Targeting & Eligibility Command Center | C | 2 | 2 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-199` | Eligibility Rule Builder | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-200` | CRM & Customer Segment Manager | B–D | 0 | 14 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
-| `ADM-201` | Membership, Loyalty & Guest Eligibility | B–D | 0 | 0 | 6 | 0 | 0 | 2 | — | notStarted (generated) |
-| `ADM-202` | Behavioral & Transaction Targeting | B–D | 6 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-203` | Context, Location, Channel & Time Targeting | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-204` | Partner, B2B & Payment Eligibility | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-205` | Audience Preview, Reach & Eligibility Simulator | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-206` | Targeting Conflict, Frequency & Exclusion Controls | B–D | 6 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-207` | AI Audience Discovery & Targeting Optimization | B–D | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
+| `ADM-200` | CRM & Customer Segment Manager | C | 0 | 14 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `ADM-201` | Membership, Loyalty & Guest Eligibility | C | 0 | 0 | 6 | 0 | 0 | 2 | — | notStarted (generated) |
+| `ADM-202` | Behavioral & Transaction Targeting | C | 6 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-203` | Context, Location, Channel & Time Targeting | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-204` | Partner, B2B & Payment Eligibility | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-205` | Audience Preview, Reach & Eligibility Simulator | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-206` | Targeting Conflict, Frequency & Exclusion Controls | C | 6 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-207` | AI Audience Discovery & Targeting Optimization | C | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

@@ -96,16 +96,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-329` | Approval Matrix Command Center | B–D | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
-| `ADM-330` | Approval Authority Matrix | B–D | 9 | 0 | 5 | 49 | 1 | 3 | — | notStarted (—) |
-| `ADM-331` | Organizational Hierarchy Routing | B–D | 0 | 0 | 6 | 49 | 0 | 0 | — | notStarted (—) |
-| `ADM-332` | Department-Based Approval Matrix | B–D | 1 | 0 | 5 | 49 | 0 | 3 | — | notStarted (—) |
-| `ADM-333` | Venue & Tenant Approval Matrix | B–D | 0 | 0 | 6 | 49 | 1 | 3 | — | notStarted (—) |
-| `ADM-334` | Value & Threshold Routing | B–D | 0 | 0 | 6 | 49 | 1 | 0 | — | notStarted (—) |
-| `ADM-335` | Risk-Based & Conditional Routing | B–D | 0 | 0 | 6 | 49 | 0 | 0 | — | notStarted (—) |
-| `ADM-336` | Approver Group & Decision Policy | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-337` | Routing Simulator & Conflict Detection | B–D | 0 | 0 | 6 | 6 | 0 | 0 | — | notStarted (—) |
-| `ADM-338` | AI Routing Advisor & Matrix Optimization | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-329` | Approval Matrix Command Center | B | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
+| `ADM-330` | Approval Authority Matrix | B | 9 | 0 | 5 | 49 | 1 | 3 | — | notStarted (—) |
+| `ADM-331` | Organizational Hierarchy Routing | B | 0 | 0 | 6 | 49 | 0 | 0 | — | notStarted (—) |
+| `ADM-332` | Department-Based Approval Matrix | B | 1 | 0 | 5 | 49 | 0 | 3 | — | notStarted (—) |
+| `ADM-333` | Venue & Tenant Approval Matrix | B | 0 | 0 | 6 | 49 | 1 | 3 | — | notStarted (—) |
+| `ADM-334` | Value & Threshold Routing | B | 0 | 0 | 6 | 49 | 1 | 0 | — | notStarted (—) |
+| `ADM-335` | Risk-Based & Conditional Routing | B | 0 | 0 | 6 | 49 | 0 | 0 | — | notStarted (—) |
+| `ADM-336` | Approver Group & Decision Policy | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-337` | Routing Simulator & Conflict Detection | B | 0 | 0 | 6 | 6 | 0 | 0 | — | notStarted (—) |
+| `ADM-338` | AI Routing Advisor & Matrix Optimization | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

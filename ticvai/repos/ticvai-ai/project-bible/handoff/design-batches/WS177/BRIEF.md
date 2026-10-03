@@ -130,16 +130,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-1071` | Integration Command Center | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1072` | Seat Management APIs | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-1073` | API Access & OAuth | B–D | 1 | 17 | 6 | 1 | 2 | 0 | — | notStarted (—) |
-| `BO-1074` | Webhook Configuration | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1075` | Seat Event Catalog | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-1076` | Concurrency, Idempotency & Limits | B–D | 0 | 14 | 6 | 15 | 0 | 4 | — | notStarted (—) |
-| `BO-1077` | Mapping & Transformation | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1078` | Monitoring, Retry & Reconciliation | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1079` | Immutable Seat Audit Logs | B–D | 1 | 26 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-1080` | Integration Approval & Compliance | B–D | 0 | 0 | 6 | 5 | 0 | 3 | — | notStarted (—) |
+| `BO-1071` | Integration Command Center | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1072` | Seat Management APIs | B | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-1073` | API Access & OAuth | B | 1 | 17 | 6 | 1 | 2 | 0 | — | notStarted (—) |
+| `BO-1074` | Webhook Configuration | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1075` | Seat Event Catalog | B | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-1076` | Concurrency, Idempotency & Limits | B | 0 | 14 | 6 | 15 | 0 | 4 | — | notStarted (—) |
+| `BO-1077` | Mapping & Transformation | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1078` | Monitoring, Retry & Reconciliation | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1079` | Immutable Seat Audit Logs | B | 1 | 26 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-1080` | Integration Approval & Compliance | B | 0 | 0 | 6 | 5 | 0 | 3 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

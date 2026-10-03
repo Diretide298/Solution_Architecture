@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-669` | Journey & Context Command Center | B–D | 0 | 0 | 6 | 3 | 0 | 6 | — | notStarted (—) |
-| `ADM-670` | Customer Journey Map & Touchpoint Designer | B–D | 30 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `ADM-671` | Real-Time Context Rule Engine | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-672` | Pre-Purchase & Booking Journey Recommendation Manager | B–D | 6 | 20 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `ADM-673` | Post-Purchase & Pre-Visit Recommendation Manager | B–D | 5 | 20 | 6 | 0 | 0 | 4 | — | notStarted (—) |
-| `ADM-674` | In-Venue & Location-Aware Recommendation Engine | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-675` | Visit State, Itinerary & Time-Aware Recommendation | B–D | 0 | 20 | 6 | 0 | 0 | 1 | — | notStarted (—) |
-| `ADM-676` | Omnichannel Recommendation Synchronization | B–D | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-677` | Contextual Trigger, Frequency & Experience Controls | B–D | 7 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-678` | Journey Simulator, Decision Trace & AI Optimization | B–D | 0 | 0 | 6 | 1 | 0 | 6 | — | notStarted (—) |
+| `ADM-669` | Journey & Context Command Center | C | 0 | 0 | 6 | 3 | 0 | 6 | — | notStarted (—) |
+| `ADM-670` | Customer Journey Map & Touchpoint Designer | C | 30 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `ADM-671` | Real-Time Context Rule Engine | C | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-672` | Pre-Purchase & Booking Journey Recommendation Manager | C | 6 | 20 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `ADM-673` | Post-Purchase & Pre-Visit Recommendation Manager | C | 5 | 20 | 6 | 0 | 0 | 4 | — | notStarted (—) |
+| `ADM-674` | In-Venue & Location-Aware Recommendation Engine | C | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-675` | Visit State, Itinerary & Time-Aware Recommendation | C | 0 | 20 | 6 | 0 | 0 | 1 | — | notStarted (—) |
+| `ADM-676` | Omnichannel Recommendation Synchronization | C | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-677` | Contextual Trigger, Frequency & Experience Controls | C | 7 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-678` | Journey Simulator, Decision Trace & AI Optimization | C | 0 | 0 | 6 | 1 | 0 | 6 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

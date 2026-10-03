@@ -99,16 +99,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-534` | Rental Booking Command Center | B–D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-535` | New Rental Booking Wizard | B–D | 7 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-536` | Availability Selection & Alternative Options | B–D | 4 | 8 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-537` | Customer & Participant Information | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `BO-538` | Group Rental & Participant Management | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-539` | Rental Agreement & Waiver Completion | B–D | 0 | 14 | 6 | 0 | 2 | 6 | — | notStarted (—) |
-| `BO-540` | Booking Commercial Summary & Payment | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-541` | Reservation Confirmation & QR Voucher | B–D | 0 | 0 | 6 | 0 | 1 | 2 | — | notStarted (—) |
-| `BO-542` | Reservation Modification, Cancellation & No-Show | B–D | 0 | 10 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-543` | Reservation Detail, Timeline & Readiness | B–D | 3 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-534` | Rental Booking Command Center | D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-535` | New Rental Booking Wizard | D | 7 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-536` | Availability Selection & Alternative Options | D | 4 | 8 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-537` | Customer & Participant Information | D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `BO-538` | Group Rental & Participant Management | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-539` | Rental Agreement & Waiver Completion | D | 0 | 14 | 6 | 0 | 2 | 6 | — | notStarted (—) |
+| `BO-540` | Booking Commercial Summary & Payment | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-541` | Reservation Confirmation & QR Voucher | D | 0 | 0 | 6 | 0 | 1 | 2 | — | notStarted (—) |
+| `BO-542` | Reservation Modification, Cancellation & No-Show | D | 0 | 10 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-543` | Reservation Detail, Timeline & Readiness | D | 3 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

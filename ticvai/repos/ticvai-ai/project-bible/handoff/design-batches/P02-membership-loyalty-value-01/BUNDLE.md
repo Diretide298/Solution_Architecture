@@ -321,7 +321,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### References
 
 - Wireframe frame: `wireframes/P02 Guest App.dc.html#gst-011` · status **notStarted** · provenance designed · **Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no …
-- Prototype (Mobile App v4, 29 September 2026, verified —, match none): `sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html`, view **
+- Prototype (Mobile App v4, 29 September 2026, verified —, match none): `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, view **
 - Drawn by: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
 - Flow F18 *A guest plays an arcade game*, step 2: Checks the card's balance in the app's wallet → What is on the card
 - Flow F53 *A guest earns, sees and spends loyalty*, step 4: Their wallet shows stored value. → **Wallet and points are different things** — one is money the venue owes, the other is a discount it might give.
@@ -593,7 +593,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### References
 
 - Wireframe frame: `wireframes/P02 Guest App.dc.html#gst-015` · status **notStarted** · provenance designed · **Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no …
-- Prototype (Mobile App v4, 29 September 2026, verified —, match none): `sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html`, view **
+- Prototype (Mobile App v4, 29 September 2026, verified —, match none): `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, view **
 - Drawn by: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
 - Flow F19 *A membership works in another country*, step 1: Guest sees the pass and where it is valid → **Valid here is not the same as bought here**
 - Flow F19 branch at step 1 (requiresStaff): when The guest asks for a refund of a pass used in two regions, Refund policy applies in the selling cell, and the usage evidence is in another. **Nobody has decided who refunds** — CF-31 named the mechanism and not the money.
@@ -912,7 +912,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### References
 
 - Wireframe frame: `wireframes/P02 Guest App.dc.html#gst-036` · status **notStarted** · provenance designed · **Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no …
-- Prototype (Mobile App v4, 29 September 2026, verified —, match none): `sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html`, view **
+- Prototype (Mobile App v4, 29 September 2026, verified —, match none): `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, view **
 - Drawn by: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
 - Flow F53 *A guest earns, sees and spends loyalty*, step 1: They check their points. → **Position, not balance.** Tier, points, and what the next tier needs — a number alone tells a guest nothing about whether to come back.
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
@@ -949,7 +949,7 @@ Every guest screen in this batch is white-label. These elements are set by the t
 | Show loading indicator (`brand.showLoadingIndicator`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | — | on | — |
 | Intro video (`brand.introVideoAssetRef`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | The optional intro video (decided 29 September, MOB-5). A video `MediaAsset` from the media library (CMS-010). |
 | Intro video mode (`brand.introVideoMode`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | Off · First launch · Every launch; Anything but `off` needs `introVideoAssetRef`, or 400. | Off | When GST-001 plays it full screen. "Skip introduction" is always shown. |
-| Powered by TICVAI credit (`brand.showPoweredBy`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | — | on | the *Powered by TICVAI* credit on the launch screen, at the foot of Account and in the web footer; on by default, and switching it off needs the licence add-on (403 … |
+| Powered by TICVAI credit (`brand.showPoweredBy`) | `CMS-104`, `ADM-016` | — | on | the *Powered by TICVAI* credit on the launch screen, at the foot of Account and in the web footer; on by default, and switching it off needs the licence add-on (403 … |
 | Primary colour (`theme.primaryColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | the brand colour (the `accentSolid` token): primary buttons (Book, Continue, Add to cart, Pay), the active step of the step indicator, selected date and time chips, focus rings |
 | Secondary colour (`theme.secondaryColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | secondary buttons and secondary emphasis: unselected chips, secondary tabs |
 | Accent colour (`theme.accentColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | highlights: badges (LIMITED, NEW, BESTSELLER), availability counts, sale prices |

@@ -1,10 +1,10 @@
 id: LLD-MarketingService
-title: MarketingService — 274 operations, 132 tables
+title: MarketingService — 275 operations, 132 tables
 generatedBy: tools/derive-diagrams.py
 tier: engagement
 deployable: operations
 index: diagrams/hld/02-services.yaml
-why: '**274 operations and 132 tables — the biggest thing in the package, and probably two services
+why: '**275 operations and 132 tables — the biggest thing in the package, and probably two services
   eventually.** CRM and campaigns have different write patterns: a guest profile is read constantly
   and written rarely; a campaign send is a burst of millions of rows nobody reads again.
 
@@ -13,7 +13,7 @@ why: '**274 operations and 132 tables — the biggest thing in the package, and 
 scale: Bursty on send, read-heavy otherwise. **The one to watch for a split.**
 ifDown: Down stops campaigns and guest lookup. Neither stops trading.
 coverage:
-  operations: 274
+  operations: 275
   inAFlow: 102
   percent: 37%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -26,7 +26,7 @@ schemas:
   largestTable: marketing.waiver_requirement
 operationsByContract:
 - contract: marketing-crm
-  count: 274
+  count: 275
   operations:
   - operation: accrueLoyaltyPoints
     verb: POST
@@ -59,7 +59,7 @@ operationsByContract:
     permission: MARKETING_SEND
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: activateJourney
     verb: POST
     path: /journeys/{journeyId}/activate
@@ -83,7 +83,7 @@ operationsByContract:
     permission: GUEST_MANAGE
     offline: true
     reads: 3
-    writes: 1
+    writes: 2
   - operation: addSuppression
     verb: POST
     path: /consent/suppression-list
@@ -115,7 +115,7 @@ operationsByContract:
     permission: MARKETING_MANAGE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: approveWaiverTesting
     verb: PUT
     path: /waiver-testing
@@ -123,7 +123,7 @@ operationsByContract:
     permission: MARKETING_MANAGE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: awardBadge
     verb: POST
     path: /customers/{customerId}/badges
@@ -187,7 +187,7 @@ operationsByContract:
     permission: MARKETING_MANAGE
     offline: false
     reads: 8
-    writes: 1
+    writes: 2
   - operation: createChallenge
     verb: POST
     path: /challenges
@@ -275,7 +275,7 @@ operationsByContract:
     permission: GUEST_MANAGE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: decideGuestCheckoutMatch
     verb: POST
     path: /guest-checkout/profile-match/decision
@@ -371,6 +371,14 @@ operationsByContract:
     permission: null
     offline: false
     reads: 4
+    writes: 0
+  - operation: getCustomerServiceCopilot
+    verb: GET
+    path: /customer-service-copilot
+    scope: venue
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 1
     writes: 0
   - operation: getDeviceConsentHistory
     verb: GET
@@ -1483,7 +1491,7 @@ operationsByContract:
     permission: ORDER_CREATE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: recordCookieScan
     verb: POST
     path: /cookie-tracking-digital/scans
@@ -1627,7 +1635,7 @@ operationsByContract:
     permission: null
     offline: false
     reads: 0
-    writes: 0
+    writes: 1
   - operation: sendTransactionalMessage
     verb: POST
     path: /messages
@@ -1723,7 +1731,7 @@ operationsByContract:
     permission: MARKETING_MANAGE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: setCommunicationRoutingRule
     verb: PUT
     path: /routing-priority-throttling
@@ -1739,7 +1747,7 @@ operationsByContract:
     permission: MARKETING_MANAGE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: setConsentPurposes
     verb: PUT
     path: /consent-purposes
@@ -1883,7 +1891,7 @@ operationsByContract:
     permission: null
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: setLegalHold
     verb: PUT
     path: /data-retention-expiry
@@ -1939,7 +1947,7 @@ operationsByContract:
     permission: MARKETING_MANAGE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: setOrderBookingTicket
     verb: PUT
     path: /order-booking-ticket
@@ -2453,7 +2461,8 @@ tables:
   columns: 20
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - marketing-crm
   foreignWriters: null
 - table: marketing.business_event
   columns: 9
@@ -2577,7 +2586,8 @@ tables:
   columns: 17
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - marketing-crm
   foreignWriters: null
 - table: marketing.communication_provider
   columns: 21
@@ -2597,7 +2607,8 @@ tables:
   columns: 13
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - marketing-crm
   foreignWriters: null
 - table: marketing.consent_propagation
   columns: 9
@@ -2733,7 +2744,8 @@ tables:
   columns: 10
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - marketing-crm
   foreignWriters: null
 - table: marketing.feedback_classification
   columns: 11
@@ -2822,7 +2834,8 @@ tables:
   columns: 9
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - marketing-crm
   foreignWriters: null
 - table: marketing.guest_preference
   columns: 7
@@ -3004,7 +3017,8 @@ tables:
   columns: 15
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - marketing-crm
   foreignWriters: null
 - table: marketing.points_earning_rule
   columns: 6
@@ -3038,7 +3052,8 @@ tables:
   columns: 8
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - marketing-crm
   foreignWriters: null
 - table: marketing.privacy_exception
   columns: 24
@@ -3324,7 +3339,8 @@ tables:
   columns: 15
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - marketing-crm
   foreignWriters: null
 - table: marketing.wishlist_item
   columns: 12

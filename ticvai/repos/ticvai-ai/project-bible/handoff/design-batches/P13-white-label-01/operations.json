@@ -445,6 +445,25 @@
   "requestBody": null,
   "responds": "TenantAppStatus"
  },
+ "getTenantConfig": {
+  "method": "GET",
+  "path": "/tenant-config",
+  "contract": "white-label",
+  "summary": "Full working configuration",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "version",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TenantConfig"
+ },
  "getTheme": {
   "method": "GET",
   "path": "/tenant-config/theme",

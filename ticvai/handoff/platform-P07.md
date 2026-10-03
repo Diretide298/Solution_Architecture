@@ -9,12 +9,12 @@
 | Contracts | 5 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 47 |
+| Operations with no screen | 44 |
 | Waves | wave1 11 |
 
 ## Gaps
 
-### 47 operations with no screen here
+### 44 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -24,7 +24,6 @@
 | `getHardwareModelCertification` | access | GET | A reader model's certification and its test results |
 | `listAccessChanges` | access | GET | Changes made to an entitlement's access |
 | `listEntryExitRule` | access | GET | Entry, Exit & Re-entry Rules |
-| `listEntryRulePoints` | access | GET | Which access points an admission rule covers |
 | `listEntryTemporaryExit` | access | GET | Re-entry & Temporary Exit Journey |
 | `setHardwareModelCertification` | access | PUT | Certify a reader model, or record that it failed |
 | `setVirtualTicketCredential` | access | PUT | Virtual Ticket & Credential 360° Workspace |
@@ -51,16 +50,17 @@
 | `listSegregationViolations` | identity | GET | Who already holds a conflicting pair |
 | `setPrincipalModuleAccess` | identity | PUT | Tick what they may do |
 | `updateRole` | identity | PATCH | Rename a role or change its description |
-| `cancelPaymentLink` | orders | POST | Cancel a live payment link |
 | `convertToTermProduct` | orders | POST | Turn a visit into a membership or season pass |
 | `issueInvitation` | orders | POST | Issue a complimentary entitlement, with no payment expected |
 | `listInvitationAllowances` | orders | GET | Who may issue comps, and how many are left |
 | `listMembershipRenewals` | orders | GET | Renewal attempts and why they failed |
 | `listOrderDiscounts` | orders | GET | Discounts applied to orders |
 | `listOrderFees` | orders | GET | Fees charged on an order |
-| `listPaymentProviders` | orders | GET | Gateways configured for this scope |
 | `openGuestCreditAccount` | orders | POST | A credit limit for an individual booking ahead |
-| … | | | 7 more |
+| `overrideCreditLimit` | orders | POST | Authorise an order beyond the credit limit |
+| `pushWalletPassUpdate` | orders | POST | Push a change to every device holding it |
+| `revokeEntitlementShare` | orders | POST | Take back a share |
+| … | | | 4 more |
 
 ## Modules
 

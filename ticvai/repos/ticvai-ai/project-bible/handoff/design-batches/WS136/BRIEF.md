@@ -103,16 +103,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-744` | Data Governance Center | B–D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `BO-745` | Identity Resolution Rules | B–D | 2 | 3 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-744` | Data Governance Center | D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `BO-745` | Identity Resolution Rules | D | 2 | 3 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-746` | Duplicate Review & Merge | D | 0 | 0 | 6 | 0 | 4 | 2 | — | notStarted (—) |
-| `BO-747` | Consent Policy Configuration | B–D | 24 | 20 | 6 | 76 | 1 | 4 | — | notStarted (—) |
-| `BO-748` | Consent Capture & Versions | B–D | 0 | 7 | 6 | 10 | 0 | 4 | — | notStarted (—) |
-| `BO-749` | Guest Preference Center | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-750` | Data Subject Requests | B–D | 17 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-751` | Retention & Anonymization | B–D | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `BO-752` | Privacy & AI Governance | B–D | 0 | 0 | 6 | 0 | 0 | 4 | — | notStarted (—) |
-| `BO-753` | Compliance Audit Dashboard | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-747` | Consent Policy Configuration | D | 24 | 20 | 6 | 76 | 1 | 4 | — | notStarted (—) |
+| `BO-748` | Consent Capture & Versions | D | 0 | 7 | 6 | 10 | 0 | 4 | — | notStarted (—) |
+| `BO-749` | Guest Preference Center | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-750` | Data Subject Requests | D | 17 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-751` | Retention & Anonymization | B | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `BO-752` | Privacy & AI Governance | D | 0 | 0 | 6 | 0 | 0 | 4 | — | notStarted (—) |
+| `BO-753` | Compliance Audit Dashboard | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

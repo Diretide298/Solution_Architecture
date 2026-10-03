@@ -1,5 +1,5 @@
 id: LLD-catalogue
-title: catalogue — 245 operations
+title: catalogue — 248 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -132,7 +132,8 @@ operations:
   - staff
   offline: false
   reads: []
-  writes: []
+  writes:
+  - catalogue.product
 - operation: cancelPerformance
   verb: POST
   path: /performances/{performanceId}/cancel
@@ -251,6 +252,9 @@ operations:
   - catalogue.channel_allocation
   - catalogue.channel_capacity
   - catalogue.inventory_hold
+  - platform.outbox
+  - seating.seat_hold
+  - seating.seat_hold_item
 - operation: copyPriceList
   verb: POST
   path: /price-lists/{priceListId}/copy
@@ -634,6 +638,17 @@ operations:
   - catalogue.product
   - marketing.loyalty_position
   writes: []
+- operation: getPackagePricingDefinition
+  verb: GET
+  path: /package-pricing
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.package_pricing
+  writes: []
 - operation: getPerformance
   verb: GET
   path: /performances/{performanceId}
@@ -684,6 +699,17 @@ operations:
   - catalogue.product
   - catalogue.product_media
   writes: []
+- operation: getProductAttributes
+  verb: GET
+  path: /products/{productId}/attributes
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.variant_dimension
+  writes: []
 - operation: getProductEligibilityRule
   verb: GET
   path: /products/{productId}/eligibility-rule
@@ -695,6 +721,16 @@ operations:
   offline: false
   reads:
   - catalogue.product_eligibility_rule
+  writes: []
+- operation: getTaxProfileJurisdiction
+  verb: GET
+  path: /tax-profile-jurisdiction
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: getWaitingRoomPosition
   verb: GET
@@ -2325,7 +2361,8 @@ operations:
   offline: false
   reads:
   - catalogue.channel_allocation
-  writes: []
+  writes:
+  - catalogue.channel_allocation
 - operation: relinquishInventoryHold
   verb: DELETE
   path: /inventory-holds/{inventoryHoldId}
@@ -2744,7 +2781,8 @@ operations:
   offline: false
   reads:
   - catalogue.entitlement_template
-  writes: []
+  writes:
+  - catalogue.entitlement_template
 - operation: setEventCapacityProfile
   verb: PUT
   path: /events/{eventId}/capacity-profile
@@ -3606,4 +3644,5 @@ operations:
   offline: false
   reads:
   - catalogue.variant
-  writes: []
+  writes:
+  - catalogue.variant

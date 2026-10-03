@@ -1,6 +1,6 @@
 # P02-transport-01 — P02 · Transport
 
-**4 screens · 13 operations · 24 schemas · 0 permissions**
+**4 screens · 14 operations · 24 schemas · 0 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -97,7 +97,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `GST-076` | Intercity Trip — Route & Schedule | A | 5 | 4 | 6 | 0 | 5 | 0 | guest | review (client-verified) |
-| `GST-077` | Intercity Trip — Route & Passengers | A | 24 | 52 | 6 | 4 | 3 | 0 | guest | review (client-verified) |
+| `GST-077` | Intercity Trip — Route & Passengers | A | 24 | 57 | 6 | 4 | 3 | 0 | guest | review (client-verified) |
 | `GST-078` | Intercity Trip — Multi-trip Passes | A | 21 | 5 | 6 | 4 | 1 | 0 | guest | review (client-verified) |
 | `GST-079` | Intercity Trip — Favourite Routes | A | 0 | 3 | 6 | 0 | 1 | 0 | guest | review (client-verified) |
 
@@ -363,6 +363,16 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 **Shown**
 
+**Load the departure the trip was opened on** (card list, from `getTransportDeparture`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Route code | text | The price card's label, e.g. `E101-Out`. |
+| Departs at | 1 Oct 2026, 14:30 | At the boarding stop. |
+| Arrives at | 1 Oct 2026, 14:30 | At the alighting stop. |
+| Duration minutes | 1,234 | — |
+| Party total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+
 **Stops** (timeline, from `getTransportRouteMap`): From and To with the stops between folded: *Show full route (n stops)*.
 
 | Shows | Format | Notes |
@@ -441,7 +451,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 - **price card**: Line and direction, departs, arrives, seats, fare per type and total; route map (internet) or the stop list offline. *(source: screens/P02-guest-mobile-app.yaml#GST-077 layout)*
 
-**Data it reads**: `getTransportRoute` (onLoad, The route and its stops); `getTransportRouteMap` (onLoad, Stop list, line and bounds for the map); `getTransportFareTable` (onLoad, Passenger types and fares of the route)
+**Data it reads**: `getTransportRoute` (onLoad, The route and its stops); `getTransportRouteMap` (onLoad, Stop list, line and bounds for the map); `getTransportFareTable` (onLoad, Passenger types and fares of the route); `getTransportDeparture` (onLoad, Load the departure the trip was opened on)
 
 **Where the user goes next**
 
@@ -486,6 +496,7 @@ departure: E201-Out · 07:30 → 09:10 · Adult × 2, Child × 1 · AED 70
 - `quoteTransportFare` → no permission · guest, public, service
 - `addCartLine` → no permission · guest, partner, staff
 - `saveFavouriteRoute` → no permission · guest
+- `getTransportDeparture` → no permission · guest, public
 
 **A refused user sees:** Searching and buying need no account. **Favourites need a signed-in guest**: a guest who is not signed in is offered sign-in and brought back, never shown an empty list.
 
@@ -530,7 +541,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (24), with its required mark, default, format and its error state (403, 404, 409, 422).
-- [ ] Every output is drawn (52 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (57 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-077?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Continue to payment, Save this route.
 - [ ] Every transition is wired: `GST-049`, `GST-041`, `GST-042`, `GST-076`.
@@ -878,7 +889,7 @@ Every guest screen in this batch is white-label. These elements are set by the t
 | Show loading indicator (`brand.showLoadingIndicator`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | — | on | — |
 | Intro video (`brand.introVideoAssetRef`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | The optional intro video (decided 29 September, MOB-5). A video `MediaAsset` from the media library (CMS-010). |
 | Intro video mode (`brand.introVideoMode`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | Off · First launch · Every launch; Anything but `off` needs `introVideoAssetRef`, or 400. | Off | When GST-001 plays it full screen. "Skip introduction" is always shown. |
-| Powered by TICVAI credit (`brand.showPoweredBy`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | — | on | the *Powered by TICVAI* credit on the launch screen, at the foot of Account and in the web footer; on by default, and switching it off needs the licence add-on (403 … |
+| Powered by TICVAI credit (`brand.showPoweredBy`) | `CMS-104`, `ADM-016` | — | on | the *Powered by TICVAI* credit on the launch screen, at the foot of Account and in the web footer; on by default, and switching it off needs the licence add-on (403 … |
 | Primary colour (`theme.primaryColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | the brand colour (the `accentSolid` token): primary buttons (Book, Continue, Add to cart, Pay), the active step of the step indicator, selected date and time chips, focus rings |
 | Secondary colour (`theme.secondaryColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | secondary buttons and secondary emphasis: unselected chips, secondary tabs |
 | Accent colour (`theme.accentColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | highlights: badges (LIMITED, NEW, BESTSELLER), availability counts, sale prices |
@@ -1061,6 +1072,7 @@ Method, path, parameters, request and response for every operation these screens
 "addCartLine": {"method":"POST","path":"/carts/{cartId}/lines","contract":"orders","summary":"Add something","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"AddCartLineRequest","responds":"Cart"},
 "deleteFavouriteRoute": {"method":"DELETE","path":"/transport/favourite-routes/{favouriteId}","contract":"transport","summary":"Remove a saved route","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "getNextTransportDeparture": {"method":"GET","path":"/transport/departures/next","contract":"transport","summary":"Next Available Trip","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"fromStationId","in":"query","required":true},{"name":"toStationId","in":"query","required":true},{"name":"after","in":"query","required":null},{"name":"passengers","in":"query","required":null}],"requestBody":null,"responds":"DepartureOffer"},
+"getTransportDeparture": {"method":"GET","path":"/transport/departures/{departureId}","contract":"transport","summary":"One departure, as a guest books it","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"DepartureOffer"},
 "getTransportFareTable": {"method":"GET","path":"/transport/routes/{routeId}/fare-table","contract":"transport","summary":"A route's fares and passenger types","permission":null,"offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"at","in":"query","required":false}],"requestBody":null,"responds":"FareTable"},
 "getTransportRoute": {"method":"GET","path":"/transport/routes/{routeId}","contract":"transport","summary":"A route with its stops","permission":null,"offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"TransportRoute"},
 "getTransportRouteMap": {"method":"GET","path":"/transport/routes/{routeId}/map","contract":"transport","summary":"The route drawn for a map, with the journey highlighted","permission":null,"offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"fromStationId","in":"query","required":null},{"name":"toStationId","in":"query","required":null}],"requestBody":null,"responds":"RouteMap"},

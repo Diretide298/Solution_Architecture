@@ -121,16 +121,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-474` | Reader Integration Command Center | B–D | 2 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-475` | Reader Manufacturer & Model Profile | B–D | 24 | 14 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-476` | Communication Protocol Configuration | B–D | 10 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-477` | Reader Command & Event Mapping | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-478` | Reader Configuration Deployment & Synchronization | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-479` | Game Trigger & I/O Control Mapping | B–D | 0 | 12 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-480` | Reader Screen, LED & Sound Output Mapping | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `BO-481` | Edge Cache & Offline Rule Package | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-482` | Device Diagnostics & Integration Logs | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-483` | Integration Certification & Test Console | B–D | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-474` | Reader Integration Command Center | D | 2 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-475` | Reader Manufacturer & Model Profile | C | 24 | 14 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-476` | Communication Protocol Configuration | D | 10 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-477` | Reader Command & Event Mapping | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-478` | Reader Configuration Deployment & Synchronization | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-479` | Game Trigger & I/O Control Mapping | D | 0 | 12 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-480` | Reader Screen, LED & Sound Output Mapping | D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `BO-481` | Edge Cache & Offline Rule Package | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-482` | Device Diagnostics & Integration Logs | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-483` | Integration Certification & Test Console | B | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

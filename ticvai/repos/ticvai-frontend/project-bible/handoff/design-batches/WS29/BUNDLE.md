@@ -130,16 +130,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-284` | Membership & Annual Pass Command Center | B–D | 11 | 228 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-285` | Membership Product & Tier Builder | B–D | 48 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-286` | Membership Eligibility & Qualification Rule Builder | B–D | 11 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-287` | Validity, Activation & Expiry Configuration | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-288` | Membership Entitlement & Admission Benefit Builder | B–D | 14 | 0 | 5 | 25 | 0 | 0 | — | notStarted (generated) |
-| `BO-289` | Membership Usage, Visit & Consumption Rules | B–D | 19 | 20 | 6 | 9 | 0 | 0 | — | notStarted (generated) |
-| `BO-290` | Family, Household & Dependent Membership Configuration | B–D | 21 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-291` | Membership Commercial, Pricing & Channel Association | B–D | 35 | 0 | 5 | 4 | 0 | 0 | — | notStarted (generated) |
-| `BO-292` | Renewal, Auto-Renewal & Membership Continuity Configuration | B–D | 11 | 0 | 5 | 1 | 1 | 0 | — | notStarted (generated) |
-| `BO-293` | Membership Product Validation, Approval, Publication & Versioning | B–D | 12 | 0 | 5 | 0 | 0 | 3 | — | notStarted (generated) |
+| `BO-284` | Membership & Annual Pass Command Center | B | 11 | 228 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-285` | Membership Product & Tier Builder | B | 48 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-286` | Membership Eligibility & Qualification Rule Builder | B | 11 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-287` | Validity, Activation & Expiry Configuration | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-288` | Membership Entitlement & Admission Benefit Builder | B | 14 | 0 | 5 | 25 | 0 | 0 | — | notStarted (generated) |
+| `BO-289` | Membership Usage, Visit & Consumption Rules | B | 19 | 20 | 6 | 9 | 0 | 0 | — | notStarted (generated) |
+| `BO-290` | Family, Household & Dependent Membership Configuration | B | 21 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-291` | Membership Commercial, Pricing & Channel Association | B | 35 | 0 | 5 | 4 | 0 | 0 | — | notStarted (generated) |
+| `BO-292` | Renewal, Auto-Renewal & Membership Continuity Configuration | B | 11 | 0 | 5 | 1 | 1 | 0 | — | notStarted (generated) |
+| `BO-293` | Membership Product Validation, Approval, Publication & Versioning | B | 12 | 0 | 5 | 0 | 0 | 3 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -159,7 +159,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-284 |
 | Who uses it | venue staff holding `PLATFORM_CELL_MANAGE`, `PLATFORM_TENANT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display; Identify) and no metric row |
@@ -548,7 +548,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the membership annual pass are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 The action is not allowed from the version's current status (`invalid-product-transition`, states/membership-product.yaml) (decided 29 September, writers pass …; 422 A suspend sent without a reason (`reason-required`) (decided 29 September, writers pass; DM4) |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The action is not allowed from the version's current status (`invalid-product-transition`, states/membership-product.yaml) (decided 29 September, writers pass …; 422 A suspend sent without a reason (`reason-required`) (decided 29 September, writers pass; DM4); 422 A wrong code, attempts one to four (CHG-R1S-025; the r1 gate found only the fifth failure specified). |
 
 #### Edge cases to draw
 
@@ -618,7 +618,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (11), with its required mark, default, format and its error state (409, 422).
+- [ ] Every input above is drawn (11), with its required mark, default, format and its error state (409, 410, 422).
 - [ ] Every output is drawn (228 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-284?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Suspend membership product, Reinstate membership product, Email me a code instead.
@@ -638,7 +638,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-285 |
 | Who uses it | venue staff holding `PLATFORM_CELL_MANAGE`, `PRODUCT_CONFIGURE` (2 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Capture; Define; Configure) and no display directory — it is settings, not a population |
@@ -826,7 +826,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-286 |
 | Who uses it | venue staff holding `PLATFORM_CELL_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; Configure whether qualification requires) and no display directory — it is settings, not a population |
@@ -947,7 +947,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-287 |
 | Who uses it | venue staff holding `PLATFORM_CELL_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1053,7 +1053,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-288 |
 | Who uses it | venue staff holding `PLATFORM_CELL_MANAGE`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -1215,7 +1215,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-289 |
 | Who uses it | venue staff holding `PLATFORM_CELL_MANAGE`, `PLATFORM_TENANT_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 configure, 2 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Maintain counters such as) and no metric row |
@@ -1421,7 +1421,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-290 |
 | Who uses it | venue staff holding `PLATFORM_CELL_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; Possible configured action) and no display directory — it is settings, not a population |
@@ -1559,7 +1559,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-291 |
 | Who uses it | venue staff holding `PLATFORM_CELL_MANAGE`, `PLATFORM_TENANT_VIEW`, `PRICE_CONFIGURE`, `PRICE_VIEW`, `PRODUCT_CONFIGURE` (3 configure, 2 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure sale through; Configure) and no display directory — it is settings, not a population |
@@ -1745,7 +1745,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-292 |
 | Who uses it | venue staff holding `PLATFORM_CELL_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; At renewal, configure whether) and no display directory — it is settings, not a population |
@@ -1875,7 +1875,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-293 |
 | Who uses it | venue staff holding `PLATFORM_CELL_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Synchronize relevant configuration with; AI Configuration Review) and no display directory — it is settings, not a population |
@@ -1941,7 +1941,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, first run (`?state=emptyFirstRun`) | No membership product validation configured yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 The action is not allowed from the version's current status (`invalid-product-transition`, states/membership-product.yaml) (decided 29 September, writers pass …; 422 A suspend sent without a reason (`reason-required`) (decided 29 September, writers pass; DM4) |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The action is not allowed from the version's current status (`invalid-product-transition`, states/membership-product.yaml) (decided 29 September, writers pass …; 422 A suspend sent without a reason (`reason-required`) (decided 29 September, writers pass; DM4); 422 A wrong code, attempts one to four (CHG-R1S-025; the r1 gate found only the fifth failure specified). |
 
 #### Edge cases to draw
 
@@ -1997,7 +1997,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (12), with its required mark, default, format and its error state (409, 422).
+- [ ] Every input above is drawn (12), with its required mark, default, format and its error state (409, 410, 422).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-293?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Approve, Email me a code instead.

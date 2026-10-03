@@ -1,5 +1,5 @@
 id: LLD-public-api
-title: public-api — 31 operations
+title: public-api — 35 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -114,6 +114,18 @@ operations:
   reads:
   - control.api_client
   writes: []
+- operation: getDeveloperAccount
+  verb: GET
+  path: /developers/{developerId}
+  scope: tenant
+  permission: DEVELOPER_VIEW
+  audience:
+  - partner
+  - staff
+  offline: false
+  reads:
+  - control.developer_account
+  writes: []
 - operation: issueApiToken
   verb: POST
   path: /oauth/token
@@ -139,6 +151,17 @@ operations:
   reads:
   - control.api_anomaly
   writes: []
+- operation: listApiAnomalyRules
+  verb: GET
+  path: /api-anomaly-rules
+  scope: tenant
+  permission: DEVELOPER_ADMIN
+  audience:
+  - staff
+  offline: false
+  reads:
+  - control.api_anomaly_rule
+  writes: []
 - operation: listApiClients
   verb: GET
   path: /api-clients
@@ -150,6 +173,28 @@ operations:
   offline: false
   reads:
   - control.api_client
+  writes: []
+- operation: listApiLicences
+  verb: GET
+  path: /api-licensing
+  scope: tenant
+  permission: DEVELOPER_ADMIN
+  audience:
+  - staff
+  offline: false
+  reads:
+  - control.api_licence
+  writes: []
+- operation: listApiQuotas
+  verb: GET
+  path: /api-quotas
+  scope: tenant
+  permission: DEVELOPER_ADMIN
+  audience:
+  - staff
+  offline: false
+  reads:
+  - control.api_limit
   writes: []
 - operation: listApiScopes
   verb: GET
@@ -362,7 +407,8 @@ operations:
   offline: false
   reads:
   - control.api_client
-  writes: []
+  writes:
+  - control.api_client
 - operation: setApiLicensing
   verb: PUT
   path: /api-licensing
@@ -436,4 +482,5 @@ operations:
   offline: false
   reads:
   - control.webhook_delivery
-  writes: []
+  writes:
+  - control.webhook_delivery

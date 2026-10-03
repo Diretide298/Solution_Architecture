@@ -1252,7 +1252,7 @@ Creates a liability, not revenue. Recognition happens when the value is spent, o
 | Lock | rowExclusive |
 | Guest callable | True |
 | Reads | `cache:idempotency`, `wallet.credit_lot`, `wallet.wallet` |
-| Writes | `cache:idempotency`, `wallet.wallet` |
+| Writes | `cache:idempotency`, `platform.outbox`, `wallet.wallet` |
 | Called by | BO-488, POS-027 |
 | State model | Guest wallet ([states/wallet.yaml](../../../states/wallet.yaml)): created as `active` |
 

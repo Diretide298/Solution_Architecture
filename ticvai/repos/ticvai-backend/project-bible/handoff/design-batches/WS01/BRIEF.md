@@ -121,16 +121,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-144` | Access Control Command Center | B–D | 0 | 30 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-145` | Venue & Park Access Structure | B–D | 0 | 0 | 6 | 6 | 0 | 0 | — | notStarted (generated) |
-| `BO-146` | Access Area & Zone Builder | B–D | 12 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-147` | Attraction Access Configuration | B–D | 12 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-148` | Access Point Directory | B–D | 25 | 0 | 5 | 2 | 2 | 0 | — | notStarted (generated) |
-| `BO-149` | Gate & Lane Configuration | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-150` | Access Control Graphical Map Designer | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-144` | Access Control Command Center | C | 0 | 30 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-145` | Venue & Park Access Structure | B | 0 | 0 | 6 | 6 | 0 | 0 | — | notStarted (generated) |
+| `BO-146` | Access Area & Zone Builder | C | 12 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-147` | Attraction Access Configuration | C | 12 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-148` | Access Point Directory | C | 25 | 0 | 5 | 2 | 2 | 0 | — | notStarted (generated) |
+| `BO-149` | Gate & Lane Configuration | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-150` | Access Control Graphical Map Designer | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-151` | Access Location Grouping | A | 6 | 3 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-152` | Operating Calendar & Special Access Days | B–D | 23 | 7 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-153` | Topology Validation & Publication | B–D | 1 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-152` | Operating Calendar & Special Access Days | C | 23 | 7 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-153` | Topology Validation & Publication | C | 1 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

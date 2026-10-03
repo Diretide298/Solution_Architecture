@@ -62,7 +62,8 @@ operations:
   offline: false
   reads:
   - workforce.open_shift
-  writes: []
+  writes:
+  - workforce.open_shift
 - operation: createRotaAssignment
   verb: POST
   path: /rota-assignments
@@ -467,7 +468,8 @@ operations:
   offline: false
   reads:
   - workforce.sync_conflict
-  writes: []
+  writes:
+  - workforce.sync_conflict
 - operation: sendStaffMessage
   verb: POST
   path: /staff-messages
@@ -610,7 +612,8 @@ operations:
   offline: false
   reads:
   - workforce.sync_run
-  writes: []
+  writes:
+  - workforce.sync_run
 - operation: updateRotaAssignment
   verb: PATCH
   path: /rota-assignments/{assignmentId}

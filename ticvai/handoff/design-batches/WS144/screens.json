@@ -232,7 +232,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "BO-824"
+    "BO-824",
+    "BO-107"
    ],
    "exitTo": [
     "BO-824"
@@ -460,7 +461,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "BO-824"
+    "BO-824",
+    "BO-107"
    ],
    "exitTo": [
     "BO-824"
@@ -616,7 +618,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "BO-824"
+    "BO-824",
+    "BO-107"
    ],
    "exitTo": [
     "BO-824"
@@ -658,6 +661,21 @@
     {
      "name": "contentBody",
      "components": [
+      {
+       "kind": "cardList",
+       "label": "Show the loyalty campaigns",
+       "operation": "listLoyaltyCampaigns",
+       "bindsTo": "MarketingLoyaltyCampaign",
+       "columns": [
+        "MarketingLoyaltyCampaign.code",
+        "MarketingLoyaltyCampaign.name",
+        "MarketingLoyaltyCampaign.startAt",
+        "MarketingLoyaltyCampaign.endAt",
+        "MarketingLoyaltyCampaign.isActive",
+        "MarketingLoyaltyCampaign.createdAt"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
       {
        "kind": "detailPanel",
        "label": "Rules in force",
@@ -711,6 +729,13 @@
     "purpose": "Every rule the programme runs on",
     "trigger": "onLoad",
     "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
+   },
+   {
+    "operationId": "listLoyaltyCampaigns",
+    "contract": "marketing-crm",
+    "purpose": "Show the loyalty campaigns",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "wireframe": {
@@ -770,7 +795,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "BO-824"
+    "BO-824",
+    "BO-107"
    ],
    "exitTo": [
     "BO-824"
@@ -805,7 +831,36 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "cardList",
+       "label": "Show the rewards a milestone can give",
+       "operation": "listRewards",
+       "bindsTo": "MarketingReward",
+       "columns": [
+        "MarketingReward.code",
+        "MarketingReward.name",
+        "MarketingReward.type",
+        "MarketingReward.pointsCost",
+        "MarketingReward.discountValue",
+        "MarketingReward.validityDays"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Show the programmes and their milestones",
+       "operation": "listLoyaltyProgrammes",
+       "bindsTo": "LoyaltyProgramme",
+       "columns": [
+        "LoyaltyProgramme.code",
+        "LoyaltyProgramme.name",
+        "LoyaltyProgramme.pointsExpireAfterMonths",
+        "LoyaltyProgramme.isActive"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      }
+     ]
     },
     {
      "name": "actionBar",
@@ -849,6 +904,20 @@
     "purpose": "Define a reward and its points cost",
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "listLoyaltyProgrammes",
+    "contract": "marketing-crm",
+    "purpose": "Show the programmes and their milestones",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+   },
+   {
+    "operationId": "listRewards",
+    "contract": "marketing-crm",
+    "purpose": "Show the rewards a milestone can give",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "wireframe": {

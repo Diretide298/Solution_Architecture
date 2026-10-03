@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-268` | Channel Operations Command Center | B–D | 0 | 24 | 6 | 2 | 1 | 0 | — | notStarted (generated) |
-| `ADM-269` | Channel Connection & Integration Manager | B–D | 33 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-270` | Product, Price & Availability Synchronization | B–D | 6 | 16 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-271` | Real-Time Channel Availability & Inventory Monitor | B–D | 0 | 14 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
-| `ADM-272` | Channel Allocation & Rebalancing Operations | B–D | 15 | 18 | 6 | 9 | 1 | 0 | — | notStarted (generated) |
-| `ADM-273` | Channel Exceptions, Incidents & Recovery | B–D | 16 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-274` | Channel Performance & Commercial Analytics | B–D | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-275` | Channel Audit, Logs & Transaction Traceability | B–D | 2 | 4 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-276` | Channel Governance, SLA & Partner Control | B–D | 11 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-277` | AI Channel Optimization & Intelligence Center | B–D | 4 | 6 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
+| `ADM-268` | Channel Operations Command Center | B | 0 | 24 | 6 | 2 | 1 | 0 | — | notStarted (generated) |
+| `ADM-269` | Channel Connection & Integration Manager | B | 33 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-270` | Product, Price & Availability Synchronization | B | 6 | 16 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-271` | Real-Time Channel Availability & Inventory Monitor | B | 0 | 14 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
+| `ADM-272` | Channel Allocation & Rebalancing Operations | B | 15 | 18 | 6 | 9 | 1 | 0 | — | notStarted (generated) |
+| `ADM-273` | Channel Exceptions, Incidents & Recovery | B | 16 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-274` | Channel Performance & Commercial Analytics | B | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-275` | Channel Audit, Logs & Transaction Traceability | B | 2 | 4 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-276` | Channel Governance, SLA & Partner Control | B | 11 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-277` | AI Channel Optimization & Intelligence Center | B | 4 | 6 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

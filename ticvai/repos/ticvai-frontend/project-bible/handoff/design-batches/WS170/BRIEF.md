@@ -130,16 +130,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-1003` | Hold Command Center | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1004` | Hold Type Master | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1005` | Hold Pool Creation | B–D | 0 | 12 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-1006` | Hold Rule Assignment | B–D | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1007` | Expiration Rules | B–D | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1008` | Automatic Hold Release | B–D | 0 | 12 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-1009` | Release, Convert & Reassign | B–D | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1010` | Hold Approval Workflow | B–D | 0 | 0 | 6 | 5 | 0 | 3 | — | notStarted (—) |
-| `BO-1011` | Priority & Conflict Resolution | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1012` | Hold Utilization & Audit | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1003` | Hold Command Center | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1004` | Hold Type Master | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1005` | Hold Pool Creation | C | 0 | 12 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-1006` | Hold Rule Assignment | C | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1007` | Expiration Rules | C | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1008` | Automatic Hold Release | C | 0 | 12 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-1009` | Release, Convert & Reassign | C | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1010` | Hold Approval Workflow | B | 0 | 0 | 6 | 5 | 0 | 3 | — | notStarted (—) |
+| `BO-1011` | Priority & Conflict Resolution | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1012` | Hold Utilization & Audit | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

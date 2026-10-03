@@ -15,6 +15,8 @@ CREATE INDEX IF NOT EXISTS api_limit_client_id_idx ON control.api_limit (client_
 CREATE INDEX IF NOT EXISTS archival_job_cell_id_idx ON control.archival_job (cell_id);
 -- convention, not declared: control.backup_run.cell_id -> control.cell
 CREATE INDEX IF NOT EXISTS backup_run_cell_id_idx ON control.backup_run (cell_id);
+-- convention, not declared: control.billing_entity.tenant_id -> control.tenant
+CREATE INDEX IF NOT EXISTS billing_entity_tenant_id_idx ON control.billing_entity (tenant_id);
 -- convention, not declared: control.burst_environment.performance_id -> catalogue.performance
 CREATE INDEX IF NOT EXISTS burst_environment_performance_id_idx ON control.burst_environment (performance_id);
 -- convention, not declared: control.burst_environment.usage_record_id -> control.usage_record
@@ -31,6 +33,12 @@ CREATE INDEX IF NOT EXISTS cell_tenant_cell_id_idx ON control.cell_tenant (cell_
 CREATE INDEX IF NOT EXISTS cell_tenant_instance_id_idx ON control.cell_tenant (instance_id);
 -- convention, not declared: control.cell_tenant.tenant_id -> control.tenant
 CREATE INDEX IF NOT EXISTS cell_tenant_tenant_id_idx ON control.cell_tenant (tenant_id);
+-- convention, not declared: control.config_package.tenant_id -> control.tenant
+CREATE INDEX IF NOT EXISTS config_package_tenant_id_idx ON control.config_package (tenant_id);
+-- convention, not declared: control.config_package_application.previous_package_id -> control.config_package
+CREATE INDEX IF NOT EXISTS config_package_application_previous_package_id_idx ON control.config_package_application (previous_package_id);
+-- convention, not declared: control.config_package_diff.package_id -> control.config_package
+CREATE INDEX IF NOT EXISTS config_package_diff_package_id_idx ON control.config_package_diff (package_id);
 -- convention, not declared: control.content_block.approved_by_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS content_block_approved_by_principal_id_idx ON control.content_block (approved_by_principal_id);
 -- convention, not declared: control.content_block.audience_segment_id -> marketing.segment
@@ -63,6 +71,8 @@ CREATE INDEX IF NOT EXISTS migration_run_tenant_cell_id_idx ON control.migration
 CREATE INDEX IF NOT EXISTS migration_run_tenant_tenant_id_idx ON control.migration_run_tenant (tenant_id);
 -- convention, not declared: control.onboarding_application.provisioned_tenant_id -> control.tenant
 CREATE INDEX IF NOT EXISTS onboarding_application_provisioned_tenant_id_idx ON control.onboarding_application (provisioned_tenant_id);
+-- convention, not declared: control.outbox_republish.requested_by_principal_id -> identity.principal
+CREATE INDEX IF NOT EXISTS outbox_republish_requested_by_principal_id_idx ON control.outbox_republish (requested_by_principal_id);
 -- convention, not declared: control.partner.account_manager_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS partner_account_manager_principal_id_idx ON control.partner (account_manager_principal_id);
 -- convention, not declared: control.partner.commercial_manager_principal_id -> identity.principal
@@ -337,8 +347,12 @@ CREATE INDEX IF NOT EXISTS migration_run_canary_cell_id_idx ON control.migration
 CREATE INDEX IF NOT EXISTS migration_run_cell_migration_run_id_idx ON control.migration_run_cell (migration_run_id);
 -- declared: control.migration_run_tenant.migration_run_id -> control.migration_run
 CREATE INDEX IF NOT EXISTS migration_run_tenant_migration_run_id_idx ON control.migration_run_tenant (migration_run_id);
+-- declared: control.onboarding_application.billing_entity_id -> control.billing_entity
+CREATE INDEX IF NOT EXISTS onboarding_application_billing_entity_id_idx ON control.onboarding_application (billing_entity_id);
 -- declared: control.onboarding_application.venue_type_template_id -> control.venue_type_template
 CREATE INDEX IF NOT EXISTS onboarding_application_venue_type_template_id_idx ON control.onboarding_application (venue_type_template_id);
+-- declared: control.outbox_republish.tenant_id -> control.tenant
+CREATE INDEX IF NOT EXISTS outbox_republish_tenant_id_idx ON control.outbox_republish (tenant_id);
 -- declared: control.partner_agreement.partner_id -> control.partner
 CREATE INDEX IF NOT EXISTS partner_agreement_partner_id_idx ON control.partner_agreement (partner_id);
 -- declared: control.partner_application_review_task.partner_application_id -> control.partner_application

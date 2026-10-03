@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-058` | Pricing Rule Command Center | B–D | 11 | 26 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `ADM-059` | Customer Segment & Profile Pricing Rules | B–D | 17 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
-| `ADM-060` | Membership & Loyalty Pricing Rules | B–D | 4 | 0 | 5 | 0 | 1 | 2 | — | notStarted (generated) |
-| `ADM-061` | Residency, Nationality & Market Pricing Rules | B–D | 13 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-062` | Channel-Based Pricing Rules | B–D | 0 | 0 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
-| `ADM-063` | Location, Venue & Event Pricing Rules | B–D | 6 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-064` | Quantity, Group & Volume Pricing Rules | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-065` | Effective Date, Season & Day-Based Pricing Rules | B–D | 8 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-066` | Timeslot, Performance & Time-of-Day Pricing Rules | B–D | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-067` | Pricing Rule Priority, Conflict Resolution & Testing | B–D | 11 | 2 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-058` | Pricing Rule Command Center | B | 11 | 26 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `ADM-059` | Customer Segment & Profile Pricing Rules | B | 17 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
+| `ADM-060` | Membership & Loyalty Pricing Rules | B | 4 | 0 | 5 | 0 | 1 | 2 | — | notStarted (generated) |
+| `ADM-061` | Residency, Nationality & Market Pricing Rules | B | 13 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-062` | Channel-Based Pricing Rules | B | 0 | 0 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
+| `ADM-063` | Location, Venue & Event Pricing Rules | B | 6 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-064` | Quantity, Group & Volume Pricing Rules | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-065` | Effective Date, Season & Day-Based Pricing Rules | B | 8 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-066` | Timeslot, Performance & Time-of-Day Pricing Rules | B | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-067` | Pricing Rule Priority, Conflict Resolution & Testing | B | 11 | 2 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

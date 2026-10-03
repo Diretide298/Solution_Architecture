@@ -106,9 +106,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-703` | Seating & Capacity Command Center | B–D | 0 | 7 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-704` | Event Capacity Profile Configuration | B–D | 0 | 7 | 6 | 0 | 3 | 0 | — | notStarted (—) |
-| `BO-705` | Seating Mode & Reservation Configuration | B–D | 0 | 7 | 6 | 0 | 2 | 6 | — | notStarted (—) |
+| `BO-703` | Seating & Capacity Command Center | B | 0 | 7 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-704` | Event Capacity Profile Configuration | B | 0 | 7 | 6 | 0 | 3 | 0 | — | notStarted (—) |
+| `BO-705` | Seating Mode & Reservation Configuration | B | 0 | 7 | 6 | 0 | 2 | 6 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

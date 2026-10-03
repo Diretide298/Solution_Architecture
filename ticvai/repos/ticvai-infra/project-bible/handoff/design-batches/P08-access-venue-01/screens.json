@@ -2148,7 +2148,7 @@
    {
     "operationId": "requestSuggestion",
     "contract": "ai",
-    "purpose": "Queue-balancing suggestion (kind queueBalancing): return-slot allocation and redirection",
+    "purpose": "Queue-balancing suggestion (kind queueBalancing): return-slot allocation and redirection. Later (CHG-RONEP-010): the queue-balancing suggestion of the day-one suggestions (AI-ENGINE-SUGGESTIONS) ships in Block A2 (Chinmay, 3 October); until then the control shows 'Later'.",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
    }
@@ -2873,6 +2873,17 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "cardList",
+       "label": "Show the rule's entry points before they are replaced",
+       "operation": "listEntryRulePoints",
+       "bindsTo": "AccessEntryRulePoint",
+       "columns": [
+        "AccessEntryRulePoint.isActive",
+        "AccessEntryRulePoint.createdAt"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
+      {
        "kind": "dataTable",
        "label": "Admission profiles",
        "bindsTo": "AdmissionRules",
@@ -2973,6 +2984,13 @@
     "invalidates": [
      "listAdmissionRules"
     ]
+   },
+   {
+    "operationId": "listEntryRulePoints",
+    "contract": "access",
+    "purpose": "Show the rule's entry points before they are replaced",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "entryState": {

@@ -137,16 +137,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-754` | Audience Intelligence | B–D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `BO-754` | Audience Intelligence | D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
 | `BO-755` | Dynamic Segment Builder | A | 21 | 23 | 6 | 10 | 1 | 6 | — | notStarted (—) |
-| `BO-756` | Static Lists & Imports | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-757` | Behavioral Segmentation | B–D | 0 | 20 | 6 | 13 | 1 | 6 | — | notStarted (—) |
-| `BO-758` | Membership & Loyalty Segments | B–D | 0 | 0 | 6 | 12 | 1 | 6 | — | notStarted (—) |
-| `BO-759` | Demographic & Geographic | B–D | 0 | 0 | 6 | 9 | 0 | 0 | — | notStarted (—) |
-| `BO-760` | Revenue & Engagement Segments | B–D | 0 | 0 | 6 | 12 | 0 | 6 | — | notStarted (—) |
-| `BO-761` | AI Audience Discovery | B–D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
-| `BO-762` | Predictive Audiences | B–D | 0 | 0 | 6 | 14 | 0 | 0 | — | notStarted (—) |
-| `BO-763` | Activation & Governance | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-756` | Static Lists & Imports | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-757` | Behavioral Segmentation | D | 0 | 20 | 6 | 13 | 1 | 6 | — | notStarted (—) |
+| `BO-758` | Membership & Loyalty Segments | D | 0 | 0 | 6 | 12 | 1 | 6 | — | notStarted (—) |
+| `BO-759` | Demographic & Geographic | D | 0 | 0 | 6 | 9 | 0 | 0 | — | notStarted (—) |
+| `BO-760` | Revenue & Engagement Segments | D | 0 | 0 | 6 | 12 | 0 | 6 | — | notStarted (—) |
+| `BO-761` | AI Audience Discovery | C | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `BO-762` | Predictive Audiences | D | 0 | 0 | 6 | 14 | 0 | 0 | — | notStarted (—) |
+| `BO-763` | Activation & Governance | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

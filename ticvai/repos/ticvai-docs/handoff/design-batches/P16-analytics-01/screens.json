@@ -4,7 +4,7 @@
   "name": "Executive Command Center",
   "module": "Analytics",
   "requiresModule": "analytics",
-  "wave": 3,
+  "wave": 1,
   "implementation": {
    "app": "venue-management-web",
    "route": "/analytics/executive-command-center",
@@ -36,7 +36,10 @@
     "ANL-031",
     "ANL-041",
     "ANL-051",
-    "ANL-061"
+    "ANL-061",
+    "ANL-023",
+    "ANL-025",
+    "ANL-066"
    ],
    "transitions": [
     {
@@ -196,6 +199,25 @@
      "carries": [
       "insightId"
      ]
+    },
+    {
+     "to": "ANL-023",
+     "trigger": "Opens Drag-and-Drop Dashboard Canvas",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A",
+     "carries": [
+      "dashboardId",
+      "reportId"
+     ]
+    },
+    {
+     "to": "ANL-025",
+     "trigger": "Opens KPI Builder",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "ANL-066",
+     "trigger": "Opens Semantic Model & Business Data Catalogue",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
     }
    ]
   },

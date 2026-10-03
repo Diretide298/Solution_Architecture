@@ -1,4 +1,17 @@
 {
+ "getBleBeaconGeofence": {
+  "method": "GET",
+  "path": "/ble-beacon-geofence",
+  "contract": "access",
+  "summary": "The BLE beacon and geofence configuration as saved",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "BleBeaconGeofenceConfigurationView"
+ },
  "listCredentialActivationDisplay": {
   "method": "GET",
   "path": "/credential-activation-display",

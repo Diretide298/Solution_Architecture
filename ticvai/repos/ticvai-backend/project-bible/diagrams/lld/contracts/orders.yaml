@@ -229,7 +229,8 @@ operations:
   offline: false
   reads:
   - orders.payment_link
-  writes: []
+  writes:
+  - orders.payment_link
 - operation: cancelReservation
   verb: DELETE
   path: /reservations/{reservationId}
@@ -360,7 +361,8 @@ operations:
   offline: false
   reads:
   - orders.payment
-  writes: []
+  writes:
+  - orders.payment
 - operation: cloneTicketTemplate
   verb: POST
   path: /ticket-templates/{templateId}/clone
@@ -372,7 +374,9 @@ operations:
   reads:
   - orders.ticket_template
   - orders.ticket_template_channel
-  writes: []
+  writes:
+  - orders.ticket_template
+  - orders.ticket_template_channel
 - operation: convertReservation
   verb: POST
   path: /reservations/{reservationId}/convert
@@ -477,7 +481,8 @@ operations:
   offline: false
   reads:
   - orders.group_enquiry
-  writes: []
+  writes:
+  - orders.group_enquiry
 - operation: createListingSeller
   verb: POST
   path: /listing-seller
@@ -509,7 +514,8 @@ operations:
   offline: false
   reads:
   - orders.member_exception
-  writes: []
+  writes:
+  - orders.member_exception
 - operation: createOrder
   verb: POST
   path: /orders
@@ -533,6 +539,7 @@ operations:
   - orders.order_line
   - orders.payment
   - orders.sales_order
+  - platform.outbox
   - promotions.promotion_evaluation_trace
 - operation: createOrderSourceChannel
   verb: POST
@@ -592,6 +599,7 @@ operations:
   writes:
   - cache:idempotency
   - marketing.message_dispatch
+  - orders.payment_link
   - orders.sales_order
 - operation: createRefund
   verb: POST
@@ -1028,7 +1036,9 @@ operations:
   reads:
   - orders.ticket_template
   - orders.ticket_template_channel
-  writes: []
+  writes:
+  - orders.ticket_template
+  - orders.ticket_template_channel
 - operation: inquirePaymentStatus
   verb: POST
   path: /payments/{paymentId}/inquiry
@@ -2371,7 +2381,8 @@ operations:
   offline: false
   reads:
   - orders.membership_migration
-  writes: []
+  writes:
+  - orders.membership_migration
 - operation: modifyOrder
   verb: POST
   path: /orders/{orderId}/modify
@@ -2404,9 +2415,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - orders.guest_credit_account
   - pii.subject
   writes:
   - cache:idempotency
+  - orders.guest_credit_account
 - operation: overrideCreditLimit
   verb: POST
   path: /b2b-accounts/{accountId}/credit/override
@@ -2618,7 +2631,8 @@ operations:
   offline: false
   reads:
   - orders.stored_value_authorisation
-  writes: []
+  writes:
+  - orders.stored_value_authorisation
 - operation: removeCartLine
   verb: DELETE
   path: /carts/{cartId}/lines/{lineId}
@@ -2726,7 +2740,8 @@ operations:
   offline: false
   reads:
   - orders.membership_activation_action
-  writes: []
+  writes:
+  - orders.membership_activation_action
 - operation: resolveSyncRejection
   verb: POST
   path: /sync/rejections/{rejectionId}/resolve
@@ -2737,7 +2752,8 @@ operations:
   offline: false
   reads:
   - sync.rejection
-  writes: []
+  writes:
+  - sync.rejection
 - operation: respondToChargeback
   verb: POST
   path: /chargebacks/{chargebackId}/respond
@@ -3034,7 +3050,8 @@ operations:
   offline: false
   reads:
   - orders.group_ticket_fulfillment
-  writes: []
+  writes:
+  - orders.group_ticket_fulfillment
 - operation: setMultiPaymentSplit
   verb: PUT
   path: /multi-payment-split
@@ -3163,7 +3180,8 @@ operations:
   offline: false
   reads:
   - orders.refund_calculation_policy
-  writes: []
+  writes:
+  - orders.refund_calculation_policy
 - operation: setRefundPolicy
   verb: PUT
   path: /venues/{venueId}/refund-policy
@@ -3441,7 +3459,8 @@ operations:
   offline: false
   reads:
   - access.entitlement
-  writes: []
+  writes:
+  - access.entitlement
 - operation: voidOrder
   verb: POST
   path: /orders/{orderId}/voids

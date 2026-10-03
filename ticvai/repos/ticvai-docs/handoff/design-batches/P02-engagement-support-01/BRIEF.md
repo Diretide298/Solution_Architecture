@@ -1,6 +1,6 @@
 # P02-engagement-support-01 — P02 · Engagement & Support (1 of 2)
 
-**10 screens · 34 operations · 81 schemas · 3 permissions**
+**10 screens · 35 operations · 83 schemas · 3 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -204,9 +204,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `GST-030` | In-Venue Notifications | A | 3 | 12 | 5 | 0 | 4 | 0 | guest | notStarted (client-verified) |
-| `GST-031` | AI Concierge – Home | A | 8 | 23 | 5 | 32 | 3 | 0 | guest | notStarted (designed) |
-| `GST-032` | AI Concierge – Chat | A | 38 | 19 | 6 | 31 | 3 | 0 | guest | notStarted (designed) |
-| `GST-033` | AI Concierge – Contextual Help | A | 7 | 20 | 5 | 18 | 0 | 0 | guest | notStarted (designed) |
+| `GST-031` | AI Concierge – Home | A | 8 | 27 | 5 | 32 | 3 | 0 | guest | notStarted (designed) |
+| `GST-032` | AI Concierge – Chat | A | 38 | 23 | 6 | 31 | 3 | 0 | guest | notStarted (designed) |
+| `GST-033` | AI Concierge – Contextual Help | A | 7 | 24 | 5 | 20 | 0 | 0 | guest | notStarted (designed) |
 | `GST-035` | Feedback & Ratings | A | 28 | 20 | 4 | 82 | 2 | 0 | guest | notStarted (client-verified) |
 | `GST-040` | Help & Support | A | 8 | 31 | 6 | 0 | 3 | 0 | guest | notStarted (client-verified) |
 | `GST-051` | Plan | A | 26 | 0 | 7 | 7 | 8 | 1 | guest | notStarted (client-verified) |

@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS payments.chargeback_evidence (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS payments.credit_account (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     organisation_id                   uuid NOT NULL,
     account_code                      text,
     credit_limit                      numeric(18,4),
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS payments.credit_account (
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS payments.currency_rule (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     payment_policy_id                 uuid NOT NULL,
     scope_path                        ltree NOT NULL,
     channel_id                        uuid,
@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS payments.currency_rule (
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS payments.deposit_activity (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     deposit_id                        uuid NOT NULL,
     payment_id                        uuid,
     type                              text NOT NULL CONSTRAINT deposit_activity_type_chk CHECK (char_length(type) <= 30),
@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS payments.dunning_case (
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS payments.dunning_policy (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     max_attempts                      integer NOT NULL DEFAULT 4,
     attempt_offset_days               integer[],
     minimum_hours_between_attempts    integer DEFAULT 24,
@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS payments.dunning_policy (
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS payments.eligibility_rule (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     payment_policy_id                 uuid NOT NULL,
     payment_method_id                 uuid NOT NULL,
     scope_path                        ltree NOT NULL,
@@ -139,7 +139,7 @@ CREATE TABLE IF NOT EXISTS payments.failover_policy (
 -- Holds 16 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS payments.fee_rule (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     payment_policy_id                 uuid NOT NULL,
     payment_method_id                 uuid,
     provider_id                       uuid,
@@ -232,7 +232,7 @@ CREATE TABLE IF NOT EXISTS payments.matching_rules (
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS payments.merchant_account (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     legal_entity_id                   uuid,
     venue_ids                         text[],
@@ -245,7 +245,7 @@ CREATE TABLE IF NOT EXISTS payments.merchant_account (
 -- Holds 16 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS payments.method (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text NOT NULL,
     kind                              text NOT NULL CONSTRAINT method_kind_chk CHECK (kind IN ('card', 'digitalWallet', 'bankTransfer', 'cash', 'storedValue', 'giftCard', 'voucher', 'onAccount', 'buyNowPayLater', 'paymentLink')),
@@ -266,7 +266,7 @@ CREATE TABLE IF NOT EXISTS payments.method (
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS payments.method_config (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     payment_policy_id                 uuid NOT NULL,
     payment_method_id                 uuid NOT NULL,
     scope_path                        ltree NOT NULL,
@@ -294,7 +294,7 @@ CREATE TABLE IF NOT EXISTS payments.mixed_tender_rules (
 -- Holds 16 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS payments.payment_attempt (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     payment_id                        uuid,
     order_id                          uuid,
     provider_connection_id            uuid NOT NULL,
@@ -354,7 +354,7 @@ CREATE TABLE IF NOT EXISTS payments.provider (
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS payments.provider_connection (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text,
     provider_kind                     text NOT NULL CONSTRAINT provider_connection_provider_kind_chk CHECK (provider_kind IN ('gateway', 'psp', 'acquirer', 'walletProvider', 'bnplProvider')),
@@ -370,7 +370,7 @@ CREATE TABLE IF NOT EXISTS payments.provider_connection (
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS payments.provider_cost (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     payment_id                        uuid,
     provider_connection_id            uuid NOT NULL,
     cost_kind                         text NOT NULL CONSTRAINT provider_cost_cost_kind_chk CHECK (cost_kind IN ('schemeFee', 'interchange', 'acquirerMargin', 'fxSpread')),
@@ -399,7 +399,7 @@ CREATE TABLE IF NOT EXISTS payments.provider_event (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS payments.reconciliation_source (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     connection_id                     uuid,
     transport                         text CONSTRAINT reconciliation_source_transport_chk CHECK (transport IN ('sftp', 'api', 'email', 'manualUpload')),
@@ -423,7 +423,7 @@ CREATE TABLE IF NOT EXISTS payments.risk_rules (
 CREATE TABLE IF NOT EXISTS payments.routing_rule (
     provider_id                       uuid NOT NULL,
     fallback_provider_id              uuid,
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     priority                          integer DEFAULT 0,
     conditions                        jsonb,
@@ -435,7 +435,7 @@ CREATE TABLE IF NOT EXISTS payments.routing_rule (
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS payments.stored_forward (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     device_id                         uuid,
     amount                            numeric(18,4),
     taken_at                          timestamptz,
@@ -469,7 +469,7 @@ CREATE TABLE IF NOT EXISTS payments.terminal (
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS payments.terminal_certification (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     model_code                        text NOT NULL CONSTRAINT terminal_certification_model_code_chk CHECK (char_length(model_code) <= 100),
     manufacturer                      text NOT NULL CONSTRAINT terminal_certification_manufacturer_chk CHECK (char_length(manufacturer) <= 200),
     emv_level1_approval_reference     text,

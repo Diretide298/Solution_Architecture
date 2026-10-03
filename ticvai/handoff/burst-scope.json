@@ -6,9 +6,9 @@
   "services": 17,
   "deployed": 3,
   "operations": 32,
-  "ofTotalOperations": 2738,
+  "ofTotalOperations": 2758,
   "tables": 62,
-  "ofTotalTables": 1113
+  "ofTotalTables": 1115
  },
  "routing": {
   "note": "**Normal traffic and sale traffic are separate systems running concurrently.** The burst environment carries the on-sale and nothing else; everything a venue does that day continues in the shared cell. **They meet once, afterwards, at reconciliation.**",
@@ -17,8 +17,8 @@
     "name": "normal",
     "target": "shared cell",
     "services": 17,
-    "operations": 2706,
-    "tables": 1113,
+    "operations": 2726,
+    "tables": 1115,
     "exampleLoad": "stadium, routine Saturday: 60,000 guests x 14 requests = 48.5 RPS",
     "description": "**Everything except the sale.** Admission, food, retail, stock, staff back-office, reporting. Runs whether or not a sale is happening."
    },
@@ -319,6 +319,17 @@
    "note": "**One thing bought on one order**, priced at the moment of sale. A price list changing afterwards does not change what somebody paid"
   },
   {
+   "table": "platform.outbox",
+   "schema": "platform",
+   "columns": 15,
+   "burstOperations": 4,
+   "written": true,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**Written in the same transaction as the state change, by the platform, not by an operation.** That is what makes it exactly-once **Hangs off**: reaches `platform.scope` through its keys; references `catalogue.event`, `p"
+  },
+  {
    "table": "catalogue.event",
    "schema": "catalogue",
    "columns": 8,
@@ -372,17 +383,6 @@
    "contended": false,
    "contentionIndeterminate": false,
    "note": "Holds 7 columns. **No description has been written for this table** — the name is the only thing saying what it is"
-  },
-  {
-   "table": "platform.outbox",
-   "schema": "platform",
-   "columns": 15,
-   "burstOperations": 3,
-   "written": true,
-   "contention": null,
-   "contended": false,
-   "contentionIndeterminate": false,
-   "note": "**Written in the same transaction as the state change, by the platform, not by an operation.** That is what makes it exactly-once **Hangs off**: reaches `platform.scope` through its keys; references `catalogue.event`, `p"
   },
   {
    "table": "promotions.promotion",
@@ -615,7 +615,7 @@
   {
    "table": "whitelabel.guided_choice_answer",
    "schema": "whitelabel",
-   "columns": 5,
+   "columns": 12,
    "burstOperations": 2,
    "written": false,
    "contention": null,
@@ -714,7 +714,7 @@
   {
    "table": "identity.session",
    "schema": "identity",
-   "columns": 2,
+   "columns": 12,
    "burstOperations": 1,
    "written": true,
    "contention": null,
@@ -1202,6 +1202,7 @@
     "orders.order_line",
     "orders.payment",
     "orders.sales_order",
+    "platform.outbox",
     "promotions.promotion_evaluation_trace"
    ],
    "lock": null

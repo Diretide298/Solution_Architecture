@@ -1121,7 +1121,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "ADM-419"
+    "ADM-419",
+    "ADM-002"
    ],
    "exitTo": [
     "ADM-419"

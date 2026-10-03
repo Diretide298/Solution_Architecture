@@ -662,6 +662,40 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listDeliveryLocations": {
+  "method": "GET",
+  "path": "/venues/{venueId}/delivery-locations",
+  "contract": "fnb",
+  "summary": "Where an order can be delivered",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "servingOutletId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listDepositBoxes": {
   "method": "GET",
   "path": "/deposit-boxes",

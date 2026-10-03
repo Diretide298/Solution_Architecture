@@ -56,7 +56,7 @@ operationsByContract:
     permission: LEDGER_POST
     offline: false
     reads: 3
-    writes: 2
+    writes: 3
   - operation: blockGiftCard
     verb: POST
     path: /gift-cards/{cardCode}/block
@@ -368,7 +368,7 @@ operationsByContract:
     permission: WALLET_OPERATE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: restoreWalletConfigurationVersion
     verb: POST
     path: /wallet-configuration/versions/{version}/restore
@@ -384,7 +384,7 @@ operationsByContract:
     permission: WALLET_OPERATE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: setCreditConsumptionPolicy
     verb: PUT
     path: /credit-consumption-policy
@@ -496,7 +496,7 @@ operationsByContract:
     permission: WALLET_CONFIGURE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: setWalletRiskRules
     verb: PUT
     path: /wallet-risk-rules
@@ -544,7 +544,7 @@ operationsByContract:
     permission: ORDER_CREATE
     offline: false
     reads: 3
-    writes: 2
+    writes: 3
   - operation: transferWalletBalance
     verb: POST
     path: /wallets/{walletId}/transfer
@@ -576,7 +576,7 @@ operationsByContract:
     permission: WALLET_OPERATE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
 tables:
 - store: cache:idempotency
   kind: cache
@@ -872,13 +872,16 @@ readsFrom:
   operations: 1
 writesOutside:
 - service: TenancyService
-  operations: 4
+  operations: 6
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
     each inserts or updates, or which operation or event TenancyService published for it — check each
     against ADR-0028.'
   writes:
+  - operation: adjustWallet
+    tables:
+    - platform.outbox
   - operation: captureWalletHold
     tables:
     - platform.idempotency_record
@@ -892,6 +895,9 @@ writesOutside:
     - platform.idempotency_record
     - platform.outbox
   - operation: settleWalletAtExit
+    tables:
+    - platform.outbox
+  - operation: topUpWallet
     tables:
     - platform.outbox
 - service: VenueOpsService

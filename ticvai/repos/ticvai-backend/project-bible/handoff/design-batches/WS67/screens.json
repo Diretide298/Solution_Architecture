@@ -522,7 +522,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "ANL-021"
+    "ANL-021",
+    "ANL-001"
    ],
    "exitTo": [
     "ANL-021"
@@ -1023,7 +1024,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "ANL-021"
+    "ANL-021",
+    "ANL-001"
    ],
    "exitTo": [
     "ANL-021"

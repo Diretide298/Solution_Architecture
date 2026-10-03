@@ -1,6 +1,6 @@
 # WS157 — Resource Management Configuration board 3
 
-**10 screens · 32 operations · 28 schemas · 6 permissions**
+**10 screens · 33 operations · 28 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -121,20 +121,20 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-873` | Staff Resource Directory | B–D | 3 | 10 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-874` | Staff Resource Profile | B–D | 11 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-875` | Skills & Competency Management | B–D | 0 | 7 | 6 | 9 | 1 | 0 | — | notStarted (—) |
-| `BO-876` | Certification & Expiry Management | B–D | 10 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-877` | Qualification & Assignment Rule Engine | A | 11 | 29 | 6 | 3 | 0 | 0 | — | notStarted (—) |
-| `BO-878` | Staff Availability & Working Pattern | B–D | 21 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `BO-879` | Shift Template & Assignment Configuration | B–D | 6 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-880` | Break, Leave & Absence Configuration | B–D | 9 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-881` | Overtime & Working-Hour Rules | B–D | 7 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-882` | Workforce Integration & Synchronization Center | B–D | 0 | 16 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-873` | Staff Resource Directory | D | 3 | 10 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-874` | Staff Resource Profile | D | 11 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-875` | Skills & Competency Management | D | 0 | 7 | 6 | 9 | 1 | 0 | — | notStarted (—) |
+| `BO-876` | Certification & Expiry Management | D | 10 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-877` | Qualification & Assignment Rule Engine | A | 11 | 39 | 6 | 22 | 0 | 0 | — | notStarted (—) |
+| `BO-878` | Staff Availability & Working Pattern | D | 21 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `BO-879` | Shift Template & Assignment Configuration | D | 6 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-880` | Break, Leave & Absence Configuration | D | 9 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-881` | Overtime & Working-Hour Rules | D | 7 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-882` | Workforce Integration & Synchronization Center | D | 0 | 16 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
-**BO-875, BO-877 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-875 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -150,7 +150,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-873 |
 | Who uses it | venue staff holding `USER_MANAGE`, `WORKFORCE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -315,7 +315,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-874 |
 | Who uses it | venue staff holding `RESOURCE_VIEW`, `USER_MANAGE`, `WORKFORCE_VIEW` (2 read, 1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -504,7 +504,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-875 |
 | Who uses it | venue staff holding `RESOURCE_MANAGE`, `RESOURCE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -695,7 +695,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-876 |
 | Who uses it | venue staff holding `RESOURCE_MANAGE`, `WORKFORCE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Administrators shall configure) and no display directory — it is settings, not a population |
@@ -896,6 +896,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | From | date and time picker | — | — | `suggestResources` ?from |
 | To | date and time picker | — | — | `suggestResources` ?to |
 | Attributes | text field | — | — | `suggestResources` ?attributes |
+| Kind | select | — | Cabana · Lounger · Locker · Wheelchair · Stroller · Equipment · Room · Auditorium · Vehicle · Instructor · Staff · Table … | `listResources` ?kind |
+| Available from | date and time picker | — | — | `listResources` ?availableFrom |
+| Available to | date and time picker | — | — | `listResources` ?availableTo |
 
 **Form: Save requirements** (modal, opened by *Save requirements*; *Save requirements* calls `setExperienceResourceRequirements`, *Cancel* sends nothing)
 
@@ -924,6 +927,26 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Outputs: what the screen shows and produces
 
 **Shown**
+
+**List the resources the assignment rules choose from** (card list, from `listResources`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Code | text | — |
+| Name | text | — |
+| Setup minutes | 1,234 | Before the booking, not inside it. An auditorium booked 14:00–16:00 is unavailable from 13:30 with a 30-minute setup, and a calendar that … |
+| Teardown minutes | 1,234 | After the booking. Kept as it is (decided 29 September, W10): with a `cleaningPolicy` of `afterEveryBooking` the cleaning buffer is added … |
+| Deposit amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Status | chip: Available, Booked, Checked out, Maintenance, Retired | — |
+
+**Load the experience's resource requirements** (card list, from `getExperienceResourceRequirements`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Quantity | 1,234 | — |
+| Mandatory | yes / no (icon or chip) | — |
+| Required qualifications | list or chips (count when long) | — |
+| Required attributes | grouped details | — |
 
 **Requirement rules** (data table, from `setExperienceResourceRequirements`): The editable rule grid: one row per requirement with its strength (minimum, preferred or mandatory) and quantity; the board drew the strengths as buttons. The current mapping of the experience is opened from BO-894.
 
@@ -978,7 +1001,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 - **Save requirements**: Binds the requirements to the experience; assignment of an unqualified person is then refused for mandatory rules. *(source: contracts/satellite/resources.yaml#setExperienceResourceRequirements / DI-493)*
 
-**Data it reads**: `suggestResources` (onLoad, Who qualifies)
+**Data it reads**: `suggestResources` (onLoad, Who qualifies); `getExperienceResourceRequirements` (onLoad, Load the experience's resource requirements); `listResources` (onLoad, List the resources the assignment rules choose from)
 
 **Where the user goes next**
 
@@ -1016,18 +1039,30 @@ rule:
 
 - `suggestResources` → `RESOURCE_VIEW` (read) · staff
 - `setExperienceResourceRequirements` → `RESOURCE_CONFIGURE` (configure) · staff
+- `getExperienceResourceRequirements` → `RESOURCE_VIEW` (read) · staff
+- `listResources` → `RESOURCE_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+22 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
 | 1.2.53 | AI shall recommend optimal resources. | Ticketing Catalogue | CONTRACTED | `suggestResources` |
 | 1.2.54 | AI shall recommend suitable staff based on skills and availability. | Ticketing Catalogue | CONTRACTED | `suggestResources` |
 | 1.2.56 | AI shall propose alternatives for scheduling conflicts. | Ticketing Catalogue | CONTRACTED | `suggestResources` |
+| 1.2.1 | The system should allow management of all types of resources: - Areas with limited capacity (e.g. Meeting rooms, Cabanas, etc.) - Staff (e.g. Ski School Instructors, etc.) - Objects (e.g. Strollers … | Ticketing Catalogue | CONTRACTED | data `Resource` |
+| 1.2.2 | The system should allow easy creation and tracking of resources, and link them to individual attraction experiences, so that a ticket is not only based on available time-slots but also on relevant … | Ticketing Catalogue | CONTRACTED | data `Resource` |
+| 1.2.14 | Ability to define resources required for each event along with the availability schedule. The resources could be of any type: | Ticketing Catalogue | CONTRACTED | data `Resource` |
+| 1.2.15 | Venues & Spaces: Auditoriums, halls, rooms, stages, breakout areas. | Ticketing Catalogue | CONTRACTED | data `Resource` |
+| 1.2.16 | Equipment & Assets: AV systems, lighting, sound systems, projectors, chairs, booths. | Ticketing Catalogue | CONTRACTED | data `Resource` |
+| 1.2.17 | Staff & Personnel: Event managers, ushers, security, performers, technical crew, mascots, hosts. | Ticketing Catalogue | CONTRACTED | data `Resource` |
+| 1.2.23 | System shall support configurable resource types including staff, venues, equipment, rooms and rental items. | Ticketing Catalogue | CONTRACTED | data `Resource` |
+| 1.2.24 | System shall support categorization of resources. | Ticketing Catalogue | CONTRACTED | data `Resource` |
+| 1.2.25 | System shall support parent-child resource relationships. | Ticketing Catalogue | CONTRACTED | data `Resource` |
+| … 10 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -1049,7 +1084,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (11), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (29 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (39 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-877?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save requirements.
 - [ ] Every transition is wired: `BO-873`.
@@ -1067,7 +1102,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-878 |
 | Who uses it | venue staff holding `RESOURCE_CONFIGURE`, `RESOURCE_VIEW`, `WORKFORCE_MANAGE`, `WORKFORCE_VIEW` (2 configure, 2 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; Users shall configure) and no display directory — it is settings, not a population |
@@ -1248,7 +1283,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-879 |
 | Who uses it | venue staff holding `WORKFORCE_MANAGE`, `WORKFORCE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Administrators shall define) and no display directory — it is settings, not a population |
@@ -1421,7 +1456,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-880 |
 | Who uses it | venue staff holding `RESOURCE_MANAGE`, `WORKFORCE_MANAGE`, `WORKFORCE_VIEW` (2 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -1621,7 +1656,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-881 |
 | Who uses it | venue staff holding `WORKFORCE_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Administrators shall configure) and no display directory — it is settings, not a population |
@@ -1778,7 +1813,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-882 |
 | Who uses it | venue staff holding `WORKFORCE_MANAGE`, `WORKFORCE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -2095,6 +2130,7 @@ Method, path, parameters, request and response for every operation these screens
 {
 "createResourceBlock": {"method":"POST","path":"/resource-blocks","contract":"resources","summary":"Take a resource out of service for a window, with a reason","permission":"RESOURCE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ResourceBlock","responds":"ResourceBlock"},
 "getEmployee": {"method":"GET","path":"/employees/{employeeId}","contract":"workforce","summary":"One person, with their employment, postings and leave balances","permission":"WORKFORCE_VIEW","offlineCapable":false,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"employeeId","in":"path","required":true}],"requestBody":null,"responds":"WorkforceEmployeeProfile"},
+"getExperienceResourceRequirements": {"method":"GET","path":"/experiences/{experienceId}/resource-requirements","contract":"resources","summary":"What an experience needs before it can run","permission":"RESOURCE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"ResourceRequirement"},
 "getFieldOwnership": {"method":"GET","path":"/integration-sources/{sourceId}/field-ownership","contract":"workforce","summary":"Which fields this source masters","permission":"WORKFORCE_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":"sourceId","in":"path","required":true}],"requestBody":null,"responds":"WorkforceFieldOwnership"},
 "getPrincipal": {"method":"GET","path":"/principals/{principalId}","contract":"identity","summary":"Read a principal","permission":"USER_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"Principal"},
 "getResourceQualifications": {"method":"GET","path":"/resources/{resourceId}/qualifications","contract":"resources","summary":"What an instructor or staff resource is certified to do, and until when — as saved","permission":"RESOURCE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"Qualification"},

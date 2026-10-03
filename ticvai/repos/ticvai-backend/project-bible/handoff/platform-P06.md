@@ -9,12 +9,12 @@
 | Contracts | 21 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 147 |
+| Operations with no screen | 139 |
 | Waves | wave1 30 · wave2 35 · wave3 31 |
 
 ## Gaps
 
-### 147 operations with no screen here
+### 139 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -24,7 +24,6 @@
 | `getHardwareModelCertification` | access | GET | A reader model's certification and its test results |
 | `listAccessChanges` | access | GET | Changes made to an entitlement's access |
 | `listEntryExitRule` | access | GET | Entry, Exit & Re-entry Rules |
-| `listEntryRulePoints` | access | GET | Which access points an admission rule covers |
 | `listEntryTemporaryExit` | access | GET | Re-entry & Temporary Exit Journey |
 | `setHardwareModelCertification` | access | PUT | Certify a reader model, or record that it failed |
 | `setVirtualTicketCredential` | access | PUT | Virtual Ticket & Credential 360° Workspace |
@@ -33,7 +32,6 @@
 | `generateVenueLayout` | ai | POST | Draft a seat map from an uploaded plan |
 | `listIndexJobs` | ai | GET | Indexing in flight and recently finished |
 | `listIndexSources` | ai | GET | What is indexed, and how current it is |
-| `proposeWalkways` | ai | POST | Find walkable space in a drawing that has no vectors |
 | `reindexSource` | ai | POST | Rebuild a source |
 | `removeIndexEntry` | ai | DELETE | Remove one record from the index |
 | `setAiTool` | ai | PUT | Register or change a tool (platform) |
@@ -49,7 +47,6 @@
 | `listAutomationExecutions` | approvals | GET | What automations ran, when, on whose rule, and the outcome |
 | `reopenApprovalRequest` | approvals | POST | Reopen an expired or cancelled request as a new one |
 | `submitApprovalRequest` | approvals | POST | Send a saved draft for approval |
-| `getCatalogueImportJob` | catalogue | GET | Progress and findings of a catalogue import |
 | `getEventChangeTreatmentPolicy` | catalogue | GET | What happens to tickets, reservations and guests when an event changes, by default |
 | `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
 | `getWaitingRoomStatus` | catalogue | GET | A performance's waiting room, its setting and how it is moving |
@@ -60,7 +57,10 @@
 | `listSeatPricingRules` | catalogue | GET | Seat-level dynamic pricing rules |
 | `relinquishInventoryHold` | catalogue | DELETE | Return unsold units |
 | `renewInventoryHold` | catalogue | POST | Extend a lease TTL |
-| … | | | 107 more |
+| `setEntitlementTemplateBlackoutDates` | catalogue | PUT | Set the dates a product's entitlement does not admit |
+| `setEventChangeTreatmentPolicy` | catalogue | PUT | Set the default treatment per kind of event change |
+| `setSeatPricingRule` | catalogue | PUT | Create or replace a seat-level dynamic pricing rule |
+| … | | | 99 more |
 
 ### 3 modules split across waves
 

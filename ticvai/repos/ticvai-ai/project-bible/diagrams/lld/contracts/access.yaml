@@ -1,5 +1,5 @@
 id: LLD-access
-title: access — 250 operations
+title: access — 256 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -331,6 +331,26 @@ operations:
   - access.risk_scoring_config
   - access.security_alert
   writes: []
+- operation: getBiometricVerificationProfile
+  verb: GET
+  path: /biometric-verification-profile
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: getBleBeaconGeofence
+  verb: GET
+  path: /ble-beacon-geofence
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: getCredentialIssuanceRetryPolicy
   verb: GET
   path: /credential-issuance-retry-policy
@@ -382,6 +402,16 @@ operations:
   - access.entitlement
   - access.scan_event
   writes: []
+- operation: getFacePassEnrollmentConfiguration
+  verb: GET
+  path: /face-pass-enrollment
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: getFacePassEnrolment
   verb: GET
   path: /face-pass/enrolments/{enrolmentId}
@@ -430,6 +460,37 @@ operations:
   - access.blacklist
   - access.dynamic_policy
   - access.entitlement
+  writes: []
+- operation: getParkingEntitlement
+  verb: GET
+  path: /parking-entitlements/{entitlementId}
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - access.parking_entitlement
+  writes: []
+- operation: getPdfPrintablePos
+  verb: GET
+  path: /pdf-printable-pos
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: getVirtualTicketIdentity
+  verb: GET
+  path: /virtual-ticket-identity
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: issueOrderEntitlements
   verb: POST
@@ -2002,7 +2063,8 @@ operations:
   offline: false
   reads:
   - access.hardware_deployment
-  writes: []
+  writes:
+  - access.hardware_deployment
 - operation: publishMediaCompatibilityTesting
   verb: PUT
   path: /media-compatibility-testing
@@ -2291,7 +2353,8 @@ operations:
   reads:
   - access.access_point
   - access.gate_mode_change
-  writes: []
+  writes:
+  - access.access_point
 - operation: setAccessPointGeofence
   verb: PUT
   path: /access-points/{accessPointId}/geofence
@@ -2364,7 +2427,8 @@ operations:
   offline: false
   reads:
   - tenancy.data_retention_setting
-  writes: []
+  writes:
+  - tenancy.data_retention_setting
 - operation: setBiometricVerificationProfile
   verb: PUT
   path: /biometric-verification-profile

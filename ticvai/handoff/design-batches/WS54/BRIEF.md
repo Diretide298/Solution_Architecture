@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-228` | Promotion Performance Command Center | B–D | 2 | 0 | 6 | 0 | 1 | 2 | — | notStarted (generated) |
-| `ADM-229` | Campaign & Promotion Performance Explorer | B–D | 4 | 5 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
-| `ADM-230` | Redemption, Conversion & Funnel Analytics | B–D | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-231` | Discount, Margin & Profitability Analytics | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-232` | Bundle, BOGO & Advanced Offer Analytics | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-233` | Upsell, Cross-Sell & Attach-Rate Analytics | B–D | 0 | 16 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-234` | Customer, Segment, Channel & Partner Analytics | B–D | 0 | 16 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
-| `ADM-235` | Incrementality, Attribution & Cannibalization Analysis | B–D | 0 | 6 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
-| `ADM-236` | AI Optimization & Next-Best-Action Center | B–D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (generated) |
-| `ADM-237` | Executive Promotion Intelligence & Reporting Studio | B–D | 0 | 2 | 6 | 0 | 0 | 2 | — | notStarted (generated) |
+| `ADM-228` | Promotion Performance Command Center | C | 2 | 0 | 6 | 0 | 1 | 2 | — | notStarted (generated) |
+| `ADM-229` | Campaign & Promotion Performance Explorer | C | 4 | 5 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `ADM-230` | Redemption, Conversion & Funnel Analytics | C | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-231` | Discount, Margin & Profitability Analytics | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-232` | Bundle, BOGO & Advanced Offer Analytics | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-233` | Upsell, Cross-Sell & Attach-Rate Analytics | C | 0 | 16 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-234` | Customer, Segment, Channel & Partner Analytics | C | 0 | 16 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `ADM-235` | Incrementality, Attribution & Cannibalization Analysis | C | 0 | 6 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
+| `ADM-236` | AI Optimization & Next-Best-Action Center | C | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (generated) |
+| `ADM-237` | Executive Promotion Intelligence & Reporting Studio | C | 0 | 2 | 6 | 0 | 0 | 2 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-953` | Seat Map Command Center | B–D | 0 | 0 | 6 | 1 | 4 | 6 | — | notStarted (—) |
-| `BO-954` | Venue Canvas | B–D | 0 | 0 | 6 | 3 | 3 | 0 | — | notStarted (—) |
-| `BO-955` | Sections & Zones | B–D | 7 | 0 | 6 | 2 | 2 | 0 | — | notStarted (—) |
-| `BO-956` | Rows & Seats | B–D | 0 | 0 | 6 | 9 | 2 | 6 | — | notStarted (—) |
-| `BO-957` | Standing Zones | B–D | 0 | 20 | 6 | 0 | 3 | 0 | — | notStarted (—) |
-| `BO-958` | Suites & Boxes | B–D | 0 | 20 | 6 | 0 | 3 | 0 | — | notStarted (—) |
-| `BO-959` | Stage & Focal Point | B–D | 0 | 20 | 6 | 4 | 0 | 0 | — | notStarted (—) |
-| `BO-960` | Entrances, Exits & Aisles | B–D | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-961` | Amenities & Obstructions | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-962` | Templates, Validation & Publish | B–D | 0 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
+| `BO-953` | Seat Map Command Center | C | 0 | 0 | 6 | 1 | 4 | 6 | — | notStarted (—) |
+| `BO-954` | Venue Canvas | C | 0 | 0 | 6 | 3 | 3 | 0 | — | notStarted (—) |
+| `BO-955` | Sections & Zones | C | 7 | 0 | 6 | 2 | 2 | 0 | — | notStarted (—) |
+| `BO-956` | Rows & Seats | C | 0 | 0 | 6 | 9 | 2 | 6 | — | notStarted (—) |
+| `BO-957` | Standing Zones | C | 0 | 20 | 6 | 0 | 3 | 0 | — | notStarted (—) |
+| `BO-958` | Suites & Boxes | C | 0 | 20 | 6 | 0 | 3 | 0 | — | notStarted (—) |
+| `BO-959` | Stage & Focal Point | C | 0 | 20 | 6 | 4 | 0 | 0 | — | notStarted (—) |
+| `BO-960` | Entrances, Exits & Aisles | C | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-961` | Amenities & Obstructions | C | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-962` | Templates, Validation & Publish | C | 0 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

@@ -263,7 +263,7 @@
      "format": "uuid"
     }
    },
-   "coversGamesAddedLater": {
+   "includesGamesAddedLater": {
     "type": "boolean",
     "default": true,
     "description": "**Whether a pass sold today covers a game added tomorrow** (Chinmay, 2 October, workbook Q397: \"venue configures; default yes\"; CHG-CSA-028). True, the default: an `allGamesPass`, or a pass bound by `attractionTypeIds`, covers games added after it was sold that match it; the coverage summary says so. False: it covers only the games that existed at sale. A pass listing `gameIds` covers those games only, whatever this says."

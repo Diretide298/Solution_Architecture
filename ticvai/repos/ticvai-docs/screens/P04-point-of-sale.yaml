@@ -2814,14 +2814,17 @@ screens:
       operation: createShopAndDrop
       crossesDevice: true
       back: false
+    - to: POS-011
+      trigger: Return or exchange a sale (a later visit, from the receipt)
+      provenance: flow brief F34 frame 4→5; added 3 October 2026 (the lead, POS design cross-check; CHG-RONEC-002)
+      carries:
+      - orderId
+      - outletId
     - to: POS-010
       trigger: The guest asks to add a locker to the ticket they just bought
       provenance: flow F58 step 6→7
       carries:
       - orderId
-    - to: POS-011
-      trigger: Return or exchange a sale (a later visit, from the receipt)
-      provenance: flow brief F34 frame 4→5; added 3 October 2026 (the lead, POS design cross-check; CHG-RONEC-002)
     uses:
     - posPrimaryRail
   notes: 'Design: Park_POS_dc.html, "Cash Payment". Add Tip appears in the design and had no operation
@@ -3922,8 +3925,8 @@ screens:
         note: '`submitShiftCount` answered `referredToSupervisor`: the shift is `pendingVariance` and
           the supervisor is alerted; the till shows no amount (CHG-FIN-003; audit R080 (e)).'
       provenance: board TICVAI POS Terminal · signOut (5641) + lockShift (5687); flow F32 step 10→11 (the
-        cashier signs out to the till door, POS-000, where the next cashier signs in; corrected 3 October 2026 from
-        POS-001, CHG-RONEC-002)
+        cashier signs out to the till door, POS-000, where the next cashier signs in; corrected 3 October
+        2026 from POS-001, CHG-RONEC-002)
     - to: POS-008
       trigger: The day is reported
       provenance: flow F74 step 1→2
@@ -3937,8 +3940,8 @@ screens:
       provenance: 'derived — POS-009 declares entryState.params  and POS-007 holds none of them. The edge
         carries nothing: POS-009 needs nothing to open'
     - to: POS-025
-      trigger: Back to Till Home (supervisor done)
-      provenance: flow brief F32 frame 11→12; added 3 October 2026 (the lead, POS design cross-check; CHG-RONEC-002)
+      trigger: A shift was closed in error
+      provenance: flow F32 step 13→14
     uses:
     - posPrimaryRail
   notes: 'The blind count is the whole control. Not in the mockup, which shows only Begin Shift. **Improved
@@ -4105,8 +4108,8 @@ screens:
       - kind: destructiveButton
         label: Close and sign out
         operation: submitShiftCount
-        notes: 'The cashier''s act: submits the blind count and signs out to the till door (POS-000). No PIN;
-          the answer says only what happens next ("Shift closed" or "Your count is with your supervisor",
+        notes: 'The cashier''s act: submits the blind count and signs out to the till door (POS-000).
+          No PIN; the answer says only what happens next ("Shift closed" or "Your count is with your supervisor",
           chip "Under review"), never an amount (CHG-FIN-003; F32, CHG-RONEC-002).'
         provenance: contract shift.yaml POST /shifts/{shiftId}/count
       - kind: secondaryButton
@@ -7273,15 +7276,15 @@ screens:
     - POS-002
     - POS-007
     transitions:
-    - to: POS-007
-      trigger: End of shift
-      provenance: flow F32 step 5→6
-      operation: recordNoSale
     - to: POS-002
       trigger: Sell — Ticket Catalogue
       provenance: 'derived — POS-002 declares entryState.params cardCode, orderId, productId, promotionId
         and POS-020 holds none of them. The edge carries nothing: cardCode, orderId, productId, promotionId
         only pre-select (deep link or optional), and POS-002 opens on its own'
+    - to: POS-007
+      trigger: End of shift
+      provenance: flow F32 step 8→9
+      operation: recordNoSale
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
     them. **Owns POS board frame(s) POS-3E** (client pack, 24 August). **Assigned by board purpose rather
     than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense,
@@ -8644,14 +8647,16 @@ screens:
     - to: POS-018
       trigger: Cash lift (the drawer is over its limit)
       provenance: flow brief F32 frame 5→6; added 3 October 2026 (the lead, POS design cross-check; CHG-RONEC-002)
+      carries:
+      - shiftId
     - to: POS-000
       trigger: Sign out (back to the till door)
-      provenance: flow brief F32 frame 12→13; added 3 October 2026 (the lead, POS design cross-check; CHG-RONEC-002)
+      provenance: flow brief F32 frame 12→13; added 3 October 2026 (the lead, POS design cross-check;
+        CHG-RONEC-002)
     - to: BO-024
-      trigger: The deposit boxes of the settled shifts close
-      provenance: flow brief F32 frame 14→15; added 3 October 2026 (the lead, POS design cross-check; CHG-RONEC-002)
-      crossesDevice: true
-      back: false
+      trigger: The deposit boxes of the settled shifts close and the cash reaches the safe
+      provenance: flow F32 step 14→15
+      operation: reopenShift
   notes: '**P04 had no entry surface.** Eleven of its screens declared `entryFrom: POS-001`, which is
     the sign-in — so the model said a cashier signs in and is somehow already inside a sale. The prototype''s
     `home` is the missing step, and it is what makes the rail in `posPrimaryRail` mean something: **twelve
@@ -8675,14 +8680,14 @@ screens:
         - Shift.openedAt
         - Shift.salesTotal
         operation: getWorkstationShift
-        notes: '**The cashier''s own sales this shift: one total across every tender and the number of sales,
-          with no tender split** (the lead, 3 October 2026, from the POS design cross-check; CHG-RONEC-002). The
-          count is the sales this till rang on the shift, from its own journal. A total with no cash share
-          cannot be turned into the expected cash, so the blind close holds (CHG-FIN-003): expected cash, the
-          variance and any cash or tender breakdown stay supervisor-only (OVERSHORT_ACCEPT, on POS-007 and
-          BO-040). Was "Shift takings so far". Read with `getWorkstationShift` under REPORT_VIEW_WORKSTATION,
-          not `getCurrentShift` (SHIFT_OPEN), so a supervisor covering the till without a shift of their own
-          loads the home (CHG-DOOR-005). A 404 `no-current-shift` is the no-shift state, not an error.'
+        notes: '**The cashier''s own sales this shift: one total across every tender and the number of
+          sales, with no tender split** (the lead, 3 October 2026, from the POS design cross-check; CHG-RONEC-002).
+          The count is the sales this till rang on the shift, from its own journal. A total with no cash
+          share cannot be turned into the expected cash, so the blind close holds (CHG-FIN-003): expected
+          cash, the variance and any cash or tender breakdown stay supervisor-only (OVERSHORT_ACCEPT,
+          on POS-007 and BO-040). Was "Shift takings so far". Read with `getWorkstationShift` under REPORT_VIEW_WORKSTATION,
+          not `getCurrentShift` (SHIFT_OPEN), so a supervisor covering the till without a shift of their
+          own loads the home (CHG-DOOR-005). A 404 `no-current-shift` is the no-shift state, not an error.'
       - kind: metricTile
         label: Open holds
         bindsTo: Order

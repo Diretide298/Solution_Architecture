@@ -708,6 +708,7 @@ operations:
   writes:
   - cache:idempotency
   - cache:resolution
+  - inventory.item
 - operation: setInventoryKitDefinition
   verb: PUT
   path: /inventory-items/{itemId}/kit-definition

@@ -1,29 +1,29 @@
 id: LLD-FnbService
-title: FnbService — 133 operations, 52 tables
+title: FnbService — 135 operations, 53 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 deployable: operations
 index: diagrams/hld/02-services.yaml
-why: '**133 operations and 52 tables — the largest single domain after marketing.** Its own service
+why: '**135 operations and 53 tables — the largest single domain after marketing.** Its own service
   because a kitchen pass has a latency profile nothing else shares: a bump must land in under a second
   on a display that may be offline.'
 scale: Write-heavy during service, idle between. **Two peaks a day, sharply.**
 ifDown: Down means the kitchen falls back to paper. Offline-capable by design.
 coverage:
-  operations: 133
+  operations: 135
   inAFlow: 65
-  percent: 49%
+  percent: 48%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: fnb
-  tables: 52
+  tables: 53
   stores:
   - postgres
   largestTable: fnb.table_reservation
 operationsByContract:
 - contract: fnb
-  count: 133
+  count: 135
   operations:
   - operation: acceptFnbOrder
     verb: POST
@@ -32,7 +32,7 @@ operationsByContract:
     permission: ORDER_MODIFY
     offline: true
     reads: 5
-    writes: 2
+    writes: 3
   - operation: amendFnbOrder
     verb: PATCH
     path: /fnb-orders/{orderId}
@@ -168,7 +168,7 @@ operationsByContract:
     permission: null
     offline: false
     reads: 6
-    writes: 4
+    writes: 5
   - operation: createMenu
     verb: POST
     path: /menus
@@ -216,7 +216,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: true
     reads: 3
-    writes: 1
+    writes: 2
   - operation: escalateCorrectiveAction
     verb: POST
     path: /food-safety/corrective-actions/{actionId}/escalate
@@ -335,7 +335,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: true
-    reads: 0
+    reads: 1
     writes: 0
   - operation: getMenu
     verb: GET
@@ -408,7 +408,7 @@ operationsByContract:
     permission: ORDER_MODIFY
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: list86Events
     verb: GET
     path: /outlets/{outletId}/86-events
@@ -424,6 +424,14 @@ operationsByContract:
     permission: null
     offline: false
     reads: 0
+    writes: 0
+  - operation: listCombos
+    verb: GET
+    path: /combos
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 2
     writes: 0
   - operation: listDeliveryLocations
     verb: GET
@@ -552,6 +560,14 @@ operationsByContract:
     permission: PRODUCT_VIEW
     offline: false
     reads: 2
+    writes: 0
+  - operation: listSubstitutionRules
+    verb: GET
+    path: /substitution-rules
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
     writes: 0
   - operation: listTableReservations
     verb: GET
@@ -688,7 +704,7 @@ operationsByContract:
     permission: ORDER_MODIFY
     offline: false
     reads: 3
-    writes: 1
+    writes: 2
   - operation: reassignServer
     verb: PUT
     path: /table-visits/{visitId}/server
@@ -768,7 +784,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 1
-    writes: 1
+    writes: 2
   - operation: resolveBookingConflict
     verb: GET
     path: /table-reservations/conflicts
@@ -895,8 +911,8 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 2
+    reads: 2
+    writes: 3
   - operation: setKitchenStations
     verb: PUT
     path: /kitchen/stations
@@ -920,7 +936,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: setMenuSections
     verb: PUT
     path: /menus/{menuId}/sections
@@ -936,7 +952,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: setPrepSheetTemplate
     verb: PUT
     path: /prep-sheet-template
@@ -1024,15 +1040,15 @@ operationsByContract:
     permission: ORDER_MODIFY
     offline: true
     reads: 3
-    writes: 2
+    writes: 3
   - operation: transferOrderItems
     verb: POST
     path: /table-visits/{visitId}/transfer-items
     scope: venue
     permission: ORDER_MODIFY
     offline: true
-    reads: 7
-    writes: 3
+    reads: 6
+    writes: 4
   - operation: transferTableVisit
     verb: POST
     path: /table-visits/{visitId}/transfer
@@ -1088,7 +1104,7 @@ operationsByContract:
     permission: PRODUCT_VIEW
     offline: false
     reads: 5
-    writes: 0
+    writes: 1
 tables:
 - store: cache:idempotency
   kind: cache
@@ -1291,7 +1307,8 @@ tables:
   columns: 8
   store: postgres
   parent: fnb.menu_item
-  writtenBy: []
+  writtenBy:
+  - fnb
   foreignWriters: null
 - table: fnb.bill_split
   columns: 3
@@ -1390,6 +1407,13 @@ tables:
   writtenBy:
   - fnb
   foreignWriters: null
+- table: fnb.kitchen_sla
+  columns: 3
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
 - table: fnb.kitchen_station
   columns: 10
   store: postgres
@@ -1483,7 +1507,8 @@ tables:
   columns: 12
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - fnb
   foreignWriters: null
 - table: fnb.prep_sheet_template
   columns: 7
@@ -1578,7 +1603,8 @@ tables:
   columns: 11
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - fnb
   foreignWriters: null
 - table: fnb.substitution_rule
   columns: 10
@@ -1651,12 +1677,35 @@ readsFrom:
 - service: InventoryService
   operations: 6
 - service: OrderService
-  operations: 4
+  operations: 3
 - service: CatalogueService
   operations: 2
 - service: AiService
   operations: 1
 writesOutside:
+- service: InventoryService
+  operations: 5
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event InventoryService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: completeProductionRun
+    tables:
+    - inventory.movement
+  - operation: enterCountLine
+    tables:
+    - inventory.count_line
+  - operation: recordWaste
+    tables:
+    - inventory.movement
+  - operation: refireItem
+    tables:
+    - inventory.movement
+  - operation: requestRecount
+    tables:
+    - inventory.count_line
 - service: MarketingService
   operations: 4
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
@@ -1677,23 +1726,27 @@ writesOutside:
   - operation: sendOrderNotification
     tables:
     - marketing.message_dispatch
-- service: InventoryService
-  operations: 3
+- service: TenancyService
+  operations: 4
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
-    each inserts or updates, or which operation or event InventoryService published for it — check each
+    each inserts or updates, or which operation or event TenancyService published for it — check each
     against ADR-0028.'
   writes:
-  - operation: completeProductionRun
+  - operation: acceptFnbOrder
     tables:
-    - inventory.movement
-  - operation: recordWaste
+    - platform.outbox
+  - operation: createFnbOrder
     tables:
-    - inventory.movement
-  - operation: refireItem
+    - platform.idempotency_record
+    - platform.outbox
+  - operation: createGuestFnbOrder
     tables:
-    - inventory.movement
+    - platform.outbox
+  - operation: setKitchenTicketStatus
+    tables:
+    - platform.outbox
 - service: CatalogueService
   operations: 2
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
@@ -1709,7 +1762,7 @@ writesOutside:
     tables:
     - catalogue.product_version
 - service: OrderService
-  operations: 2
+  operations: 1
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -1719,24 +1772,6 @@ writesOutside:
   - operation: compItem
     tables:
     - orders.order_line
-  - operation: transferOrderItems
-    tables:
-    - orders.order_line
-- service: TenancyService
-  operations: 2
-  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
-    published.'
-  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
-    each inserts or updates, or which operation or event TenancyService published for it — check each
-    against ADR-0028.'
-  writes:
-  - operation: createFnbOrder
-    tables:
-    - platform.idempotency_record
-    - platform.outbox
-  - operation: setKitchenTicketStatus
-    tables:
-    - platform.outbox
 screens:
 - P01:WEB-031 My Reservations
 - P01:WEB-036 F&B – Browse & Order

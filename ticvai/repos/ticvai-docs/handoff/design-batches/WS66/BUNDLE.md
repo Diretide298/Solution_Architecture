@@ -1469,7 +1469,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | Block D · task APP-SETUP-ANL-019 |
+| Block | Block D · task APP-ANALYTICS-ANL-019 |
 | Who uses it | venue staff holding `AI_USE`, `REPORT_VIEW_VENUE` (2 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listAiInsights` reads the population and the selected insight is decided or explained — list, select, act (CHG-SOT-011). |

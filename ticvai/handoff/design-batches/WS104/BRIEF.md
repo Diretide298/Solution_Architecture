@@ -181,16 +181,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-595` | AI Setup Command Center | B–D | 0 | 15 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-596` | Guided Setup Plan | B–D | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-597` | AI Configuration Workspace | B–D | 0 | 0 | 6 | 19 | 1 | 0 | — | notStarted (—) |
-| `BO-598` | AI Draft Review & Approval | B–D | 2 | 0 | 6 | 20 | 1 | 3 | — | notStarted (—) |
-| `BO-599` | Manual Configuration Center | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-600` | Venue, Calendar & Operational Setup | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-601` | Product, Pricing & Sales Channel Setup | B–D | 16 | 8 | 6 | 5 | 0 | 0 | — | notStarted (—) |
-| `BO-602` | POS, Payment & Access Setup | B–D | 13 | 0 | 6 | 10 | 0 | 0 | — | notStarted (—) |
-| `BO-603` | Configuration Health & AI Review | B–D | 1 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-604` | Setup Completion & Handoff to Go-Live | B–D | 3 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-595` | AI Setup Command Center | B | 0 | 15 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-596` | Guided Setup Plan | B | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-597` | AI Configuration Workspace | D | 0 | 0 | 6 | 19 | 1 | 0 | — | notStarted (—) |
+| `BO-598` | AI Draft Review & Approval | D | 2 | 0 | 6 | 20 | 1 | 3 | — | notStarted (—) |
+| `BO-599` | Manual Configuration Center | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-600` | Venue, Calendar & Operational Setup | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-601` | Product, Pricing & Sales Channel Setup | B | 16 | 8 | 6 | 5 | 0 | 0 | — | notStarted (—) |
+| `BO-602` | POS, Payment & Access Setup | B | 13 | 0 | 6 | 10 | 0 | 0 | — | notStarted (—) |
+| `BO-603` | Configuration Health & AI Review | B | 1 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-604` | Setup Completion & Handoff to Go-Live | B | 3 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

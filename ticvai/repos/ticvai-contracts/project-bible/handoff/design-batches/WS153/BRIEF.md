@@ -136,15 +136,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-620` | Reconciliation Source & Import Manager | B–D | 0 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-621` | Transaction Matching & Reconciliation Engine | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-622` | Reconciliation Exception & Investigation Center | B–D | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-623` | Settlement & Payout Manager | B–D | 0 | 32 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-624` | Fees, Commission, FX & Settlement Economics | B–D | 0 | 10 | 6 | 0 | 0 | 4 | — | notStarted (—) |
-| `ADM-625` | Merchant Account & Settlement Calendar Manager | B–D | 2 | 16 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-626` | Settlement Posting, Finance Handoff & Close Manager | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-627` | Reconciliation Audit, Trace & Evidence Center | B–D | 7 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-628` | Reconciliation Simulator, Forecast & AI Operations Advisor | B–D | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-620` | Reconciliation Source & Import Manager | C | 0 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-621` | Transaction Matching & Reconciliation Engine | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-622` | Reconciliation Exception & Investigation Center | C | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-623` | Settlement & Payout Manager | C | 0 | 32 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-624` | Fees, Commission, FX & Settlement Economics | C | 0 | 10 | 6 | 0 | 0 | 4 | — | notStarted (—) |
+| `ADM-625` | Merchant Account & Settlement Calendar Manager | C | 2 | 16 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-626` | Settlement Posting, Finance Handoff & Close Manager | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-627` | Reconciliation Audit, Trace & Evidence Center | C | 7 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-628` | Reconciliation Simulator, Forecast & AI Operations Advisor | C | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

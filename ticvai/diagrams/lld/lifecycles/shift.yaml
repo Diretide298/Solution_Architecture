@@ -43,7 +43,9 @@ transitions:
 - from: pendingClosure
   to: closed
   trigger: job
-  guard: Variance within tolerance
+  guard: Variance within tolerance. Measured in the same transaction as the count (`closeShift`, `submitShiftCount`)
+    or the release of a supervised close (`approveShiftClose`), so each of those emits `shift.closed`
+    when it lands here (CHG-R1S-009)
   emits:
   - shift.closed
 - from: pendingVariance

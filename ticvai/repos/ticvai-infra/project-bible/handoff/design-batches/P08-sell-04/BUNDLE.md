@@ -123,13 +123,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-122` | POS Experience Dashboard | B–D | 3 | 12 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-123` | POS Profile Management | B–D | 9 | 12 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
+| `BO-122` | POS Experience Dashboard | B | 3 | 12 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-123` | POS Profile Management | B | 9 | 12 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
 | `BO-124` | Layout & Journey Builder | B | 38 | 22 | 6 | 9 | 2 | 6 | — | notStarted (generated) |
-| `BO-125` | Product & Category Button Configuration | B–D | 19 | 6 | 6 | 14 | 3 | 0 | — | notStarted (generated) |
-| `BO-126` | Deployment, Preview & Audit | B–D | 23 | 47 | 5 | 2 | 0 | 0 | — | notStarted (generated) |
-| `BO-142` | Store Rules, Controls & Permissions | B–D | 11 | 5 | 6 | 0 | 1 | 5 | — | notStarted (generated) |
-| `BO-143` | Retail Global Settings & Controls | B–D | 10 | 10 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-125` | Product & Category Button Configuration | B | 19 | 6 | 6 | 14 | 3 | 0 | — | notStarted (generated) |
+| `BO-126` | Deployment, Preview & Audit | B | 23 | 47 | 5 | 2 | 0 | 0 | — | notStarted (generated) |
+| `BO-142` | Store Rules, Controls & Permissions | C | 11 | 5 | 6 | 0 | 1 | 5 | — | notStarted (generated) |
+| `BO-143` | Retail Global Settings & Controls | C | 10 | 10 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -149,7 +149,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-122 |
 | Who uses it | venue staff holding `SCOPE_VIEW` (1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listSaleBoards` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -290,7 +290,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-123 |
 | Who uses it | venue staff holding `SCOPE_VIEW`, `TENANT_CONFIGURE` (1 read, 1 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listSaleBoards` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -461,7 +461,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 2 · needs the `core` module |
-| Block | Block B · task APP-SETUP-BO-124 |
+| Block | Block B · task VM-BO-124 |
 | Who uses it | venue staff holding `DEVICE_VIEW`, `SCOPE_VIEW`, `TENANT_CONFIGURE`, `WORKSTATION_CONFIGURE` (2 read, 2 configure); in the flows as technician |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listAuditRecords` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -744,7 +744,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-125 |
 | Who uses it | venue staff holding `PRODUCT_VIEW`, `WORKSTATION_CONFIGURE` (1 read, 1 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listProducts` reads the population and `getWorkstationHealth` reads one of them — list, select, act |
@@ -948,7 +948,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-126 |
 | Who uses it | venue staff holding `AUDIT_VIEW`, `SCOPE_VIEW`, `TENANT_CONFIGURE`, `WORKSTATION_CONFIGURE` (2 read, 2 configure); in the flows as technician, venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): 3 independent reads and no read of one record — the screen watches a population rather than working one |
@@ -1208,7 +1208,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-142 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listRoles` reads the population and `getVenueSettings` reads one of them — list, select, act |
@@ -1394,7 +1394,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-143 |
 | Who uses it | venue staff holding `ORDER_VIEW`, `PRODUCT_CONFIGURE`, `REGION_CONFIGURE` (1 read, 2 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | statusTracker (compact density): `getVenueSettings` reads one record and nothing reads a population — the screen is about that one thing |

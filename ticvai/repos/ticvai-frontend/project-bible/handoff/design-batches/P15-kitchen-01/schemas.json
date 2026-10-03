@@ -559,10 +559,22 @@
  },
  "KitchenSla": {
   "type": "object",
-  "description": "**How long a ticket may sit, per service mode, and what pushes it up the rail** (`setKitchenSla`). The priority weights are the ones `listKitchenTickets` orders the rail by.\n",
+  "x-ticvai-persistence": "fnb.kitchen_sla",
+  "x-ticvai-primary-key": [
+   "outletId"
+  ],
+  "description": "**How long a ticket may sit, per service mode, and what pushes it up the rail** (`setKitchenSla`). The priority weights are the ones `listKitchenTickets` orders the rail by.\n\n**Stored per outlet in `fnb.kitchen_sla`** (3 October 2026, CHG-R1S-005: the HLD/LLD cross-check found `setKitchenSla` wrote no table). One row per outlet; the targets and weights are held whole.\n",
   "properties": {
+   "outletId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The outlet, from the path. The row's key."
+   },
    "targets": {
     "type": "array",
+    "x-ticvai-persistence-kind": "valueObject",
+    "x-ticvai-persistence-column": "jsonb",
     "items": {
      "type": "object",
      "required": [
@@ -586,6 +598,8 @@
    },
    "priorityWeights": {
     "type": "object",
+    "x-ticvai-persistence-kind": "valueObject",
+    "x-ticvai-persistence-column": "jsonb",
     "description": "The weight of each signal the board names — age, promise time, table stage, a VIP marker.",
     "properties": {
      "age": {

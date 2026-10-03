@@ -131,12 +131,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-710` | Event Resource Command Center | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-711` | Event Resource Requirement Configuration | B–D | 0 | 20 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `BO-712` | Staff & Role Assignment Configuration | B–D | 0 | 40 | 6 | 9 | 0 | 5 | — | notStarted (—) |
-| `BO-713` | Contractor & External Workforce Configuration | B–D | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-714` | Event Shift & Roster Configuration | B–D | 13 | 24 | 6 | 10 | 0 | 6 | — | notStarted (—) |
-| `BO-715` | Resource Location & Deployment Configuration | B–D | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-710` | Event Resource Command Center | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-711` | Event Resource Requirement Configuration | B | 0 | 20 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `BO-712` | Staff & Role Assignment Configuration | B | 0 | 40 | 6 | 9 | 0 | 5 | — | notStarted (—) |
+| `BO-713` | Contractor & External Workforce Configuration | B | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-714` | Event Shift & Roster Configuration | D | 13 | 24 | 6 | 10 | 0 | 6 | — | notStarted (—) |
+| `BO-715` | Resource Location & Deployment Configuration | B | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

@@ -1,6 +1,6 @@
 # WS102 — Subscription Licensing AI Self Service board 5
 
-**10 screens · 14 operations · 26 schemas · 10 permissions**
+**10 screens · 15 operations · 26 schemas · 11 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 10 permissions apply here:
-  `ACCOUNT_CONFIGURE, PLATFORM_BILLING_MANAGE, PLATFORM_BILLING_VIEW, PLATFORM_CELL_MANAGE, PLATFORM_PLAN_MANAGE, PLATFORM_TENANT_ACCESS, PLATFORM_TENANT_MANAGE, PLATFORM_TENANT_VIEW, SCOPE_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 11 permissions apply here:
+  `ACCOUNT_CONFIGURE, ORDER_VIEW, PLATFORM_BILLING_MANAGE, PLATFORM_BILLING_VIEW, PLATFORM_CELL_MANAGE, PLATFORM_PLAN_MANAGE, PLATFORM_TENANT_ACCESS, PLATFORM_TENANT_MANAGE, PLATFORM_TENANT_VIEW, SCOPE_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -129,7 +129,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-409` | Purchase / Trial Journey Selection | B | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `ADM-410` | Contract & Billing Cycle Selection | B | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 | `ADM-411` | Billing & Legal Entity Information | B | 17 | 19 | 7 | 9 | 0 | 0 | — | notStarted (—) |
-| `ADM-412` | Payment Method & Settlement Setup | A | 41 | 7 | 7 | 24 | 0 | 0 | — | notStarted (—) |
+| `ADM-412` | Payment Method & Settlement Setup | A | 41 | 13 | 7 | 24 | 0 | 0 | — | notStarted (—) |
 | `ADM-413` | Trial Configuration & Conversion Rules | B | 16 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `ADM-414` | Order & Commercial Pricing Review | B | 0 | 10 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 | `ADM-415` | Commercial Agreement, Billable Definition & Customer Acceptance | B | 0 | 16 | 6 | 0 | 0 | 0 | — | notStarted (—) |
@@ -622,7 +622,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 1 · needs the `core` module |
 | Block | Block A · task APP-SETUP-ADM-412 |
-| Who uses it | ticvai staff holding `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`, `SCOPE_VIEW`, `TENANT_CONFIGURE` (1 operate, 2 read, 1 configure); in the flows as platform admin |
+| Who uses it | ticvai staff holding `ORDER_VIEW`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`, `SCOPE_VIEW`, `TENANT_CONFIGURE` (3 read, 1 operate, 1 configure); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -717,6 +717,17 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 **Shown**
 
+**Show the payment providers as configured** (card list, from `listPaymentProviders`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Name | text | — |
+| Kind | chip: Network international, Stripe, Adyen, Checkout, Cash, Wallet… | — |
+| Supports tokenisation | yes / no (icon or chip) | The keystone. Recurring billing, wallet auto-reload, one-click checkout and payment links all require a stored credential, and none of them … |
+| Supports partial capture | yes / no (icon or chip) | — |
+| Supports3ds | yes / no (icon or chip) | — |
+| Scope level | chip: Tenant, Region, Venue | — |
+
 **Open grant into this tenant** (detail panel, from `listOwnPlatformStaffGrants`): **Always visible while the screen acts on a tenant** (decided 28 September, audit R098): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log.
 
 | Shows | Format | Notes |
@@ -744,7 +755,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 - **Open access grant**: Confirmation names the consequence first, then asks for the authentication code (authenticator app, or an emailed code as fallback); only a verified challenge sends openPlatformStaffGrant with its single-use stepUpToken. Wrong code: the action is not sent and nothing changes; five wrong codes lock step-up for the policy's lockout minutes and the screen says when it lifts. Why the control exists: Opens a platform operator's access into a tenant's data. *(source: contracts/spine/identity.yaml#openPlatformStaffGrant; R126; contracts/spine/identity.yaml#createMfaChallenge)*
 
-**Data it reads**: `listTenants` (onLoad, The tenant picker — the operator picks a tenant before …); `listOrgUnits` (onLoad, The picked tenant's venues, to pick the venue the payment …)
+**Data it reads**: `listTenants` (onLoad, The tenant picker — the operator picks a tenant before …); `listOrgUnits` (onLoad, The picked tenant's venues, to pick the venue the payment …); `listPaymentProviders` (onLoad, Show the payment providers as configured)
 
 **Where the user goes next**
 
@@ -801,6 +812,7 @@ provider:
 - `setPaymentProvider` → `TENANT_CONFIGURE` (configure) · staff, prospect
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `listOrgUnits` → `SCOPE_VIEW` (read) · staff
+- `listPaymentProviders` → `ORDER_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -846,11 +858,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (41), with its required mark, default, format and its error state (400, 403, 412).
-- [ ] Every output is drawn (7 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-412?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Save payment provider, Open access grant.
 - [ ] Every transition is wired: `ADM-409`.
-- [ ] Every gated control is gated: `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`, `SCOPE_VIEW`, `TENANT_CONFIGURE`.
+- [ ] Every gated control is gated: `ORDER_VIEW`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`, `SCOPE_VIEW`, `TENANT_CONFIGURE`.
 - [ ] The module and platform inputs below are applied.
 - [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -1730,6 +1742,7 @@ Method, path, parameters, request and response for every operation these screens
 "getSubscription": {"method":"GET","path":"/tenants/{tenantId}/subscription","contract":"subscription","summary":"Read the current subscription","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"Subscription"},
 "listOrgUnits": {"method":"GET","path":"/org-units","contract":"tenancy","summary":"List scope nodes visible to the session","permission":"SCOPE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"under","in":"query","required":null},{"name":"level","in":"query","required":null},{"name":"includeInactive","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listOwnPlatformStaffGrants": {"method":"GET","path":"/platform-staff-grants/mine","contract":"identity","summary":"The calling platform operator's own grants into this tenant","permission":"PLATFORM_TENANT_ACCESS","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"activeOnly","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listPaymentProviders": {"method":"GET","path":"/payment-providers","contract":"orders","summary":"Gateways configured for this scope","permission":"ORDER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listTenants": {"method":"GET","path":"/tenants","contract":"subscription","summary":"List tenants","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"status","in":"query","required":null},{"name":"planId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "openPlatformStaffGrant": {"method":"POST","path":"/platform-staff-grants","contract":"identity","summary":"A platform operator opens a time-boxed grant into this tenant","permission":"PLATFORM_TENANT_ACCESS","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"PlatformStaffGrant"},
 "previewSubscriptionChange": {"method":"POST","path":"/tenants/{tenantId}/subscription/preview","contract":"subscription","summary":"Preview the effect of a plan change","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"SetSubscriptionRequest","responds":"SubscriptionPreview"},

@@ -756,6 +756,40 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listTicketTransfers": {
+  "method": "GET",
+  "path": "/ticket-transfers",
+  "contract": "orders",
+  "summary": "The ticket transfers this guest sent or received",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "direction",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "recordConsent": {
   "method": "POST",
   "path": "/guests/{subjectId}/consents",

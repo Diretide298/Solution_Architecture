@@ -96,16 +96,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-605` | Go-Live Readiness Command Center | B–D | 0 | 13 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-606` | Automated Validation Plan | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-607` | Ticketing & Product Validation | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-608` | End-to-End Sales Channel Testing | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-609` | Payment & Financial Validation | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-610` | Ticket, QR & Access Validation | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-611` | User, Security & Integration Validation | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-612` | Communication & Customer Journey Validation | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-613` | Blocker, Warning & AI Resolution Center | B–D | 6 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-614` | Final Go-Live Approval & Production Launch | B–D | 1 | 11 | 6 | 0 | 0 | 3 | — | notStarted (—) |
+| `BO-605` | Go-Live Readiness Command Center | B | 0 | 13 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-606` | Automated Validation Plan | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-607` | Ticketing & Product Validation | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-608` | End-to-End Sales Channel Testing | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-609` | Payment & Financial Validation | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-610` | Ticket, QR & Access Validation | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-611` | User, Security & Integration Validation | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-612` | Communication & Customer Journey Validation | B | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-613` | Blocker, Warning & AI Resolution Center | B | 6 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-614` | Final Go-Live Approval & Production Launch | B | 1 | 11 | 6 | 0 | 0 | 3 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

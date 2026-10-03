@@ -103,16 +103,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-804` | Case Command Center | B–D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `BO-805` | Case Queue & Search | B–D | 4 | 13 | 6 | 1 | 0 | 6 | — | notStarted (—) |
-| `BO-806` | Case Creation | B–D | 3 | 7 | 6 | 8 | 2 | 0 | — | notStarted (—) |
-| `BO-807` | Classification & Workflow | B–D | 8 | 7 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-808` | Assignment & Workload | B–D | 6 | 6 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `BO-809` | SLA Policy Configuration | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-810` | Escalation Rules | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-811` | Case Workspace | B–D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
-| `BO-812` | Service Recovery | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-813` | Case Analytics & Audit | B–D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `BO-804` | Case Command Center | D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `BO-805` | Case Queue & Search | D | 4 | 13 | 6 | 1 | 0 | 6 | — | notStarted (—) |
+| `BO-806` | Case Creation | D | 3 | 7 | 6 | 8 | 2 | 0 | — | notStarted (—) |
+| `BO-807` | Classification & Workflow | D | 8 | 7 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-808` | Assignment & Workload | D | 6 | 6 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `BO-809` | SLA Policy Configuration | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-810` | Escalation Rules | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-811` | Case Workspace | D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `BO-812` | Service Recovery | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-813` | Case Analytics & Audit | D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

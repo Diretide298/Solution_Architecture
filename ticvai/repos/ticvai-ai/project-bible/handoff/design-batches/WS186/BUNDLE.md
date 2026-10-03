@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-1083` | Wallet Command Center | B–D | 26 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-1084` | Wallet Type Library | B–D | 30 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-1085` | Wallet Creation & Provisioning Rules | B–D | 17 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-1086` | Wallet Ownership & Account Association | B–D | 6 | 0 | 6 | 16 | 1 | 6 | — | notStarted (—) |
-| `BO-1087` | Wallet Currency & Monetary Configuration | B–D | 16 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-1088` | Credit & Balance Type Configuration | B–D | 30 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-1089` | Wallet Feature Profile | B–D | 0 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-1090` | Wallet Lifecycle Configuration | B–D | 11 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-1091` | Wallet Numbering, Identity & Digital Credentials | B–D | 17 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-1092` | Wallet Configuration Preview, Validation & Publication | B–D | 18 | 10 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-1083` | Wallet Command Center | C | 26 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-1084` | Wallet Type Library | C | 30 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-1085` | Wallet Creation & Provisioning Rules | C | 17 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-1086` | Wallet Ownership & Account Association | C | 6 | 0 | 6 | 16 | 1 | 6 | — | notStarted (—) |
+| `BO-1087` | Wallet Currency & Monetary Configuration | C | 16 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-1088` | Credit & Balance Type Configuration | C | 30 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-1089` | Wallet Feature Profile | C | 0 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-1090` | Wallet Lifecycle Configuration | C | 11 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-1091` | Wallet Numbering, Identity & Digital Credentials | C | 17 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-1092` | Wallet Configuration Preview, Validation & Publication | C | 18 | 10 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -135,7 +135,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-1083 |
 | Who uses it | venue staff holding `WALLET_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Backend Configuration) and no display directory — it is settings, not a population |
@@ -298,7 +298,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-1084 |
 | Who uses it | venue staff holding `WALLET_CONFIGURE`, `WALLET_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Backend Configuration; Each wallet type can configure) and no display directory — it is settings, not a population |
@@ -440,7 +440,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-1085 |
 | Who uses it | venue staff holding `WALLET_CONFIGURE`, `WALLET_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -596,7 +596,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-1086 |
 | Who uses it | venue staff holding `WALLET_CONFIGURE`, `WALLET_OPERATE`, `WALLET_VIEW` (1 configure, 1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure roles such as) and no display directory — it is settings, not a population |
@@ -753,7 +753,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-1087 |
 | Who uses it | venue staff holding `WALLET_CONFIGURE`, `WALLET_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -906,7 +906,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-1088 |
 | Who uses it | venue staff holding `WALLET_CONFIGURE`, `WALLET_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Administrators can define; For each balance type configure) and no display directory — it is settings, not a population |
@@ -1044,7 +1044,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-1089 |
 | Who uses it | venue staff holding `WALLET_CONFIGURE`, `WALLET_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1187,7 +1187,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-1090 |
 | Who uses it | venue staff holding `WALLET_CONFIGURE`, `WALLET_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -1334,7 +1334,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-1091 |
 | Who uses it | venue staff holding `WALLET_CONFIGURE`, `WALLET_OPERATE`, `WALLET_VIEW` (1 configure, 1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -1489,7 +1489,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-1092 |
 | Who uses it | venue staff holding `WALLET_CONFIGURE`, `WALLET_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Show configuration summary covering; Every configuration publication records) and no display directory — it is settings, not a population |

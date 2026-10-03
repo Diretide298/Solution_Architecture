@@ -1,6 +1,6 @@
 # P12-overview-01 — P12 · Overview
 
-**2 screens · 18 operations · 31 schemas · 4 permissions**
+**2 screens · 19 operations · 32 schemas · 4 permissions**
 
 Platform P12 Venue Support · ships as **venue-management** ·
 staff audience · web ·
@@ -133,7 +133,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `SUP-002` | Agent Dashboard | A | 35 | 27 | 6 | 17 | 1 | 0 | — | notStarted (generated) |
+| `SUP-002` | Agent Dashboard | A | 35 | 33 | 6 | 17 | 1 | 0 | — | notStarted (generated) |
 | `SUP-008` | Agent Performance & SLA View | D | 76 | 25 | 6 | 97 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings

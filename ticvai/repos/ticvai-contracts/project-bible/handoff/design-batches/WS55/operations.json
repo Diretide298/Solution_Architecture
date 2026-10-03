@@ -69,6 +69,30 @@
   "requestBody": null,
   "responds": "ApprovalDelegation"
  },
+ "listApprovalMatrices": {
+  "method": "GET",
+  "path": "/approval-matrices",
+  "contract": "approvals",
+  "summary": "What requires approval here",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "effective",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApprovalMatrix"
+ },
  "listConditionDecisionLogic": {
   "method": "GET",
   "path": "/condition-decision-logic",

@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS approvals.approved_action_execution (
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS approvals.approver_availability (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     principal_id                      uuid,
     unavailable_from                  timestamptz,
     unavailable_to                    timestamptz,
@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS approvals.business_rule (
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS approvals.control_policy (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text,
     applies_to_request_kinds          text[],
@@ -125,9 +125,9 @@ CREATE TABLE IF NOT EXISTS approvals.control_policy (
 
 -- Every decision at every level. Immutable once the request completes — an approval is evidence
 -- Hangs off: reaches approvals.request through its keys; references approvals.request,
--- identity.principal. Reached by: 16 operations read it and 3 write it.
+-- identity.principal. Reached by: 19 operations read it and 3 write it.
 CREATE TABLE IF NOT EXISTS approvals.decision (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     level                             integer NOT NULL,
     principal_id                      uuid NOT NULL,
     display_name                      text,
@@ -189,7 +189,7 @@ CREATE TABLE IF NOT EXISTS approvals.decision_table_row (
 -- remembers Hangs off: reaches approvals.request through its keys; references identity.principal.
 -- Reached by: 8 operations read it and 3 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS approvals.delegation (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     delegator_principal_id            uuid NOT NULL,
     delegate_principal_id             uuid NOT NULL,
     kinds                             text[],
@@ -212,7 +212,7 @@ CREATE TABLE IF NOT EXISTS approvals.escalation (
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS approvals.evidence_package (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     requested_by                      uuid,
     requested_at                      timestamptz,
     valid_from                        timestamptz,
@@ -247,7 +247,7 @@ CREATE TABLE IF NOT EXISTS approvals.external_dispatch (
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS approvals.external_provider (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text NOT NULL,
     endpoint_url                      text NOT NULL,
@@ -255,6 +255,8 @@ CREATE TABLE IF NOT EXISTS approvals.external_provider (
     outbound_credential               text,
     signing_secret                    text,
     api_client_id                     uuid NOT NULL,
+    request_mapping                   jsonb,
+    decision_mapping                  jsonb NOT NULL,
     timeout_minutes                   integer DEFAULT 1440,
     on_timeout                        text DEFAULT 'fallBackToRoles' CONSTRAINT external_provider_on_timeout_chk CHECK (on_timeout IN ('fallBackToRoles', 'escalate', 'reject')),
     max_attempts                      integer DEFAULT 5,
@@ -267,7 +269,7 @@ CREATE TABLE IF NOT EXISTS approvals.external_provider (
 -- raised under Hangs off: reaches approvals.request through its keys. Reached by: 8 operations
 -- read it and 2 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS approvals.matrix (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     kind                              text NOT NULL CONSTRAINT matrix_kind_chk CHECK (kind IN ('refund', 'priceOverride', 'discountOverride', 'complimentaryTicket', 'membershipCancellation', 'accessPermissionChange', 'configurationChange', 'aiRecommendation', 'releasePromotion', 'requisition', 'stockWriteOff', 'journalEntry', 'periodClose', 'periodReopen', 'purchaseOrderCancel', 'purchaseOrderShortClose', 'tenantMigration', 'productChange', 'pricingChange')),
     scope_level                       text NOT NULL CONSTRAINT matrix_scope_level_chk CHECK (scope_level IN ('tenant', 'region', 'venue')),
     scope_path                        ltree NOT NULL,
@@ -276,8 +278,8 @@ CREATE TABLE IF NOT EXISTS approvals.matrix (
 );
 
 -- One request per action needing authorisation. The subject is a reference, never a copy Hangs
--- off: a root — nothing above it in its schema; references identity.principal. Reached by: 31
--- operations read it and 24 write it; 50 tables reference it; written by 3 contracts — approvals,
+-- off: a root — nothing above it in its schema; references identity.principal. Reached by: 34
+-- operations read it and 24 write it; 51 tables reference it; written by 3 contracts — approvals,
 -- subscription, workforce.
 CREATE TABLE IF NOT EXISTS approvals.request (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -304,6 +306,9 @@ CREATE TABLE IF NOT EXISTS approvals.request (
     sla_due_at                        timestamptz,
     is_sla_breached                   boolean,
     expires_at                        timestamptz,
+    assigned_to_principal_id          uuid,
+    assigned_to_department_id         uuid,
+    assigned_at                       timestamptz,
     requested_at                      timestamptz NOT NULL,
     completed_at                      timestamptz,
     ai_assessment                     jsonb
@@ -312,7 +317,7 @@ CREATE TABLE IF NOT EXISTS approvals.request (
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS approvals.retention_policy (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     applies_to_request_kinds          text[],
     retain_years                      integer,
     retain_signatures                 boolean DEFAULT true,
@@ -325,9 +330,9 @@ CREATE TABLE IF NOT EXISTS approvals.retention_policy (
 
 -- Ordered within a matrix. First match wins, so adding a rule cannot silently change another Hangs
 -- off: reaches approvals.request through its keys; references approvals.external_provider,
--- approvals.matrix. Reached by: 15 operations read it and 2 write it; 3 tables reference it.
+-- approvals.matrix. Reached by: 15 operations read it and 2 write it; 2 tables reference it.
 CREATE TABLE IF NOT EXISTS approvals.rule (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     sort_order                        integer NOT NULL,
     min_amount                        numeric(18,4),
     max_amount                        numeric(18,4),
@@ -343,6 +348,8 @@ CREATE TABLE IF NOT EXISTS approvals.rule (
     escalate_after_minutes            integer,
     escalate_to_role_ids              text[],
     expires_after_minutes             integer,
+    subject_types                     text[],
+    signature_methods                 text[],
     external_provider_id              uuid,
     matrix_id                         uuid NOT NULL
 );
@@ -350,7 +357,7 @@ CREATE TABLE IF NOT EXISTS approvals.rule (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS approvals.signature (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     request_id                        uuid,
     signed_by                         uuid,
     signed_at                         timestamptz,
@@ -365,7 +372,7 @@ CREATE TABLE IF NOT EXISTS approvals.signature (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS approvals.sla_policy (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     applies_to_request_kinds          text[],
     target_minutes                    integer,

@@ -97,16 +97,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-244` | Access Security & Fraud Command Center | B–D | 11 | 262 | 6 | 1 | 3 | 0 | — | notStarted (generated) |
-| `BO-245` | Fraud Detection Rule & Signal Library | B–D | 13 | 0 | 6 | 8 | 1 | 0 | — | notStarted (generated) |
-| `BO-246` | Credential Sharing & Concurrent Usage Detection | B–D | 3 | 0 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
-| `BO-247` | Unified Identity & Credential Lock Manager | B–D | 9 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-248` | Biometric & Identity Integrity Monitoring | B–D | 5 | 6 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
-| `BO-249` | Relationship & Companion Fraud Monitoring | B–D | 12 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-250` | Access Risk Scoring & Decision Engine | B–D | 6 | 0 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
-| `BO-251` | Real-Time Security Response & Playbook Builder | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-252` | Security Investigation & Evidence Workspace | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-253` | Security Analytics, AI Detection & Governance | B–D | 5 | 32 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-244` | Access Security & Fraud Command Center | C | 11 | 262 | 6 | 1 | 3 | 0 | — | notStarted (generated) |
+| `BO-245` | Fraud Detection Rule & Signal Library | C | 13 | 0 | 6 | 8 | 1 | 0 | — | notStarted (generated) |
+| `BO-246` | Credential Sharing & Concurrent Usage Detection | C | 3 | 0 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
+| `BO-247` | Unified Identity & Credential Lock Manager | C | 9 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-248` | Biometric & Identity Integrity Monitoring | C | 5 | 6 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `BO-249` | Relationship & Companion Fraud Monitoring | C | 12 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-250` | Access Risk Scoring & Decision Engine | C | 6 | 0 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
+| `BO-251` | Real-Time Security Response & Playbook Builder | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-252` | Security Investigation & Evidence Workspace | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-253` | Security Analytics, AI Detection & Governance | C | 5 | 32 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

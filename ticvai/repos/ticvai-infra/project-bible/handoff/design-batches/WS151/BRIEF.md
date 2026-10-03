@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-599` | Mixed Tender & Credit Command Center | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-600` | Mixed Tender Rule & Combination Builder | B–D | 0 | 15 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-601` | Split Payment & Tender Allocation Manager | B–D | 4 | 5 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-602` | B2B Credit Account & Limit Manager | B–D | 7 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-599` | Mixed Tender & Credit Command Center | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-600` | Mixed Tender Rule & Combination Builder | C | 0 | 15 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-601` | Split Payment & Tender Allocation Manager | C | 4 | 5 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-602` | B2B Credit Account & Limit Manager | C | 7 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-603` | B2B Invoice, On-Account & Payment Terms Configuration | A | 10 | 8 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-604` | Stored Value, Gift Card & Voucher Tender Controls | B–D | 11 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `ADM-605` | Advanced Payment Eligibility, Sequence & Restriction Rules | B–D | 0 | 11 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-606` | Partial Payment, Failure & Recovery Manager | B–D | 0 | 4 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-607` | Mixed Tender Transaction Trace & Allocation Audit | B–D | 11 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-608` | Mixed Tender Simulator, Credit Exposure & AI Advisor | B–D | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-604` | Stored Value, Gift Card & Voucher Tender Controls | C | 11 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `ADM-605` | Advanced Payment Eligibility, Sequence & Restriction Rules | C | 0 | 11 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-606` | Partial Payment, Failure & Recovery Manager | C | 0 | 4 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-607` | Mixed Tender Transaction Trace & Allocation Audit | C | 11 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-608` | Mixed Tender Simulator, Credit Exposure & AI Advisor | C | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

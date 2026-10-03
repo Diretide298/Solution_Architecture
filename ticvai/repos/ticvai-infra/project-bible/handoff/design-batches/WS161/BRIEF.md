@@ -154,16 +154,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-913` | Event Resource Planning Command Center | B–D | 2 | 24 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-914` | Event Resource Requirement Builder | B–D | 0 | 40 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-915` | Venue & Space Allocation | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-916` | Equipment & Asset Allocation | B–D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `BO-917` | Event Staff & Personnel Allocation | B–D | 0 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-918` | Event Resource Template Library | B–D | 37 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-913` | Event Resource Planning Command Center | B | 2 | 24 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-914` | Event Resource Requirement Builder | B | 0 | 40 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-915` | Venue & Space Allocation | B | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-916` | Equipment & Asset Allocation | D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `BO-917` | Event Staff & Personnel Allocation | D | 0 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-918` | Event Resource Template Library | D | 37 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-919` | AI Event Resource Forecasting | A | 7 | 19 | 6 | 47 | 0 | 0 | — | notStarted (—) |
-| `BO-920` | Event Resource Cost Estimator | B–D | 2 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-921` | Multi-Event Allocation & Conflict Optimizer | B–D | 4 | 15 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-922` | Event Resource Approval & Readiness Gate | B–D | 0 | 0 | 6 | 5 | 0 | 3 | — | notStarted (—) |
+| `BO-920` | Event Resource Cost Estimator | B | 2 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-921` | Multi-Event Allocation & Conflict Optimizer | D | 4 | 15 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-922` | Event Resource Approval & Readiness Gate | B | 0 | 0 | 6 | 5 | 0 | 3 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

@@ -104,6 +104,38 @@
   "requestBody": null,
   "responds": "Order"
  },
+ "getTenantAppStatus": {
+  "method": "GET",
+  "path": "/tenant-config/status",
+  "contract": "white-label",
+  "summary": "App status and recent changes",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "TenantAppStatus"
+ },
+ "handoverToAgent": {
+  "method": "POST",
+  "path": "/conversations/{conversationId}/handover",
+  "contract": "marketing-crm",
+  "summary": "Pass an assistant conversation to a person",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Conversation"
+ },
  "listMerchandise": {
   "method": "GET",
   "path": "/merchandise",
@@ -181,35 +213,6 @@
   ],
   "requestBody": null,
   "responds": "PriceCheck"
- },
- "lookupShopAndDrop": {
-  "method": "GET",
-  "path": "/shop-and-drop/lookup",
-  "contract": "retail",
-  "summary": "Find a guest's dropped goods",
-  "permission": "ORDER_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "entitlementId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "dropReference",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "receiptNumber",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "ShopAndDrop"
  },
  "reprintOrder": {
   "method": "POST",

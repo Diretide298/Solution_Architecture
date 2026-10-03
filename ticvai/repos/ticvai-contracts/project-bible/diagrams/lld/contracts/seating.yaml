@@ -532,7 +532,8 @@ operations:
   offline: false
   reads:
   - seating.reassignment
-  writes: []
+  writes:
+  - seating.reassignment
 - operation: recommendSeats
   verb: POST
   path: /performances/{performanceId}/seat-recommendations
@@ -555,7 +556,8 @@ operations:
   offline: false
   reads:
   - seating.hold_pool
-  writes: []
+  writes:
+  - seating.hold_pool
 - operation: relinquishSeatBlock
   verb: DELETE
   path: /seat-blocks/{blockId}

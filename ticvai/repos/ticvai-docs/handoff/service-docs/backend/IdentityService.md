@@ -7,7 +7,7 @@
 | Tier | foundation: Read by everything, reads nothing above. Deploys first and alone. |
 | Contracts | `identity` |
 | Schemas owned | `identity`, `pii` |
-| Operations in the slice | 37 of 94 |
+| Operations in the slice | 38 of 94 |
 | Scale | Read-heavy, latency-critical, cached hard. Every request resolves a principal. |
 | If it is down | A restart is an outage everywhere. Deploys go out first and alone. |
 
@@ -34,6 +34,7 @@
 | administration | [`listRoles`](#listroles) | GET | `/roles` | core | 1 | ADM-021, BO-054, BO-106, CMS-019 |
 | administration | [`openPlatformStaffGrant`](#openplatformstaffgrant) | POST | `/platform-staff-grants` | core | 1 | ADM-004, ADM-005, ADM-006, ADM-015, ADM-016, ADM-017 … |
 | administration | [`updatePrincipal`](#updateprincipal) | PATCH | `/principals/{principalId}` | core | 1 | ADM-020, BO-053, BO-054, CMS-019, PTR-003 |
+| administration | [`updateRole`](#updaterole) | PATCH | `/roles/{roleId}` | setup | 1 |  |
 | guestAuth | [`deleteGuestAccount`](#deleteguestaccount) | DELETE | `/auth/guest/account` | core | 1 | GST-066, WEB-024 |
 | guestAuth | [`getGuestSession`](#getguestsession) | GET | `/auth/guest/session` | core | 1 | GST-042, GST-073, WEB-016 |
 | guestAuth | [`getMyIdentityVerification`](#getmyidentityverification) | GET | `/auth/guest/identity-verifications/current` | core | 1 | WEB-020 |
@@ -308,7 +309,7 @@ Requires step-up: the operator holds `PLATFORM_*` permissions, which require MFA
 | Conflict policy | serverWins |
 | Step-up auth | mfa |
 | Reads | `identity.platform_staff_grant` |
-| Writes | - |
+| Writes | `identity.platform_staff_grant` |
 | Called by | ADM-004, ADM-005, ADM-006, ADM-015, ADM-016, ADM-017, ADM-018, ADM-019, ADM-020, ADM-021, ADM-026, ADM-031, ADM-037, ADM-068, ADM-411, ADM-412, ADM-420, ADM-421, ADM-422, ADM-424, ADM-425, ADM-426, ADM-469, ADM-470, ADM-471, ADM-472, ADM-473, ADM-474, ADM-475, ADM-476, ADM-477, ADM-478, ADM-479, ADM-480, ADM-481, ADM-482, ADM-483, ADM-484, ADM-485, ADM-486, ADM-487, ADM-488, ADM-489, ADM-490, ADM-491, ADM-492, ADM-493, ADM-494, ADM-495, ADM-496, ADM-497, ADM-498, ADM-499, ADM-500, ADM-501, ADM-502, ADM-503, ADM-504, ADM-505, ADM-506, ADM-507, ADM-508, ADM-509, ADM-510, ADM-511, ADM-512, ADM-513, ADM-514, ADM-515, ADM-516, ADM-517, ADM-518, ADM-519, ADM-520, ADM-521, ADM-522, ADM-523, ADM-524, ADM-525, ADM-526, ADM-527, ADM-528, ADM-529, ADM-530, ADM-531, ADM-532, ADM-533, ADM-534, ADM-535, ADM-536, ADM-537, ADM-538, ADM-539, ADM-540, ADM-541, ADM-542, ADM-543, ADM-544, ADM-545, ADM-546, ADM-547, ADM-548, ADM-549, ADM-550, ADM-551, ADM-552, ADM-553, ADM-554, ADM-555, ADM-556, ADM-557, ADM-558, ADM-619 |
 
 **Parameters**
@@ -407,6 +408,61 @@ Deactivation invalidates any live session immediately. **A change to `validTo`, 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### updateRole
+
+**`PATCH /roles/{roleId}`**: Rename a role or change its description
+
+**A role made from a preset is renamed here** (decided 2 October 2026, Chinmay, pre-apply round: *"they can still give that viewer more permissions and rename it"*; DEC-007; CHG-CSP-003). Until this operation a role's name was fixed at `createRole`. `code` does not change: a grant and the audit log name the role by it. The permissions are `setRolePermissions`.
+
+|  |  |
+|---|---|
+| Permission | `ROLE_MANAGE` |
+| Scope level | venue |
+| Part of slice | setup, changes rows of `identity.role` that another operation creates |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `identity.role` |
+| Writes | `identity.role` |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| roleId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| name | string |  | (max length 200) |
+| description | string |  | (max length 500; nullable) |
+
+**Response**: `Role`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| code | string | yes | Unique within the tenant (decided 28 September, audit R108). |
+| name | string | yes |  |
+| description | string |  |  |
+| permissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) |  | A role that grants no permissions is not a role. |
+| inheritsFromRoleId | string (uuid) |  | Role composition, one level deep and no deeper. (nullable) |
+| isSystem | boolean |  | Seeded roles ship and are editable; deleting one is refused. (default False) |
+| presetCode | string |  | The preset this role was started from, for the record only (decided 2 October 2026, Chinmay; DEC-007; CHG-CSP-003): the first of createRole.presetCodes, or null for a role ticked by hand. (max length 64; read-only; nullable) |
+| principalCount | integer |  |  |
+| grantCount | integer |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The role, renamed |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -2127,6 +2183,8 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 |---|---|---|
 | 200 |  | Verified. |
 | 401 | Unauthorized | Missing, expired or superseded session |
+| 410 |  | The challenge has expired or was voided (by a fifth wrong code, or a newer challenge for the same purpose). |
+| 422 |  | A wrong code, attempts one to four (CHG-R1S-025; the r1 gate found only the fifth failure specified). |
 | 429 |  | Five wrong codes and step-up is locked (decided 28 September, audit R126 (6)). |
 
 ### verifyMfaEnrolment
@@ -2223,11 +2281,11 @@ Who is logged in, on which workstation, since when. There was previously no way 
 | items[].status | object | yes | A registry that only holds live sessions cannot answer why one ended. |
 | items[].sessionId | string | yes |  |
 | items[].principalId | string (uuid) | yes |  |
-| items[].principalName | string |  |  |
+| items[].principalName | string |  | Read from identity.principal with the row. |
 | items[].roleId | string (uuid) |  | (nullable) |
-| items[].roleName | string |  | (nullable) |
+| items[].roleName | string |  | Read from identity.role with the row. (nullable) |
 | items[].workstationId | string (uuid) |  | (nullable) |
-| items[].workstationName | string |  | (nullable) |
+| items[].workstationName | string |  | Read from the workstation with the row. (nullable) |
 | items[].venueId | string (uuid) |  | (nullable) |
 | items[].ipAddress | string |  | (nullable) |
 | items[].deviceInfo | string |  | (nullable) |
@@ -2441,8 +2499,18 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| status | text | yes | A registry that only holds live sessions cannot answer why one ended. |
+| session_id | text | yes |  |
+| principal_id | uuid | yes |  |
+| role_id | uuid | no |  |
+| workstation_id | uuid | no |  |
+| venue_id | uuid | no |  |
+| ip_address | text | no |  |
+| device_info | text | no |  |
+| is_mfa_satisfied | boolean | no |  |
+| started_at | timestamptz | yes |  |
+| last_seen_at | timestamptz | yes |  |
 | id | uuid | yes | Synthesised key. |
-| principal_id | uuid | yes | Points at identity.principal. |
 
 ### `pii.subject`
 
@@ -2494,11 +2562,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-57 operations, added to this service in later releases without changing any of the above.
+56 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
-| administration | `createAccessReviewCampaign`, `createAuthorisationPolicy`, `createDelegatedAccess`, `createEmergencyAccessOverride`, `createPrincipal`, `decideAccessReviewItem`, `deleteDelegatedAccess`, `evaluateAccess`, `getAuthorisationPolicy`, `getAuthorisationPolicyBundle`, `getPrincipal`, `getPrincipalModuleAccess`, `listAccessDecisions`, `listAccessReviewCampaigns`, `listAccessReviewItems`, `listAuthorisationPolicies`, `listAuthorisationPolicyEffectiveness`, `listAuthorisationPolicyHistory`, `listAuthorisationPolicyTemplates`, `listCapabilityTemplates`, `listDelegatedAccess`, `listModuleCapabilities`, `listPermissionFindings`, `listPlatformStaffGrants`, `resetPrincipalCredential`, `resolvePermissions`, `restoreAuthorisationPolicyVersion`, `setAuthorisationPolicyState`, `setCapabilityTemplate`, `setPrincipalModuleAccess`, `simulateAuthorisationPolicy`, `suggestRoleAssignment`, `updateAuthorisationPolicy`, `updateRole` |
+| administration | `createAccessReviewCampaign`, `createAuthorisationPolicy`, `createDelegatedAccess`, `createEmergencyAccessOverride`, `createPrincipal`, `decideAccessReviewItem`, `deleteDelegatedAccess`, `evaluateAccess`, `getAuthorisationPolicy`, `getAuthorisationPolicyBundle`, `getPrincipal`, `getPrincipalModuleAccess`, `listAccessDecisions`, `listAccessReviewCampaigns`, `listAccessReviewItems`, `listAuthorisationPolicies`, `listAuthorisationPolicyEffectiveness`, `listAuthorisationPolicyHistory`, `listAuthorisationPolicyTemplates`, `listCapabilityTemplates`, `listDelegatedAccess`, `listModuleCapabilities`, `listPermissionFindings`, `listPlatformStaffGrants`, `resetPrincipalCredential`, `resolvePermissions`, `restoreAuthorisationPolicyVersion`, `setAuthorisationPolicyState`, `setCapabilityTemplate`, `setPrincipalModuleAccess`, `simulateAuthorisationPolicy`, `suggestRoleAssignment`, `updateAuthorisationPolicy` |
 | identity | `decideGuestIdentityVerification`, `getGuestVerificationPolicy`, `getMembership`, `getPasswordPolicy`, `listCustomerMemberships`, `listGuestIdentityVerifications`, `listModules`, `listPermissions`, `listSegregationRules`, `listSegregationViolations`, `logout`, `recordBenefitUsage`, `setSegregationRules` |
 | prospectAuth | `startProspectSignup`, `verifyProspectSignupCode` |
 | session | `endOwnSession`, `listOwnSessions`, `revokeAllSessions` |

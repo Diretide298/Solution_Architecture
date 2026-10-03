@@ -1,4 +1,65 @@
 {
+ "AddCartLineRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only",
+  "required": [
+   "variantId",
+   "quantity"
+  ],
+  "properties": {
+   "variantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "quantity": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "bookedWindow": {
+    "$ref": "#/components/schemas/BookedWindow"
+   },
+   "recommendationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `trackingId` of the ai `decideRecommendations` item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather than guessed. Optional; sent by a page or till that shows the engine's recommendations. Not validated against the engine: an unknown id only fails to attribute.\n"
+   },
+   "tableReservationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A table deposit line (decided 29 September, rev 3 REV3-8b): the `fnb.TableReservation` in `awaitingDeposit` this pays for, sent with `variantId` set to the booking's `deposit.variantId` and `quantity` 1. The price is the booking's `deposit.amount`. A booking that is not awaiting a deposit is refused 422 `depositNotDue`.\n"
+   },
+   "seatIds": {
+    "type": "array",
+    "maxItems": 50,
+    "description": "At most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking on a guest channel (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); at most 10 per sale on staff and POS (audit R080 (c)). Over the limit is 422 `seatLimitExceeded`.",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "resourceHoldId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A `resources.ResourceHold` on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); `variantId` is the placed resource's price-band variant and `quantity` is 1. The hold is the line's capacity; no inventory lease is taken."
+   },
+   "parentLineId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For an add-on attaching to a ticket already in the cart. **Removing the parent removes the child** — a locker with no admission is not a sale.\n"
+   },
+   "attributes": {
+    "$ref": "#/components/schemas/OrderLineAttributes"
+   }
+  }
+ },
  "AiAnswerFeedback": {
   "type": "object",
   "x-ticvai-persistence": "ai.answer_feedback",
@@ -208,7 +269,7 @@
    "localLlm",
    "openaiCompatible"
   ],
-  "description": "`openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). Any other protocol needs an adapter.\n**Core42 Compass is reached through `openaiCompatible`** (Chinmay, 2 October: the AI residency decision, amending AI-D02; CHG-CSA-002). Compass is the provider of the `uaeOnly` residency class (common `AiResidencyClass`): Small tier Compass GPT-4.1 mini (or Seraj), Strong tier Compass GPT-5, with OpenAI UAE and then the in-cell open-weights model as the fallback chain. OpenAI UAE is `openai` with a UAE `endpoint`; the in-cell model is `localLlm`.\n**A kind is a protocol, not a vendor** (Chinmay, 2 October, contract follow-ups: BYOK accepts any provider; CHG-FUP-008). Any vendor is accepted, named in `AiProvider.vendor`: Mistral, Cohere or any other is reached through `openaiCompatible` where its API speaks it, which the compatibility test confirms before activation (`AiProviderCompatibility`). A new native adapter is a new value here, a breaking change for a client built earlier that goes out with an approval (`docs/active/breaking-changes.yaml`); until then a vendor without either protocol is refused `422 provider-protocol-unsupported`.\n"
+  "description": "`openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). Any other protocol needs an adapter.\n**Core42 Compass is reached through `openaiCompatible`** (Chinmay, 2 October: the AI residency decision, amending AI-D02; CHG-CSA-002). Compass is the provider of the `uaeOnly` residency class (common `AiResidencyClass`): Small tier Compass GPT-4.1 mini (or Seraj), Strong tier Compass GPT-5, with OpenAI UAE as the fallback. OpenAI UAE is `openai` with a UAE `endpoint`: OpenAI's UAE-region API project, `ae.api.openai.com` (in-country processing, on OpenAI sales approval), allowed under `uaeOnly` and the only endpoint a `uaeOnly` BYOK OpenAI key may use (CHG-R1S-016). **We host no model** (Chinmay, 3 October, CHG-R1S-002): there is no in-cell open-weights fallback; `localLlm` is used only where a client asks for self-hosting and runs the model on the client's estate (`onPrem`).\n**A kind is a protocol, not a vendor** (Chinmay, 2 October, contract follow-ups: BYOK accepts any provider; CHG-FUP-008). Any vendor is accepted, named in `AiProvider.vendor`: Mistral, Cohere or any other is reached through `openaiCompatible` where its API speaks it, which the compatibility test confirms before activation (`AiProviderCompatibility`). A new native adapter is a new value here, a breaking change for a client built earlier that goes out with an approval (`docs/active/breaking-changes.yaml`); until then a vendor without either protocol is refused `422 provider-protocol-unsupported`.\n"
  },
  "AiSourceList": {
   "type": "array",
@@ -218,6 +279,323 @@
   "items": {
    "$ref": "#/components/schemas/AiSource"
   }
+ },
+ "BookedWindow": {
+  "type": "object",
+  "nullable": true,
+  "x-ticvai-persistence": "none — embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
+  "description": "**The booked time window of an hourly product, such as a meeting room** (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). The guest picks a date, a length and a start time from `resources.listProductStartTimes`; the length is the product's `length` variant (1 hour, 2 hours, half day, full day), priced per variant, so the price is the variant's. **`endsAt` minus `startsAt` must equal the chosen variant's length** (its `length` dimension value's `durationMinutes`), or the line is refused 422 `windowLengthMismatch`. Required on a product with `catalogue.Product.requiresTimeWindow` true and refused on any other (`windowRequired`, `windowNotAllowed`). The room itself is not named here: the window holds capacity of the room type, and `resources.allocateResources` picks the room at checkout (26 August minute: a guest books a meeting room product, never a raw room).\n",
+  "required": [
+   "startsAt",
+   "endsAt"
+  ],
+  "properties": {
+   "startsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "endsAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "After `startsAt`, on the same venue day."
+   }
+  }
+ },
+ "Cart": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.cart",
+  "required": [
+   "id",
+   "venueId",
+   "channel",
+   "status",
+   "lines"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "token": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**How an anonymous guest returns to their cart**, including from a recovery email. Rotated on claim, so a link shared before signing in does not reach the account after.\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "channel": {
+    "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Null while anonymous. Set by `claimCart`."
+   },
+   "status": {
+    "$ref": "#/components/schemas/CartStatus"
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/CartLine"
+    }
+   },
+   "conflicts": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/CartConflict"
+    }
+   },
+   "consentQuestions": {
+    "type": "array",
+    "readOnly": true,
+    "description": "**The consent questions this cart's products and flow ask** (decided 29 September, rev 3 REV3-26), computed on read at their current version as **the union of each line's published booking flow's `white-label.BookingFlow.settings.consentQuestionIds`** (the flow `getPublishedBookingFlow` resolves for the line's product: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig`, 29 September W12) **and every line's `catalogue.Product.consentQuestionIds`, each question once**: the flow's first, in its order, then each product's in cart-line order, a question already listed not repeated (its `lineIds` gain the line). The client asks them, in the order given, and sends the answers to `marketing.recordConsentAnswers`; `answered` then turns true. One or several, as the venue chose. `checkoutCart` refuses while a required one is unanswered.\n",
+    "items": {
+     "allOf": [
+      {
+       "$ref": "../satellite/marketing-crm.yaml#/components/schemas/ConsentQuestion"
+      },
+      {
+       "type": "object",
+       "properties": {
+        "lineIds": {
+         "type": "array",
+         "description": "The cart lines that ask it. Empty for a question the flow asks.",
+         "items": {
+          "type": "string",
+          "format": "uuid"
+         }
+        },
+        "answered": {
+         "type": "boolean",
+         "description": "Every person (for `perPerson`) or the booking (for `perBooking`) has an answer."
+        }
+       }
+      }
+     ]
+    }
+   },
+   "subtotal": {
+    "x-ticvai-column": "net_amount",
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "discountTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "total": {
+    "x-ticvai-column": "gross_amount",
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "appliedPromotionIds": {
+    "type": "array",
+    "description": "**Re-evaluated on every read.** A promotion that expired while the cart sat must not still be applied at checkout, and a promotion that became applicable should be.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "couponCodes": {
+    "type": "array",
+    "readOnly": true,
+    "description": "The promo codes the guest entered through `applyCartPromoCode` (decided 28 September, audit R073 (e)). **Sent as `couponCodes` on every promotions evaluation of this cart**, so a code is re-checked on each read like any promotion; a code that stops qualifying stays listed here and its promotion drops out of `appliedPromotionIds`.\n",
+    "items": {
+     "type": "string",
+     "maxLength": 100
+    }
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "The earliest lease expiry in the cart, or the cart's own window where it holds none."
+   },
+   "extensionsUsed": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "maxExtensions": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "locale": {
+    "type": "string"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "CartConflict": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed on read",
+  "description": "2.9.5. Golf at 13:00 and karting at 13:00 for the same guest. **A prompt, not a refusal** — a party of four may legitimately split, and refusing would be wrong more often than right.\n",
+  "properties": {
+   "kind": {
+    "type": "string",
+    "enum": [
+     "overlappingTime",
+     "sameSessionDifferentVenue",
+     "exceedsPartySize",
+     "requiresPrerequisite",
+     "consentBlocksBooking"
+    ]
+   },
+   "lineIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "message": {
+    "type": "string"
+   },
+   "isBlocking": {
+    "type": "boolean",
+    "description": "Most are not. `requiresPrerequisite` is — an add-on with no ticket to attach to cannot be sold. So is `consentBlocksBooking`: a consent question answered with the answer the venue set to block the booking (decided 29 September, rev 3 REV3-26).\n"
+   }
+  }
+ },
+ "CartLine": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.cart_line",
+  "required": [
+   "id",
+   "variantId",
+   "quantity"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "variantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "productName": {
+    "type": "string",
+    "readOnly": true
+   },
+   "quantity": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "bookedWindow": {
+    "$ref": "#/components/schemas/BookedWindow"
+   },
+   "recommendationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `trackingId` of the ai `decideRecommendations` item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather than guessed. Set from `addCartLine`; checkout copies it to the order line.\n"
+   },
+   "tableReservationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the `fnb.TableReservation` this line secures. Priced from the deposit the booking snapshotted, not from the variant. Becomes an `orders.deposit` row at checkout, not revenue. A table booking with no deposit never has a line (rev 3 REV3-8).\n"
+   },
+   "seatIds": {
+    "type": "array",
+    "maxItems": 50,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "resourceHoldId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `resources.ResourceHold` this line buys (decided 29 September, rev 3 REV3-15). While set, `leaseExpiresAt` is the hold's `expiresAt` and `inventoryHoldId` is null."
+   },
+   "attributes": {
+    "$ref": "#/components/schemas/OrderLineAttributes"
+   },
+   "parentLineId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The line this add-on is attached to, from `AddCartLineRequest.parentLineId`. Kept on the line because **removing the parent removes the child**, and `removeCartLine` has to be able to find the children.\n"
+   },
+   "overridePrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "overrideReason": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "priceMatch",
+     "serviceRecovery",
+     "negotiated",
+     "damagedGoods",
+     "staffSale",
+     "error"
+    ],
+    "description": "BL-085. **An operator could apply an approved discount and not enter a price.** A price match against a competitor and a service-recovery gesture are not discounts off a list — they are a number somebody decided.\n**Escalated above a configured threshold, and the reason is a closed set**: a free-text override reason is an override nobody can report on, and this is the field an auditor reads first.\n"
+   },
+   "feeKind": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "booking",
+     "transaction",
+     "service",
+     "delivery",
+     "convenience",
+     "cancellation"
+    ],
+    "description": "**A fee is a line, not an adjustment.** `orders` already separates a service charge from a tip for the reason that applies here: **a guest is entitled to see what they are being charged for**, and a fee folded into the ticket price is a fee nobody can question.\nItemised at checkout, taxed on its own code, and refundable separately — **a cancellation fee is usually the one thing not refunded**, which only works if it is its own line.\n"
+   },
+   "unitPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "lineTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "inventoryHoldId": {
+    "type": "string",
+    "nullable": true,
+    "description": "The capacity held for this line — a `catalogue.InventoryHold.id`, typed as that id is. **Null for a product with no capacity** — a t-shirt needs stock, not a lease.\n"
+   },
+   "leaseExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Shown to the guest. *\"Your seats are held for 6 minutes\"* is better than discovering it at checkout.\n"
+   },
+   "isAvailable": {
+    "type": "boolean",
+    "readOnly": true,
+    "description": "Re-checked on every read. **A line can become unavailable while the cart sits** — a lease expiring is not the same as the product selling out, and both land here.\n"
+   }
+  }
+ },
+ "CartStatus": {
+  "type": "string",
+  "enum": [
+   "active",
+   "expiring",
+   "expired",
+   "abandoned",
+   "checkedOut"
+  ]
  },
  "Channel": {
   "type": "string",
@@ -523,6 +901,18 @@
  },
  "ModuleKey": {
   "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
+ },
+ "OrderLineAttributes": {
+  "type": "object",
+  "nullable": true,
+  "additionalProperties": true,
+  "x-ticvai-persistence": "none — embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+  "description": "Open attributes of a line, kept from the cart to the order line. **`transport` is the one with a defined shape** (decided 29 September, rev 3 REV3-21); other keys are free.\n",
+  "properties": {
+   "transport": {
+    "$ref": "#/components/schemas/TransportLineAttributes"
+   }
+  }
  },
  "Page": {
   "type": "object",

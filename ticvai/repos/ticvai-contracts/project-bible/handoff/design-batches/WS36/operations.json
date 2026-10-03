@@ -1,4 +1,17 @@
 {
+ "getTaxProfileJurisdiction": {
+  "method": "GET",
+  "path": "/tax-profile-jurisdiction",
+  "contract": "catalogue",
+  "summary": "The tax profile and jurisdiction configuration as saved",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "TaxProfileJurisdictionConfigurationView"
+ },
  "listCalculationValidationReconciliation": {
   "method": "GET",
   "path": "/calculation-validation-reconciliation",

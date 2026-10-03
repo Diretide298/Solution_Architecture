@@ -15,7 +15,8 @@ operations:
   offline: false
   reads:
   - control.config_package_application
-  writes: []
+  writes:
+  - control.config_package_application
 - operation: applyMigration
   verb: POST
   path: /migrations/apply
@@ -74,7 +75,8 @@ operations:
   offline: false
   reads:
   - control.config_package_diff
-  writes: []
+  writes:
+  - control.config_package_diff
 - operation: exportConfigPackage
   verb: POST
   path: /config-packages
@@ -85,7 +87,8 @@ operations:
   offline: false
   reads:
   - control.config_package
-  writes: []
+  writes:
+  - control.config_package
 - operation: getMigrationRun
   verb: GET
   path: /migrations/runs/{runId}

@@ -1,6 +1,6 @@
 {
  "generatedBy": "tools/build-white-label-map.py",
- "generated": "2026-10-03",
+ "generated": "2026-10-04",
  "note": "Derived from the configuring operations' request schemas and the screens. Never edit; rerun the tool.",
  "elements": [
   {
@@ -441,16 +441,6 @@
    "help": "\"Powered by TICVAI\", a configuration toggle, on by default (Chinmay, 2 October, workbook Q160 and the pre-apply round; consistent with DI-297; CHG-CSA-036).",
    "effect": "the *Powered by TICVAI* credit on the launch screen, at the foot of Account and in the web footer; on by default, and switching it off needs the licence add-on (403 powered-by-locked)",
    "configuredOn": [
-    {
-     "screen": "CMS-002",
-     "name": "Brand Kit",
-     "op": "setBrandIdentity"
-    },
-    {
-     "screen": "CMS-004",
-     "name": "Logo & Assets",
-     "op": "setBrandIdentity"
-    },
     {
      "screen": "CMS-104",
      "name": "App Build & Store Publishing",
@@ -8135,7 +8125,7 @@
     }
    ],
    "reach": "status",
-   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, WEB-001 … (12)",
+   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13)",
    "specific": [
     "GST-001",
     "GST-029",
@@ -8144,6 +8134,7 @@
     "GST-047",
     "GST-051",
     "KSK-002",
+    "KSK-014",
     "WEB-001",
     "WEB-025",
     "WEB-029",
@@ -8175,7 +8166,7 @@
     }
    ],
    "reach": "status",
-   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, WEB-001 … (12)",
+   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13)",
    "specific": [
     "GST-001",
     "GST-029",
@@ -8184,6 +8175,7 @@
     "GST-047",
     "GST-051",
     "KSK-002",
+    "KSK-014",
     "WEB-001",
     "WEB-025",
     "WEB-029",
@@ -8215,7 +8207,7 @@
     }
    ],
    "reach": "status",
-   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, WEB-001 … (12)",
+   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13)",
    "specific": [
     "GST-001",
     "GST-029",
@@ -8224,6 +8216,7 @@
     "GST-047",
     "GST-051",
     "KSK-002",
+    "KSK-014",
     "WEB-001",
     "WEB-025",
     "WEB-029",
@@ -8255,7 +8248,7 @@
     }
    ],
    "reach": "status",
-   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, WEB-001 … (12)",
+   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13)",
    "specific": [
     "GST-001",
     "GST-029",
@@ -8264,6 +8257,7 @@
     "GST-047",
     "GST-051",
     "KSK-002",
+    "KSK-014",
     "WEB-001",
     "WEB-025",
     "WEB-029",
@@ -8295,7 +8289,7 @@
     }
    ],
    "reach": "status",
-   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, WEB-001 … (12)",
+   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13)",
    "specific": [
     "GST-001",
     "GST-029",
@@ -8304,6 +8298,7 @@
     "GST-047",
     "GST-051",
     "KSK-002",
+    "KSK-014",
     "WEB-001",
     "WEB-025",
     "WEB-029",
@@ -8335,7 +8330,7 @@
     }
    ],
    "reach": "status",
-   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, WEB-001 … (12)",
+   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13)",
    "specific": [
     "GST-001",
     "GST-029",
@@ -8344,6 +8339,7 @@
     "GST-047",
     "GST-051",
     "KSK-002",
+    "KSK-014",
     "WEB-001",
     "WEB-025",
     "WEB-029",
@@ -8375,7 +8371,7 @@
     }
    ],
    "reach": "status",
-   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, WEB-001 … (13)",
+   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (14)",
    "specific": [
     "GST-001",
     "GST-029",
@@ -8384,6 +8380,7 @@
     "GST-047",
     "GST-051",
     "KSK-002",
+    "KSK-014",
     "WEB-001",
     "WEB-025",
     "WEB-028",
@@ -8416,7 +8413,7 @@
     }
    ],
    "reach": "status",
-   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, WEB-001 … (12)",
+   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13)",
    "specific": [
     "GST-001",
     "GST-029",
@@ -8425,6 +8422,7 @@
     "GST-047",
     "GST-051",
     "KSK-002",
+    "KSK-014",
     "WEB-001",
     "WEB-025",
     "WEB-029",
@@ -8456,7 +8454,7 @@
     }
    ],
    "reach": "status",
-   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, WEB-001 … (12)",
+   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13)",
    "specific": [
     "GST-001",
     "GST-029",
@@ -8465,6 +8463,7 @@
     "GST-047",
     "GST-051",
     "KSK-002",
+    "KSK-014",
     "WEB-001",
     "WEB-025",
     "WEB-029",
@@ -8496,7 +8495,7 @@
     }
    ],
    "reach": "status",
-   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, WEB-001 … (12)",
+   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13)",
    "specific": [
     "GST-001",
     "GST-029",
@@ -8505,6 +8504,7 @@
     "GST-047",
     "GST-051",
     "KSK-002",
+    "KSK-014",
     "WEB-001",
     "WEB-025",
     "WEB-029",
@@ -8536,7 +8536,7 @@
     }
    ],
    "reach": "status",
-   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, WEB-001 … (12)",
+   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13)",
    "specific": [
     "GST-001",
     "GST-029",
@@ -8545,6 +8545,7 @@
     "GST-047",
     "GST-051",
     "KSK-002",
+    "KSK-014",
     "WEB-001",
     "WEB-025",
     "WEB-029",
@@ -8576,7 +8577,7 @@
     }
    ],
    "reach": "status",
-   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, WEB-001 … (12)",
+   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13)",
    "specific": [
     "GST-001",
     "GST-029",
@@ -8585,6 +8586,7 @@
     "GST-047",
     "GST-051",
     "KSK-002",
+    "KSK-014",
     "WEB-001",
     "WEB-025",
     "WEB-029",
@@ -8616,7 +8618,7 @@
     }
    ],
    "reach": "status",
-   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, WEB-001 … (12)",
+   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13)",
    "specific": [
     "GST-001",
     "GST-029",
@@ -8625,6 +8627,7 @@
     "GST-047",
     "GST-051",
     "KSK-002",
+    "KSK-014",
     "WEB-001",
     "WEB-025",
     "WEB-029",
@@ -8656,7 +8659,7 @@
     }
    ],
    "reach": "status",
-   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, WEB-001 … (12)",
+   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13)",
    "specific": [
     "GST-001",
     "GST-029",
@@ -8665,6 +8668,7 @@
     "GST-047",
     "GST-051",
     "KSK-002",
+    "KSK-014",
     "WEB-001",
     "WEB-025",
     "WEB-029",
@@ -13203,7 +13207,22 @@
    "specific": []
   },
   "KSK-014": {
-   "specific": []
+   "specific": [
+    "maintenance.isInMaintenance",
+    "maintenance.message",
+    "maintenance.expectedBackAt",
+    "maintenance.minimumAppVersion",
+    "maintenance.minimumAppVersion.ios",
+    "maintenance.minimumAppVersion.android",
+    "maintenance.contact",
+    "maintenance.contact.phone",
+    "maintenance.contact.email",
+    "maintenance.contact.whatsapp",
+    "maintenance.contact.address",
+    "maintenance.contact.openingHours",
+    "maintenance.availability",
+    "maintenance.availabilityMessage"
+   ]
   },
   "KSK-015": {
    "specific": []
@@ -13226,8 +13245,7 @@
    "brand.splashBackgroundColour",
    "brand.showLoadingIndicator",
    "brand.introVideoAssetRef",
-   "brand.introVideoMode",
-   "brand.showPoweredBy"
+   "brand.introVideoMode"
   ],
   "CMS-004": [
    "brand.logoAssetRef",
@@ -13240,7 +13258,6 @@
    "brand.showLoadingIndicator",
    "brand.introVideoAssetRef",
    "brand.introVideoMode",
-   "brand.showPoweredBy",
    "appIcons.sourceAssetRef"
   ],
   "CMS-104": [

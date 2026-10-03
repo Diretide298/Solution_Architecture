@@ -97,16 +97,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-244` | Access Security & Fraud Command Center | B–D | 11 | 262 | 6 | 1 | 3 | 0 | — | notStarted (generated) |
-| `BO-245` | Fraud Detection Rule & Signal Library | B–D | 13 | 0 | 6 | 8 | 1 | 0 | — | notStarted (generated) |
-| `BO-246` | Credential Sharing & Concurrent Usage Detection | B–D | 3 | 0 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
-| `BO-247` | Unified Identity & Credential Lock Manager | B–D | 9 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-248` | Biometric & Identity Integrity Monitoring | B–D | 5 | 6 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
-| `BO-249` | Relationship & Companion Fraud Monitoring | B–D | 12 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-250` | Access Risk Scoring & Decision Engine | B–D | 6 | 0 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
-| `BO-251` | Real-Time Security Response & Playbook Builder | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-252` | Security Investigation & Evidence Workspace | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-253` | Security Analytics, AI Detection & Governance | B–D | 5 | 32 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-244` | Access Security & Fraud Command Center | C | 11 | 262 | 6 | 1 | 3 | 0 | — | notStarted (generated) |
+| `BO-245` | Fraud Detection Rule & Signal Library | C | 13 | 0 | 6 | 8 | 1 | 0 | — | notStarted (generated) |
+| `BO-246` | Credential Sharing & Concurrent Usage Detection | C | 3 | 0 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
+| `BO-247` | Unified Identity & Credential Lock Manager | C | 9 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-248` | Biometric & Identity Integrity Monitoring | C | 5 | 6 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `BO-249` | Relationship & Companion Fraud Monitoring | C | 12 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-250` | Access Risk Scoring & Decision Engine | C | 6 | 0 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
+| `BO-251` | Real-Time Security Response & Playbook Builder | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-252` | Security Investigation & Evidence Workspace | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-253` | Security Analytics, AI Detection & Governance | C | 5 | 32 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -126,7 +126,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-244 |
 | Who uses it | venue staff holding `INCIDENT_MANAGE`, `SCOPE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display; Show) and no metric row |
@@ -556,12 +556,12 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 - → `BO-100` Venue Home: *Venue Home*
 - → `BO-245` Fraud Detection Rule & Signal Library: *Works in Fraud Detection Rule & Signal Library*; calls `listAccessSecurityFraud`
-- → `BO-247` Unified Identity & Credential Lock Manager: *Works in Unified Identity & Credential Lock Manager*; carries `lockId`; calls `listAccessSecurityFraud`
 - → `BO-249` Relationship & Companion Fraud Monitoring: *Works in Relationship & Companion Fraud Monitoring*; calls `listAccessSecurityFraud`
 - → `BO-250` Access Risk Scoring & Decision Engine: *Works in Access Risk Scoring & Decision Engine*; calls `listAccessSecurityFraud`
 - → `BO-251` Real-Time Security Response & Playbook Builder: *Works in Real-Time Security Response & Playbook Builder*; calls `listAccessSecurityFraud`
 - → `BO-252` Security Investigation & Evidence Workspace: *Works in Security Investigation & Evidence Workspace*; calls `listAccessSecurityFraud`
 - → `BO-246` Credential Sharing & Concurrent Usage Detection: *Works in Credential Sharing & Concurrent Usage Detection*; carries `alertId`; calls `listAccessSecurityFraud`
+- → `BO-247` Unified Identity & Credential Lock Manager: *Works in Unified Identity & Credential Lock Manager*; carries `lockId`; calls `listAccessSecurityFraud`
 - → `BO-248` Biometric & Identity Integrity Monitoring: *Works in Biometric & Identity Integrity Monitoring*; carries `alertId`; calls `listAccessSecurityFraud`
 - → `BO-253` Security Analytics, AI Detection & Governance: *Works in Security Analytics, AI Detection & Governance*; carries `alertId`; calls `listAccessSecurityFraud`
 
@@ -678,7 +678,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (262 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-244?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Lock identity, Save security alert.
-- [ ] Every transition is wired: `BO-100`, `BO-245`, `BO-247`, `BO-249`, `BO-250`, `BO-251`, `BO-252`, `BO-246`, `BO-248`, `BO-253`.
+- [ ] Every transition is wired: `BO-100`, `BO-245`, `BO-249`, `BO-250`, `BO-251`, `BO-252`, `BO-246`, `BO-247`, `BO-248`, `BO-253`.
 - [ ] Every gated control is gated: `INCIDENT_MANAGE`, `SCOPE_VIEW`.
 - [ ] The 3 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 1 edge case(s) from the process notes are drawn.
@@ -696,7 +696,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-245 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -887,7 +887,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-246 |
 | Who uses it | venue staff holding `INCIDENT_MANAGE`, `SCOPE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1043,7 +1043,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-247 |
 | Who uses it | venue staff holding `INCIDENT_MANAGE`, `SCOPE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
@@ -1235,7 +1235,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-248 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `BIOMETRIC_IMAGE_VIEW`, `GUEST_MANAGE`, `INCIDENT_MANAGE`, `SCOPE_VIEW` (3 configure, 2 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Monitor) and no metric row |
@@ -1433,7 +1433,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-249 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -1595,7 +1595,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-250 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1766,7 +1766,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-251 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1914,7 +1914,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-252 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -2056,7 +2056,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-253 |
 | Who uses it | venue staff holding `INCIDENT_MANAGE`, `REPORT_VIEW_VENUE` (1 configure, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show; Measure) and no metric row |

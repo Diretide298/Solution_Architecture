@@ -61,6 +61,15 @@ CREATE TABLE IF NOT EXISTS ledger.credit_memo (
     tax_amount                        numeric(18,4) NOT NULL,
     gross_amount                      numeric(18,4) NOT NULL,
     tax_amount_in_legal_currency      numeric(18,4),
+    legal_fx_rate                     numeric(18,6),
+    invoice_supply_value              numeric(18,4),
+    corrected_supply_value            numeric(18,4),
+    supplier_name                     text,
+    supplier_address                  text,
+    supplier_tax_registration_number  text,
+    buyer_name                        text,
+    buyer_address                     text,
+    buyer_tax_registration_number     text,
     note                              text,
     rendition_asset_id                uuid,
     e_invoice_status                  text CONSTRAINT credit_memo_e_invoice_status_chk CHECK (e_invoice_status IN ('notRequired', 'queued', 'sent', 'accepted', 'rejected', 'failed')),
@@ -123,7 +132,7 @@ CREATE TABLE IF NOT EXISTS ledger.einvoice_transmission (
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ledger.einvoicing_provider (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     legal_entity_id                   uuid NOT NULL,
     provider_name                     text NOT NULL CONSTRAINT einvoicing_provider_provider_name_chk CHECK (char_length(provider_name) <= 200),
     endpoint_url                      text,
@@ -188,9 +197,9 @@ CREATE TABLE IF NOT EXISTS ledger.fx_provider_assignment (
 
 -- configured rates with effective windows. A rate change is a new row; the old is never edited
 -- Hangs off: reaches ledger.account through its keys; references identity.principal,
--- platform.scope. Reached by: 17 operations read it and 2 write it; 1 tables reference it.
+-- platform.scope. Reached by: 18 operations read it and 2 write it; 2 tables reference it.
 CREATE TABLE IF NOT EXISTS ledger.fx_rate (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     from_currency                     text NOT NULL,
     to_currency                       text NOT NULL,
     rate                              numeric(18,6) NOT NULL,
@@ -439,6 +448,13 @@ CREATE TABLE IF NOT EXISTS ledger.tax_invoice (
     tax_amount                        numeric(18,4) NOT NULL,
     gross_amount                      numeric(18,4) NOT NULL,
     tax_amount_in_legal_currency      numeric(18,4),
+    legal_currency                    text,
+    gross_amount_in_legal_currency    numeric(18,4),
+    legal_fx_rate                     numeric(18,6),
+    legal_fx_rate_source              text,
+    paid_currency                     text,
+    paid_amount                       numeric(18,4),
+    reverse_charge_statement          text,
     credited_amount                   numeric(18,4),
     languages                         text[],
     supersedes_invoice_id             uuid,
@@ -466,13 +482,14 @@ CREATE TABLE IF NOT EXISTS ledger.tax_invoice_line (
     tax_amount                        numeric(18,4) NOT NULL,
     gross_amount                      numeric(18,4) NOT NULL,
     credited_amount                   numeric(18,4),
+    gross_amount_in_legal_currency    numeric(18,4),
     id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- Holds 18 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ledger.tax_invoice_template (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     legal_entity_id                   uuid NOT NULL,
     document_kind                     text NOT NULL CONSTRAINT tax_invoice_template_document_kind_chk CHECK (document_kind IN ('taxInvoice', 'simplifiedTaxInvoice', 'creditMemo')),
     number_prefix                     text NOT NULL CONSTRAINT tax_invoice_template_number_prefix_chk CHECK (char_length(number_prefix) <= 20),

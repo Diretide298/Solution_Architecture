@@ -129,12 +129,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-105` | Stock & Supply | B–D | 17 | 6 | 6 | 18 | 1 | 4 | — | notStarted (generated) |
-| `BO-137` | Recipe Consumption & Theoretical Inventory | B–D | 3 | 27 | 6 | 10 | 1 | 6 | — | notStarted (generated) |
-| `BO-138` | Production Execution & Batch Management | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-139` | Wastage, Spoilage, Returns & Write-Off | B–D | 21 | 6 | 5 | 15 | 1 | 0 | — | notStarted (generated) |
-| `BO-140` | Product Availability, 86 & Operational Food Safety | B–D | 8 | 51 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
-| `BO-141` | Operational Alerts, AI Replenishment & Action Center | B–D | 18 | 18 | 6 | 6 | 0 | 0 | — | notStarted (generated) |
+| `BO-105` | Stock & Supply | D | 17 | 6 | 6 | 18 | 1 | 4 | — | notStarted (generated) |
+| `BO-137` | Recipe Consumption & Theoretical Inventory | C | 3 | 27 | 6 | 10 | 1 | 6 | — | notStarted (generated) |
+| `BO-138` | Production Execution & Batch Management | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-139` | Wastage, Spoilage, Returns & Write-Off | C | 21 | 6 | 5 | 15 | 1 | 0 | — | notStarted (generated) |
+| `BO-140` | Product Availability, 86 & Operational Food Safety | C | 8 | 51 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
+| `BO-141` | Operational Alerts, AI Replenishment & Action Center | D | 18 | 18 | 6 | 6 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -154,7 +154,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Stock & Supply · wave 1 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-105 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `REPORT_VIEW_VENUE` (1 configure, 1 operate) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listInventoryItems` reads the population and `getVenueSettings` reads one of them — list, select, act |
@@ -382,7 +382,7 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Stock & Supply · wave 2 · needs the `fnb` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-137 |
 | Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as storekeeper, supervisor |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listRecipes` reads the population and `getCountVariance` reads one of them — list, select, act |
@@ -625,7 +625,7 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Stock & Supply · wave 2 · needs the `fnb` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-138 |
 | Who uses it | venue |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listExpiringBatches` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -766,7 +766,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Stock & Supply · wave 2 · needs the `fnb` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-139 |
 | Who uses it | venue staff holding `AI_USE`, `ORDER_MODIFY`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 operate, 1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the screen declares only writes (`recordWaste`) and no read of a population — it is settings, not a list |
@@ -1004,7 +1004,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Stock & Supply · wave 2 · needs the `fnb` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-140 |
 | Who uses it | venue staff holding `INCIDENT_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 read, 1 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listExpiringBatches` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1300,7 +1300,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Stock & Supply · wave 2 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-141 |
 | Who uses it | venue staff holding `PROCUREMENT_REQUEST`, `REPORT_VIEW_VENUE` (2 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listAlerts` reads a population and nothing reads one of them; the detail is the row until a `get` exists |

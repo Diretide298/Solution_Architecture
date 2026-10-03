@@ -885,6 +885,23 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "detailPanel",
+       "label": "Show the import's progress and its findings",
+       "operation": "getCatalogueImportJob",
+       "bindsTo": "CatalogueImportJob",
+       "columns": [
+        "CatalogueImportJob.status",
+        "CatalogueImportJob.outcome",
+        "CatalogueImportJob.parsedCount",
+        "CatalogueImportJob.createCount",
+        "CatalogueImportJob.updateCount",
+        "CatalogueImportJob.jobKind",
+        "CatalogueImportJob.warningCount",
+        "CatalogueImportJob.errorCount"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
+      {
        "kind": "searchField",
        "label": "Search product import, governance",
        "provenance": "carried from the previous definition"
@@ -921,7 +938,7 @@
    "error": "Could not load. Names which read failed and leaves the product import governance untouched.",
    "emptyFirstRun": "No product import governance yet. Offers Import product catalogue (`importProductCatalogue`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on venueId, kind and the product import governance are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_CONFIGURE`, which `importProductCatalogue` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getCatalogueImportJob` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `generateConfiguration`; `PRODUCT_CONFIGURE` for `importProductCatalogue`, `commitCatalogueImport`."
   },
   "apis": [
    {
@@ -942,6 +959,13 @@
     "purpose": "Apply a parsed catalogue import",
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "getCatalogueImportJob",
+    "contract": "catalogue",
+    "purpose": "Show the import's progress and its findings",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "entryState": {

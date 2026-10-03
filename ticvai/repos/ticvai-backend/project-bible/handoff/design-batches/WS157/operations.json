@@ -37,6 +37,19 @@
   "requestBody": null,
   "responds": "WorkforceEmployeeProfile"
  },
+ "getExperienceResourceRequirements": {
+  "method": "GET",
+  "path": "/experiences/{experienceId}/resource-requirements",
+  "contract": "resources",
+  "summary": "What an experience needs before it can run",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ResourceRequirement"
+ },
  "getFieldOwnership": {
   "method": "GET",
   "path": "/integration-sources/{sourceId}/field-ownership",

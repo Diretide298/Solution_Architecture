@@ -526,6 +526,44 @@
    "createdAt"
   ],
   "properties": {
+   "scrubAudit": {
+    "type": "object",
+    "readOnly": true,
+    "x-ticvai-persistence-kind": "valueObject",
+    "x-ticvai-persistence-column": "jsonb",
+    "description": "**The audit of one call's scrubbing and routing** (3 October 2026, CHG-R1S-016; the legal research `docs/active/research/openai-key-uae-3-october.md`, item 9). Counts of the entities found by type, **never the values**; the residency class, endpoint and region; the scrubber version; whether the call was allowed or blocked; and a hash of the outbound payload. Exportable to the tenant as controller.",
+    "properties": {
+     "entityCounts": {
+      "type": "object",
+      "additionalProperties": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "description": "Per entity type, e.g. emiratesId 1 and uaePhone 2. Counts only, never values."
+     },
+     "residencyClass": {
+      "$ref": "../shared/common.yaml#/components/schemas/AiResidencyClass"
+     },
+     "endpointRegion": {
+      "type": "string",
+      "description": "Where the call went, e.g. `uaeNorth`, `ae.api.openai.com`, `global`."
+     },
+     "scrubberVersion": {
+      "type": "string"
+     },
+     "decision": {
+      "type": "string",
+      "enum": [
+       "allowed",
+       "blocked"
+      ]
+     },
+     "outboundPayloadHash": {
+      "type": "string",
+      "description": "SHA-256 of the prompt as sent (after scrubbing), so a dispute can be checked without keeping the text."
+     }
+    }
+   },
    "id": {
     "type": "string",
     "format": "uuid"
@@ -960,7 +998,7 @@
    "localLlm",
    "openaiCompatible"
   ],
-  "description": "`openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). Any other protocol needs an adapter.\n**Core42 Compass is reached through `openaiCompatible`** (Chinmay, 2 October: the AI residency decision, amending AI-D02; CHG-CSA-002). Compass is the provider of the `uaeOnly` residency class (common `AiResidencyClass`): Small tier Compass GPT-4.1 mini (or Seraj), Strong tier Compass GPT-5, with OpenAI UAE and then the in-cell open-weights model as the fallback chain. OpenAI UAE is `openai` with a UAE `endpoint`; the in-cell model is `localLlm`.\n**A kind is a protocol, not a vendor** (Chinmay, 2 October, contract follow-ups: BYOK accepts any provider; CHG-FUP-008). Any vendor is accepted, named in `AiProvider.vendor`: Mistral, Cohere or any other is reached through `openaiCompatible` where its API speaks it, which the compatibility test confirms before activation (`AiProviderCompatibility`). A new native adapter is a new value here, a breaking change for a client built earlier that goes out with an approval (`docs/active/breaking-changes.yaml`); until then a vendor without either protocol is refused `422 provider-protocol-unsupported`.\n"
+  "description": "`openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). Any other protocol needs an adapter.\n**Core42 Compass is reached through `openaiCompatible`** (Chinmay, 2 October: the AI residency decision, amending AI-D02; CHG-CSA-002). Compass is the provider of the `uaeOnly` residency class (common `AiResidencyClass`): Small tier Compass GPT-4.1 mini (or Seraj), Strong tier Compass GPT-5, with OpenAI UAE as the fallback. OpenAI UAE is `openai` with a UAE `endpoint`: OpenAI's UAE-region API project, `ae.api.openai.com` (in-country processing, on OpenAI sales approval), allowed under `uaeOnly` and the only endpoint a `uaeOnly` BYOK OpenAI key may use (CHG-R1S-016). **We host no model** (Chinmay, 3 October, CHG-R1S-002): there is no in-cell open-weights fallback; `localLlm` is used only where a client asks for self-hosting and runs the model on the client's estate (`onPrem`).\n**A kind is a protocol, not a vendor** (Chinmay, 2 October, contract follow-ups: BYOK accepts any provider; CHG-FUP-008). Any vendor is accepted, named in `AiProvider.vendor`: Mistral, Cohere or any other is reached through `openaiCompatible` where its API speaks it, which the compatibility test confirms before activation (`AiProviderCompatibility`). A new native adapter is a new value here, a breaking change for a client built earlier that goes out with an approval (`docs/active/breaking-changes.yaml`); until then a vendor without either protocol is refused `422 provider-protocol-unsupported`.\n"
  },
  "AiRecommendationExplanation": {
   "type": "object",

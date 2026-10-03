@@ -120,16 +120,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-923` | AI Resource Intelligence Command Center | B–D | 0 | 26 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-924` | Optimal Resource Recommendation Engine | B–D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
-| `BO-925` | AI Staff Recommendation & Workforce Matching | B–D | 0 | 0 | 6 | 19 | 0 | 0 | — | notStarted (—) |
-| `BO-926` | Resource Demand Forecasting | B–D | 0 | 6 | 6 | 46 | 0 | 0 | — | notStarted (—) |
+| `BO-923` | AI Resource Intelligence Command Center | D | 0 | 26 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-924` | Optimal Resource Recommendation Engine | D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `BO-925` | AI Staff Recommendation & Workforce Matching | D | 0 | 0 | 6 | 19 | 0 | 0 | — | notStarted (—) |
+| `BO-926` | Resource Demand Forecasting | D | 0 | 6 | 6 | 46 | 0 | 0 | — | notStarted (—) |
 | `BO-927` | AI Staffing Requirement Forecast | A | 17 | 16 | 6 | 47 | 1 | 0 | — | notStarted (—) |
-| `BO-928` | AI Conflict Resolution Assistant | B–D | 0 | 0 | 6 | 15 | 0 | 0 | — | notStarted (—) |
-| `BO-929` | Automatic Schedule Optimization | B–D | 0 | 0 | 6 | 12 | 0 | 0 | — | notStarted (—) |
-| `BO-930` | Alternative & Replacement Resource | B–D | 0 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
-| `BO-931` | Operational Scenario Simulator & Digital Twin | B–D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `BO-932` | Conversational AI Resource Copilot | B–D | 0 | 0 | 6 | 16 | 0 | 0 | — | notStarted (—) |
+| `BO-928` | AI Conflict Resolution Assistant | D | 0 | 0 | 6 | 15 | 0 | 0 | — | notStarted (—) |
+| `BO-929` | Automatic Schedule Optimization | D | 0 | 0 | 6 | 12 | 0 | 0 | — | notStarted (—) |
+| `BO-930` | Alternative & Replacement Resource | D | 0 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
+| `BO-931` | Operational Scenario Simulator & Digital Twin | D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `BO-932` | Conversational AI Resource Copilot | D | 0 | 0 | 6 | 16 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

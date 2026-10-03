@@ -102,7 +102,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-1081` | Finance Dashboard | B–D | 2 | 41 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-1081` | Finance Dashboard | C | 2 | 41 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 
 ## Design inputs from the client meetings
 

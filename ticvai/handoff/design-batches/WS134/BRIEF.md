@@ -123,13 +123,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-727` | F&B Command Center | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `BO-728` | Outlet Management | B–D | 0 | 0 | 6 | 0 | 3 | 0 | — | notStarted (—) |
-| `BO-729` | Create / Edit Outlet | B–D | 0 | 0 | 6 | 0 | 3 | 0 | — | notStarted (—) |
-| `BO-730` | Outlet Types & Templates | B–D | 10 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `BO-731` | Operating Hours & Service Periods | B–D | 16 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-732` | POS & Device Assignment | B–D | 7 | 22 | 6 | 11 | 3 | 0 | — | notStarted (—) |
-| `BO-733` | Service Channel Configuration | B–D | 0 | 33 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-727` | F&B Command Center | B | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `BO-728` | Outlet Management | B | 0 | 0 | 6 | 0 | 3 | 0 | — | notStarted (—) |
+| `BO-729` | Create / Edit Outlet | B | 0 | 0 | 6 | 0 | 3 | 0 | — | notStarted (—) |
+| `BO-730` | Outlet Types & Templates | C | 10 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `BO-731` | Operating Hours & Service Periods | B | 16 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-732` | POS & Device Assignment | B | 7 | 22 | 6 | 11 | 3 | 0 | — | notStarted (—) |
+| `BO-733` | Service Channel Configuration | C | 0 | 33 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

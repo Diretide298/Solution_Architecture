@@ -409,6 +409,35 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listIngredientSubstitutes": {
+  "method": "GET",
+  "path": "/recipes/{recipeId}/substitutes",
+  "contract": "fnb",
+  "summary": "Approved substitutions for a recipe's ingredients",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "recipeId",
+    "in": "path",
+    "required": true
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listInventoryHolds": {
   "method": "GET",
   "path": "/inventory-holds",
@@ -588,6 +617,30 @@
   ],
   "requestBody": null,
   "responds": "SaleBoard"
+ },
+ "listSubstitutionRules": {
+  "method": "GET",
+  "path": "/substitution-rules",
+  "contract": "fnb",
+  "summary": "What may replace what, as saved",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listSyncRejections": {
   "method": "GET",

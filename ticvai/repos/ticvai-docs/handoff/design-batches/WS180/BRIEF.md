@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-639` | Recommendation Command Center | B–D | 0 | 40 | 6 | 3 | 0 | 0 | — | notStarted (—) |
-| `ADM-640` | Recommendation Strategy Manager | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-641` | Recommendation Objective & KPI Configuration | B–D | 5 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-642` | Recommendation Type & Product Relationship Manager | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-643` | Recommendation Placement & Touchpoint Manager | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-644` | Channel & Journey Strategy Manager | B–D | 0 | 20 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `ADM-645` | Recommendation Priority, Ranking & Suppression Manager17 | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-646` | Recommendation Guardrails & Business Controls | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-647` | Recommendation Policy, AI Control & Governance | B–D | 22 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-648` | Recommendation Strategy Simulator & AI Advisor | B–D | 11 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-639` | Recommendation Command Center | C | 0 | 40 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `ADM-640` | Recommendation Strategy Manager | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-641` | Recommendation Objective & KPI Configuration | C | 5 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-642` | Recommendation Type & Product Relationship Manager | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-643` | Recommendation Placement & Touchpoint Manager | C | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-644` | Channel & Journey Strategy Manager | C | 0 | 20 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `ADM-645` | Recommendation Priority, Ranking & Suppression Manager17 | C | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-646` | Recommendation Guardrails & Business Controls | C | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-647` | Recommendation Policy, AI Control & Governance | C | 22 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-648` | Recommendation Strategy Simulator & AI Advisor | C | 11 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

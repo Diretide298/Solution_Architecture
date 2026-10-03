@@ -1,6 +1,6 @@
 # WS141 — Marketing CRM Configuration Reference v1.0 board 7
 
-**10 screens · 20 operations · 27 schemas · 5 permissions**
+**10 screens · 21 operations · 27 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -103,16 +103,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-794` | Omnichannel Command Center | B–D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `BO-795` | Unified Inbox | B–D | 0 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
-| `BO-796` | Guest Conversation 360 | B–D | 0 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
-| `BO-797` | AI Chatbot Configuration | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-798` | Intent & Knowledge Management | A | 5 | 11 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `BO-799` | Agent Workspace | B–D | 0 | 0 | 6 | 7 | 0 | 0 | — | notStarted (—) |
-| `BO-800` | Routing & Queue Management | B–D | 8 | 13 | 6 | 0 | 2 | 6 | — | notStarted (—) |
-| `BO-801` | Sales & Service Actions | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-802` | Sentiment, Quality & Escalation | B–D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `BO-803` | Chat Analytics & Audit | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-794` | Omnichannel Command Center | D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `BO-795` | Unified Inbox | D | 0 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
+| `BO-796` | Guest Conversation 360 | D | 0 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
+| `BO-797` | AI Chatbot Configuration | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-798` | Intent & Knowledge Management | A | 5 | 14 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `BO-799` | Agent Workspace | A | 0 | 0 | 6 | 7 | 0 | 0 | — | notStarted (—) |
+| `BO-800` | Routing & Queue Management | D | 8 | 13 | 6 | 0 | 2 | 6 | — | notStarted (—) |
+| `BO-801` | Sales & Service Actions | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-802` | Sentiment, Quality & Escalation | D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `BO-803` | Chat Analytics & Audit | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

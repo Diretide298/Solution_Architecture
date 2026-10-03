@@ -38,7 +38,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | [CMS-006](#cms-006-component-preview) | Component Preview | White Label | 1 | 6 |
 | [CMS-007](#cms-007-page-builder) | Page Builder | White Label | 1 | 12 |
 | [CMS-008](#cms-008-content-blocks) | Content Blocks | White Label | 1 | 10 |
-| [CMS-009](#cms-009-navigation-menus) | Navigation & Menus | White Label | 1 | 6 |
+| [CMS-009](#cms-009-navigation-menus) | Navigation & Menus | White Label | 1 | 7 |
 | [CMS-010](#cms-010-media-library) | Media Library | White Label | 1 | 11 |
 | [CMS-011](#cms-011-translations) | Translations | White Label | 1 | 3 |
 | [CMS-012](#cms-012-rtl-preview) | RTL Preview | White Label | 1 | 2 |
@@ -324,6 +324,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | CMS-041 | Waiver & Consent Command Center |  |  |
 | CMS-051 | Waiver Operations Command Center |  |  |
 | CMS-003 | Typography |  |  |
+| CMS-025 | Opens Cookie, Tracking & Digital Technology Registry |  |  |
+| CMS-026 | Opens Cookie Banner & Preference Center Designer |  |  |
 
 ## CMS-002 Brand Kit
 
@@ -669,6 +671,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | `setFooter` | [WhiteLabelService](../backend/WhiteLabelService.md#setfooter) | onAction | The footer editor, saved on its own (DEC-049) | `TENANT_CONFIGURE` |
 | `getDeepLinkScheme` | [WhiteLabelService](../backend/WhiteLabelService.md#getdeeplinkscheme) | onLoad | The published deep-link scheme (DEC-548) | `TENANT_CONFIGURE` |
 | `buildDeepLink` | [WhiteLabelService](../backend/WhiteLabelService.md#builddeeplink) | onAction | Build a deep link to a target for a tenant's own site (DEC-548) | `TENANT_CONFIGURE` |
+| `getTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantconfig) | onLoad | Load the working header and footer | `TENANT_CONFIGURE` |
 
 **States**
 

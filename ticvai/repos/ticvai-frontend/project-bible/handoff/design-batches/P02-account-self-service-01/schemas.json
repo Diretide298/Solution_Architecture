@@ -2742,6 +2742,82 @@
    }
   }
  },
+ "TicketTransfer": {
+  "x-ticvai-persistence": "orders.ticket_transfer",
+  "type": "object",
+  "required": [
+   "id",
+   "orderId",
+   "ticketIds",
+   "status",
+   "offeredAt",
+   "expiresAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "ticketIds": {
+    "type": "array",
+    "description": "The entitlements offered — `Entitlement.id` values, since a ticket is an entitlement. Each points at `access.entitlement`.",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "fromSubjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "toSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Set only on claim. Ownership moves then, not at offer."
+   },
+   "recipientAddressMasked": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "offered",
+     "claimed",
+     "expired",
+     "cancelled"
+    ]
+   },
+   "claimUrl": {
+    "type": "string",
+    "nullable": true
+   },
+   "claimToken": {
+    "type": "string",
+    "format": "password",
+    "writeOnly": true,
+    "description": "**What `claimTicketTransfer` checks the presented `claimToken` against.** Carried to the recipient inside `claimUrl` and never returned — the sender reading their transfer must not be able to claim it on the recipient's behalf.\n"
+   },
+   "offeredAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "claimedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "An unclaimed transfer expires and the tickets return. A transfer to a mistyped address must not strand a ticket somewhere nobody can reach.\n"
+   }
+  }
+ },
  "TokenPair": {
   "x-ticvai-persistence": "none — transient",
   "type": "object",

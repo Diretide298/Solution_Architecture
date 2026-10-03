@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 50 |
-| Operations | 210 |
+| Operations | 214 |
 | Contracts | 19 |
 | Modules | 14 |
 | Undrawn | 0 |
-| Operations with no screen | 18 |
+| Operations with no screen | 16 |
 | Waves | wave1 50 |
 
 ## Gaps
 
-### 18 operations with no screen here
+### 16 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -31,9 +31,7 @@
 | `listCustomerMemberships` | identity | GET | Memberships a customer holds |
 | `checkGuestCheckoutMatch` | marketing-crm | POST | Does this contact already have a profile here |
 | `decideGuestCheckoutMatch` | marketing-crm | POST | Use the existing profile or keep this booking separate |
-| `getGuestConversation` | marketing-crm | GET | The guest's own handed-over conversation, with the agent's replies and the queue position |
 | `uploadGuestDocument` | marketing-crm | POST | Store a guest photo, ID or signed document |
-| `listTicketTransfers` | orders | GET | The ticket transfers this guest sent or received |
 | `revokeEntitlementShare` | orders | POST | Take back a share |
 | `getUpsellSuggestions` | promotions | POST | Suggestions for a cart |
 | `recordRecommendationOutcome` | promotions | POST | Shown, clicked, accepted or dismissed |
@@ -66,13 +64,13 @@
 | `WEB-002` | Event & Attraction Listing | Discovery & Browse | 1 | 6 | yes |
 | `WEB-003` | Search Results | Discovery & Browse | 1 | 2 | yes |
 | `WEB-004` | Attraction Details | Discovery & Browse | 1 | 5 | yes |
-| `WEB-005` | Ticket Type Selection | Booking & Selection | 1 | 6 | yes |
+| `WEB-005` | Ticket Type Selection | Booking & Selection | 1 | 7 | yes |
 | `WEB-006` | Date & Performance Selection | Booking & Selection | 1 | 8 | yes |
 | `WEB-007` | Interactive Seat Selection | Booking & Selection | 1 | 6 | yes |
 | `WEB-008` | Add-ons & Upsell | Booking & Selection | 1 | 5 | yes |
 | `WEB-009` | Wishlist | Booking & Selection | 1 | 3 | yes |
 | `WEB-010` | Shopping Cart | Cart & Checkout | 1 | 14 | yes |
-| `WEB-011` | Guest Details & Attendee Forms | Cart & Checkout | 1 | 6 | yes |
+| `WEB-011` | Guest Details & Attendee Forms | Cart & Checkout | 1 | 7 | yes |
 | `WEB-012` | Checkout — Payment | Cart & Checkout | 1 | 6 | yes |
 | `WEB-013` | Booking Confirmation | Cart & Checkout | 1 | 3 | yes |
 | `WEB-014` | Pay for a Booking | Cart & Checkout | 1 | 2 | yes |
@@ -92,20 +90,20 @@
 | `WEB-028` | Contact & Venue Information | Engagement & Support | 1 | 1 | yes |
 | `WEB-029` | Error / Sold Out / Maintenance | System States | 1 | 2 | yes |
 | `WEB-030` | Ticket Transfer | Ticketing | 1 | 3 | yes |
-| `WEB-031` | My Reservations | Ticketing | 1 | 9 | yes |
+| `WEB-031` | My Reservations | Ticketing | 1 | 10 | yes |
 | `WEB-032` | Offers & Promotions | Promotions | 1 | 2 | yes |
 | `WEB-033` | Shop | Retail | 1 | 5 | yes |
 | `WEB-034` | Lost & Found | Support | 1 | 4 | yes |
 | `WEB-035` | Multi-Currency & Pricing | Ticketing | 1 | 2 | yes |
-| `WEB-036` | F&B – Browse & Order | In-venue Services | 1 | 13 | yes |
+| `WEB-036` | F&B – Browse & Order | In-venue Services | 1 | 14 | yes |
 | `WEB-037` | Menu Item Detail | In-venue Services | 1 | 1 | yes |
 | `WEB-038` | F&B – Order Tracking | In-venue Services | 1 | 2 | yes |
 | `WEB-039` | Venue Map & Wait Times | In-venue Services | 1 | 4 | yes |
 | `WEB-040` | Virtual Queue | In-venue Services | 1 | 4 | yes |
-| `WEB-041` | Parking – Reserve & Pay | In-venue Services | 1 | 3 | yes |
+| `WEB-041` | Parking – Reserve & Pay | In-venue Services | 1 | 4 | yes |
 | `WEB-042` | Retail & Shop and Drop | Retail | 1 | 3 | yes |
 | `WEB-043` | Loyalty & Rewards | Membership, Loyalty & Value | 1 | 11 | yes |
-| `WEB-044` | AI Concierge – Home | Engagement & Support | 1 | 8 | yes |
+| `WEB-044` | AI Concierge – Home | Engagement & Support | 1 | 9 | yes |
 | `WEB-045` | Help Centre & Accessibility | Support | 1 | 4 | yes |
 | `WEB-046` | In-Venue Notifications | Engagement & Support | 1 | 2 | yes |
 | `WEB-047` | Map Booking — Cabanas & Spots | Booking & Selection | 1 | 8 | yes |

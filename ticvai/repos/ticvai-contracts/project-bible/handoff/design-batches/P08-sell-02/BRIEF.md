@@ -1,6 +1,6 @@
 # P08-sell-02 — P08 · Sell (2 of 4)
 
-**10 screens · 53 operations · 67 schemas · 14 permissions**
+**10 screens · 55 operations · 67 schemas · 14 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -156,16 +156,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-017` | Capacity Management | B–D | 24 | 20 | 6 | 14 | 7 | 0 | — | notStarted (generated) |
-| `BO-018` | Allocation & Holds | B–D | 4 | 14 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-019` | Closures & Blackouts | B–D | 44 | 31 | 6 | 38 | 1 | 0 | — | notStarted (generated) |
-| `BO-037` | Offline Package Status | B–D | 52 | 32 | 6 | 3 | 0 | 0 | — | notStarted (generated) |
-| `BO-063` | Opening Hours & Calendar | B–D | 16 | 9 | 6 | 17 | 2 | 0 | — | notStarted (generated) |
-| `BO-102` | Sell | B–D | 2 | 37 | 6 | 57 | 0 | 0 | — | notStarted (generated) |
-| `BO-109` | Menu Builder & POS Layout Designer | B–D | 49 | 7 | 6 | 8 | 2 | 2 | — | notStarted (generated) |
+| `BO-017` | Capacity Management | B | 24 | 20 | 6 | 14 | 7 | 0 | — | notStarted (generated) |
+| `BO-018` | Allocation & Holds | B | 4 | 14 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-019` | Closures & Blackouts | B | 44 | 31 | 6 | 38 | 1 | 0 | — | notStarted (generated) |
+| `BO-037` | Offline Package Status | B | 52 | 32 | 6 | 3 | 0 | 0 | — | notStarted (generated) |
+| `BO-063` | Opening Hours & Calendar | B | 16 | 9 | 6 | 17 | 2 | 0 | — | notStarted (generated) |
+| `BO-102` | Sell | B | 2 | 37 | 6 | 57 | 0 | 0 | — | notStarted (generated) |
+| `BO-109` | Menu Builder & POS Layout Designer | A | 49 | 7 | 6 | 8 | 2 | 2 | — | notStarted (generated) |
 | `BO-110` | Recipe & BOM Management | B | 0 | 0 | 6 | 0 | 2 | 2 | — | notStarted (generated) |
-| `BO-111` | Ingredient Substitution, Allergen & Nutrition | B–D | 21 | 29 | 5 | 6 | 1 | 0 | — | notStarted (generated) |
-| `BO-112` | Production Planning & Production Sheets | B–D | 35 | 18 | 5 | 17 | 1 | 0 | — | notStarted (generated) |
+| `BO-111` | Ingredient Substitution, Allergen & Nutrition | A | 21 | 38 | 5 | 6 | 1 | 0 | — | notStarted (generated) |
+| `BO-112` | Production Planning & Production Sheets | A | 35 | 18 | 5 | 17 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

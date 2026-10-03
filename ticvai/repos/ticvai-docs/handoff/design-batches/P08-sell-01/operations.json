@@ -445,6 +445,19 @@
   "requestBody": null,
   "responds": null
  },
+ "getBundle": {
+  "method": "GET",
+  "path": "/bundles/{bundleId}",
+  "contract": "promotions",
+  "summary": "Read a bundle with components and allocation",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Bundle"
+ },
  "getChannelAllocations": {
   "method": "GET",
   "path": "/channel-capacities/{channelCapacityId}/channel-allocations",
@@ -552,6 +565,19 @@
   "requestBody": null,
   "responds": "CatalogueBundle"
  },
+ "getPackagePricingDefinition": {
+  "method": "GET",
+  "path": "/package-pricing",
+  "contract": "catalogue",
+  "summary": "The package pricing definition as saved",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PackagePricing"
+ },
  "getPerformance": {
   "method": "GET",
   "path": "/performances/{performanceId}",
@@ -590,6 +616,19 @@
   "parameters": [],
   "requestBody": null,
   "responds": "Product"
+ },
+ "getProductAttributes": {
+  "method": "GET",
+  "path": "/products/{productId}/attributes",
+  "contract": "catalogue",
+  "summary": "A product's attribute axes",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": null
  },
  "getPromotion": {
   "method": "GET",
@@ -747,6 +786,30 @@
   "parameters": [],
   "requestBody": null,
   "responds": "ChannelListing"
+ },
+ "listCombos": {
+  "method": "GET",
+  "path": "/combos",
+  "contract": "fnb",
+  "summary": "The combos defined at the venue, with their slots",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listCommercialCampaigns": {
   "method": "GET",

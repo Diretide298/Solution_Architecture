@@ -7,15 +7,15 @@
  "audience": "staff",
  "formFactor": "posTerminal",
  "offlineCapable": true,
- "generated": "2026-10-03",
+ "generated": "2026-10-04",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 32,
-  "operations": 151,
+  "operations": 152,
   "contracts": 19,
   "modules": 4,
   "undrawn": 0,
-  "operationsWithNoScreen": 161
+  "operationsWithNoScreen": 153
  },
  "waves": {
   "wave1": 32
@@ -76,8 +76,8 @@
    "operations": 8
   },
   {
-   "contract": "reporting",
-   "operations": 5
+   "contract": "tenancy",
+   "operations": 6
   },
   {
    "contract": "promotions",
@@ -88,24 +88,20 @@
    "operations": 5
   },
   {
-   "contract": "tenancy",
+   "contract": "reporting",
    "operations": 5
-  },
-  {
-   "contract": "finance",
-   "operations": 4
   },
   {
    "contract": "seating",
    "operations": 4
   },
   {
-   "contract": "approvals",
-   "operations": 3
+   "contract": "finance",
+   "operations": 4
   },
   {
-   "contract": "wallet",
-   "operations": 2
+   "contract": "approvals",
+   "operations": 3
   },
   {
    "contract": "access",
@@ -116,7 +112,11 @@
    "operations": 2
   },
   {
-   "contract": "games",
+   "contract": "wallet",
+   "operations": 2
+  },
+  {
+   "contract": "inventory",
    "operations": 1
   },
   {
@@ -124,7 +124,7 @@
    "operations": 1
   },
   {
-   "contract": "inventory",
+   "contract": "games",
    "operations": 1
   }
  ],
@@ -261,7 +261,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/sales-exceptions-controls-operational-actions",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -279,7 +279,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/till-configuration",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -288,7 +288,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/cash-in-cash-out-operations",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -351,7 +351,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/outlet-setup",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -445,12 +445,6 @@
     "summary": "Entry, Exit & Re-entry Rules"
    },
    {
-    "operation": "listEntryRulePoints",
-    "contract": "access",
-    "verb": "GET",
-    "summary": "Which access points an admission rule covers"
-   },
-   {
     "operation": "listEntryTemporaryExit",
     "contract": "access",
     "verb": "GET",
@@ -533,12 +527,6 @@
     "contract": "approvals",
     "verb": "POST",
     "summary": "Send a saved draft for approval"
-   },
-   {
-    "operation": "getCatalogueImportJob",
-    "contract": "catalogue",
-    "verb": "GET",
-    "summary": "Progress and findings of a catalogue import"
    },
    {
     "operation": "getEventChangeTreatmentPolicy",
@@ -689,12 +677,6 @@
     "contract": "fnb",
     "verb": "GET",
     "summary": "Upsell and pairing suggestions for F&B"
-   },
-   {
-    "operation": "listIngredientSubstitutes",
-    "contract": "fnb",
-    "verb": "GET",
-    "summary": "Approved substitutions for a recipe's ingredients"
    },
    {
     "operation": "sendOrderNotification",
@@ -907,12 +889,6 @@
     "summary": "List case routing rules"
    },
    {
-    "operation": "listLoyaltyCampaigns",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Time-boxed campaigns inside a programme"
-   },
-   {
     "operation": "listLoyaltyPointEntries",
     "contract": "marketing-crm",
     "verb": "GET",
@@ -1075,12 +1051,6 @@
     "summary": "Store a guest photo, ID or signed document"
    },
    {
-    "operation": "cancelPaymentLink",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Cancel a live payment link"
-   },
-   {
     "operation": "convertToTermProduct",
     "contract": "orders",
     "verb": "POST",
@@ -1115,12 +1085,6 @@
     "contract": "orders",
     "verb": "GET",
     "summary": "Fees charged on an order"
-   },
-   {
-    "operation": "listPaymentProviders",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "Gateways configured for this scope"
    },
    {
     "operation": "openGuestCreditAccount",
@@ -1249,12 +1213,6 @@
     "summary": "List returns"
    },
    {
-    "operation": "extendSeatHold",
-    "contract": "seating",
-    "verb": "POST",
-    "summary": "Extend a hold"
-   },
-   {
     "operation": "adjustDepositBoxFloat",
     "contract": "shift",
     "verb": "POST",
@@ -1277,12 +1235,6 @@
     "contract": "tenancy",
     "verb": "GET",
     "summary": "The connectivity thresholds saved at one scope node"
-   },
-   {
-    "operation": "getOfflinePolicy",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "The offline policy saved at one scope node"
    },
    {
     "operation": "getOutlet",

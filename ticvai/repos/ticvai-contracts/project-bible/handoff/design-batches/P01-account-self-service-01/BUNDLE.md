@@ -385,7 +385,7 @@ Errors to draw in the form: 403 Contact detail on the order does not match the v
 | Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025), and this is the screen a guest who is not signed in is sent to, so it has no no-access case of its own. A session that has expired lands here with the screen it came from kept, and returns to it after sign-in. |
 | Sign in refused (`?state=signInRefused`) | **One message for every refusal of a password sign-in**: `guestPasswordLogin` answers 401 alike for a wrong password, an unknown identifier, an account with no password and a locked account, and the screen never says which. Too many attempts (429, or the lockout after `PasswordPolicy.lockoutAfterAttempts`) says to try again later and offers **Send me a code** instead (decided 28 September, audit R073 (a)). |
 | Offline (`?state=offline`) | **Not available, and the offline banner says why.** Signing in, registering and verifying a code need the server. |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Identifier already registered. Deliberately indistinguishable in timing from success — a registration endpoint that reveals which addresses exist is an account …; 409 The key is already claimed by another subject (`already-claimed`) |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Identifier already registered. Deliberately indistinguishable in timing from success — a registration endpoint that reveals which addresses exist is an account …; 409 The key is already claimed by another subject (`already-claimed`); 422 A wrong code, attempts one to four (CHG-R1S-025; the r1 gate found only the fifth failure specified). |
 
 #### Edge cases to draw
 
@@ -500,7 +500,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### References
 
 - Wireframe frame: `wireframes/P01 Guest Web.dc.html#web-016` · status **review** · provenance client-verified
-- Prototype (rev 3, verified 2026-09-28, match partial): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html`, view *Header profile icon (signed out), or automatically when leaving Add-ons / at payment*. Differences: No password sign-in and no mobile-number OTP (YAML has guestPasswordLogin and 'Email or mobile number'); it is a modal, not a page. Account → Security still shows 'Two-step verification' and passkeys, which the YAML ruled out for guests (R167). Guest checkout route belongs to WEB-012 in the prototype.
+- Prototype (rev 3 (pointer moved to the 30 September build, CHG-R1S-015), verified 2026-09-28, match partial): `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, view *Header profile icon (signed out), or automatically when leaving Add-ons / at payment*. Differences: No password sign-in and no mobile-number OTP (YAML has guestPasswordLogin and 'Email or mobile number'); it is a modal, not a page. Account → Security still shows 'Two-step verification' and passkeys, which the YAML ruled out for guests (R167). Guest checkout route belongs to WEB-012 in the prototype.
 - Flow F56 *A guest registers, verifies and sets preferences*, step 3: A guest who checked out anonymously links their order. → **This is the operation that stops duplicates.** A guest who bought without an account and registers afterwards is one person — and without this they are two, which is what `mergeGuests` then has to …
 - Flow F01 branch at step 4 (recoverable): when The guest is not signed in and leaves the ticket step (or Add-ons, where the booking has one), With the published flow's `settings.signInAt` `afterAddOns` (the default; read with `getPublishedBookingFlow`, W12) the guest is asked to sign in, or for a guest code when guest checkout is on …
 - Flow F01 branch at step 4 (recoverable): when The guest checks out as a guest (guest checkout on for the venue), The pop-up asks only `BookingFlowSettings.guestContactFields` (email, and name or mobile where configured), then the six-digit code. After the code nothing is asked again: the cart goes to WEB-012 …
@@ -511,7 +511,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (35), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every input above is drawn (35), with its required mark, default, format and its error state (400, 403, 404, 409, 410, 422).
 - [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-016?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, signInRefused, offline.
 - [ ] Every action is wired with its success and its failure: Send me a code, Sign in with the code, Sign in with password, Continue with Apple or Google, Continue with UAE Pass, Create an account, Sign out, Link an order I placed as a guest, Keep my cart.
@@ -800,7 +800,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### References
 
 - Wireframe frame: `wireframes/P01 Guest Web.dc.html#web-017` · status **review** · provenance client-verified · **Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed …
-- Prototype (rev 3, verified 2026-09-28, match exact): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html`, view *Sign in → avatar menu → 'Account overview'*. Differences: Prototype makes the account a single page with section panes; most YAML account screens (019–024, 026, 027, 030, 031, 034) are panes of it. Groups & invitations (respondToInvitation, getMyChallenges, referral code) sits here. Signed-out state 'Sign in to see your account' is drawn.
+- Prototype (rev 3 (pointer moved to the 30 September build, CHG-R1S-015), verified 2026-09-28, match exact): `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, view *Sign in → avatar menu → 'Account overview'*. Differences: Prototype makes the account a single page with section panes; most YAML account screens (019–024, 026, 027, 030, 031, 034) are panes of it. Groups & invitations (respondToInvitation, getMyChallenges, referral code) sits here. Signed-out state 'Sign in to see your account' is drawn.
 - Derived from `wireframes/reference/Dashboards Board.dc.html`
 - Client design-board frames: `Dashboards Board.dc.html#web-017`
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
@@ -1116,7 +1116,7 @@ Also set there, as content the tenant writes: social links: platform.
 #### References
 
 - Wireframe frame: `wireframes/P01 Guest Web.dc.html#web-018` · status **review** · provenance client-verified
-- Prototype (rev 3, verified 2026-09-28, match partial): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html`, view *Header 'My tickets' → a ticket → 'Manage' (ticket sheet)*. Differences: QR is static — no rotating code with a visible countdown (YAML R230). Prototype adds reschedule, add guests, refund, resale and cancel on the ticket sheet (YAML routes refunds to WEB-019 and transfers to WEB-030).
+- Prototype (rev 3 (pointer moved to the 30 September build, CHG-R1S-015), verified 2026-09-28, match partial): `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, view *Header 'My tickets' → a ticket → 'Manage' (ticket sheet)*. Differences: QR is static — no rotating code with a visible countdown (YAML R230). Prototype adds reschedule, add guests, refund, resale and cancel on the ticket sheet (YAML routes refunds to WEB-019 and transfers to WEB-030).
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
@@ -1442,7 +1442,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### References
 
 - Wireframe frame: `wireframes/P01 Guest Web.dc.html#web-019` · status **review** · provenance client-verified
-- Prototype (rev 3, verified 2026-09-28, match partial): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html`, view *Account → 'Order history'*. Differences: A list pane with toast-only actions; no order detail view. Refund request and transfer are rows, not flows.
+- Prototype (rev 3 (pointer moved to the 30 September build, CHG-R1S-015), verified 2026-09-28, match partial): `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, view *Account → 'Order history'*. Differences: A list pane with toast-only actions; no order detail view. Refund request and transfer are rows, not flows.
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
@@ -1725,7 +1725,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### References
 
 - Wireframe frame: `wireframes/P01 Guest Web.dc.html#web-020` · status **review** · provenance client-verified
-- Prototype (rev 3, verified 2026-09-28, match partial): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html`, view *Account → 'Personal details', 'Notifications', 'Accessibility'*. Differences: Split over three panes; fields are read-only with a 'Save changes' toast. No 'which level the current value came from' (YAML purpose). Consent purposes appear as two marketing toggles rather than the configured purpose list.
+- Prototype (rev 3 (pointer moved to the 30 September build, CHG-R1S-015), verified 2026-09-28, match partial): `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, view *Account → 'Personal details', 'Notifications', 'Accessibility'*. Differences: Split over three panes; fields are read-only with a 'Save changes' toast. No 'which level the current value came from' (YAML purpose). Consent purposes appear as two marketing toggles rather than the configured purpose list.
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0045 *Every order carries a proven contact, and the gate is the checkout page* (`docs/adr/0045-every-order-carries-a-proven-contact.md`)
 
@@ -1760,7 +1760,7 @@ Every guest screen in this batch is white-label. These elements are set by the t
 | Show loading indicator (`brand.showLoadingIndicator`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | — | on | — |
 | Intro video (`brand.introVideoAssetRef`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | The optional intro video (decided 29 September, MOB-5). A video `MediaAsset` from the media library (CMS-010). |
 | Intro video mode (`brand.introVideoMode`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | Off · First launch · Every launch; Anything but `off` needs `introVideoAssetRef`, or 400. | Off | When GST-001 plays it full screen. "Skip introduction" is always shown. |
-| Powered by TICVAI credit (`brand.showPoweredBy`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | — | on | the *Powered by TICVAI* credit on the launch screen, at the foot of Account and in the web footer; on by default, and switching it off needs the licence add-on (403 … |
+| Powered by TICVAI credit (`brand.showPoweredBy`) | `CMS-104`, `ADM-016` | — | on | the *Powered by TICVAI* credit on the launch screen, at the foot of Account and in the web footer; on by default, and switching it off needs the licence add-on (403 … |
 | Primary colour (`theme.primaryColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | the brand colour (the `accentSolid` token): primary buttons (Book, Continue, Add to cart, Pay), the active step of the step indicator, selected date and time chips, focus rings |
 | Secondary colour (`theme.secondaryColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | secondary buttons and secondary emphasis: unselected chips, secondary tabs |
 | Accent colour (`theme.accentColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | highlights: badges (LIMITED, NEW, BESTSELLER), availability counts, sale prices |

@@ -129,16 +129,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-963` | Import Command Center | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-964` | PDF & Image Import | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-965` | SVG & CAD Import | B–D | 0 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
-| `BO-966` | CSV & Excel Import | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-967` | AI Section Recognition | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-968` | AI Row & Seat Recognition | B–D | 0 | 0 | 6 | 6 | 2 | 6 | — | notStarted (—) |
-| `BO-969` | AI Aisle, VIP & Accessibility | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-970` | AI Numbering & Labeling | B–D | 0 | 0 | 6 | 5 | 0 | 0 | — | notStarted (—) |
-| `BO-971` | Validation & Correction | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-972` | AI Venue Designer & Publish | B–D | 0 | 38 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `BO-963` | Import Command Center | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-964` | PDF & Image Import | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-965` | SVG & CAD Import | C | 0 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
+| `BO-966` | CSV & Excel Import | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-967` | AI Section Recognition | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-968` | AI Row & Seat Recognition | C | 0 | 0 | 6 | 6 | 2 | 6 | — | notStarted (—) |
+| `BO-969` | AI Aisle, VIP & Accessibility | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-970` | AI Numbering & Labeling | D | 0 | 0 | 6 | 5 | 0 | 0 | — | notStarted (—) |
+| `BO-971` | Validation & Correction | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-972` | AI Venue Designer & Publish | C | 0 | 38 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

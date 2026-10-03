@@ -272,7 +272,7 @@
   "name": "Price Bands & Categories",
   "module": "Access & Venue",
   "requiresModule": "seating",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "10",
@@ -287,7 +287,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "BO-1043"
+    "BO-1043",
+    "BO-103"
    ],
    "exitTo": [
     "BO-1043"

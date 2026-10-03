@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-278` | Resale Marketplace Command Center | B–D | 2 | 40 | 6 | 0 | 1 | 5 | — | notStarted (generated) |
-| `ADM-279` | Resale Eligibility Rule Configuration | B–D | 13 | 0 | 5 | 0 | 2 | 5 | — | notStarted (generated) |
-| `ADM-280` | Resale Policy & Marketplace Settings | B–D | 54 | 8 | 5 | 0 | 0 | 5 | — | notStarted (generated) |
-| `ADM-281` | Listing Creation & Seller Configuration | B–D | 17 | 20 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-282` | Resale Pricing & Price Guardrails | B–D | 48 | 8 | 5 | 0 | 1 | 5 | — | notStarted (generated) |
-| `ADM-283` | Resale Fees, Commission & Seller Proceeds | B–D | 8 | 0 | 5 | 0 | 2 | 5 | — | notStarted (generated) |
-| `ADM-284` | Listing Approval & Moderation | B–D | 0 | 40 | 6 | 0 | 1 | 3 | — | notStarted (generated) |
-| `ADM-285` | Resale Inventory & Availability Management | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
-| `ADM-286` | Listing Lifecycle, Expiry & Cancellation | B–D | 8 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-287` | AI Resale Configuration & Marketplace Recommendations | B–D | 8 | 20 | 5 | 1 | 0 | 5 | — | notStarted (generated) |
+| `ADM-278` | Resale Marketplace Command Center | C | 2 | 40 | 6 | 0 | 1 | 5 | — | notStarted (generated) |
+| `ADM-279` | Resale Eligibility Rule Configuration | C | 13 | 0 | 5 | 0 | 2 | 5 | — | notStarted (generated) |
+| `ADM-280` | Resale Policy & Marketplace Settings | C | 54 | 8 | 5 | 0 | 0 | 5 | — | notStarted (generated) |
+| `ADM-281` | Listing Creation & Seller Configuration | C | 17 | 20 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-282` | Resale Pricing & Price Guardrails | C | 48 | 8 | 5 | 0 | 1 | 5 | — | notStarted (generated) |
+| `ADM-283` | Resale Fees, Commission & Seller Proceeds | C | 8 | 0 | 5 | 0 | 2 | 5 | — | notStarted (generated) |
+| `ADM-284` | Listing Approval & Moderation | C | 0 | 40 | 6 | 0 | 1 | 3 | — | notStarted (generated) |
+| `ADM-285` | Resale Inventory & Availability Management | C | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `ADM-286` | Listing Lifecycle, Expiry & Cancellation | C | 8 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-287` | AI Resale Configuration & Marketplace Recommendations | C | 8 | 20 | 5 | 1 | 0 | 5 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

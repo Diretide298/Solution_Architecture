@@ -696,6 +696,20 @@
      "slot": "record",
      "components": [
       {
+       "kind": "detailPanel",
+       "label": "Show the cart the suggestions are for",
+       "operation": "getCart",
+       "bindsTo": "Cart",
+       "columns": [
+        "Cart.status",
+        "Cart.subtotal",
+        "Cart.discountTotal",
+        "Cart.taxTotal",
+        "Cart.total"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
+      {
        "kind": "cardList",
        "label": "Suggested for you",
        "bindsTo": "AiRecommendationItem",
@@ -753,6 +767,13 @@
     "purpose": "Report what happened to recommended items",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getCart",
+    "contract": "orders",
+    "purpose": "Show the cart the suggestions are for",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "entryState": {
@@ -769,7 +790,7 @@
    "provenance": "designed",
    "board": "wireframes/P02 Guest App.dc.html#gst-048",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
     "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-048.html, and #GST-048 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → Upsell / cross-sell (exact)."
@@ -1240,7 +1261,7 @@
    "provenance": "designed",
    "board": "wireframes/P02 Guest App.dc.html#gst-050",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
     "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-050.html, and #GST-050 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 3 → Resource booking – cabana; Rev 3 feedback → Cabana map (partial). What v2 did differently: Rev 3 books from a map, with a hold countdown and sold-out cabanas; the YAML is a list with addCartLine and no hold. YAML GST-070 also says cabanas are booked by staff (R073c), which contradicts both this screen and the prototype."
@@ -1435,7 +1456,7 @@
    "provenance": "designed",
    "board": "wireframes/P02 Guest App.dc.html#gst-056",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
     "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-056.html, and #GST-056 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → Bundle package (exact)."
@@ -1628,7 +1649,7 @@
    "provenance": "designed",
    "board": "wireframes/P02 Guest App.dc.html#gst-058",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
     "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-058.html, and #GST-058 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 3 → Resource availability (cabana); Rev 3 feedback → Cabana map (exact). What v2 did differently: The Rev 3 cabana map puts availability and booking on one screen."
@@ -2245,7 +2266,7 @@
    "provenance": "designed",
    "board": "wireframes/P02 Guest App.dc.html#gst-074",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
     "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-074.html, and #GST-074 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Rev 3 feedback → Cabana map (r3cabmap) (exact)."
@@ -2471,7 +2492,7 @@
    "provenance": "designed",
    "board": "wireframes/P02 Guest App.dc.html#gst-075",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
     "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-075.html, and #GST-075 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Rev 3 feedback → Meeting room by the hour (r3room) (exact)."

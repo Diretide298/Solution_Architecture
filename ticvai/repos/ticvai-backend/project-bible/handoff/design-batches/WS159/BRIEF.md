@@ -97,16 +97,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-893` | Experience Resource Requirement Builder | B–D | 11 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-894` | Staff-to-Experience Qualification Mapping | B–D | 19 | 9 | 6 | 3 | 1 | 0 | — | notStarted (—) |
-| `BO-895` | Resource Combination Builder | B–D | 28 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-896` | Ticket Demand & Resource Capacity Mapping | B–D | 3 | 17 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-897` | Customer Resource Selection Configuration | B–D | 1 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `BO-898` | Skill-Based & Smart Resource Selection | B–D | 4 | 22 | 6 | 22 | 1 | 0 | — | notStarted (—) |
-| `BO-899` | Customer / Cashier Resource Assignment Experience | B–D | 1 | 0 | 6 | 4 | 2 | 6 | — | notStarted (—) |
-| `BO-900` | Dynamic Resource Allocation Engine | B–D | 10 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `BO-901` | Priority, Scoring & Allocation Policy | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-902` | Automatic Replacement & Assignment Recovery | B–D | 8 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-893` | Experience Resource Requirement Builder | D | 11 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-894` | Staff-to-Experience Qualification Mapping | D | 19 | 9 | 6 | 3 | 1 | 0 | — | notStarted (—) |
+| `BO-895` | Resource Combination Builder | D | 28 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-896` | Ticket Demand & Resource Capacity Mapping | D | 3 | 17 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-897` | Customer Resource Selection Configuration | D | 1 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `BO-898` | Skill-Based & Smart Resource Selection | D | 4 | 22 | 6 | 22 | 1 | 0 | — | notStarted (—) |
+| `BO-899` | Customer / Cashier Resource Assignment Experience | D | 1 | 0 | 6 | 4 | 2 | 6 | — | notStarted (—) |
+| `BO-900` | Dynamic Resource Allocation Engine | D | 10 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `BO-901` | Priority, Scoring & Allocation Policy | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-902` | Automatic Replacement & Assignment Recovery | D | 8 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

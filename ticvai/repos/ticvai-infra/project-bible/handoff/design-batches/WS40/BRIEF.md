@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-108` | Revenue Optimization Command Center | B–D | 0 | 22 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
-| `ADM-109` | Pricing Simulation Studio | B–D | 0 | 12 | 6 | 4 | 1 | 0 | — | notStarted (generated) |
-| `ADM-110` | Scenario Modeling & What-If Analysis | B–D | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
-| `ADM-111` | A/B Pricing Experiment Studio | B–D | 0 | 8 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
-| `ADM-112` | Revenue & Demand Impact Forecasting | B–D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (generated) |
-| `ADM-113` | AI Recommendation Review & Decision Queue | B–D | 5 | 22 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
-| `ADM-114` | Automation Policy & Autonomous Pricing Orchestrator | B–D | 47 | 0 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
-| `ADM-115` | Live Dynamic Price Execution & Deployment Monitor | B–D | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-116` | Dynamic Pricing Performance & Optimization Analytics | B–D | 0 | 36 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
-| `ADM-117` | AI Learning, Model Performance & Optimization Feedback | B–D | 18 | 16 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-108` | Revenue Optimization Command Center | B | 0 | 22 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
+| `ADM-109` | Pricing Simulation Studio | B | 0 | 12 | 6 | 4 | 1 | 0 | — | notStarted (generated) |
+| `ADM-110` | Scenario Modeling & What-If Analysis | B | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
+| `ADM-111` | A/B Pricing Experiment Studio | B | 0 | 8 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
+| `ADM-112` | Revenue & Demand Impact Forecasting | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (generated) |
+| `ADM-113` | AI Recommendation Review & Decision Queue | B | 5 | 22 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `ADM-114` | Automation Policy & Autonomous Pricing Orchestrator | B | 47 | 0 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
+| `ADM-115` | Live Dynamic Price Execution & Deployment Monitor | B | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-116` | Dynamic Pricing Performance & Optimization Analytics | B | 0 | 36 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
+| `ADM-117` | AI Learning, Model Performance & Optimization Feedback | B | 18 | 16 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

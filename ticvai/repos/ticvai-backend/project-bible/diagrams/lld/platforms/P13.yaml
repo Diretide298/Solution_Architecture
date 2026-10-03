@@ -23,7 +23,7 @@ modulesUsed:
   screens: 103
 servicesCalled:
 - service: WhiteLabelService
-  operationCalls: 106
+  operationCalls: 107
 - service: MarketingService
   operationCalls: 71
 - service: VenueOpsService
@@ -78,6 +78,8 @@ screens:
   - CMS-016
   - CMS-019
   - CMS-021
+  - CMS-025
+  - CMS-026
   - CMS-031
   - CMS-041
   - CMS-051
@@ -309,6 +311,7 @@ screens:
   - buildDeepLink
   - getDeepLinkScheme
   - getNavigation
+  - getTenantConfig
   - setFooter
   - setHeader
   - setNavigation

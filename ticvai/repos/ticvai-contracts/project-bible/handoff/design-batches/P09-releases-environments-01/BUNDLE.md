@@ -1603,6 +1603,8 @@ Verifies the code and returns the step-up token the apply needs.
 |---|---|---|---|---|---|---|---|
 | Code `code` | text field | required | — | — | — | — | `verifyMfaChallenge` body |
 
+Errors to draw in the form: 410 The challenge has expired or was voided (by a fifth wrong code, or a newer challenge for the same purpose).; 422 A wrong code, attempts one to four (CHG-R1S-025; the r1 gate found only the fifth failure specified).
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -1660,7 +1662,7 @@ Verifies the code and returns the step-up token the apply needs.
 | Empty, no results (`?state=emptyNoResults`) | Never shown: nothing on this screen filters. |
 | Permission denied (`?state=emptyNoAccess`) | You don't have access to promote configuration — it needs TICVAI's release permissions. Named in words, never an empty table. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 The diff is stale (`diff-stale`), or not approved (`diff-not-approved`).; 409 The package was exported for a different tenant than the target (`package-tenant-mismatch`). |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The diff is stale (`diff-stale`), or not approved (`diff-not-approved`).; 409 The package was exported for a different tenant than the target (`package-tenant-mismatch`).; 422 A wrong code, attempts one to four (CHG-R1S-025; the r1 gate found only the fifth failure specified). |
 
 #### Permissions
 
@@ -1697,7 +1699,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (11), with its required mark, default, format and its error state (404, 409).
+- [ ] Every input above is drawn (11), with its required mark, default, format and its error state (404, 409, 410, 422).
 - [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-700?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: What applying changes, Export package, Compare with target, Apply package.

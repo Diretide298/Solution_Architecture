@@ -99,16 +99,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-049` | Stock Levels | B–D | 18 | 23 | 6 | 34 | 2 | 4 | — | notStarted (generated) |
-| `BO-050` | Stock Position & Valuation | B–D | 0 | 12 | 5 | 12 | 2 | 4 | — | notStarted (generated) |
-| `BO-051` | Purchase Orders | B–D | 22 | 14 | 6 | 12 | 1 | 4 | — | notStarted (generated) |
-| `BO-052` | Goods Receipt | B–D | 19 | 19 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
-| `BO-078` | Requisitions | B–D | 23 | 26 | 6 | 16 | 3 | 0 | — | notStarted (generated) |
-| `BO-079` | Stock Count | B–D | 28 | 18 | 6 | 8 | 0 | 4 | — | notStarted (generated) |
-| `BO-080` | Stock Transfers | B–D | 18 | 12 | 6 | 8 | 2 | 4 | — | notStarted (generated) |
+| `BO-049` | Stock Levels | D | 18 | 23 | 6 | 34 | 2 | 4 | — | notStarted (generated) |
+| `BO-050` | Stock Position & Valuation | D | 0 | 12 | 5 | 12 | 2 | 4 | — | notStarted (generated) |
+| `BO-051` | Purchase Orders | D | 22 | 14 | 6 | 12 | 1 | 4 | — | notStarted (generated) |
+| `BO-052` | Goods Receipt | D | 19 | 19 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
+| `BO-078` | Requisitions | D | 23 | 26 | 6 | 16 | 3 | 0 | — | notStarted (generated) |
+| `BO-079` | Stock Count | D | 28 | 18 | 6 | 8 | 0 | 4 | — | notStarted (generated) |
+| `BO-080` | Stock Transfers | D | 18 | 12 | 6 | 8 | 2 | 4 | — | notStarted (generated) |
 | `BO-081` | Inventory Items | A | 33 | 18 | 6 | 33 | 2 | 4 | — | notStarted (generated) |
-| `BO-082` | Stock Movements | B–D | 14 | 16 | 6 | 18 | 0 | 4 | — | notStarted (generated) |
-| `BO-083` | Suppliers | B–D | 36 | 13 | 6 | 7 | 1 | 4 | — | notStarted (generated) |
+| `BO-082` | Stock Movements | D | 14 | 16 | 6 | 18 | 0 | 4 | — | notStarted (generated) |
+| `BO-083` | Suppliers | D | 36 | 13 | 6 | 7 | 1 | 4 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -128,7 +128,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Stock & Supply · wave 2 · needs the `inventory` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-049 |
 | Who uses it | venue staff holding `LEDGER_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 read, 1 configure); in the flows as storekeeper |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listStockLocations` reads the population and `getStockPositions` reads one of them — list, select, act |
@@ -286,8 +286,8 @@ Errors to draw in the form: 400 Validation failed, including an `adjustmentIn`, 
 - → `BO-082` Stock Movements: *The four orders are sourced from another store instead*; calls `createStockMovement`
 - → `BO-079` Stock Count: *Stock Count*
 - → `BO-080` Stock Transfers: *Stock Transfers*; carries `transferId`
-- → `EMP-065` Receiving: *The delivery arrives*; carries `transferId`
 - → `BO-081` Inventory Items: *Inventory Items*; carries `itemId`
+- → `EMP-065` Receiving: *The delivery arrives*; carries `transferId`
 
 #### States
 
@@ -422,7 +422,7 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 - [ ] Every output is drawn (23 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-049?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create stock transfer, Create stock movement.
-- [ ] Every transition is wired: `BO-082`, `BO-079`, `BO-080`, `EMP-065`, `BO-081`.
+- [ ] Every transition is wired: `BO-082`, `BO-079`, `BO-080`, `BO-081`, `EMP-065`.
 - [ ] Every gated control is gated: `LEDGER_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 3 edge case(s) from the process notes are drawn.
@@ -440,7 +440,7 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Stock & Supply · wave 2 · needs the `inventory` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-050 |
 | Who uses it | venue staff holding `LEDGER_VIEW`, `PRODUCT_VIEW` (2 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | statusTracker (compact density): `getStockPositions` reads one record and nothing reads a population — the screen is about that one thing |
@@ -634,7 +634,7 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Stock & Supply · wave 2 · needs the `inventory` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-051 |
 | Who uses it | venue staff holding `PROCUREMENT_MANAGE`, `PROCUREMENT_VIEW` (1 configure, 1 read); in the flows as storekeeper |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listPurchaseOrders` reads the population and `getPurchaseOrder` reads one of them — list, select, act |
@@ -926,7 +926,7 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Stock & Supply · wave 2 · needs the `inventory` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-052 |
 | Who uses it | venue staff holding `PROCUREMENT_RECEIVE`, `PROCUREMENT_VIEW` (1 operate, 1 read); in the flows as technician |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listPurchaseOrders` reads the population and `getPurchaseOrder` reads one of them — list, select, act |
@@ -1201,7 +1201,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Stock & Supply · wave 1 · needs the `inventory` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-078 |
 | Who uses it | venue staff holding `APPROVAL_ACT`, `PROCUREMENT_REQUEST`, `PROCUREMENT_VIEW`, `PRODUCT_VIEW` (2 operate, 2 read); in the flows as storekeeper, technician |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | approvalInbox (compact density): `approveRequisition` decides items that `listRequisitions` queues — every row is waiting for a person, so the empty state is success |
@@ -1527,7 +1527,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Stock & Supply · wave 1 · needs the `inventory` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-079 |
 | Who uses it | venue staff holding `LEDGER_APPROVE`, `LEDGER_POST`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 operate, 1 configure, 1 read); in the flows as storekeeper |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listStockCounts` reads the population and `getCountVariance` reads one of them — list, select, act |
@@ -1866,7 +1866,7 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Stock & Supply · wave 2 · needs the `inventory` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-080 |
 | Who uses it | venue staff holding `LEDGER_APPROVE`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 operate, 1 configure, 1 read); in the flows as storekeeper |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listStockTransfers` reads the population and `getStockTransfer` reads one of them — list, select, act |
@@ -2460,7 +2460,7 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Stock & Supply · wave 1 · needs the `inventory` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-082 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listStockMovements` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -2704,7 +2704,7 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Stock & Supply · wave 2 · needs the `inventory` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-083 |
 | Who uses it | venue staff holding `PROCUREMENT_MANAGE`, `PROCUREMENT_VIEW`, `REPORT_VIEW_VENUE` (1 configure, 1 read, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listSuppliers` reads the population and `getSupplierPerformance` reads one of them — list, select, act |

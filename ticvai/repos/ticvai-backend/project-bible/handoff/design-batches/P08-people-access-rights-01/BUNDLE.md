@@ -123,13 +123,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-053` | Staff Directory | B | 28 | 21 | 6 | 3 | 0 | 0 | — | notStarted (generated) |
 | `BO-054` | Role Assignment | A | 16 | 16 | 6 | 6 | 1 | 5 | — | notStarted (generated) |
-| `BO-055` | Rota & Scheduling | B–D | 32 | 19 | 6 | 21 | 0 | 0 | — | notStarted (generated) |
-| `BO-056` | Time & Attendance | B–D | 5 | 19 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
-| `BO-057` | Training & Certification | B–D | 2 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-066` | Notification Settings | B–D | 12 | 23 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
-| `BO-084` | Approval Inbox | B–D | 11 | 11 | 6 | 22 | 0 | 3 | — | notStarted (generated) |
-| `BO-085` | Approval Request | B–D | 8 | 8 | 6 | 24 | 0 | 3 | — | notStarted (generated) |
-| `BO-086` | Approval Matrix | B–D | 24 | 10 | 6 | 49 | 0 | 3 | — | notStarted (generated) |
+| `BO-055` | Rota & Scheduling | A | 32 | 19 | 6 | 21 | 0 | 0 | — | notStarted (generated) |
+| `BO-056` | Time & Attendance | D | 5 | 19 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
+| `BO-057` | Training & Certification | B | 2 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-066` | Notification Settings | D | 12 | 23 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
+| `BO-084` | Approval Inbox | A | 11 | 11 | 6 | 22 | 0 | 3 | — | notStarted (generated) |
+| `BO-085` | Approval Request | A | 8 | 8 | 6 | 24 | 0 | 3 | — | notStarted (generated) |
+| `BO-086` | Approval Matrix | B | 24 | 10 | 6 | 49 | 0 | 3 | — | notStarted (generated) |
 | `BO-087` | Approval Delegations | B | 8 | 12 | 6 | 2 | 0 | 3 | — | notStarted (generated) |
 
 ---
@@ -146,7 +146,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | People & Access Rights · wave 1 · needs the `core` module |
-| Block | Block B · task APP-SETUP-BO-053 |
+| Block | Block B · task VM-BO-053 |
 | Who uses it | venue staff holding `PERMISSION_VIEW`, `SESSION_FORCE_LOGOUT`, `USER_MANAGE`, `WORKFORCE_MANAGE`, `WORKFORCE_VIEW` (2 read, 1 operate, 2 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listPrincipals` reads the population and `getPrincipal` reads one of them — list, select, act |
@@ -288,11 +288,11 @@ Errors to draw in the form: 403 Step-up token missing, expired or issued for a d
 
 | Shows | Format | Notes |
 |---|---|---|
-| Principal name | text | — |
-| Role name | text | — |
-| Workstation name | text | — |
+| Principal name | text | Read from `identity.principal` with the row. |
+| Role name | text | Read from `identity.role` with the row. |
+| Workstation name | text | Read from the workstation with the row. |
 | Device info | text | — |
-| Has open shift | yes / no (icon or chip) | Revoking this session leaves cash unreconciled. |
+| Has open shift | yes / no (icon or chip) | Revoking this session leaves cash unreconciled. Computed on read from the shift the principal holds open at the workstation … |
 | Started at | 1 Oct 2026, 14:30 | — |
 | Last seen at | 1 Oct 2026, 14:30 | — |
 
@@ -431,7 +431,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (28), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every input above is drawn (28), with its required mark, default, format and its error state (400, 403, 404, 409, 410, 422).
 - [ ] Every output is drawn (21 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-053?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: End this session, Create principal, Save principal, Reset principal credential, Sign everyone out, Email me a code instead.
@@ -693,7 +693,7 @@ Also apply: 2 for P08 · People & Access Rights, 24 for all of P08, 29 for every
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | People & Access Rights · wave 1 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block A · task APP-SETUP-BO-055 |
 | Who uses it | venue staff holding `SCOPE_VIEW`, `WORKFORCE_MANAGE`, `WORKFORCE_VIEW` (2 read, 1 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listRotaAssignments` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -946,7 +946,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | People & Access Rights · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-056 |
 | Who uses it | venue staff holding `WORKFORCE_MANAGE`, `WORKFORCE_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listAttendance` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1133,7 +1133,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | People & Access Rights · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-057 |
 | Who uses it | venue staff holding `USER_MANAGE`, `WORKFORCE_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listPrincipals` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1276,7 +1276,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | People & Access Rights · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-066 |
 | Who uses it | venue staff holding `ANNOUNCEMENT_PUBLISH`, `WORKFORCE_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listAnnouncements` reads the population and `getAnnouncementReach` reads one of them — list, select, act |
@@ -1476,7 +1476,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | People & Access Rights · wave 1 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block A · task VM-BO-084 |
 | Who uses it | venue staff holding `APPROVAL_DECIDE`, `APPROVAL_REQUEST`, `APPROVAL_VIEW` (2 operate, 1 read); in the flows as cashier, technician, venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | approvalInbox (compact density): `decideApprovalRequest` decides items that `listApprovalRequests` queues — every row is waiting for a person, so the empty state is success |
@@ -1716,7 +1716,7 @@ Also apply: 2 for P08 · People & Access Rights, 24 for all of P08, 29 for every
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | People & Access Rights · wave 1 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block A · task VM-BO-085 |
 | Who uses it | venue staff holding `APPROVAL_DECIDE`, `APPROVAL_REQUEST`, `APPROVAL_VIEW` (2 operate, 1 read); in the flows as cashier |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | statusTracker (compact density): One request opened by `requestId`: its subject, its trail and the decision. The queue is BO-084 (design-note correction, 2 October 2026). |
@@ -1941,7 +1941,7 @@ Also apply: 2 for P08 · People & Access Rights, 24 for all of P08, 29 for every
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | People & Access Rights · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-086 |
 | Who uses it | venue staff holding `APPROVAL_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listApprovalMatrices` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -2152,7 +2152,7 @@ Also apply: 2 for P08 · People & Access Rights, 24 for all of P08, 29 for every
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | People & Access Rights · wave 2 · needs the `core` module |
-| Block | Block B · task APP-SETUP-BO-087 |
+| Block | Block B · task VM-BO-087 |
 | Who uses it | venue staff holding `APPROVAL_DECIDE`, `APPROVAL_VIEW` (1 operate, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listApprovalDelegations` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -2486,7 +2486,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"ActiveSession": {"x-ticvai-persistence":"none — Redis session registry","type":"object","required":["sessionId","principalId","status","startedAt","lastSeenAt"],"properties":{"status":{"allOf":[{"$ref":"#/components/schemas/SessionStatus"}],"description":"**A registry that only holds live sessions cannot answer why one ended.** Kept on the record so a supervisor asking *what happened to till 4* gets `terminated` or `expired` rather than an absence.\n"},"sessionId":{"type":"string"},"principalId":{"type":"string","format":"uuid"},"principalName":{"type":"string"},"roleId":{"type":"string","format":"uuid","nullable":true},"roleName":{"type":"string","nullable":true},"workstationId":{"type":"string","format":"uuid","nullable":true},"workstationName":{"type":"string","nullable":true},"venueId":{"type":"string","format":"uuid","nullable":true},"ipAddress":{"type":"string","nullable":true},"deviceInfo":{"type":"string","nullable":true},"hasOpenShift":{"type":"boolean","description":"Revoking this session leaves cash unreconciled."},"mfaSatisfied":{"type":"boolean"},"startedAt":{"type":"string","format":"date-time"},"lastSeenAt":{"type":"string","format":"date-time"}}},
+"ActiveSession": {"x-ticvai-persistence":"identity.session","description":"**The session record, in `identity.session`** (3 October 2026, CHG-R1S-008; the HLD/LLD cross-check and the r1 gate). Until then it was \"none — Redis session registry\", and 11 operations wrote a session no SQL created: nothing defined its columns, so `listActiveSessions` could not page, filter by workstation or venue, or run under row-level security. The row is the record of record, tenant-scoped and under RLS like every identity table; Redis stays the token cache in front of it (ADR-0004: a session is a token with a validity window, and the cache answers that check). The names and `hasOpenShift` are read with it, not stored.","type":"object","required":["sessionId","principalId","status","startedAt","lastSeenAt"],"properties":{"status":{"allOf":[{"$ref":"#/components/schemas/SessionStatus"}],"description":"**A registry that only holds live sessions cannot answer why one ended.** Kept on the record so a supervisor asking *what happened to till 4* gets `terminated` or `expired` rather than an absence.\n"},"sessionId":{"type":"string"},"principalId":{"type":"string","format":"uuid"},"principalName":{"type":"string","x-ticvai-persisted":false,"description":"Read from `identity.principal` with the row."},"roleId":{"type":"string","format":"uuid","nullable":true},"roleName":{"type":"string","nullable":true,"x-ticvai-persisted":false,"description":"Read from `identity.role` with the row."},"workstationId":{"type":"string","format":"uuid","nullable":true},"workstationName":{"type":"string","nullable":true,"x-ticvai-persisted":false,"description":"Read from the workstation with the row."},"venueId":{"type":"string","format":"uuid","nullable":true},"ipAddress":{"type":"string","nullable":true},"deviceInfo":{"type":"string","nullable":true},"hasOpenShift":{"type":"boolean","x-ticvai-persisted":false,"x-ticvai-derived":"onRead","description":"Revoking this session leaves cash unreconciled. **Computed on read** from the shift the principal holds open at the workstation (`orders.pos_shift`), never stored here."},"mfaSatisfied":{"type":"boolean"},"startedAt":{"type":"string","format":"date-time"},"lastSeenAt":{"type":"string","format":"date-time"}}},
 "AiApprovalRequestScore": {"type":"object","x-ticvai-persistence":"ai.approval_request_score","description":"**Context for an approval reviewer** (11.1.73..75): risk, priority and a suggested escalation for one pending request, the latest per request. **There is no approve or reject field, by design** (minutes of 8 September: AI in approvals never recommends or influences approve or reject).","required":["approvalRequestId","riskScore","riskBand","priorityScore","escalationSuggestion"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"approvalRequestId":{"type":"string","format":"uuid","x-ticvai-references":"approvals.request"},"trigger":{"type":"string","enum":["submitted","resubmitted","slaTick","escalated"]},"riskScore":{"type":"integer","minimum":0,"maximum":100},"riskBand":{"type":"string","enum":["low","medium","high","critical"],"description":"Design 5.6: a risk score and band, never a probability."},"priorityScore":{"type":"integer","minimum":0,"maximum":100,"description":"For ordering work in an inbox; higher first."},"escalationSuggestion":{"type":"object","required":["action"],"properties":{"action":{"type":"string","enum":["escalate","addBackupApprover","none"]},"reason":{"type":"string","nullable":true}},"description":"A suggestion for an SLA problem, carried out if at all by a person or the tenant's SLA policy."},"signals":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string","description":"e.g. `amountAboveRequesterNorm`, `requesterEntityRisk`, `outOfHours`, `irreversibleAction`, `slaDueSoon`, `stepBreachRate`, `approverUnavailable`."},"contribution":{"type":"number"},"detail":{"type":"string","nullable":true}}}},"basis":{"$ref":"#/components/schemas/SuggestionBasis"},"decisionRecordId":{"type":"string","format":"uuid","nullable":true},"scoredAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "Announcement": {"type":"object","x-ticvai-persistence":"workforce.announcement","required":["title","body","kind","publishedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"title":{"type":"string","maxLength":140},"body":{"type":"string","maxLength":4000},"kind":{"$ref":"#/components/schemas/AnnouncementKind"},"venueIds":{"type":"array","items":{"type":"string","format":"uuid"}},"departmentIds":{"type":"array","items":{"type":"string","format":"uuid"}},"roleIds":{"type":"array","items":{"type":"string","format":"uuid"}},"requiresAcknowledgement":{"type":"boolean"},"deliveryChannels":{"type":"array","description":"How it reaches people (29 September, build, 18.1.5). `inApp` always; `push` to the targeted people's registered staff phones (tenancy `RegisteredDevice`, kind `mobileHandset`). `emergency` is sent by both whatever is set here.\n","items":{"type":"string","enum":["inApp","push"]},"default":["inApp","push"]},"expiresAt":{"type":"string","format":"date-time","nullable":true},"publishedByPrincipalId":{"type":"string","format":"uuid","readOnly":true},"publishedAt":{"type":"string","format":"date-time"},"locale":{"type":"string","nullable":true}}},
 "AnnouncementKind": {"type":"string","description":"`emergency` is not a louder `operational`. It overrides the home screen, bypasses quiet hours, requires acknowledgement, and carries a separate permission.\n","enum":["operational","safety","emergency","hr","celebration"]},

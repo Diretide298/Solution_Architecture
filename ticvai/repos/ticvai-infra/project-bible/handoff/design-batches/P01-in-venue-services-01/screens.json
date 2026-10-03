@@ -44,6 +44,19 @@
      "components": [
       {
        "kind": "cardList",
+       "label": "Show the guest's own reservations, the one being changed among them",
+       "operation": "listMyTableReservations",
+       "bindsTo": "MyTableBooking",
+       "columns": [
+        "MyTableBooking.kind",
+        "MyTableBooking.outletName",
+        "MyTableBooking.reservation",
+        "MyTableBooking.waitlistEntry"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
+      {
+       "kind": "cardList",
        "label": "Where you can eat now",
        "bindsTo": "DiningOutlet",
        "columns": [
@@ -260,6 +273,13 @@
     "contract": "fnb",
     "purpose": "Change or cancel the guest's own table booking (web and app parity with GST-070)",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listMyTableReservations",
+    "contract": "fnb",
+    "purpose": "Show the guest's own reservations, the one being changed among them",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "entryState": {
@@ -489,8 +509,8 @@
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-037",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (pointer moved to the 30 September build, CHG-R1S-015)",
     "verified": "2026-09-28",
     "match": "exact",
     "view": "At the venue → Order food → tap a dish; Takeaway/Delivery → 'Add' opens the modifier side panel",
@@ -669,8 +689,8 @@
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-038",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (pointer moved to the 30 September build, CHG-R1S-015)",
     "verified": "2026-09-28",
     "match": "exact",
     "view": "At the venue → Order food → 'Send to the kitchen'",
@@ -1170,6 +1190,23 @@
      "components": [
       {
        "kind": "cardList",
+       "label": "Load the parking entitlement being changed",
+       "operation": "getParkingEntitlement",
+       "bindsTo": "ParkingEntitlement",
+       "columns": [
+        "ParkingEntitlement.plateNumber",
+        "ParkingEntitlement.plateCountry",
+        "ParkingEntitlement.mediaCode",
+        "ParkingEntitlement.status",
+        "ParkingEntitlement.pushedAt",
+        "ParkingEntitlement.pushFailureReason",
+        "ParkingEntitlement.validFrom",
+        "ParkingEntitlement.validTo"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
+      {
+       "kind": "cardList",
        "label": "Car parks",
        "bindsTo": "ParkingFacility",
        "columns": [
@@ -1258,6 +1295,13 @@
     "invalidates": [
      "listParkingFacilities"
     ]
+   },
+   {
+    "operationId": "getParkingEntitlement",
+    "contract": "access",
+    "purpose": "Load the parking entitlement being changed",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "entryState": {

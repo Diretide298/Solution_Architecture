@@ -309,6 +309,20 @@
      "slot": "record",
      "components": [
       {
+       "kind": "cardList",
+       "label": "Load the departure the trip was opened on",
+       "operation": "getTransportDeparture",
+       "bindsTo": "DepartureOffer",
+       "columns": [
+        "DepartureOffer.routeCode",
+        "DepartureOffer.departsAt",
+        "DepartureOffer.arrivesAt",
+        "DepartureOffer.durationMinutes",
+        "DepartureOffer.partyTotal"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
+      {
        "kind": "timeline",
        "label": "Stops",
        "bindsTo": "RouteMap.stops",
@@ -410,6 +424,13 @@
     "invalidates": [
      "listMyFavouriteRoutes"
     ]
+   },
+   {
+    "operationId": "getTransportDeparture",
+    "contract": "transport",
+    "purpose": "Load the departure the trip was opened on",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "entryState": {

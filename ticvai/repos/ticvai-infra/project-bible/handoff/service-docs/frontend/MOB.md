@@ -50,13 +50,13 @@
 | [GST-024](#gst-024-f-b-browse-order) | F&B – Browse & Order | In-venue Services | 1 | 8 |
 | [GST-025](#gst-025-f-b-order-tracking) | F&B – Order Tracking | In-venue Services | 1 | 2 |
 | [GST-026](#gst-026-retail-merchandise) | Retail / Merchandise | Retail | 1 | 4 |
-| [GST-027](#gst-027-parking-reserve-pay) | Parking – Reserve & Pay | In-venue Services | 1 | 3 |
+| [GST-027](#gst-027-parking-reserve-pay) | Parking – Reserve & Pay | In-venue Services | 1 | 4 |
 | [GST-028](#gst-028-parking-reservation-confirmed) | Parking – Reservation Confirmed | In-venue Services | 1 | 2 |
 | [GST-029](#gst-029-venue-info-services) | Venue Info & Services | In-venue Services | 1 | 3 |
 | [GST-030](#gst-030-in-venue-notifications) | In-Venue Notifications | Engagement & Support | 1 | 2 |
-| [GST-031](#gst-031-ai-concierge-home) | AI Concierge – Home | Engagement & Support | 1 | 8 |
-| [GST-032](#gst-032-ai-concierge-chat) | AI Concierge – Chat | Engagement & Support | 1 | 9 |
-| [GST-033](#gst-033-ai-concierge-contextual-help) | AI Concierge – Contextual Help | Engagement & Support | 1 | 4 |
+| [GST-031](#gst-031-ai-concierge-home) | AI Concierge – Home | Engagement & Support | 1 | 9 |
+| [GST-032](#gst-032-ai-concierge-chat) | AI Concierge – Chat | Engagement & Support | 1 | 10 |
+| [GST-033](#gst-033-ai-concierge-contextual-help) | AI Concierge – Contextual Help | Engagement & Support | 1 | 5 |
 | [GST-034](#gst-034-lost-found) | Lost & Found | Support | 1 | 4 |
 | [GST-035](#gst-035-feedback-ratings) | Feedback & Ratings | Engagement & Support | 1 | 5 |
 | [GST-036](#gst-036-loyalty-rewards) | Loyalty & Rewards | Membership, Loyalty & Value | 1 | 11 |
@@ -68,10 +68,10 @@
 | [GST-042](#gst-042-simple-registration-otp) | Simple Registration & OTP | Account & Self-Service | 1 | 13 |
 | [GST-043](#gst-043-arabic-rtl-experience) | Arabic / RTL Experience | System States | 1 | 1 |
 | [GST-044](#gst-044-multi-currency-pricing) | Multi-Currency & Pricing | Ticketing | 1 | 2 |
-| [GST-045](#gst-045-ticket-delivery-sharing) | Ticket Delivery & Sharing | Account & Self-Service | 1 | 1 |
+| [GST-045](#gst-045-ticket-delivery-sharing) | Ticket Delivery & Sharing | Account & Self-Service | 1 | 2 |
 | [GST-046](#gst-046-branded-queue-waiting-room) | Branded Queue / Waiting Room | High-Demand Access | 1 | 2 |
 | [GST-047](#gst-047-maintenance-upgrade-page) | Maintenance / Upgrade Page | System States | 1 | 2 |
-| [GST-048](#gst-048-upsell-cross-sell) | Upsell / Cross-Sell | Booking & Selection | 1 | 3 |
+| [GST-048](#gst-048-upsell-cross-sell) | Upsell / Cross-Sell | Booking & Selection | 1 | 4 |
 | [GST-049](#gst-049-interactive-seat-selection) | Interactive Seat Selection | Booking & Selection | 1 | 5 |
 | [GST-050](#gst-050-resource-booking-cabana) | Resource Booking – Cabana | Booking & Selection | 1 | 3 |
 | [GST-051](#gst-051-plan) | Plan | Engagement & Support | 1 | 4 |
@@ -88,7 +88,7 @@
 | [GST-063](#gst-063-explore-search-results) | Explore – Search Results | Discovery | 1 | 1 |
 | [GST-065](#gst-065-newsletter-preferences) | Newsletter & Preferences | Marketing | 1 | 5 |
 | [GST-066](#gst-066-privacy-my-data) | Privacy & My Data | Account & Self-Service | 1 | 9 |
-| [GST-067](#gst-067-refunds-resale) | Refunds & Resale | Account & Self-Service | 1 | 2 |
+| [GST-067](#gst-067-refunds-resale) | Refunds & Resale | Account & Self-Service | 1 | 3 |
 | [GST-068](#gst-068-help-my-cases) | Help & My Cases | Engagement & Support | 1 | 4 |
 | [GST-069](#gst-069-face-pass) | Face Pass | Account & Self-Service | 1 | 4 |
 | [GST-070](#gst-070-reserve-a-table) | Reserve a Table | In-venue Services | 1 | 7 |
@@ -98,7 +98,7 @@
 | [GST-074](#gst-074-map-booking-cabanas-spots) | Map Booking — Cabanas & Spots | Booking & Selection | 1 | 8 |
 | [GST-075](#gst-075-book-a-space-by-the-hour) | Book a Space by the Hour | Booking & Selection | 1 | 4 |
 | [GST-076](#gst-076-intercity-trip-route-schedule) | Intercity Trip — Route & Schedule | Transport | 1 | 4 |
-| [GST-077](#gst-077-intercity-trip-route-passengers) | Intercity Trip — Route & Passengers | Transport | 1 | 6 |
+| [GST-077](#gst-077-intercity-trip-route-passengers) | Intercity Trip — Route & Passengers | Transport | 1 | 7 |
 | [GST-078](#gst-078-intercity-trip-multi-trip-passes) | Intercity Trip — Multi-trip Passes | Transport | 1 | 3 |
 | [GST-079](#gst-079-intercity-trip-favourite-routes) | Intercity Trip — Favourite Routes | Transport | 1 | 2 |
 
@@ -1466,6 +1466,7 @@
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Put the car park's parking product in the cart; refused `soldOutForDay` when the car park is at capacity (decided 28 September, audit R166) | `None` |
 | `updateParkingEntitlement` | [AccessService](../backend/AccessService.md#updateparkingentitlement) | onAction | Change the plate, or revoke | `None` |
 | `listParkingFacilities` | [AccessService](../backend/AccessService.md#listparkingfacilities) | onLoad | Car parks at a venue, and how each integrates | `PARKING_CONFIGURE` |
+| `getParkingEntitlement` | [AccessService](../backend/AccessService.md#getparkingentitlement) | onLoad | Load the parking entitlement being changed | `None` |
 
 **States**
 
@@ -1646,10 +1647,11 @@
 | `sendAiMessage` | [AiService](../backend/AiService.md#sendaimessage) | onAction | Ask | `AI_USE` |
 | `createAiConversation` | [AiService](../backend/AiService.md#createaiconversation) | background | Opened silently on the first message; the scope comes from the session, never a module the guest picks | `AI_USE` |
 | `handoverToAgent` | [MarketingService](../backend/MarketingService.md#handovertoagent) | onAction | One tap; reason guestRequested and Sahli's summary are set for the guest | `None` |
-| `requestSuggestion` | [AiService](../backend/AiService.md#requestsuggestion) | background | From the conversation only, kinds waitTime and upsell (prepPlan is the kitchen's production plan; an itinerary is asked on the Plan tab); never a kind picker | `AI_USE` |
+| `requestSuggestion` | [AiService](../backend/AiService.md#requestsuggestion) | background | From the conversation only, kinds waitTime and upsell (prepPlan is the kitchen's production plan; an itinerary is asked on the Plan tab); never a kind picker. Later (CHG-RONEP-010): the wait-time and upsell suggestions of the day-one suggestions (AI-ENGINE-SUGGESTIONS) ships in Block A2 (Chinmay, 3 October); until then the control shows 'Later'. | `AI_USE` |
 | `listAiConversations` | [AiService](../backend/AiService.md#listaiconversations) | onLoad | The guest's own earlier conversations | `AI_USE` |
 | `recordAnswerFeedback` | [AiService](../backend/AiService.md#recordanswerfeedback) | onAction | Say whether an answer helped | `AI_USE` |
 | `sendGuestConversationMessage` | [MarketingService](../backend/MarketingService.md#sendguestconversationmessage) | onAction | After a handover, the guest writes to the agent, as the guest: sendConversationMessage needs CASE_MANAGE (decided by Chinmay, 3 October 2026 (CHG-SPF-013)) | `None` |
+| `getGuestConversation` | [MarketingService](../backend/MarketingService.md#getguestconversation) | onInterval | The agent's replies, the queue position and the wait after a handover, polled every 5 s while the chat is on screen and every 30 s while hidden, with afterMessageId (decided by Chinmay, 3 October 2026, r1 additions; CHG-RONEC-003) | `None` |
 
 **States**
 
@@ -1701,6 +1703,7 @@
 | `checkoutCart` | [OrderService](../backend/OrderService.md#checkoutcart) | onAction | Turn the cart into an order | `None` |
 | `sendAiMessage` | [AiService](../backend/AiService.md#sendaimessage) | onAction | Ask | `AI_USE` |
 | `sendGuestConversationMessage` | [MarketingService](../backend/MarketingService.md#sendguestconversationmessage) | onAction | After a handover, the guest writes to the agent, as the guest: sendConversationMessage needs CASE_MANAGE (decided by Chinmay, 3 October 2026 (CHG-SPF-013)) | `None` |
+| `getGuestConversation` | [MarketingService](../backend/MarketingService.md#getguestconversation) | onInterval | The agent's replies, the queue position and the wait after a handover, polled every 5 s while the chat is on screen and every 30 s while hidden, with afterMessageId (decided by Chinmay, 3 October 2026, r1 additions; CHG-RONEC-003) | `None` |
 | `handoverToAgent` | [MarketingService](../backend/MarketingService.md#handovertoagent) | onAction | Pass an assistant conversation to a person | `None` |
 | `recordAnswerFeedback` | [AiService](../backend/AiService.md#recordanswerfeedback) | onAction | Say whether an answer helped | `AI_USE` |
 
@@ -1750,6 +1753,7 @@
 | `createAiConversation` | [AiService](../backend/AiService.md#createaiconversation) | background | Opened silently on the first question; the scope comes from the session | `AI_USE` |
 | `handoverToAgent` | [MarketingService](../backend/MarketingService.md#handovertoagent) | onAction | One tap; reason guestRequested | `None` |
 | `recordAnswerFeedback` | [AiService](../backend/AiService.md#recordanswerfeedback) | onAction | Say whether an answer helped | `AI_USE` |
+| `listAiConversations` | [AiService](../backend/AiService.md#listaiconversations) | onLoad | Show the guest's earlier conversations with the assistant | `AI_USE` |
 
 **States**
 
@@ -2314,6 +2318,7 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `transferOrderTickets` | [OrderService](../backend/OrderService.md#transferordertickets) | onAction | Transfer tickets to another guest | `None` |
+| `listTicketTransfers` | [OrderService](../backend/OrderService.md#listtickettransfers) | onLoad | Show the tickets the guest has sent and received | `None` |
 
 **States**
 
@@ -2439,6 +2444,7 @@
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add something | `None` |
 | `decideRecommendations` | [AiService](../backend/AiService.md#deciderecommendations) | onLoad | Fill the cart slot, maxItems 3 (DI-959) | `AI_USE` |
 | `recordRecommendationEvents` | [AiService](../backend/AiService.md#recordrecommendationevents) | onAction | Report what happened to recommended items | `AI_USE` |
+| `getCart` | [OrderService](../backend/OrderService.md#getcart) | onLoad | Show the cart the suggestions are for | `None` |
 
 **States**
 
@@ -2731,7 +2737,7 @@
 | `getVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#getvisitplan) | onLoad | The plan: days, timed items and add-on suggestions, at its current version Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `None` |
 | `updateVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#updatevisitplan) | onAction | Swap, remove, add or undo: each change is a new version, so undo goes back one | `None` |
 | `createAiConversation` | [AiService](../backend/AiService.md#createaiconversation) | onAction | Opened on the first message to the planner, never on opening the Plan tab (a conversation is billed); the plan loads without it | `AI_USE` |
-| `requestSuggestion` | [AiService](../backend/AiService.md#requestsuggestion) | onAction | A suggestion of kind `itinerary` (guest-allowed since 29 September): the planner agent's proposal for the plan, applied through `updateVisitPlan` | `AI_USE` |
+| `requestSuggestion` | [AiService](../backend/AiService.md#requestsuggestion) | onAction | A suggestion of kind `itinerary` (guest-allowed since 29 September): the planner agent's proposal for the plan, applied through `updateVisitPlan`. Later (CHG-RONEP-010): the planner agent's refinement in chat (AI-ENGINE-PLANNER); the rules plan still answers in A1 ships in Block A2 (Chinmay, 3 October); until then the control shows 'Later'. | `AI_USE` |
 
 **States**
 
@@ -3201,6 +3207,7 @@
 | Parameter | From |
 |---|---|
 | subjectId | session |
+| orderId | navigation |
 
 **Operations**
 
@@ -3208,6 +3215,7 @@
 |---|---|---|---|---|
 | `createRefundRequest` | [OrderService](../backend/OrderService.md#createrefundrequest) | onAction | Guest-initiated refund request | `None` |
 | `createResaleListing` | [OrderService](../backend/OrderService.md#createresalelisting) | onAction | List an entitlement for resale | `ORDER_CREATE` |
+| `getOrder` | [OrderService](../backend/OrderService.md#getorder) | onLoad | Load the order a refund or resale is asked for | `ORDER_VIEW` |
 
 **States**
 
@@ -3707,6 +3715,7 @@
 | `quoteTransportFare` | [VenueOpsService](../backend/VenueOpsService.md#quotetransportfare) | onAction | The price for the stations and passengers | `None` |
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add the trip or pass to the basket (`attributes.transport`) | `None` |
 | `saveFavouriteRoute` | [VenueOpsService](../backend/VenueOpsService.md#savefavouriteroute) | onAction | Save this route | `None` |
+| `getTransportDeparture` | [VenueOpsService](../backend/VenueOpsService.md#gettransportdeparture) | onLoad | Load the departure the trip was opened on | `None` |
 
 **States**
 

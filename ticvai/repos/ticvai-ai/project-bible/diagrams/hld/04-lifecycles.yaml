@@ -2792,7 +2792,7 @@ stateModels:
   - unavailable
   operations:
   - allocateBlockedSeats
-  - createPayment
+  - convertInventoryHold
   - createRefund
   - createSeatBlock
   - createSeatHold

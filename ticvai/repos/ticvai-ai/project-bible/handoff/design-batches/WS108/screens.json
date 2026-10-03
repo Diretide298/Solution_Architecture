@@ -567,7 +567,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "BO-615"
+    "BO-615",
+    "BO-103"
    ],
    "exitTo": [
     "BO-615"
@@ -599,6 +600,21 @@
      "name": "contentBody",
      "slot": "fields",
      "components": [
+      {
+       "kind": "cardList",
+       "label": "Show the programmes, the one being changed among them",
+       "operation": "listAccreditationProgrammes",
+       "bindsTo": "AccreditationProgramme",
+       "columns": [
+        "AccreditationProgramme.code",
+        "AccreditationProgramme.name",
+        "AccreditationProgramme.applicationsOpenAt",
+        "AccreditationProgramme.applicationsCloseAt",
+        "AccreditationProgramme.isTemplate",
+        "AccreditationProgramme.status"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
       {
        "kind": "selectField",
        "label": "Field requirement",
@@ -658,6 +674,13 @@
     "purpose": "Open one form at a version",
     "trigger": "onAction",
     "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
+   },
+   {
+    "operationId": "listAccreditationProgrammes",
+    "contract": "accreditation",
+    "purpose": "Show the programmes, the one being changed among them",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "wireframe": {

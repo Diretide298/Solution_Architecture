@@ -305,7 +305,7 @@ CREATE TABLE IF NOT EXISTS inventory.stock_batch (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS inventory.stock_reservation (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     item_id                           uuid NOT NULL,
     location_id                       uuid NOT NULL,
     quantity                          numeric(18,4) NOT NULL,
@@ -340,7 +340,7 @@ CREATE TABLE IF NOT EXISTS inventory.supplier (
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS inventory.supplier_contract (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     supplier_id                       uuid NOT NULL,
     number                            text NOT NULL CONSTRAINT supplier_contract_number_chk CHECK (char_length(number) <= 100),
     name                              text NOT NULL CONSTRAINT supplier_contract_name_chk CHECK (char_length(name) <= 200),

@@ -178,6 +178,60 @@
   "requestBody": null,
   "responds": "ReportDefinition"
  },
+ "listAgentWorkloadAvailability": {
+  "method": "GET",
+  "path": "/agent-workload-availability",
+  "contract": "marketing-crm",
+  "summary": "Agent Workload, Availability & Workforce Control",
+  "permission": "CASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "queueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "team",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "skill",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "language",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listCases": {
   "method": "GET",
   "path": "/cases",

@@ -106,10 +106,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-721` | Activity Performance & Slot Template Configuration | B–D | 0 | 0 | 6 | 0 | 3 | 0 | — | notStarted (—) |
-| `BO-722` | Prepaid Minute Package & Customer Balance Configuration | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-723` | Peak, Off-Peak & Super Prime Time Configuration | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-724` | Walk-In / There-and-Then Booking Configuration | B–D | 0 | 18 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-721` | Activity Performance & Slot Template Configuration | B | 0 | 0 | 6 | 0 | 3 | 0 | — | notStarted (—) |
+| `BO-722` | Prepaid Minute Package & Customer Balance Configuration | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-723` | Peak, Off-Peak & Super Prime Time Configuration | B | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-724` | Walk-In / There-and-Then Booking Configuration | B | 0 | 18 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

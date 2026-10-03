@@ -127,16 +127,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-254` | Access Monitoring & Analytics Command Center | B–D | 0 | 300 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-255` | Live Venue Occupancy & People Counting | B–D | 0 | 0 | 6 | 0 | 4 | 0 | — | notStarted (generated) |
-| `BO-256` | Graphical Access Map & Live Gate Performance | B–D | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-257` | Attendance & Admission Analytics | B–D | 2 | 18 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-258` | Entry, Exit, Re-entry & Crossover Analytics | B–D | 0 | 12 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-259` | Throughput, Queue & Validation Performance Analytics | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
-| `BO-260` | Validation Outcome & Rejection Analytics | B–D | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-261` | Guest Dwell Time, Length of Stay & Attraction Flow | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-262` | Access Reports, Scheduled Reporting & Data Export | B–D | 2 | 0 | 6 | 9 | 0 | 0 | — | notStarted (generated) |
-| `BO-263` | AI Access Intelligence, Forecasting & Executive Insights | B–D | 0 | 16 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
+| `BO-254` | Access Monitoring & Analytics Command Center | C | 0 | 300 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-255` | Live Venue Occupancy & People Counting | C | 0 | 0 | 6 | 0 | 4 | 0 | — | notStarted (generated) |
+| `BO-256` | Graphical Access Map & Live Gate Performance | C | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-257` | Attendance & Admission Analytics | C | 2 | 18 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-258` | Entry, Exit, Re-entry & Crossover Analytics | C | 0 | 12 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-259` | Throughput, Queue & Validation Performance Analytics | C | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `BO-260` | Validation Outcome & Rejection Analytics | C | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-261` | Guest Dwell Time, Length of Stay & Attraction Flow | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-262` | Access Reports, Scheduled Reporting & Data Export | D | 2 | 0 | 6 | 9 | 0 | 0 | — | notStarted (generated) |
+| `BO-263` | AI Access Intelligence, Forecasting & Executive Insights | C | 0 | 16 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

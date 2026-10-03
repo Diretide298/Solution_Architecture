@@ -2481,6 +2481,74 @@
    "ota"
   ]
  },
+ "SeatHold": {
+  "x-ticvai-persistence": "seating.seat_hold",
+  "type": "object",
+  "required": [
+   "id",
+   "performanceId",
+   "seatIds",
+   "status",
+   "createdAt",
+   "expiresAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "seatIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "bufferedSeatIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Neighbours implicitly held by a seating rule."
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "held",
+     "converted",
+     "released",
+     "expired"
+    ]
+   },
+   "totalPrice": {
+    "x-ticvai-column": "gross_amount",
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "heldByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "extensionCount": {
+    "type": "integer"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "TenderKind": {
   "type": "string",
   "description": "`wallet` is a **digital wallet** (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside `card` (decided 28 September, audit R080 (a)). **The stored-value TICVAI wallet is a separate tender**: it is spent through `authoriseStoredValue` and `captureStoredValue` (`StoredValueKind` `wallet`), never as this value, so the client can see which of the two the decision meant.\n",

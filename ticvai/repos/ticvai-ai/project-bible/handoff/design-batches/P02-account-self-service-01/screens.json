@@ -1038,7 +1038,7 @@
    "provenance": "designed",
    "board": "wireframes/P02 Guest App.dc.html#gst-019",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
     "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-019.html, and #GST-019 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → Order history (exact)."
@@ -1458,7 +1458,7 @@
    "provenance": "designed",
    "board": "wireframes/P02 Guest App.dc.html#gst-039",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
     "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-039.html, and #GST-039 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 1 → Profile (also Account → Profile) (exact). What v2 did differently: Emirates ID upload is on Profile in the prototype; the YAML has uploadGuestDocument on GST-066. Account also has a \"Saved guests (heights on file)\" row that no screen defines."
@@ -1927,7 +1927,7 @@
    "provenance": "designed",
    "board": "wireframes/P02 Guest App.dc.html#gst-042",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
     "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-042.html, and #GST-042 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 1 → Simple registration & OTP (same #ident screen) + \"Log in or register\" sheet from home (partial). What v2 did differently: Prototype has email code, Apple and Google only; the YAML also has password login, UAE Pass and explicit registration."
@@ -2021,6 +2021,19 @@
      "name": "contentBody",
      "components": [
       {
+       "kind": "dataTable",
+       "label": "Show the tickets the guest has sent and received",
+       "operation": "listTicketTransfers",
+       "bindsTo": "TicketTransfer",
+       "columns": [
+        "TicketTransfer.status",
+        "TicketTransfer.offeredAt",
+        "TicketTransfer.claimedAt",
+        "TicketTransfer.expiresAt"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
+      {
        "kind": "cardList",
        "label": "Tickets to send",
        "operation": "transferOrderTickets",
@@ -2057,6 +2070,13 @@
     "contract": "orders",
     "purpose": "Transfer tickets to another guest",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listTicketTransfers",
+    "contract": "orders",
+    "purpose": "Show the tickets the guest has sent and received",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "entryState": {
@@ -2534,7 +2554,7 @@
    "provenance": "designed",
    "board": "wireframes/P02 Guest App.dc.html#gst-066",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
     "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-066.html, and #GST-066 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → Privacy & my data (#privacy; also Account → Data & privacy) (exact). What v2 did differently: The prototype labels this screen \"GST-070 · Your data\" (aria-label \"GST-070 Data and privacy\"), but GST-070 is Reserve a Table in the YAML, so the label is wrong. Document upload is on Profile instead."

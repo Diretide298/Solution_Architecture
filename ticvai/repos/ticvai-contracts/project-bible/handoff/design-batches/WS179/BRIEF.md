@@ -102,7 +102,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-1082` | Admissions Revenue | B–D | 2 | 0 | 6 | 5 | 0 | 0 | — | notStarted (—) |
+| `BO-1082` | Admissions Revenue | D | 2 | 0 | 6 | 5 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

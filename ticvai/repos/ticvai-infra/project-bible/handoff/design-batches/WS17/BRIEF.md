@@ -96,16 +96,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-384` | Delegation & Escalation Command Center | B–D | 9 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-385` | Delegation Management | B–D | 10 | 0 | 5 | 2 | 1 | 0 | — | notStarted (—) |
-| `BO-386` | Temporary Delegation & Availability Calendar | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-387` | Out-of-Office & Substitute Routing | B–D | 7 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-388` | Approval SLA Policy Configuration | B–D | 8 | 0 | 5 | 0 | 1 | 3 | — | notStarted (—) |
-| `BO-389` | Reminder & Breach Notification Rules | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-390` | Escalation Policy Builder | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-391` | Live Escalation Operations Center | B–D | 9 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-392` | SLA & Escalation Performance Analytics | B–D | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-393` | AI SLA & Escalation Advisor | B–D | 2 | 16 | 6 | 9 | 0 | 0 | — | notStarted (—) |
+| `BO-384` | Delegation & Escalation Command Center | B | 9 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-385` | Delegation Management | B | 10 | 0 | 5 | 2 | 1 | 0 | — | notStarted (—) |
+| `BO-386` | Temporary Delegation & Availability Calendar | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-387` | Out-of-Office & Substitute Routing | B | 7 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-388` | Approval SLA Policy Configuration | B | 8 | 0 | 5 | 0 | 1 | 3 | — | notStarted (—) |
+| `BO-389` | Reminder & Breach Notification Rules | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-390` | Escalation Policy Builder | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-391` | Live Escalation Operations Center | B | 9 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-392` | SLA & Escalation Performance Analytics | B | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-393` | AI SLA & Escalation Advisor | B | 2 | 16 | 6 | 9 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

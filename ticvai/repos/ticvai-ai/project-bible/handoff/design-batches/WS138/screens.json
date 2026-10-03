@@ -328,7 +328,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "BO-764"
+    "BO-764",
+    "BO-107"
    ],
    "exitTo": [
     "BO-764"
@@ -1229,7 +1230,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "BO-764"
+    "BO-764",
+    "BO-107"
    ],
    "exitTo": [
     "BO-764"

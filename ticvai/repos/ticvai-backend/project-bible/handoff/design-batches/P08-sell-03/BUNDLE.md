@@ -1,6 +1,6 @@
 # P08-sell-03 — P08 · Sell (3 of 4)
 
-**10 screens · 26 operations · 42 schemas · 9 permissions**
+**10 screens · 27 operations · 42 schemas · 9 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -188,20 +188,20 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-113` | Central Kitchen & Commissary Management | B–D | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (generated) |
-| `BO-114` | Variants, Attributes, Barcode & RFID Management | B–D | 3 | 8 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-115` | Category, Brand & Merchandise Hierarchy | B–D | 14 | 15 | 6 | 0 | 2 | 6 | — | notStarted (generated) |
+| `BO-113` | Central Kitchen & Commissary Management | B | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (generated) |
+| `BO-114` | Variants, Attributes, Barcode & RFID Management | D | 3 | 8 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-115` | Category, Brand & Merchandise Hierarchy | B | 14 | 15 | 6 | 0 | 2 | 6 | — | notStarted (generated) |
 | `BO-116` | Merchandising & Product Presentation | B | 30 | 62 | 6 | 4 | 1 | 0 | — | notStarted (generated) |
-| `BO-117` | Product Import, Governance & AI Configuration Assistant | A | 7 | 0 | 6 | 32 | 5 | 0 | — | notStarted (generated) |
-| `BO-118` | Campaign & Audience Management | B–D | 47 | 45 | 6 | 14 | 0 | 6 | — | notStarted (generated) |
-| `BO-119` | Cross-Sell, Upsell & Recommendation Rules | B–D | 1 | 24 | 5 | 54 | 4 | 0 | — | notStarted (generated) |
-| `BO-120` | Omnichannel Commerce & Journey Configuration | B–D | 28 | 14 | 6 | 9 | 1 | 6 | — | notStarted (generated) |
-| `BO-121` | Personalized Offers & Guest Engagement | B–D | 42 | 14 | 6 | 8 | 1 | 0 | — | notStarted (generated) |
-| `BO-1190` | Donation Campaigns | B–D | 27 | 16 | 7 | 5 | 2 | 6 | — | notStarted (generated) |
+| `BO-117` | Product Import, Governance & AI Configuration Assistant | A | 7 | 8 | 6 | 32 | 5 | 0 | — | notStarted (generated) |
+| `BO-118` | Campaign & Audience Management | D | 47 | 45 | 6 | 14 | 0 | 6 | — | notStarted (generated) |
+| `BO-119` | Cross-Sell, Upsell & Recommendation Rules | B | 1 | 24 | 5 | 54 | 4 | 0 | — | notStarted (generated) |
+| `BO-120` | Omnichannel Commerce & Journey Configuration | D | 28 | 14 | 6 | 9 | 1 | 6 | — | notStarted (generated) |
+| `BO-121` | Personalized Offers & Guest Engagement | D | 42 | 14 | 6 | 8 | 1 | 0 | — | notStarted (generated) |
+| `BO-1190` | Donation Campaigns | B | 27 | 16 | 7 | 5 | 2 | 6 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
-**BO-113, BO-117 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-113 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -217,7 +217,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 2 · needs the `fnb` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-113 |
 | Who uses it | venue |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the screen declares only writes (`planProductionRun`, `completeProductionRun`) and no read of a population — it is settings, not a list |
@@ -366,7 +366,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 2 · needs the `inventory` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-114 |
 | Who uses it | venue staff holding `PRODUCT_VIEW` (1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listSerialisedItems` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -532,7 +532,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 2 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-115 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `TENANT_CONFIGURE` (2 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listProductCategories` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -718,7 +718,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 2 · needs the `retail` module |
-| Block | Block B · task APP-SETUP-BO-116 |
+| Block | Block B · task VM-BO-116 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `SCOPE_VIEW`, `WORKSTATION_CONFIGURE` (2 configure, 2 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): 3 independent reads and no read of one record — the screen watches a population rather than working one |
@@ -1015,7 +1015,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 1 · needs the `ticketing` module |
 | Block | Block A · task APP-SETUP-BO-117 |
-| Who uses it | venue staff holding `AI_USE`, `PRODUCT_CONFIGURE` (1 operate, 1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `AI_USE`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 operate, 1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listSaleBoards` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
 | Offline | online only |
@@ -1067,6 +1067,21 @@ Errors to draw in the form: 409 `mode` is `replaceCategory` and a category the f
 
 #### Outputs: what the screen shows and produces
 
+**Shown**
+
+**Show the import's progress and its findings** (detail panel, from `getCatalogueImportJob`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Status | chip: Parsing, Preview ready, Committing, Committed, Failed | — |
+| Outcome | chip: Parsed, Parsed with findings, Nothing found, Unreadable | — |
+| Parsed count | 1,234 | — |
+| Create count | 1,234 | — |
+| Update count | 1,234 | — |
+| Job kind | chip: Product import, Environment transfer, Pricing bulk update, Pricing import | One job table for every catalogue bulk operation (29 September, data model DM3): product import (the original use), environment transfer … |
+| Warning count | 1,234 | — |
+| Error count | 1,234 | — |
+
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
@@ -1083,6 +1098,8 @@ Errors to draw in the form: 409 `mode` is `replaceCategory` and a category the f
 
 - **Commit import**: Refused when nothing was found or the file was unreadable; otherwise creates or updates products as drafts and reports counts. *(source: contracts/spine/catalogue.yaml#commitCatalogueImport)*
 
+**Data it reads**: `getCatalogueImportJob` (onLoad, Show the import's progress and its findings)
+
 **Where the user goes next**
 
 - → `BO-102` Sell: *Sell*
@@ -1096,7 +1113,7 @@ Errors to draw in the form: 409 `mode` is `replaceCategory` and a category the f
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the product import governance untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No product import governance yet. Offers Import product catalogue (`importProductCatalogue`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId, kind and the product import governance are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_CONFIGURE`, which `importProductCatalogue` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getCatalogueImportJob` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `generateConfiguration`; `PRODUCT_CONFIGURE` for `importProductCatalogue`, `commitCatalogueImport`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The job found nothing, or was already committed. Partial application is reported rather than rolled back — three thousand products half-created is a state …; 409 `mode` is `replaceCategory` and a category the file would replace has live orders against it — that is a migration, not an import. |
 
@@ -1133,8 +1150,9 @@ import:
 - `importProductCatalogue` → `PRODUCT_CONFIGURE` (configure) · staff
 - `generateConfiguration` → `AI_USE` (operate) · staff
 - `commitCatalogueImport` → `PRODUCT_CONFIGURE` (configure) · staff
+- `getCatalogueImportJob` → `PRODUCT_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_CONFIGURE`, which `importProductCatalogue` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getCatalogueImportJob` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `generateConfiguration`; `PRODUCT_CONFIGURE` for `importProductCatalogue`, `commitCatalogueImport`.
 
 #### Requirements it meets
 
@@ -1182,12 +1200,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (7), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (7), with its required mark, default, format and its error state (404, 409).
+- [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-117?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Import product catalogue, Generate configuration.
 - [ ] Every transition is wired: `BO-102`, `BO-118`.
-- [ ] Every gated control is gated: `AI_USE`, `PRODUCT_CONFIGURE`.
+- [ ] Every gated control is gated: `AI_USE`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The 5 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -1202,7 +1220,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 2 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-118 |
 | Who uses it | venue staff holding `MARKETING_MANAGE`, `MARKETING_VIEW`, `REPORT_VIEW_VENUE` (1 configure, 1 read, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): 3 independent reads and no read of one record — the screen watches a population rather than working one |
@@ -1483,7 +1501,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 2 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-119 |
 | Who uses it | venue staff holding `AI_USE`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 operate, 1 configure, 1 read); in the flows as marketer |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | statusTracker (compact density): `getRecommendations` reads one record and nothing reads a population — the screen is about that one thing |
@@ -1684,7 +1702,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 2 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-120 |
 | Who uses it | venue staff holding `MARKETING_MANAGE`, `MARKETING_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listJourneys` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1895,7 +1913,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 2 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-121 |
 | Who uses it | venue staff holding `MARKETING_MANAGE`, `MARKETING_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listSegments` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -2107,7 +2125,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 2 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-BO-1190 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listDonationCampaigns` reads the population and the panel edits one of them — list, select, act |
@@ -2424,6 +2442,7 @@ Method, path, parameters, request and response for every operation these screens
 "decideRecommendations": {"method":"POST","path":"/recommendations/decide","contract":"ai","summary":"Fill a recommendation slot","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AiRecommendationResult"},
 "deleteUpsellRule": {"method":"DELETE","path":"/upsell-rules/{ruleId}","contract":"promotions","summary":"Remove an upsell rule","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "generateConfiguration": {"method":"POST","path":"/generate/configuration","contract":"ai","summary":"Draft a configuration from a description","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"GeneratedConfiguration"},
+"getCatalogueImportJob": {"method":"GET","path":"/products/import/{jobId}","contract":"catalogue","summary":"Progress and findings of a catalogue import","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"CatalogueImportJob"},
 "importProductCatalogue": {"method":"POST","path":"/products/import","contract":"catalogue","summary":"Parse a catalogue file into a preview","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "listBookingFlows": {"method":"GET","path":"/venues/{venueId}/booking-flows","contract":"white-label","summary":"A venue's booking flows, in the working draft","permission":"TENANT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"flowTypeKey","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listCampaigns": {"method":"GET","path":"/campaigns","contract":"marketing-crm","summary":"List campaigns","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
@@ -2473,7 +2492,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "DonationCampaign": {"type":"object","x-ticvai-persistence":"catalogue.donation_campaign","required":["name","amountMode","isActive"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"name":{"type":"string","maxLength":200},"description":{"type":"string","maxLength":1000},"beneficiary":{"type":"string","description":"Who the money is for. Shown to the guest, and it is the reason they give."},"venueIds":{"type":"array","items":{"type":"string","format":"uuid"}},"amountMode":{"$ref":"#/components/schemas/DonationAmountMode"},"fixedAmounts":{"type":"array","description":"1.1.129. Predefined values, e.g. 5, 10, 25.","items":{"$ref":"../shared/common.yaml#/components/schemas/Money"}},"minAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"liabilityAccountId":{"type":"string","format":"uuid","description":"**Donations post here, not to revenue** (1.1.132). Money collected for a charity is not the venue's to recognise, and treating it as revenue is a restatement waiting to happen.\n"},"channels":{"type":"array","description":"1.1.133. Where it may be solicited — POS, kiosk, web, app.","items":{"$ref":"../shared/common.yaml#/components/schemas/SalesChannel"}},"isActive":{"type":"boolean"},"validFrom":{"type":"string","format":"date-time"},"validTo":{"type":"string","format":"date-time","nullable":true},"raisedTotal":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"readOnly":true,"description":"**Not reversed when the campaign closes.** The money is still owed.\n"}}},
 "FieldType": {"type":"string","enum":["string","integer","decimal","money","boolean","date","dateTime","uuid","enum"]},
 "GeneratedConfiguration": {"type":"object","x-ticvai-persistence":"none — a draft, applied through the owning contract; the draft itself is the ai.proposed_action row named by proposedActionId","required":["proposedActionId","kind","targetContract","targetOperation","payload"],"properties":{"proposedActionId":{"type":"string","format":"uuid","description":"**The `ai.proposed_action` row this draft was written as**, and the id `decideProposedAction` takes. Without it a reviewer (BO-598) has a draft and no way to approve it.\n"},"kind":{"type":"string","enum":["product","membership","pass","promotion","discountRule","pricingCalendar","seatingZone","operatingHours","campaign"],"description":"The `kind` the request asked for."},"targetContract":{"type":"string"},"targetOperation":{"type":"string"},"payload":{"type":"object","additionalProperties":true,"description":"**Open on purpose: its shape is the request body of `targetOperation` in `targetContract`**, validated against that operation before it is returned — this contract does not restate thirty other contracts' request schemas.\n"},"assumptions":{"type":"array","description":"**What it had to guess.** An admin reviewing a draft needs to know which fields came from what they said and which the assistant chose, or they approve a decision they did not make.\n","items":{"type":"object","properties":{"field":{"type":"string"},"value":{"type":"string"},"reason":{"type":"string"}}}},"clarificationsNeeded":{"type":"array","description":"What it could not resolve and should ask about.","items":{"type":"string"}},"confidence":{"type":"number","nullable":true},"traceId":{"type":"string"},"planId":{"type":"string","format":"uuid","description":"The one-step `ai.action_plan` the draft was written as (AI design 2.3), readable with `getActionPlan`."}}},
-"GuestMerchandiseItem": {"x-ticvai-persistence":"none — guest projection of MerchandiseItem","type":"object","description":"**What a guest caller of `listMerchandise` receives.** The fields a shop screen shows and the ids a guest needs to reserve or buy, and nothing else: no inventory link, no catalogue variant, no stock count, no serial-number flag. `additionalProperties: false` is the guarantee: a staff field added to `MerchandiseItem` does not reach a guest by default.\n","additionalProperties":false,"required":["id","name","outletId","price","isAvailable"],"properties":{"id":{"type":"string","format":"uuid"},"sku":{"type":"string"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"outletId":{"type":"string","format":"uuid"},"categoryId":{"type":"string","format":"uuid","nullable":true},"price":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"isAvailable":{"type":"boolean","description":"True when the item is active and in stock at its outlet. An item with no `inventoryItemId` never runs out, so it is available while active.\n"},"isReturnable":{"type":"boolean"},"returnWindowDays":{"type":"integer","nullable":true},"imageAssetRef":{"type":"string","nullable":true}}},
+"GuestMerchandiseItem": {"x-ticvai-persistence":"none — guest projection of MerchandiseItem","type":"object","description":"**What a guest caller of `listMerchandise` receives.** The fields a shop screen shows and the ids a guest needs to reserve or buy, and nothing else: no inventory link, no catalogue variant, no stock count, no serial-number flag. `additionalProperties: false` is the guarantee: a staff field added to `MerchandiseItem` does not reach a guest by default.\n","additionalProperties":false,"required":["id","name","outletId","price","isAvailable"],"properties":{"id":{"type":"string","format":"uuid"},"sku":{"type":"string"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"outletId":{"type":"string","format":"uuid"},"categoryId":{"type":"string","format":"uuid","nullable":true},"price":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"isAvailable":{"type":"boolean","description":"True when the item is active and in stock at its outlet. An item with no `inventoryItemId` never runs out, so it is available while active.\n"},"isReturnable":{"type":"boolean"},"returnWindowDays":{"type":"integer","nullable":true},"imageAssetRef":{"type":"string","nullable":true},"productVariantId":{"type":"string","format":"uuid","description":"The catalogue Product variant the item sells, which `addCartLine` takes as its `variantId` (added 3 October 2026, CHG-R1S-004: the r1 gate found WEB-033 could not add to the cart from the guest projection; qualified from `variantId` by CHG-GTRB-001, since the glossary bans a bare Variant). An id, not the variant record: price and tax still come from the server.\n","x-ticvai-references":"catalogue.ProductVariant"}}},
 "Journey": {"type":"object","x-ticvai-persistence":"marketing.journey + marketing.journey_step","description":"22.3.1b to 22.3.10b, CF-137. **A journey is a sequence with branches; a `MessageTrigger` is one step of it.** The trigger already handles *\"send this when that happens\"* — a journey is what you need when the next message depends on what the guest did about the last one.\nFive of the ten requirements are named lifecycles — abandoned cart, membership, loyalty, wallet, birthday. **They are not five features.** Each is a journey with a different entry event and a different set of steps, which is why this is one entity and a template library rather than five contracts.\n**Consent is checked at every send, not at entry.** A guest who opts out mid-journey stops receiving, and the journey does not need to know — the same rule `MessageTrigger` follows and the one PDPL Article 17(1) makes unconditional.\n","required":["id","name","entryEvent","status","steps"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"name":{"type":"string"},"templateKind":{"type":"string","nullable":true,"enum":["abandonedCart","membershipLifecycle","loyaltyLifecycle","walletLifecycle","birthday","onboarding","winBack","custom"],"description":"Which named lifecycle this implements. **Set for reporting and for the library**, not for behaviour — the steps decide what happens.\n"},"entryEvent":{"type":"string","description":"22.3.2b. From the event catalogue, so a journey cannot enter on something nothing publishes.\n"},"entryConditions":{"type":"object","nullable":true,"description":"Narrows entry — a segment, a tier, a venue. **Evaluated once at entry**, unlike step conditions.\n"},"steps":{"type":"array","description":"22.3.1b. What the builder produces. **The visual builder is a frontend over this** — the contract holds the graph and the canvas is a rendering of it.\n","items":{"$ref":"#/components/schemas/JourneyStep"}},"status":{"readOnly":true,"type":"string","enum":["draft","active","paused","archived"]},"maxDurationDays":{"type":"integer","default":30,"description":"**A journey with no end is a guest who never leaves it.** After this, entrants exit wherever they are.\n"},"reentryPolicy":{"type":"string","enum":["never","afterCompletion","always"],"default":"afterCompletion","description":"22.3.6b. **Abandoned cart is the case that needs this.** A guest who abandons three carts in an hour should not get three recovery sequences, and `never` is wrong too — they may genuinely abandon one next month.\n"},"scopePath":{"readOnly":true,"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
 "JourneyStep": {"type":"object","description":"One node. **A step either sends, waits, or branches** — three kinds rather than a general graph, because a marketing user drawing an arbitrary graph draws a loop.\n","required":["id","kind"],"properties":{"id":{"type":"string"},"kind":{"type":"string","x-ticvai-column":"type","enum":["send","wait","branch","exit","goal"]},"templateId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-column":"message_template_id","description":"For `send`. Channel is resolved from the guest's preference at the moment of sending."},"sendTimeMode":{"type":"string","enum":["fixed","optimised"],"default":"fixed","description":"For `send` (29 September, build pass, group G2; 22.3.19). `optimised` delays the send, after the step is reached, to the recipient's suggested hour from `ai.requestSuggestion` (kind `sendTime`) within the next 24 hours and inside `waitUntil`; no suggestion or AI off sends at once, as `fixed`."},"channelMode":{"type":"string","enum":["preference","optimised"],"default":"preference","description":"For `send`. `optimised` tries first the consented channel the send-time suggestion names, then `channelPreference` in order (22.9.16)."},"channelPreference":{"type":"array","nullable":true,"description":"22.3.3b. Ordered fallback — email, then SMS, then push. **A guest with no email address does not get an email step**, and the step does not fail, it moves down the list.\n","items":{"type":"string","enum":["email","sms","whatsapp","push","inApp"]}},"waitMinutes":{"type":"integer","nullable":true},"waitUntil":{"type":"object","nullable":true,"description":"22.3.5b. **Business hours, time zone and blackout windows** — a wallet low-balance alert at 3am is a complaint, and the venue's quiet hours are venue configuration rather than a property of this step.\n","properties":{"businessHoursOnly":{"type":"boolean","default":false},"timezone":{"type":"string","nullable":true},"respectQuietHours":{"type":"boolean","default":true},"notBefore":{"type":"string","nullable":true}}},"condition":{"type":"object","nullable":true,"description":"22.3.4b. IF/THEN over guest profile, behaviour and prior steps. **The most common condition is whether the previous message worked** — a recovery sequence must stop when the guest buys.\n","properties":{"field":{"type":"string"},"operator":{"type":"string","enum":["eq","neq","gt","lt","contains","exists","notExists"]},"value":{"type":"string","nullable":true}}},"onTrue":{"type":"string","nullable":true,"description":"Next step id."},"onFalse":{"type":"string","nullable":true},"next":{"type":"string","nullable":true,"x-ticvai-column":"next_journey_step_id"},"goalEvent":{"type":"string","nullable":true,"description":"For `goal`. **The event that means this journey worked and the guest should leave it** — a purchase for abandoned cart, a renewal for membership. **Reaching a goal exits immediately**, which is what stops a recovered cart from being chased.\n"}}},
 "LocalisedText": {"x-ticvai-persistence":"none — jsonb column","type":"object","additionalProperties":{"type":"string"}},

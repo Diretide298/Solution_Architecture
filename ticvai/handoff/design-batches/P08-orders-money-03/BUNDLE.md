@@ -127,11 +127,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-075` | Account Mapping | A | 31 | 43 | 6 | 16 | 2 | 0 | — | notStarted (generated) |
-| `BO-076` | Revenue Recognition | B–D | 16 | 18 | 6 | 74 | 2 | 0 | — | notStarted (generated) |
+| `BO-076` | Revenue Recognition | C | 16 | 18 | 6 | 74 | 2 | 0 | — | notStarted (generated) |
 | `BO-077` | FX Rates & Variances | A | 15 | 24 | 6 | 1 | 2 | 4 | — | notStarted (generated) |
-| `BO-089` | Journal Entries | B–D | 19 | 14 | 6 | 22 | 1 | 0 | — | notStarted (generated) |
-| `BO-090` | Period Close | B–D | 5 | 22 | 6 | 11 | 1 | 0 | — | notStarted (generated) |
-| `BO-101` | Orders & Money | B–D | 7 | 22 | 6 | 5 | 0 | 0 | — | notStarted (generated) |
+| `BO-089` | Journal Entries | C | 19 | 14 | 6 | 22 | 1 | 0 | — | notStarted (generated) |
+| `BO-090` | Period Close | C | 5 | 22 | 6 | 11 | 1 | 0 | — | notStarted (generated) |
+| `BO-101` | Orders & Money | C | 7 | 22 | 6 | 5 | 0 | 0 | — | notStarted (generated) |
 
 ---
 
@@ -463,7 +463,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-076 |
 | Who uses it | venue staff holding `ACCOUNT_CONFIGURE`, `LEDGER_POST`, `LEDGER_VIEW` (1 configure, 1 operate, 1 read); in the flows as finance controller |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listRecognitionSchedules` reads the population and `getDeferredRevenue` reads one of them — list, select, act |
@@ -958,7 +958,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 1 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-089 |
 | Who uses it | venue staff holding `LEDGER_APPROVE`, `LEDGER_POST`, `LEDGER_VIEW` (2 operate, 1 read); in the flows as finance controller |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | approvalInbox (compact density): `approveJournalEntry` decides items that `listJournalEntries` queues — every row is waiting for a person, so the empty state is success |
@@ -1207,7 +1207,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 1 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-090 |
 | Who uses it | venue staff holding `LEDGER_APPROVE`, `LEDGER_VIEW` (1 operate, 1 read); in the flows as finance controller |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listFiscalPeriods` reads the population and `getTrialBalance` reads one of them — list, select, act |
@@ -1466,7 +1466,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 1 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-101 |
 | Who uses it | venue staff holding `ORDER_VIEW`, `SETTLEMENT_VIEW` (2 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listOrders` reads the population and `getVenueSettings` reads one of them — list, select, act |
@@ -1582,6 +1582,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - → `BO-089` Journal Entries: *Journal Entries*
 - → `BO-090` Period Close: *Period Close*
 - → `BO-028` Refund Approval Queue: *Refund Approval Queue*
+- → `BO-1094` Funding Method Configuration: *Opens Funding Method Configuration*
+- → `BO-1111` Credit Expiry, Extension & Forfeiture Operations: *Opens Credit Expiry, Extension & Forfeiture Operations*
+- → `BO-1146` Refund-to-Wallet Policy Configuration: *Opens Refund-to-Wallet Policy Configuration*; carries `venueId`
+- → `BO-1162` Security Governance, Audit & Rule Publication: *Opens Security Governance, Audit & Rule Publication*
+- → `BO-1179` Integration Monitoring & Exception Workbench: *Opens Integration Monitoring & Exception Workbench*
 
 #### States
 
@@ -1657,7 +1662,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-101?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `BO-008`, `BO-022`, `BO-023`, `BO-024`, `BO-025`, `BO-026`, `BO-027`, `BO-029`, `BO-039`, `BO-040`, `BO-041`, `BO-042`, `BO-043`, `BO-047`, `BO-048`, `BO-059`, `BO-061`, `BO-062`, `BO-065`, `BO-074`, `BO-075`, `BO-077`, `BO-089`, `BO-090`, `BO-028`.
+- [ ] Every transition is wired: `BO-008`, `BO-022`, `BO-023`, `BO-024`, `BO-025`, `BO-026`, `BO-027`, `BO-029`, `BO-039`, `BO-040`, `BO-041`, `BO-042`, `BO-043`, `BO-047`, `BO-048`, `BO-059`, `BO-061`, `BO-062`, `BO-065`, `BO-074`, `BO-075`, `BO-077`, `BO-089`, `BO-090`, `BO-028`, `BO-1094`, `BO-1111`, `BO-1146`, `BO-1162`, `BO-1179`.
 - [ ] Every gated control is gated: `ORDER_VIEW`, `SETTLEMENT_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] The 1 edge case(s) from the process notes are drawn.

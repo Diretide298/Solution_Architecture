@@ -4,7 +4,7 @@
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS games.attraction_type (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text NOT NULL,
     family                            text CONSTRAINT attraction_type_family_chk CHECK (family IN ('ride', 'arcadeGame', 'redemptionGame', 'crane', 'vrExperience', 'softPlay', 'attraction', 'show')),
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS games.attraction_type (
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS games.authorisation (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     decision                          text CONSTRAINT authorisation_decision_chk CHECK (decision IN ('allow', 'refuse')),
     reason                            text CONSTRAINT authorisation_reason_chk CHECK (reason IN ('ok', 'cardNotFound', 'cardExpired', 'cardBlocked', 'retapTooSoon', 'heightRestriction', 'ageRestriction', 'insufficientFunds', 'entitlementExhausted', 'entitlementNotValidHere', 'cooldownActive', 'dailyCapReached', 'readerNotConfigured', 'gameUnavailable')),
     guest_message                     text,
@@ -73,12 +73,13 @@ CREATE TABLE IF NOT EXISTS games.credit_ledger (
 -- Holds 15 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS games.entitlement (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text,
     kind                              text NOT NULL CONSTRAINT entitlement_kind_chk CHECK (kind IN ('allGamesPass', 'unlimitedSingleGame', 'limitedSingleGame', 'package', 'freePlay')),
     game_ids                          text[],
     attraction_type_ids               text[],
+    includes_games_added_later        boolean DEFAULT true,
     play_count                        integer,
     validity_kind                     text CONSTRAINT entitlement_validity_kind_chk CHECK (validity_kind IN ('sameDay', 'days', 'untilDate', 'untilUsed')),
     validity_days                     integer,
@@ -112,7 +113,7 @@ CREATE TABLE IF NOT EXISTS games.game (
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS games.gameplay_transaction (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     reader_id                         uuid,
     game_id                           uuid,
     card_id                           uuid,
@@ -179,6 +180,7 @@ CREATE TABLE IF NOT EXISTS games.pricing (
     vip_price                         numeric(18,4),
     retry_price                       numeric(18,4),
     retry_window_seconds              integer,
+    retry_offer_lead_seconds          integer,
     priority                          text[],
     scope_path                        ltree NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL
@@ -187,7 +189,7 @@ CREATE TABLE IF NOT EXISTS games.pricing (
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS games.pricing_exception (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     game_id                           uuid NOT NULL,
     kind                              text NOT NULL CONSTRAINT pricing_exception_kind_chk CHECK (kind IN ('group', 'peak', 'calendarException')),
     minimum_players                   integer,
@@ -249,7 +251,7 @@ CREATE TABLE IF NOT EXISTS games.reader (
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS games.reader_deployment (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     reader_id                         uuid,
     configuration_version             integer,
     edge_package_expires_at           timestamptz,
@@ -275,13 +277,15 @@ CREATE TABLE IF NOT EXISTS games.reader_profile (
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS games.reader_sync_status (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     reader_id                         uuid NOT NULL,
     pending_transactions              integer NOT NULL,
     pending_value                     numeric(18,4),
     oldest_pending_at                 timestamptz,
     last_sync_at                      timestamptz,
     reported_at                       timestamptz NOT NULL,
+    offline_since                     timestamptz,
+    is_refusing_offline_taps          boolean,
     scope_path                        ltree NOT NULL
 );
 

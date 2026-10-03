@@ -1,5 +1,5 @@
 id: LLD-CatalogueService
-title: CatalogueService — 443 operations, 137 tables
+title: CatalogueService — 446 operations, 137 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 deployable: commerce
@@ -16,7 +16,7 @@ why: '**What is sold, at what price, in which seat.** Promotions and seating are
 scale: Read-heavy, bundle-published to tills. **The catalogue bundle is this service's output** (ADR-0013).
 ifDown: A bad publish reaches every workstation. Versioned and rollback-able for that reason.
 coverage:
-  operations: 443
+  operations: 446
   inAFlow: 240
   percent: 54%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -44,7 +44,7 @@ schemas:
   largestTable: seating.group_request
 operationsByContract:
 - contract: catalogue
-  count: 245
+  count: 248
   operations:
   - operation: acquireInventoryHold
     verb: POST
@@ -109,7 +109,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 0
-    writes: 0
+    writes: 1
   - operation: cancelPerformance
     verb: POST
     path: /performances/{performanceId}/cancel
@@ -165,7 +165,7 @@ operationsByContract:
     permission: null
     offline: false
     reads: 4
-    writes: 4
+    writes: 7
   - operation: copyPriceList
     verb: POST
     path: /price-lists/{priceListId}/copy
@@ -382,6 +382,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 0
+  - operation: getPackagePricingDefinition
+    verb: GET
+    path: /package-pricing
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: getPerformance
     verb: GET
     path: /performances/{performanceId}
@@ -414,6 +422,14 @@ operationsByContract:
     offline: true
     reads: 2
     writes: 0
+  - operation: getProductAttributes
+    verb: GET
+    path: /products/{productId}/attributes
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: getProductEligibilityRule
     verb: GET
     path: /products/{productId}/eligibility-rule
@@ -421,6 +437,14 @@ operationsByContract:
     permission: PRODUCT_VIEW
     offline: false
     reads: 1
+    writes: 0
+  - operation: getTaxProfileJurisdiction
+    verb: GET
+    path: /tax-profile-jurisdiction
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
     writes: 0
   - operation: getWaitingRoomPosition
     verb: GET
@@ -1357,7 +1381,7 @@ operationsByContract:
     permission: CAPACITY_CONFIGURE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: relinquishInventoryHold
     verb: DELETE
     path: /inventory-holds/{inventoryHoldId}
@@ -1565,7 +1589,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: setEventCapacityProfile
     verb: PUT
     path: /events/{eventId}/capacity-profile
@@ -2005,7 +2029,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
 - contract: promotions
   count: 143
   operations:
@@ -3467,7 +3491,7 @@ operationsByContract:
     permission: ORDER_MODIFY
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: recommendSeats
     verb: POST
     path: /performances/{performanceId}/seat-recommendations
@@ -3483,7 +3507,7 @@ operationsByContract:
     permission: CAPACITY_CONFIGURE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: relinquishSeatBlock
     verb: DELETE
     path: /seat-blocks/{blockId}
@@ -4791,7 +4815,8 @@ tables:
   columns: 11
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - seating
   foreignWriters: null
 - table: seating.recommendation_rules
   columns: 6
@@ -4832,6 +4857,7 @@ tables:
   store: postgres
   parent: null
   writtenBy:
+  - catalogue
   - seating
   foreignWriters: null
 - table: seating.seat_hold_item
@@ -4839,6 +4865,7 @@ tables:
   store: postgres
   parent: seating.seat_hold
   writtenBy:
+  - catalogue
   - seating
   foreignWriters: null
 - table: seating.seat_map
@@ -4916,7 +4943,7 @@ readsFrom:
   operations: 1
 writesOutside:
 - service: TenancyService
-  operations: 25
+  operations: 26
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -4930,6 +4957,9 @@ writesOutside:
     tables:
     - platform.outbox
   - operation: concludeRecommendationExperiment
+    tables:
+    - platform.outbox
+  - operation: convertInventoryHold
     tables:
     - platform.outbox
   - operation: createLiveDynamicPrice
@@ -5025,6 +5055,7 @@ screens:
 - P01:WEB-007 Interactive Seat Selection
 - P01:WEB-008 Add-ons & Upsell
 - P01:WEB-010 Shopping Cart
+- P01:WEB-011 Guest Details & Attendee Forms
 - P01:WEB-015 Branded Queue / Waiting Room
 - P01:WEB-022 Membership Plans
 - P01:WEB-023 Membership Management
@@ -5065,10 +5096,10 @@ screens:
 - P04:POS-004 Sell — Seat Map
 - P04:POS-021 Sell — Food & Drink
 - P04:POS-023 Sell — Merchandise
+- P05:KSK-001 Attract Loop
 - P05:KSK-003 What are you buying
 - P05:KSK-004 Choose tickets
 - P05:KSK-005 Choose a performance
-- P05:KSK-006 Review
 - P05:KSK-015 Assistant
 - P06:EMP-018 Offline package
 - P06:EMP-033 Capacity view

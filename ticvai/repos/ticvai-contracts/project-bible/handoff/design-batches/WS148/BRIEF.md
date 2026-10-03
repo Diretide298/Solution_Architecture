@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-569` | Payment Orchestration Command Center | B–D | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-569` | Payment Orchestration Command Center | C | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-570` | Gateway, PSP & Acquirer Directory | A | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-571` | Provider Connection & Adapter Configuration | B–D | 0 | 40 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-572` | Gateway Capability & Payment Method Mapping | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-573` | Payment Routing Rule Builder | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-574` | Routing Strategy, Priority & Load Distribution | B–D | 0 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-575` | Failover, Retry & Resilience Manager | B–D | 8 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-576` | Provider Health, SLA & Performance Monitor | B–D | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-577` | Provider Cost, Commercial & Routing Economics | B–D | 5 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-578` | Payment Routing Simulator, Decision Trace & AI Advisor | B–D | 0 | 24 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-571` | Provider Connection & Adapter Configuration | C | 0 | 40 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-572` | Gateway Capability & Payment Method Mapping | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-573` | Payment Routing Rule Builder | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-574` | Routing Strategy, Priority & Load Distribution | C | 0 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-575` | Failover, Retry & Resilience Manager | C | 8 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-576` | Provider Health, SLA & Performance Monitor | C | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-577` | Provider Cost, Commercial & Routing Economics | C | 5 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-578` | Payment Routing Simulator, Decision Trace & AI Advisor | C | 0 | 24 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

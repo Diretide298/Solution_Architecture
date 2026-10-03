@@ -96,16 +96,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-339` | Governance & Compliance Command Center | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-340` | Segregation of Duties Policy Manager | B–D | 9 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-341` | Four-Eyes & Dual-Control Policy | B–D | 7 | 0 | 5 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-339` | Governance & Compliance Command Center | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-340` | Segregation of Duties Policy Manager | B | 9 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-341` | Four-Eyes & Dual-Control Policy | B | 7 | 0 | 5 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-342` | Authentication & MFA Policy Manager | A | 27 | 28 | 6 | 11 | 2 | 0 | — | notStarted (—) |
-| `ADM-343` | Sensitive Action Confirmation | B–D | 6 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-344` | Digital Signature Management | B–D | 7 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-345` | Immutable Approval Record & Tamper Detection | B–D | 0 | 18 | 6 | 0 | 0 | 3 | — | notStarted (—) |
-| `ADM-346` | Approval Record Retention Policy | B–D | 8 | 0 | 5 | 2 | 1 | 3 | — | notStarted (—) |
-| `ADM-347` | Regulatory Audit & Evidence Center | B–D | 2 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-348` | Governance Risk & AI Compliance Advisor | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-343` | Sensitive Action Confirmation | B | 6 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-344` | Digital Signature Management | B | 7 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-345` | Immutable Approval Record & Tamper Detection | B | 0 | 18 | 6 | 0 | 0 | 3 | — | notStarted (—) |
+| `ADM-346` | Approval Record Retention Policy | B | 8 | 0 | 5 | 2 | 1 | 3 | — | notStarted (—) |
+| `ADM-347` | Regulatory Audit & Evidence Center | B | 2 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-348` | Governance Risk & AI Compliance Advisor | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -125,7 +125,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-339 |
 | Who uses it | venue staff holding `APPROVAL_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
@@ -273,7 +273,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-340 |
 | Who uses it | venue staff holding `ROLE_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Price Configuration User) and no display directory — it is settings, not a population |
@@ -403,7 +403,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-341 |
 | Who uses it | venue staff holding `APPROVAL_CONFIGURE`, `APPROVAL_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Administrators should configure) and no display directory — it is settings, not a population |
@@ -781,7 +781,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-343 |
 | Who uses it | venue staff holding `APPROVAL_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configuration) and no display directory — it is settings, not a population |
@@ -910,7 +910,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-344 |
 | Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -1019,7 +1019,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-345 |
 | Who uses it | venue staff holding `APPROVAL_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -1166,7 +1166,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-346 |
 | Who uses it | venue staff holding `APPROVAL_CONFIGURE`, `TENANT_CONFIGURE`, `TENANT_VIEW` (2 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configuration) and no display directory — it is settings, not a population |
@@ -1302,7 +1302,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-347 |
 | Who uses it | venue staff holding `APPROVAL_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1409,7 +1409,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-348 |
 | Who uses it | venue staff holding `APPROVAL_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |

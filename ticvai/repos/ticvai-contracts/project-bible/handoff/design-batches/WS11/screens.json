@@ -48,15 +48,6 @@
      "operation": "listAccessSecurityFraud"
     },
     {
-     "to": "BO-247",
-     "trigger": "Works in Unified Identity & Credential Lock Manager",
-     "provenance": "flow F121 step 5→6",
-     "operation": "listAccessSecurityFraud",
-     "carries": [
-      "lockId"
-     ]
-    },
-    {
      "to": "BO-249",
      "trigger": "Works in Relationship & Companion Fraud Monitoring",
      "provenance": "flow F121 step 9→10",
@@ -87,6 +78,15 @@
      "operation": "listAccessSecurityFraud",
      "carries": [
       "alertId"
+     ]
+    },
+    {
+     "to": "BO-247",
+     "trigger": "Works in Unified Identity & Credential Lock Manager",
+     "provenance": "flow F121 step 5→6",
+     "operation": "listAccessSecurityFraud",
+     "carries": [
+      "lockId"
      ]
     },
     {

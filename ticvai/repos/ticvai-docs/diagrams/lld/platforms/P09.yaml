@@ -37,7 +37,7 @@ servicesCalled:
 - service: LedgerService
   operationCalls: 4
 - service: OrderService
-  operationCalls: 2
+  operationCalls: 3
 - service: CatalogueService
   operationCalls: 1
 coverage:
@@ -154,18 +154,28 @@ screens:
   - ADM-389
   - ADM-399
   - ADM-409
+  - ADM-412
   - ADM-419
+  - ADM-424
   - ADM-449
   - ADM-459
   - ADM-469
   - ADM-479
   - ADM-489
   - ADM-499
+  - ADM-500
+  - ADM-506
+  - ADM-508
   - ADM-509
   - ADM-519
+  - ADM-523
+  - ADM-527
+  - ADM-528
   - ADM-529
   - ADM-539
   - ADM-549
+  - ADM-554
+  - ADM-556
   - ADM-619
   - ADM-699
   boardFrames:
@@ -2415,6 +2425,7 @@ screens:
   operations:
   - listOrgUnits
   - listOwnPlatformStaffGrants
+  - listPaymentProviders
   - listTenants
   - openPlatformStaffGrant
   - setPaymentProvider

@@ -281,7 +281,8 @@ operations:
   offline: false
   reads:
   - assets.approval
-  writes: []
+  writes:
+  - assets.approval
 - operation: setMediaAssetRights
   verb: PUT
   path: /media-assets/{assetId}/rights

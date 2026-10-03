@@ -12,8 +12,8 @@ scale: Latency-tolerant, cost-sensitive, token-metered. Different hardware from 
 ifDown: Down degrades suggestions and the concierge. **Nothing that takes money depends on it.**
 coverage:
   operations: 144
-  inAFlow: 18
-  percent: 12%
+  inAFlow: 19
+  percent: 13%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -1532,7 +1532,7 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.activity
-  columns: 24
+  columns: 25
   store: postgres-analytical
   parent: null
   writtenBy:
@@ -1879,7 +1879,7 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.policy
-  columns: 31
+  columns: 32
   store: postgres
   parent: null
   writtenBy:
@@ -1907,7 +1907,7 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.provider
-  columns: 26
+  columns: 27
   store: postgres
   parent: null
   writtenBy:

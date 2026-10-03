@@ -1,6 +1,6 @@
 # WS36 — Pricing   Revenue Management board 3
 
-**9 screens · 18 operations · 23 schemas · 6 permissions**
+**9 screens · 19 operations · 23 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -136,14 +136,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-069` | Tax Profile & Jurisdiction Configuration | A | 15 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-070` | Tax Rule & Treatment Builder | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-071` | Fee & Surcharge Library | B–D | 30 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-072` | Fee Applicability & Charging Rule Builder | B–D | 5 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-073` | Fee Waiver, Tax Exemption & Exception Rules | B–D | 11 | 0 | 5 | 0 | 1 | 4 | — | notStarted (generated) |
-| `ADM-074` | Price Calculation Sequence & Formula Engine | B–D | 25 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-069` | Tax Profile & Jurisdiction Configuration | A | 15 | 8 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-070` | Tax Rule & Treatment Builder | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-071` | Fee & Surcharge Library | B | 30 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-072` | Fee Applicability & Charging Rule Builder | B | 5 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-073` | Fee Waiver, Tax Exemption & Exception Rules | B | 11 | 0 | 5 | 0 | 1 | 4 | — | notStarted (generated) |
+| `ADM-074` | Price Calculation Sequence & Formula Engine | B | 25 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-075` | Currency Precision, Rounding & Monetary Rules | B | 11 | 2 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
-| `ADM-076` | Price Breakdown, Calculation Simulation & Explainability | B–D | 13 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-076` | Price Breakdown, Calculation Simulation & Explainability | B | 13 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-077` | Calculation Validation, Reconciliation & Service Interface | A | 0 | 0 | 6 | 1 | 0 | 6 | — | notStarted (generated) |
 
 ## Thin screens in this batch
@@ -165,7 +165,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 1 · needs the `ticketing` module |
 | Block | Block A · task APP-SETUP-ADM-069 |
-| Who uses it | venue staff holding `LEDGER_VIEW`, `PRODUCT_CONFIGURE`, `TAX_CONFIGURE` (1 read, 2 configure); in the flows as platform admin |
+| Who uses it | venue staff holding `LEDGER_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `TAX_CONFIGURE` (2 read, 2 configure); in the flows as platform admin |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
@@ -234,6 +234,21 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 #### Outputs: what the screen shows and produces
 
+**Shown**
+
+**Load the tax profile and jurisdiction as saved** (detail panel, from `getTaxProfileJurisdiction`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Tax profile name | text | Tax Profile Name |
+| Tax profile code | text | Tax Profile Code |
+| Country | text | Country: ISO 3166-1 alpha-2 code |
+| Tax registration number | text | Tax Registration Number |
+| Status | text | Status: draft, active, inactive or expired |
+| Rate percent | 1,234.5 | Rate in percent (UAE VAT 5); empty when the tax is a fixed amount set on the tax rule |
+| Consuming product count | 1,234 | Dependencies: products using the profile; read-only |
+| Consuming venue count | 1,234 | Dependencies: venues using the profile; read-only |
+
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
@@ -254,7 +269,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 - **Save profile**: Saves a new version from its effective date; the previous version stays for history. *(source: contracts/spine/catalogue.yaml#setTaxProfileJurisdiction)*
 - **Switch e-invoicing to Live**: Only after a test document was accepted; until then Live is disabled with the reason. *(source: contracts/spine/finance.yaml#/components/schemas/FinEInvoicingProvider)*
 
-**Data it reads**: `listTaxInvoiceTemplates` (onLoad, Show invoice templates and number series); `listEInvoicingProviders` (onLoad, Show the e-invoicing provider connection)
+**Data it reads**: `listTaxInvoiceTemplates` (onLoad, Show invoice templates and number series); `listEInvoicingProviders` (onLoad, Show the e-invoicing provider connection); `getTaxProfileJurisdiction` (onLoad, Load the tax profile and jurisdiction as saved)
 
 **Where the user goes next**
 
@@ -305,6 +320,7 @@ template: 'SINV- · resets yearly · next 004813 · English + Arabic · VAT rece
 - `setTaxInvoiceTemplate` → `TAX_CONFIGURE` (configure) · staff
 - `listEInvoicingProviders` → `LEDGER_VIEW` (read) · staff
 - `setEInvoicingProvider` → `TAX_CONFIGURE` (configure) · staff
+- `getTaxProfileJurisdiction` → `PRODUCT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -333,12 +349,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (15), with its required mark, default, format and its error state (404, 409, 422).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (15), with its required mark, default, format and its error state (403, 404, 409, 422).
+- [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-069?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Sales Tax, Entertainment Tax, Tourism Tax, Municipality Tax, Service Tax.
 - [ ] Every transition is wired: `ADM-068`, `BO-100`.
-- [ ] Every gated control is gated: `LEDGER_VIEW`, `PRODUCT_CONFIGURE`, `TAX_CONFIGURE`.
+- [ ] Every gated control is gated: `LEDGER_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `TAX_CONFIGURE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] The 5 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
@@ -355,7 +371,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-070 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as platform admin |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -475,7 +491,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-071 |
 | Who uses it | venue staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as platform admin |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Capture; Configure whether the fee is) and no display directory — it is settings, not a population |
@@ -646,7 +662,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-072 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as platform admin |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure whether fees can) and no display directory — it is settings, not a population |
@@ -775,7 +791,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-073 |
 | Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as platform admin |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure by) and no display directory — it is settings, not a population |
@@ -919,7 +935,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-074 |
 | Who uses it | venue staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as platform admin |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Each step should define) and no display directory — it is settings, not a population |
@@ -1072,7 +1088,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
-| Block | Block B · task APP-SETUP-ADM-075 |
+| Block | Block B · task VM-ADM-075 |
 | Who uses it | venue staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as platform admin |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -1231,7 +1247,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-076 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as platform admin |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Select) and no display directory — it is settings, not a population |
@@ -1608,6 +1624,7 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+"getTaxProfileJurisdiction": {"method":"GET","path":"/tax-profile-jurisdiction","contract":"catalogue","summary":"The tax profile and jurisdiction configuration as saved","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"TaxProfileJurisdictionConfigurationView"},
 "listCalculationValidationReconciliation": {"method":"GET","path":"/calculation-validation-reconciliation","contract":"catalogue","summary":"Calculation Validation, Reconciliation & Service Interface","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"resultKind","in":"query","required":false},{"name":"area","in":"query","required":false},{"name":"severity","in":"query","required":false},{"name":"passed","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listCurrencyPrecisionRounding": {"method":"GET","path":"/currency-precision-rounding","contract":"catalogue","summary":"Currency Precision, Rounding & Monetary Rules","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"CurrencyPrecisionRoundingMonetaryRulesView"},
 "listEInvoiceTransmissions": {"method":"GET","path":"/e-invoicing/transmissions","contract":"finance","summary":"What was sent to the e-invoicing provider, and what came back","permission":"LEDGER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":"legalEntityId","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":"documentId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},

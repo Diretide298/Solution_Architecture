@@ -4,7 +4,7 @@
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS subscription.capacity_pack (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     tenant_id                         uuid NOT NULL,
     unit                              text NOT NULL,
     quantity                          integer NOT NULL,
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS subscription.contract (
 -- Holds 3 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS subscription.enforcement_policy (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     is_hard_stop_allowed              boolean DEFAULT false,
     grace_days                        integer DEFAULT 7
 );
@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS subscription.go_live_readiness (
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS subscription.licensing_model (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text,
     billable_unit                     text NOT NULL CONSTRAINT licensing_model_billable_unit_chk CHECK (billable_unit IN ('perVenue', 'perAdmission', 'perTransaction', 'perActiveUser', 'perDevice', 'perModule', 'flatFee', 'revenueShare')),
@@ -135,7 +135,7 @@ CREATE TABLE IF NOT EXISTS subscription.membership_household_policy (
 -- Holds 5 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS subscription.membership_household_policy_role_limit (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     membership_household_policy_id    uuid,
     role                              text NOT NULL CONSTRAINT membership_household_policy_role_limit_role_chk CHECK (role IN ('primaryMember', 'secondaryAdult', 'dependent', 'child', 'guardian', 'authorizedManager')),
     min_count                         integer,
@@ -355,7 +355,7 @@ CREATE TABLE IF NOT EXISTS subscription.plan_module (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS subscription.tier_allowance (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     tier_id                           uuid NOT NULL,
     code                              text NOT NULL CONSTRAINT tier_allowance_code_chk CHECK (char_length(code) <= 100),
     name                              text NOT NULL CONSTRAINT tier_allowance_name_chk CHECK (char_length(name) <= 150),
@@ -370,7 +370,7 @@ CREATE TABLE IF NOT EXISTS subscription.tier_allowance (
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS subscription.tier_module (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     tier_id                           uuid NOT NULL,
     code                              text NOT NULL CONSTRAINT tier_module_code_chk CHECK (char_length(code) <= 100),
     is_included                       boolean NOT NULL,
@@ -383,7 +383,7 @@ CREATE TABLE IF NOT EXISTS subscription.tier_module (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS subscription.trial_config (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     tier_code                         text,
     duration_days                     integer DEFAULT 30,
     included_modules                  text[],
@@ -398,7 +398,7 @@ CREATE TABLE IF NOT EXISTS subscription.trial_config (
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS subscription.vsi_assessment (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     organisation_name                 text,
     contact_email                     text,
     venue_type                        text,

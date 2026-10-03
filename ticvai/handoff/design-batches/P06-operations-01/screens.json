@@ -519,7 +519,8 @@
     "EMP-070",
     "EMP-071",
     "EMP-081",
-    "EMP-091"
+    "EMP-091",
+    "EMP-032"
    ],
    "inferred": true,
    "fromFlows": true,
@@ -754,6 +755,11 @@
      "to": "EMP-042",
      "trigger": "Profile",
      "provenance": "derived — EMP-042 declares entryState.params methodId and EMP-003 holds none of them. The edge carries nothing: methodId only pre-selects (deep link or optional), and EMP-042 opens on its own"
+    },
+    {
+     "to": "EMP-032",
+     "trigger": "Opens Manual wait entry",
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
     }
    ],
    "entryFrom": [

@@ -15,7 +15,8 @@ operations:
   offline: true
   reads:
   - games.authorisation
-  writes: []
+  writes:
+  - games.authorisation
 - operation: cloneGame
   verb: POST
   path: /games/{gameId}/clone
@@ -26,7 +27,8 @@ operations:
   offline: false
   reads:
   - games.game
-  writes: []
+  writes:
+  - games.game
 - operation: cloneReaderConfiguration
   verb: POST
   path: /readers/{readerId}/clone
@@ -37,7 +39,8 @@ operations:
   offline: false
   reads:
   - games.reader
-  writes: []
+  writes:
+  - games.reader
 - operation: createGame
   verb: POST
   path: /games
@@ -88,7 +91,8 @@ operations:
   offline: false
   reads:
   - games.reader_deployment
-  writes: []
+  writes:
+  - games.reader_deployment
 - operation: getGameCard
   verb: GET
   path: /game-cards/{cardCode}
@@ -331,7 +335,8 @@ operations:
   offline: false
   reads:
   - games.card
-  writes: []
+  writes:
+  - games.card
 - operation: setGameKioskConfiguration
   verb: PUT
   path: /game-kiosk-config

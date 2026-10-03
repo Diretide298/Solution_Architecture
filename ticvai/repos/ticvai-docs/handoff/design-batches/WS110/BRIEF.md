@@ -155,15 +155,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-635` | Accreditation Review Queue | B–D | 17 | 26 | 6 | 1 | 1 | 6 | — | notStarted (—) |
-| `BO-636` | Application Review Workspace | B–D | 3 | 12 | 6 | 5 | 0 | 0 | — | notStarted (—) |
-| `BO-637` | Approval Workflow Builder | B–D | 19 | 0 | 6 | 0 | 1 | 3 | — | notStarted (—) |
-| `BO-638` | Approval Rules & Conditions | B–D | 0 | 0 | 6 | 0 | 1 | 3 | — | notStarted (—) |
-| `BO-639` | Reviewer Assignment & Delegation | B–D | 0 | 0 | 6 | 49 | 0 | 0 | — | notStarted (—) |
-| `BO-640` | Rejection & Resubmission Management | B–D | 0 | 20 | 6 | 3 | 0 | 0 | — | notStarted (—) |
-| `BO-641` | Escalation & Exception Management | B–D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
-| `BO-642` | Approval Decision History | B–D | 0 | 12 | 6 | 2 | 0 | 3 | — | notStarted (—) |
-| `BO-643` | Approval Policy Validation & Publication | B–D | 20 | 34 | 6 | 2 | 0 | 3 | — | notStarted (—) |
+| `BO-635` | Accreditation Review Queue | D | 17 | 26 | 6 | 1 | 1 | 6 | — | notStarted (—) |
+| `BO-636` | Application Review Workspace | D | 3 | 12 | 6 | 5 | 0 | 0 | — | notStarted (—) |
+| `BO-637` | Approval Workflow Builder | B | 19 | 0 | 6 | 0 | 1 | 3 | — | notStarted (—) |
+| `BO-638` | Approval Rules & Conditions | B | 0 | 0 | 6 | 0 | 1 | 3 | — | notStarted (—) |
+| `BO-639` | Reviewer Assignment & Delegation | B | 0 | 0 | 6 | 49 | 0 | 0 | — | notStarted (—) |
+| `BO-640` | Rejection & Resubmission Management | D | 0 | 20 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `BO-641` | Escalation & Exception Management | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `BO-642` | Approval Decision History | D | 0 | 12 | 6 | 2 | 0 | 3 | — | notStarted (—) |
+| `BO-643` | Approval Policy Validation & Publication | B | 20 | 34 | 6 | 2 | 0 | 3 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

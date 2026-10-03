@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-324` | Payment & Order Financial Command Center | B–D | 2 | 14 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
-| `BO-325` | Order Payment Detail & Transaction Ledger | B–D | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-326` | Multi-Payment, Split Tender & Payment Allocation Configuration | B–D | 16 | 5 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-327` | Deposit, Partial Payment & Outstanding Balance Management | B–D | 21 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-328` | Order Split, Merge & Transaction Relationship Management | B–D | 2 | 0 | 6 | 2 | 0 | 2 | — | notStarted (generated) |
-| `BO-329` | Related Order & Transaction Relationship Explorer | B–D | 2 | 14 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-330` | External Payment, Partner & Settlement Reference Mapping | B–D | 26 | 5 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-331` | Payment Reconciliation & Exception Management | B–D | 0 | 2 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-332` | Financial Traceability, Control & Audit Explorer | B–D | 1 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-333` | Order Financial Analytics & AI Reconciliation Intelligence | B–D | 2 | 10 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-324` | Payment & Order Financial Command Center | C | 2 | 14 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
+| `BO-325` | Order Payment Detail & Transaction Ledger | C | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-326` | Multi-Payment, Split Tender & Payment Allocation Configuration | C | 16 | 5 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-327` | Deposit, Partial Payment & Outstanding Balance Management | C | 21 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-328` | Order Split, Merge & Transaction Relationship Management | C | 2 | 0 | 6 | 2 | 0 | 2 | — | notStarted (generated) |
+| `BO-329` | Related Order & Transaction Relationship Explorer | C | 2 | 14 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-330` | External Payment, Partner & Settlement Reference Mapping | C | 26 | 5 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-331` | Payment Reconciliation & Exception Management | C | 0 | 2 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-332` | Financial Traceability, Control & Audit Explorer | C | 1 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-333` | Order Financial Analytics & AI Reconciliation Intelligence | C | 2 | 10 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

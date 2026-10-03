@@ -112,6 +112,30 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listPaymentProviders": {
+  "method": "GET",
+  "path": "/payment-providers",
+  "contract": "orders",
+  "summary": "Gateways configured for this scope",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listTenants": {
   "method": "GET",
   "path": "/tenants",

@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS seating.accessible (
 -- Holds 15 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS seating.group_request (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     reference                         text,
     performance_id                    uuid NOT NULL,
     organisation_id                   uuid,
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS seating.group_request (
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS seating.group_request_participant (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     group_request_id                  uuid,
     name                              text NOT NULL,
     seat_id                           uuid,
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS seating.group_request_participant (
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS seating.hold_pool (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     hold_type_id                      uuid NOT NULL,
     performance_id                    uuid NOT NULL,
     seat_ids                          text[],
@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS seating.hold_pool (
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS seating.hold_type (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text NOT NULL,
     purpose                           text CONSTRAINT hold_type_purpose_chk CHECK (purpose IN ('production', 'house', 'accessibility', 'press', 'sponsor', 'contractual', 'maintenance', 'distancing')),
@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS seating.import_job (
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS seating.reassignment (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     order_id                          uuid,
     from_seat_ids                     text[],
     to_seat_ids                       text[],
@@ -151,7 +151,7 @@ CREATE TABLE IF NOT EXISTS seating.seat_block (
 -- Holds 4 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS seating.seat_block_item (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     block_id                          uuid NOT NULL,
     seat_id                           uuid NOT NULL,
     created_at                        timestamptz NOT NULL
@@ -187,7 +187,7 @@ CREATE TABLE IF NOT EXISTS seating.seat_hold (
 -- Holds 5 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS seating.seat_hold_item (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     hold_id                           uuid NOT NULL,
     seat_id                           uuid NOT NULL,
     held_price                        numeric(18,4),
@@ -226,7 +226,7 @@ CREATE TABLE IF NOT EXISTS seating.seat_map_template (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS seating.seat_price_band (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     seat_category_id                  uuid,
     code                              text NOT NULL CONSTRAINT seat_price_band_code_chk CHECK (char_length(code) <= 64),
     display_label                     text NOT NULL CONSTRAINT seat_price_band_display_label_chk CHECK (char_length(display_label) <= 200),
@@ -253,7 +253,7 @@ CREATE TABLE IF NOT EXISTS seating.seat_rules (
 
 -- How seats may be chosen — best available, adjacency, party splitting
 CREATE TABLE IF NOT EXISTS seating.seating_rules (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     seat_map_id                       uuid NOT NULL,
     buffer_seats                      integer DEFAULT 0,
     buffer_rows                       integer DEFAULT 0,

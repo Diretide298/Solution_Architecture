@@ -147,7 +147,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `maintenance` module |
-| Block | Block D · task APP-SETUP-EMP-048 |
+| Block | Block D · task APP-STAFF-EMP-048 |
 | Who uses it | venue staff holding `INSPECTION_SUBMIT`, `INSPECTION_VIEW` (1 operate, 1 read); in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listInspectionTemplates` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1041,7 +1041,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Scans `scans` | repeatable rows | required | — | at least 1; at most 500 | — | — | `syncScans` body |
 | ID `scans[].id` | picker: choose an id | required | — | — | shows names, sends the id | Client-generated UUIDv7. Also the idempotency key and dedupe key. | `syncScans` body |
 | Media code `scans[].mediaCode` | text area | required | — | max length 256 | — | What was read from the media. NOT the ticket id — media can be re-linked over a ticket's life. | `syncScans` body |
-| Media kind `scans[].mediaKind` | select | required | — | Image · Video · Audio · Document · Vector · Font · Archive | — | — | `syncScans` body |
+| Media kind `scans[].mediaKind` | select | required | — | Image · Video · Audio · Document · Vector · Font · Archive · Model3d; glb`) venue model, at most 40 MB. | — | `model3d` added 3 October 2026 (r1 additions; ADR-0069 action item 4): a glTF binary (`model/gltf-binary`, `.glb`) venue model, at most 40 MB. | `syncScans` body |
 | Direction `scans[].direction` | radio group | required | — | Entry · Exit · Reentry · Crossover | — | — | `syncScans` body |
 | Group size `scans[].groupSize` | number field | optional | — | min 1 | — | For group media admitting several holders on one read. | `syncScans` body |
 | Proximity token `scans[].proximityToken` | text field | optional | — | — | — | BLE proximity assertion where the venue requires the operator to be physically at the gate. | `syncScans` body |

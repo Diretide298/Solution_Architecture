@@ -1,6 +1,6 @@
 # P08-sell-03 — P08 · Sell (3 of 4)
 
-**10 screens · 26 operations · 42 schemas · 9 permissions**
+**10 screens · 27 operations · 42 schemas · 9 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -188,20 +188,20 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-113` | Central Kitchen & Commissary Management | B–D | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (generated) |
-| `BO-114` | Variants, Attributes, Barcode & RFID Management | B–D | 3 | 8 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-115` | Category, Brand & Merchandise Hierarchy | B–D | 14 | 15 | 6 | 0 | 2 | 6 | — | notStarted (generated) |
+| `BO-113` | Central Kitchen & Commissary Management | B | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (generated) |
+| `BO-114` | Variants, Attributes, Barcode & RFID Management | D | 3 | 8 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-115` | Category, Brand & Merchandise Hierarchy | B | 14 | 15 | 6 | 0 | 2 | 6 | — | notStarted (generated) |
 | `BO-116` | Merchandising & Product Presentation | B | 30 | 62 | 6 | 4 | 1 | 0 | — | notStarted (generated) |
-| `BO-117` | Product Import, Governance & AI Configuration Assistant | A | 7 | 0 | 6 | 32 | 5 | 0 | — | notStarted (generated) |
-| `BO-118` | Campaign & Audience Management | B–D | 47 | 45 | 6 | 14 | 0 | 6 | — | notStarted (generated) |
-| `BO-119` | Cross-Sell, Upsell & Recommendation Rules | B–D | 1 | 24 | 5 | 54 | 4 | 0 | — | notStarted (generated) |
-| `BO-120` | Omnichannel Commerce & Journey Configuration | B–D | 28 | 14 | 6 | 9 | 1 | 6 | — | notStarted (generated) |
-| `BO-121` | Personalized Offers & Guest Engagement | B–D | 42 | 14 | 6 | 8 | 1 | 0 | — | notStarted (generated) |
-| `BO-1190` | Donation Campaigns | B–D | 27 | 16 | 7 | 5 | 2 | 6 | — | notStarted (generated) |
+| `BO-117` | Product Import, Governance & AI Configuration Assistant | A | 7 | 8 | 6 | 32 | 5 | 0 | — | notStarted (generated) |
+| `BO-118` | Campaign & Audience Management | D | 47 | 45 | 6 | 14 | 0 | 6 | — | notStarted (generated) |
+| `BO-119` | Cross-Sell, Upsell & Recommendation Rules | B | 1 | 24 | 5 | 54 | 4 | 0 | — | notStarted (generated) |
+| `BO-120` | Omnichannel Commerce & Journey Configuration | D | 28 | 14 | 6 | 9 | 1 | 6 | — | notStarted (generated) |
+| `BO-121` | Personalized Offers & Guest Engagement | D | 42 | 14 | 6 | 8 | 1 | 0 | — | notStarted (generated) |
+| `BO-1190` | Donation Campaigns | B | 27 | 16 | 7 | 5 | 2 | 6 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
-**BO-113, BO-117 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-113 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

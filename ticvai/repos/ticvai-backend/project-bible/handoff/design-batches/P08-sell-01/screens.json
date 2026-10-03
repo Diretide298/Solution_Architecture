@@ -81,6 +81,18 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "cardList",
+       "label": "Load the product's attribute axes before they are replaced",
+       "operation": "getProductAttributes",
+       "bindsTo": "VariantDimension",
+       "columns": [
+        "VariantDimension.code",
+        "VariantDimension.name",
+        "VariantDimension.values"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
+      {
        "kind": "multiSelect",
        "label": "Kind",
        "operation": "listProducts",
@@ -384,6 +396,13 @@
     "purpose": "Change many products at once, with a preview",
     "trigger": "onAction",
     "provenance": "design-note correction, 2 October 2026 (BO-007)"
+   },
+   {
+    "operationId": "getProductAttributes",
+    "contract": "catalogue",
+    "purpose": "Load the product's attribute axes before they are replaced",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "entryState": {
@@ -660,6 +679,18 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "cardList",
+       "label": "Load the product's attribute axes before they are replaced",
+       "operation": "getProductAttributes",
+       "bindsTo": "VariantDimension",
+       "columns": [
+        "VariantDimension.code",
+        "VariantDimension.name",
+        "VariantDimension.values"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
+      {
        "kind": "dataTable",
        "label": "Every product variant",
        "bindsTo": "ProductVariant",
@@ -932,6 +963,13 @@
     "purpose": "The PDF ticket and the Apple and Google Wallet pass proofs of this product (DEC-151, CHG-CSP-038)",
     "trigger": "onLoad",
     "provenance": "design-note correction, 2 October 2026 (BO-008)"
+   },
+   {
+    "operationId": "getProductAttributes",
+    "contract": "catalogue",
+    "purpose": "Load the product's attribute axes before they are replaced",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "entryState": {
@@ -2418,6 +2456,53 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "cardList",
+       "label": "Load the package pricing as saved",
+       "operation": "getPackagePricingDefinition",
+       "bindsTo": "PackagePricing",
+       "columns": [
+        "PackagePricing.recordKind",
+        "PackagePricing.name",
+        "PackagePricing.pricingModel",
+        "PackagePricing.addOnType",
+        "PackagePricing.packagePrice",
+        "PackagePricing.components",
+        "PackagePricing.componentPriceVisibility",
+        "PackagePricing.status"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
+      {
+       "kind": "cardList",
+       "label": "Load the bundle being edited",
+       "operation": "getBundle",
+       "bindsTo": "Bundle",
+       "columns": [
+        "Bundle.code",
+        "Bundle.name",
+        "Bundle.description",
+        "Bundle.kind",
+        "Bundle.price",
+        "Bundle.savingsAmount",
+        "Bundle.savingsPercentage",
+        "Bundle.hasBeenSold"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
+      {
+       "kind": "cardList",
+       "label": "List the combos and their slots",
+       "operation": "listCombos",
+       "bindsTo": "Combo",
+       "columns": [
+        "Combo.name",
+        "Combo.price",
+        "Combo.availability",
+        "Combo.isActive"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
+      {
        "kind": "dataTable",
        "label": "Every bundle",
        "bindsTo": "BundleSummary",
@@ -2675,6 +2760,27 @@
      "getLatestBundle",
      "listCommercialCampaigns"
     ]
+   },
+   {
+    "operationId": "listCombos",
+    "contract": "fnb",
+    "purpose": "List the combos and their slots",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+   },
+   {
+    "operationId": "getBundle",
+    "contract": "promotions",
+    "purpose": "Load the bundle being edited",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+   },
+   {
+    "operationId": "getPackagePricingDefinition",
+    "contract": "catalogue",
+    "purpose": "Load the package pricing as saved",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "entryState": {
@@ -2895,6 +3001,18 @@
      "name": "contentBody",
      "slot": "collection",
      "components": [
+      {
+       "kind": "cardList",
+       "label": "Load the product's attribute axes before they are replaced",
+       "operation": "getProductAttributes",
+       "bindsTo": "VariantDimension",
+       "columns": [
+        "VariantDimension.code",
+        "VariantDimension.name",
+        "VariantDimension.values"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
       {
        "kind": "textField",
        "label": "Venue id",
@@ -3149,6 +3267,13 @@
     "invalidates": [
      "listProducts"
     ]
+   },
+   {
+    "operationId": "getProductAttributes",
+    "contract": "catalogue",
+    "purpose": "Load the product's attribute axes before they are replaced",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "entryState": {

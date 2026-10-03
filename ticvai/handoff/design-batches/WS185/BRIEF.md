@@ -129,16 +129,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-689` | Recommendation Performance Command Center | B–D | 2 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
-| `ADM-690` | Recommendation Strategy & Placement Analytics | B–D | 0 | 30 | 6 | 3 | 0 | 0 | — | notStarted (—) |
-| `ADM-691` | Recommendation Experiment & A/B Test Studio | B–D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-692` | Experiment Results & Winner Decision Workspace | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-693` | Recommendation Attribution & Incrementality Analytics | B–D | 5 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
-| `ADM-694` | AI Model Performance & Drift Monitor | B–D | 0 | 24 | 6 | 3 | 0 | 0 | — | notStarted (—) |
-| `ADM-695` | Recommendation Governance & Deployment Control | B–D | 0 | 2 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-696` | AI Risk, Fairness, Explainability & Safety Center | B–D | 3 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-697` | Recommendation Audit, Decision Trace & Investigation | B–D | 2 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-698` | AI Optimization & Recommendation Intelligence Lab | B–D | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-689` | Recommendation Performance Command Center | C | 2 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `ADM-690` | Recommendation Strategy & Placement Analytics | C | 0 | 30 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `ADM-691` | Recommendation Experiment & A/B Test Studio | C | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-692` | Experiment Results & Winner Decision Workspace | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-693` | Recommendation Attribution & Incrementality Analytics | C | 5 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `ADM-694` | AI Model Performance & Drift Monitor | C | 0 | 24 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `ADM-695` | Recommendation Governance & Deployment Control | C | 0 | 2 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-696` | AI Risk, Fairness, Explainability & Safety Center | D | 3 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-697` | Recommendation Audit, Decision Trace & Investigation | D | 2 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-698` | AI Optimization & Recommendation Intelligence Lab | C | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

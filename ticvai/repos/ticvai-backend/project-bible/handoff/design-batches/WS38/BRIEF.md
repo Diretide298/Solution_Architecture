@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-088` | Dynamic Pricing Strategy Command Center | B–D | 2 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-089` | Dynamic Pricing Strategy Builder | B–D | 24 | 20 | 5 | 2 | 1 | 0 | — | notStarted (generated) |
+| `ADM-088` | Dynamic Pricing Strategy Command Center | B | 2 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-089` | Dynamic Pricing Strategy Builder | B | 24 | 20 | 5 | 2 | 1 | 0 | — | notStarted (generated) |
 | `ADM-090` | Demand, Occupancy & Availability Rule Builder | B | 0 | 20 | 6 | 5 | 0 | 0 | — | notStarted (generated) |
 | `ADM-091` | Booking Velocity & Time-to-Event Rule Builder | B | 0 | 20 | 6 | 1 | 0 | 6 | — | notStarted (generated) |
-| `ADM-092` | Seasonal, Calendar, Day & Timeslot Dynamic Rules | B–D | 26 | 20 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `ADM-093` | Channel, Customer Segment & Location Dynamic Rules | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
-| `ADM-094` | Dynamic Price Bands, Ladders & Adjustment Matrix | B–D | 24 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
+| `ADM-092` | Seasonal, Calendar, Day & Timeslot Dynamic Rules | B | 26 | 20 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `ADM-093` | Channel, Customer Segment & Location Dynamic Rules | B | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `ADM-094` | Dynamic Price Bands, Ladders & Adjustment Matrix | B | 24 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
 | `ADM-095` | Dynamic Pricing Guardrails & Commercial Protection | B | 47 | 0 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
-| `ADM-096` | Dynamic Pricing Automation Policy & Control | B–D | 50 | 0 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
-| `ADM-097` | Rule Priority, Conflict Resolution & Dynamic Pricing Test Console | B–D | 0 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-096` | Dynamic Pricing Automation Policy & Control | B | 50 | 0 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
+| `ADM-097` | Rule Priority, Conflict Resolution & Dynamic Pricing Test Console | B | 0 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

@@ -4,7 +4,7 @@
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS sync.cell_connection (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     source_cell_id                    uuid NOT NULL,
     target_cell_id                    uuid NOT NULL,
     type                              text NOT NULL CONSTRAINT cell_connection_type_chk CHECK (char_length(type) <= 30),
@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS sync.cell_connection (
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS sync.cross_cell_request (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     guest_link_id                     uuid NOT NULL,
     type                              text NOT NULL CONSTRAINT cross_cell_request_type_chk CHECK (char_length(type) <= 50),
     source_cell_id                    uuid NOT NULL,

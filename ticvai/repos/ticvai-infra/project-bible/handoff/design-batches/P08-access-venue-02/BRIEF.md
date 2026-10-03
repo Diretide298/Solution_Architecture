@@ -1,6 +1,6 @@
 # P08-access-venue-02 — P08 · Access & Venue (2 of 3)
 
-**10 screens · 40 operations · 62 schemas · 17 permissions**
+**10 screens · 46 operations · 69 schemas · 19 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 17 permissions apply here:
-  `ASSET_LIBRARY_VIEW, ASSET_MANAGE, ASSET_VIEW, AUDIT_VIEW, INCIDENT_MANAGE, INCIDENT_REPORT, INCIDENT_VIEW, ORDER_MODIFY, ORDER_VIEW, PRODUCT_VIEW, REPORT_VIEW_VENUE, RESOURCE_MANAGE`…. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 19 permissions apply here:
+  `AI_USE, ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_VIEW, ASSET_MANAGE, ASSET_VIEW, AUDIT_VIEW, INCIDENT_MANAGE, INCIDENT_REPORT, INCIDENT_VIEW, ORDER_MODIFY, ORDER_VIEW, PRODUCT_VIEW`…. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -131,16 +131,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-034` | Scan Activity | B–D | 7 | 10 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
-| `BO-035` | Override Audit | B–D | 7 | 17 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
-| `BO-038` | Reconciliation Queue | B–D | 3 | 20 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
-| `BO-069` | Asset Register | B–D | 42 | 22 | 6 | 23 | 3 | 0 | — | notStarted (generated) |
-| `BO-071` | Planned Maintenance | B–D | 21 | 21 | 6 | 5 | 2 | 2 | — | notStarted (generated) |
-| `BO-072` | Incident Log | B–D | 35 | 22 | 6 | 10 | 0 | 0 | — | notStarted (generated) |
+| `BO-034` | Scan Activity | C | 7 | 10 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
+| `BO-035` | Override Audit | C | 7 | 17 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
+| `BO-038` | Reconciliation Queue | C | 3 | 20 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `BO-069` | Asset Register | A | 42 | 22 | 6 | 23 | 3 | 0 | — | notStarted (generated) |
+| `BO-071` | Planned Maintenance | D | 21 | 21 | 6 | 5 | 2 | 2 | — | notStarted (generated) |
+| `BO-072` | Incident Log | D | 35 | 22 | 6 | 10 | 0 | 0 | — | notStarted (generated) |
 | `BO-092` | Venue Maps | A | 14 | 14 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-093` | Map Import & Labelling | A | 66 | 27 | 6 | 4 | 3 | 0 | — | notStarted (generated) |
-| `BO-094` | Map Editor & Publish | A | 57 | 9 | 5 | 13 | 3 | 0 | — | notStarted (generated) |
-| `BO-095` | Resources | B–D | 26 | 13 | 6 | 19 | 1 | 0 | — | notStarted (generated) |
+| `BO-093` | Map Import & Labelling | A | 87 | 57 | 6 | 5 | 3 | 0 | — | notStarted (generated) |
+| `BO-094` | Map Editor & Publish | A | 67 | 49 | 5 | 14 | 3 | 0 | — | notStarted (generated) |
+| `BO-095` | Resources | D | 26 | 13 | 6 | 19 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

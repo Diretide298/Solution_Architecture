@@ -612,13 +612,33 @@
    "scrubbing": {
     "type": "object",
     "readOnly": true,
-    "description": "**Mandatory offline PII scrubbing and moderation on every LLM call** (Chinmay, 2 October: \"we may need to scrub personal info no matter what\"; ADR-0020 amended; CHG-CSA-003). Not a setting: it applies whatever the tenant's residency class, and a tenant cannot switch it off. Before a prompt leaves the cell the gateway runs Microsoft Presidio (offline) with UAE recognisers (Emirates ID, UAE phone, passport, IBAN, Luhn-checked card, email) and an Arabic NER model; each value found becomes a reversible placeholder (`[GUEST_1]`) whose map never leaves the cell, and the reply is re-filled before it reaches the user. An offline guard model (Qwen3Guard, which covers Arabic) checks input and output. **Fails closed**: with the scrubber or the guard down, the call is refused (`503 scrubber-unavailable`), never sent raw. This object reports what is in force.\n",
+    "description": "**Mandatory offline PII scrubbing and moderation on every LLM call** (Chinmay, 2 October: \"we may need to scrub personal info no matter what\"; ADR-0020 amended; CHG-CSA-003). Not a setting: it applies whatever the tenant's residency class, and a tenant cannot switch it off. Before a prompt leaves the cell the gateway runs Microsoft Presidio (offline) with UAE recognisers (Emirates ID, UAE phone, passport, IBAN, Luhn-checked card, email) and an Arabic NER model; each value found becomes a reversible placeholder (`[GUEST_1]`) whose map never leaves the cell, and the reply is re-filled before it reaches the user. An input and output guard checks both directions: **the provider's content-safety service, not a model we host** (Chinmay, 3 October: we host no LLM unless a client asks, and a guard model is an LLM; CHG-R1S-002): Azure AI Content Safety in UAE North for `uaeOnly`, the provider's own moderation for BYOK and `globalAllowed`. The scrubber stays a CPU library in our own worker and is mandatory in every residency class. **Fails closed**: with the scrubber or the safety service down, the call is refused (`503 scrubber-unavailable`), never sent raw. This object reports what is in force.\n\n**A second, deterministic pass after Presidio** (3 October 2026, CHG-R1S-016; the legal research `docs/active/research/openai-key-uae-3-october.md`, item 5: Presidio itself says it will not find everything). Fixed patterns run over the scrubbed text: Emirates ID (`784-...`), `+971` numbers, Luhn-valid card numbers (PAN), IBAN and email. **Any survivor blocks the call**, fail closed, `503 scrubber-unavailable` with no provider fallback, never sent. The Presidio version is pinned (`scrubberVersion`): it is community-maintained now, so a release is taken on purpose, after the golden corpus passes.\n",
     "properties": {
      "mode": {
       "type": "string",
       "enum": [
        "mandatory"
       ]
+     },
+     "scrubberVersion": {
+      "type": "string",
+      "readOnly": true,
+      "description": "The pinned Presidio release (and recogniser set) in force, e.g. `presidio-2.2.355+uae-1` (CHG-R1S-016). Recorded on every call's activity row."
+     },
+     "residualPatternCheck": {
+      "type": "array",
+      "readOnly": true,
+      "items": {
+       "type": "string",
+       "enum": [
+        "emiratesId",
+        "uaePhone",
+        "cardPan",
+        "iban",
+        "email"
+       ]
+      },
+      "description": "The deterministic patterns run after Presidio; a match blocks the call (fail closed, `503 scrubber-unavailable`). Always all five (CHG-R1S-016)."
      },
      "recognisers": {
       "type": "array",
@@ -633,7 +653,49 @@
      },
      "guardModel": {
       "type": "string",
-      "description": "The input and output guard model in force, e.g. `qwen3guard`."
+      "description": "The input and output guard in force, e.g. `azureContentSafety` (the provider''s content-safety service, CHG-R1S-002); a self-hosted guard model appears only where a client asked for self-hosting."
+     }
+    }
+   },
+   "globalEndpointExclusions": {
+    "type": "object",
+    "readOnly": true,
+    "description": "**What never goes to a global endpoint** (3 October 2026, CHG-R1S-016; the legal research `docs/active/research/openai-key-uae-3-october.md`, item 6). A field-level exclusion list applied by the prompt builders when the resolved endpoint is outside the UAE (`globalAllowed`): the fields are dropped from the prompt, not masked, and the media kinds are refused. Not a setting: it applies to every tenant.",
+    "properties": {
+     "fieldCategories": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "enum": [
+        "allergy",
+        "accessibility",
+        "familyAndChildren",
+        "health",
+        "biometric",
+        "religion",
+        "payment"
+       ]
+      },
+      "description": "Allergy, accessibility and family or children data in F&B and booking prompts, and health, biometric, religion and payment data anywhere."
+     },
+     "fields": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      },
+      "description": "The schema fields held under those categories, e.g. `Allergen.contains`, `Attendee.accessibilityNeeds`, `Attendee.dateOfBirth`."
+     },
+     "blockedMedia": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "enum": [
+        "image",
+        "audio",
+        "file"
+       ]
+      },
+      "description": "Images, audio and files are never sent to a global endpoint."
      }
     }
    },

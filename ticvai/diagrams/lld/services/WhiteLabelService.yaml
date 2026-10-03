@@ -152,7 +152,7 @@ operationsByContract:
     permission: TENANT_PUBLISH
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: getAppBuild
     verb: GET
     path: /tenant-config/app-builds/{appBuildId}
@@ -496,7 +496,7 @@ operationsByContract:
     permission: TENANT_PUBLISH
     offline: false
     reads: 4
-    writes: 2
+    writes: 3
   - operation: recordStorefrontSessionEvents
     verb: POST
     path: /storefront/session-events
@@ -512,7 +512,7 @@ operationsByContract:
     permission: TENANT_CONFIGURE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: relinquishCustomDomain
     verb: DELETE
     path: /tenant-domains/{domainId}
@@ -664,7 +664,7 @@ operationsByContract:
     permission: TENANT_CONFIGURE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: setPublishReviewPolicy
     verb: PUT
     path: /publish-review-policy
@@ -704,7 +704,7 @@ operationsByContract:
     permission: TENANT_PUBLISH
     offline: false
     reads: 3
-    writes: 0
+    writes: 1
   - operation: updateBanner
     verb: PATCH
     path: /tenant-config/banners/{bannerId}
@@ -735,8 +735,8 @@ operationsByContract:
     scope: venue
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 3
-    writes: 1
+    reads: 4
+    writes: 4
   - operation: updatePromoBlock
     verb: PATCH
     path: /tenant-config/promo-blocks/{promoBlockId}
@@ -821,6 +821,7 @@ tables:
   - updateBanner
   - updateBookingFlowDefinition
   - updateContentPage
+  - updateGuidedChoice
   - updatePromoBlock
   - validateBookingFlow
   - validateTenantConfig
@@ -857,6 +858,7 @@ tables:
   - setTheme
   - updateBanner
   - updateContentPage
+  - updateGuidedChoice
   - updatePromoBlock
   - verifyCustomDomain
 - store: cache:resolution
@@ -997,7 +999,7 @@ tables:
   - white-label
   foreignWriters: null
 - table: whitelabel.guided_choice_answer
-  columns: 5
+  columns: 12
   store: postgres
   parent: whitelabel.guided_choice
   writtenBy:
@@ -1056,7 +1058,8 @@ tables:
   columns: 9
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - white-label
   foreignWriters: null
 - table: whitelabel.site_setup_progress
   columns: 7
@@ -1104,13 +1107,16 @@ writesOutside:
     tables:
     - control.content_block
 - service: TenancyService
-  operations: 1
+  operations: 2
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
     each inserts or updates, or which operation or event TenancyService published for it — check each
     against ADR-0028.'
   writes:
+  - operation: publishTenantConfig
+    tables:
+    - platform.outbox
   - operation: recordStorefrontSessionEvents
     tables:
     - platform.outbox
@@ -1143,6 +1149,7 @@ screens:
 - P02:GST-051 Plan
 - P02:GST-057 Accessibility Information
 - P05:KSK-002 Language Select
+- P05:KSK-014 Out of service
 - P08:BO-007 Product Directory
 - P08:BO-008 Product Detail & Variants
 - P08:BO-115 Category, Brand & Merchandise Hierarchy

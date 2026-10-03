@@ -3096,6 +3096,12 @@
    "imageAssetRef": {
     "type": "string",
     "nullable": true
+   },
+   "productVariantId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The catalogue Product variant the item sells, which `addCartLine` takes as its `variantId` (added 3 October 2026, CHG-R1S-004: the r1 gate found WEB-033 could not add to the cart from the guest projection; qualified from `variantId` by CHG-GTRB-001, since the glossary bans a bare Variant). An id, not the variant record: price and tax still come from the server.\n",
+    "x-ticvai-references": "catalogue.ProductVariant"
    }
   }
  },
@@ -3290,8 +3296,10 @@
    "document",
    "vector",
    "font",
-   "archive"
-  ]
+   "archive",
+   "model3d"
+  ],
+  "description": "`model3d` added 3 October 2026 (r1 additions; ADR-0069 action item 4): a glTF binary (`model/gltf-binary`, `.glb`) venue model, at most 40 MB. No rendition or derivative is generated for it; the guest app downloads the file as uploaded.\n"
  },
  "MediaRights": {
   "x-ticvai-persistence": "none — embedded in asset",

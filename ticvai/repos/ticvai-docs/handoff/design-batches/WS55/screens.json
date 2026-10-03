@@ -878,7 +878,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "ADM-238"
+    "ADM-238",
+    "BO-100"
    ],
    "exitTo": [
     "ADM-238",
@@ -922,6 +923,18 @@
      "name": "contentBody",
      "slot": "fields",
      "components": [
+      {
+       "kind": "dataTable",
+       "label": "Show the approval matrices, the one being changed among them",
+       "operation": "listApprovalMatrices",
+       "bindsTo": "ApprovalMatrix",
+       "columns": [
+        "ApprovalMatrix.kind",
+        "ApprovalMatrix.scopeLevel",
+        "ApprovalMatrix.isActive"
+       ],
+       "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+      },
       {
        "kind": "selectField",
        "label": "User",
@@ -1037,6 +1050,13 @@
     "purpose": "Set role authority and approval limits",
     "trigger": "onAction",
     "provenance": "decided 29 September, readiness close-out (QA wiring note)"
+   },
+   {
+    "operationId": "listApprovalMatrices",
+    "contract": "approvals",
+    "purpose": "Show the approval matrices, the one being changed among them",
+    "trigger": "onLoad",
+    "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
   ],
   "wireframe": {

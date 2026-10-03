@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-218` | Campaign Governance & Budget Command Center | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `ADM-218` | Campaign Governance & Budget Command Center | C | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
 | `ADM-219` | Campaign Budget & Financial Limit Setup | C | 29 | 5 | 5 | 0 | 0 | 6 | — | notStarted (generated) |
-| `ADM-220` | Redemption, Discount & Exposure Limit Manager | B–D | 5 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-221` | Budget Consumption & Forecast Monitor | B–D | 0 | 13 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-222` | Threshold Actions & Automatic Suspension | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-223` | Campaign Approval Workflow Designer | B–D | 0 | 20 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
-| `ADM-224` | Approval Inbox & Decision Workspace | B–D | 0 | 46 | 6 | 7 | 0 | 3 | — | notStarted (generated) |
-| `ADM-225` | Campaign Financial & Commercial Simulator | B–D | 0 | 24 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
-| `ADM-226` | Campaign Experiment & A/B Test Manager | B–D | 4 | 16 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
-| `ADM-227` | Governance Audit, AI Risk & Launch Readiness | B–D | 2 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-220` | Redemption, Discount & Exposure Limit Manager | C | 5 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-221` | Budget Consumption & Forecast Monitor | C | 0 | 13 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-222` | Threshold Actions & Automatic Suspension | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-223` | Campaign Approval Workflow Designer | C | 0 | 20 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `ADM-224` | Approval Inbox & Decision Workspace | C | 0 | 46 | 6 | 7 | 0 | 3 | — | notStarted (generated) |
+| `ADM-225` | Campaign Financial & Commercial Simulator | C | 0 | 24 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `ADM-226` | Campaign Experiment & A/B Test Manager | C | 4 | 16 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `ADM-227` | Governance Audit, AI Risk & Launch Readiness | C | 2 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

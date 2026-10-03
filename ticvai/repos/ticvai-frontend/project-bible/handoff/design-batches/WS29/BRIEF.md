@@ -130,16 +130,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-284` | Membership & Annual Pass Command Center | B–D | 11 | 228 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-285` | Membership Product & Tier Builder | B–D | 48 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-286` | Membership Eligibility & Qualification Rule Builder | B–D | 11 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-287` | Validity, Activation & Expiry Configuration | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-288` | Membership Entitlement & Admission Benefit Builder | B–D | 14 | 0 | 5 | 25 | 0 | 0 | — | notStarted (generated) |
-| `BO-289` | Membership Usage, Visit & Consumption Rules | B–D | 19 | 20 | 6 | 9 | 0 | 0 | — | notStarted (generated) |
-| `BO-290` | Family, Household & Dependent Membership Configuration | B–D | 21 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-291` | Membership Commercial, Pricing & Channel Association | B–D | 35 | 0 | 5 | 4 | 0 | 0 | — | notStarted (generated) |
-| `BO-292` | Renewal, Auto-Renewal & Membership Continuity Configuration | B–D | 11 | 0 | 5 | 1 | 1 | 0 | — | notStarted (generated) |
-| `BO-293` | Membership Product Validation, Approval, Publication & Versioning | B–D | 12 | 0 | 5 | 0 | 0 | 3 | — | notStarted (generated) |
+| `BO-284` | Membership & Annual Pass Command Center | B | 11 | 228 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-285` | Membership Product & Tier Builder | B | 48 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-286` | Membership Eligibility & Qualification Rule Builder | B | 11 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-287` | Validity, Activation & Expiry Configuration | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-288` | Membership Entitlement & Admission Benefit Builder | B | 14 | 0 | 5 | 25 | 0 | 0 | — | notStarted (generated) |
+| `BO-289` | Membership Usage, Visit & Consumption Rules | B | 19 | 20 | 6 | 9 | 0 | 0 | — | notStarted (generated) |
+| `BO-290` | Family, Household & Dependent Membership Configuration | B | 21 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-291` | Membership Commercial, Pricing & Channel Association | B | 35 | 0 | 5 | 4 | 0 | 0 | — | notStarted (generated) |
+| `BO-292` | Renewal, Auto-Renewal & Membership Continuity Configuration | B | 11 | 0 | 5 | 1 | 1 | 0 | — | notStarted (generated) |
+| `BO-293` | Membership Product Validation, Approval, Publication & Versioning | B | 12 | 0 | 5 | 0 | 0 | 3 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

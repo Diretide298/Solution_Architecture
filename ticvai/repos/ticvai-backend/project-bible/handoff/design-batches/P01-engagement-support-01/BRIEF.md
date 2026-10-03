@@ -1,6 +1,6 @@
 # P01-engagement-support-01 — P01 · Engagement & Support
 
-**6 screens · 25 operations · 66 schemas · 3 permissions**
+**6 screens · 26 operations · 68 schemas · 3 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
@@ -159,7 +159,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `WEB-026` | Survey & Feedback | A | 28 | 20 | 5 | 82 | 2 | 0 | guest | review (client-verified) |
 | `WEB-027` | Newsletter Subscription | A | 3 | 13 | 6 | 10 | 1 | 0 | guest | review (client-verified) |
 | `WEB-028` | Contact & Venue Information | A | 0 | 20 | 5 | 0 | 0 | 0 | guest | review (client-verified) |
-| `WEB-044` | AI Concierge – Home | A | 8 | 23 | 6 | 32 | 4 | 0 | guest | review (client-verified) |
+| `WEB-044` | AI Concierge – Home | A | 8 | 27 | 6 | 32 | 4 | 0 | guest | review (client-verified) |
 | `WEB-046` | In-Venue Notifications | A | 3 | 12 | 6 | 0 | 2 | 0 | guest | review (client-verified) |
 
 ## Thin screens in this batch

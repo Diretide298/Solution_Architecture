@@ -1,4 +1,4 @@
--- catalogue — 80 tables
+-- catalogue — 82 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
@@ -210,7 +210,7 @@ CREATE TABLE IF NOT EXISTS catalogue.change_request_line (
 
 -- How much of a capacity each channel may sell. Web cannot consume the counter’s share
 CREATE TABLE IF NOT EXISTS catalogue.channel_allocation (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     channel                           text NOT NULL CONSTRAINT channel_allocation_channel_chk CHECK (channel IN ('pos', 'kiosk', 'web', 'mobile', 'b2b', 'ota', 'callCentre')),
     allocated_units                   integer NOT NULL,
     sold_units                        integer,
@@ -473,7 +473,7 @@ CREATE TABLE IF NOT EXISTS catalogue.demand_signal (
 -- charity is not the venue’s to recognise Hangs off: reaches catalogue.product through its keys;
 -- references ledger.account, platform.scope. Reached by: 3 operations read it and 2 write it.
 CREATE TABLE IF NOT EXISTS catalogue.donation_campaign (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     name                              text NOT NULL CONSTRAINT donation_campaign_name_chk CHECK (char_length(name) <= 200),
     description                       text CONSTRAINT donation_campaign_description_chk CHECK (char_length(description) <= 1000),
     beneficiary                       text,
@@ -632,6 +632,15 @@ CREATE TABLE IF NOT EXISTS catalogue.event_capacity_profile (
     id                                uuid PRIMARY KEY NOT NULL
 );
 
+-- Holds 4 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS catalogue.event_change_treatment_policy (
+    id                                uuid PRIMARY KEY NOT NULL,
+    scope_path                        ltree NOT NULL,
+    treatments                        jsonb NOT NULL,
+    updated_at                        timestamptz
+);
+
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS catalogue.event_registration (
@@ -647,7 +656,7 @@ CREATE TABLE IF NOT EXISTS catalogue.event_registration (
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS catalogue.event_reschedule (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     kind                              text NOT NULL CONSTRAINT event_reschedule_kind_chk CHECK (kind IN ('moveTime', 'moveDate', 'moveVenue', 'cancel', 'abandon')),
     performance_ids                   text[],
     new_starts_at                     timestamptz,
@@ -686,7 +695,7 @@ CREATE TABLE IF NOT EXISTS catalogue.event_schedule (
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS catalogue.event_type (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text NOT NULL,
     has_performances                  boolean DEFAULT true,
@@ -759,7 +768,7 @@ CREATE TABLE IF NOT EXISTS catalogue.fee_rule (
 -- What makes a product a school-trip format or a party package: participants, duration, hosts,
 -- free leaders per pupils and how it is paid. The product row still carries the price
 CREATE TABLE IF NOT EXISTS catalogue.group_package (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     product_id                        text,
     kind                              text NOT NULL CONSTRAINT group_package_kind_chk CHECK (kind IN ('school', 'party')),
     max_participants                  integer NOT NULL,
@@ -774,7 +783,7 @@ CREATE TABLE IF NOT EXISTS catalogue.group_package (
 
 -- Two-phase catalogue import (BL-057), following seating.ImportJob. A job that parses zero
 -- products is not a parsed job. Hangs off: reaches catalogue.product through its keys; references
--- catalogue.change_request, identity.principal. Reached by: 6 operations read it and 3 write it.
+-- catalogue.change_request, identity.principal. Reached by: 5 operations read it and 2 write it.
 CREATE TABLE IF NOT EXISTS catalogue.import_job (
     id                                uuid PRIMARY KEY NOT NULL,
     status                            text NOT NULL CONSTRAINT import_job_status_chk CHECK (status IN ('parsing', 'previewReady', 'committing', 'committed', 'failed')),
@@ -873,7 +882,7 @@ CREATE TABLE IF NOT EXISTS catalogue.lifecycle_workflow (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS catalogue.membership_benefit (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL CONSTRAINT membership_benefit_code_chk CHECK (char_length(code) <= 100),
     name                              text NOT NULL CONSTRAINT membership_benefit_name_chk CHECK (char_length(name) <= 150),
     type                              text NOT NULL CONSTRAINT membership_benefit_type_chk CHECK (char_length(type) <= 30),
@@ -948,7 +957,7 @@ CREATE TABLE IF NOT EXISTS catalogue.performance_media (
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS catalogue.performance_template (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text,
     space_id                          uuid,
@@ -975,7 +984,7 @@ CREATE TABLE IF NOT EXISTS catalogue.plan_benefit (
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS catalogue.prepaid_minutes (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text,
     minutes                           integer NOT NULL,
@@ -992,7 +1001,7 @@ CREATE TABLE IF NOT EXISTS catalogue.prepaid_minutes (
 
 -- What something costs on one price list. A change here never rewrites what somebody already paid
 CREATE TABLE IF NOT EXISTS catalogue.price (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     price_list_id                     uuid NOT NULL,
     variant_id                        uuid NOT NULL,
     amount                            numeric(18,4) NOT NULL,
@@ -1475,7 +1484,7 @@ CREATE TABLE IF NOT EXISTS catalogue.product_channel_assignment (
 -- booking, checked by staff at the gate; whether a guest who fails there is refunded is a column,
 -- because the design says they are not
 CREATE TABLE IF NOT EXISTS catalogue.product_eligibility_rule (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     product_id                        text,
     min_age_years                     integer,
     max_age_years                     integer,
@@ -1670,6 +1679,27 @@ CREATE TABLE IF NOT EXISTS catalogue.sales_channel (
     updated_at                        timestamptz
 );
 
+-- Holds 16 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS catalogue.seat_pricing_rule (
+    id                                uuid PRIMARY KEY NOT NULL,
+    name                              text NOT NULL CONSTRAINT seat_pricing_rule_name_chk CHECK (char_length(name) <= 200),
+    strategy_id                       uuid NOT NULL,
+    seat_map_id                       uuid NOT NULL,
+    performance_id                    uuid,
+    seat_section_codes                text[],
+    rows                              text[],
+    seat_ids                          text[],
+    seat_category                     text CONSTRAINT seat_pricing_rule_seat_category_chk CHECK (char_length(seat_category) <= 64),
+    floor_price                       numeric(18,4) NOT NULL,
+    ceiling_price                     numeric(18,4) NOT NULL,
+    step_price                        numeric(18,4),
+    priority                          integer DEFAULT 0,
+    is_active                         boolean DEFAULT true,
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz
+);
+
 -- Holds 25 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS catalogue.signal_registry (
@@ -1703,7 +1733,7 @@ CREATE TABLE IF NOT EXISTS catalogue.signal_registry (
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS catalogue.space (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text NOT NULL,
     venue_id                          uuid,
@@ -1791,8 +1821,10 @@ CREATE TABLE IF NOT EXISTS catalogue.variant_dimension (
     product_id                        uuid NOT NULL
 );
 
+-- Holds 12 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
 CREATE TABLE IF NOT EXISTS catalogue.waiting_room_setting (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     performance_id                    uuid NOT NULL,
     venue_id                          uuid NOT NULL,
     mode                              text NOT NULL DEFAULT 'off' CONSTRAINT waiting_room_setting_mode_chk CHECK (mode IN ('off', 'onSaleWindow', 'on')),
@@ -1811,7 +1843,7 @@ CREATE TABLE IF NOT EXISTS catalogue.waiting_room_setting (
 -- catalogue.performance, catalogue.variant, pii.subject. Reached by: 5 operations read it and 3
 -- write it.
 CREATE TABLE IF NOT EXISTS catalogue.waitlist_entry (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     performance_id                    uuid NOT NULL,
     variant_id                        uuid,
     subject_id                        uuid,

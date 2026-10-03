@@ -1112,10 +1112,12 @@ screens:
     - to: WEB-010
       trigger: Shopping Cart
       carries:
+      - cartId
       - code
       - lineId
+      - performanceId
       provenance: derived — WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId
-        and WEB-005 holds code, lineId, so an edge into it carries them
+        and WEB-005 holds cartId, code, lineId, performanceId, so an edge into it carries them
     - to: WEB-016
       trigger: Continue, when sign-in is asked after add-ons and this booking has no add-ons step
       carries:
@@ -1715,9 +1717,9 @@ screens:
     transitions:
     - to: WEB-005
       trigger: Ticket Type Selection
-      provenance: 'derived — WEB-005 declares entryState.params productId and WEB-007 holds none of them.
-        The edge carries nothing: WEB-005 finds productId (listProducts) itself, and WEB-005 opens on
-        its own'
+      provenance: 'derived — WEB-005 declares entryState.params cartId, productId and WEB-007 holds none
+        of them. The edge carries nothing: cartId only pre-selects (deep link or optional); WEB-005 finds
+        productId (listProducts) itself, and WEB-005 opens on its own'
     - to: WEB-008
       trigger: Add-ons & Upsell
       provenance: 'derived — WEB-008 declares entryState.params bundleId and WEB-007 holds none of them.
@@ -1990,9 +1992,10 @@ screens:
     transitions:
     - to: WEB-005
       trigger: Ticket Type Selection
-      provenance: 'derived — WEB-005 declares entryState.params productId and WEB-008 holds none of them.
-        The edge carries nothing: WEB-005 finds productId (listProducts) itself, and WEB-005 opens on
-        its own'
+      carries:
+      - cartId
+      provenance: derived — WEB-005 declares entryState.params cartId, productId and WEB-008 holds cartId,
+        so an edge into it carries them
     - to: WEB-006
       trigger: Date & Performance Selection
       carries:
@@ -2209,9 +2212,9 @@ screens:
     transitions:
     - to: WEB-005
       trigger: Ticket Type Selection
-      provenance: 'derived — WEB-005 declares entryState.params productId and WEB-009 holds none of them.
-        The edge carries nothing: WEB-005 finds productId (listProducts) itself, and WEB-005 opens on
-        its own'
+      provenance: 'derived — WEB-005 declares entryState.params cartId, productId and WEB-009 holds none
+        of them. The edge carries nothing: cartId only pre-selects (deep link or optional); WEB-005 finds
+        productId (listProducts) itself, and WEB-005 opens on its own'
     - to: WEB-006
       trigger: Date & Performance Selection
       carries:
@@ -2394,6 +2397,8 @@ screens:
     - to: WEB-011
       trigger: Answers attendee forms and consent, only where the cart needs them
       provenance: flow F01 step 5→6, F02 step 3→4, F55 step 1→2
+      carries:
+      - holdId
     - to: WEB-030
       trigger: They transfer three tickets
       provenance: flow F55 step 3→4
@@ -2720,6 +2725,7 @@ screens:
       provenance: flow F55 step 2→3
       carries:
       - cartId
+      - holdId
       - lineId
       - performanceId
   notes: '**Wired 24 August from review**: updateMyProfile. **The operations existed and this screen could
@@ -2961,9 +2967,9 @@ screens:
         and WEB-012 holds lineId, performanceId, so an edge into it carries them
     - to: WEB-011
       trigger: Guest Details & Attendee Forms
-      provenance: 'derived — WEB-011 declares entryState.params  and WEB-012 holds none of them. The edge
-        carries nothing: WEB-012 is opened from WEB-011, so this edge is the way back and WEB-011 keeps
-        its own state'
+      provenance: 'derived — WEB-011 declares entryState.params holdId and WEB-012 holds none of them.
+        The edge carries nothing: WEB-012 is opened from WEB-011, so this edge is the way back and WEB-011
+        keeps its own state'
     - to: WEB-016
       trigger: Sign in or use a guest code (when sign-in is asked at payment)
       carries:
@@ -3214,8 +3220,9 @@ screens:
         and WEB-013 holds lineId, performanceId, so an edge into it carries them
     - to: WEB-011
       trigger: Guest Details & Attendee Forms
-      provenance: 'derived — WEB-011 declares entryState.params  and WEB-013 holds none of them. The edge
-        carries nothing: WEB-011 needs nothing to open'
+      provenance: 'derived — WEB-011 declares entryState.params holdId and WEB-013 holds none of them.
+        The edge carries nothing: holdId only pre-selects (deep link or optional), and WEB-011 opens on
+        its own'
     - to: WEB-012
       trigger: Checkout — Payment
       carries:
@@ -3657,8 +3664,9 @@ screens:
         per-site guestCheckout off by default (matrix 2.6.28)
     - to: WEB-011
       trigger: Guest Details & Attendee Forms
-      provenance: 'derived — WEB-011 declares entryState.params  and WEB-016 holds none of them. The edge
-        carries nothing: WEB-011 needs nothing to open'
+      provenance: 'derived — WEB-011 declares entryState.params holdId and WEB-016 holds none of them.
+        The edge carries nothing: holdId only pre-selects (deep link or optional), and WEB-011 opens on
+        its own'
     - to: WEB-012
       trigger: Checkout — Payment
       provenance: 'derived — WEB-012 declares entryState.params orderId, paymentId and WEB-016 holds none
@@ -9538,10 +9546,10 @@ screens:
         - GuestConversation.messages
         operation: getGuestConversation
         notes: '**After a handover the thread is read here** (Chinmay, 3 October 2026, r1 additions; CHG-RONEC-003):
-          the agent''s replies, where the guest is in the queue and the wait, until an agent claims it. Polled
-          every 5 seconds while the chat is on screen and every 30 seconds while the app or tab is hidden, with
-          `afterMessageId` so each poll fetches only what is new; it stops when the conversation ends
-          (`resolved`, `abandoned`, `timedOut`).'
+          the agent''s replies, where the guest is in the queue and the wait, until an agent claims it.
+          Polled every 5 seconds while the chat is on screen and every 30 seconds while the app or tab
+          is hidden, with `afterMessageId` so each poll fetches only what is new; it stops when the conversation
+          ends (`resolved`, `abandoned`, `timedOut`).'
         provenance: decided 3 October 2026, r1 additions (CHG-RONEC-003)
       - kind: cardList
         label: Earlier conversations
@@ -9627,9 +9635,9 @@ screens:
     trigger: onAction
   - operationId: getGuestConversation
     contract: marketing-crm
-    purpose: 'The agent''s replies, the queue position and the wait after a handover, polled every 5 s while the
-      chat is on screen and every 30 s while hidden, with afterMessageId (decided by Chinmay, 3 October 2026,
-      r1 additions; CHG-RONEC-003)'
+    purpose: The agent's replies, the queue position and the wait after a handover, polled every 5 s while
+      the chat is on screen and every 30 s while hidden, with afterMessageId (decided by Chinmay, 3 October
+      2026, r1 additions; CHG-RONEC-003)
     trigger: onInterval
     pollSeconds: 5
     pollSecondsHidden: 30

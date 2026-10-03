@@ -60,6 +60,37 @@
    }
   }
  },
+ "Allergen": {
+  "type": "object",
+  "description": "BL-127. **Fourteen declarable allergens is a legal list in most jurisdictions, not a preference.** A menu item with no allergen data is one a venue cannot serve to somebody who asks.\n**`contains` and `mayContain` are different claims.** The first is a recipe fact; the second is a kitchen fact about shared equipment, and conflating them either over-warns everybody or under-warns the person it matters to.\n",
+  "properties": {
+   "contains": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AllergenCode"
+    }
+   },
+   "mayContain": {
+    "type": "array",
+    "description": "**Cross-contamination, which is about the kitchen rather than the recipe.** A fryer shared with breaded fish makes chips a fish risk and nothing in the recipe says so.\n",
+    "items": {
+     "$ref": "#/components/schemas/AllergenCode"
+    }
+   },
+   "isVegetarian": {
+    "type": "boolean",
+    "default": false
+   },
+   "isVegan": {
+    "type": "boolean",
+    "default": false
+   },
+   "isHalal": {
+    "type": "boolean",
+    "default": false
+   }
+  }
+ },
  "AllergenCode": {
   "type": "string",
   "description": "**The fourteen declarable allergens, as one closed list.** Every allergen field in this contract uses it — the menu claim, the ticket line, a substitution's delta, a modifier option, the label on a bag — so a declared set and an actual set compare without anybody normalising case or synonyms. It was the `Allergen.contains` enum; the other fields were free text.\n",
@@ -79,6 +110,16 @@
    "lupin",
    "molluscs"
   ]
+ },
+ "AppAvailability": {
+  "type": "string",
+  "description": "**The sold-out or closed signal (decided 28 September, audit R073).** `open` is the normal state. `soldOut` shows WEB-029's sold-out state across the app while browsing still works; `closed` shows the closed state (a weather closure, a private event). Neither refuses a request on its own: it is what the guest is told, and a sale is still refused by availability where it applies. Set with `setMaintenanceMode`.\n",
+  "enum": [
+   "open",
+   "soldOut",
+   "closed"
+  ],
+  "default": "open"
  },
  "BookedWindow": {
   "type": "object",
@@ -397,6 +438,279 @@
    "checkedOut"
   ]
  },
+ "Conversation": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.conversation",
+  "description": "22.8. **A conversation is not a case.** A case is a ticket measured in hours; a conversation is a live session measured in seconds, with somebody waiting. A conversation may create a case; it is not one.\n",
+  "required": [
+   "id",
+   "channel",
+   "state"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "telephony": {
+    "type": "object",
+    "nullable": true,
+    "description": "BL-083. **`ConversationChannel` included `voice` with nothing behind it** — the model anticipated telephony and stopped at the enum.\n**Not an integration, a binding.** Genesys, Avaya, Amazon Connect, Teams and 3CX all do call control themselves; what the platform needs is the call bound to the guest and the case, so **an agent who answers already knows who is calling and what about.**\n",
+    "properties": {
+     "providerCallId": {
+      "type": "string"
+     },
+     "direction": {
+      "type": "string",
+      "enum": [
+       "inbound",
+       "outbound",
+       "transferred"
+      ]
+     },
+     "fromNumberMasked": {
+      "type": "string",
+      "nullable": true,
+      "description": "**Masked, and it is still personal data.** A phone number identifies a person more reliably than a name does.\n"
+     },
+     "recordingRef": {
+      "type": "string",
+      "nullable": true,
+      "description": "Held by the provider, referenced here. **Recording consent is jurisdictional and the platform does not assume it** — a reference with no consent record is a recording nobody may play.\n"
+     },
+     "agentState": {
+      "type": "string",
+      "enum": [
+       "available",
+       "onCall",
+       "wrapUp",
+       "away",
+       "offline"
+      ],
+      "nullable": true
+     }
+    }
+   },
+   "assistSessionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "BL-094. **`startKioskAssist` recorded a staff member helping a guest and `createCase` recorded a service interaction, and neither referenced the other** — so the traceability 2.13.20 asks for had no link to follow.\n**The link is here rather than on the assist session**, because a case may span several assists and an assist belongs to at most one case.\n"
+   },
+   "channel": {
+    "$ref": "#/components/schemas/ConversationChannel"
+   },
+   "state": {
+    "$ref": "#/components/schemas/ConversationState"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "22.8.3. Resolved from phone, email, membership number or a signed-in session. **A conversation with none of those stays anonymous rather than being guessed at.**\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "assignedPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "queueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "queuePosition": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "Place among the unclaimed conversations in `queueId`, from the live agent queue (audit R149). Null once claimed."
+   },
+   "estimatedWaitSeconds": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "From the live agent queue — the conversations ahead divided across that queue's agents online now (audit R149). Null once claimed."
+   },
+   "handoverReason": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "guestRequested",
+     "assistantRefused",
+     "assistantFailed",
+     "outOfScope",
+     "negativeSentiment",
+     "complexIntent",
+     "paymentIssue"
+    ]
+   },
+   "handoverSummary": {
+    "type": "string",
+    "nullable": true,
+    "description": "**The assistant's own account of what the guest wants**, so an agent opens with context rather than reading a transcript while somebody waits.\n"
+   },
+   "sentiment": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "positive",
+     "neutral",
+     "negative",
+     "escalating"
+    ],
+    "description": "22.8.16. **`escalating` is a routing signal**, not a report line."
+   },
+   "intent": {
+    "type": "string",
+    "nullable": true,
+    "description": "22.8.13. What the guest appears to want, used for routing."
+   },
+   "locale": {
+    "type": "string"
+   },
+   "caseId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "22.8.12. Where the conversation raised one."
+   },
+   "messages": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ConversationMessage"
+    }
+   },
+   "firstResponseSeconds": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "closedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "outcome": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "resolved",
+     "caseRaised",
+     "abandonedByGuest",
+     "timedOut",
+     "spam"
+    ]
+   }
+  }
+ },
+ "ConversationChannel": {
+  "type": "string",
+  "enum": [
+   "webChat",
+   "inAppChat",
+   "whatsapp",
+   "sms",
+   "email",
+   "kiosk",
+   "voice"
+  ]
+ },
+ "ConversationMessage": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.conversation_message + marketing.conversation_message_attachment",
+  "required": [
+   "id",
+   "sender",
+   "body",
+   "sentAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "sender": {
+    "type": "string",
+    "enum": [
+     "guest",
+     "agent",
+     "assistant",
+     "system"
+    ],
+    "description": "**Resolved, never declared.** The assistant is labelled as one — a guest talking to a bot that presents as a person is a complaint waiting for the moment they find out.\n"
+   },
+   "senderPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "body": {
+    "type": "string"
+   },
+   "attachments": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "assetId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "kind": {
+       "type": "string",
+       "enum": [
+        "image",
+        "video",
+        "document",
+        "ticket",
+        "qr",
+        "paymentLink"
+       ]
+      }
+     }
+    }
+   },
+   "aiInteractionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Where the assistant sent it. **Links the message to its tokens and cost**, so a conversation's spend is attributable (CF-14).\n"
+   },
+   "sentAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "readAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "ConversationState": {
+  "type": "string",
+  "description": "**`withAssistant` and `queued` are different, and the second has a person waiting.** Merging them makes the service level unmeasurable, because time with a bot is not time in a queue.\n",
+  "enum": [
+   "withAssistant",
+   "queued",
+   "withAgent",
+   "waitingOnGuest",
+   "resolved",
+   "abandoned",
+   "timedOut"
+  ]
+ },
  "CreateGuestOrderLine": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
@@ -521,7 +835,7 @@
  },
  "GuestMenu": {
   "type": "object",
-  "x-ticvai-persistence": "none — projection over menu, item and availability",
+  "x-ticvai-persistence": "none — projection over fnb.menu, fnb.menu_item and availability",
   "required": [
    "outletId",
    "menuId",
@@ -610,6 +924,14 @@
            "$ref": "#/components/schemas/AllergenCode"
           }
          },
+         "allergenDetail": {
+          "allOf": [
+           {
+            "$ref": "#/components/schemas/Allergen"
+           }
+          ],
+          "description": "**What the dish contains and what it may contain, told apart** (3 October 2026, CHG-R1S-022: the kiosk and guest menus promise the difference and the flat list cannot carry it). `allergens` stays the flat list."
+         },
          "preparationMinutes": {
           "type": "integer",
           "nullable": true
@@ -681,6 +1003,12 @@
    "imageAssetRef": {
     "type": "string",
     "nullable": true
+   },
+   "productVariantId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The catalogue Product variant the item sells, which `addCartLine` takes as its `variantId` (added 3 October 2026, CHG-R1S-004: the r1 gate found WEB-033 could not add to the cart from the guest projection; qualified from `variantId` by CHG-GTRB-001, since the glossary bans a bare Variant). An id, not the variant record: price and tax still come from the server.\n",
+    "x-ticvai-references": "catalogue.ProductVariant"
    }
   }
  },
@@ -907,6 +1235,13 @@
    }
   }
  },
+ "LocalisedText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
  "MerchandiseItem": {
   "x-ticvai-persistence": "retail.merchandise",
   "type": "object",
@@ -1052,6 +1387,24 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   }
+  }
+ },
+ "MinimumAppVersion": {
+  "x-ticvai-persistence": "none — embedded in tenant_config",
+  "type": "object",
+  "nullable": true,
+  "description": "**The oldest guest app build still allowed to run (decided 28 September, audit R073).** A guest app whose own version is below the one for its platform shows the forced-upgrade screen (GST-047) and nothing else. Null, or a platform left null, forces nothing. Live at once through `setMaintenanceMode`, because an upgrade that must wait for a publish is not forced.\n",
+  "properties": {
+   "ios": {
+    "type": "string",
+    "nullable": true,
+    "pattern": "^\\d+\\.\\d+\\.\\d+$"
+   },
+   "android": {
+    "type": "string",
+    "nullable": true,
+    "pattern": "^\\d+\\.\\d+\\.\\d+$"
    }
   }
  },
@@ -1690,107 +2043,221 @@
    }
   }
  },
- "ShopAndDrop": {
+ "TenantAppStatus": {
+  "x-ticvai-persistence": "none — computed",
   "type": "object",
-  "x-ticvai-persistence": "retail.shop_and_drop + retail.shop_and_drop_line",
+  "description": "Computed on read. The published fields come from the current `ConfigVersion`, the maintenance fields from the tenant's `tenant_config` row (`setMaintenanceMode`), and the draft fields from the working draft. **Fields marked staff only are left out of a response to a caller without a staff session** (`getTenantAppStatus`).\n",
   "required": [
-   "id",
-   "dropReference",
-   "collectionPointId",
-   "status",
-   "collectBy"
+   "tenantId",
+   "isPublished",
+   "isInMaintenance"
   ],
   "properties": {
-   "id": {
-    "type": "string"
-   },
-   "dropReference": {
-    "type": "string",
-    "description": "Short and readable. Printed on the slip a guest may or may not keep."
-   },
-   "saleId": {
-    "type": "string",
-    "nullable": true,
-    "description": "The till sale. Null for an online order, which sets `orderId` (audit R236)."
-   },
-   "orderId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The paid online order that created this collection (audit R236)."
-   },
-   "entitlementId": {
-    "type": "string",
-    "nullable": true,
-    "description": "The ticket that claims these goods. The point of 4.4.7 — a guest does not have to keep a receipt safe for eight hours in a water park.\n"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "collectionPointId": {
+   "tenantId": {
     "type": "string",
     "format": "uuid"
    },
-   "collectionPointName": {
-    "type": "string"
+   "isPublished": {
+    "type": "boolean",
+    "x-ticvai-derived": "onRead",
+    "description": "True once any version has been published."
    },
-   "status": {
+   "publishedVersion": {
     "type": "string",
-    "enum": [
-     "awaitingCollection",
-     "partiallyCollected",
-     "collected",
-     "uncollected",
-     "disposed"
-    ]
+    "nullable": true
    },
-   "lines": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "lineId": {
-       "type": "string"
-      },
-      "merchandiseId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "name": {
-       "type": "string"
-      },
-      "quantity": {
-       "type": "integer"
-      },
-      "collectedQuantity": {
-       "type": "integer"
-      }
-     }
-    }
-   },
-   "droppedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "collectBy": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "collectedAt": {
+   "publishedAt": {
     "type": "string",
     "format": "date-time",
     "nullable": true
    },
-   "collectedByPrincipalId": {
+   "draftVersion": {
     "type": "string",
-    "format": "uuid",
+    "description": "Staff only."
+   },
+   "hasUnpublishedChanges": {
+    "type": "boolean",
+    "x-ticvai-derived": "onRead",
+    "description": "Staff only. The working draft differs from the current version's `snapshot`."
+   },
+   "activeModuleCount": {
+    "type": "integer",
+    "x-ticvai-derived": "onRead",
+    "description": "Staff only. `ModuleEnablement` rows with `isEnabled` true."
+   },
+   "licensedModuleCount": {
+    "type": "integer",
+    "x-ticvai-derived": "onRead",
+    "description": "Staff only. `ModuleEnablement` rows with `isLicensed` true."
+   },
+   "activePageCount": {
+    "type": "integer",
+    "x-ticvai-derived": "onRead",
+    "description": "Staff only. Content pages that are `published` and enabled."
+   },
+   "isInMaintenance": {
+    "type": "boolean"
+   },
+   "maintenanceMessage": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "expectedBackAt": {
+    "type": "string",
+    "format": "date-time",
     "nullable": true
    },
-   "verifiedBy": {
+   "minimumAppVersion": {
+    "$ref": "#/components/schemas/MinimumAppVersion"
+   },
+   "contact": {
+    "$ref": "#/components/schemas/VenueContact"
+   },
+   "availability": {
+    "$ref": "#/components/schemas/AppAvailability"
+   },
+   "availabilityMessage": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "What the sold-out or closed screen says (WEB-029). Null shows the default wording."
+   },
+   "venues": {
+    "type": "array",
+    "maxItems": 200,
+    "x-ticvai-derived": "onRead",
+    "description": "**Public: the venues a guest can pick** (decided 28 September, audit R267; schema named 29 September, readiness close-out, our build plan). The source of the venue picker on WEB-001 and GST-001, returned with or without a session. **Published only**: a venue is listed when its scope node is active (`tenancy.OrgUnit.isActive`) and it is in the tenant's current published `ConfigVersion`; a venue added or reactivated since the last publish appears after the next publish, and a draft never reaches a guest. Ordered by `name`. Empty when nothing is published.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "venueId",
+      "name"
+     ],
+     "properties": {
+      "venueId": {
+       "type": "string",
+       "format": "uuid",
+       "description": "**The venue's scope node** (`tenancy.OrgUnit.id`, level venue): what every guest screen that declares `venueId` `from: session` reads once the guest picks it."
+      },
+      "name": {
+       "type": "string",
+       "maxLength": 200,
+       "description": "The venue's name (`tenancy.OrgUnit.name`)."
+      },
+      "city": {
+       "type": "string",
+       "maxLength": 120,
+       "nullable": true,
+       "description": "Shown under the name so two venues with similar names can be told apart."
+      },
+      "openingHoursToday": {
+       "type": "object",
+       "nullable": true,
+       "description": "Today's opening hours in the venue's time zone, from `tenancy.VenueSettings` opening hours. Null when the venue is closed today or has none set.",
+       "properties": {
+        "opens": {
+         "type": "string",
+         "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+        },
+        "closes": {
+         "type": "string",
+         "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+        }
+       }
+      }
+     }
+    }
+   },
+   "whatsNew": {
+    "type": "array",
+    "maxItems": 10,
+    "x-ticvai-derived": "onRead",
+    "description": "**Public: the guest \"what's new\"** (decided 29 September, rev 3 GAP-B2). Newest first, at most 10, from `platform-ops.Release.guestReleaseNotes` of the releases the tenant's cell has received; a release with no guest notes is skipped. Returned with or without a staff session.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "version",
+      "publishedAt",
+      "notes"
+     ],
+     "properties": {
+      "version": {
+       "type": "string",
+       "description": "The release version."
+      },
+      "publishedAt": {
+       "type": "string",
+       "format": "date-time",
+       "description": "When the release reached the tenant's cell."
+      },
+      "notes": {
+       "$ref": "#/components/schemas/LocalisedText"
+      }
+     }
+    }
+   },
+   "recentChanges": {
+    "type": "array",
+    "description": "Staff only. Names the principal behind each change, so it never reaches a public response.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "area": {
+       "type": "string"
+      },
+      "description": {
+       "type": "string"
+      },
+      "principalId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "at": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    }
+   }
+  }
+ },
+ "VenueContact": {
+  "x-ticvai-persistence": "none — embedded in tenant_config",
+  "type": "object",
+  "nullable": true,
+  "description": "How a guest reaches the venue: WEB-028 Contact & Venue Information, and the screen shown on an error or when the app cannot help (decided 28 September, audit R073). Public, because nothing here is personal.\n",
+  "properties": {
+   "phone": {
     "type": "string",
     "nullable": true
+   },
+   "email": {
+    "type": "string",
+    "format": "email",
+    "nullable": true
+   },
+   "whatsapp": {
+    "type": "string",
+    "nullable": true
+   },
+   "address": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true
+   },
+   "openingHours": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "Prose, as the guest reads it. The bookable hours are the catalogue's."
    }
   }
  }

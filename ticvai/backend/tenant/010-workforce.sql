@@ -5,7 +5,7 @@
 -- workforce.employee through its keys; references identity.principal, platform.scope. Reached by:
 -- 3 operations read it and 2 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS workforce.announcement (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     title                             text NOT NULL CONSTRAINT announcement_title_chk CHECK (char_length(title) <= 140),
     body                              text NOT NULL CONSTRAINT announcement_body_chk CHECK (char_length(body) <= 4000),
     kind                              text NOT NULL CONSTRAINT announcement_kind_chk CHECK (kind IN ('operational', 'safety', 'emergency', 'hr', 'celebration')),
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS workforce.attendance_amendment (
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.employee (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     tenant_id                         uuid NOT NULL,
     principal_id                      uuid,
     code                              text NOT NULL CONSTRAINT employee_code_chk CHECK (char_length(code) <= 50),
@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS workforce.employee (
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.employment (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     employee_id                       uuid NOT NULL,
     contract_type                     text NOT NULL CONSTRAINT employment_contract_type_chk CHECK (char_length(contract_type) <= 30),
     start_date                        date NOT NULL,
@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS workforce.employment (
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.field_ownership (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     table_name                        text NOT NULL CONSTRAINT field_ownership_table_name_chk CHECK (char_length(table_name) <= 120),
     column_name                       text NOT NULL CONSTRAINT field_ownership_column_name_chk CHECK (char_length(column_name) <= 120),
     master                            text NOT NULL CONSTRAINT field_ownership_master_chk CHECK (master IN ('ticvai', 'external')),
@@ -113,7 +113,7 @@ CREATE TABLE IF NOT EXISTS workforce.field_ownership (
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.forecast_requirement (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     requirement_id                    uuid NOT NULL,
     version_id                        uuid NOT NULL,
     venue_id                          uuid,
@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS workforce.forecast_requirement (
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.integration_source (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL CONSTRAINT integration_source_code_chk CHECK (char_length(code) <= 60),
     name                              text NOT NULL CONSTRAINT integration_source_name_chk CHECK (char_length(name) <= 150),
     kind                              text NOT NULL CONSTRAINT integration_source_kind_chk CHECK (kind IN ('hrms', 'workforceManagement', 'payroll', 'timeAndAttendance', 'identity', 'staffingAgency')),
@@ -145,7 +145,7 @@ CREATE TABLE IF NOT EXISTS workforce.integration_source (
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.job_title (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     tenant_id                         uuid NOT NULL,
     code                              text NOT NULL CONSTRAINT job_title_code_chk CHECK (char_length(code) <= 50),
     name                              text NOT NULL CONSTRAINT job_title_name_chk CHECK (char_length(name) <= 150),
@@ -172,7 +172,7 @@ CREATE TABLE IF NOT EXISTS workforce.labour_budget (
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.leave_balance (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     employee_id                       uuid NOT NULL,
     type_id                           uuid NOT NULL,
     period_year                       integer NOT NULL,
@@ -186,7 +186,7 @@ CREATE TABLE IF NOT EXISTS workforce.leave_balance (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.leave_request (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     principal_id                      uuid NOT NULL,
     kind                              text NOT NULL CONSTRAINT leave_request_kind_chk CHECK (kind IN ('annual', 'sick', 'unpaid', 'parental', 'compassionate', 'training', 'timeOffInLieu')),
     valid_from                        date NOT NULL,
@@ -201,7 +201,7 @@ CREATE TABLE IF NOT EXISTS workforce.leave_request (
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.leave_type (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     tenant_id                         uuid NOT NULL,
     code                              text NOT NULL CONSTRAINT leave_type_code_chk CHECK (char_length(code) <= 50),
     name                              text NOT NULL CONSTRAINT leave_type_name_chk CHECK (char_length(name) <= 100),
@@ -214,7 +214,7 @@ CREATE TABLE IF NOT EXISTS workforce.leave_type (
 -- Holds 16 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.open_shift (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     rota_assignment_id                uuid,
     shift_template_id                 uuid,
     venue_id                          uuid,
@@ -259,7 +259,7 @@ CREATE TABLE IF NOT EXISTS workforce.rota_assignment (
     rest_period_before                integer,
     breaches_working_hour_limit       boolean DEFAULT false,
     labour_cost                       numeric(18,4),
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     principal_id                      uuid NOT NULL,
     display_name                      text,
     venue_id                          uuid NOT NULL,
@@ -277,7 +277,7 @@ CREATE TABLE IF NOT EXISTS workforce.rota_assignment (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.shift (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     tenant_id                         uuid NOT NULL,
     code                              text NOT NULL CONSTRAINT shift_code_chk CHECK (char_length(code) <= 50),
     name                              text NOT NULL CONSTRAINT shift_name_chk CHECK (char_length(name) <= 100),
@@ -306,7 +306,7 @@ CREATE TABLE IF NOT EXISTS workforce.shift_swap (
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.shift_template (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text NOT NULL,
     kind                              text CONSTRAINT shift_template_kind_chk CHECK (kind IN ('early', 'late', 'middle', 'split', 'double', 'night', 'onCall', 'overtime')),
@@ -374,7 +374,7 @@ CREATE TABLE IF NOT EXISTS workforce.staffing_rules (
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.sync_conflict (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     source_id                         uuid NOT NULL,
     sync_run_id                       uuid,
     kind                              text NOT NULL CONSTRAINT sync_conflict_kind_chk CHECK (kind IN ('missingInTicvai', 'missingExternally', 'venueChangedExternally', 'certificationExpired', 'terminatedExternally', 'fieldDisagreement')),
@@ -392,7 +392,7 @@ CREATE TABLE IF NOT EXISTS workforce.sync_conflict (
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.sync_run (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     source_id                         uuid NOT NULL,
     started_at                        timestamptz NOT NULL,
     finished_at                       timestamptz,
@@ -422,7 +422,7 @@ CREATE TABLE IF NOT EXISTS workforce.training_record (
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.work_assignment (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     employee_id                       uuid NOT NULL,
     job_title_id                      uuid NOT NULL,
     scope_path                        ltree NOT NULL,

@@ -88,7 +88,7 @@ Branding, content, navigation and the tenant's own app configuration. Separate b
 | navigation | [`setNavigation`](#setnavigation) | PUT | `/tenant-config/navigation` | core | 1 | CMS-009 |
 | overview | [`getPublishedTenantConfig`](#getpublishedtenantconfig) | GET | `/storefront/tenant-config` | core | 1 | GST-001, GST-043, GST-047, KSK-002, WEB-001, WEB-028 … |
 | overview | [`getTenantAppStatus`](#gettenantappstatus) | GET | `/tenant-config/status` | core | 1 | CMS-001, CMS-014, CMS-102, GST-001, GST-029, GST-038 … |
-| overview | [`getTenantConfig`](#gettenantconfig) | GET | `/tenant-config` | core | 1 | ADM-018, BO-834, CMS-011 |
+| overview | [`getTenantConfig`](#gettenantconfig) | GET | `/tenant-config` | core | 1 | ADM-018, BO-834, CMS-009, CMS-011 |
 | overview | [`listAnalyticsProviders`](#listanalyticsproviders) | GET | `/tenant-config/analytics-providers` | core | 1 | CMS-016 |
 | overview | [`recordStorefrontSessionEvents`](#recordstorefrontsessionevents) | POST | `/storefront/session-events` | core | 1 | GST-001, WEB-001 |
 | overview | [`setAnalyticsProvider`](#setanalyticsprovider) | PUT | `/tenant-config/analytics-providers` | core | 1 | CMS-016 |
@@ -2613,7 +2613,7 @@ Returns it to `draft` (decided 29 September, rev 3 REV3-11). Guests stop seeing 
 | Config scope | venue |
 | Conflict policy | serverWins |
 | Reads | `whitelabel.guided_choice`, `whitelabel.guided_choice_answer`, `whitelabel.guided_choice_question` |
-| Writes | - |
+| Writes | `whitelabel.guided_choice` |
 | Called by | CMS-101 |
 | State model | Guided choice ([states/guided-choice.yaml](../../../states/guided-choice.yaml)): moves `published` -> `draft` |
 
@@ -2821,8 +2821,8 @@ A partial update. Only a `draft` may be edited: a `published` choice is unpublis
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
-| Reads | `whitelabel.guided_choice`, `whitelabel.guided_choice_answer`, `whitelabel.guided_choice_question` |
-| Writes | `whitelabel.guided_choice_question` |
+| Reads | `cache:idempotency`, `whitelabel.guided_choice`, `whitelabel.guided_choice_answer`, `whitelabel.guided_choice_question` |
+| Writes | `cache:idempotency`, `whitelabel.guided_choice`, `whitelabel.guided_choice_answer`, `whitelabel.guided_choice_question` |
 | Called by | CMS-101 |
 
 **Parameters**
@@ -3840,7 +3840,7 @@ Also the endpoint the guest app calls to discover a maintenance window, which is
 | Read routing | replica |
 | Reads | `whitelabel.config_version`, `whitelabel.tenant_config` |
 | Writes | - |
-| Called by | CMS-001, CMS-014, CMS-102, GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, WEB-001, WEB-025, WEB-029, WEB-045, WEB-050 |
+| Called by | CMS-001, CMS-014, CMS-102, GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014, WEB-001, WEB-025, WEB-029, WEB-045, WEB-050 |
 
 **Response**: `TenantAppStatus`
 
@@ -3911,7 +3911,7 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | Read routing | replica |
 | Reads | `whitelabel.booking_flow`, `whitelabel.booking_flow_step`, `whitelabel.feature_toggle`, `whitelabel.footer_config`, `whitelabel.footer_config_column`, `whitelabel.footer_config_social_link`, `whitelabel.homepage_section`, `whitelabel.module_enablement`, `whitelabel.navigation_item`, `whitelabel.tenant_config` |
 | Writes | - |
-| Called by | ADM-018, BO-834, CMS-011 |
+| Called by | ADM-018, BO-834, CMS-009, CMS-011 |
 
 **Parameters**
 
@@ -4555,7 +4555,7 @@ What a review step actually needs. A publish note saying "updated homepage" is n
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `whitelabel.site_package` |
-| Writes | - |
+| Writes | `whitelabel.site_package` |
 | Called by | ADM-016, CMS-014 |
 
 **Parameters**
@@ -4617,7 +4617,7 @@ Off by default: a single publish by a `TENANT_PUBLISH` holder (CHG-CSA-042).
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | enabled | boolean | yes | (default False) |
-| reviewerMustDifferFromAuthor | boolean |  | (default True) |
+| requiresReviewerOtherThanAuthor | boolean |  | (default True) |
 | appliesTo | array of enum (tenantConfig, contentBlocks) |  | What the review covers. |
 | scopePath | string |  | The partition key (ADR-0005). (read-only) |
 
@@ -4789,7 +4789,7 @@ The response names any build-time change in the draft that will **not** reach gu
 | Config scope | tenant |
 | Conflict policy | serverWins |
 | Reads | `whitelabel.booking_flow`, `whitelabel.booking_flow_step`, `whitelabel.config_version`, `whitelabel.tenant_config` |
-| Writes | `cache:idempotency`, `whitelabel.config_version` |
+| Writes | `cache:idempotency`, `platform.outbox`, `whitelabel.config_version` |
 | Called by | ADM-016, BO-843, CMS-014, CMS-103 |
 | State model | White-label content ([states/content.yaml](../../../states/content.yaml)): moves `draft` -> `published`, `archived` -> `published` |
 
@@ -5097,7 +5097,7 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 
 **`PUT /publish-review-policy`**: Switch the publish review step on or off
 
-**An optional review step the venue can switch on** (Chinmay, 2 October, workbook Q156; CHG-CSA-042). When on, `publishTenantConfig` and `publishContentBlock` raise an approval request instead of publishing, and the version or block goes live when approved; `reviewerMustDifferFromAuthor` keeps the products' rule. When off, a permission holder simulates (`createPreview`) and publishes in one step.
+**An optional review step the venue can switch on** (Chinmay, 2 October, workbook Q156; CHG-CSA-042). When on, `publishTenantConfig` and `publishContentBlock` raise an approval request instead of publishing, and the version or block goes live when approved; `requiresReviewerOtherThanAuthor` keeps the products' rule. When off, a permission holder simulates (`createPreview`) and publishes in one step.
 
 |  |  |
 |---|---|
@@ -5123,7 +5123,7 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | enabled | boolean | yes | (default False) |
-| reviewerMustDifferFromAuthor | boolean |  | (default True) |
+| requiresReviewerOtherThanAuthor | boolean |  | (default True) |
 | appliesTo | array of enum (tenantConfig, contentBlocks) |  | What the review covers. |
 | scopePath | string |  | The partition key (ADR-0005). (read-only) |
 
@@ -5132,7 +5132,7 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | enabled | boolean | yes | (default False) |
-| reviewerMustDifferFromAuthor | boolean |  | (default True) |
+| requiresReviewerOtherThanAuthor | boolean |  | (default True) |
 | appliesTo | array of enum (tenantConfig, contentBlocks) |  | What the review covers. |
 | scopePath | string |  | The partition key (ADR-0005). (read-only) |
 
@@ -5576,7 +5576,7 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 | dnsRecords[].observedValue | string |  | (nullable) |
 | dnsRecords[].status | enum (ok, missing, wrong) | yes |  |
 | revalidation | enum (none, pendingRevalidation, timedOut) |  | The two waits CMS-017 shows beside status (CHG-CSA-043). (default none; read-only) |
-| cnameLost | boolean |  | Takeover warning (CHG-CSA-043). (read-only) |
+| isCnameLost | boolean |  | Takeover warning (CHG-CSA-043). (read-only) |
 | isPrimary | boolean |  | The tenant's primary domain for its kind; the others redirect to it (setPrimaryDomain). (read-only) |
 | readiness | object |  | Per-domain setup a guest needs (CHG-CSA-043): the UAE Pass redirect URI registered for this hostname, the Apple Pay merchant domain verified, and the app links (Apple app-site association, Android as… (read-only) |
 | readiness.uaePassRedirect | enum (ready, pending, notApplicable) |  |  |
@@ -5667,7 +5667,7 @@ The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `whitelabel.custom_domain` |
-| Writes | - |
+| Writes | `whitelabel.custom_domain` |
 | Called by | ADM-017, CMS-017 |
 
 **Parameters**
@@ -5703,7 +5703,7 @@ The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-
 | dnsRecords[].observedValue | string |  | (nullable) |
 | dnsRecords[].status | enum (ok, missing, wrong) | yes |  |
 | revalidation | enum (none, pendingRevalidation, timedOut) |  | The two waits CMS-017 shows beside status (CHG-CSA-043). (default none; read-only) |
-| cnameLost | boolean |  | Takeover warning (CHG-CSA-043). (read-only) |
+| isCnameLost | boolean |  | Takeover warning (CHG-CSA-043). (read-only) |
 | isPrimary | boolean |  | The tenant's primary domain for its kind; the others redirect to it (setPrimaryDomain). (read-only) |
 | readiness | object |  | Per-domain setup a guest needs (CHG-CSA-043): the UAE Pass redirect URI registered for this hostname, the Apple Pay merchant domain verified, and the app links (Apple app-site association, Android as… (read-only) |
 | readiness.uaePassRedirect | enum (ready, pending, notApplicable) |  |  |
@@ -5727,7 +5727,7 @@ The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-
 **A live app is an app with a published configuration (decided 28 September, audit R096)**: the tenant has a current `ConfigVersion` (`TenantAppStatus.isPublished` true) for the app the domain serves. Maintenance mode does not make an app less live.
 
 **Detaching unroutes the hostname** (SD-021, applied 30 September): the release calls tenancy `setTenantDomainMapping` with status `detached`, so the edge stops routing the host to this tenant in the same step; the row is kept for the audit trail, not deleted.
-**The takeover warning** (CHG-CSA-043): the confirmation tells the tenant to remove the CNAME (and the TXT record) from its DNS, because a record left pointing at TICVAI could be claimed by somebody else; a scheduled check flags any that remain (`CustomDomain.cnameLost`).
+**The takeover warning** (CHG-CSA-043): the confirmation tells the tenant to remove the CNAME (and the TXT record) from its DNS, because a record left pointing at TICVAI could be claimed by somebody else; a scheduled check flags any that remain (`CustomDomain.isCnameLost`).
 
 |  |  |
 |---|---|
@@ -5772,7 +5772,7 @@ The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `whitelabel.custom_domain` |
-| Writes | - |
+| Writes | `whitelabel.custom_domain` |
 | Called by | ADM-017, CMS-017 |
 
 **Parameters**
@@ -5808,7 +5808,7 @@ The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-
 | dnsRecords[].observedValue | string |  | (nullable) |
 | dnsRecords[].status | enum (ok, missing, wrong) | yes |  |
 | revalidation | enum (none, pendingRevalidation, timedOut) |  | The two waits CMS-017 shows beside status (CHG-CSA-043). (default none; read-only) |
-| cnameLost | boolean |  | Takeover warning (CHG-CSA-043). (read-only) |
+| isCnameLost | boolean |  | Takeover warning (CHG-CSA-043). (read-only) |
 | isPrimary | boolean |  | The tenant's primary domain for its kind; the others redirect to it (setPrimaryDomain). (read-only) |
 | readiness | object |  | Per-domain setup a guest needs (CHG-CSA-043): the UAE Pass redirect URI registered for this hostname, the Apple Pay merchant domain verified, and the app links (Apple app-site association, Android as… (read-only) |
 | readiness.uaePassRedirect | enum (ready, pending, notApplicable) |  |  |
@@ -5879,7 +5879,7 @@ The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-
 | dnsRecords[].observedValue | string |  | (nullable) |
 | dnsRecords[].status | enum (ok, missing, wrong) | yes |  |
 | revalidation | enum (none, pendingRevalidation, timedOut) |  | The two waits CMS-017 shows beside status (CHG-CSA-043). (default none; read-only) |
-| cnameLost | boolean |  | Takeover warning (CHG-CSA-043). (read-only) |
+| isCnameLost | boolean |  | Takeover warning (CHG-CSA-043). (read-only) |
 | isPrimary | boolean |  | The tenant's primary domain for its kind; the others redirect to it (setPrimaryDomain). (read-only) |
 | readiness | object |  | Per-domain setup a guest needs (CHG-CSA-043): the UAE Pass redirect URI registered for this hostname, the Apple Pay merchant domain verified, and the app links (Apple app-site association, Android as… (read-only) |
 | readiness.uaePassRedirect | enum (ready, pending, notApplicable) |  |  |
@@ -6238,7 +6238,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | routing | text | no | How the hostname reaches TICVAI (Chinmay, 2 October: "subdomain plus CNAME"; CHG-CSA-043). |
 | dns_records | jsonb | no | Every record the tenant must publish, with what is observed now (CHG-CSA-043): the TXT _dnsauth record, the CNAME, and CAA or NS where they apply. |
 | revalidation | text | no | The two waits CMS-017 shows beside status (CHG-CSA-043). |
-| cname_lost | boolean | no | Takeover warning (CHG-CSA-043). |
+| is_cname_lost | boolean | no | Takeover warning (CHG-CSA-043). |
 | is_primary | boolean | no | The tenant's primary domain for its kind; the others redirect to it (setPrimaryDomain). |
 | readiness | jsonb | no | Per-domain setup a guest needs (CHG-CSA-043): the UAE Pass redirect URI registered for this hostname, the Apple Pay merchant domain verified, and the app links (Apple app-site association, Android as… |
 
@@ -6323,11 +6323,18 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| guided_choice_id | uuid | yes | The parent row. |
+| guided_choice_question_id | uuid | yes | The parent row. |
 | id | uuid | yes | UUIDv7. |
 | title | jsonb | yes |  |
-| kind | text | no | What the question asks (decided 29 September, W4). |
+| body | jsonb | no | The one-liner under the title, at most 140 characters in each language. |
+| icon | text | no | An icon name from the guest app's icon set. |
+| badge | jsonb | no | Optional, e.g. |
 | sort_order | integer | yes |  |
+| target | jsonb | no | Required with behaviour recommend on the last question; optional with filter, where it is the card shown above the filtered list. |
+| filter | jsonb | no | What this answer keeps in the list (decided 29 September, W4). |
+| consent_prefill | jsonb | no | Pre-fills a REV3-26 consent question from this answer (decided 29 September, W4). |
+| result | jsonb | no | The result card when this answer decides the result. |
+| guided_choice_id | uuid | yes | Points at whitelabel.guided_choice. |
 
 ### `whitelabel.guided_choice_question`
 
@@ -6406,7 +6413,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | is_enabled | boolean | yes |  |
-| reviewer_must_differ_from_author | boolean | no |  |
+| requires_reviewer_other_than_author | boolean | no |  |
 | applies_to | text[] | no | What the review covers. |
 | scope_path | text | no | The partition key (ADR-0005). |
 | id | uuid | yes | Synthesised key. |

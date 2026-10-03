@@ -99,16 +99,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-494` | Rental Product Command Center | B–D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-495` | Create Rental Product Wizard | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-496` | Rental Product Profile | B–D | 0 | 28 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-497` | Rental Category & Classification Setup | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-498` | Inventory Tracking Model | B–D | 8 | 0 | 6 | 0 | 1 | 4 | — | notStarted (—) |
-| `BO-499` | Rental Location Assignment | B–D | 0 | 0 | 6 | 0 | 2 | 6 | — | notStarted (—) |
-| `BO-500` | Rental Duration & Turnaround Configuration | B–D | 10 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-501` | Rental Rules & Operational Policy | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-502` | Customer Requirements, Agreement & Waiver | B–D | 16 | 0 | 6 | 0 | 1 | 4 | — | notStarted (—) |
-| `BO-503` | Product Validation, Approval & Publication | B–D | 11 | 0 | 6 | 0 | 1 | 3 | — | notStarted (—) |
+| `BO-494` | Rental Product Command Center | D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-495` | Create Rental Product Wizard | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-496` | Rental Product Profile | D | 0 | 28 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-497` | Rental Category & Classification Setup | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-498` | Inventory Tracking Model | D | 8 | 0 | 6 | 0 | 1 | 4 | — | notStarted (—) |
+| `BO-499` | Rental Location Assignment | D | 0 | 0 | 6 | 0 | 2 | 6 | — | notStarted (—) |
+| `BO-500` | Rental Duration & Turnaround Configuration | D | 10 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-501` | Rental Rules & Operational Policy | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-502` | Customer Requirements, Agreement & Waiver | D | 16 | 0 | 6 | 0 | 1 | 4 | — | notStarted (—) |
+| `BO-503` | Product Validation, Approval & Publication | D | 11 | 0 | 6 | 0 | 1 | 3 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

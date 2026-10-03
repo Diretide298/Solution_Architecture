@@ -1,6 +1,6 @@
 # P08-food-beverage-01 — P08 · Food & Beverage
 
-**8 screens · 39 operations · 47 schemas · 10 permissions**
+**8 screens · 40 operations · 47 schemas · 10 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -99,14 +99,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-020` | F&B Order Management | B–D | 25 | 25 | 6 | 15 | 0 | 1 | — | notStarted (generated) |
-| `BO-021` | Order Search | B–D | 5 | 40 | 5 | 1 | 0 | 0 | — | notStarted (generated) |
+| `BO-020` | F&B Order Management | A | 25 | 25 | 6 | 15 | 0 | 1 | — | notStarted (generated) |
+| `BO-021` | Order Search | A | 5 | 40 | 5 | 1 | 0 | 0 | — | notStarted (generated) |
 | `BO-045` | Menu Management | A | 68 | 75 | 6 | 15 | 3 | 2 | — | notStarted (generated) |
-| `BO-046` | Kitchen Display | B–D | 8 | 14 | 6 | 7 | 0 | 3 | — | notStarted (generated) |
-| `BO-104` | Food & Beverage | B–D | 1 | 12 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-134` | Kitchen & Preparation Stations | B–D | 15 | 16 | 6 | 1 | 1 | 6 | — | notStarted (generated) |
-| `BO-135` | Order Routing & KDS/Printer Rules | B–D | 7 | 7 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-136` | F&B Global Settings & Controls | A | 84 | 1 | 6 | 17 | 1 | 0 | — | notStarted (generated) |
+| `BO-046` | Kitchen Display | C | 8 | 14 | 6 | 7 | 0 | 3 | — | notStarted (generated) |
+| `BO-104` | Food & Beverage | D | 1 | 12 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-134` | Kitchen & Preparation Stations | C | 15 | 16 | 6 | 1 | 1 | 6 | — | notStarted (generated) |
+| `BO-135` | Order Routing & KDS/Printer Rules | C | 7 | 7 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-136` | F&B Global Settings & Controls | A | 84 | 5 | 6 | 17 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -126,7 +126,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Food & Beverage · wave 1 · needs the `fnb` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block A · task VM-BO-020 |
 | Who uses it | venue staff holding `ORDER_MODIFY`, `ORDER_VIEW`, `SCOPE_VIEW` (1 operate, 2 read); in the flows as guest |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listFnbOrders` reads the population and `getFnbOrder` reads one of them — list, select, act |
@@ -466,7 +466,7 @@ Also apply: 2 for P08 · Food & Beverage, 24 for all of P08, 29 for every app (s
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Food & Beverage · wave 1 · needs the `fnb` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block A · task VM-BO-021 |
 | Who uses it | venue staff holding `ORDER_MODIFY`, `ORDER_VIEW` (1 operate, 1 read); in the flows as guest |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | statusTracker (compact density): `getGuestOrderStatus` reads one record and nothing reads a population — the screen is about that one thing |
@@ -692,7 +692,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Food & Beverage · wave 1 · needs the `fnb` module |
-| Block | Block A · task APP-SETUP-BO-045 |
+| Block | Block A · task APP-SETUP-BO-045-REST |
 | Who uses it | venue staff holding `APPROVAL_REQUEST`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `SCOPE_VIEW` (1 operate, 1 configure, 2 read); in the flows as supervisor, venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listMenus` reads the population and `getMenu` reads one of them — list, select, act |
@@ -1203,7 +1203,7 @@ Also apply: 2 for P08 · Food & Beverage, 24 for all of P08, 29 for every app (s
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Food & Beverage · wave 1 · needs the `fnb` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-046 |
 | Who uses it | venue staff holding `ORDER_MODIFY`, `ORDER_VIEW` (1 operate, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listKitchenTickets` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1447,7 +1447,7 @@ Also apply: 2 for P08 · Food & Beverage, 24 for all of P08, 29 for every app (s
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Food & Beverage · wave 1 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task VM-BO-104 |
 | Who uses it | venue staff holding `REPORT_VIEW_OWN`, `REPORT_VIEW_VENUE` (2 operate) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listMenus` reads the population and `getVenueSettings` reads one of them — list, select, act |
@@ -1641,7 +1641,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Food & Beverage · wave 2 · needs the `fnb` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-134 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `SCOPE_VIEW` (1 configure, 2 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listKitchenStations` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1911,7 +1911,7 @@ Also apply: 2 for P08 · Food & Beverage, 24 for all of P08, 29 for every app (s
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Food & Beverage · wave 2 · needs the `fnb` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task VM-BO-135 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listWorkstations` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -2097,7 +2097,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Food & Beverage · wave 1 · needs the `fnb` module |
 | Block | Block A · task APP-SETUP-BO-136 |
-| Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `TENANT_CONFIGURE`, `TENANT_VIEW` (2 configure, 1 read) |
+| Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `TENANT_CONFIGURE`, `TENANT_VIEW` (2 configure, 2 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listProductionRuns` reads the population and `getVenueSettings` reads one of them — list, select, act |
 | Offline | online only |
@@ -2210,6 +2210,15 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 **Shown**
 
+**Load the outlet's course rules as saved** (card list, from `getCourseRules`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Default coursing | chip: Fire and forget, Hold and fire, Phased, Timed, Delayed | How a ticket's courses are fired. `fireAndForget` sends every course at once, which is no coursing; `holdAndFire` waits for a server to … |
+| Course names | list or chips (count when long) | — |
+| Auto fire minutes | 1,234 | — |
+| Service mode overrides | grouped details | A different default per service mode. |
+
 **The venue settings** (detail panel, from `getVenueSettings`)
 
 | Shows | Format | Notes |
@@ -2231,7 +2240,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 - **Save F&B settings**: The settings save replaces the venue's whole settings record; the screen must send every non-F&B setting back unchanged (they are not shown here), or they revert to defaults. *(source: contracts/spine/tenancy.yaml#setVenueSettings)*
 
-**Data it reads**: `getVenueSettings` (onLoad, Operational settings for this venue)
+**Data it reads**: `getVenueSettings` (onLoad, Operational settings for this venue); `getCourseRules` (onLoad, Load the outlet's course rules as saved)
 
 **Where the user goes next**
 
@@ -2289,6 +2298,7 @@ approvals:
 - `getVenueSettings` → `TENANT_VIEW` (read) · staff
 - `setVenueSettings` → `TENANT_CONFIGURE` (configure) · staff
 - `setCourseRules` → `PRODUCT_CONFIGURE` (configure) · staff
+- `getCourseRules` → `PRODUCT_VIEW` (read) · staff
 
 **A refused user sees:** Shown when the caller lacks `TENANT_VIEW`, which `getVenueSettings` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setCourseRules`; `TENANT_CONFIGURE` for `setVenueSettings`.
 
@@ -2334,11 +2344,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (84), with its required mark, default, format and its error state (400, 403, 404, 412, 422).
-- [ ] Every output is drawn (1 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-136?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save venue settings, Save course rules.
 - [ ] Every transition is wired: `BO-137`, `BO-104`.
-- [ ] Every gated control is gated: `PRODUCT_CONFIGURE`, `TENANT_CONFIGURE`, `TENANT_VIEW`.
+- [ ] Every gated control is gated: `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `TENANT_CONFIGURE`, `TENANT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] The 2 decision(s) taken on this screen are drawn as decided, not as the old default.
@@ -2452,6 +2462,7 @@ Method, path, parameters, request and response for every operation these screens
 "createMenu": {"method":"POST","path":"/menus","contract":"fnb","summary":"Create a menu","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreateMenuRequest","responds":"Menu"},
 "createModifierGroup": {"method":"POST","path":"/modifier-groups","contract":"fnb","summary":"Create a modifier group","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ModifierGroup","responds":"ModifierGroup"},
 "getAllergenVerification": {"method":"GET","path":"/menu-items/{menuItemId}/allergen-verification","contract":"fnb","summary":"The last allergen verdict recorded for a dish","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"AllergenVerdict"},
+"getCourseRules": {"method":"GET","path":"/outlets/{outletId}/course-rules","contract":"fnb","summary":"How this outlet courses by default (read)","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"CourseRules"},
 "getFnbOrder": {"method":"GET","path":"/fnb-orders/{orderId}","contract":"fnb","summary":"Read an F&B order","permission":"ORDER_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"FnbOrder"},
 "getKitchenRoutingRules": {"method":"GET","path":"/outlets/{outletId}/kitchen-routing","contract":"fnb","summary":"An outlet's kitchen routing rules","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"KitchenRoutingRules"},
 "getKpiValues": {"method":"GET","path":"/kpi-values","contract":"reporting","summary":"Current values, against target, with movement","permission":"REPORT_VIEW_VENUE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"kpiIds","in":"query","required":null},{"name":"kpiCodes","in":"query","required":null},{"name":"scopePath","in":"query","required":null},{"name":"period","in":"query","required":null},{"name":"compareTo","in":"query","required":null},{"name":"interval","in":"query","required":null},{"name":"groupBy","in":"query","required":null},{"name":"module","in":"query","required":null}],"requestBody":null,"responds":"KpiValue"},
@@ -2507,7 +2518,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "FnbOrderStatus": {"type":"string","description":"The full lifecycle from 4.6.35. Nine states, not six — the earlier enum collapsed `accepted` into `placed` and had no `collected` or `delivered` at all, which made collection and delivery indistinguishable from a server putting a plate down.\n`accepted` matters because an outlet may refuse: past last orders, out of a key ingredient, or simply too far behind. A guest whose order sat in `placed` for ten minutes and was then rejected has a worse experience than one refused immediately.\n","enum":["ordered","accepted","inPreparation","ready","served","collected","delivered","cancelled","refunded"]},
 "GuestOrderStatus": {"type":"object","x-ticvai-persistence":"none — projection over kitchen_ticket","required":["orderId","status","lines"],"properties":{"orderId":{"type":"string"},"orderNumber":{"type":"string"},"status":{"$ref":"#/components/schemas/FnbOrderStatus"},"estimatedReadyAt":{"type":"string","format":"date-time","nullable":true},"isReadyForCollection":{"type":"boolean"},"lines":{"type":"array","description":"Per-line status. A guest waiting on one dish should see which.","items":{"type":"object","properties":{"name":{"type":"string"},"quantity":{"type":"integer"},"status":{"$ref":"#/components/schemas/KitchenTicketStatus"}}}}}},
 "KitchenRoutingRules": {"type":"object","x-ticvai-persistence":"fnb.kitchen_routing_rule","description":"**Where a line goes when its item names no station** (Chinmay, 2 October, workbook Q189 and Q190; DI-323; CHG-CSA-015). Item rules are `KitchenStation.menuItemIds`; these are the category rules, the default station and the fallback station of one outlet. One row per outlet.\n","required":["defaultStationId"],"properties":{"outletId":{"type":"string","format":"uuid","readOnly":true,"description":"The outlet in the path."},"categoryRules":{"type":"array","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"jsonb","description":"Tried in order; the first match wins.","items":{"type":"object","required":["matchKind","matchValue","stationId"],"properties":{"matchKind":{"type":"string","enum":["menuSection","productCategory"]},"matchValue":{"type":"string","description":"A `MenuSection.code`, or a catalogue product category code."},"stationId":{"type":"string","format":"uuid"}}}},"defaultStationId":{"type":"string","format":"uuid","description":"Where a line that matches no item rule and no category rule goes (workbook Q190). Never refused for want of a station."},"fallbackStationId":{"type":"string","format":"uuid","nullable":true,"description":"Where a ticket goes when the station it routed to is inactive or every display assigned to it is down (DI-323)."},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Operations write it at `outlet` scope."}}},
-"KitchenSla": {"type":"object","description":"**How long a ticket may sit, per service mode, and what pushes it up the rail** (`setKitchenSla`). The priority weights are the ones `listKitchenTickets` orders the rail by.\n","properties":{"targets":{"type":"array","items":{"type":"object","required":["serviceMode","targetMinutes"],"properties":{"serviceMode":{"$ref":"#/components/schemas/ServiceMode"},"targetMinutes":{"type":"integer","minimum":1},"warnAtPercent":{"type":"integer","default":80}}}},"priorityWeights":{"type":"object","description":"The weight of each signal the board names — age, promise time, table stage, a VIP marker.","properties":{"age":{"type":"integer","minimum":0},"targetReadyAt":{"type":"integer","minimum":0,"description":"Promise time."},"tableStage":{"type":"integer","minimum":0},"vip":{"type":"integer","minimum":0}}}}},
+"KitchenSla": {"type":"object","x-ticvai-persistence":"fnb.kitchen_sla","x-ticvai-primary-key":["outletId"],"description":"**How long a ticket may sit, per service mode, and what pushes it up the rail** (`setKitchenSla`). The priority weights are the ones `listKitchenTickets` orders the rail by.\n\n**Stored per outlet in `fnb.kitchen_sla`** (3 October 2026, CHG-R1S-005: the HLD/LLD cross-check found `setKitchenSla` wrote no table). One row per outlet; the targets and weights are held whole.\n","properties":{"outletId":{"type":"string","format":"uuid","readOnly":true,"description":"The outlet, from the path. The row's key."},"targets":{"type":"array","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"jsonb","items":{"type":"object","required":["serviceMode","targetMinutes"],"properties":{"serviceMode":{"$ref":"#/components/schemas/ServiceMode"},"targetMinutes":{"type":"integer","minimum":1},"warnAtPercent":{"type":"integer","default":80}}}},"priorityWeights":{"type":"object","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"jsonb","description":"The weight of each signal the board names — age, promise time, table stage, a VIP marker.","properties":{"age":{"type":"integer","minimum":0},"targetReadyAt":{"type":"integer","minimum":0,"description":"Promise time."},"tableStage":{"type":"integer","minimum":0},"vip":{"type":"integer","minimum":0}}}}},
 "KitchenStation": {"x-ticvai-persistence":"fnb.kitchen_station","type":"object","required":["id","code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"outletId":{"type":"string","format":"uuid"},"menuItemIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"Items routed to this station."},"displayWorkstationIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"**The kitchen displays assigned to this station** (decided 28 September, audit R277), as tenancy `Workstation` ids, primary first and fallbacks after it. Set with `setKitchenStations`. A display reads the rail for the station it is assigned to (`listKitchenTickets`). A workstation is assigned to at most one station; a second assignment is refused `400`.\n"},"displayEndpoint":{"type":"string","nullable":true,"description":"The P15 Kitchen Display device this station's tickets go to (19 Sep: the display is TICVAI software on commodity hardware, per station, with a fallback device where the primary is down — 18 Aug minute). Absent where the station has no display assigned.\n"},"printerDeviceIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"**The kitchen printers assigned to this station** (Chinmay, 2 October, workbook Q187: kitchen printers are in release 1; CHG-CSA-014), as tenancy `RegisteredDevice` ids of kind `receiptPrinter` or `labelPrinter`. A station may have printers, displays or both; a ticket for a station with printers is printed there as well as shown, and `printPrepSheet` sends the station's part of a prep sheet to them.\n"},"servesOutletIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"**A producing outlet's station serving other outlets** (Chinmay, 2 October, workbook Q186 and Q188; DI-330; CHG-CSA-015). `outletId` is the producing outlet (the commissary or main kitchen); the outlets listed here route their orders to this station as if it were their own. Empty, the default, means the station serves only its own outlet.\n"},"isActive":{"type":"boolean"}}},
 "KitchenTicket": {"x-ticvai-persistence":"fnb.kitchen_ticket + fnb.kitchen_ticket_line","type":"object","required":["id","orderId","outletId","status","lines","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"orderId":{"type":"string","format":"uuid","description":"The F&B order the ticket was created from on acceptance (`FnbOrder.id`)."},"orderNumber":{"type":"string"},"outletId":{"type":"string","format":"uuid"},"tableLabel":{"type":"string","nullable":true},"serviceMode":{"$ref":"#/components/schemas/ServiceMode"},"coursing":{"allOf":[{"$ref":"#/components/schemas/CoursingPolicy"}],"nullable":true,"description":"BL-131. **Starters before mains is the entire job of a kitchen pass**, and the model fired everything at once.\n`holdAndFire` waits for a server to call it; `timed` fires on a clock; `phased` staggers by course. **Without this a table gets its dessert while eating its starter.**\n"},"buzzerCode":{"type":"string","nullable":true,"description":"BL-128. **The pager number handed to a guest at a counter.** Recorded against the order so a lost buzzer is a lookup rather than an argument.\n"},"status":{"$ref":"#/components/schemas/KitchenTicketStatus"},"priority":{"type":"integer","description":"Higher fires sooner. Raised by Fast Pass or supervisor override."},"prioritisedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"prioritiseReason":{"type":"string","nullable":true},"lines":{"type":"array","items":{"type":"object","required":["lineId","name","quantity","status"],"properties":{"lineId":{"type":"string","format":"uuid"},"name":{"type":"string"},"quantity":{"type":"integer"},"modifiers":{"type":"array","items":{"type":"string"}},"note":{"type":"string","nullable":true},"allergens":{"type":"array","items":{"$ref":"#/components/schemas/AllergenCode"}},"refireOfLineId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"**Set on a refire.** The line it remakes, which stays — food cost counts both, the bill counts one (`refireItem`)."},"refireReason":{"allOf":[{"$ref":"#/components/schemas/RefireReason"}],"nullable":true,"readOnly":true},"isChargeable":{"type":"boolean","nullable":true,"readOnly":true,"description":"A refire's `chargeable` flag. Null on a line that is not a refire."},"course":{"type":"integer","nullable":true},"stationId":{"type":"string","format":"uuid","nullable":true},"status":{"$ref":"#/components/schemas/KitchenTicketStatus"}}}},"createdAt":{"type":"string","format":"date-time"},"targetReadyAt":{"type":"string","format":"date-time","nullable":true},"elapsedSeconds":{"type":"integer"}}},
 "KitchenTicketStatus": {"type":"string","enum":["received","preparing","ready","served","recalled","cancelled"]},

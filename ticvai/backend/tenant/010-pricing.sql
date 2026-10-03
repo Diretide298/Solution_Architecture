@@ -4,7 +4,7 @@
 -- Holds 6 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS pricing.dynamic_price_action (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     dynamic_price_rule_id             uuid NOT NULL,
     type                              text NOT NULL CONSTRAINT dynamic_price_action_type_chk CHECK (char_length(type) <= 30),
     value                             numeric(18,4) NOT NULL,
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS pricing.dynamic_price_condition (
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS pricing.dynamic_price_rule (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     pricing_rule_code                 text NOT NULL CONSTRAINT dynamic_price_rule_pricing_rule_code_chk CHECK (char_length(pricing_rule_code) <= 100),
     name                              text NOT NULL CONSTRAINT dynamic_price_rule_name_chk CHECK (char_length(name) <= 200),
     product_id                        uuid,

@@ -1,6 +1,6 @@
 # WS55 — Rules  Workflow  Approval   Automation Engine board 1
 
-**10 screens · 14 operations · 22 schemas · 3 permissions**
+**10 screens · 15 operations · 22 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -96,16 +96,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-238` | Rules & Workflow Command Center | B–D | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-239` | Visual Business Rule Builder | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-240` | Conditions, Decision Logic & Decision Tables | B–D | 0 | 0 | 6 | 0 | 0 | 1 | — | notStarted (generated) |
-| `ADM-241` | Visual Workflow Designer | B–D | 21 | 12 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-242` | Approval Matrix & Multi-Level Approval Configuration | B–D | 7 | 0 | 5 | 0 | 0 | 3 | — | notStarted (generated) |
-| `ADM-243` | Roles, Authority, Delegation & Approval Limits | A | 14 | 0 | 5 | 51 | 0 | 6 | — | notStarted (generated) |
-| `ADM-244` | SLA, Escalation, Reminder & Timeout Rules | B–D | 21 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-245` | Trigger, Action & Cross-Module Orchestration Configuration | B–D | 12 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-246` | Workflow Testing, Simulation & Impact Analysis | B–D | 0 | 16 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-247` | Versioning, Governance, Approval & Publication | B–D | 25 | 20 | 6 | 0 | 0 | 3 | — | notStarted (generated) |
+| `ADM-238` | Rules & Workflow Command Center | B | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-239` | Visual Business Rule Builder | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-240` | Conditions, Decision Logic & Decision Tables | B | 0 | 0 | 6 | 0 | 0 | 1 | — | notStarted (generated) |
+| `ADM-241` | Visual Workflow Designer | B | 21 | 12 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-242` | Approval Matrix & Multi-Level Approval Configuration | B | 7 | 0 | 5 | 0 | 0 | 3 | — | notStarted (generated) |
+| `ADM-243` | Roles, Authority, Delegation & Approval Limits | A | 14 | 3 | 5 | 51 | 0 | 6 | — | notStarted (generated) |
+| `ADM-244` | SLA, Escalation, Reminder & Timeout Rules | B | 21 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-245` | Trigger, Action & Cross-Module Orchestration Configuration | B | 12 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-246` | Workflow Testing, Simulation & Impact Analysis | B | 0 | 16 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-247` | Versioning, Governance, Approval & Publication | B | 25 | 20 | 6 | 0 | 0 | 3 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -125,7 +125,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-238 |
 | Who uses it | venue staff holding `APPROVAL_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each configuration should show) — counts over a population, then the population |
@@ -321,7 +321,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-239 |
 | Who uses it | venue staff holding `APPROVAL_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -431,7 +431,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-240 |
 | Who uses it | venue staff holding `APPROVAL_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -536,7 +536,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-241 |
 | Who uses it | venue staff holding `APPROVAL_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -688,7 +688,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-242 |
 | Who uses it | venue |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -853,6 +853,13 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | End | select field | — | — | — | — | — | — |
 | Reason | select field | — | — | — | — | — | — |
 
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Kind | select | — | Refund · Price override · Discount override · Complimentary ticket · Membership cancellation · Access permission change · Configuration change · AI recommendation · Release promotion · Requisition · Stock write off · Journal entry …; - Publishing white-label … | `listApprovalMatrices` ?kind |
+| Effective | toggle | off | — | `listApprovalMatrices` ?effective |
+
 **Rules for these inputs** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
 
 - **Scope this applies at**: Not a free choice; each write has one level and the selector says it: setApprovalMatrix: set for the venue chosen in the venue filter, showing beside each value the tenant or region value it overrides. Nearest ancestor wins; a workstation is assigned a profile, never configured. *(source: ADR-0018; ADR-0029; screens/_patterns.yaml#configEditor; contracts/spine/approvals.yaml#setApprovalMatrix)*
@@ -861,13 +868,23 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 #### Outputs: what the screen shows and produces
 
+**Shown**
+
+**Show the approval matrices, the one being changed among them** (data table, from `listApprovalMatrices`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kind | chip: Refund, Price override, Discount override, Complimentary ticket, Membership … | 11.1.7 and 11.1.30–11.1.37. The first four already exist as bespoke implementations and this contract is what they collapse into. |
+| Scope level | chip: Tenant, Region, Venue | — |
+| Is active | yes / no (icon or chip) | — |
+
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Event operations (primary button) | navigation or local | — | — | — | — |
 
-**Data it reads**: `listApprovalDelegations` (onLoad, Delegations in force)
+**Data it reads**: `listApprovalDelegations` (onLoad, Delegations in force); `listApprovalMatrices` (onLoad, Show the approval matrices, the one being changed among them)
 
 **Where the user goes next**
 
@@ -918,6 +935,7 @@ form example:
 - `listApprovalDelegations` → `APPROVAL_VIEW` (read) · staff
 - `createApprovalDelegation` → `APPROVAL_DECIDE` (operate) · staff
 - `setApprovalMatrix` → `APPROVAL_CONFIGURE` (configure) · staff
+- `listApprovalMatrices` → `APPROVAL_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -962,11 +980,12 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS136 Rules  Workflow  Approval   Automation Engine Board 1.dc.html#adm-243`
 - Workshop pack: Rules__Workflow__Approval___Automation_Engine_Reference.pdf board 1
 - Flow F164 *Rules Workflow Approval Automation Engine board 1: Rules & Workflow Command …*, step 10: Works in Roles, Authority, Delegation & Approval Limits → Define who has authority to perform or approve specific actions. This should work with TICVAI RBAC/PBAC rather than replace it.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (14), with its required mark, default, format and its error state (400, 403, 409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (3 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-243?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Event operations.
 - [ ] Every transition is wired: `ADM-238`, `BO-087`.
@@ -985,7 +1004,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-244 |
 | Who uses it | venue staff holding `APPROVAL_CONFIGURE`, `APPROVAL_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -1124,7 +1143,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-245 |
 | Who uses it | venue staff holding `APPROVAL_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -1247,7 +1266,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-246 |
 | Who uses it | venue staff holding `APPROVAL_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
@@ -1386,7 +1405,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task VM-ADM-247 |
 | Who uses it | venue staff holding `APPROVAL_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
@@ -1503,6 +1522,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the versioning governance approval are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 422 A wrong code, attempts one to four (CHG-R1S-025; the r1 gate found only the fifth failure specified). |
 
 #### Sample data for the mock-up
 
@@ -1548,7 +1568,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (25), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (25), with its required mark, default, format and its error state (410, 422).
 - [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-247?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Publish Now, Schedule, Selected Tenant, Selected Venue, Selected Brand, Email me a code instead.
@@ -1655,6 +1675,7 @@ Method, path, parameters, request and response for every operation these screens
 "createApprovalDelegation": {"method":"POST","path":"/delegations","contract":"approvals","summary":"Delegate approval authority","permission":"APPROVAL_DECIDE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ApprovalDelegation","responds":"ApprovalDelegation"},
 "createMfaChallenge": {"method":"POST","path":"/auth/mfa/challenge","contract":"identity","summary":"Second factor at staff sign-in, and step-up for a sensitive action","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "listApprovalDelegations": {"method":"GET","path":"/delegations","contract":"approvals","summary":"Who is standing in for whom","permission":"APPROVAL_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"ApprovalDelegation"},
+"listApprovalMatrices": {"method":"GET","path":"/approval-matrices","contract":"approvals","summary":"What requires approval here","permission":"APPROVAL_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"kind","in":"query","required":null},{"name":"effective","in":"query","required":null}],"requestBody":null,"responds":"ApprovalMatrix"},
 "listConditionDecisionLogic": {"method":"GET","path":"/condition-decision-logic","contract":"approvals","summary":"Conditions, Decision Logic & Decision Tables","permission":"APPROVAL_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"ConditionsDecisionLogicDecisionTablesView"},
 "listRuleWorkflow": {"method":"GET","path":"/rule-workflow","contract":"approvals","summary":"Rules & Workflow Command Center","permission":"APPROVAL_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"type","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":"sourceModule","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listSlaEscalationReminder": {"method":"GET","path":"/sla-escalation-reminder","contract":"approvals","summary":"SLA, Escalation, Reminder & Timeout Rules","permission":"APPROVAL_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"SlaEscalationReminderTimeoutRulesView"},

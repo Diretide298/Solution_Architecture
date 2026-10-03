@@ -601,10 +601,12 @@
    "listProductCategories",
    "listProducts",
    "getPublishedGuidedChoice",
-   "getPublishedBookingFlow"
+   "getPublishedBookingFlow",
+   "addCartLine"
   ],
   "services": [
    "CatalogueService",
+   "OrderService",
    "WhiteLabelService"
   ],
   "stores": [
@@ -613,12 +615,18 @@
   ],
   "reads": [
    "cache:idempotency",
+   "catalogue.channel_capacity",
+   "catalogue.performance",
    "catalogue.price_list",
    "catalogue.product",
    "catalogue.product_category",
    "catalogue.product_eligibility_rule",
    "catalogue.product_media",
    "catalogue.variant",
+   "marketing.consent_question",
+   "marketing.consent_question_version",
+   "orders.cart",
+   "orders.cart_line",
    "promotions.coupon_code",
    "promotions.promotion",
    "promotions.promotion_rule",
@@ -631,6 +639,9 @@
   ],
   "writes": [
    "cache:idempotency",
+   "orders.cart",
+   "orders.cart_line",
+   "platform.idempotency_record",
    "promotions.promotion_evaluation_trace"
   ],
   "storedProcedures": [],
@@ -677,10 +688,12 @@
     "to": "WEB-010",
     "trigger": "Shopping Cart",
     "carries": [
+     "cartId",
      "code",
-     "lineId"
+     "lineId",
+     "performanceId"
     ],
-    "provenance": "derived \u2014 WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId and WEB-005 holds code, lineId, so an edge into it carries them"
+    "provenance": "derived \u2014 WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId and WEB-005 holds cartId, code, lineId, performanceId, so an edge into it carries them"
    },
    {
     "to": "WEB-016",
@@ -785,6 +798,7 @@
    "whitelabel.config_version"
   ],
   "writes": [
+   "marketing.booking_consent_record",
    "orders.cart",
    "orders.cart_line",
    "platform.idempotency_record"
@@ -959,7 +973,7 @@
    {
     "to": "WEB-005",
     "trigger": "Ticket Type Selection",
-    "provenance": "derived \u2014 WEB-005 declares entryState.params productId and WEB-007 holds none of them. The edge carries nothing: WEB-005 finds productId (listProducts) itself, and WEB-005 opens on its own"
+    "provenance": "derived \u2014 WEB-005 declares entryState.params cartId, productId and WEB-007 holds none of them. The edge carries nothing: cartId only pre-selects (deep link or optional); WEB-005 finds productId (listProducts) itself, and WEB-005 opens on its own"
    },
    {
     "to": "WEB-008",
@@ -1120,7 +1134,10 @@
    {
     "to": "WEB-005",
     "trigger": "Ticket Type Selection",
-    "provenance": "derived \u2014 WEB-005 declares entryState.params productId and WEB-008 holds none of them. The edge carries nothing: WEB-005 finds productId (listProducts) itself, and WEB-005 opens on its own"
+    "carries": [
+     "cartId"
+    ],
+    "provenance": "derived \u2014 WEB-005 declares entryState.params cartId, productId and WEB-008 holds cartId, so an edge into it carries them"
    },
    {
     "to": "WEB-006",
@@ -1232,7 +1249,7 @@
    {
     "to": "WEB-005",
     "trigger": "Ticket Type Selection",
-    "provenance": "derived \u2014 WEB-005 declares entryState.params productId and WEB-009 holds none of them. The edge carries nothing: WEB-005 finds productId (listProducts) itself, and WEB-005 opens on its own"
+    "provenance": "derived \u2014 WEB-005 declares entryState.params cartId, productId and WEB-009 holds none of them. The edge carries nothing: cartId only pre-selects (deep link or optional); WEB-005 finds productId (listProducts) itself, and WEB-005 opens on its own"
    },
    {
     "to": "WEB-006",
@@ -1399,7 +1416,10 @@
    {
     "to": "WEB-011",
     "trigger": "Answers attendee forms and consent, only where the cart needs them",
-    "provenance": "flow F01 step 5\u21926, F02 step 3\u21924, F55 step 1\u21922"
+    "provenance": "flow F01 step 5\u21926, F02 step 3\u21924, F55 step 1\u21922",
+    "carries": [
+     "holdId"
+    ]
    },
    {
     "to": "WEB-030",
@@ -1449,9 +1469,11 @@
    "getCart",
    "recordConsentAnswers",
    "getPublishedBookingFlow",
-   "getMyProfile"
+   "getMyProfile",
+   "extendSeatHold"
   ],
   "services": [
+   "CatalogueService",
    "MarketingService",
    "OrderService",
    "WhiteLabelService"
@@ -1477,6 +1499,7 @@
    "orders.cart",
    "orders.cart_line",
    "promotions.promotion",
+   "seating.seat_hold",
    "whitelabel.booking_flow",
    "whitelabel.booking_flow_step",
    "whitelabel.config_version"
@@ -1484,8 +1507,10 @@
   "writes": [
    "cache:idempotency",
    "cache:resolution",
+   "marketing.booking_consent_record",
    "marketing.guest_profile",
-   "pii.subject"
+   "pii.subject",
+   "seating.seat_hold"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -1529,6 +1554,7 @@
     "provenance": "flow F55 step 2\u21923",
     "carries": [
      "cartId",
+     "holdId",
      "lineId",
      "performanceId"
     ]
@@ -1653,7 +1679,7 @@
    {
     "to": "WEB-011",
     "trigger": "Guest Details & Attendee Forms",
-    "provenance": "derived \u2014 WEB-011 declares entryState.params  and WEB-012 holds none of them. The edge carries nothing: WEB-012 is opened from WEB-011, so this edge is the way back and WEB-011 keeps its own state"
+    "provenance": "derived \u2014 WEB-011 declares entryState.params holdId and WEB-012 holds none of them. The edge carries nothing: WEB-012 is opened from WEB-011, so this edge is the way back and WEB-011 keeps its own state"
    },
    {
     "to": "WEB-016",
@@ -1746,7 +1772,7 @@
    {
     "to": "WEB-011",
     "trigger": "Guest Details & Attendee Forms",
-    "provenance": "derived \u2014 WEB-011 declares entryState.params  and WEB-013 holds none of them. The edge carries nothing: WEB-011 needs nothing to open"
+    "provenance": "derived \u2014 WEB-011 declares entryState.params holdId and WEB-013 holds none of them. The edge carries nothing: holdId only pre-selects (deep link or optional), and WEB-011 opens on its own"
    },
    {
     "to": "WEB-012",
@@ -2064,7 +2090,7 @@
    {
     "to": "WEB-011",
     "trigger": "Guest Details & Attendee Forms",
-    "provenance": "derived \u2014 WEB-011 declares entryState.params  and WEB-016 holds none of them. The edge carries nothing: WEB-011 needs nothing to open"
+    "provenance": "derived \u2014 WEB-011 declares entryState.params holdId and WEB-016 holds none of them. The edge carries nothing: holdId only pre-selects (deep link or optional), and WEB-011 opens on its own"
    },
    {
     "to": "WEB-012",
@@ -3768,7 +3794,8 @@
    "cancelReservation",
    "getGroupBooking",
    "getResourceAvailability",
-   "updateTableReservation"
+   "updateTableReservation",
+   "listMyTableReservations"
   ],
   "services": [
    "CatalogueService",
@@ -3777,7 +3804,9 @@
    "VenueOpsService"
   ],
   "stores": [
+   "derived",
    "postgres",
+   "postgres-analytical",
    "redis"
   ],
   "reads": [
@@ -3786,6 +3815,7 @@
    "catalogue.product",
    "fnb.reservation_table",
    "fnb.table_reservation",
+   "fnb.waitlist_entry",
    "maintenance.work_order",
    "orders.group_booking",
    "orders.reservation",
@@ -4220,7 +4250,8 @@
    "joinRestaurantWaitlist",
    "leaveRestaurantWaitlist",
    "addCartLine",
-   "updateTableReservation"
+   "updateTableReservation",
+   "listMyTableReservations"
   ],
   "services": [
    "FnbService",
@@ -4270,7 +4301,8 @@
    "fnb.waitlist_entry",
    "orders.cart",
    "orders.cart_line",
-   "platform.idempotency_record"
+   "platform.idempotency_record",
+   "platform.outbox"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -4609,7 +4641,8 @@
   "operations": [
    "listParkingFacilities",
    "addCartLine",
-   "updateParkingEntitlement"
+   "updateParkingEntitlement",
+   "getParkingEntitlement"
   ],
   "services": [
    "AccessService",
@@ -4935,6 +4968,7 @@
    "getGuestMenu",
    "listAiConversations",
    "sendGuestConversationMessage",
+   "getGuestConversation",
    "recordAnswerFeedback"
   ],
   "services": [
@@ -5002,6 +5036,7 @@
    "cache:answer",
    "cache:idempotency",
    "marketing.conversation",
+   "marketing.conversation_message",
    "platform.outbox",
    "qdrant:knowledge"
   ],
@@ -6714,6 +6749,7 @@
    "whitelabel.guided_choice_answer"
   ],
   "writes": [
+   "marketing.booking_consent_record",
    "orders.cart",
    "orders.cart_line",
    "platform.idempotency_record"
@@ -8483,7 +8519,8 @@
    "fnb.kitchen_ticket",
    "fnb.location_session",
    "fnb.order_fulfilment",
-   "fnb.service_order"
+   "fnb.service_order",
+   "platform.outbox"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -8769,7 +8806,8 @@
   "operations": [
    "addCartLine",
    "updateParkingEntitlement",
-   "listParkingFacilities"
+   "listParkingFacilities",
+   "getParkingEntitlement"
   ],
   "services": [
    "AccessService",
@@ -9090,7 +9128,8 @@
    "requestSuggestion",
    "listAiConversations",
    "recordAnswerFeedback",
-   "sendGuestConversationMessage"
+   "sendGuestConversationMessage",
+   "getGuestConversation"
   ],
   "services": [
    "AiService",
@@ -9157,6 +9196,7 @@
    "cache:answer",
    "cache:idempotency",
    "marketing.conversation",
+   "marketing.conversation_message",
    "platform.outbox",
    "qdrant:knowledge"
   ],
@@ -9214,6 +9254,7 @@
    "checkoutCart",
    "sendAiMessage",
    "sendGuestConversationMessage",
+   "getGuestConversation",
    "handoverToAgent",
    "recordAnswerFeedback"
   ],
@@ -9286,6 +9327,7 @@
    "fnb.service_order",
    "marketing.consent_record",
    "marketing.conversation",
+   "marketing.conversation_message",
    "orders.cart",
    "orders.cart_line",
    "orders.order_line",
@@ -9444,7 +9486,8 @@
    "sendAiMessage",
    "createAiConversation",
    "handoverToAgent",
-   "recordAnswerFeedback"
+   "recordAnswerFeedback",
+   "listAiConversations"
   ],
   "services": [
    "AiService",
@@ -10745,7 +10788,8 @@
   "app": "guest-app",
   "route": "/general/ticket-delivery-and-sharing",
   "operations": [
-   "transferOrderTickets"
+   "transferOrderTickets",
+   "listTicketTransfers"
   ],
   "services": [
    "OrderService"
@@ -10917,7 +10961,8 @@
   "operations": [
    "addCartLine",
    "decideRecommendations",
-   "recordRecommendationEvents"
+   "recordRecommendationEvents",
+   "getCart"
   ],
   "services": [
    "AiService",
@@ -10937,12 +10982,14 @@
    "cache:rec-candidates",
    "cache:rec-features",
    "catalogue.channel_capacity",
+   "catalogue.inventory_hold",
    "catalogue.performance",
    "catalogue.variant",
    "marketing.consent_question",
    "marketing.consent_question_version",
    "orders.cart",
-   "orders.cart_line"
+   "orders.cart_line",
+   "promotions.promotion"
   ],
   "writes": [
    "ai.decision_record",
@@ -12540,7 +12587,8 @@
   "route": "/account/refunds-resale",
   "operations": [
    "createRefundRequest",
-   "createResaleListing"
+   "createResaleListing",
+   "getOrder"
   ],
   "services": [
    "OrderService"
@@ -12554,6 +12602,10 @@
    "cache:idempotency",
    "catalogue.entitlement_template",
    "orders.fraud_rule",
+   "orders.order_line",
+   "orders.order_line_discount",
+   "orders.order_line_eligibility",
+   "orders.payment",
    "orders.refund_policy",
    "orders.resale_listing",
    "orders.sales_order"
@@ -13651,6 +13703,7 @@
    "redis"
   ],
   "reads": [
+   "catalogue.channel_capacity",
    "transport.departure",
    "transport.fare_matrix_cell",
    "transport.fare_passenger_type",
@@ -13731,7 +13784,8 @@
    "getTransportFareTable",
    "quoteTransportFare",
    "addCartLine",
-   "saveFavouriteRoute"
+   "saveFavouriteRoute",
+   "getTransportDeparture"
   ],
   "services": [
    "OrderService",
@@ -13749,6 +13803,7 @@
    "marketing.consent_question_version",
    "orders.cart",
    "orders.cart_line",
+   "transport.departure",
    "transport.fare_matrix_cell",
    "transport.fare_passenger_type",
    "transport.fare_table",
@@ -13756,7 +13811,8 @@
    "transport.pass_type",
    "transport.route",
    "transport.route_stop",
-   "transport.station"
+   "transport.station",
+   "transport.timetable"
   ],
   "writes": [
    "orders.cart",
@@ -15582,7 +15638,8 @@
    "POS-010",
    "POS-022",
    "POS-023",
-   "POS-026"
+   "POS-026",
+   "POS-011"
   ],
   "pattern": "listDetail",
   "entryFrom": [
@@ -15652,6 +15709,15 @@
     "operation": "createShopAndDrop",
     "crossesDevice": true,
     "back": false
+   },
+   {
+    "to": "POS-011",
+    "trigger": "Return or exchange a sale (a later visit, from the receipt)",
+    "provenance": "flow brief F34 frame 4\u21925; added 3 October 2026 (the lead, POS design cross-check; CHG-RONEC-002)",
+    "carries": [
+     "orderId",
+     "outletId"
+    ]
    },
    {
     "to": "POS-010",
@@ -16271,6 +16337,7 @@
    "ledger.journal_entry",
    "orders.cash_count_line",
    "orders.pos_shift",
+   "orders.pos_shift_incident",
    "platform.outbox"
   ],
   "storedProcedures": [],
@@ -16278,9 +16345,10 @@
   "offline": true,
   "specified": true,
   "exits": [
-   "POS-001",
+   "POS-000",
    "POS-008",
-   "POS-009"
+   "POS-009",
+   "POS-025"
   ],
   "pattern": "approvalInbox",
   "entryFrom": [
@@ -16290,7 +16358,7 @@
   ],
   "transitions": [
    {
-    "to": "POS-001",
+    "to": "POS-000",
     "trigger": "Close and sign out",
     "control": "primaryButton#lockShift",
     "precondition": "closeStep == 'summary'",
@@ -16312,7 +16380,7 @@
       "note": "`submitShiftCount` answered `referredToSupervisor`: the shift is `pendingVariance` and the supervisor is alerted; the till shows no amount (CHG-FIN-003; audit R080 (e))."
      }
     ],
-    "provenance": "board TICVAI POS Terminal \u00b7 signOut (5641) + lockShift (5687); flow F32 step 6"
+    "provenance": "board TICVAI POS Terminal \u00b7 signOut (5641) + lockShift (5687); flow F32 step 10\u219211 (the cashier signs out to the till door, POS-000, where the next cashier signs in; corrected 3 October 2026 from POS-001, CHG-RONEC-002)"
    },
    {
     "to": "POS-008",
@@ -16330,6 +16398,11 @@
     "to": "POS-009",
     "trigger": "Staff Roster",
     "provenance": "derived \u2014 POS-009 declares entryState.params  and POS-007 holds none of them. The edge carries nothing: POS-009 needs nothing to open"
+   },
+   {
+    "to": "POS-025",
+    "trigger": "A shift was closed in error",
+    "provenance": "flow F32 step 13\u219214"
    }
   ],
   "machine": {
@@ -17407,7 +17480,8 @@
   "operations": [
    "recordNoSale",
    "voidOrder",
-   "applyManualDiscount"
+   "applyManualDiscount",
+   "getOrder"
   ],
   "services": [
    "OrderService"
@@ -17460,7 +17534,7 @@
    "loading": "The saved sales exceptions controls.",
    "error": "Could not load. Names which read failed and leaves the sales exceptions controls untouched.",
    "emptyFirstRun": "No sales exceptions controls configured. The form opens empty and `recordNoSale` saves the first one; it says what the platform does in the meantime.",
-   "emptyNoAccess": "Shown when the caller lacks `CASH_NO_SALE`, which `recordNoSale` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires to show this screen, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASH_NO_SALE` for `recordNoSale`; `ORDER_DISCOUNT` for `applyManualDiscount`; `ORDER_VOID` for `voidOrder`.",
    "offline": "**Working from the local journal.** The till keeps taking money; this reconciles on sync.",
    "approvalRejected": "The supervisor declined the no-sale or void; the drawer stays shut and the reason is shown."
   },
@@ -17593,7 +17667,8 @@
    "allocateDepositBox",
    "configureWorkstation",
    "listDevices",
-   "setDeviceAssignment"
+   "setDeviceAssignment",
+   "getDeviceAssignment"
   ],
   "services": [
    "OrderService",
@@ -17717,7 +17792,8 @@
   "app": "venue-pos",
   "route": "/sell/cash-in-cash-out-operations",
   "operations": [
-   "createCashMovement"
+   "createCashMovement",
+   "listCashMovements"
   ],
   "services": [
    "OrderService"
@@ -17762,7 +17838,7 @@
    "loading": "The saved cash cash out.",
    "error": "Could not load. Names which read failed and leaves the cash cash out untouched.",
    "emptyFirstRun": "No cash cash out configured. The form opens empty and `createCashMovement` saves the first one; it says what the platform does in the meantime.",
-   "emptyNoAccess": "Shown when the caller lacks `CASH_LIFT`, which `createCashMovement` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listCashMovements` requires to show this screen, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASH_LIFT` for `createCashMovement`.",
    "offline": "**Working from the local journal.** The till keeps taking money; this reconciles on sync."
   },
   "overlays": []
@@ -18042,15 +18118,15 @@
   ],
   "transitions": [
    {
-    "to": "POS-007",
-    "trigger": "End of shift",
-    "provenance": "flow F32 step 5\u21926",
-    "operation": "recordNoSale"
-   },
-   {
     "to": "POS-002",
     "trigger": "Sell \u2014 Ticket Catalogue",
     "provenance": "derived \u2014 POS-002 declares entryState.params cardCode, orderId, productId, promotionId and POS-020 holds none of them. The edge carries nothing: cardCode, orderId, productId, promotionId only pre-select (deep link or optional), and POS-002 opens on its own"
+   },
+   {
+    "to": "POS-007",
+    "trigger": "End of shift",
+    "provenance": "flow F32 step 8\u21929",
+    "operation": "recordNoSale"
    }
   ],
   "machine": null,
@@ -18687,7 +18763,8 @@
    "setTableLayout",
    "setTableCombinations",
    "setItemAvailability",
-   "getTableMap"
+   "getTableMap",
+   "getGuestMenu"
   ],
   "services": [
    "FnbService"
@@ -18700,6 +18777,8 @@
    "cache:idempotency",
    "fnb.dining_table",
    "fnb.menu_item",
+   "fnb.modifier_group",
+   "fnb.modifier_option",
    "fnb.table_combination"
   ],
   "writes": [
@@ -18851,7 +18930,10 @@
    "POS-026",
    "POS-007",
    "POS-030",
-   "POS-031"
+   "POS-031",
+   "POS-018",
+   "POS-000",
+   "BO-024"
   ],
   "pattern": "dashboard",
   "entryFrom": [
@@ -18912,6 +18994,25 @@
     "to": "POS-031",
     "trigger": "Reservations (F5)",
     "provenance": "decided 1 October 2026 (POSV2-2): v2's F5 Reservations and the Bookings rail item"
+   },
+   {
+    "to": "POS-018",
+    "trigger": "Cash lift (the drawer is over its limit)",
+    "provenance": "flow brief F32 frame 5\u21926; added 3 October 2026 (the lead, POS design cross-check; CHG-RONEC-002)",
+    "carries": [
+     "shiftId"
+    ]
+   },
+   {
+    "to": "POS-000",
+    "trigger": "Sign out (back to the till door)",
+    "provenance": "flow brief F32 frame 12\u219213; added 3 October 2026 (the lead, POS design cross-check; CHG-RONEC-002)"
+   },
+   {
+    "to": "BO-024",
+    "trigger": "The deposit boxes of the settled shifts close and the cash reaches the safe",
+    "provenance": "flow F32 step 14\u219215",
+    "operation": "reopenShift"
    }
   ],
   "machine": null,
@@ -19083,6 +19184,7 @@
    "marketing.consent_propagation",
    "marketing.consent_record",
    "marketing.guest_profile",
+   "platform.outbox",
    "wallet.wallet"
   ],
   "storedProcedures": [],
@@ -19187,6 +19289,7 @@
    "fnb.dining_table",
    "fnb.reservation_table",
    "fnb.service_order",
+   "fnb.sub_bill",
    "fnb.table_reservation",
    "fnb.table_session",
    "fnb.table_visit"
@@ -19782,20 +19885,33 @@
   "operator": "guest",
   "app": "guest-app",
   "route": "/sell/attract-loop",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
+  "operations": [
+   "listProducts"
+  ],
+  "services": [
+   "CatalogueService"
+  ],
+  "stores": [
+   "postgres"
+  ],
+  "reads": [
+   "catalogue.product",
+   "catalogue.product_category",
+   "catalogue.product_eligibility_rule",
+   "catalogue.product_media",
+   "whitelabel.guided_choice_answer"
+  ],
   "writes": [],
   "storedProcedures": [],
-  "wave": 2,
+  "wave": 1,
   "offline": true,
   "specified": true,
   "exits": [
    "KSK-002",
    "KSK-003",
    "KSK-004",
-   "KSK-014"
+   "KSK-014",
+   "KSK-015"
   ],
   "pattern": "listDetail",
   "entryFrom": [],
@@ -19813,12 +19929,20 @@
    {
     "to": "KSK-004",
     "trigger": "Choose tickets",
-    "provenance": "structural \u2014 KSK-001 is P05's home screen and its exits are its launcher"
+    "provenance": "structural \u2014 KSK-001 is P05's home screen and its exits are its launcher",
+    "carries": [
+     "productId"
+    ]
    },
    {
     "to": "KSK-014",
     "trigger": "Out of service",
     "provenance": "structural \u2014 KSK-001 is P05's home screen and its exits are its launcher"
+   },
+   {
+    "to": "KSK-015",
+    "trigger": "Opens Assistant",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
    }
   ],
   "machine": null,
@@ -20013,7 +20137,7 @@
    {
     "to": "KSK-015",
     "trigger": "Assistant",
-    "provenance": "derived \u2014 KSK-015 declares entryState.params conversationId, messageId and KSK-004 holds none of them. The edge carries nothing: conversationId, messageId only pre-select (deep link or optional), and KSK-015 opens on its own"
+    "provenance": "derived \u2014 KSK-015 declares entryState.params cartId, conversationId, messageId and KSK-004 holds none of them. The edge carries nothing: conversationId, messageId, cartId only pre-select (deep link or optional), and KSK-015 opens on its own"
    }
   ],
   "machine": null,
@@ -20099,12 +20223,9 @@
   "route": "/sell/review",
   "operations": [
    "getCart",
-   "addCartLine",
-   "checkoutCart",
-   "evaluatePromotions"
+   "checkoutCart"
   ],
   "services": [
-   "CatalogueService",
    "OrderService"
   ],
   "stores": [
@@ -20112,12 +20233,8 @@
    "redis"
   ],
   "reads": [
-   "cache:idempotency",
    "catalogue.channel_capacity",
    "catalogue.inventory_hold",
-   "catalogue.performance",
-   "catalogue.price_list",
-   "catalogue.variant",
    "marketing.consent_question",
    "marketing.consent_question_version",
    "orders.cart",
@@ -20128,22 +20245,17 @@
    "orders.order_line_eligibility",
    "orders.payment",
    "orders.sales_order",
-   "promotions.coupon_code",
-   "promotions.promotion",
-   "promotions.promotion_rule"
+   "promotions.promotion"
   ],
   "writes": [
-   "cache:idempotency",
    "marketing.consent_record",
    "orders.cart",
-   "orders.cart_line",
    "orders.order_line",
    "orders.order_line_discount",
    "orders.order_line_eligibility",
    "orders.sales_order",
    "platform.idempotency_record",
-   "platform.outbox",
-   "promotions.promotion_evaluation_trace"
+   "platform.outbox"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -20183,7 +20295,22 @@
    "emptyNoAccess": "**A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant has published like any visitor. A kiosk whose device registration is revoked goes out of service (KSK-014); it never shows a sign-in or names a permission.",
    "offline": "Not available"
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "formCheckoutCart",
+    "component": "modal",
+    "trigger": "Pay",
+    "body": "**Confirms the basket before payment; the guest types nothing.** The kiosk sends the cart it holds and its sales channel; offers are already on the cart. Then the terminal takes the payment (KSK-007). (CHG-R1S-022)",
+    "confirm": {
+     "label": "Pay",
+     "operation": "checkoutCart"
+    },
+    "dismiss": {
+     "label": "Back"
+    },
+    "provenance": "design cross-check, 3 October 2026 (CHG-R1S-022)"
+   }
+  ]
  },
  "KSK-007": {
   "name": "Payment",
@@ -20300,7 +20427,7 @@
    "KSK-003",
    "KSK-010"
   ],
-  "pattern": "configEditor",
+  "pattern": "statusTracker",
   "entryFrom": [
    "KSK-006",
    "KSK-007"
@@ -20477,12 +20604,10 @@
   "app": "guest-app",
   "route": "/sell/collect-a-booking",
   "operations": [
-   "lookupShopAndDrop",
    "getOrder"
   ],
   "services": [
-   "OrderService",
-   "RetailService"
+   "OrderService"
   ],
   "stores": [
    "postgres"
@@ -20492,9 +20617,7 @@
    "orders.order_line_discount",
    "orders.order_line_eligibility",
    "orders.payment",
-   "orders.sales_order",
-   "retail.shop_and_drop",
-   "retail.shop_and_drop_line"
+   "orders.sales_order"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -20587,7 +20710,8 @@
   "app": "guest-app",
   "route": "/sell/call-staff",
   "operations": [
-   "endKioskAssist"
+   "endKioskAssist",
+   "handoverToAgent"
   ],
   "services": [
    "MarketingService"
@@ -20598,11 +20722,17 @@
   ],
   "reads": [
    "cache:idempotency",
+   "marketing.agent_availability",
+   "marketing.conversation",
+   "marketing.conversation_message",
+   "marketing.conversation_message_attachment",
    "marketing.kiosk_assist_session"
   ],
   "writes": [
    "cache:idempotency",
-   "marketing.kiosk_assist_session"
+   "marketing.conversation",
+   "marketing.kiosk_assist_session",
+   "platform.outbox"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -20625,7 +20755,22 @@
    "emptyFirstRun": "Not applicable",
    "offline": "Shows the counter location"
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "formHandoverToAgent",
+    "component": "modal",
+    "trigger": "Call a member of staff",
+    "body": "**Asks what the guest needs help with, in one tap** (paying, finding a booking, something else); the kiosk sends its conversation and that reason, and a member of staff joins from the agent workspace (BO-799). (CHG-R1S-022)",
+    "confirm": {
+     "label": "Call a member of staff",
+     "operation": "handoverToAgent"
+    },
+    "dismiss": {
+     "label": "Back"
+    },
+    "provenance": "design cross-check, 3 October 2026 (CHG-R1S-022)"
+   }
+  ]
  },
  "KSK-014": {
   "name": "Out of service",
@@ -20634,10 +20779,19 @@
   "operator": "guest",
   "app": "guest-app",
   "route": "/sell/out-of-service",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
+  "operations": [
+   "getTenantAppStatus"
+  ],
+  "services": [
+   "WhiteLabelService"
+  ],
+  "stores": [
+   "postgres"
+  ],
+  "reads": [
+   "whitelabel.config_version",
+   "whitelabel.tenant_config"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 2,
@@ -20675,12 +20829,14 @@
    "getAvailability",
    "handoverToAgent",
    "recordAnswerFeedback",
-   "createAiConversation"
+   "createAiConversation",
+   "addCartLine"
   ],
   "services": [
    "AiService",
    "CatalogueService",
-   "MarketingService"
+   "MarketingService",
+   "OrderService"
   ],
   "stores": [
    "postgres",
@@ -20708,10 +20864,15 @@
    "catalogue.product_category",
    "catalogue.product_eligibility_rule",
    "catalogue.product_media",
+   "catalogue.variant",
    "marketing.agent_availability",
+   "marketing.consent_question",
+   "marketing.consent_question_version",
    "marketing.conversation",
    "marketing.conversation_message",
    "marketing.conversation_message_attachment",
+   "orders.cart",
+   "orders.cart_line",
    "qdrant:knowledge",
    "whitelabel.guided_choice_answer"
   ],
@@ -20726,6 +20887,9 @@
    "cache:answer",
    "cache:idempotency",
    "marketing.conversation",
+   "orders.cart",
+   "orders.cart_line",
+   "platform.idempotency_record",
    "platform.outbox",
    "qdrant:knowledge"
   ],
@@ -20738,7 +20902,8 @@
   ],
   "pattern": "statusTracker",
   "entryFrom": [
-   "KSK-004"
+   "KSK-004",
+   "KSK-001"
   ],
   "transitions": [
    {
@@ -20774,6 +20939,20 @@
      "label": "Keep asking"
     },
     "provenance": "corrected 2 October 2026 (CHG-SGU-016, design-notes correction)"
+   },
+   {
+    "id": "formAddCartLine",
+    "component": "modal",
+    "trigger": "Add to basket",
+    "body": "**Confirms what the assistant suggested: the item and how many** (a quantity stepper, 1 by default); the kiosk sends its cart, the product or variant the answer named, and the quantity. (CHG-R1S-022)",
+    "confirm": {
+     "label": "Add to basket",
+     "operation": "addCartLine"
+    },
+    "dismiss": {
+     "label": "Back"
+    },
+    "provenance": "design cross-check, 3 October 2026 (CHG-R1S-022)"
    }
   ]
  },
@@ -20810,14 +20989,16 @@
    "cache:idempotency",
    "fnb.kitchen_ticket",
    "fnb.order_fulfilment",
-   "fnb.service_order"
+   "fnb.service_order",
+   "platform.outbox"
   ],
   "storedProcedures": [],
   "wave": 2,
   "offline": false,
   "specified": true,
   "exits": [
-   "KSK-017"
+   "KSK-017",
+   "KSK-007"
   ],
   "pattern": "statusTracker",
   "entryFrom": [
@@ -20831,6 +21012,14 @@
      "outletId"
     ],
     "provenance": "derived \u2014 KSK-017 declares entryState.params outletId and KSK-016 holds outletId, so an edge into it carries them"
+   },
+   {
+    "to": "KSK-007",
+    "trigger": "Pays for the food order",
+    "carries": [
+     "orderId"
+    ],
+    "provenance": "design cross-check, 3 October 2026 (CHG-R1S-022)"
    }
   ],
   "machine": null,
@@ -20846,7 +21035,7 @@
     "id": "formCreateGuestFnbOrder",
     "component": "modal",
     "trigger": "Pay",
-    "body": "**Collects what `createGuestFnbOrder` sends before it is called.** Required: `id`, `lines`, `quotedTotal`, `recordedAt`. Optional: `locationSessionId`, `outletId`, `fulfilment`, `paymentMethod`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Confirms the basket before it is sent; the guest types nothing here.** The kiosk sends the basket's lines; `id`, `recordedAt`, `quotedTotal` and `locationSessionId` are set by the kiosk and `fulfilment` is the outlet's counter pickup. Then the guest pays at the terminal (KSK-007) and the kitchen sees the order only once it is paid; KSK-009 confirms it (CHG-R1S-022). Dismissing sends nothing.",
     "bindsTo": "CreateGuestOrderRequest",
     "confirm": {
      "label": "Pay",
@@ -21272,7 +21461,8 @@
    "EMP-070",
    "EMP-071",
    "EMP-081",
-   "EMP-091"
+   "EMP-091",
+   "EMP-032"
   ],
   "pattern": "approvalInbox",
   "entryFrom": [
@@ -21511,6 +21701,11 @@
     "to": "EMP-042",
     "trigger": "Profile",
     "provenance": "derived \u2014 EMP-042 declares entryState.params methodId and EMP-003 holds none of them. The edge carries nothing: methodId only pre-selects (deep link or optional), and EMP-042 opens on its own"
+   },
+   {
+    "to": "EMP-032",
+    "trigger": "Opens Manual wait entry",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
    }
   ],
   "machine": null,
@@ -23752,7 +23947,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "EMP-031"
+   "EMP-031",
+   "EMP-003"
   ],
   "transitions": [
    {
@@ -23773,7 +23969,7 @@
    {
     "to": "EMP-003",
     "trigger": "Home \u2014 on duty",
-    "provenance": "derived \u2014 EMP-003 declares entryState.params incidentId and EMP-032 holds none of them. The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens on its own"
+    "provenance": "derived \u2014 EMP-003 declares entryState.params incidentId and EMP-032 holds none of them. The edge carries nothing: EMP-032 is opened from EMP-003, so this edge is the way back and EMP-003 keeps its own state"
    },
    {
     "to": "BO-005",
@@ -23841,7 +24037,9 @@
    "catalogue.channel_allocation",
    "catalogue.channel_capacity"
   ],
-  "writes": [],
+  "writes": [
+   "catalogue.channel_allocation"
+  ],
   "storedProcedures": [],
   "wave": 2,
   "offline": true,
@@ -25326,7 +25524,9 @@
   ],
   "writes": [
    "cache:idempotency",
-   "maintenance.incident"
+   "maintenance.incident",
+   "maintenance.incident_involved_party",
+   "maintenance.incident_media"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -27271,6 +27471,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "marketing.guest_note",
    "marketing.guest_profile",
    "pii.subject"
   ],
@@ -27667,6 +27868,7 @@
    "fnb.kitchen_ticket_line",
    "fnb.service_order",
    "fnb.service_order_line",
+   "fnb.sub_bill",
    "fnb.table_visit",
    "ledger.journal_entry",
    "ledger.journal_line",
@@ -28422,7 +28624,9 @@
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "inventory.count"
+   "inventory.count",
+   "inventory.count_line",
+   "inventory.item"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -29323,7 +29527,9 @@
    "rental.booking",
    "rental.participant"
   ],
-  "writes": [],
+  "writes": [
+   "rental.booking"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": true,
@@ -29374,7 +29580,9 @@
    "rental.booking",
    "rental.participant"
   ],
-  "writes": [],
+  "writes": [
+   "rental.booking"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": true,
@@ -29477,7 +29685,9 @@
    "rental.booking",
    "rental.participant"
   ],
-  "writes": [],
+  "writes": [
+   "rental.booking"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": true,
@@ -29774,7 +29984,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "rental.booking"
+   "rental.booking",
+   "rental.quote"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -29826,7 +30037,9 @@
    "rental.booking",
    "rental.participant"
   ],
-  "writes": [],
+  "writes": [
+   "rental.booking"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": true,
@@ -33109,7 +33322,8 @@
    "createMerchandise",
    "listMenus",
    "listMerchandise",
-   "bulkUpdateCatalogueProducts"
+   "bulkUpdateCatalogueProducts",
+   "getProductAttributes"
   ],
   "services": [
    "CatalogueService",
@@ -33394,7 +33608,8 @@
    "assessProductChange",
    "cloneProduct",
    "listProductVersions",
-   "previewProductTickets"
+   "previewProductTickets",
+   "getProductAttributes"
   ],
   "services": [
    "CatalogueService",
@@ -34063,14 +34278,19 @@
    "setComboSlots",
    "updateBundle",
    "listCommercialCampaigns",
-   "setPackagePricingDefinition"
+   "setPackagePricingDefinition",
+   "listCombos",
+   "getBundle",
+   "getPackagePricingDefinition"
   ],
   "services": [
    "CatalogueService",
    "FnbService"
   ],
   "stores": [
+   "derived",
    "postgres",
+   "postgres-analytical",
    "redis"
   ],
   "reads": [
@@ -34266,7 +34486,8 @@
    "setAlternativeCodes",
    "setProductAttributes",
    "transitionProductLifecycle",
-   "updateProduct"
+   "updateProduct",
+   "getProductAttributes"
   ],
   "services": [
    "CatalogueService"
@@ -37498,7 +37719,8 @@
    "listAdmissionRules",
    "createAdmissionRules",
    "updateAdmissionRules",
-   "setEntryRulePoints"
+   "setEntryRulePoints",
+   "listEntryRulePoints"
   ],
   "services": [
    "AccessService"
@@ -38122,7 +38344,9 @@
   "reads": [
    "sync.rejection"
   ],
-  "writes": [],
+  "writes": [
+   "sync.rejection"
+  ],
   "storedProcedures": [],
   "wave": 1,
   "offline": false,
@@ -38247,6 +38471,7 @@
    "ledger.journal_entry",
    "orders.cash_count_line",
    "orders.pos_shift",
+   "orders.pos_shift_incident",
    "platform.outbox"
   ],
   "storedProcedures": [],
@@ -38562,6 +38787,7 @@
    "ledger.settlement_exception",
    "orders.cash_count_line",
    "orders.pos_shift",
+   "orders.pos_shift_incident",
    "payments.provider_cost",
    "platform.outbox"
   ],
@@ -38720,7 +38946,8 @@
    "recordCorrectiveAction",
    "escalateCorrectiveAction",
    "closeCorrectiveAction",
-   "setDeliveryLocationOutletMapping"
+   "setDeliveryLocationOutletMapping",
+   "listDeliveryLocations"
   ],
   "services": [
    "FnbService",
@@ -38739,6 +38966,7 @@
    "fnb.cold_chain_event",
    "fnb.corrective_action",
    "fnb.delivery_location",
+   "fnb.delivery_location_outlet",
    "fnb.delivery_policy",
    "fnb.dining_table",
    "fnb.temperature_log",
@@ -38993,6 +39221,7 @@
    "cache:resolution",
    "catalogue.price",
    "catalogue.product_version",
+   "fnb.allergen_verdict",
    "fnb.menu",
    "fnb.menu_item",
    "fnb.menu_item_modifier",
@@ -39760,6 +39989,14 @@
     "provenance": "derived \u2014 BO-080 declares entryState.params transferId and BO-049 holds transferId, so an edge into it carries them"
    },
    {
+    "to": "BO-081",
+    "trigger": "Inventory Items",
+    "provenance": "flow F92 step 1\u21922",
+    "carries": [
+     "itemId"
+    ]
+   },
+   {
     "to": "EMP-065",
     "trigger": "The delivery arrives",
     "provenance": "flow F35 step 1\u21922",
@@ -39767,14 +40004,6 @@
     "back": false,
     "carries": [
      "transferId"
-    ]
-   },
-   {
-    "to": "BO-081",
-    "trigger": "Inventory Items",
-    "provenance": "flow F92 step 1\u21922",
-    "carries": [
-     "itemId"
     ]
    }
   ],
@@ -41875,7 +42104,8 @@
    "createDeliveryLocation",
    "updateDeliveryLocation",
    "getTillShiftPolicy",
-   "setTillShiftPolicy"
+   "setTillShiftPolicy",
+   "listDeliveryLocations"
   ],
   "services": [
    "FnbService",
@@ -41893,6 +42123,7 @@
    "cache:idempotency",
    "cache:resolution",
    "fnb.delivery_location",
+   "fnb.delivery_location_outlet",
    "fnb.dining_table",
    "orders.refund_policy",
    "orders.refund_policy_time_band",
@@ -45394,6 +45625,14 @@
   "entryFrom": [],
   "transitions": [
    {
+    "to": "BO-094",
+    "trigger": "Map Editor & Publish",
+    "carries": [
+     "mapId"
+    ],
+    "provenance": "derived \u2014 BO-094 declares entryState.params mapId, pathId and BO-092 holds mapId, so an edge into it carries them"
+   },
+   {
     "to": "BO-093",
     "trigger": "The plan is uploaded and read",
     "provenance": "flow F26 step 1\u21922",
@@ -45401,14 +45640,6 @@
     "carries": [
      "mapId"
     ]
-   },
-   {
-    "to": "BO-094",
-    "trigger": "Map Editor & Publish",
-    "carries": [
-     "mapId"
-    ],
-    "provenance": "derived \u2014 BO-094 declares entryState.params mapId, pathId and BO-092 holds mapId, so an edge into it carries them"
    }
   ],
   "machine": null,
@@ -45457,7 +45688,11 @@
    "proposeVenueLabels",
    "acceptVenueLabelProposals",
    "getVenueMapImportJob",
-   "acceptWalkwayProposals"
+   "acceptWalkwayProposals",
+   "createUpload",
+   "completeUpload",
+   "listProposedActions",
+   "proposeWalkways"
   ],
   "services": [
    "AiService",
@@ -45473,6 +45708,8 @@
    "ai.policy",
    "ai.proposed_action",
    "ai.provider",
+   "assets.media_asset",
+   "assets.media_upload",
    "cache:idempotency",
    "qdrant:knowledge",
    "venuemap.import_job",
@@ -45482,6 +45719,9 @@
   "writes": [
    "ai.activity",
    "ai.proposed_action",
+   "assets.media_asset",
+   "assets.media_fingerprint",
+   "assets.media_upload",
    "cache:idempotency",
    "venuemap.import_job",
    "venuemap.path",
@@ -45552,7 +45792,11 @@
    "validateVenueMapGraph",
    "setPathClosure",
    "getVenueMapGraph",
-   "setPlacedResource"
+   "setPlacedResource",
+   "createUpload",
+   "completeUpload",
+   "setVenueMapArtwork",
+   "getVenueNavigationFile"
   ],
   "services": [
    "CatalogueService",
@@ -45565,6 +45809,7 @@
   "reads": [
    "access.access_point",
    "assets.media_asset",
+   "assets.media_upload",
    "cache:idempotency",
    "cache:resolution",
    "catalogue.product",
@@ -45581,6 +45826,9 @@
    "whitelabel.guided_choice_answer"
   ],
   "writes": [
+   "assets.media_asset",
+   "assets.media_fingerprint",
+   "assets.media_upload",
    "cache:idempotency",
    "cache:resolution",
    "venuemap.map",
@@ -45615,9 +45863,27 @@
    "loading": "The map editor publish, read by `getVenueMap`.",
    "error": "Could not load. Names which read failed and leaves the map editor publish untouched.",
    "emptyFirstRun": "No map editor publish yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
-   "emptyNoAccess": "Shown when the caller lacks `VENUE_MAP_VIEW`, which `getVenueMap` requires to show this screen, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ASSET_LIBRARY_VIEW` for `searchMedia`; `PRODUCT_VIEW` for `listProducts`, `listCatalogueBundles`; `VENUE_MAP_MANAGE` for `setVenuePoint`, `validateVenueMapGraph`, `setPathClosure`, `setPlacedResource`; `VENUE_MAP_PUBLISH` for `publishVenueMap`."
+   "emptyNoAccess": "Shown when the caller lacks `VENUE_MAP_VIEW`, which `getVenueMap` requires to show this screen, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ASSET_LIBRARY_VIEW` for `searchMedia`; `PRODUCT_VIEW` for `listProducts`, `listCatalogueBundles`; `VENUE_MAP_MANAGE` for `setVenuePoint`, `validateVenueMapGraph`, `setPathClosure`, `setPlacedResource`, `setVenueMapArtwork`; `VENUE_MAP_PUBLISH` for `publishVenueMap`; `ASSET_LIBRARY_MANAGE` for `createUpload`, `completeUpload`."
   },
   "overlays": [
+   {
+    "id": "formSetVenueMapArtwork",
+    "component": "modal",
+    "trigger": "Save artwork and alignment",
+    "body": "**Collects what `setVenueMapArtwork` sends before it is called.** Required: `baseAssetId` (the uploaded artwork, or none to remove it) and, with an image, `baseImageAlignment`: the image size and two to four alignment pairs, each a point clicked on the artwork and the same point clicked on the plan. Dismissing sends nothing; the map keeps the artwork it had.",
+    "confirm": {
+     "label": "Save artwork and alignment",
+     "operation": "setVenueMapArtwork"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "baseAssetId",
+      "baseImageAlignment"
+     ]
+    },
+    "provenance": "contract venue-map.yaml POST /venue-maps/{mapId}/artwork; decided 3 October 2026 (CHG-RONEC-001)"
+   },
    {
     "id": "formSetVenuePoint",
     "component": "modal",
@@ -46423,7 +46689,11 @@
    "PTR-037",
    "PTR-039",
    "PTR-047",
-   "PTR-048"
+   "PTR-048",
+   "ADM-243",
+   "ADM-342",
+   "ADM-354",
+   "BO-1065"
   ],
   "pattern": "listDetail",
   "entryFrom": [
@@ -47392,6 +47662,26 @@
     "to": "PTR-048",
     "trigger": "Commission Calculation & Settlement Management",
     "provenance": "moved to Venue Management 2 October 2026 (CHG-CLN-004); its board's hub PTR-042 stays on the partner portal"
+   },
+   {
+    "to": "ADM-243",
+    "trigger": "Opens Roles, Authority, Delegation & Approval Limits",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "ADM-342",
+    "trigger": "Opens Authentication & MFA Policy Manager",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "ADM-354",
+    "trigger": "Opens External Workflow System Integration",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-1065",
+    "trigger": "Opens Currency, Timezone & Channels",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
    }
   ],
   "machine": null,
@@ -47458,7 +47748,12 @@
    "BO-076",
    "BO-077",
    "BO-089",
-   "BO-090"
+   "BO-090",
+   "BO-1094",
+   "BO-1111",
+   "BO-1146",
+   "BO-1162",
+   "BO-1179"
   ],
   "pattern": "listDetail",
   "entryFrom": [
@@ -47595,6 +47890,34 @@
     "to": "BO-028",
     "trigger": "Refund Approval Queue",
     "provenance": "derived \u2014 BO-028 declares entryState.params refundId and BO-101 holds none of them. The edge carries nothing: refundId only pre-selects (deep link or optional), and BO-028 opens on its own"
+   },
+   {
+    "to": "BO-1094",
+    "trigger": "Opens Funding Method Configuration",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-1111",
+    "trigger": "Opens Credit Expiry, Extension & Forfeiture Operations",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-1146",
+    "trigger": "Opens Refund-to-Wallet Policy Configuration",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A",
+    "carries": [
+     "venueId"
+    ]
+   },
+   {
+    "to": "BO-1162",
+    "trigger": "Opens Security Governance, Audit & Rule Publication",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-1179",
+    "trigger": "Opens Integration Monitoring & Exception Workbench",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
    }
   ],
   "machine": null,
@@ -47684,7 +48007,11 @@
    "BO-126",
    "BO-142",
    "BO-143",
-   "BO-1190"
+   "BO-1190",
+   "ADM-164",
+   "ADM-570",
+   "ADM-603",
+   "BO-696"
   ],
   "pattern": "listDetail",
   "entryFrom": [
@@ -47868,6 +48195,26 @@
     "to": "BO-1190",
     "trigger": "Donation Campaigns",
     "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "to": "ADM-164",
+    "trigger": "Opens Code Distribution & Assignment Manager",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "ADM-570",
+    "trigger": "Opens Gateway, PSP & Acquirer Directory",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "ADM-603",
+    "trigger": "Opens B2B Invoice, On-Account & Payment Terms Configuration",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-696",
+    "trigger": "Opens Event Duplication & Clone Configuration",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
    }
   ],
   "machine": null,
@@ -47940,7 +48287,24 @@
    "BO-096",
    "BO-097",
    "BO-098",
-   "BO-099"
+   "BO-099",
+   "BO-1045",
+   "BO-1062",
+   "BO-151",
+   "BO-155",
+   "BO-161",
+   "BO-166",
+   "BO-167",
+   "BO-168",
+   "BO-185",
+   "BO-186",
+   "BO-188",
+   "BO-189",
+   "BO-201",
+   "BO-230",
+   "BO-335",
+   "BO-346",
+   "BO-618"
   ],
   "pattern": "listDetail",
   "entryFrom": [
@@ -48044,6 +48408,94 @@
     "to": "BO-099",
     "trigger": "Performance Manifest",
     "provenance": "derived \u2014 BO-099 declares entryState.params performanceId and BO-103 holds none of them. The edge carries nothing: BO-103 is the Access & Venue hub and this is its menu entry; BO-099 has no source yet for performanceId"
+   },
+   {
+    "to": "BO-1045",
+    "trigger": "Opens Price Bands & Categories",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-1062",
+    "trigger": "Opens Tenant & Brand Context",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-151",
+    "trigger": "Opens Access Location Grouping",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-155",
+    "trigger": "Opens Visual Access Rule Builder",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-161",
+    "trigger": "Opens Guest, Companion & Eligibility Rules",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-166",
+    "trigger": "Opens Credential Activation & Display Rules",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-167",
+    "trigger": "Opens Device Binding & Session Security",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-168",
+    "trigger": "Opens BLE Beacon & Geofence Configuration",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-185",
+    "trigger": "Opens Biometric Verification Profile Builder",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-186",
+    "trigger": "Opens Face Pass Enrollment Configuration",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-188",
+    "trigger": "Opens Face Tag Temporary Enrollment",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-189",
+    "trigger": "Opens Face Matching & Verification Thresholds",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-201",
+    "trigger": "Opens Gate Modes, Free Spin & Emergency Controls",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-230",
+    "trigger": "Opens Live Gate Mode & Lane Control",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A",
+    "carries": [
+     "accessPointId"
+    ]
+   },
+   {
+    "to": "BO-335",
+    "trigger": "Opens Virtual Ticket Identity & Master Record Configuration",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-346",
+    "trigger": "Opens PDF, Printable & POS Ticket Designer",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-618",
+    "trigger": "Opens Accreditation Form Builder",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
    }
   ],
   "machine": null,
@@ -48489,7 +48941,17 @@
   "exits": [
    "BO-068",
    "BO-073",
-   "BO-091"
+   "BO-091",
+   "BO-755",
+   "BO-766",
+   "BO-772",
+   "BO-785",
+   "BO-798",
+   "BO-799",
+   "BO-825",
+   "BO-826",
+   "BO-827",
+   "BO-828"
   ],
   "pattern": "listDetail",
   "entryFrom": [
@@ -48505,6 +48967,65 @@
     "to": "BO-091",
     "trigger": "AI Policy & Spend",
     "provenance": "derived \u2014 BO-091 declares entryState.params profileKey, tenantId and BO-107 holds none of them. The edge carries nothing: profileKey only pre-selects (deep link or optional); BO-091 opens on listIndexFailures, and tenantId has no source on BO-091 yet (a gap in BO-091, not in this edge)"
+   },
+   {
+    "to": "BO-755",
+    "trigger": "Opens Dynamic Segment Builder",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A",
+    "carries": [
+     "segmentId"
+    ]
+   },
+   {
+    "to": "BO-766",
+    "trigger": "Opens Campaign Builder",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A",
+    "carries": [
+     "campaignId"
+    ]
+   },
+   {
+    "to": "BO-772",
+    "trigger": "Opens A/B & AI Optimization",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A",
+    "carries": [
+     "campaignId"
+    ]
+   },
+   {
+    "to": "BO-785",
+    "trigger": "Opens Template Library",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-798",
+    "trigger": "Opens Intent & Knowledge Management",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-799",
+    "trigger": "Opens Agent Workspace",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-825",
+    "trigger": "Opens Challenge Builder",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-826",
+    "trigger": "Opens Achievement & Badge Engine",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-827",
+    "trigger": "Opens Points & Activity Rules",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-828",
+    "trigger": "Opens Milestones & Reward Rules",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
    }
   ],
   "machine": null,
@@ -48600,7 +49121,16 @@
    "BO-133",
    "BO-1184",
    "BO-1183",
-   "BO-070"
+   "BO-070",
+   "BO-395",
+   "BO-857",
+   "BO-861",
+   "BO-866",
+   "BO-870",
+   "BO-877",
+   "BO-911",
+   "BO-919",
+   "BO-927"
   ],
   "pattern": "listDetail",
   "entryFrom": [
@@ -48689,6 +49219,51 @@
     "carries": [
      "workOrderId"
     ]
+   },
+   {
+    "to": "BO-395",
+    "trigger": "Opens Game & Ride Directory",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-857",
+    "trigger": "Opens Resource Creation & Profile",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-861",
+    "trigger": "Opens Resource Package & Bundle Configuration",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-866",
+    "trigger": "Opens Resource Availability Schedule Configuration",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-870",
+    "trigger": "Opens Operational Time & Resource Blocking",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-877",
+    "trigger": "Opens Qualification & Assignment Rule Engine",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-911",
+    "trigger": "Opens Inspection, Condition & Compliance Management",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-919",
+    "trigger": "Opens AI Event Resource Forecasting",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-927",
+    "trigger": "Opens AI Staffing Requirement Forecast",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
    }
   ],
   "machine": null,
@@ -48885,7 +49460,9 @@
    "verifyAllergens",
    "setIngredientSubstitutes",
    "getAllergenVerification",
-   "listRecipes"
+   "listRecipes",
+   "listIngredientSubstitutes",
+   "listSubstitutionRules"
   ],
   "services": [
    "FnbService"
@@ -48909,6 +49486,7 @@
   "writes": [
    "cache:idempotency",
    "cache:resolution",
+   "fnb.allergen_verdict",
    "fnb.ingredient_substitute",
    "fnb.recipe",
    "fnb.recipe_ingredient",
@@ -49474,7 +50052,8 @@
   "operations": [
    "importProductCatalogue",
    "generateConfiguration",
-   "commitCatalogueImport"
+   "commitCatalogueImport",
+   "getCatalogueImportJob"
   ],
   "services": [
    "AiService",
@@ -49556,7 +50135,7 @@
    "error": "Could not load. Names which read failed and leaves the product import governance untouched.",
    "emptyFirstRun": "No product import governance yet. Offers Import product catalogue (`importProductCatalogue`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on venueId, kind and the product import governance are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_CONFIGURE`, which `importProductCatalogue` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getCatalogueImportJob` requires to show this screen, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `generateConfiguration`; `PRODUCT_CONFIGURE` for `importProductCatalogue`, `commitCatalogueImport`."
   },
   "overlays": [
    {
@@ -50692,7 +51271,8 @@
   "operations": [
    "setOfflinePolicy",
    "listSyncRejections",
-   "resolveSyncRejection"
+   "resolveSyncRejection",
+   "getOfflinePolicy"
   ],
   "services": [
    "OrderService",
@@ -50710,7 +51290,8 @@
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "platform.offline_policy"
+   "platform.offline_policy",
+   "sync.rejection"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -50985,7 +51566,8 @@
    "cache:idempotency",
    "platform.audit_read",
    "reporting.alert_rule",
-   "reporting.execution"
+   "reporting.execution",
+   "sync.rejection"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -51120,12 +51702,14 @@
   ],
   "reads": [
    "cache:idempotency",
+   "fnb.kitchen_sla",
    "fnb.kitchen_station",
    "platform.outlet"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
+   "fnb.kitchen_sla",
    "fnb.kitchen_station"
   ],
   "storedProcedures": [],
@@ -51276,14 +51860,17 @@
   "operations": [
    "getVenueSettings",
    "setVenueSettings",
-   "setCourseRules"
+   "setCourseRules",
+   "getCourseRules"
   ],
   "services": [
    "FnbService",
    "TenancyService"
   ],
   "stores": [
+   "derived",
    "postgres",
+   "postgres-analytical",
    "redis"
   ],
   "reads": [
@@ -52523,7 +53110,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "BO-144"
+   "BO-144",
+   "BO-103"
   ],
   "transitions": [
    {
@@ -52907,7 +53495,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "BO-154"
+   "BO-154",
+   "BO-103"
   ],
   "transitions": [
    {
@@ -53301,7 +53890,8 @@
   ],
   "pattern": "configEditor",
   "entryFrom": [
-   "BO-154"
+   "BO-154",
+   "BO-103"
   ],
   "transitions": [
    {
@@ -53686,7 +54276,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "BO-164"
+   "BO-164",
+   "BO-103"
   ],
   "transitions": [
    {
@@ -53771,7 +54362,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "BO-164"
+   "BO-164",
+   "BO-103"
   ],
   "transitions": [
    {
@@ -53838,7 +54430,8 @@
   "app": "venue-management-web",
   "route": "/access-venue/ble-beacon-geofence-configuration-bo-168",
   "operations": [
-   "setBleBeaconGeofence"
+   "setBleBeaconGeofence",
+   "getBleBeaconGeofence"
   ],
   "services": [
    "AccessService"
@@ -53867,7 +54460,8 @@
   ],
   "pattern": "configEditor",
   "entryFrom": [
-   "BO-164"
+   "BO-164",
+   "BO-103"
   ],
   "transitions": [
    {
@@ -54960,7 +55554,8 @@
   "app": "venue-management-web",
   "route": "/access-venue/biometric-verification-profile-builder-bo-185",
   "operations": [
-   "setBiometricVerificationProfile"
+   "setBiometricVerificationProfile",
+   "getBiometricVerificationProfile"
   ],
   "services": [
    "AccessService"
@@ -54988,7 +55583,8 @@
   ],
   "pattern": "configEditor",
   "entryFrom": [
-   "BO-184"
+   "BO-184",
+   "BO-103"
   ],
   "transitions": [
    {
@@ -55015,7 +55611,8 @@
   "app": "venue-management-web",
   "route": "/access-venue/face-pass-enrollment-configuration-bo-186",
   "operations": [
-   "setFacePassEnrollment"
+   "setFacePassEnrollment",
+   "getFacePassEnrollmentConfiguration"
   ],
   "services": [
    "AccessService"
@@ -55042,7 +55639,8 @@
   ],
   "pattern": "configEditor",
   "entryFrom": [
-   "BO-184"
+   "BO-184",
+   "BO-103"
   ],
   "transitions": [
    {
@@ -55201,7 +55799,8 @@
   ],
   "pattern": "configEditor",
   "entryFrom": [
-   "BO-184"
+   "BO-184",
+   "BO-103"
   ],
   "transitions": [
    {
@@ -55282,7 +55881,8 @@
   ],
   "pattern": "configEditor",
   "entryFrom": [
-   "BO-184"
+   "BO-184",
+   "BO-103"
   ],
   "transitions": [
    {
@@ -55484,7 +56084,9 @@
   "reads": [
    "tenancy.data_retention_setting"
   ],
-  "writes": [],
+  "writes": [
+   "tenancy.data_retention_setting"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -56224,7 +56826,8 @@
   ],
   "pattern": "configEditor",
   "entryFrom": [
-   "BO-194"
+   "BO-194",
+   "BO-103"
   ],
   "transitions": [
    {
@@ -56351,7 +56954,10 @@
    "access.hardware_model",
    "platform.device"
   ],
-  "writes": [],
+  "writes": [
+   "access.hardware_deployment",
+   "platform.device"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -56668,7 +57274,9 @@
    "access.edge_package",
    "access.hardware_deployment"
   ],
-  "writes": [],
+  "writes": [
+   "access.hardware_deployment"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -57124,24 +57732,6 @@
     "operation": "listGuestJourney"
    },
    {
-    "to": "BO-219",
-    "trigger": "Works in Re-entry & Temporary Exit Journey",
-    "provenance": "flow F118 step 9\u219210",
-    "operation": "listGuestJourney",
-    "carries": [
-     "profileId"
-    ]
-   },
-   {
-    "to": "BO-220",
-    "trigger": "Works in Multi-Park & Crossover Journey Orchestrator",
-    "provenance": "flow F118 step 11\u219212",
-    "operation": "listGuestJourney",
-    "carries": [
-     "profileId"
-    ]
-   },
-   {
     "to": "BO-221",
     "trigger": "Works in Fast Pass & Attraction Access Journey",
     "provenance": "flow F118 step 13\u219214",
@@ -57158,6 +57748,24 @@
     "trigger": "Works in Journey Simulation, Audit & Publication",
     "provenance": "flow F118 step 17\u219218",
     "operation": "listGuestJourney"
+   },
+   {
+    "to": "BO-219",
+    "trigger": "Works in Re-entry & Temporary Exit Journey",
+    "provenance": "flow F118 step 9\u219210",
+    "operation": "listGuestJourney",
+    "carries": [
+     "profileId"
+    ]
+   },
+   {
+    "to": "BO-220",
+    "trigger": "Works in Multi-Park & Crossover Journey Orchestrator",
+    "provenance": "flow F118 step 11\u219212",
+    "operation": "listGuestJourney",
+    "carries": [
+     "profileId"
+    ]
    }
   ],
   "machine": null,
@@ -58331,7 +58939,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "BO-224"
+   "BO-224",
+   "BO-103"
   ],
   "transitions": [
    {
@@ -59323,15 +59932,6 @@
     "operation": "listAccessSecurityFraud"
    },
    {
-    "to": "BO-247",
-    "trigger": "Works in Unified Identity & Credential Lock Manager",
-    "provenance": "flow F121 step 5\u21926",
-    "operation": "listAccessSecurityFraud",
-    "carries": [
-     "lockId"
-    ]
-   },
-   {
     "to": "BO-249",
     "trigger": "Works in Relationship & Companion Fraud Monitoring",
     "provenance": "flow F121 step 9\u219210",
@@ -59362,6 +59962,15 @@
     "operation": "listAccessSecurityFraud",
     "carries": [
      "alertId"
+    ]
+   },
+   {
+    "to": "BO-247",
+    "trigger": "Works in Unified Identity & Credential Lock Manager",
+    "provenance": "flow F121 step 5\u21926",
+    "operation": "listAccessSecurityFraud",
+    "carries": [
+     "lockId"
     ]
    },
    {
@@ -60892,7 +61501,9 @@
    "orders.group_customer_organization",
    "orders.group_enquiry"
   ],
-  "writes": [],
+  "writes": [
+   "orders.group_enquiry"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -61779,7 +62390,9 @@
    "orders.group_ticket_fulfillment",
    "orders.wallet_pass"
   ],
-  "writes": [],
+  "writes": [
+   "orders.group_ticket_fulfillment"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -63116,7 +63729,9 @@
    "orders.sales_order",
    "subscription.membership_product"
   ],
-  "writes": [],
+  "writes": [
+   "orders.membership_activation_action"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -63298,7 +63913,9 @@
    "orders.sales_order",
    "subscription.membership_product"
   ],
-  "writes": [],
+  "writes": [
+   "orders.membership_migration"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -63436,7 +64053,8 @@
   "writes": [
    "access.entitlement",
    "approvals.request",
-   "cache:idempotency"
+   "cache:idempotency",
+   "orders.member_exception"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -64544,6 +65162,7 @@
   "writes": [
    "cache:idempotency",
    "cache:resolution",
+   "orders.refund_calculation_policy",
    "orders.refund_policy",
    "orders.refund_policy_time_band"
   ],
@@ -64607,6 +65226,7 @@
    "orders.sales_order"
   ],
   "writes": [
+   "access.entitlement",
    "cache:idempotency",
    "orders.order_event",
    "orders.order_line",
@@ -65653,7 +66273,8 @@
   "app": "venue-management-web",
   "route": "/access-venue/virtual-ticket-identity-master-record-configuration-bo-335",
   "operations": [
-   "setVirtualTicketIdentity"
+   "setVirtualTicketIdentity",
+   "getVirtualTicketIdentity"
   ],
   "services": [
    "AccessService"
@@ -65680,7 +66301,8 @@
   ],
   "pattern": "configEditor",
   "entryFrom": [
-   "BO-334"
+   "BO-334",
+   "BO-103"
   ],
   "transitions": [
    {
@@ -66257,7 +66879,9 @@
   "writes": [
    "access.configuration_change",
    "access.media_template",
-   "cache:idempotency"
+   "cache:idempotency",
+   "orders.ticket_template",
+   "orders.ticket_template_channel"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -66430,7 +67054,8 @@
    "createTicketTemplate",
    "updateTicketTemplate",
    "printTicketProof",
-   "setPdfPrintablePos"
+   "setPdfPrintablePos",
+   "getPdfPrintablePos"
   ],
   "services": [
    "AccessService",
@@ -66462,7 +67087,8 @@
   ],
   "pattern": "configEditor",
   "entryFrom": [
-   "BO-344"
+   "BO-344",
+   "BO-103"
   ],
   "transitions": [
    {
@@ -68344,7 +68970,9 @@
    "approvals.evidence_package",
    "approvals.request"
   ],
-  "writes": [],
+  "writes": [
+   "approvals.evidence_package"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -68484,6 +69112,7 @@
   "writes": [
    "approvals.decision",
    "approvals.request",
+   "approvals.signature",
    "cache:idempotency",
    "control.partner_agreement",
    "control.partner_application",
@@ -68787,7 +69416,9 @@
    "approvals.workflow_version",
    "identity.principal"
   ],
-  "writes": [],
+  "writes": [
+   "approvals.approved_action_execution"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -69759,7 +70390,8 @@
   ],
   "pattern": "configEditor",
   "entryFrom": [
-   "BO-394"
+   "BO-394",
+   "BO-108"
   ],
   "transitions": [
    {
@@ -71488,6 +72120,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "platform.outbox",
    "wallet.wallet"
   ],
   "storedProcedures": [],
@@ -73837,7 +74470,9 @@
   "reads": [
    "games.card"
   ],
-  "writes": [],
+  "writes": [
+   "games.card"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -73902,6 +74537,7 @@
    "wallet.credential"
   ],
   "writes": [
+   "games.card",
    "wallet.credential"
   ],
   "storedProcedures": [],
@@ -74880,7 +75516,9 @@
   "reads": [
    "games.reader_deployment"
   ],
-  "writes": [],
+  "writes": [
+   "games.reader_deployment"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -75034,7 +75672,9 @@
   "reads": [
    "games.reader_deployment"
   ],
-  "writes": [],
+  "writes": [
+   "games.reader_deployment"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -75449,6 +76089,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "platform.outbox",
    "wallet.wallet"
   ],
   "storedProcedures": [],
@@ -76365,7 +77006,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "platform.audit_read"
+   "platform.audit_read",
+   "rental.product"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -78364,7 +79006,8 @@
   "writes": [
    "cache:idempotency",
    "rental.booking",
-   "rental.participant"
+   "rental.participant",
+   "rental.quote"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -78472,7 +79115,9 @@
    "rental.booking",
    "rental.participant"
   ],
-  "writes": [],
+  "writes": [
+   "rental.booking"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -78637,7 +79282,8 @@
    "rental.quote"
   ],
   "writes": [
-   "cache:idempotency"
+   "cache:idempotency",
+   "rental.quote"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -78738,7 +79384,9 @@
    "rental.booking",
    "rental.participant"
   ],
-  "writes": [],
+  "writes": [
+   "rental.booking"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -79237,7 +79885,9 @@
    "rental.booking",
    "rental.participant"
   ],
-  "writes": [],
+  "writes": [
+   "rental.booking"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -79287,7 +79937,9 @@
    "rental.booking",
    "rental.participant"
   ],
-  "writes": [],
+  "writes": [
+   "rental.booking"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -79388,7 +80040,9 @@
    "rental.booking",
    "rental.participant"
   ],
-  "writes": [],
+  "writes": [
+   "rental.booking"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -79672,7 +80326,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "rental.booking"
+   "rental.booking",
+   "rental.quote"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -79723,7 +80378,9 @@
    "rental.booking",
    "rental.participant"
   ],
-  "writes": [],
+  "writes": [
+   "rental.booking"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -82561,7 +83218,9 @@
   "reads": [
    "subscription.go_live_readiness"
   ],
-  "writes": [],
+  "writes": [
+   "subscription.go_live_readiness"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -82784,7 +83443,9 @@
   "reads": [
    "subscription.go_live_readiness"
   ],
-  "writes": [],
+  "writes": [
+   "subscription.go_live_readiness"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -82835,7 +83496,9 @@
   "reads": [
    "subscription.go_live_readiness"
   ],
-  "writes": [],
+  "writes": [
+   "subscription.go_live_readiness"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -82886,7 +83549,9 @@
   "reads": [
    "subscription.go_live_readiness"
   ],
-  "writes": [],
+  "writes": [
+   "subscription.go_live_readiness"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -82937,7 +83602,9 @@
   "reads": [
    "subscription.go_live_readiness"
   ],
-  "writes": [],
+  "writes": [
+   "subscription.go_live_readiness"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -82988,7 +83655,9 @@
   "reads": [
    "subscription.go_live_readiness"
   ],
-  "writes": [],
+  "writes": [
+   "subscription.go_live_readiness"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -83039,7 +83708,9 @@
   "reads": [
    "subscription.go_live_readiness"
   ],
-  "writes": [],
+  "writes": [
+   "subscription.go_live_readiness"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -83090,7 +83761,9 @@
   "reads": [
    "subscription.go_live_readiness"
   ],
-  "writes": [],
+  "writes": [
+   "subscription.go_live_readiness"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -83478,7 +84151,8 @@
    "createForm",
    "updateAccreditationProgramme",
    "listForms",
-   "getForm"
+   "getForm",
+   "listAccreditationProgrammes"
   ],
   "services": [
    "MarketingService",
@@ -83510,7 +84184,8 @@
   ],
   "pattern": "configEditor",
   "entryFrom": [
-   "BO-615"
+   "BO-615",
+   "BO-103"
   ],
   "transitions": [
    {
@@ -84212,7 +84887,9 @@
   "reads": [
    "accreditation.document"
   ],
-  "writes": [],
+  "writes": [
+   "accreditation.document"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -84660,6 +85337,7 @@
   "writes": [
    "accreditation.application",
    "accreditation.audit",
+   "accreditation.document",
    "accreditation.holder",
    "cache:idempotency",
    "platform.outbox"
@@ -88014,6 +88692,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "control.webhook_delivery",
    "control.webhook_subscription"
   ],
   "storedProcedures": [],
@@ -88283,7 +88962,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "BO-694"
+   "BO-694",
+   "BO-102"
   ],
   "transitions": [
    {
@@ -90386,7 +91066,9 @@
   "reads": [
    "fnb.outlet_template"
   ],
-  "writes": [],
+  "writes": [
+   "fnb.outlet_template"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -91586,6 +92268,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "marketing.duplicate_candidate",
    "marketing.guest_profile",
    "pii.subject"
   ],
@@ -91798,7 +92481,9 @@
    "marketing.consent_record",
    "pii.subject"
   ],
-  "writes": [],
+  "writes": [
+   "marketing.communication_preference_type"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -92238,7 +92923,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "BO-754"
+   "BO-754",
+   "BO-107"
   ],
   "transitions": [
    {
@@ -93013,7 +93699,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "BO-764"
+   "BO-764",
+   "BO-107"
   ],
   "transitions": [
    {
@@ -93449,7 +94136,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "BO-764"
+   "BO-764",
+   "BO-107"
   ],
   "transitions": [
    {
@@ -94351,7 +95039,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "BO-784"
+   "BO-784",
+   "BO-107"
   ],
   "transitions": [
    {
@@ -95191,7 +95880,8 @@
    "setCustomerServiceCopilot",
    "listKnowledgeGaps",
    "listKnowledgeCollections",
-   "ingestKnowledgeDocument"
+   "ingestKnowledgeDocument",
+   "getCustomerServiceCopilot"
   ],
   "services": [
    "AiService",
@@ -95230,7 +95920,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "BO-794"
+   "BO-794",
+   "BO-107"
   ],
   "transitions": [
    {
@@ -95305,7 +95996,7 @@
    "marketing.kiosk_assist_session"
   ],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -95313,7 +96004,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "BO-794"
+   "BO-794",
+   "BO-107"
   ],
   "transitions": [
    {
@@ -96912,7 +97604,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "BO-824"
+   "BO-824",
+   "BO-107"
   ],
   "transitions": [
    {
@@ -96996,7 +97689,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "BO-824"
+   "BO-824",
+   "BO-107"
   ],
   "transitions": [
    {
@@ -97026,7 +97720,8 @@
   "operations": [
    "setLoyaltyRules",
    "setLoyaltyCampaign",
-   "getLoyaltyRules"
+   "getLoyaltyRules",
+   "listLoyaltyCampaigns"
   ],
   "services": [
    "MarketingService"
@@ -97056,7 +97751,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "BO-824"
+   "BO-824",
+   "BO-107"
   ],
   "transitions": [
    {
@@ -97085,7 +97781,9 @@
   "route": "/engagement-support/milestones-reward-rules-bo-828",
   "operations": [
    "createLoyaltyProgramme",
-   "setReward"
+   "setReward",
+   "listLoyaltyProgrammes",
+   "listRewards"
   ],
   "services": [
    "MarketingService"
@@ -97117,7 +97815,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "BO-824"
+   "BO-824",
+   "BO-107"
   ],
   "transitions": [
    {
@@ -98032,6 +98731,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "platform.outbox",
    "whitelabel.config_version"
   ],
   "storedProcedures": [],
@@ -98995,7 +99695,8 @@
   ],
   "pattern": "configEditor",
   "entryFrom": [
-   "BO-854"
+   "BO-854",
+   "BO-108"
   ],
   "transitions": [
    {
@@ -99210,7 +99911,8 @@
   ],
   "pattern": "configEditor",
   "entryFrom": [
-   "BO-854"
+   "BO-854",
+   "BO-108"
   ],
   "transitions": [
    {
@@ -99375,7 +100077,8 @@
    "approvals.control_policy",
    "approvals.matrix",
    "approvals.rule",
-   "cache:idempotency"
+   "cache:idempotency",
+   "resources.resource"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -99636,7 +100339,8 @@
   ],
   "pattern": "configEditor",
   "entryFrom": [
-   "BO-864"
+   "BO-864",
+   "BO-108"
   ],
   "transitions": [
    {
@@ -99887,7 +100591,8 @@
   ],
   "pattern": "configEditor",
   "entryFrom": [
-   "BO-864"
+   "BO-864",
+   "BO-108"
   ],
   "transitions": [
    {
@@ -100020,7 +100725,9 @@
    "resources.resource_schedule",
    "resources.resource_type"
   ],
-  "writes": [],
+  "writes": [
+   "resources.booking"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -100353,7 +101060,9 @@
   "route": "/rentals/qualification-assignment-rule-engine-bo-877",
   "operations": [
    "suggestResources",
-   "setExperienceResourceRequirements"
+   "setExperienceResourceRequirements",
+   "getExperienceResourceRequirements",
+   "listResources"
   ],
   "services": [
    "VenueOpsService"
@@ -100378,7 +101087,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "BO-873"
+   "BO-873",
+   "BO-108"
   ],
   "transitions": [
    {
@@ -100682,7 +101392,9 @@
   ],
   "writes": [
    "workforce.field_ownership",
-   "workforce.integration_source"
+   "workforce.integration_source",
+   "workforce.sync_conflict",
+   "workforce.sync_run"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -101981,7 +102693,9 @@
   "reads": [
    "resources.booking"
   ],
-  "writes": [],
+  "writes": [
+   "resources.booking"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -102254,7 +102968,9 @@
    "rental.booking",
    "rental.participant"
   ],
-  "writes": [],
+  "writes": [
+   "rental.booking"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -102592,7 +103308,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "BO-903"
+   "BO-903",
+   "BO-108"
   ],
   "transitions": [
    {
@@ -102679,6 +103396,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "resources.resource",
    "resources.resource_cost"
   ],
   "storedProcedures": [],
@@ -103189,7 +103907,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "BO-913"
+   "BO-913",
+   "BO-108"
   ],
   "transitions": [
    {
@@ -103750,7 +104469,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "BO-923"
+   "BO-923",
+   "BO-108"
   ],
   "transitions": [
    {
@@ -104360,6 +105080,8 @@
   "writes": [
    "cache:idempotency",
    "maintenance.incident",
+   "resources.booking",
+   "resources.resource_request",
    "workforce.attendance"
   ],
   "storedProcedures": [],
@@ -104527,7 +105249,9 @@
   "reads": [
    "resources.resource_request"
   ],
-  "writes": [],
+  "writes": [
+   "resources.resource_request"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -107260,7 +107984,9 @@
    "seating.hold_pool",
    "seating.hold_type"
   ],
-  "writes": [],
+  "writes": [
+   "seating.hold_pool"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -108975,7 +109701,9 @@
   "reads": [
    "seating.hold_pool"
   ],
-  "writes": [],
+  "writes": [
+   "seating.hold_pool"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -109026,7 +109754,9 @@
   "reads": [
    "seating.hold_pool"
   ],
-  "writes": [],
+  "writes": [
+   "seating.hold_pool"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -110292,7 +111022,9 @@
    "seating.group_request",
    "seating.hold_pool"
   ],
-  "writes": [],
+  "writes": [
+   "seating.hold_pool"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -110884,7 +111616,9 @@
    "seating.seat_category",
    "seating.seat_hold"
   ],
-  "writes": [],
+  "writes": [
+   "seating.reassignment"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -111204,7 +111938,7 @@
    "seating.seat_price_band"
   ],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -111212,7 +111946,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "BO-1043"
+   "BO-1043",
+   "BO-103"
   ],
   "transitions": [
    {
@@ -112276,7 +113011,7 @@
    "platform.venue_settings"
   ],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -112284,7 +113019,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "BO-1061"
+   "BO-1061",
+   "BO-103"
   ],
   "transitions": [
    {
@@ -112484,7 +113220,7 @@
    "platform.region_settings"
   ],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -112492,7 +113228,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "BO-1061"
+   "BO-1061",
+   "BO-100"
   ],
   "transitions": [
    {
@@ -112540,6 +113277,25 @@
      ]
     },
     "provenance": "contract tenancy.yaml PUT /regions/{regionId}/settings"
+   },
+   {
+    "id": "formUpdateAiResidency",
+    "component": "modal",
+    "trigger": "Save AI residency",
+    "body": "**Collects the residency section before `updateRegionSettings` is called** (3 October 2026, CHG-RONEC-004). Asks for `aiResidencyClass`, `allowedAiResidencies` and, for `globalAllowed`, the three `aiResidencyOptIn` references; every other field is sent as `getRegionSettings` returned it. A move to a wider class says what changes for guests (calls may leave the UAE) and asks the operator to confirm. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save AI residency",
+     "operation": "updateRegionSettings"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "aiResidencyClass",
+      "allowedAiResidencies",
+      "aiResidencyOptIn"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /regions/{regionId}/settings; decided 3 October 2026 (CHG-RONEC-004)"
    },
    {
     "id": "formSetDenominations",
@@ -112610,6 +113366,7 @@
   "writes": [
    "cache:idempotency",
    "cache:resolution",
+   "identity.access_override",
    "identity.access_review_campaign",
    "identity.access_review_item",
    "identity.authorisation_policy",
@@ -114331,7 +115088,7 @@
    "wallet.funding_rules"
   ],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -114339,7 +115096,8 @@
   ],
   "pattern": "configEditor",
   "entryFrom": [
-   "BO-1093"
+   "BO-1093",
+   "BO-101"
   ],
   "transitions": [
    {
@@ -114646,6 +115404,8 @@
   ],
   "writes": [
    "cache:idempotency",
+   "platform.outbox",
+   "wallet.adjustment",
    "wallet.wallet"
   ],
   "storedProcedures": [],
@@ -115305,7 +116065,7 @@
    "wallet.wallet_transaction"
   ],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -115313,7 +116073,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "BO-1103"
+   "BO-1103",
+   "BO-101"
   ],
   "transitions": [
    {
@@ -117521,7 +118282,7 @@
    "wallet.refund_policy"
   ],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -117529,7 +118290,8 @@
   ],
   "pattern": "configEditor",
   "entryFrom": [
-   "BO-1143"
+   "BO-1143",
+   "BO-101"
   ],
   "transitions": [
    {
@@ -117640,7 +118402,9 @@
    "wallet.adjustment",
    "wallet.wallet_transaction"
   ],
-  "writes": [],
+  "writes": [
+   "wallet.adjustment"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -117706,6 +118470,7 @@
    "approvals.matrix",
    "approvals.rule",
    "cache:idempotency",
+   "platform.outbox",
    "wallet.wallet"
   ],
   "storedProcedures": [],
@@ -118539,7 +119304,7 @@
    "wallet.wallet_type"
   ],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -118547,7 +119312,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "BO-1153"
+   "BO-1153",
+   "BO-101"
   ],
   "transitions": [
    {
@@ -118864,6 +119630,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "platform.outbox",
    "wallet.wallet"
   ],
   "storedProcedures": [],
@@ -119628,7 +120395,9 @@
   ],
   "writes": [
    "cache:idempotency",
+   "control.api_client",
    "control.webhook_delivery",
+   "wallet.dispute",
    "wallet.integration_mapping"
   ],
   "storedProcedures": [],
@@ -119640,7 +120409,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "BO-1173"
+   "BO-1173",
+   "BO-101"
   ],
   "transitions": [
    {
@@ -119895,7 +120665,7 @@
    "transport.station"
   ],
   "storedProcedures": [],
-  "wave": 2,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -119999,7 +120769,7 @@
    "transport.route_stop"
   ],
   "storedProcedures": [],
-  "wave": 2,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -120164,7 +120934,7 @@
    "transport.fare_table"
   ],
   "storedProcedures": [],
-  "wave": 2,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -120246,7 +121016,7 @@
    "transport.timetable_run"
   ],
   "storedProcedures": [],
-  "wave": 2,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -120372,7 +121142,8 @@
   "writes": [
    "cache:idempotency",
    "catalogue.performance",
-   "platform.outbox"
+   "platform.outbox",
+   "transport.departure"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -120472,7 +121243,7 @@
    "transport.pass_type"
   ],
   "storedProcedures": [],
-  "wave": 2,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -120573,7 +121344,7 @@
    "transport.timetable_run"
   ],
   "storedProcedures": [],
-  "wave": 2,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -122133,7 +122904,8 @@
    "listTaxInvoiceTemplates",
    "setTaxInvoiceTemplate",
    "listEInvoicingProviders",
-   "setEInvoicingProvider"
+   "setEInvoicingProvider",
+   "getTaxProfileJurisdiction"
   ],
   "services": [
    "CatalogueService",
@@ -129136,7 +129908,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "ADM-158"
+   "ADM-158",
+   "BO-102"
   ],
   "transitions": [
    {
@@ -133998,7 +134771,8 @@
   "operations": [
    "listApprovalDelegations",
    "createApprovalDelegation",
-   "setApprovalMatrix"
+   "setApprovalMatrix",
+   "listApprovalMatrices"
   ],
   "services": [
    "TenancyService"
@@ -134032,7 +134806,8 @@
   ],
   "pattern": "configEditor",
   "entryFrom": [
-   "ADM-238"
+   "ADM-238",
+   "BO-100"
   ],
   "transitions": [
    {
@@ -139891,7 +140666,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "ADM-569"
+   "ADM-569",
+   "BO-102"
   ],
   "transitions": [
    {
@@ -141186,6 +141962,7 @@
   "writes": [
    "cache:idempotency",
    "marketing.message_dispatch",
+   "orders.payment_link",
    "orders.sales_order"
   ],
   "storedProcedures": [],
@@ -141226,7 +142003,8 @@
   "route": "/commercial/payment-link-distribution-customer-journey-manager-t74-adm-593",
   "operations": [
    "resendPaymentLink",
-   "getPaymentLink"
+   "getPaymentLink",
+   "cancelPaymentLink"
   ],
   "services": [
    "OrderService"
@@ -141278,7 +142056,25 @@
    "emptyNoResults": "The filter narrowed it and the payment link distribution are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "formCancelPaymentLink",
+    "component": "modal",
+    "trigger": "Cancel link",
+    "body": "**Collects what `cancelPaymentLink` sends before it is called.** Required: `reason` (3 to 500 characters, kept in the audit trail, never shown to the guest). Says that the guest's link stops working at once and that the order is not cancelled. Dismissing sends nothing; the link stays live.",
+    "confirm": {
+     "label": "Cancel link",
+     "operation": "cancelPaymentLink"
+    },
+    "dismiss": {
+     "label": "Keep the link",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /payment-links/{linkId}/cancel; decided 3 October 2026 (CHG-RONEC-005)"
+   }
+  ]
  },
  "ADM-594": {
   "name": "Hosted Checkout, Redirect & Return Flow Configuration",
@@ -141873,7 +142669,8 @@
   ],
   "pattern": "configEditor",
   "entryFrom": [
-   "ADM-599"
+   "ADM-599",
+   "BO-102"
   ],
   "transitions": [
    {
@@ -142025,6 +142822,7 @@
    "payments.mixed_tender_rules"
   ],
   "writes": [
+   "payments.dunning_case",
    "payments.dunning_policy",
    "payments.mixed_tender_rules"
   ],
@@ -149911,7 +150709,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "ADM-339"
+   "ADM-339",
+   "BO-100"
   ],
   "transitions": [
    {
@@ -150179,7 +150978,9 @@
   "reads": [
    "approvals.evidence_package"
   ],
-  "writes": [],
+  "writes": [
+   "approvals.evidence_package"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -150617,7 +151418,8 @@
   ],
   "pattern": "configEditor",
   "entryFrom": [
-   "ADM-349"
+   "ADM-349",
+   "BO-100"
   ],
   "transitions": [
    {
@@ -150744,7 +151546,9 @@
    "control.api_client",
    "identity.authorisation_policy"
   ],
-  "writes": [],
+  "writes": [
+   "control.api_client"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -152447,7 +153251,17 @@
    "ADM-539",
    "ADM-549",
    "ADM-619",
-   "ADM-699"
+   "ADM-699",
+   "ADM-412",
+   "ADM-424",
+   "ADM-500",
+   "ADM-506",
+   "ADM-508",
+   "ADM-523",
+   "ADM-527",
+   "ADM-528",
+   "ADM-554",
+   "ADM-556"
   ],
   "pattern": "listDetail",
   "entryFrom": [],
@@ -152838,6 +153652,86 @@
     "provenance": "new screen, 2 October 2026 (CHG-SBO-022)"
    },
    {
+    "to": "ADM-412",
+    "trigger": "Opens Payment Method & Settlement Setup",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A",
+    "carries": [
+     "tenantId"
+    ]
+   },
+   {
+    "to": "ADM-424",
+    "trigger": "Opens Module Activation & Dependency Validation",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A",
+    "carries": [
+     "tenantId"
+    ]
+   },
+   {
+    "to": "ADM-500",
+    "trigger": "Opens Forecast Configuration & Forecasting Strategy",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A",
+    "carries": [
+     "tenantId"
+    ]
+   },
+   {
+    "to": "ADM-506",
+    "trigger": "Opens Forecast Drivers, Confidence & Explainability",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A",
+    "carries": [
+     "tenantId"
+    ]
+   },
+   {
+    "to": "ADM-508",
+    "trigger": "Opens Forecast Accuracy, Review & Publication Center",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A",
+    "carries": [
+     "tenantId"
+    ]
+   },
+   {
+    "to": "ADM-523",
+    "trigger": "Opens AI Action & Permission Policy Builder",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A",
+    "carries": [
+     "tenantId"
+    ]
+   },
+   {
+    "to": "ADM-527",
+    "trigger": "Opens AI Policy Testing & Governance Simulation",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A",
+    "carries": [
+     "tenantId"
+    ]
+   },
+   {
+    "to": "ADM-528",
+    "trigger": "Opens AI Governance Policy Publication & Effective Policy Map",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A",
+    "carries": [
+     "tenantId"
+    ]
+   },
+   {
+    "to": "ADM-554",
+    "trigger": "Opens AI Quality, Behavior & Governance Drift Monitoring",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A",
+    "carries": [
+     "tenantId"
+    ]
+   },
+   {
+    "to": "ADM-556",
+    "trigger": "Opens AI Incident & Remediation Management",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A",
+    "carries": [
+     "tenantId"
+    ]
+   },
+   {
     "to": "ADM-020",
     "trigger": "Creates the first principal and grants it the role",
     "provenance": "flow F109 step 4\u21925",
@@ -153031,6 +153925,7 @@
    "platform.scope"
   ],
   "writes": [
+   "identity.platform_staff_grant",
    "platform.audit_read"
   ],
   "storedProcedures": [],
@@ -153160,6 +154055,7 @@
    "control.licence_add_on",
    "control.licence_add_on_limit",
    "control.tenant",
+   "identity.platform_staff_grant",
    "identity.sso_group_mapping",
    "identity.sso_provider",
    "platform.outbox",
@@ -153433,6 +154329,7 @@
    "cache:idempotency",
    "cache:resolution",
    "control.tenant",
+   "identity.platform_staff_grant",
    "platform.scope"
   ],
   "storedProcedures": [],
@@ -154586,7 +155483,8 @@
    "control.api_anomaly_rule",
    "control.api_client",
    "control.api_limit",
-   "control.production_access_request"
+   "control.production_access_request",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -154785,11 +155683,14 @@
   "writes": [
    "cache:idempotency",
    "cache:resolution",
+   "identity.platform_staff_grant",
+   "platform.outbox",
    "whitelabel.config_version",
    "whitelabel.feature_toggle",
    "whitelabel.homepage_section",
    "whitelabel.module_enablement",
    "whitelabel.navigation_item",
+   "whitelabel.site_package",
    "whitelabel.tenant_config"
   ],
   "storedProcedures": [],
@@ -155009,6 +155910,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "identity.platform_staff_grant",
    "whitelabel.custom_domain"
   ],
   "storedProcedures": [],
@@ -155135,6 +156037,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "identity.platform_staff_grant",
    "whitelabel.tenant_config"
   ],
   "storedProcedures": [],
@@ -155240,6 +156143,7 @@
    "platform.venue_settings"
   ],
   "writes": [
+   "identity.platform_staff_grant",
    "platform.venue_settings"
   ],
   "storedProcedures": [],
@@ -155357,6 +156261,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "identity.platform_staff_grant",
    "identity.principal",
    "identity.principal_credential"
   ],
@@ -155490,6 +156395,7 @@
   "writes": [
    "cache:idempotency",
    "cache:resolution",
+   "identity.platform_staff_grant",
    "identity.role"
   ],
   "storedProcedures": [],
@@ -155601,7 +156507,8 @@
    "identity.mfa_recovery_code",
    "identity.password_policy",
    "identity.principal",
-   "identity.principal_credential"
+   "identity.principal_credential",
+   "identity.session"
   ],
   "writes": [
    "cache:idempotency",
@@ -156178,6 +157085,7 @@
    "cache:idempotency",
    "control.api_version",
    "control.support_notice",
+   "identity.platform_staff_grant",
    "marketing.message_dispatch"
   ],
   "storedProcedures": [],
@@ -156543,6 +157451,9 @@
   ],
   "writes": [
    "cache:idempotency",
+   "control.config_package",
+   "control.config_package_application",
+   "control.config_package_diff",
    "identity.mfa_challenge",
    "identity.mfa_recovery_code",
    "identity.session",
@@ -156927,6 +157838,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "identity.platform_staff_grant",
    "reporting.dashboard",
    "reporting.dashboard_tile",
    "reporting.dashboard_view"
@@ -157485,7 +158397,8 @@
    "ai.provider",
    "ai.release",
    "cache:idempotency",
-   "cache:resolution"
+   "cache:resolution",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -157698,7 +158611,9 @@
    "ledger.tax_invoice",
    "ledger.tax_invoice_line"
   ],
-  "writes": [],
+  "writes": [
+   "identity.platform_staff_grant"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -160437,6 +161352,7 @@
   "writes": [
    "cache:idempotency",
    "control.billing_entity",
+   "identity.platform_staff_grant",
    "ledger.legal_entity"
   ],
   "storedProcedures": [],
@@ -160525,7 +161441,8 @@
    "listTenants",
    "setPaymentProvider",
    "listOwnPlatformStaffGrants",
-   "listOrgUnits"
+   "listOrgUnits",
+   "listPaymentProviders"
   ],
   "services": [
    "IdentityService",
@@ -160543,11 +161460,13 @@
    "control.tenant",
    "identity.platform_staff_grant",
    "payments.provider",
+   "payments.routing_rule",
    "platform.scope"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
+   "identity.platform_staff_grant",
    "payments.provider",
    "payments.routing_rule"
   ],
@@ -160560,7 +161479,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "ADM-409"
+   "ADM-409",
+   "ADM-002"
   ],
   "transitions": [
    {
@@ -161089,6 +162009,7 @@
    "cache:idempotency",
    "cache:resolution",
    "control.tenant",
+   "identity.platform_staff_grant",
    "platform.scope"
   ],
   "storedProcedures": [],
@@ -161187,6 +162108,7 @@
   "writes": [
    "cache:idempotency",
    "cache:resolution",
+   "identity.platform_staff_grant",
    "platform.scope"
   ],
   "storedProcedures": [],
@@ -161293,6 +162215,7 @@
    "control.licence_add_on",
    "control.licence_add_on_limit",
    "identity.password_policy",
+   "identity.platform_staff_grant",
    "identity.principal",
    "identity.principal_credential"
   ],
@@ -161460,6 +162383,7 @@
   "writes": [
    "cache:idempotency",
    "cache:resolution",
+   "identity.platform_staff_grant",
    "whitelabel.module_enablement"
   ],
   "storedProcedures": [],
@@ -161471,7 +162395,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "ADM-419"
+   "ADM-419",
+   "ADM-002"
   ],
   "transitions": [
    {
@@ -161547,7 +162472,9 @@
    "control.venue_type_template",
    "identity.platform_staff_grant"
   ],
-  "writes": [],
+  "writes": [
+   "identity.platform_staff_grant"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -161638,8 +162565,10 @@
   "writes": [
    "cache:idempotency",
    "cache:resolution",
+   "identity.platform_staff_grant",
    "platform.region_settings",
-   "platform.venue_settings"
+   "platform.venue_settings",
+   "subscription.go_live_readiness"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -163042,7 +163971,8 @@
    "ai.blueprint_decision",
    "ai.config_session",
    "ai.config_source",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -163223,7 +164153,8 @@
    "ai.blueprint_decision",
    "ai.config_session",
    "ai.config_source",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -163323,7 +164254,8 @@
    "ai.blueprint_decision",
    "ai.config_session",
    "ai.venue_settings",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -163434,7 +164366,8 @@
    "ai.blueprint",
    "ai.blueprint_decision",
    "ai.config_session",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -163531,7 +164464,8 @@
    "ai.blueprint",
    "ai.blueprint_decision",
    "ai.config_session",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -163628,7 +164562,8 @@
    "ai.blueprint",
    "ai.blueprint_decision",
    "ai.config_session",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -163725,7 +164660,8 @@
    "ai.blueprint",
    "ai.blueprint_decision",
    "ai.config_session",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -163818,7 +164754,8 @@
   "writes": [
    "ai.blueprint",
    "ai.blueprint_decision",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -163921,7 +164858,8 @@
    "ai.blueprint_decision",
    "ai.config_session",
    "ai.config_source",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -164022,7 +164960,8 @@
    "ai.config_session",
    "ai.decision_record",
    "ai.proposed_action",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -164124,7 +165063,8 @@
    "ai.config_session",
    "ai.decision_record",
    "ai.proposed_action",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -164305,7 +165245,8 @@
   "writes": [
    "ai.blueprint",
    "ai.blueprint_decision",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -164401,7 +165342,8 @@
   "writes": [
    "ai.blueprint",
    "ai.blueprint_decision",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -164497,7 +165439,8 @@
   "writes": [
    "ai.blueprint",
    "ai.blueprint_decision",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -164593,7 +165536,8 @@
   "writes": [
    "ai.blueprint",
    "ai.blueprint_decision",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -164689,7 +165633,8 @@
   "writes": [
    "ai.blueprint",
    "ai.blueprint_decision",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -164785,7 +165730,8 @@
   "writes": [
    "ai.blueprint",
    "ai.blueprint_decision",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -164881,7 +165827,8 @@
   "writes": [
    "ai.blueprint",
    "ai.blueprint_decision",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -164973,7 +165920,8 @@
   "writes": [
    "ai.action_plan",
    "ai.action_step",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -165065,7 +166013,8 @@
   "writes": [
    "ai.action_plan",
    "ai.action_step",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -165163,7 +166112,8 @@
   ],
   "writes": [
    "ai.venue_settings",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -165361,7 +166311,8 @@
   "writes": [
    "ai.action_plan",
    "ai.action_step",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -165454,7 +166405,8 @@
   "writes": [
    "ai.blueprint",
    "ai.blueprint_decision",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -165550,7 +166502,8 @@
    "ai.activity",
    "ai.decision_record",
    "ai.proposed_action",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -165644,7 +166597,8 @@
    "ai.action_step",
    "ai.decision_record",
    "ai.intervention",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -165739,7 +166693,8 @@
    "ai.action_step",
    "ai.decision_record",
    "ai.intervention",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -165833,7 +166788,8 @@
    "ai.action_step",
    "ai.decision_record",
    "ai.proposed_action",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -165939,7 +166895,8 @@
    "ai.config_session",
    "ai.decision_record",
    "ai.proposed_action",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -166035,7 +166992,8 @@
    "ai.action_step",
    "ai.decision_record",
    "ai.proposed_action",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -166125,7 +167083,9 @@
    "control.tenant",
    "identity.platform_staff_grant"
   ],
-  "writes": [],
+  "writes": [
+   "identity.platform_staff_grant"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -166218,7 +167178,8 @@
   ],
   "writes": [
    "ai.forecast_export",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -166392,7 +167353,8 @@
    "ai.forecast_definition",
    "ai.forecast_point",
    "ai.forecast_version",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -166403,7 +167365,8 @@
   ],
   "pattern": "configEditor",
   "entryFrom": [
-   "ADM-499"
+   "ADM-499",
+   "ADM-002"
   ],
   "transitions": [
    {
@@ -166484,7 +167447,8 @@
   "writes": [
    "ai.forecast_definition",
    "ai.signal_source",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -166578,7 +167542,8 @@
   ],
   "writes": [
    "ai.anomaly_detector",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -166665,7 +167630,9 @@
    "control.tenant",
    "identity.platform_staff_grant"
   ],
-  "writes": [],
+  "writes": [
+   "identity.platform_staff_grant"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -166751,7 +167718,9 @@
    "control.tenant",
    "identity.platform_staff_grant"
   ],
-  "writes": [],
+  "writes": [
+   "identity.platform_staff_grant"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -166837,7 +167806,9 @@
    "control.tenant",
    "identity.platform_staff_grant"
   ],
-  "writes": [],
+  "writes": [
+   "identity.platform_staff_grant"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -166933,7 +167904,8 @@
   "writes": [
    "ai.activity",
    "ai.insight",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -166944,7 +167916,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "ADM-499"
+   "ADM-499",
+   "ADM-002"
   ],
   "transitions": [
    {
@@ -167027,7 +168000,8 @@
   "writes": [
    "ai.forecast_point",
    "ai.forecast_scenario",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -167130,7 +168104,8 @@
    "ai.forecast_point",
    "ai.forecast_version",
    "ai.operational_requirement",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -167141,7 +168116,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "ADM-499"
+   "ADM-499",
+   "ADM-002"
   ],
   "transitions": [
    {
@@ -167258,7 +168234,9 @@
    "control.tenant",
    "identity.platform_staff_grant"
   ],
-  "writes": [],
+  "writes": [
+   "identity.platform_staff_grant"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -167431,7 +168409,8 @@
   ],
   "writes": [
    "ai.anomaly_detector",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -167545,7 +168524,8 @@
   "writes": [
    "ai.activity",
    "ai.suggestion",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -167634,7 +168614,9 @@
    "control.tenant",
    "identity.platform_staff_grant"
   ],
-  "writes": [],
+  "writes": [
+   "identity.platform_staff_grant"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -167731,7 +168713,9 @@
    "workforce.staffing_rules",
    "workforce.training_record"
   ],
-  "writes": [],
+  "writes": [
+   "identity.platform_staff_grant"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -167819,7 +168803,9 @@
    "control.tenant",
    "identity.platform_staff_grant"
   ],
-  "writes": [],
+  "writes": [
+   "identity.platform_staff_grant"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -167907,7 +168893,9 @@
    "control.tenant",
    "identity.platform_staff_grant"
   ],
-  "writes": [],
+  "writes": [
+   "identity.platform_staff_grant"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -167995,7 +168983,9 @@
    "control.tenant",
    "identity.platform_staff_grant"
   ],
-  "writes": [],
+  "writes": [
+   "identity.platform_staff_grant"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -168088,7 +169078,8 @@
   "writes": [
    "ai.forecast_point",
    "ai.forecast_scenario",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -168179,7 +169170,8 @@
   "writes": [
    "ai.decision_record",
    "ai.operational_requirement",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -168282,7 +169274,8 @@
    "ai.intervention",
    "ai.policy",
    "ai.release",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -168450,7 +169443,8 @@
   "writes": [
    "ai.capability",
    "ai.decision_record",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -168567,7 +169561,8 @@
   "writes": [
    "ai.capability",
    "ai.decision_record",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -168662,7 +169657,8 @@
   "writes": [
    "ai.capability",
    "ai.decision_record",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -168755,7 +169751,8 @@
   "writes": [
    "ai.governance_policy",
    "ai.governance_policy_version",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -168766,7 +169763,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "ADM-519"
+   "ADM-519",
+   "ADM-002"
   ],
   "transitions": [
    {
@@ -168874,6 +169872,7 @@
    "ai.governance_policy",
    "ai.governance_policy_version",
    "cache:idempotency",
+   "identity.platform_staff_grant",
    "tenancy.data_retention_setting"
   ],
   "storedProcedures": [],
@@ -168968,7 +169967,8 @@
   "writes": [
    "ai.governance_policy",
    "ai.governance_policy_version",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -169064,7 +170064,8 @@
   "writes": [
    "ai.decision_record",
    "ai.policy_exception",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -169194,7 +170195,8 @@
   ],
   "writes": [
    "ai.governance_policy_version",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -169205,7 +170207,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "ADM-519"
+   "ADM-519",
+   "ADM-002"
   ],
   "transitions": [
    {
@@ -169310,7 +170313,8 @@
    "ai.governance_policy",
    "ai.governance_policy_version",
    "cache:governance-policy",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -169321,7 +170325,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "ADM-519"
+   "ADM-519",
+   "ADM-002"
   ],
   "transitions": [
    {
@@ -169398,7 +170403,9 @@
    "control.tenant",
    "identity.platform_staff_grant"
   ],
-  "writes": [],
+  "writes": [
+   "identity.platform_staff_grant"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -169580,7 +170587,8 @@
    "ai.governance_policy_version",
    "approvals.matrix",
    "approvals.rule",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -169696,7 +170704,8 @@
    "ai.activity",
    "ai.decision_record",
    "ai.proposed_action",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -169798,7 +170807,8 @@
    "ai.activity",
    "ai.decision_record",
    "ai.proposed_action",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -169910,6 +170920,7 @@
    "ai.proposed_action",
    "cache:answer",
    "cache:idempotency",
+   "identity.platform_staff_grant",
    "qdrant:knowledge"
   ],
   "storedProcedures": [],
@@ -170017,6 +171028,7 @@
    "approvals.request",
    "approvals.sla_policy",
    "cache:idempotency",
+   "identity.platform_staff_grant",
    "platform.outbox"
   ],
   "storedProcedures": [],
@@ -170115,7 +171127,8 @@
    "ai.decision_record",
    "ai.intervention",
    "ai.proposed_action",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -170230,7 +171243,8 @@
    "ai.capability",
    "ai.decision_record",
    "ai.intervention",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -170390,7 +171404,9 @@
    "control.tenant",
    "identity.platform_staff_grant"
   ],
-  "writes": [],
+  "writes": [
+   "identity.platform_staff_grant"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -170484,7 +171500,8 @@
    "ai.action_plan",
    "ai.action_step",
    "ai.governance_policy_version",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -170569,7 +171586,9 @@
    "control.tenant",
    "identity.platform_staff_grant"
   ],
-  "writes": [],
+  "writes": [
+   "identity.platform_staff_grant"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -170737,7 +171756,9 @@
    "control.tenant",
    "identity.platform_staff_grant"
   ],
-  "writes": [],
+  "writes": [
+   "identity.platform_staff_grant"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -170825,7 +171846,9 @@
    "control.tenant",
    "identity.platform_staff_grant"
   ],
-  "writes": [],
+  "writes": [
+   "identity.platform_staff_grant"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -170913,7 +171936,9 @@
    "control.tenant",
    "identity.platform_staff_grant"
   ],
-  "writes": [],
+  "writes": [
+   "identity.platform_staff_grant"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -171003,7 +172028,9 @@
    "control.tenant",
    "identity.platform_staff_grant"
   ],
-  "writes": [],
+  "writes": [
+   "identity.platform_staff_grant"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -171093,7 +172120,9 @@
    "control.tenant",
    "identity.platform_staff_grant"
   ],
-  "writes": [],
+  "writes": [
+   "identity.platform_staff_grant"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -171181,7 +172210,9 @@
    "control.tenant",
    "identity.platform_staff_grant"
   ],
-  "writes": [],
+  "writes": [
+   "identity.platform_staff_grant"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -171270,7 +172301,9 @@
    "control.tenant",
    "identity.platform_staff_grant"
   ],
-  "writes": [],
+  "writes": [
+   "identity.platform_staff_grant"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -171360,7 +172393,8 @@
   ],
   "writes": [
    "ai.evidence_package",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -171453,7 +172487,8 @@
   ],
   "writes": [
    "ai.activity",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -171547,7 +172582,9 @@
    "control.tenant",
    "identity.platform_staff_grant"
   ],
-  "writes": [],
+  "writes": [
+   "identity.platform_staff_grant"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -171715,7 +172752,8 @@
   ],
   "writes": [
    "ai.risk_register",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -171810,7 +172848,8 @@
    "ai.control",
    "ai.control_test",
    "ai.governance_alert",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -171900,7 +172939,8 @@
   "writes": [
    "ai.governance_alert",
    "ai.incident",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -171990,7 +173030,8 @@
   "writes": [
    "ai.governance_alert",
    "ai.incident",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -172092,7 +173133,8 @@
    "ai.governance_alert",
    "ai.policy",
    "ai.release",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -172103,7 +173145,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "ADM-549"
+   "ADM-549",
+   "ADM-002"
   ],
   "transitions": [
    {
@@ -172241,7 +173284,8 @@
   "writes": [
    "ai.governance_alert",
    "ai.incident",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -172346,7 +173390,8 @@
    "ai.policy",
    "ai.policy_exception",
    "ai.release",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -172357,7 +173402,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "ADM-549"
+   "ADM-549",
+   "ADM-002"
   ],
   "transitions": [
    {
@@ -172538,7 +173584,8 @@
   ],
   "writes": [
    "ai.evidence_package",
-   "cache:idempotency"
+   "cache:idempotency",
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -172625,7 +173672,9 @@
    "control.tenant",
    "identity.platform_staff_grant"
   ],
-  "writes": [],
+  "writes": [
+   "identity.platform_staff_grant"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -172710,7 +173759,9 @@
    "ledger.settlement",
    "payments.reconciliation_source"
   ],
-  "writes": [],
+  "writes": [
+   "identity.platform_staff_grant"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -173507,6 +174558,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "catalogue.channel_allocation",
    "orders.sales_order"
   ],
   "storedProcedures": [],
@@ -177628,6 +178680,7 @@
   "writes": [
    "accreditation.application",
    "accreditation.audit",
+   "accreditation.document",
    "accreditation.holder",
    "cache:idempotency",
    "platform.outbox"
@@ -177927,7 +178980,8 @@
    "reopenCase",
    "updateCase",
    "listConversations",
-   "setAgentAvailability"
+   "setAgentAvailability",
+   "listAgentWorkloadAvailability"
   ],
   "services": [
    "MarketingService"
@@ -177940,11 +178994,13 @@
    "cache:idempotency",
    "identity.principal",
    "marketing.agent_availability",
+   "marketing.agent_service_profile",
    "marketing.case",
    "marketing.case_message",
    "marketing.conversation",
    "marketing.conversation_message",
-   "marketing.conversation_message_attachment"
+   "marketing.conversation_message_attachment",
+   "marketing.service_queue"
   ],
   "writes": [
    "cache:idempotency",
@@ -180332,7 +181388,9 @@
    "CMS-071",
    "CMS-081",
    "CMS-091",
-   "CMS-102"
+   "CMS-102",
+   "CMS-025",
+   "CMS-026"
   ],
   "pattern": "statusTracker",
   "entryFrom": [],
@@ -180434,6 +181492,16 @@
     "to": "CMS-003",
     "trigger": "Typography",
     "provenance": "flow F102 step 1\u21922"
+   },
+   {
+    "to": "CMS-025",
+    "trigger": "Opens Cookie, Tracking & Digital Technology Registry",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "CMS-026",
+    "trigger": "Opens Cookie Banner & Preference Center Designer",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
    }
   ],
   "machine": null,
@@ -180583,7 +181651,7 @@
     "id": "formSetBrandIdentity",
     "component": "modal",
     "trigger": "Save brand identity",
-    "body": "**Collects what `setBrandIdentity` sends before it is called.** Required: `logoAssetRef`. Optional: `logoVariant` (light, dark or duotone: which lockup sits in the nav bar and which colour reading of it drives the theme, decided 29 September, rev 3 CFG-4), `logoDarkAssetRef`, `faviconAssetRef`, `splashImageAssetRefs`, `splashDurationSeconds`, `splashBackgroundColour`, `showLoadingIndicator`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setBrandIdentity` sends before it is called.** Required: `logoAssetRef`. Optional: `logoVariant` (light, dark or duotone: which lockup sits in the nav bar and which colour reading of it drives the theme, decided 29 September, rev 3 CFG-4), `logoDarkAssetRef`, `faviconAssetRef`, `splashImageAssetRefs`, `splashDurationSeconds`, `splashBackgroundColour`, `showLoadingIndicator`. **`showPoweredBy` is not asked here**: it is sent as read, and changed only on CMS-104 (CHG-R1S-012). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "BrandIdentity",
     "confirm": {
      "label": "Save brand identity",
@@ -181458,7 +182526,8 @@
    "setHeader",
    "setFooter",
    "getDeepLinkScheme",
-   "buildDeepLink"
+   "buildDeepLink",
+   "getTenantConfig"
   ],
   "services": [
    "WhiteLabelService"
@@ -181470,9 +182539,14 @@
   "reads": [
    "cache:idempotency",
    "cache:resolution",
+   "whitelabel.booking_flow",
+   "whitelabel.booking_flow_step",
+   "whitelabel.feature_toggle",
    "whitelabel.footer_config",
    "whitelabel.footer_config_column",
    "whitelabel.footer_config_social_link",
+   "whitelabel.homepage_section",
+   "whitelabel.module_enablement",
    "whitelabel.navigation_item",
    "whitelabel.tenant_config"
   ],
@@ -182090,8 +183164,10 @@
   ],
   "writes": [
    "cache:idempotency",
+   "platform.outbox",
    "whitelabel.config_version",
    "whitelabel.publish_review_policy",
+   "whitelabel.site_package",
    "whitelabel.tenant_config"
   ],
   "storedProcedures": [],
@@ -183107,7 +184183,9 @@
   "reads": [
    "marketing.communication_preference_type"
   ],
-  "writes": [],
+  "writes": [
+   "marketing.communication_preference_type"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -183184,7 +184262,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "CMS-021"
+   "CMS-021",
+   "CMS-001"
   ],
   "transitions": [
    {
@@ -183280,7 +184359,8 @@
   ],
   "pattern": "configEditor",
   "entryFrom": [
-   "CMS-021"
+   "CMS-021",
+   "CMS-001"
   ],
   "transitions": [
    {
@@ -183334,7 +184414,9 @@
   "reads": [
    "marketing.consent_capture_point"
   ],
-  "writes": [],
+  "writes": [
+   "marketing.consent_capture_point"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -183467,7 +184549,9 @@
   "reads": [
    "marketing.minor_privacy_rule"
   ],
-  "writes": [],
+  "writes": [
+   "marketing.minor_privacy_rule"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -183522,6 +184606,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "marketing.privacy_change_set",
    "marketing.privacy_notice_governance"
   ],
   "storedProcedures": [],
@@ -184823,7 +185908,9 @@
   "reads": [
    "marketing.waiver_version_control"
   ],
-  "writes": [],
+  "writes": [
+   "marketing.waiver_version_control"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -187004,7 +188091,9 @@
   "reads": [
    "assets.approval"
   ],
-  "writes": [],
+  "writes": [
+   "assets.approval"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -187062,7 +188151,9 @@
   "reads": [
    "assets.approval"
   ],
-  "writes": [],
+  "writes": [
+   "assets.approval"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -188385,6 +189476,7 @@
    "catalogue.product",
    "catalogue.product_category",
    "catalogue.product_media",
+   "platform.outbox",
    "whitelabel.booking_flow",
    "whitelabel.booking_flow_step",
    "whitelabel.config_version"
@@ -188651,7 +189743,7 @@
   ],
   "writes": [],
   "storedProcedures": [],
-  "wave": 2,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -188701,7 +189793,8 @@
   "route": "/developer/organisation",
   "operations": [
    "registerDeveloper",
-   "setDeveloperMembers"
+   "setDeveloperMembers",
+   "getDeveloperAccount"
   ],
   "services": [
    "PlatformService"
@@ -189288,7 +190381,10 @@
    "deprecateApiVersion",
    "listProductionAccessRequests",
    "decideProductionAccess",
-   "setApiAnomalyRule"
+   "setApiAnomalyRule",
+   "listApiQuotas",
+   "listApiAnomalyRules",
+   "listApiLicences"
   ],
   "services": [
    "PlatformService"
@@ -189503,14 +190599,6 @@
   "entryFrom": [],
   "transitions": [
    {
-    "to": "KIT-002",
-    "trigger": "Kitchen Display System (KDS)",
-    "provenance": "flow F83 step 1\u21922",
-    "carries": [
-     "ticketId"
-    ]
-   },
-   {
     "to": "KIT-003",
     "trigger": "Order Firing & Course Management",
     "provenance": "structural \u2014 KIT-001 is P15's home screen and its exits are its launcher",
@@ -189564,6 +190652,14 @@
     "to": "KIT-010",
     "trigger": "Kitchen Performance, AI & Operational Optimization",
     "provenance": "structural \u2014 KIT-001 is P15's home screen and its exits are its launcher"
+   },
+   {
+    "to": "KIT-002",
+    "trigger": "Kitchen Display System (KDS)",
+    "provenance": "flow F83 step 1\u21922",
+    "carries": [
+     "ticketId"
+    ]
    }
   ],
   "machine": null,
@@ -190346,11 +191442,13 @@
   ],
   "reads": [
    "cache:idempotency",
-   "fnb.course_rule"
+   "fnb.course_rule",
+   "fnb.kitchen_sla"
   ],
   "writes": [
    "cache:idempotency",
-   "cache:resolution"
+   "cache:resolution",
+   "fnb.kitchen_sla"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -190538,7 +191636,7 @@
    "reporting.execution"
   ],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -190564,7 +191662,10 @@
    "ANL-031",
    "ANL-041",
    "ANL-051",
-   "ANL-061"
+   "ANL-061",
+   "ANL-023",
+   "ANL-025",
+   "ANL-066"
   ],
   "pattern": "listDetail",
   "entryFrom": [],
@@ -190726,6 +191827,25 @@
     "carries": [
      "insightId"
     ]
+   },
+   {
+    "to": "ANL-023",
+    "trigger": "Opens Drag-and-Drop Dashboard Canvas",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A",
+    "carries": [
+     "dashboardId",
+     "reportId"
+    ]
+   },
+   {
+    "to": "ANL-025",
+    "trigger": "Opens KPI Builder",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "ANL-066",
+    "trigger": "Opens Semantic Model & Business Data Catalogue",
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
    }
   ],
   "machine": null,
@@ -192790,7 +193910,8 @@
   ],
   "pattern": "configEditor",
   "entryFrom": [
-   "ANL-021"
+   "ANL-021",
+   "ANL-001"
   ],
   "transitions": [
    {
@@ -192946,7 +194067,8 @@
   ],
   "pattern": "configEditor",
   "entryFrom": [
-   "ANL-021"
+   "ANL-021",
+   "ANL-001"
   ],
   "transitions": [
    {
@@ -195644,7 +196766,8 @@
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "ANL-061"
+   "ANL-061",
+   "ANL-001"
   ],
   "transitions": [
    {

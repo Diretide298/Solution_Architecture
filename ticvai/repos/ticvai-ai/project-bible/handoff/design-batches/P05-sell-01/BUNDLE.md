@@ -1,6 +1,6 @@
 # P05-sell-01 — P05 · Sell (1 of 2)
 
-**10 screens · 13 operations · 48 schemas · 5 permissions**
+**10 screens · 12 operations · 46 schemas · 4 permissions**
 
 Platform P05 Guest Kiosk · ships as **guest** ·
 guest audience · kiosk ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 5 permissions apply here:
-  `ORDER_CREATE, ORDER_REPRINT, ORDER_VIEW, PRICE_VIEW, PRODUCT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `ORDER_CREATE, ORDER_REPRINT, ORDER_VIEW, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -122,12 +122,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `KSK-001` | Attract Loop | C | 0 | 0 | 4 | 0 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-001` | Attract Loop | C | 0 | 2 | 4 | 12 | 0 | 0 | guest | notStarted (generated) |
 | `KSK-002` | Language Select | B | 1 | 20 | 5 | 0 | 0 | 0 | guest | notStarted (generated) |
 | `KSK-003` | What are you buying | B | 0 | 4 | 6 | 12 | 0 | 0 | guest | notStarted (generated) |
 | `KSK-004` | Choose tickets | B | 0 | 17 | 6 | 14 | 2 | 0 | guest | notStarted (generated) |
 | `KSK-005` | Choose a performance | C | 0 | 35 | 5 | 9 | 1 | 0 | guest | notStarted (generated) |
-| `KSK-006` | Review | C | 11 | 29 | 5 | 29 | 1 | 0 | guest | notStarted (generated) |
+| `KSK-006` | Review | C | 10 | 31 | 5 | 11 | 1 | 0 | guest | notStarted (generated) |
 | `KSK-007` | Payment | C | 0 | 20 | 5 | 9 | 2 | 0 | guest | notStarted (generated) |
 | `KSK-008` | Payment unresolved | C | 0 | 0 | 5 | 0 | 0 | 0 | guest | notStarted (generated) |
 | `KSK-009` | Ticket issued | C | 5 | 10 | 5 | 10 | 0 | 0 | guest | notStarted (generated) |
@@ -135,7 +135,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**KSK-001, KSK-002, KSK-003, KSK-004, KSK-005, KSK-007, KSK-008, KSK-009, KSK-010 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**KSK-001, KSK-002, KSK-003, KSK-004, KSK-005, KSK-006, KSK-007, KSK-008, KSK-009, KSK-010 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -150,7 +150,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P05 Guest Kiosk (kiosk) |
-| Module | Sell · wave 2 · needs the `core` module |
+| Module | Sell · wave 1 · needs the `core` module |
 | Block | Block C · task APP-KIOSK-KSK-001 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is a portrait touch kiosk, 1080 x 1920, large touch targets, no keyboard, an attract screen when idle. · LTR and RTL · the venue's theme |
@@ -161,19 +161,34 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **What the spec says about it.** Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **The attract loop is the entry.** A kiosk has no login and nobody navigates to it — it is what the screen shows when nobody is standing there. **Declared 20 August** — `isEntryPoint` existed in the schema and five platforms used none, so every screen in them read as unreachable.
 
-**Known gaps.** **This screen declares no operation the contracts recognise.** Nothing fills it, nothing it does is committed anywhere, and its shape below is a default rather than a reading.
-
 **From the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process.** The kiosk's attract loop: what the screen shows when nobody is standing there, to pull a guest out of the ticket queue. After Block A. Kiosks are guest-facing and white-labelled to the client's brand with a kiosk-specific layout, "Powered by TICVAI" kept.
 
-**Known correction pending (do not draw the wrong version)**
-
-- **The screen declares no operation; nothing fills the loop.** Why: The loop needs the venue's products and media (listProducts with Product.media) or a configured playlist. *(source: screens/P05-guest-kiosk.yaml#KSK-001 gaps; Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale))*
+**Fixed on main** (the package already carries these; draw what it says): The screen declares no operation; nothing fills the loop. (CHG-R1S-022).
 
 #### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Kind | select | — | Admission · Timed admission · Dated admission · Open dated · Seated · Membership · Bundle · Fnb · Retail · Rental · Add on · Gift card | `listProducts` ?kind |
+| Is sellable | toggle | — | — | `listProducts` ?isSellable |
+| Category | picker: choose a category | — | — | `listProducts` ?categoryId |
+| Segment tag | text field | — | max length 120 | `listProducts` ?segmentTag |
+| Guided answers | multi-picker: choose guided answers | — | at most 10 | `listProducts` ?guidedAnswerIds |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**What's on** (card list, from `listProducts`): Published products only, primary media first; a touch opens the language choice (CHG-R1S-022).
+
+| Shows | Format | Notes |
+|---|---|---|
+| Name | text | — |
+| Media | list or chips (count when long) | The product's own photos and video (decided 29 September, 23SEP-4). *Read more* opens on the `isPrimary` item, and a listing shows each … |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
 
@@ -183,12 +198,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 - **Touch anywhere**: Language choice, then What are you buying (KSK-003). *(source: F07 step 1-3)*
 
+**Data it reads**: `listProducts` (onLoad, Fill the loop with the venue's products and their media)
+
 **Where the user goes next**
 
 - → `KSK-002` Language Select: *Chooses a language*
 - → `KSK-003` What are you buying: *What are you buying*
-- → `KSK-004` Choose tickets: *Choose tickets*
+- → `KSK-004` Choose tickets: *Choose tickets*; carries `productId`
 - → `KSK-014` Out of service: *Out of service*
+- → `KSK-015` Assistant: *Opens Assistant*
 
 #### States
 
@@ -198,6 +216,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Error (`?state=error`) | Falls through to KSK-014 if the kiosk cannot reach the server |
 | Empty, first run (`?state=emptyFirstRun`) | Not applicable |
 | Offline (`?state=offline`) | **Not available.** An unattended terminal selling from a stale catalogue oversells with nobody watching |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is not an answer of the venue's published guided choice (W4, 29 … |
 
 #### Edge cases to draw
 
@@ -219,9 +238,26 @@ loop:
 
 #### Permissions
 
+- `listProducts` → `PRODUCT_VIEW` (read) · staff, guest, partner
+
 #### Requirements it meets
 
-No matrix row traces to this screen's operations or data.
+12 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 2.6.7 | For BtoC online sales, the following points shall be available online: | Ticketing Sales | CONTRACTED | `listProducts` |
+| 2.6.8 | - All PLUs | Ticketing Sales | CONTRACTED | `listProducts` |
+| 2.13.21 | All PLUs can be sold on the POS (ticketing and non-ticketing) including Packages. | Ticketing Sales | CONTRACTED | `listProducts` |
+| 8.8.1 | A price for a PLU is changing depending on the date of visit. I can sell today a product to be used after a price change at the new price defined in the sales calendar. | Unified Operations Dashboard | CONTRACTED | data `Product` |
+| 8.8.2 | System shall support future-dated pricing schedules. | Unified Operations Dashboard | CONTRACTED | data `Product` |
+| 8.8.3 | System shall support pricing by visit date. | Unified Operations Dashboard | CONTRACTED | data `Product` |
+| 8.8.4 | System shall support pricing by booking date. | Unified Operations Dashboard | CONTRACTED | data `Product` |
+| 8.8.5 | System shall support pricing calendar management. | Unified Operations Dashboard | CONTRACTED | data `Product` |
+| 8.8.6 | System shall support automatic activation of future pricing. | Unified Operations Dashboard | CONTRACTED | data `Product` |
+| 8.8.7 | System shall support overlapping pricing schedules with priority rules. | Unified Operations Dashboard | CONTRACTED | data `Product` |
+| 8.8.8 | System shall maintain pricing schedule history. | Unified Operations Dashboard | CONTRACTED | data `Product` |
+| 8.8.9 | System shall provide pricing schedule audit trails. | Unified Operations Dashboard | CONTRACTED | data `Product` |
 
 #### Client meeting inputs
 
@@ -247,19 +283,20 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - Flow F07 *Guest buys at a kiosk*, step 1: Touches the attract loop → Wakes to language selection **Calls nothing** — the attract loop is idle video until somebody touches it.
 - Flow F75 *A kiosk serves itself and calls for help*, step 1: The kiosk attracts and a guest touches it. → **No operation.** The attract loop is a local asset — a kiosk that needs the network to show its own screensaver looks broken when it is not.
 - Flow F07 branch at step 1 (abandonsFlow): when Kiosk cannot reach the server, KSK-014 out of service. It does not attempt a cached sale.
+- ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403).
+- [ ] Every output is drawn (2 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#KSK-001?state=<state>`: loading, error, emptyFirstRun, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `KSK-002`, `KSK-003`, `KSK-004`, `KSK-014`.
+- [ ] Every transition is wired: `KSK-002`, `KSK-003`, `KSK-004`, `KSK-014`, `KSK-015`.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The module and platform inputs below are applied.
 - [ ] Drawn in the default theme; on a key screen also in the alternate tenant theme; nothing hard-codes a brand colour, logo or font.
 - [ ] The 1 edge case(s) from the process notes are drawn.
-- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -990,19 +1027,13 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 **From the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process.** Review before money moves: lines, totals, and any purchase-gating question the product needs (e.g. "I confirm I am not pregnant"). After Block A.
 
-**Known correction pending (do not draw the wrong version)**
-
-- **"Add cart line" and "Evaluate promotions" buttons on the review.** Why: Lines are added before; promotions apply automatically. *(source: screens/P05-guest-kiosk.yaml#KSK-006 layout; Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale))*
+**Fixed on main** (the package already carries these; draw what it says): "Add cart line" and "Evaluate promotions" buttons on the review. (CHG-R1S-022).
 
 #### Inputs: what the user enters or picks
 
-**On the screen**
+**Form: Pay** (modal, opened by *Pay*; *Pay* calls `checkoutCart`, *Back* sends nothing)
 
-| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
-|---|---|---|---|---|---|---|---|
-| Quantity | number field | — | — | — | — | A large stepper per line; + adds one more (`addCartLine`). | — |
-
-**Sent by *Pay*** (`checkoutCart`; no form is declared, so these are filled from the screen or collected inline)
+**Confirms the basket before payment; the guest types nothing.** The kiosk sends the cart it holds and its sales channel; offers are already on the cart. Then the terminal takes the payment (KSK-007). (CHG-R1S-022)
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1016,6 +1047,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Attendees `attendees` | repeatable rows | optional | — | — | — | The named holder for each cart line that needs one. Becomes `CreateOrderLine.holderName` on the order's matching line. | `checkoutCart` body |
 | Line `attendees[].lineId` | picker: choose a line | required | — | — | shows names, sends the id | A `CartLine.id` in this cart. | `checkoutCart` body |
 | Holder name `attendees[].holderName` | text field | required | — | — | — | — | `checkoutCart` body |
+
+Errors to draw in the form: 400 `chargeCurrency` is not one the venue takes (problem type `currency-not-chargeable`, CHG-FIN-001).; 403 The contact the tickets would go to is not proven — an unverified session (`sessionNotVerified`), or a guest checkout with no confirmed one-time code … (CartProblem); 409 A lease expired between the last read and checkout (`leaseExpired`), or a resource hold did (`resourceHoldInvalid`, rev 3 REV3-15). (CartProblem); 422 A required consent question is unanswered (`consentRequired`), or an answer blocks the booking (`consentAnswerBlocks`), with the lines in `lineIds` (decided 29 … (CartProblem)
 
 #### Outputs: what the screen shows and produces
 
@@ -1037,34 +1070,36 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Extensions used | 1,234 | — |
 | Max extensions | 1,234 | — |
 
-**Offers applied** (banner, from `evaluatePromotions`): The promotions that apply and the near misses, evaluated by themselves (`evaluatePromotions`) and shown before payment (F75 step 4).
+**Offers applied** (banner, from `getCart`): The offers the cart already carries (`Cart.discountTotal`): promotions apply on their own, nothing is pressed (CHG-R1S-022).
 
 | Shows | Format | Notes |
 |---|---|---|
-| Total discount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| ID | the name it points at, never the id | — |
+| Token | text | How an anonymous guest returns to their cart, including from a recovery email. Rotated on claim, so a link shared before signing in does … |
+| Venue | the name it points at, never the id | — |
+| Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Where a sale came from. Restored 24 August — this was lost in the `Money` rewrite and nine references across four contracts were pointing … |
+| Subject | the name it points at, never the id | Null while anonymous. Set by `claimCart`. |
+| Status | chip: Active, Expiring, Expired, Abandoned, Checked out | — |
 | Lines | list or chips (count when long) | — |
-| Line | text | — |
-| Original price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Discounted price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Discount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Applied promotions | list or chips (count when long) | — |
-| Applied | list or chips (count when long) | — |
-| Promotion | the name it points at, never the id | — |
-| Promotion code | text | — |
-| Promotion name | text | — |
-| Discount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Coupon code | text | — |
-| Rejected | list or chips (count when long) | Promotions that matched the products but did not apply, with the reason. This is what a cashier reads to a guest who expected a discount. |
-| Promotion code | text | — |
-| Promotion name | text | — |
-| Reason | chip: Conditions not met, Superseded by better offer, Exclusive promotion applied … | — |
-| Detail | text | — |
+| ID | the name it points at, never the id | — |
+| Variant | the name it points at, never the id | — |
+| Product name | text | — |
+| Quantity | 1,234 | — |
+| Performance | the name it points at, never the id | — |
+| Booked window | grouped details | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in … |
+| Starts at | 1 Oct 2026, 14:30 | — |
+| Ends at | 1 Oct 2026, 14:30 | After `startsAt`, on the same venue day. |
+| Recommendation | the name it points at, never the id | The `trackingId` of the ai `decideRecommendations` item this line came from (29 September, build, AI system design 2.2 A step 8), so a … |
+| Table reservation | the name it points at, never the id | Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the `fnb.TableReservation` this line secures. |
+| Seats | list or chips (count when long) | — |
+| Resource hold | the name it points at, never the id | The `resources.ResourceHold` this line buys (decided 29 September, rev 3 REV3-15). |
+| Attributes | grouped details | Open attributes of a line, kept from the cart to the order line. `transport` is the one with a defined shape (decided 29 September, rev 3 … |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Pay (primary button) | `checkoutCart` POST `/carts/{cartId}/checkout` | inline | Order | 400 `chargeCurrency` is not one the venue takes (problem type `currency-not-chargeable`, CHG-FIN-001).; 403 The contact the tickets would go to is not proven — an unverified session (`sessionNotVerified`), or a guest … | emits `order.created` |
+| Pay (primary button) | `checkoutCart` POST `/carts/{cartId}/checkout` | inline | Order | 400 `chargeCurrency` is not one the venue takes (problem type `currency-not-chargeable`, CHG-FIN-001).; 403 The contact the tickets would go to is not proven — an unverified session (`sessionNotVerified`), or a guest … | emits `order.created`; opens modal first |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
 
@@ -1090,7 +1125,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Empty, first run (`?state=emptyFirstRun`) | No review yet. Offers Add cart line (`addCartLine`). |
 | Permission denied (`?state=emptyNoAccess`) | **A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant has published like any visitor. A kiosk whose device registration is revoked goes out of service (KSK-014); it never shows a sign-in or names a permission. |
 | Offline (`?state=offline`) | Not available |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 400 `chargeCurrency` is not one the venue takes (problem type `currency-not-chargeable`, CHG-FIN-001).; 409 A lease expired between the last read and checkout (`leaseExpired`), or a resource hold did (`resourceHoldInvalid`, rev 3 REV3-15). (CartProblem); 409 No capacity, or the product is not sellable on this channel (`notSellableOnChannel`). (CartProblem) |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 `chargeCurrency` is not one the venue takes (problem type `currency-not-chargeable`, CHG-FIN-001).; 409 A lease expired between the last read and checkout (`leaseExpired`), or a resource hold did (`resourceHoldInvalid`, rev 3 REV3-15). (CartProblem); 422 A required consent question is unanswered (`consentRequired`), or an answer blocks the booking (`consentAnswerBlocks`), with the lines in … |
 
 #### Consistency with other screens
 
@@ -1107,31 +1142,27 @@ total: AED 655 · Day Pass Adult × 2, Child × 1
 #### Permissions
 
 - `getCart` → no permission · guest, partner, staff
-- `addCartLine` → no permission · guest, partner, staff
 - `checkoutCart` → no permission · guest, partner
-- `evaluatePromotions` → `PRICE_VIEW` (read) · staff, guest, partner
 
 **A refused user sees:** **A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant has published like any visitor. A kiosk whose device registration is revoked goes out of service (KSK-014); it never shows a sign-in or names a permission.
 
 #### Requirements it meets
 
-29 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+11 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
 | 2.9.2 | The system should provide a service to enable the dynamic composition of the shop cart. The system must provide back all the information in real time, such as the performance availabilities of an … | Ticketing Sales | CONTRACTED | `getCart` |
 | 2.9.5 | The system should highlight conflicting times at different attractions when trying to purchase tickets in the same time-slot for one guest. For example, if a ticket for Golf 1 to 2 pm has been added … | Ticketing Sales | CONTRACTED | `getCart` |
-| 19.2.19 | Add-On Purchases - System shall support add-on purchases. | Guest Mobile App & Branding | CONTRACTED | `addCartLine` |
-| 1.1.130 | The solution shall support donation solicitation during the customer checkout process. Functional Requirements Donation prompt at checkout. Optional donation acceptance. Multiple donation campaign … | Ticketing Catalogue | CONTRACTED | `addCartLine` |
-| 2.12.1 | The system should have the ability for order entry: - Select an item to place on an order. - Indicate quantity of item selected - Apply a name to an order (e.g. Smith Party). Each admission on the … | Ticketing Sales | CONTRACTED | `addCartLine` |
-| 2.12.29 | In order to improve Guest experience, it shall be possible to pre-order as many product or services as possible, including multi-park pass. | Ticketing Sales | CONTRACTED | `addCartLine` |
 | 19.2.10 | Ticket Purchase - System shall support ticket purchases. | Guest Mobile App & Branding | CONTRACTED | `checkoutCart` |
 | 19.2.23 | Membership Purchase - System shall support membership purchases. | Guest Mobile App & Branding | CONTRACTED | `checkoutCart` |
 | 19.2.24 | Membership Renewal - System shall support membership renewals. | Guest Mobile App & Branding | CONTRACTED | `checkoutCart` |
 | 19.2.53 | Product Purchases - System shall support merchandise purchases. | Guest Mobile App & Branding | CONTRACTED | `checkoutCart` |
 | 1.1.98 | Membership renewals | Ticketing Catalogue | CONTRACTED | `checkoutCart` |
 | 1.4.12 | System shall support dependencies between products, ensuring prerequisite products are purchased when required. | Ticketing Catalogue | CONTRACTED | `checkoutCart` |
-| … 17 more | | | | `traceability.json` |
+| 2.1.10 | This system should provide a Self-service kiosk solution that enables the guests to skip the queues at POS and purchase all type of tickets defined in the system including multi-day, combo ticket … | Ticketing Sales | CONTRACTED | `checkoutCart` |
+| 2.1.11 | The system should provide POS and Kiosk solution that allow the collection of tickets (free or not) booked on any portal. The kiosk should allow the collection of tickets using an identification … | Ticketing Sales | CONTRACTED | `checkoutCart` |
+| 7.4.46 | Support mandatory, optional and conditional dependencies between products. Example: VIP package requires admission ticket; driving experience requires waiver and age validation. | F&B POS | CONTRACTED | `checkoutCart` |
 
 #### Client meeting inputs
 
@@ -1160,22 +1191,18 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - Flow F57 *A guest uses a kiosk and it fails*, step 1: They review and confirm. → The last point a guest can correct anything alone.
 - Flow F75 *A kiosk serves itself and calls for help*, step 4: They review the basket. → **The only chance to correct anything without a member of staff.** Promotions are shown here rather than at payment — a discount a guest discovers on the receipt is a discount they did not choose.
 - ADR-0045 *Every order carries a proven contact, and the gate is the checkout page* (`docs/adr/0045-every-order-carries-a-proven-contact.md`)
-- ADR-0037 *A lock holds one statement, not a transaction* (`docs/adr/0037-what-may-be-inside-a-lock.md`)
-- ADR-0066 *The on-sale waiting room sits at the edge, apart from the ride queue* (`docs/adr/0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md`)
 - ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
-- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (11), with its required mark, default, format and its error state (400, 403, 409, 410, 422).
-- [ ] Every output is drawn (29 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (10), with its required mark, default, format and its error state (400, 403, 409, 410, 422).
+- [ ] Every output is drawn (31 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#KSK-006?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Pay.
 - [ ] Every transition is wired: `KSK-007`, `KSK-008`.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Drawn in the default theme; on a key screen also in the alternate tenant theme; nothing hard-codes a brand colour, logo or font.
-- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1353,20 +1380,16 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Block | Block C · task APP-KIOSK-KSK-008 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is a portrait touch kiosk, 1080 x 1920, large touch targets, no keyboard, an attract screen when idle. · LTR and RTL · the venue's theme |
-| Pattern | configEditor (touchLarge density): the screen declares only writes (`inquirePaymentStatus`) and no read of a population — it is settings, not a list |
+| Pattern | statusTracker (touchLarge density): `inquirePaymentStatus` asks the provider what became of one payment; the screen shows the answer, it edits nothing (CHG-R1S-022) |
 | Offline | Not applicable |
 | Opens with | `paymentId` (deepLink) · cold entry: **A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation … |
 | Route | `/sell/payment-unresolved` |
 
 **What the spec says about it.** Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.
 
-**Known gaps.** **`inquirePaymentStatus` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.
-
 **From the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process.** Payment unresolved, with nobody standing next to the guest. After Block A. Check with the bank, show the order reference, and call staff; never charge again.
 
-**Known correction pending (do not draw the wrong version)**
-
-- **inquirePaymentStatus declares no request body, so the screen's editor has nothing to edit.** Why: Recorded gap; the screen is a status, not an editor. *(source: screens/P05-guest-kiosk.yaml#KSK-008 gaps; Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale))*
+**Fixed on main** (the package already carries these; draw what it says): inquirePaymentStatus declares no request body, so the screen's editor has nothing to edit. (CHG-R1S-022).
 
 #### Inputs: what the user enters or picks
 
@@ -1378,7 +1401,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Inquire payment status (primary button) | `inquirePaymentStatus` POST `/payments/{paymentId}/inquiry` | — | Payment | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | — |
+| Check the payment again (primary button) | `inquirePaymentStatus` POST `/payments/{paymentId}/inquiry` | — | Payment | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
@@ -1447,12 +1470,11 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#KSK-008?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Inquire payment status, Cancel.
+- [ ] Every action is wired with its success and its failure: Check the payment again, Cancel.
 - [ ] Every transition is wired: `KSK-010`.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The module and platform inputs below are applied.
 - [ ] Drawn in the default theme; on a key screen also in the alternate tenant theme; nothing hard-codes a brand colour, logo or font.
-- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1769,7 +1791,7 @@ Every guest screen in this batch is white-label. These elements are set by the t
 | Show loading indicator (`brand.showLoadingIndicator`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | — | on | — |
 | Intro video (`brand.introVideoAssetRef`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | The optional intro video (decided 29 September, MOB-5). A video `MediaAsset` from the media library (CMS-010). |
 | Intro video mode (`brand.introVideoMode`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | Off · First launch · Every launch; Anything but `off` needs `introVideoAssetRef`, or 400. | Off | When GST-001 plays it full screen. "Skip introduction" is always shown. |
-| Powered by TICVAI credit (`brand.showPoweredBy`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | — | on | the *Powered by TICVAI* credit on the launch screen, at the foot of Account and in the web footer; on by default, and switching it off needs the licence add-on (403 … |
+| Powered by TICVAI credit (`brand.showPoweredBy`) | `CMS-104`, `ADM-016` | — | on | the *Powered by TICVAI* credit on the launch screen, at the foot of Account and in the web footer; on by default, and switching it off needs the licence add-on (403 … |
 | Primary colour (`theme.primaryColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | the brand colour (the `accentSolid` token): primary buttons (Book, Continue, Add to cart, Pay), the active step of the step indicator, selected date and time chips, focus rings |
 | Secondary colour (`theme.secondaryColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | secondary buttons and secondary emphasis: unselected chips, secondary tabs |
 | Accent colour (`theme.accentColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | highlights: badges (LIMITED, NEW, BESTSELLER), availability counts, sale prices |
@@ -1916,7 +1938,6 @@ Method, path, parameters, request and response for every operation these screens
 "addCartLine": {"method":"POST","path":"/carts/{cartId}/lines","contract":"orders","summary":"Add something","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"AddCartLineRequest","responds":"Cart"},
 "checkoutCart": {"method":"POST","path":"/carts/{cartId}/checkout","contract":"orders","summary":"Turn the cart into an order","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Order"},
 "createPayment": {"method":"POST","path":"/payments","contract":"orders","summary":"Take a payment against an order","permission":"ORDER_CREATE","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"workstation","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreatePaymentRequest","responds":"Payment"},
-"evaluatePromotions": {"method":"POST","path":"/promotions/evaluate","contract":"promotions","summary":"Evaluate promotions against a cart","permission":"PRICE_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"EvaluatePromotionsRequest","responds":"PromotionEvaluation"},
 "getAvailability": {"method":"GET","path":"/availability","contract":"catalogue","summary":"Live remaining capacity","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"performanceId","in":"query","required":null},{"name":"channelCapacityId","in":"query","required":null},{"name":"eventId","in":"query","required":null},{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"PerformanceAvailabilityPage"},
 "getCart": {"method":"GET","path":"/carts/{cartId}","contract":"orders","summary":"The cart, priced and checked, right now","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Cart"},
 "getOrder": {"method":"GET","path":"/orders/{orderId}","contract":"orders","summary":"Read an order","permission":"ORDER_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Order"},
@@ -1948,7 +1969,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "CartStatus": {"type":"string","enum":["active","expiring","expired","abandoned","checkedOut"]},
 "Channel": {"type":"string","enum":["pos","kiosk","web","mobile","b2b","ota","callCentre"]},
 "CreatePaymentRequest": {"type":"object","required":["id","orderId","tender","amount","recordedAt"],"properties":{"id":{"type":"string","format":"uuid","description":"Client-generated UUIDv7 of the payment, and its idempotency key — it must equal the `Idempotency-Key` header."},"orderId":{"type":"string","format":"uuid"},"tender":{"$ref":"#/components/schemas/TenderKind"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"tenderCurrency":{"type":"string","pattern":"^[A-Z]{3}$","nullable":true,"description":"The currency the guest handed over, where it is not the venue's — becomes `Payment.tenderCurrency`. Omit for a payment in the venue's own currency. For a guest-channel card or wallet payment on an order with a `chargeCurrency`, the server sets it from the order (CHG-FIN-001)."},"tenderAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"**What the guest handed over**, in `tenderCurrency` — becomes `Payment.tenderAmount`, one name for one concept (renamed from `tenderedAmount` on 26 September). For cash, change is the difference.\n"},"walletAuthorisationId":{"type":"string","nullable":true,"description":"Cross-cell wallet hold, where the guest's home cell is elsewhere."},"walletHoldId":{"type":"string","format":"uuid","nullable":true,"description":"For a `wallet` tender, the hold `wallet.holdWalletFunds` placed (SD-027). Capture debits it; the order service writes no wallet table."},"returnUrl":{"type":"string","format":"uri","nullable":true,"description":"Where the provider returns the guest after a 3-D Secure challenge or hosted page (SD-034). Required for a card payment from the guest web or app."},"terminalId":{"type":"string","format":"uuid","nullable":true,"description":"The card terminal to instruct, for a card payment at a till (ECR flow, SD-034)."},"deviceId":{"type":"string","format":"uuid","nullable":true},"recordedAt":{"type":"string","format":"date-time"}}},
-"EvaluatePromotionsRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["venueId","channel","lines"],"properties":{"venueId":{"type":"string","format":"uuid"},"channel":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/SalesChannel"}],"description":"Where the sale is being made. Matched against `PromotionConditions.channels`, so both sides use the one shared vocabulary.\n"},"subjectId":{"type":"string","format":"uuid"},"membershipTierId":{"type":"string","format":"uuid"},"couponCodes":{"type":"array","items":{"type":"string"}},"evaluateAt":{"type":"string","format":"date-time","description":"For back-office testing of a rule before publishing."},"orderId":{"type":"string","format":"uuid","nullable":true,"description":"The order (`orders.sales_order`) being priced for payment. Sent only by the order service when it confirms an order; when present the evaluation writes one `promotions.promotion_evaluation_trace` row for it. (decided 29 September, writers pass)"},"lines":{"type":"array","minItems":1,"items":{"type":"object","required":["lineId","variantId","quantity","unitPrice"],"properties":{"lineId":{"type":"string"},"variantId":{"type":"string","format":"uuid"},"performanceId":{"type":"string","format":"uuid"},"quantity":{"type":"integer","minimum":1},"unitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}}}},
 "ExchangeRateDecimal": {"type":"string","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,6)","description":"**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one — a JavaScript client must not round a rate in transit. **Six decimal places**, the precision `finance.FxRate.rate` asks for, and stored at that precision.\n","pattern":"^\\d+(\\.\\d{1,6})?$"},
 "FontConfig": {"x-ticvai-persistence":"none — embedded in tenant_config","type":"object","required":["primaryLatin"],"properties":{"primaryLatin":{"type":"string"},"primaryArabic":{"type":"string","nullable":true,"description":"Required when `ar` is among the tenant's languages (audit R163). A Latin face alone leaves Arabic in a system fallback that will not match.\n"},"secondaryLatin":{"type":"string","nullable":true},"secondaryArabic":{"type":"string","nullable":true,"description":"Required whenever `secondaryLatin` is set and `ar` is among the tenant's languages (decided 28 September, audit R163)."},"customFontAssetRefs":{"type":"array","description":"Uploaded font files, as `MediaAsset` ids.","items":{"type":"string","format":"uuid"}},"changeScope":{"allOf":[{"$ref":"#/components/schemas/ChangeScope"}],"readOnly":true,"x-ticvai-derived":"onRead","description":"Custom font files are `buildTime`; selecting a bundled face is `runtime`."}}},
 "FooterConfig": {"type":"object","x-ticvai-persistence":"whitelabel.footer_config + whitelabel.footer_config_column + whitelabel.footer_config_social_link","description":"BL-002. **`setHeader` and `HeaderConfig` exist and the footer does not**, which looked like symmetry until you notice it is not: **a header is chrome and a footer is a link surface.**\nA footer carries the legal links — terms, privacy, accessibility statement, cookie preferences — and **those are the ones a regulator checks.** Treating it as a mirror of the header would have given it a logo and no way to reach a privacy notice.\n**Where it is stored.** `legalLinks` and `copyrightText` are columns of `whitelabel.footer_config`; each entry of `columns` is a `whitelabel.footer_config_column` row and each entry of `socialLinks` a `whitelabel.footer_config_social_link` row. Part of the working draft (see the header). **In the tenant's own database, not the control plane (decided 28 September, audit R163)**: it moved from `control.footer_config` and its two child tables.\n","required":["id","scopePath"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"The partition key (ADR-0005), written at `tenant` scope by the server."},"columns":{"type":"array","items":{"type":"object","properties":{"heading":{"type":"string"},"links":{"type":"array","items":{"type":"object","properties":{"label":{"type":"string"},"url":{"type":"string"},"opensCookiePreferences":{"type":"boolean","default":false}}}}}}},"legalLinks":{"type":"object","description":"**Required links, held separately from the free-form columns** — a tenant reorganising their footer must not be able to remove the privacy notice by accident.\n","properties":{"termsUrl":{"type":"string"},"privacyUrl":{"type":"string"},"accessibilityUrl":{"type":"string","nullable":true},"cookiePolicyUrl":{"type":"string","nullable":true}}},"copyrightText":{"type":"string"},"socialLinks":{"type":"array","items":{"type":"object","properties":{"platform":{"type":"string"},"url":{"type":"string"}}}}}},
@@ -1976,7 +1996,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "ProductMedia": {"x-ticvai-persistence":"catalogue.product_media","type":"object","required":["assetId","kind","isPrimary"],"description":"One photo or video of a product, referencing the asset library (decided 29 September, 23SEP-4). One row per product and asset, so the asset library can answer which products use an asset.\n","properties":{"assetId":{"type":"string","format":"uuid","description":"A `MediaAsset` of `assets.yaml`, in status `ready`."},"kind":{"type":"string","enum":["image","video"]},"isPrimary":{"type":"boolean","default":false,"description":"The item *Read more* opens on and a listing shows. Exactly one per product."},"displayOrder":{"type":"integer","default":100},"altText":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true}}},
 "ProductSalesContact": {"x-ticvai-persistence":"none — jsonb column on catalogue.product","type":"object","description":"Who to contact to book a view-only product (decided 29 September, W3). At least one of `phone` or `email`.\n","minProperties":1,"properties":{"phone":{"type":"string","maxLength":32,"nullable":true},"email":{"type":"string","format":"email","maxLength":254,"nullable":true},"note":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"A line shown under the contact, e.g. *Group courses are booked by phone*. At most 200 characters per language."}}},
 "ProductVariant": {"x-ticvai-persistence":"catalogue.variant","type":"object","required":["id","productId","sku","axisValues","isActive"],"properties":{"id":{"type":"string","format":"uuid"},"productId":{"type":"string","format":"uuid"},"sku":{"type":"string"},"axisValues":{"type":"object","additionalProperties":{"type":"string"}},"name":{"type":"string","maxLength":150,"nullable":true,"description":"**Taken from their variant tables, 20 September.** `axisValues` gives `{size: L}` and no string a guest can read. A menu showing *Large* needs somewhere for the word to live.\n"},"barcode":{"type":"string","maxLength":64,"nullable":true,"description":"**Taken from their variant tables, 20 September.** `catalogue.alternative_code` is a partner's own code for a variant and **requires `partnerId`**, so a manufacturer's EAN had nowhere to go. One per variant against many per variant is a different cardinality and belongs in a different place — and a POS scan should be an indexed column lookup, not a join.\n"},"isDefault":{"type":"boolean","default":false,"description":"Taken from their variant tables. Which variant a product page opens on. Ours had no way to say, so a three-size drink opened on whichever row sorted first.\n"},"isActive":{"type":"boolean","description":"False when retired. Retired variants are never deleted — orders reference them."},"description":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"**Who this ticket type is for and what it includes**, shown behind the (i) on each Adult, Child, Senior or Infant row (decided 29 September, 23SEP-6). Each language value at most 300 characters; longer is a `400`. Set with `updateProductVariant`. Whether the guest screen shows it is `BookingFlowConfig.cardInfo` (white-label).\n"}}},
-"PromotionEvaluation": {"x-ticvai-persistence":"none — computed","type":"object","required":["totalDiscount","lines","applied","rejected"],"properties":{"totalDiscount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"lines":{"type":"array","items":{"type":"object","required":["lineId","originalPrice","discountedPrice","discount"],"properties":{"lineId":{"type":"string"},"originalPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"discountedPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"discount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"appliedPromotionIds":{"type":"array","items":{"type":"string","format":"uuid"}}}}},"applied":{"type":"array","items":{"type":"object","required":["promotionId","promotionCode","discount"],"properties":{"promotionId":{"type":"string","format":"uuid"},"promotionCode":{"type":"string"},"promotionName":{"type":"string"},"discount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"couponCode":{"type":"string","nullable":true}}}},"rejected":{"type":"array","description":"Promotions that matched the products but did not apply, with the reason. This is what a cashier reads to a guest who expected a discount.\n","items":{"type":"object","required":["promotionCode","reason"],"properties":{"promotionCode":{"type":"string"},"promotionName":{"type":"string"},"reason":{"type":"string","enum":["conditionsNotMet","supersededByBetterOffer","exclusivePromotionApplied","redemptionLimitReached","budgetExhausted","outsideValidPeriod","wrongChannel","membershipRequired","couponRequired"]},"detail":{"type":"string"}}}}}},
 "PublishedAnalyticsProvider": {"x-ticvai-persistence":"none — the enabled rows of whitelabel.analytics_provider, guest-facing fields only","description":"**What the tag loader needs and nothing else** (CHG-GCF-005): no reporting property, no credential, no venue or scope. The values are those of `StorefrontAnalyticsProvider`.","type":"object","required":["provider","measurementId","surfaces","consentCategory"],"properties":{"provider":{"type":"string","enum":["googleAnalytics4","googleTagManager","adobeAnalytics","metaPixel","matomo","other"]},"otherProviderName":{"type":"string","maxLength":100,"nullable":true,"description":"The provider's name, when `provider` is `other` (`StorefrontAnalyticsProvider.providerLabel`)."},"measurementId":{"type":"string","maxLength":100,"description":"What the tag or SDK reports to (GA4 `G-...`, Tag Manager `GTM-...`, a pixel id)."},"surfaces":{"type":"array","minItems":1,"items":{"type":"string","enum":["guestWeb","guestApp"]}},"consentCategory":{"type":"string","enum":["functional","analytics","personalisation","marketing"],"description":"The cookie category the visitor must grant before this provider loads (marketing-crm `CookieCategory`)."}}},
 "PublishedTenantConfig": {"x-ticvai-persistence":"none — computed from the current ConfigVersion snapshot and the live status on whitelabel.tenant_config","type":"object","x-ticvai-agreed":"2 October: decided by Chinmay, fix before Block A starts (GFIX-1)","description":"**The public view of the tenant's configuration** (`getPublishedTenantConfig`, decided 2 October, GFIX-1). The published parts a guest surface renders with, from the current `ConfigVersion`, and the live status `setMaintenanceMode` writes. Nothing a guest cannot see on the page: no draft marker, no CMS counts, no sender addresses, no licensing, no person.\n","required":["tenantId","publishedVersion","publishedAt","isInMaintenance"],"properties":{"tenantId":{"type":"string","format":"uuid"},"publishedVersion":{"type":"string","description":"The `ConfigVersion.version` this answer was read from; a client holding the same version keeps its copy."},"publishedAt":{"type":"string","format":"date-time"},"brand":{"$ref":"#/components/schemas/BrandIdentity"},"appIcons":{"$ref":"#/components/schemas/AppIcons"},"theme":{"$ref":"#/components/schemas/Theme"},"fonts":{"$ref":"#/components/schemas/FontConfig"},"header":{"$ref":"#/components/schemas/HeaderConfig"},"footer":{"$ref":"#/components/schemas/FooterConfig"},"navigation":{"$ref":"#/components/schemas/NavigationConfig"},"homepage":{"$ref":"#/components/schemas/HomepageLayout"},"bookingFlow":{"allOf":[{"$ref":"#/components/schemas/BookingFlowConfig"}],"description":"The booking-flow display settings, resolved for `venueId` when one was sent (the tenant's values with that venue's `venueOverrides` entry laid over, rev 3 CFG-11)."},"languages":{"$ref":"#/components/schemas/LanguageConfig"},"accessibility":{"$ref":"#/components/schemas/AccessibilitySettings"},"enabledModules":{"type":"array","description":"The modules the tenant has enabled and published, so a guest surface hides a tab or a homepage section for a module that is off. Licensing is not shown.","items":{"$ref":"#/components/schemas/ModuleKey"}},"enabledFeatures":{"type":"array","description":"The `featureKey` of every feature toggle that is on in the published version.","items":{"type":"string"}},"isInMaintenance":{"type":"boolean","description":"Live state (`setMaintenanceMode`), as on `getTenantAppStatus`."},"maintenanceMessage":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true},"expectedBackAt":{"type":"string","format":"date-time","nullable":true},"minimumAppVersion":{"$ref":"#/components/schemas/MinimumAppVersion"},"availability":{"$ref":"#/components/schemas/AppAvailability"},"availabilityMessage":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true},"contact":{"$ref":"#/components/schemas/VenueContact"},"analyticsProviders":{"type":"array","description":"**The analytics platforms the storefront and app load** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-005): a guest reads them here instead of `listAnalyticsProviders`, which needs `TENANT_CONFIGURE`. The enabled `StorefrontAnalyticsProvider` rows in force for the venue being browsed (that venue's own rows when `venueId` was sent and it has any, else the tenant-wide ones), read live, with only what the tag loader needs. **A provider loads only once marketing-crm `getCookieConsentRuntime` says its `consentCategory` is granted**; before that nothing is sent to it (2.6.58).","items":{"$ref":"#/components/schemas/PublishedAnalyticsProvider"}}}},
 "TenantAppStatus": {"x-ticvai-persistence":"none — computed","type":"object","description":"Computed on read. The published fields come from the current `ConfigVersion`, the maintenance fields from the tenant's `tenant_config` row (`setMaintenanceMode`), and the draft fields from the working draft. **Fields marked staff only are left out of a response to a caller without a staff session** (`getTenantAppStatus`).\n","required":["tenantId","isPublished","isInMaintenance"],"properties":{"tenantId":{"type":"string","format":"uuid"},"isPublished":{"type":"boolean","x-ticvai-derived":"onRead","description":"True once any version has been published."},"publishedVersion":{"type":"string","nullable":true},"publishedAt":{"type":"string","format":"date-time","nullable":true},"draftVersion":{"type":"string","description":"Staff only."},"hasUnpublishedChanges":{"type":"boolean","x-ticvai-derived":"onRead","description":"Staff only. The working draft differs from the current version's `snapshot`."},"activeModuleCount":{"type":"integer","x-ticvai-derived":"onRead","description":"Staff only. `ModuleEnablement` rows with `isEnabled` true."},"licensedModuleCount":{"type":"integer","x-ticvai-derived":"onRead","description":"Staff only. `ModuleEnablement` rows with `isLicensed` true."},"activePageCount":{"type":"integer","x-ticvai-derived":"onRead","description":"Staff only. Content pages that are `published` and enabled."},"isInMaintenance":{"type":"boolean"},"maintenanceMessage":{"$ref":"#/components/schemas/LocalisedText"},"expectedBackAt":{"type":"string","format":"date-time","nullable":true},"minimumAppVersion":{"$ref":"#/components/schemas/MinimumAppVersion"},"contact":{"$ref":"#/components/schemas/VenueContact"},"availability":{"$ref":"#/components/schemas/AppAvailability"},"availabilityMessage":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"What the sold-out or closed screen says (WEB-029). Null shows the default wording."},"venues":{"type":"array","maxItems":200,"x-ticvai-derived":"onRead","description":"**Public: the venues a guest can pick** (decided 28 September, audit R267; schema named 29 September, readiness close-out, our build plan). The source of the venue picker on WEB-001 and GST-001, returned with or without a session. **Published only**: a venue is listed when its scope node is active (`tenancy.OrgUnit.isActive`) and it is in the tenant's current published `ConfigVersion`; a venue added or reactivated since the last publish appears after the next publish, and a draft never reaches a guest. Ordered by `name`. Empty when nothing is published.\n","items":{"type":"object","required":["venueId","name"],"properties":{"venueId":{"type":"string","format":"uuid","description":"**The venue's scope node** (`tenancy.OrgUnit.id`, level venue): what every guest screen that declares `venueId` `from: session` reads once the guest picks it."},"name":{"type":"string","maxLength":200,"description":"The venue's name (`tenancy.OrgUnit.name`)."},"city":{"type":"string","maxLength":120,"nullable":true,"description":"Shown under the name so two venues with similar names can be told apart."},"openingHoursToday":{"type":"object","nullable":true,"description":"Today's opening hours in the venue's time zone, from `tenancy.VenueSettings` opening hours. Null when the venue is closed today or has none set.","properties":{"opens":{"type":"string","pattern":"^([01][0-9]|2[0-3]):[0-5][0-9]$"},"closes":{"type":"string","pattern":"^([01][0-9]|2[0-3]):[0-5][0-9]$"}}}}}},"whatsNew":{"type":"array","maxItems":10,"x-ticvai-derived":"onRead","description":"**Public: the guest \"what's new\"** (decided 29 September, rev 3 GAP-B2). Newest first, at most 10, from `platform-ops.Release.guestReleaseNotes` of the releases the tenant's cell has received; a release with no guest notes is skipped. Returned with or without a staff session.\n","items":{"type":"object","required":["version","publishedAt","notes"],"properties":{"version":{"type":"string","description":"The release version."},"publishedAt":{"type":"string","format":"date-time","description":"When the release reached the tenant's cell."},"notes":{"$ref":"#/components/schemas/LocalisedText"}}}},"recentChanges":{"type":"array","description":"Staff only. Names the principal behind each change, so it never reaches a public response.","items":{"type":"object","properties":{"area":{"type":"string"},"description":{"type":"string"},"principalId":{"type":"string","format":"uuid"},"at":{"type":"string","format":"date-time"}}}}}},

@@ -4,7 +4,7 @@
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS accreditation.access_profile (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text NOT NULL,
     zone_ids                          text[],
@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS accreditation.access_profile (
 -- Holds 15 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS accreditation.application (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     reference                         text,
     programme_id                      uuid NOT NULL,
     category_code                     text,
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS accreditation.application (
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS accreditation.audit (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     at                                timestamptz,
     holder_id                         uuid,
     action                            text,
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS accreditation.audit (
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS accreditation.badge_template (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text,
     size                              text,
@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS accreditation.badge_template (
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS accreditation.credential (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     holder_id                         uuid NOT NULL,
     kind                              text NOT NULL CONSTRAINT credential_kind_chk CHECK (kind IN ('printedBadge', 'mobileCredential', 'qr', 'nfcCard', 'rfidCard', 'wristband')),
     symbology                         text CONSTRAINT credential_symbology_chk CHECK (symbology IN ('qr', 'dataMatrix', 'pdf417', 'aztec', 'code128', 'nfcNdef', 'rfidEpc', 'none')),
@@ -99,7 +99,7 @@ CREATE TABLE IF NOT EXISTS accreditation.credential (
 -- is until it expires. Personal data leaves only with a stated purpose, and this row is that
 -- record
 CREATE TABLE IF NOT EXISTS accreditation.data_export (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     dataset                           text NOT NULL CONSTRAINT data_export_dataset_chk CHECK (dataset IN ('holders', 'applications', 'credentials', 'accessAssignments', 'documents')),
     format                            text NOT NULL CONSTRAINT data_export_format_chk CHECK (format IN ('csv', 'xlsx')),
     programme_id                      uuid,
@@ -122,7 +122,7 @@ CREATE TABLE IF NOT EXISTS accreditation.data_export (
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS accreditation.document (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     holder_id                         uuid,
     application_id                    uuid,
     requirement_code                  text NOT NULL,
@@ -191,7 +191,7 @@ CREATE TABLE IF NOT EXISTS accreditation.identity_conflict (
 -- and how far it got: queued, sent, delivered, opened, failed or superseded by a later send. A
 -- credential that never arrived is a person at a gate with nothing to show
 CREATE TABLE IF NOT EXISTS accreditation.mobile_credential_delivery (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     credential_id                     uuid NOT NULL,
     holder_id                         uuid,
     channel                           text NOT NULL CONSTRAINT mobile_credential_delivery_channel_chk CHECK (channel IN ('email', 'sms', 'holderApp', 'appleWallet', 'googleWallet')),
@@ -217,7 +217,7 @@ CREATE TABLE IF NOT EXISTS accreditation.notification_rules (
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS accreditation.print_job (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     credential_ids                    text[],
     printer_device_id                 uuid,
     queued_at                         timestamptz,
@@ -230,7 +230,7 @@ CREATE TABLE IF NOT EXISTS accreditation.print_job (
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS accreditation.programme (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text NOT NULL,
     venue_ids                         text[],
@@ -243,6 +243,8 @@ CREATE TABLE IF NOT EXISTS accreditation.programme (
     is_template                       boolean DEFAULT false,
     template_programme_id             uuid,
     status                            text CONSTRAINT programme_status_chk CHECK (status IN ('draft', 'open', 'closed', 'archived')),
+    face_matching                     jsonb,
+    identity_verification             jsonb,
     scope_path                        ltree NOT NULL
 );
 

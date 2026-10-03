@@ -1,6 +1,6 @@
 # P14-developer-api-01 — P14 · Developer & API
 
-**8 screens · 28 operations · 18 schemas · 3 permissions**
+**8 screens · 32 operations · 18 schemas · 3 permissions**
 
 Platform P14 Developer · ships as **ticvai-control** ·
 partner audience · web ·
@@ -97,13 +97,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `DEV-001` | API Reference | B | 1 | 38 | 6 | 11 | 4 | 0 | — | notStarted (generated) |
-| `DEV-002` | Register & Organisation | A | 12 | 0 | 5 | 6 | 0 | 0 | — | notStarted (generated) |
+| `DEV-002` | Register & Organisation | A | 12 | 6 | 5 | 6 | 0 | 0 | — | notStarted (generated) |
 | `DEV-003` | Clients & Credentials | A | 15 | 16 | 6 | 17 | 4 | 0 | — | notStarted (generated) |
 | `DEV-004` | Sandbox | B | 14 | 31 | 6 | 20 | 3 | 0 | — | notStarted (generated) |
 | `DEV-005` | Webhooks | B | 9 | 21 | 6 | 13 | 0 | 0 | — | notStarted (generated) |
 | `DEV-006` | Usage & Limits | B | 0 | 13 | 6 | 5 | 1 | 0 | — | notStarted (generated) |
 | `DEV-007` | Marketplace Listing | B | 8 | 17 | 6 | 2 | 1 | 0 | — | notStarted (generated) |
-| `DEV-008` | Programme Administration | A | 41 | 24 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
+| `DEV-008` | Programme Administration | A | 41 | 39 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

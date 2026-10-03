@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS assets.asset_version (
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS assets.audit (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     asset_id                          uuid,
     at                                timestamptz,
     action                            text CONSTRAINT audit_action_chk CHECK (action IN ('uploaded', 'updated', 'retagged', 'versioned', 'approved', 'published', 'shared', 'downloaded', 'delivered', 'archived', 'deleted')),
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS assets.distribution_channel (
 -- one service, so a takedown is one delete
 CREATE TABLE IF NOT EXISTS assets.media_asset (
     id                                uuid PRIMARY KEY NOT NULL,
-    kind                              text NOT NULL CONSTRAINT media_asset_kind_chk CHECK (kind IN ('image', 'video', 'audio', 'document', 'vector', 'font', 'archive')),
+    kind                              text NOT NULL CONSTRAINT media_asset_kind_chk CHECK (kind IN ('image', 'video', 'audio', 'document', 'vector', 'font', 'archive', 'model3d')),
     status                            text NOT NULL CONSTRAINT media_asset_status_chk CHECK (status IN ('processing', 'ready', 'quarantined', 'failed', 'archived')),
     filename                          text NOT NULL,
     content_type                      text NOT NULL,
@@ -122,7 +122,7 @@ CREATE TABLE IF NOT EXISTS assets.media_fingerprint (
 
 -- An upload in progress, with the ticket a client uses to send bytes directly
 CREATE TABLE IF NOT EXISTS assets.media_upload (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     upload_id                         uuid NOT NULL,
     upload_url                        text NOT NULL,
     method                            text NOT NULL CONSTRAINT media_upload_method_chk CHECK (method IN ('PUT', 'POST')),
@@ -139,7 +139,7 @@ CREATE TABLE IF NOT EXISTS assets.media_upload (
 -- Where an asset is used. What a takedown has to check before deleting
 CREATE TABLE IF NOT EXISTS assets.media_usage (
     extracted_text                    text,
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     surface                           text NOT NULL CONSTRAINT media_usage_surface_chk CHECK (surface IN ('tenantBranding', 'homepageBanner', 'promoBlock', 'contentPage', 'product', 'event', 'menuItem', 'merchandise', 'workOrder', 'incident', 'inspection', 'campaign')),
     reference_id                      text NOT NULL,
     label                             text,
@@ -150,7 +150,7 @@ CREATE TABLE IF NOT EXISTS assets.media_usage (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS assets.rendition (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     preset                            text NOT NULL,
     format                            text,
     width                             integer,
@@ -165,7 +165,7 @@ CREATE TABLE IF NOT EXISTS assets.rendition (
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS assets.share (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     asset_ids                         text[] NOT NULL,
     recipient_email                   text,
     recipient_organisation            text,

@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-264` | Group Sales Command Center | B–D | 0 | 24 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
-| `BO-265` | Group Enquiry & Opportunity Capture | B–D | 42 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-266` | Group Customer & Organization Profile | B–D | 15 | 16 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-267` | Group Requirements, Availability & Capacity Planner | B–D | 0 | 14 | 6 | 0 | 0 | 1 | — | notStarted (generated) |
-| `BO-268` | Group Package & Experience Builder | B–D | 0 | 31 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-269` | Group Quotation Builder & Proposal Generation | B–D | 11 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-270` | Quote Revision, Negotiation & Version Management | B–D | 8 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-271` | Group Discount, Exception & Approval Workflow | B–D | 0 | 0 | 6 | 0 | 1 | 3 | — | notStarted (generated) |
-| `BO-272` | Quote-to-Booking Conversion & Confirmation | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `BO-273` | Group Booking 360° & Handover Workspace | B–D | 0 | 74 | 6 | 7 | 1 | 6 | — | notStarted (generated) |
+| `BO-264` | Group Sales Command Center | C | 0 | 24 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
+| `BO-265` | Group Enquiry & Opportunity Capture | C | 42 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-266` | Group Customer & Organization Profile | C | 15 | 16 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-267` | Group Requirements, Availability & Capacity Planner | C | 0 | 14 | 6 | 0 | 0 | 1 | — | notStarted (generated) |
+| `BO-268` | Group Package & Experience Builder | C | 0 | 31 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-269` | Group Quotation Builder & Proposal Generation | C | 11 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-270` | Quote Revision, Negotiation & Version Management | C | 8 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-271` | Group Discount, Exception & Approval Workflow | C | 0 | 0 | 6 | 0 | 1 | 3 | — | notStarted (generated) |
+| `BO-272` | Quote-to-Booking Conversion & Confirmation | C | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `BO-273` | Group Booking 360° & Handover Workspace | C | 0 | 74 | 6 | 7 | 1 | 6 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

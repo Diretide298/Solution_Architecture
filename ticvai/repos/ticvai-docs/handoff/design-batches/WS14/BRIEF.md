@@ -127,15 +127,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-319` | Approval Workflow Library | B–D | 0 | 20 | 6 | 0 | 0 | 3 | — | notStarted (—) |
-| `ADM-320` | Create Approval Workflow | B–D | 17 | 0 | 5 | 0 | 1 | 3 | — | notStarted (—) |
-| `ADM-322` | Approval Stage Configuration | B–D | 14 | 0 | 5 | 0 | 1 | 3 | — | notStarted (—) |
-| `ADM-323` | Condition & Decision Rule Builder | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-324` | Approval Sequence & Parallel Routing | B–D | 0 | 0 | 6 | 0 | 1 | 3 | — | notStarted (—) |
-| `ADM-325` | Workflow Outcome & Action Configuration | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-326` | Workflow Validation & Simulation | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-327` | Workflow Publication & Lifecycle | B–D | 6 | 0 | 5 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-328` | Workflow Versioning & Change History | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-319` | Approval Workflow Library | B | 0 | 20 | 6 | 0 | 0 | 3 | — | notStarted (—) |
+| `ADM-320` | Create Approval Workflow | B | 17 | 0 | 5 | 0 | 1 | 3 | — | notStarted (—) |
+| `ADM-322` | Approval Stage Configuration | B | 14 | 0 | 5 | 0 | 1 | 3 | — | notStarted (—) |
+| `ADM-323` | Condition & Decision Rule Builder | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-324` | Approval Sequence & Parallel Routing | B | 0 | 0 | 6 | 0 | 1 | 3 | — | notStarted (—) |
+| `ADM-325` | Workflow Outcome & Action Configuration | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-326` | Workflow Validation & Simulation | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-327` | Workflow Publication & Lifecycle | B | 6 | 0 | 5 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-328` | Workflow Versioning & Change History | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

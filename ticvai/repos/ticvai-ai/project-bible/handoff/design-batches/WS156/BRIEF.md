@@ -97,15 +97,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-864` | Resource Calendar Command Center | B–D | 0 | 10 | 6 | 0 | 3 | 0 | — | notStarted (—) |
-| `BO-865` | Calendar Filters, Search & Smart Discovery | B–D | 2 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
+| `BO-864` | Resource Calendar Command Center | D | 0 | 10 | 6 | 0 | 3 | 0 | — | notStarted (—) |
+| `BO-865` | Calendar Filters, Search & Smart Discovery | D | 2 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
 | `BO-866` | Resource Availability Schedule Configuration | A | 23 | 6 | 6 | 47 | 1 | 0 | — | notStarted (—) |
-| `BO-867` | Resource Time-Slot Configuration | B–D | 13 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `BO-868` | Advance Reservation Management | B–D | 26 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-869` | Recurring Reservation Configuration | B–D | 10 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-867` | Resource Time-Slot Configuration | D | 13 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `BO-868` | Advance Reservation Management | D | 26 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-869` | Recurring Reservation Configuration | D | 10 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-870` | Operational Time & Resource Blocking | A | 9 | 5 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-871` | Multi-Event Resource Planning | B–D | 0 | 18 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `BO-872` | Smart Assignment & Drag-and-Drop Reallocation | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-871` | Multi-Event Resource Planning | D | 0 | 18 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `BO-872` | Smart Assignment & Drag-and-Drop Reallocation | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

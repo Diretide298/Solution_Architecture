@@ -1,4 +1,4 @@
--- access — 76 tables
+-- access — 77 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 27 columns. No description has been written for this table — the name is the only thing
@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS access.access_area (
     operating_schedule                text,
     capacity                          integer,
     security_classification           text,
+    security_classification_level     text CONSTRAINT access_area_security_classification_level_chk CHECK (security_classification_level IN ('public', 'restricted', 'secure', 'critical')),
     entry_requirements                text,
     exit_requirements                 text,
     allowed_credential_classes        text[],
@@ -51,7 +52,7 @@ CREATE TABLE IF NOT EXISTS access.access_attribute (
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS access.access_change (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     old_access_id                     uuid NOT NULL,
     new_access_id                     uuid,
     type                              text NOT NULL CONSTRAINT access_change_type_chk CHECK (char_length(type) <= 30),
@@ -108,6 +109,7 @@ CREATE TABLE IF NOT EXISTS access.access_point (
     vehicle_location_capture          boolean DEFAULT false,
     mode                              text,
     direction                         text,
+    temporary_closure                 jsonb,
     is_anti_passback_enabled          boolean,
     requires_exit_before_reentry      boolean DEFAULT false,
     driver                            text,
@@ -837,6 +839,9 @@ CREATE TABLE IF NOT EXISTS access.entitlement (
     entries_used                      integer DEFAULT 0,
     entries_allowed                   integer,
     last_entry_at                     timestamptz,
+    first_entry_at                    timestamptz,
+    time_bound_until                  timestamptz,
+    cancellation_kind                 text CONSTRAINT entitlement_cancellation_kind_chk CHECK (cancellation_kind IN ('voided', 'refunded', 'performanceCancelled', 'superseded')),
     frozen_days                       integer DEFAULT 0,
     suspended_reason                  text,
     freeze_reason                     text CONSTRAINT entitlement_freeze_reason_chk CHECK (freeze_reason IN ('travelling', 'injury', 'personal', 'seasonal', 'other')),
@@ -856,7 +861,7 @@ CREATE TABLE IF NOT EXISTS access.entry_rule_point (
     access_point_id                   uuid NOT NULL,
     is_active                         boolean NOT NULL,
     created_at                        timestamptz NOT NULL,
-    id                                uuid PRIMARY KEY
+    id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- Holds 16 columns. No description has been written for this table — the name is the only thing
@@ -968,6 +973,8 @@ CREATE TABLE IF NOT EXISTS access.gate_mode_change (
     access_point_id                   uuid NOT NULL,
     from_mode                         text,
     target_mode                       text NOT NULL,
+    from_direction                    text,
+    to_direction                      text,
     status                            text NOT NULL CONSTRAINT gate_mode_change_status_chk CHECK (status IN ('pending', 'applied', 'cancelled')),
     reason                            text CONSTRAINT gate_mode_change_reason_chk CHECK (char_length(reason) <= 500),
     effective_at                      timestamptz,
@@ -1027,6 +1034,20 @@ CREATE TABLE IF NOT EXISTS access.group_admission_rule (
     admission_method                  text CONSTRAINT group_admission_rule_admission_method_chk CHECK (admission_method IN ('entireGroup', 'partialGroup', 'multipleWaves', 'individualScan', 'leaderQuantity', 'manifestBased')),
     created_at                        timestamptz,
     updated_at                        timestamptz
+);
+
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS access.hardware_certification (
+    model_id                          uuid NOT NULL,
+    outcome                           text NOT NULL CONSTRAINT hardware_certification_outcome_chk CHECK (outcome IN ('certified', 'failed')),
+    results                           jsonb NOT NULL,
+    valid_until                       date,
+    firmware_version_tested           text CONSTRAINT hardware_certification_firmware_version_tested_chk CHECK (char_length(firmware_version_tested) <= 64),
+    certified_by_principal_id         uuid,
+    certified_at                      timestamptz,
+    scope_path                        ltree NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
@@ -1118,6 +1139,7 @@ CREATE TABLE IF NOT EXISTS access.journey_sequence_rule (
     window_minutes                    integer,
     required_sequence                 text[],
     violation_responses               text[],
+    applies_to                        jsonb,
     created_at                        timestamptz,
     updated_at                        timestamptz
 );
@@ -1352,6 +1374,8 @@ CREATE TABLE IF NOT EXISTS access.operating_calendar_entry (
     admission_type                    text CONSTRAINT operating_calendar_entry_admission_type_chk CHECK (admission_type IN ('freeViewDay', 'specialEvent')),
     attraction_validation             boolean,
     is_manual_attendance_required     boolean,
+    is_venue_closed                   boolean DEFAULT false,
+    priority                          integer DEFAULT 0,
     scope_path                        ltree NOT NULL,
     created_at                        timestamptz,
     updated_at                        timestamptz
@@ -1362,7 +1386,7 @@ CREATE TABLE IF NOT EXISTS access.operating_calendar_entry (
 -- references access.parking_facility, orders.sales_order, pii.subject. Reached by: 2 operations
 -- read it and 3 write it.
 CREATE TABLE IF NOT EXISTS access.parking_entitlement (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     facility_id                       uuid NOT NULL,
     order_id                          uuid NOT NULL,
     subject_id                        uuid,
@@ -1380,7 +1404,7 @@ CREATE TABLE IF NOT EXISTS access.parking_entitlement (
 -- (CF-52) Hangs off: reaches access.entitlement through its keys; references platform.scope.
 -- Reached by: 3 operations read it and 1 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS access.parking_facility (
-    id                                uuid PRIMARY KEY,
+    id                                uuid PRIMARY KEY NOT NULL,
     name                              text NOT NULL,
     venue_id                          uuid NOT NULL,
     mode                              text NOT NULL CONSTRAINT parking_facility_mode_chk CHECK (mode IN ('none', 'plateWhitelist', 'qrHandoff')),

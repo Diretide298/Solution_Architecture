@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-118` | Product Lifecycle Command Center | B–D | 0 | 0 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
-| `ADM-119` | Product Creation Workspace | B–D | 0 | 0 | 6 | 25 | 8 | 3 | — | notStarted (generated) |
-| `ADM-120` | Lifecycle Status & Workflow Configuration | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-118` | Product Lifecycle Command Center | B | 0 | 0 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
+| `ADM-119` | Product Creation Workspace | B | 0 | 0 | 6 | 25 | 8 | 3 | — | notStarted (generated) |
+| `ADM-120` | Lifecycle Status & Workflow Configuration | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-121` | Bulk Product Creation & Catalogue Import | B–D | 0 | 0 | 6 | 0 | 2 | 3 | — | notStarted (generated) |
-| `ADM-122` | Product Import / Export & Environment Transfer | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-123` | Product Context, Ownership & Assignment | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-124` | Channel Publication & Availability | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `ADM-125` | Publication & Activation Scheduler | B–D | 11 | 19 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `ADM-126` | Product Duplication & Template Library | B–D | 26 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
-| `ADM-127` | AI Catalogue Builder & Configuration Review | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-122` | Product Import / Export & Environment Transfer | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-123` | Product Context, Ownership & Assignment | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-124` | Channel Publication & Availability | B | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `ADM-125` | Publication & Activation Scheduler | B | 11 | 19 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `ADM-126` | Product Duplication & Template Library | B | 26 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
+| `ADM-127` | AI Catalogue Builder & Configuration Review | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

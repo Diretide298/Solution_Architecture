@@ -1,19 +1,19 @@
 id: LLD-VenueOpsService
-title: VenueOpsService — 287 operations, 124 tables
+title: VenueOpsService — 290 operations, 124 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 deployable: operations
 index: diagrams/hld/02-services.yaml
-why: '**Six small domains, 287 operations, one team.** Queue, maintenance, bookable resources, venue
+why: '**Six small domains, 290 operations, one team.** Queue, maintenance, bookable resources, venue
   mapping, media assets and arcade. None is large enough to deploy alone, all are venue-scoped, none
   is on the critical sale path, and **all six are licensed as optional modules** — a venue that buys
   none of them should not be running six idle services.'
 scale: Low and steady. Queue readings are the only frequent write.
 ifDown: Down degrades venue operations. Selling and admitting continue.
 coverage:
-  operations: 287
-  inAFlow: 53
-  percent: 18%
+  operations: 290
+  inAFlow: 55
+  percent: 19%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -84,7 +84,7 @@ operationsByContract:
     permission: RESOURCE_BOOK
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: checkInResource
     verb: POST
     path: /resource-bookings/{bookingId}/check-in
@@ -108,7 +108,7 @@ operationsByContract:
     permission: RESOURCE_MANAGE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: createResource
     verb: POST
     path: /resources
@@ -156,7 +156,7 @@ operationsByContract:
     permission: ORDER_CREATE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: createResourcePackage
     verb: POST
     path: /resource-packages
@@ -188,7 +188,7 @@ operationsByContract:
     permission: ORDER_CREATE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: getExperienceResourceRequirements
     verb: GET
     path: /experiences/{experienceId}/resource-requirements
@@ -388,7 +388,7 @@ operationsByContract:
     permission: RESOURCE_VIEW
     offline: true
     reads: 1
-    writes: 0
+    writes: 1
   - operation: releaseResourceBlock
     verb: DELETE
     path: /resource-blocks/{blockId}
@@ -420,7 +420,7 @@ operationsByContract:
     permission: RESOURCE_BOOK
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: setExperienceResourceRequirements
     verb: PUT
     path: /experiences/{experienceId}/resource-requirements
@@ -444,7 +444,7 @@ operationsByContract:
     permission: RESOURCE_BOOK
     offline: true
     reads: 1
-    writes: 0
+    writes: 1
   - operation: setResourceDependencies
     verb: PUT
     path: /resources/{resourceId}/dependencies
@@ -468,7 +468,7 @@ operationsByContract:
     permission: RESOURCE_MANAGE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: setResourceQualifications
     verb: PUT
     path: /resources/{resourceId}/qualifications
@@ -524,7 +524,7 @@ operationsByContract:
     permission: RESOURCE_BOOK
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: updateResourceCategory
     verb: PUT
     path: /resource-categories/{categoryId}
@@ -567,7 +567,7 @@ operationsByContract:
     permission: INCIDENT_REPORT
     offline: true
     reads: 1
-    writes: 0
+    writes: 1
   - operation: attachWorkOrderEvidence
     verb: POST
     path: /work-orders/{workOrderId}/attachments
@@ -895,7 +895,7 @@ operationsByContract:
     permission: INCIDENT_REPORT
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: verifyWorkOrder
     verb: POST
     path: /work-orders/{workOrderId}/verify
@@ -930,7 +930,7 @@ operationsByContract:
     permission: RENTAL_OPERATE
     offline: true
     reads: 2
-    writes: 0
+    writes: 1
   - operation: createRentalAgreement
     verb: POST
     path: /agreements
@@ -1090,7 +1090,7 @@ operationsByContract:
     permission: RENTAL_APPROVE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: quoteRentalPrice
     verb: POST
     path: /rental-price
@@ -1098,7 +1098,7 @@ operationsByContract:
     permission: RENTAL_VIEW
     offline: false
     reads: 7
-    writes: 1
+    writes: 2
   - operation: recordRentalInspection
     verb: POST
     path: /rental-bookings/{bookingId}/inspection
@@ -1218,7 +1218,7 @@ operationsByContract:
     permission: RENTAL_OPERATE
     offline: false
     reads: 2
-    writes: 0
+    writes: 1
   - operation: updateRentalBooking
     verb: PATCH
     path: /rental-bookings/{bookingId}
@@ -1226,7 +1226,7 @@ operationsByContract:
     permission: RENTAL_BOOK
     offline: false
     reads: 2
-    writes: 0
+    writes: 1
   - operation: updateRentalPricingProfile
     verb: PUT
     path: /rental-pricing-profiles/{profileId}
@@ -1261,7 +1261,7 @@ operationsByContract:
     permission: ACCESS_VALIDATE
     offline: true
     reads: 1
-    writes: 0
+    writes: 1
   - operation: cloneGame
     verb: POST
     path: /games/{gameId}/clone
@@ -1269,7 +1269,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: cloneReaderConfiguration
     verb: POST
     path: /readers/{readerId}/clone
@@ -1277,7 +1277,7 @@ operationsByContract:
     permission: DEVICE_CONFIGURE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: createGame
     verb: POST
     path: /games
@@ -1309,7 +1309,7 @@ operationsByContract:
     permission: DEVICE_CONFIGURE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: getGameCard
     verb: GET
     path: /game-cards/{cardCode}
@@ -1461,7 +1461,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: setGameKioskConfiguration
     verb: PUT
     path: /game-kiosk-config
@@ -1575,7 +1575,7 @@ operationsByContract:
     reads: 7
     writes: 1
 - contract: transport
-  count: 31
+  count: 32
   operations:
   - operation: applyTransportNetworkImport
     verb: POST
@@ -1631,7 +1631,15 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 8
+    reads: 9
+    writes: 0
+  - operation: getTransportDeparture
+    verb: GET
+    path: /transport/departures/{departureId}
+    scope: venue
+    permission: null
+    offline: false
+    reads: 9
     writes: 0
   - operation: getTransportFareTable
     verb: GET
@@ -1759,7 +1767,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 8
+    reads: 9
     writes: 0
   - operation: setTransportFareTable
     verb: PUT
@@ -1776,7 +1784,7 @@ operationsByContract:
     permission: TRANSPORT_MANAGE
     offline: false
     reads: 3
-    writes: 0
+    writes: 1
   - operation: updateTransportDeparture
     verb: PATCH
     path: /transport/departures/{departureId}
@@ -1784,7 +1792,7 @@ operationsByContract:
     permission: TRANSPORT_MANAGE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: updateTransportPassType
     verb: PATCH
     path: /transport/pass-types/{passTypeId}
@@ -1792,7 +1800,7 @@ operationsByContract:
     permission: TRANSPORT_PRICE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: updateTransportRoute
     verb: PATCH
     path: /transport/routes/{routeId}
@@ -1808,7 +1816,7 @@ operationsByContract:
     permission: TRANSPORT_MANAGE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: updateTransportTimetable
     verb: PATCH
     path: /transport/timetables/{timetableId}
@@ -1824,7 +1832,7 @@ operationsByContract:
     permission: TRANSPORT_MANAGE
     offline: false
     reads: 2
-    writes: 0
+    writes: 1
 - contract: assets
   count: 26
   operations:
@@ -1995,7 +2003,7 @@ operationsByContract:
     permission: ASSET_LIBRARY_APPROVE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: setMediaAssetRights
     verb: PUT
     path: /media-assets/{assetId}/rights
@@ -2036,6 +2044,185 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 2
+- contract: venue-map
+  count: 22
+  operations:
+  - operation: acceptVenueLabelProposals
+    verb: POST
+    path: /venue-maps/{mapId}/proposals
+    scope: venue
+    permission: VENUE_MAP_MANAGE
+    offline: false
+    reads: 4
+    writes: 2
+  - operation: acceptWalkwayProposals
+    verb: POST
+    path: /venue-maps/{mapId}/walkway-proposals
+    scope: venue
+    permission: VENUE_MAP_MANAGE
+    offline: false
+    reads: 4
+    writes: 3
+  - operation: bookVisitPlan
+    verb: POST
+    path: /visit-plans/{planId}/booking
+    scope: venue
+    permission: null
+    offline: false
+    reads: 10
+    writes: 5
+  - operation: createVenueMap
+    verb: POST
+    path: /venue-maps
+    scope: venue
+    permission: VENUE_MAP_MANAGE
+    offline: false
+    reads: 4
+    writes: 2
+  - operation: generateVisitPlan
+    verb: POST
+    path: /visit-plans
+    scope: venue
+    permission: null
+    offline: false
+    reads: 11
+    writes: 3
+  - operation: getVenueMap
+    verb: GET
+    path: /venue-maps/{mapId}
+    scope: venue
+    permission: VENUE_MAP_VIEW
+    offline: true
+    reads: 5
+    writes: 0
+  - operation: getVenueMapGraph
+    verb: GET
+    path: /venue-maps/{mapId}/graph
+    scope: venue
+    permission: VENUE_MAP_VIEW
+    offline: true
+    reads: 4
+    writes: 1
+  - operation: getVenueMapImportJob
+    verb: GET
+    path: /venue-maps/{mapId}/import/{jobId}
+    scope: venue
+    permission: VENUE_MAP_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getVenueMapLive
+    verb: GET
+    path: /venue-maps/{mapId}/live
+    scope: venue
+    permission: VENUE_MAP_VIEW
+    offline: false
+    reads: 4
+    writes: 0
+  - operation: getVenueNavigationFile
+    verb: GET
+    path: /venue-maps/{mapId}/navigation-file
+    scope: venue
+    permission: VENUE_MAP_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: getVisitPlan
+    verb: GET
+    path: /visit-plans/{planId}
+    scope: venue
+    permission: null
+    offline: true
+    reads: 2
+    writes: 0
+  - operation: importVenueGeometry
+    verb: POST
+    path: /venue-maps/{mapId}/import
+    scope: venue
+    permission: VENUE_MAP_MANAGE
+    offline: false
+    reads: 3
+    writes: 4
+  - operation: listBookableVenueMaps
+    verb: GET
+    path: /bookable-venue-maps
+    scope: venue
+    permission: VENUE_MAP_VIEW
+    offline: true
+    reads: 3
+    writes: 0
+  - operation: listVenueMaps
+    verb: GET
+    path: /venue-maps
+    scope: venue
+    permission: VENUE_MAP_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listVisitPlanAlternatives
+    verb: GET
+    path: /visit-plans/{planId}/items/{itemId}/alternatives
+    scope: venue
+    permission: null
+    offline: false
+    reads: 8
+    writes: 0
+  - operation: publishVenueMap
+    verb: POST
+    path: /venue-maps/{mapId}/publish
+    scope: venue
+    permission: VENUE_MAP_PUBLISH
+    offline: false
+    reads: 6
+    writes: 3
+  - operation: setPathClosure
+    verb: POST
+    path: /venue-maps/{mapId}/paths/{pathId}/closure
+    scope: venue
+    permission: VENUE_MAP_MANAGE
+    offline: false
+    reads: 3
+    writes: 4
+  - operation: setPlacedResource
+    verb: POST
+    path: /venue-maps/{mapId}/resources
+    scope: venue
+    permission: VENUE_MAP_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setVenueMapArtwork
+    verb: POST
+    path: /venue-maps/{mapId}/artwork
+    scope: venue
+    permission: VENUE_MAP_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setVenuePoint
+    verb: POST
+    path: /venue-maps/{mapId}/points
+    scope: venue
+    permission: VENUE_MAP_MANAGE
+    offline: false
+    reads: 8
+    writes: 2
+  - operation: updateVisitPlan
+    verb: PUT
+    path: /visit-plans/{planId}
+    scope: venue
+    permission: null
+    offline: false
+    reads: 8
+    writes: 3
+  - operation: validateVenueMapGraph
+    verb: POST
+    path: /venue-maps/{mapId}/validate-graph
+    scope: venue
+    permission: VENUE_MAP_MANAGE
+    offline: false
+    reads: 3
+    writes: 0
 - contract: queue
   count: 22
   operations:
@@ -2215,169 +2402,6 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 2
-- contract: venue-map
-  count: 20
-  operations:
-  - operation: acceptVenueLabelProposals
-    verb: POST
-    path: /venue-maps/{mapId}/proposals
-    scope: venue
-    permission: VENUE_MAP_MANAGE
-    offline: false
-    reads: 4
-    writes: 2
-  - operation: acceptWalkwayProposals
-    verb: POST
-    path: /venue-maps/{mapId}/walkway-proposals
-    scope: venue
-    permission: VENUE_MAP_MANAGE
-    offline: false
-    reads: 4
-    writes: 3
-  - operation: bookVisitPlan
-    verb: POST
-    path: /visit-plans/{planId}/booking
-    scope: venue
-    permission: null
-    offline: false
-    reads: 10
-    writes: 5
-  - operation: createVenueMap
-    verb: POST
-    path: /venue-maps
-    scope: venue
-    permission: VENUE_MAP_MANAGE
-    offline: false
-    reads: 4
-    writes: 2
-  - operation: generateVisitPlan
-    verb: POST
-    path: /visit-plans
-    scope: venue
-    permission: null
-    offline: false
-    reads: 11
-    writes: 3
-  - operation: getVenueMap
-    verb: GET
-    path: /venue-maps/{mapId}
-    scope: venue
-    permission: VENUE_MAP_VIEW
-    offline: true
-    reads: 5
-    writes: 0
-  - operation: getVenueMapGraph
-    verb: GET
-    path: /venue-maps/{mapId}/graph
-    scope: venue
-    permission: VENUE_MAP_VIEW
-    offline: true
-    reads: 4
-    writes: 1
-  - operation: getVenueMapImportJob
-    verb: GET
-    path: /venue-maps/{mapId}/import/{jobId}
-    scope: venue
-    permission: VENUE_MAP_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: getVenueMapLive
-    verb: GET
-    path: /venue-maps/{mapId}/live
-    scope: venue
-    permission: VENUE_MAP_VIEW
-    offline: false
-    reads: 4
-    writes: 0
-  - operation: getVisitPlan
-    verb: GET
-    path: /visit-plans/{planId}
-    scope: venue
-    permission: null
-    offline: true
-    reads: 2
-    writes: 0
-  - operation: importVenueGeometry
-    verb: POST
-    path: /venue-maps/{mapId}/import
-    scope: venue
-    permission: VENUE_MAP_MANAGE
-    offline: false
-    reads: 3
-    writes: 4
-  - operation: listBookableVenueMaps
-    verb: GET
-    path: /bookable-venue-maps
-    scope: venue
-    permission: VENUE_MAP_VIEW
-    offline: true
-    reads: 3
-    writes: 0
-  - operation: listVenueMaps
-    verb: GET
-    path: /venue-maps
-    scope: venue
-    permission: VENUE_MAP_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: listVisitPlanAlternatives
-    verb: GET
-    path: /visit-plans/{planId}/items/{itemId}/alternatives
-    scope: venue
-    permission: null
-    offline: false
-    reads: 8
-    writes: 0
-  - operation: publishVenueMap
-    verb: POST
-    path: /venue-maps/{mapId}/publish
-    scope: venue
-    permission: VENUE_MAP_PUBLISH
-    offline: false
-    reads: 6
-    writes: 3
-  - operation: setPathClosure
-    verb: POST
-    path: /venue-maps/{mapId}/paths/{pathId}/closure
-    scope: venue
-    permission: VENUE_MAP_MANAGE
-    offline: false
-    reads: 3
-    writes: 4
-  - operation: setPlacedResource
-    verb: POST
-    path: /venue-maps/{mapId}/resources
-    scope: venue
-    permission: VENUE_MAP_MANAGE
-    offline: false
-    reads: 1
-    writes: 1
-  - operation: setVenuePoint
-    verb: POST
-    path: /venue-maps/{mapId}/points
-    scope: venue
-    permission: VENUE_MAP_MANAGE
-    offline: false
-    reads: 8
-    writes: 2
-  - operation: updateVisitPlan
-    verb: PUT
-    path: /visit-plans/{planId}
-    scope: venue
-    permission: null
-    offline: false
-    reads: 8
-    writes: 3
-  - operation: validateVenueMapGraph
-    verb: POST
-    path: /venue-maps/{mapId}/validate-graph
-    scope: venue
-    permission: VENUE_MAP_MANAGE
-    offline: false
-    reads: 3
-    writes: 0
 tables:
 - store: cache:idempotency
   kind: cache
@@ -2592,7 +2616,8 @@ tables:
   columns: 7
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - assets
   foreignWriters: null
 - table: assets.asset_version
   columns: 11
@@ -2696,7 +2721,8 @@ tables:
   columns: 11
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - games
   foreignWriters: null
 - table: games.card
   columns: 13
@@ -2801,7 +2827,8 @@ tables:
   columns: 8
   store: postgres
   parent: games.reader
-  writtenBy: []
+  writtenBy:
+  - games
   foreignWriters: null
 - table: games.reader_profile
   columns: 7
@@ -2897,13 +2924,15 @@ tables:
   columns: 7
   store: postgres
   parent: maintenance.incident
-  writtenBy: []
+  writtenBy:
+  - maintenance
   foreignWriters: null
 - table: maintenance.incident_media
   columns: 9
   store: postgres
   parent: maintenance.incident
-  writtenBy: []
+  writtenBy:
+  - maintenance
   foreignWriters: null
 - table: maintenance.inspection
   columns: 14
@@ -3161,7 +3190,8 @@ tables:
   columns: 17
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - rental
   foreignWriters: null
 - table: rental.settlement
   columns: 15
@@ -3271,7 +3301,8 @@ tables:
   columns: 11
   store: postgres
   parent: resources.resource
-  writtenBy: []
+  writtenBy:
+  - resources
   foreignWriters: null
 - table: resources.resource_requirement
   columns: 10
@@ -3393,21 +3424,21 @@ tables:
   - transport
   foreignWriters: null
 - table: venuemap.import_job
-  columns: 11
+  columns: 14
   store: postgres
   parent: null
   writtenBy:
   - venue-map
   foreignWriters: null
 - table: venuemap.map
-  columns: 15
+  columns: 19
   store: postgres
   parent: null
   writtenBy:
   - venue-map
   foreignWriters: null
 - table: venuemap.map_version
-  columns: 7
+  columns: 10
   store: postgres
   parent: venuemap.map
   writtenBy: []
@@ -3449,7 +3480,7 @@ tables:
   foreignWriters: null
 readsFrom:
 - service: CatalogueService
-  operations: 7
+  operations: 10
 - service: TenancyService
   operations: 4
 - service: IdentityService

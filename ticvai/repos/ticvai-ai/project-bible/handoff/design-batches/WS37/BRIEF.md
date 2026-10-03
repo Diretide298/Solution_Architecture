@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-078` | Pricing Governance Command Center | B–D | 4 | 260 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-079` | Pricing Change Request & Workspace | B–D | 17 | 0 | 5 | 1 | 0 | 0 | — | notStarted (generated) |
-| `ADM-080` | Bulk Pricing Update, Import & Mass Maintenance | B–D | 0 | 8 | 6 | 0 | 1 | 2 | — | notStarted (generated) |
-| `ADM-081` | Pricing Version & Baseline Management | B–D | 0 | 26 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
-| `ADM-082` | Pricing Change Impact Analysis | B–D | 0 | 26 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-083` | Pricing Approval Workflow & Authority Matrix | B–D | 4 | 20 | 5 | 1 | 1 | 3 | — | notStarted (generated) |
-| `ADM-084` | Pricing Publication & Effective-Date Scheduler | B–D | 1 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-085` | Pricing Distribution, Synchronization & Publication Monitor | B–D | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-086` | Pricing Rollback & Emergency Control Center | B–D | 22 | 0 | 6 | 1 | 1 | 2 | — | notStarted (generated) |
-| `ADM-087` | Pricing History, Audit & Compliance Explorer | B–D | 2 | 0 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
+| `ADM-078` | Pricing Governance Command Center | B | 4 | 260 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-079` | Pricing Change Request & Workspace | B | 17 | 0 | 5 | 1 | 0 | 0 | — | notStarted (generated) |
+| `ADM-080` | Bulk Pricing Update, Import & Mass Maintenance | B | 0 | 8 | 6 | 0 | 1 | 2 | — | notStarted (generated) |
+| `ADM-081` | Pricing Version & Baseline Management | B | 0 | 26 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
+| `ADM-082` | Pricing Change Impact Analysis | B | 0 | 26 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-083` | Pricing Approval Workflow & Authority Matrix | B | 4 | 20 | 5 | 1 | 1 | 3 | — | notStarted (generated) |
+| `ADM-084` | Pricing Publication & Effective-Date Scheduler | B | 1 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-085` | Pricing Distribution, Synchronization & Publication Monitor | B | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-086` | Pricing Rollback & Emergency Control Center | B | 22 | 0 | 6 | 1 | 1 | 2 | — | notStarted (generated) |
+| `ADM-087` | Pricing History, Audit & Compliance Explorer | B | 2 | 0 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

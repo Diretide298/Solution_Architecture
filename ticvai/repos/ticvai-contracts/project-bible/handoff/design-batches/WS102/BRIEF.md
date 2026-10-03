@@ -1,6 +1,6 @@
 # WS102 — Subscription Licensing AI Self Service board 5
 
-**10 screens · 14 operations · 26 schemas · 10 permissions**
+**10 screens · 15 operations · 26 schemas · 11 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 10 permissions apply here:
-  `ACCOUNT_CONFIGURE, PLATFORM_BILLING_MANAGE, PLATFORM_BILLING_VIEW, PLATFORM_CELL_MANAGE, PLATFORM_PLAN_MANAGE, PLATFORM_TENANT_ACCESS, PLATFORM_TENANT_MANAGE, PLATFORM_TENANT_VIEW, SCOPE_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 11 permissions apply here:
+  `ACCOUNT_CONFIGURE, ORDER_VIEW, PLATFORM_BILLING_MANAGE, PLATFORM_BILLING_VIEW, PLATFORM_CELL_MANAGE, PLATFORM_PLAN_MANAGE, PLATFORM_TENANT_ACCESS, PLATFORM_TENANT_MANAGE, PLATFORM_TENANT_VIEW, SCOPE_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -129,7 +129,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-409` | Purchase / Trial Journey Selection | B | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `ADM-410` | Contract & Billing Cycle Selection | B | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 | `ADM-411` | Billing & Legal Entity Information | B | 17 | 19 | 7 | 9 | 0 | 0 | — | notStarted (—) |
-| `ADM-412` | Payment Method & Settlement Setup | A | 41 | 7 | 7 | 24 | 0 | 0 | — | notStarted (—) |
+| `ADM-412` | Payment Method & Settlement Setup | A | 41 | 13 | 7 | 24 | 0 | 0 | — | notStarted (—) |
 | `ADM-413` | Trial Configuration & Conversion Rules | B | 16 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `ADM-414` | Order & Commercial Pricing Review | B | 0 | 10 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 | `ADM-415` | Commercial Agreement, Billable Definition & Customer Acceptance | B | 0 | 16 | 6 | 0 | 0 | 0 | — | notStarted (—) |

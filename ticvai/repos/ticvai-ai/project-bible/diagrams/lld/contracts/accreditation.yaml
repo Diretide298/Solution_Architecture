@@ -647,7 +647,8 @@ operations:
   offline: false
   reads:
   - accreditation.document
-  writes: []
+  writes:
+  - accreditation.document
 - operation: withdrawAccreditationApplication
   verb: POST
   path: /accreditation-applications/{applicationId}/withdraw

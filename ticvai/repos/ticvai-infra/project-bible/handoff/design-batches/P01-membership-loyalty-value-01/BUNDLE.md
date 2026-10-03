@@ -390,7 +390,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### References
 
 - Wireframe frame: `wireframes/P01 Guest Web.dc.html#web-021` · status **review** · provenance client-verified
-- Prototype (rev 3, verified 2026-09-28, match partial): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html`, view *Account → 'Wallet & gift cards' (and 'Payment methods')*. Differences: Rows with toast actions; no transaction list, no gift-card balance lookup. Auto top-up is a prototype addition with no YAML operation. Saved payment tokens are a separate pane.
+- Prototype (rev 3 (pointer moved to the 30 September build, CHG-R1S-015), verified 2026-09-28, match partial): `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, view *Account → 'Wallet & gift cards' (and 'Payment methods')*. Differences: Rows with toast actions; no transaction list, no gift-card balance lookup. Auto top-up is a prototype addition with no YAML operation. Saved payment tokens are a separate pane.
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
@@ -587,7 +587,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### References
 
 - Wireframe frame: `wireframes/P01 Guest Web.dc.html#web-022` · status **review** · provenance client-verified
-- Prototype (rev 3, verified 2026-09-28, match partial): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html`, view *Summit Peaks → 'Annual pass / membership' flow; Kids Club → 'Membership pass'; Account → Membership → 'Other plans — Compare'*. Differences: Plans are sold as a booking flow, not a plans page; the account 'Compare' action is a toast.
+- Prototype (rev 3 (pointer moved to the 30 September build, CHG-R1S-015), verified 2026-09-28, match partial): `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, view *Summit Peaks → 'Annual pass / membership' flow; Kids Club → 'Membership pass'; Account → Membership → 'Other plans — Compare'*. Differences: Plans are sold as a booking flow, not a plans page; the account 'Compare' action is a toast.
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
 
@@ -810,7 +810,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### References
 
 - Wireframe frame: `wireframes/P01 Guest Web.dc.html#web-023` · status **review** · provenance client-verified
-- Prototype (rev 3, verified 2026-09-28, match partial): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html`, view *Account → 'Membership' → 'Billing statement — View'*. Differences: Billing and dunning retry are well covered. Prototype adds membership transfer to a family member and guest passes; YAML's transferOrderTickets on this screen has no visible use.
+- Prototype (rev 3 (pointer moved to the 30 September build, CHG-R1S-015), verified 2026-09-28, match partial): `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, view *Account → 'Membership' → 'Billing statement — View'*. Differences: Billing and dunning retry are well covered. Prototype adds membership transfer to a family member and guest passes; YAML's transferOrderTickets on this screen has no visible use.
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
@@ -1192,7 +1192,7 @@ Also set there, as content the tenant writes: theme, buttons, links.
 #### References
 
 - Wireframe frame: `wireframes/P01 Guest Web.dc.html#web-024` · status **review** · provenance client-verified
-- Prototype (rev 3, verified 2026-09-28, match partial): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html`, view *Account → 'Security' (devices), 'Face Pass', 'Data & privacy', 'Newsletters' (devices that get notifications)*. Differences: Spread across four panes rather than one screen; wishlist is its own view (WEB-009). Security pane includes passkeys and two-step verification, which the YAML does not have for guests. YAML purpose text still says 'See loyalty & rewards' (stale).
+- Prototype (rev 3 (pointer moved to the 30 September build, CHG-R1S-015), verified 2026-09-28, match partial): `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, view *Account → 'Security' (devices), 'Face Pass', 'Data & privacy', 'Newsletters' (devices that get notifications)*. Differences: Spread across four panes rather than one screen; wishlist is its own view (WEB-009). Security pane includes passkeys and two-step verification, which the YAML does not have for guests. YAML purpose text still says 'See loyalty & rewards' (stale).
 - Flow F53 *A guest earns, sees and spends loyalty*, step 2: They see rewards and manage their devices. → **Consent sits here deliberately.** A rewards screen is where a guest is most willing to opt in, and CF-160 keeps the merge from ever widening it.
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0010 *Cross-Jurisdiction Entitlements* (`docs/adr/0010-cross-jurisdiction-entitlements.md`)
@@ -1527,7 +1527,7 @@ Every guest screen in this batch is white-label. These elements are set by the t
 | Show loading indicator (`brand.showLoadingIndicator`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | — | on | — |
 | Intro video (`brand.introVideoAssetRef`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | The optional intro video (decided 29 September, MOB-5). A video `MediaAsset` from the media library (CMS-010). |
 | Intro video mode (`brand.introVideoMode`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | Off · First launch · Every launch; Anything but `off` needs `introVideoAssetRef`, or 400. | Off | When GST-001 plays it full screen. "Skip introduction" is always shown. |
-| Powered by TICVAI credit (`brand.showPoweredBy`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | — | on | the *Powered by TICVAI* credit on the launch screen, at the foot of Account and in the web footer; on by default, and switching it off needs the licence add-on (403 … |
+| Powered by TICVAI credit (`brand.showPoweredBy`) | `CMS-104`, `ADM-016` | — | on | the *Powered by TICVAI* credit on the launch screen, at the foot of Account and in the web footer; on by default, and switching it off needs the licence add-on (403 … |
 | Primary colour (`theme.primaryColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | the brand colour (the `accentSolid` token): primary buttons (Book, Continue, Add to cart, Pay), the active step of the step indicator, selected date and time chips, focus rings |
 | Secondary colour (`theme.secondaryColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | secondary buttons and secondary emphasis: unselected chips, secondary tabs |
 | Accent colour (`theme.accentColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | highlights: badges (LIMITED, NEW, BESTSELLER), availability counts, sale prices |
