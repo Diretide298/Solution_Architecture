@@ -1,0 +1,2495 @@
+process: finance-insights
+title: 'Flow design briefs, Block A: Finance, Ledger & Tax, Reporting & Analytics'
+written: 2026-10-03, finance-insights brief agent
+cross_cutting:
+  same_numbers: >-
+    Same-numbers rule (DEC-559, CHG-DOC-022; docs/active/block-test-strategy.md): the till day view POS-008, the back-office
+    reports BO-058/BO-059 and Analytics P16 are windows onto one reporting area. For one scope, one period and one as-of
+    time they show the same takings, gross sales excluding VAT and refunds; a frontend comparison test fails on any difference.
+    Every figure carries its "as of" time; scope comes from the person's rights, never from a filter.
+  as_of: >-
+    Every figure shows its "as of" time (lag-tolerant reporting copy); a stale or partial figure says so instead of showing
+    a total.
+  money: >-
+    base currency of the region; AED 2 decimals; BHD/KWD/OMR 3 decimals never rounded away; one figure per currency, never
+    a cross-currency sum
+scope:
+  rule: >-
+    Block A = builds of the tickets under BLOCK-A in handoff/service-docs/op-release.json; a flow belongs to the process
+    of its trigger screen.
+  covered:
+  - F74
+  - F98
+  - F13
+  - F107
+  - F20
+  - F303
+  - F82
+  - F99
+  - F106
+  - F145
+  - F176
+  - F180
+  note_F74: >-
+    assigned here by the lead (day report + daily cash reconciliation); fnb-retail may claim it by entry screen POS-007
+  skipped:
+  - flows:
+    - F175
+    - F177
+    - F178
+    - F179
+    - F262
+    reason: no step touches a Block A screen or operation
+flows:
+  F74:
+    title: A shift closes and the day is reported
+    process: finance-insights
+    trigger: >-
+      The venue is closing and somebody has to know what was taken: every till's shift is counted blind, the day is reported
+      on the till, and the next morning the daily cash reconciliation resolves each shift.
+    actors:
+      roles:
+      - cashier (blind count)
+      - supervisor (PIN; OVERSHORT_ACCEPT, SHIFT_CLOSE_OTHER)
+      - venue manager
+      - finance controller
+      apps:
+      - P04 Venue POS (POS-007, POS-008, POS-009)
+      - P08 Venue Management (BO-043)
+    note: >-
+      Assigned to finance-insights by the lead (the day report and the daily cash reconciliation are finance); by its entry
+      screen POS-007 the fnb-retail brief may also claim it: dedupe on merge. The till side of the close is drawn in full
+      in platform-foundation.yaml F32.
+    inputs:
+    - name: Blind closing count
+      formats:
+      - per denomination, drawer order
+      - declared non-cash totals per tender
+      limits: no expected, no variance, no takings shown to the cashier (CHG-FIN-003)
+      validation:
+      - open orders -> close refused, each listed
+      - offline -> "Closing needs a connection."
+      source: cashier on POS-007
+    - name: Day report period and scope
+      formats:
+      - Today (default) / This shift
+      - My sales / This terminal / This outlet (only scopes the role may read; hidden, not greyed)
+      limits:
+      - a cashier cannot widen it; a supervisor may pick a past day for this terminal
+      - between allowed views
+      validation:
+      - >-
+        offline -> "Reports need a connection. Your sales are safe and will sync." (no figures from the local journal)
+      - outlet with a till still open -> "2 tills still open" instead of a partial total
+      - >-
+        Today (default) or "This shift". A cashier cannot widen it; a supervisor may pick a past day for this terminal.
+      - >-
+        Shows only the scopes the signed-in role may read; hidden, not greyed. The server already limits what a role sees;
+        the control only switches between allowed views.
+      source:
+      - POS-008
+      - venueManager on POS-008 Reports
+      also_named:
+      - Period
+      - Scope (My sales / This terminal / This outlet)
+      ref: >-
+        DI-181 | contracts/satellite/reporting.yaml#runReport | DI-802 | DI-387 | contracts/shared/permissions.yaml#/components/schemas/Permission
+    - name: Reconciliation day and venue
+      formats:
+      - date (yesterday by default)
+      - venue pick (only venues in Session.scope)
+      limits: midnight to midnight in the region's time zone; one venue-day is the unit of sign-off (CHG-FIN-009)
+      validation:
+      - >-
+        The file is for a different currency than the venue trades in -> Show both currencies and refuse to compute a difference
+        that means nothing. (derived)
+      - >-
+        A file arrives for a day already reconciled -> A new batch; never overwrites the earlier one. (derived)
+      - >-
+        One day (yesterday by default) and one venue; the day runs midnight to midnight in the region's time zone.
+      source:
+      - finance on BO-043
+      - venueManager on BO-043 Daily Reconciliation
+      also_named:
+      - Day and venue
+      ref: R110 | contracts/spine/finance.yaml#/components/schemas/Settlement
+    - name: Supervisor decision on a shift (BO-043 or any till)
+      formats:
+      - supervisor PIN in body supervisorStepUp
+      - reason 3-500 characters
+      limits: >-
+        the supervisor must not be the cashier; refused without the step-up (RUL-1, RUL-2, CHG-RUL-019); venue scope, any
+        till or BO-043
+      validation:
+      - 'no step-up / wrong PIN -> 403 supervisor-step-up-refused: "That PIN was not accepted."'
+      - own shift -> "A different supervisor must accept this."
+      - 'already decided -> 409: the row refreshes to who decided and how'
+      - reject without reason -> "Tell the cashier why you want a recount"
+      source: the supervisor (OVERSHORT_ACCEPT; SHIFT_CLOSE_OTHER to close a still-open shift)
+    - name: Question to the assistant
+      screen: POS-008
+      validation: >-
+        Free text. Answered only within the person's role; if the question needs data they cannot see, the answer is narrower,
+        not refused outright. Asks back when the period or measure is missing.
+      source: venueManager on POS-008 Reports
+      ref: DI-964 | DI-712 | F20 step 1
+      formats:
+      - text field (derived)
+      limits:
+      - only within the person's role (derived)
+      merged: merged from the fnb-retail brief (3 Oct)
+    - name: Clock in / out, Start / End break
+      screen: POS-009
+      validation: >-
+        One tap each; device time recorded and queued offline; at a venue that requires it, the access point or location is
+        captured.
+      source: venueManager on POS-009 Staff Roster
+      ref: contracts/satellite/workforce.yaml#recordAttendance | POSV2-3
+      formats:
+      - form field (derived)
+      limits:
+      - no size or count limit in the package; the bound contract field applies (derived)
+      merged: merged from the fnb-retail brief (3 Oct)
+    - name: Upload settlement file
+      screen: BO-043
+      formats:
+      - CSV
+      - JSON
+      validation: >-
+        Provider (Stripe, Network International…), the day it covers, the file, and its format (CSV, fixed width, XML, JSON)
+        if not detected. Parsing runs in the background; the row shows Ingesting, Parsing, Matching, then Matched or Has exceptions.
+      source: venueManager on BO-043 Daily Reconciliation
+      ref: >-
+        contracts/spine/finance.yaml#ingestSettlementFile | contracts/spine/finance.yaml#/components/schemas/SettlementStatus
+      limits:
+      - no size or count limit in the package; the bound contract field applies (derived)
+      merged: merged from the fnb-retail brief (3 Oct)
+    - name: Resolve an exception
+      screen: BO-043
+      validation: >-
+        Outcome (Matched by hand, Write off, Dispute raised, Provider error, Timing difference), a required note, and the
+        matching payment when matching by hand.
+      source: venueManager on BO-043 Daily Reconciliation
+      ref: >-
+        contracts/spine/finance.yaml#/components/schemas/SettlementResolution | contracts/spine/finance.yaml#resolveSettlementException
+      formats:
+      - text field (derived)
+      limits:
+      - no size or count limit in the package; the bound contract field applies (derived)
+      merged: merged from the fnb-retail brief (3 Oct)
+    - screen: POS-007
+      see: platform-foundation#F32
+      note: inputs of this screen are detailed once, in that flow
+    processing:
+    - input: Blind count
+      operations:
+      - shift#submitShiftCount
+      does: >-
+        expected and variance computed on the server; beyond shiftVarianceThreshold the shift is pendingVariance and supervisors
+        are alerted
+    - input: Day report
+      operations:
+      - reporting#runReport
+      does: >-
+        runs a seeded definition for the till scope; a till runs reports, never authors them; figures come from the reporting
+        copy with an as-of time
+    - input: Staffing against takings
+      operations:
+      - workforce#listRotaAssignments
+      - shift#listShifts
+      does: takings per staffed hour
+    - input: Daily cash reconciliation
+      operations:
+      - shift#listShifts
+      - shift#getShiftCountLines
+      - shift#acceptShiftVariance
+      - shift#rejectShiftVariance
+      - shift#closeShift
+      does: >-
+        lists every shift of the venue-day with status; a shift still open is closed by a supervisor (closeShift, PIN), an
+        Under-review shift is accepted (posts over/short to the over/short account, boxes reconciled) or sent back for a recount;
+        count lines read note by note before any expected figure
+    - operation: shift#listDenominations
+      what: The notes and coins a till counts
+      steps:
+      - 1
+      block_a: true
+      offline_capable: true
+    outputs:
+    - output: Day report (POS-008)
+      states:
+        loading: skeleton tiles
+        ready: takings, gross sales excl. VAT, refunds with "as of 22:41"
+        partial: '"2 tills still open": no total presented as the day'
+        deferred: reported with shifts "Under review" marked, not missing
+        offline: '"Reports need a connection."'
+        emptyNoAccess: names REPORT_VIEW_* missing
+        error: Could not load. Names which read failed and leaves the reports untouched.
+        emptyFirstRun: >-
+          No reports yet. Offers no create action — this screen declares no operation that makes one — and says so rather
+          than showing an empty table.
+        emptyNoResults: >-
+          Nothing matches the filter on category, search and the reports are still there. Names the active filter and offers
+          to clear it.
+      failure_branches:
+      - at_step: 2
+        what: A till has not closed yet.
+        user_sees: >-
+          The day report says so rather than reporting a partial figure as a total. A number that quietly excludes a lane
+          is worse than a number that is late.
+        recovery: listShifts
+      - screen: POS-008
+        what_goes_wrong: Offline
+        user_sees: >-
+          "Reports need a connection. Your sales are safe and will sync." No figures from the terminal's local journal: they
+          would disagree with the back office.
+      - screen: POS-008
+        what_goes_wrong: Another till at the outlet has not closed yet (outlet scope)
+        user_sees: >-
+          The day view says so ("2 tills still open") rather than presenting a partial figure as the day's total.
+      - screen: POS-008
+        what_goes_wrong: A three-decimal currency venue
+        user_sees: All amounts at three decimals (BHD 1,284.375); never rounded to two.
+      - screen: POS-008
+        what_goes_wrong: A cashier asks the assistant for venue revenue
+        user_sees: The answer covers only what they may see ("Your sales today were AED 6,240.00").
+      shows:
+      - element: Headline tiles
+        rule: >-
+          Gross sales, transactions, average basket, voids and refunds (count and value). Each tile carries "as of HH:MM".
+          Labels follow the process vocabulary: "Gross sales", not "Revenue".
+      - element: Sales mix
+        rule: By line of business (Tickets, Food & drink, Retail, Other) and by hour. Bars start at zero.
+      - element: Tenders
+        rule: >-
+          Cash, card, wallet, gift card and foreign currency. Foreign currency shows the amount taken in that currency and
+          its AED equivalent at the rate applied; only the AED figure adds to totals.
+      - element: Expected cash in drawer
+        rule: Never shown to a cashier. Supervisors see it on the shift close and POS-020, not here.
+      - element: Top products
+        rule: Units, sales and share for this terminal; at most ten rows.
+      package_states:
+        loading: The reports list.
+        emptyNoAccess: >-
+          Shown when the caller holds neither REPORT_VIEW_OWN (a cashier's own figures) nor REPORT_VIEW_WORKSTATION (this
+          terminal's, for a supervisor), and names them. Never the venue-wide …
+        offline: >-
+          Not available. Reporting reads the analytical replica (ADR-0016) and a terminal-local figure would disagree with
+          the back office
+      also_named:
+      - Reports
+    - output: Shifts of the day (BO-043)
+      states:
+        open: 'still open: Close shift (supervisor PIN)'
+        pendingVariance: 'Under review: Accept variance / Reject and recount'
+        recountRequested: waiting for the cashier's new count
+        closed: closed within threshold
+        closedWithVariance: accepted, with who and the reason
+        allResolved: '"Every shift of Tue 29 Sep is resolved"'
+        loading: The daily reconciliation list.
+        error: Could not load. Names which read failed and leaves the daily reconciliation untouched.
+        emptyFirstRun: >-
+          No daily reconciliation yet. Offers no create action — this screen declares no operation that makes one — and says
+          so rather than showing an empty table.
+        emptyNoResults: >-
+          Nothing matches the filter on providerName, status and the daily reconciliation are still there. Names the active
+          filter and offers to clear it.
+        emptyNoAccess: >-
+          Shown when the caller lacks `LEDGER_VIEW`, which `getTrialBalance` requires to show this screen, and names that
+          permission (the screen's other reads need …
+      failure_branches:
+      - at_step: 4
+        what: The supervisor does not accept the count.
+        user_sees: >-
+          Sent back for a recount, not reopened for trading (decided 2 October 2026, batch 6 #175, BO-040: "Add Reject + recount
+          (DI-804)"; CHG-CSP-013).
+        recovery: rejectShiftVariance, then the cashier's submitShiftCount
+      - at_step: 4
+        what: A shift is still under review when the day is reported.
+        user_sees: >-
+          The day report names it as under review rather than leaving it out. Its counted figure is in the day; its variance
+          is pending until the reconciliation resolves it.
+        recovery: Supervisor, in the daily cash reconciliation (BO-043)
+      - screen: BO-043
+        what_goes_wrong: The file is for a different currency than the venue trades in
+        user_sees: Show both currencies and refuse to compute a difference that means nothing.
+      - screen: BO-043
+        what_goes_wrong: A file arrives for a day already reconciled
+        user_sees: A new batch; never overwrites the earlier one.
+      - screen: BO-043
+        what_goes_wrong: Parsing fails
+        user_sees: Status Failed with the reason and an "Upload again" action.
+      - screen: BO-043
+        what_goes_wrong: Exceptions still open at month end
+        user_sees: They block the period close; the close screen links back here.
+      shows:
+      - element: Sources against the ledger
+        rule: >-
+          One row per source (POS cash, each gateway, bank, wallet, ledger) with its total and count, and below them each
+          variance with the two sources it lies between, the amount and the likely cause. A day with no variance says "Balanced"
+          in words.
+      - element: Settlement batches
+        rule: >-
+          Provider, day, status, lines, matched, exceptions, provider gross, fees, net, ledger gross, difference. Differences
+          in red with sign; fees shown separately so fees are never mistaken for a shortfall.
+      - element: Exceptions
+        rule: >-
+          Kind in words (In provider file but not in our records; In our records but not in the file; Amount differs; Duplicate
+          in file; Fee not explained), provider reference, amount against expected. Open first.
+      - element: Cash
+        rule: >-
+          Expected against deposited per till and the over/short, which posts to the over/short account visible at month end.
+      also_named:
+      - Daily Reconciliation
+    - output: Figures consistency
+      states:
+        rule: >-
+          Same-numbers rule (DEC-559, CHG-DOC-022; docs/active/block-test-strategy.md): the till day view POS-008, the back-office
+          reports BO-058/BO-059 and Analytics P16 are windows onto one reporting area. For one scope, one period and one as-of
+          time they show the same takings, gross sales excluding VAT and refunds; a frontend comparison test fails on any
+          difference. Every figure carries its "as of" time; scope comes from the person's rights, never from a filter.
+      failure_branches:
+      - what_goes_wrong: the operation behind this output fails (derived)
+        user_sees: the error state names what failed and keeps what was entered (package error-state rule) (derived)
+        recovery: retry (derived)
+    - output: POS-007 Close Shift
+      states:
+        loading: The close shift list.
+        error: Could not load. Names which read failed and leaves the close shift untouched.
+        emptyFirstRun: Nothing is waiting, which is the good outcome. An empty queue means every item has been decided;
+        emptyNoResults: >-
+          Never shown: listCashMovements takes no filter, so an empty list is always the first-run state above.
+        emptyNoAccess: >-
+          Shown when the caller lacks SHIFT_OPEN, which getCurrentShift requires to show this screen, and names that permission
+          (the screen's other reads need R ...
+        offline: Cannot close. Closing requires the server total, and a locally computed variance is not a variance
+        denied: >-
+          acceptShiftVariance was refused: the caller lacks OVERSHORT_ACCEPT at this venue, or is the cashier whose shift
+          it is.
+        pendingVariance: Counted; "Under review". submitShiftCount answered referredToSupervisor.
+        recountRequested: >-
+          "Recount requested". A supervisor rejected the variance (rejectShiftVariance) with a reason the cashier reads;
+      failure_branches:
+      - at_step: 1
+        what: The count is over the variance threshold and no supervisor is at the till.
+        user_sees: >-
+          The cashier signs out and the shift waits as "Under review" (decided 2 October 2026, Chinmay, batch 3 #1, POS-007:
+          "The cashier may sign out, and the shift stays pending until the supervisor accepts.
+        recovery: Supervisor, with acceptShiftVariance or closeShift (supervisor PIN), on POS-007 or BO-043
+    - output: POS-008 Reports
+      states:
+        loading: The reports list.
+        error: Could not load. Names which read failed and leaves the reports untouched.
+        emptyFirstRun: >-
+          No reports yet. Offers no create action — this screen declares no operation that makes one — and says so rather
+          than showing an empty table.
+        emptyNoResults: >-
+          Nothing matches the filter on category, search and the reports are still there. Names the active filter and offers
+          to clear it.
+        emptyNoAccess: >-
+          Shown when the caller holds neither REPORT_VIEW_OWN (a cashier's own figures) nor REPORT_VIEW_WORKSTATION (this
+          terminal's, for a supervisor), and nam ...
+        offline: >-
+          Not available. Reporting reads the analytical replica (ADR-0016) and a terminal-local figure would disagree with
+          the back office
+      failure_branches:
+      - what_goes_wrong: error state on POS-008
+        user_sees: Could not load. Names which read failed and leaves the reports untouched.
+        recovery: Retry; nothing entered is lost (derived)
+      - what_goes_wrong: emptyNoAccess state on POS-008
+        user_sees: >-
+          Shown when the caller holds neither REPORT_VIEW_OWN (a cashier's own figures) nor REPORT_VIEW_WORKSTATION (this
+          terminal's, for a supervisor), and nam ...
+        recovery: Ask an administrator for the permission the state names (derived)
+      - what_goes_wrong: offline state on POS-008
+        user_sees: >-
+          Not available. Reporting reads the analytical replica (ADR-0016) and a terminal-local figure would disagree with
+          the back office
+        recovery: Reconnect; the screen picks up where it was (derived)
+    - output: POS-009 Staff Roster
+      states:
+        loading: The staff roster list.
+        error: Could not load. Names which read failed and leaves the staff roster untouched.
+        emptyFirstRun: Nothing is waiting, which is the good outcome. An empty queue means every item has been decided;
+        emptyNoResults: >-
+          Nothing matches the filter on workstationId, status, openedFrom, openedTo and the staff roster are still there.
+        emptyNoAccess: >-
+          Shown when the caller lacks REPORT_VIEW_WORKSTATION, which listShifts requires to show this screen, and names that
+          permission (the screen's other read ...
+        offline: Last known roster, with its age shown
+      failure_branches:
+      - what_goes_wrong: error state on POS-009
+        user_sees: Could not load. Names which read failed and leaves the staff roster untouched.
+        recovery: Retry; nothing entered is lost (derived)
+      - what_goes_wrong: emptyNoAccess state on POS-009
+        user_sees: >-
+          Shown when the caller lacks REPORT_VIEW_WORKSTATION, which listShifts requires to show this screen, and names that
+          permission (the screen's other read ...
+        recovery: Ask an administrator for the permission the state names (derived)
+      - what_goes_wrong: offline state on POS-009
+        user_sees: Last known roster, with its age shown
+        recovery: Reconnect; the screen picks up where it was (derived)
+      - screen: POS-009
+        what_goes_wrong: Clock-out with no clock-in, or a second clock-in
+        user_sees: Refused and reported as out of sequence, not silently corrected.
+      - screen: POS-009
+        what_goes_wrong: Offline
+        user_sees: Last known roster with its age; clock actions queue with device time.
+      shows:
+      - element: Roster
+        rule: >-
+          Rows: staff name, role, till, rota time, attendance (on duty / on break / not clocked in), shift status (Open, Suspended,
+          Waiting for supervisor). Sorted by till. A cashier without the view permission sees only themselves.
+      - element: My shift
+        rule: Start time, elapsed time and breaks taken today. No takings and no expected cash.
+      package_states:
+        emptyFirstRun: >-
+          Nothing is waiting, which is the good outcome. An empty queue means every item has been decided; it offers no create
+          action, because creating work is not what it needs.
+        emptyNoResults: >-
+          Nothing matches the filter on workstationId, status, openedFrom, openedTo and the staff roster are still there.
+          Names the active filter and offers to clear it.
+        emptyNoAccess: >-
+          Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires to show this screen, and names
+          that permission (the screen's other reads need `WORKFORCE_VIEW` …
+    - output: BO-043 Daily Reconciliation
+      states:
+        loading: The daily reconciliation list.
+        error: Could not load. Names which read failed and leaves the daily reconciliation untouched.
+        emptyFirstRun: >-
+          No daily reconciliation yet. Offers no create action — this screen declares no operation that makes one — and says
+          so rather than showing an empty tab ...
+        emptyNoResults: >-
+          Nothing matches the filter on providerName, status and the daily reconciliation are still there. Names the active
+          filter and offers to clear it.
+        emptyNoAccess: >-
+          Shown when the caller lacks LEDGER_VIEW, which getTrialBalance requires to show this screen, and names that permission
+          (the screen's other reads need ...
+      failure_branches:
+      - what_goes_wrong: error state on BO-043
+        user_sees: Could not load. Names which read failed and leaves the daily reconciliation untouched.
+        recovery: Retry; nothing entered is lost (derived)
+      - what_goes_wrong: emptyNoAccess state on BO-043
+        user_sees: >-
+          Shown when the caller lacks LEDGER_VIEW, which getTrialBalance requires to show this screen, and names that permission
+          (the screen's other reads need ...
+        recovery: Ask an administrator for the permission the state names (derived)
+    - name: Flow outcome (exit states)
+      states:
+        reported: All tills closed, day reported.
+        partial: Incomplete and labelled as such.
+        deferred: >-
+          Reported, with one or more shifts "Under review" until the daily reconciliation resolves them (DEC-059).
+      failure_branches:
+      - at_step: 2
+        what_goes_wrong: A till has not closed yet.
+        user_sees: >-
+          The day report says so rather than reporting a partial figure as a total. A number that quietly excludes a lane
+          is worse than a number that is late.
+        recovery: high; resolved by shift#listShifts
+      - at_step: 1
+        what_goes_wrong: The count is over the variance threshold and no supervisor is at the till.
+        user_sees: >-
+          The cashier signs out and the shift waits as "Under review" (decided 2 October 2026, Chinmay, batch 3 #1, POS-007:
+          "The cashier may sign out, and the shift stays pending until the supervisor accepts. That must not stop the next
+          cashier starting a shift"; DEC-059, CHG-CSP-012, DI-805). The shift is `pendingVariance` with its own deposit box
+          and count; `openShift` refuses only while a shift is `open` or `suspended`, …
+        recovery: >-
+          requiresStaff; resolved by Supervisor, with acceptShiftVariance or closeShift (supervisor PIN), on POS-007 or BO-043
+          (not in contracts)
+      - at_step: 4
+        what_goes_wrong: The supervisor does not accept the count.
+        user_sees: >-
+          Sent back for a recount, not reopened for trading (decided 2 October 2026, batch 6 #175, BO-040: "Add Reject + recount
+          (DI-804)"; CHG-CSP-013). The shift stays `pendingVariance` and the cashier sees "Recount requested" rather than
+          "Under review", recounts at any till of the venue and resubmits with `submitShiftCount`. Still blind: the rejection
+          carries the reason, never the expected figure.
+        recovery: >-
+          requiresStaff; resolved by rejectShiftVariance, then the cashier's submitShiftCount (not in contracts)
+      - at_step: 4
+        what_goes_wrong: A shift is still under review when the day is reported.
+        user_sees: >-
+          The day report names it as under review rather than leaving it out. Its counted figure is in the day; its variance
+          is pending until the reconciliation resolves it.
+        recovery: recoverable; resolved by Supervisor, in the daily cash reconciliation (BO-043) (not in contracts)
+      merged: merged from the fnb-retail brief (3 Oct)
+    - screen: POS-007
+      see: platform-foundation#F32
+      note: outputs of this screen are detailed once, in that flow
+    steps:
+    - frame: 1
+      screen: POS-007 Close Shift
+      sees: denomination counter, no expected
+      does: cashier counts and submits
+      calls:
+      - shift#listDenominations
+      - shift#submitShiftCount
+      result: '"Shift closed" or "Your count is with your supervisor" (Under review)'
+    - frame: 2
+      screen: POS-008 Reports
+      sees: 'Today / This terminal tiles: takings, gross sales excl. VAT, refunds, each with "as of"'
+      does: supervisor reads the day for the terminal
+      calls:
+      - reporting#runReport
+      result: >-
+        figures equal BO-058/BO-059 and P16 for the same scope, period and as-of (DEC-559); "2 tills still open" if any is
+    - frame: 3
+      screen: POS-009 Staff Roster
+      sees: who was on duty, per terminal
+      does: reads takings against staffed hours
+      calls:
+      - workforce#listRotaAssignments
+      - shift#listShifts
+      result: takings per staffed hour
+    - frame: 4
+      screen: BO-043 Daily Reconciliation (shifts tab)
+      sees: 'Shifts of the day: till, cashier, status chip, counted (supervisor only), expected, variance'
+      does: finance opens yesterday for Aquaventure Waterpark
+      calls:
+      - shift#listShifts
+      result: every shift listed; Under-review ones first
+    - frame: 5
+      screen: BO-043 Daily Reconciliation (resolve one)
+      sees: >-
+        Count by denomination for the selected shift, note by note; then expected and variance after the supervisor PIN
+      does: supervisor enters PIN and reason; Accept variance or Reject and recount
+      calls:
+      - shift#getShiftCountLines
+      - shift#acceptShiftVariance
+      - shift#rejectShiftVariance
+      result: accepted -> closed, over/short posted; rejected -> cashier recounts blind and resubmits
+    - frame: 6
+      screen: BO-043 Daily Reconciliation (still open)
+      sees: a shift nobody closed
+      does: supervisor closes it with PIN
+      calls:
+      - shift#closeShift
+      result: closed; expected and variance recorded; marked as closed by the supervisor
+    exits:
+    - reported
+    - partial (a till still open)
+    - deferred (shifts Under review until BO-043 resolves them)
+    - reconciled
+    motion:
+    - Status chips change as each shift is resolved; the "N shifts to resolve" counter decrements.
+    - Day report tiles show the as-of time; no auto-refresh on the till (the figure is read on open).
+    decisions:
+    - id: DEC-059, DEC-173, DEC-174, DEC-175, PRE-1
+      says: >-
+        Under review never blocks the next cashier; supervisor PIN at any till or in the daily cash reconciliation; reject
+        + recount
+    - id: CHG-FIN-003
+      says: blind close
+    - id: CHG-FIN-009, DEC-215
+      says: reconciliation daily per venue, plus a month view listing the days
+    - id: DEC-559, CHG-DOC-022
+      says: same-numbers test across POS-008, BO-058/BO-059 and P16
+    - id: SPF-4 (3 Oct defaults)
+      says: >-
+        POS-008 runReport needs REPORT_VIEW_VENUE; the till should show the cashier's own or terminal figures; exempted, question
+        to the contract owner
+    - ids:
+      - CHG-CSP-012
+      - CHG-CSP-013
+      - CHG-FIN-003
+      - CHG-SOT-001
+      - DEC-059
+    - 'answers-2-oct-batch1.md L225: daily per venue, plus a month view listing the days'
+    - 'answers-2-oct-batch1.md L414: POS-008 till day view permission question left with the contract owner'
+    - 'ids in the flow: CHG-FIN-003, DEC-059, CHG-CSP-012, CHG-SOT-001, CHG-CSP-013'
+    - >-
+      POS-007: A cashier may sign out with the variance pending; the shift shows "Under review" on the cashier's view and
+      never blocks the next cashier opening a shift on that till. A supervisor resolves it with closeShift on POS-007 (supervisor
+      PIN, any till) or …
+    - >-
+      POS-007: Blind close: the cashier sees only that a variance was recorded; the supervisor sees the amount. (Chinmay 2026-10-02)
+    - >-
+      POS-008: Drawn default accepted: Cashier sees own transactions count and own sales only; never expected cash. (Chinmay
+      2026-10-02)
+    - >-
+      POS-008: Drawn default accepted: Use the proposed set until the client corrects it. (Chinmay 2026-10-02)
+    - >-
+      BO-043: Daily per venue (applied by CHG-FIN-009), plus a month view listing the days. (Chinmay 2026-10-02)
+    - >-
+      answers-2-oct-batch1.md L79: 1 | POS-007 | The cashier may sign out, and the shift stays pending until the supervisor
+      accepts. That must not stop the next cashier starting a shift. On the cashier's page it shows "Under review". At the
+      end-of-day cash …
+    - >-
+      answers-2-oct-batch1.md L148: 173 | BO-040 | If no supervisor is available, may the cashier log out with the variance
+      logged for later review? | As POS-007: cashier signs out; shift pending ('Under review'); next cashier can start
+    - >-
+      answers-2-oct-batch1.md L345: Supervisor shift close | POS-007 plus the daily reconciliation | closeShift is declared
+      on POS-007 (supervisor PIN, any till) and in the daily cash reconciliation.
+    sources:
+    - flows/F74
+    - 'screens/P04#POS-007, #POS-008'
+    - screens/P08#BO-043
+    - contracts/spine/shift.yaml
+    - docs/active/block-test-strategy.md (same-numbers test)
+    - MoM 9 Sep 2026 4.18 (DI-806)
+    - flows/F74
+    - DI-804
+    - DI-805
+    - flows/F74-a-shift-closes-and-the-day-is-reported.yaml
+    - DI-803
+    - DI-775
+    - DI-776
+    - DI-806
+    - DI-272
+    - DI-271
+    - DI-181
+    - DI-802
+    - DI-387
+    - DI-964
+    - DI-712
+    - DI-799
+    - DI-213
+    - DI-282
+    - DI-306
+    - DI-268
+    - DI-275
+    - DI-258
+    - handoff/design-notes (screens POS-007, POS-008, POS-009, BO-043)
+    open:
+    - q: >-
+        The brief request says supervisor PIN only for reject/reopen; the contract requires it on accept and close too (CHG-RUL-019).
+      default: PIN on every supervisor action; a finance user without the PIN sees the shifts read-only
+    - q: 'POS-008 permission (SPF-4): a cashier may lack REPORT_VIEW_VENUE.'
+      default: draw My sales / This terminal for a cashier; outlet only for a supervisor
+    - q: >-
+        POS-009 and BO-043 shift operations are wave 2 in the flow file (SPF-1 sets Block A screens to wave 1).
+      default: draw as Block A
+    offline: Reporting needs the network. A day report from one till is not a day.
+    block_a:
+      screens:
+      - POS-007
+      - POS-008
+      - POS-009
+      - BO-043
+      operations:
+      - shift#acceptShiftVariance
+      - shift#closeShift
+      - shift#getShiftCountLines
+      - shift#listDenominations
+      - workforce#listRotaAssignments
+      - shift#listShifts
+      - reporting#runReport
+      - shift#submitShiftCount
+      screens_outside_block_a: []
+    merged_from:
+    - the fnb-retail copy of this flow (3 Oct dedupe)
+    merged_detail:
+      from: >-
+        the fnb-retail copy (lifted from flows/, screens/ and contracts/; the storyboard above is the one to draw)
+      trigger:
+        description: The venue is closing and somebody has to know what was taken.
+      steps:
+      - frame: 1
+        screen: POS-007
+        screen_name: Close Shift
+        block_a: true
+        user_sees: >-
+          The end of a cashier's shift: count the drawer blind, declare non-cash totals, give a reason if the count is off,
+          and close.
+        user_does: >-
+          The shift closes on a blind count and settles (CHG-FIN-003). A supervisor closes or resolves it with their own PIN
+          at any till of the venue (decided 2 October 2026, DEC-059, CHG-CSP-012).
+        operations:
+        - shift#submitShiftCount
+        - shift#acceptShiftVariance
+        - shift#listDenominations
+        - shift#closeShift
+        result: >-
+          F32 walks this in detail; here it is the input to the day. A counted shift waiting for review is still an input
+          to the day, shown as "Under review", not as missing.
+      - frame: 2
+        screen: POS-008
+        screen_name: Reports
+        block_a: true
+        user_sees: >-
+          How the day is going, seen from the terminal: the till's own sales, tenders, voids and refunds today, and the foreign-currency
+          cash it took.
+        user_does: The day is reported.
+        operations:
+        - reporting#runReport
+        result: >-
+          `runReport` with a definition, not a bespoke endpoint. `POS-008` declared `createReport` and `updateReport` until
+          24 August — a till that could author report definitions.
+        crosses_device: true
+      - frame: 3
+        screen: POS-009
+        screen_name: Staff Roster
+        block_a: true
+        user_sees: >-
+          Who is on duty right now, on which till, and their own clock: a supervisor sees the venue's staff on shift (role,
+          till, shift times, status), and any staff member clocks in or out and starts or ends a break here — the v2 shift
+          panel's …
+        user_does: Staffing against takings is read.
+        operations:
+        - workforce#listRotaAssignments
+        - shift#listShifts
+        result: Takings per staffed hour is the number a venue manager actually wants, and it needs both sides.
+        crosses_device: true
+      - frame: 4
+        screen: BO-043
+        screen_name: Daily Reconciliation
+        block_a: true
+        user_sees: >-
+          Finance proves each venue's day balances: every money source (till cash, card gateway settlements, bank, wallet)
+          set against the ledger, with the differences named and the unmatched settlement lines to resolve.
+        user_does: >-
+          The daily cash reconciliation lists every shift of the day and resolves the ones still under review, one by one.
+        operations:
+        - shift#listShifts
+        - shift#getShiftCountLines
+        - shift#closeShift
+        result: >-
+          Daily per venue, shift by shift (decided 2 October 2026, Chinmay, batch 3 #1 and batch 6 #215; DEC-059, CHG-CSP-012).
+          Each pending shift is accepted, sent back for a recount or closed by a supervisor with their PIN; the count lines
+          are read note by note, never the expected figure first.
+        crosses_device: true
+      processing:
+      - operation: shift#submitShiftCount
+        what: The cashier's blind count, closing their own shift
+        steps:
+        - 1
+        block_a: true
+        writes: true
+      - operation: shift#acceptShiftVariance
+        what: Accept an over/short beyond the threshold
+        steps:
+        - 1
+        block_a: true
+        writes: true
+      - operation: shift#closeShift
+        what: Blind close-out
+        steps:
+        - 1
+        - 4
+        block_a: true
+        writes: true
+      - operation: reporting#runReport
+        what: Run a report
+        steps:
+        - 2
+        block_a: true
+        writes: true
+      - operation: workforce#listRotaAssignments
+        what: The rota
+        steps:
+        - 3
+        block_a: true
+        offline_capable: true
+      - operation: shift#listShifts
+        what: List shifts
+        steps:
+        - 3
+        - 4
+        block_a: true
+      - operation: shift#getShiftCountLines
+        what: The denomination breakdown of a shift's counts
+        steps:
+        - 4
+        block_a: true
+  F98:
+    title: A day is reconciled from takings to the ledger
+    process: finance-insights
+    trigger: >-
+      Yesterday happened and the numbers have to agree: one venue-day of POS cash, gateway settlements, bank and wallet set
+      against the ledger.
+    actors:
+      role: financeController
+      apps:
+      - P08
+    inputs:
+    - name: Day and venue
+      formats:
+      - date picker (yesterday default)
+      - venue pick
+      limits: one day, one venue; region time zone
+      validation:
+      - >-
+        The file is for a different currency than the venue trades in -> Show both currencies and refuse to compute a difference
+        that means nothing. (derived)
+      - >-
+        A file arrives for a day already reconciled -> A new batch; never overwrites the earlier one. (derived)
+      source: finance controller on BO-043
+    - name: Settlement file
+      formats:
+      - CSV
+      - fixed width
+      - XML
+      - JSON (format picked when not detected)
+      limits: >-
+        provider (Stripe, Network International...), the day it covers; one file per upload; size limit not in the package
+      validation:
+      - parse fails -> status Failed with the reason and "Upload again"
+      - file for a different currency -> both currencies shown; no difference computed
+      - file for a day already reconciled -> a new batch, never overwrites
+      source: finance controller on BO-043 (Ingest settlement file)
+    - name: Resolve an exception
+      formats:
+      - 'outcome: Matched by hand / Write off / Dispute raised / Provider error / Timing difference'
+      - note (required)
+      - matching payment when matching by hand
+      limits: note required
+      validation:
+      - 'no note -> "Add a note: who reads this next month needs the reason"'
+      source: BO-043
+    - name: Filters
+      formats:
+      - provider pick list
+      - status pick list
+      limits: not free text (design-note correction)
+      validation:
+      - >-
+        Required as drawn; a value the server refuses is named inline with the server's reason and what was entered is kept
+        (package error-state rule) (derived)
+      source: BO-043
+    - name: Account and mapping edits
+      formats:
+      - account code, type, ERP code
+      - event -> debit/credit per venue
+      limits: see F16
+      validation:
+      - row removed -> "Refunds will post to suspense"
+      source: BO-074, BO-075
+    processing:
+    - input: Settlement file
+      operations:
+      - finance#ingestSettlementFile
+      - finance#listSettlements
+      - finance#getSettlement
+      does: >-
+        ingest, parse, match, classify, auto-resolve in the background; Ingesting -> Parsing -> Matching -> Matched / Has
+        exceptions; fees shown apart from shortfalls
+    - input: Exceptions
+      operations:
+      - finance#listSettlementExceptions
+      - finance#resolveSettlementException
+      does: >-
+        only genuine mismatches reach a person; closes with who and why; batch Resolved when none open; a found chargeback
+        goes to BO-025
+    - input: Ledger
+      operations:
+      - finance#listLedgerEntries
+      - finance#getTrialBalance
+      does: postings behind a figure, read-only
+    - input: Sources side by side
+      operations:
+      - finance#getUnifiedReconciliation (not Block A)
+      does: POS cash, each gateway, bank, wallet and ledger with totals; each variance names its two sources
+    outputs:
+    - output: Sources against the ledger
+      states:
+        balanced: '"Balanced" in words'
+        variance: '"gateway against ledger: AED 500.00 short - likely cause: 3 refunds settled next day"'
+        notAvailable: 'getUnifiedReconciliation is not in Block A: panel drawn, marked later'
+      failure_branches:
+      - what_goes_wrong: the operation behind this output fails (derived)
+        user_sees: the error state names what failed and keeps what was entered (package error-state rule) (derived)
+        recovery: retry (derived)
+    - output: Settlement batch row
+      states:
+        Ingesting: progress
+        Parsing: progress
+        Matching: progress
+        Matched: green
+        Has exceptions: count of open exceptions
+        Failed: reason + Upload again
+        Resolved: none open
+      failure_branches:
+      - what_goes_wrong: Failed state
+        user_sees: reason + Upload again
+        recovery: Retry; nothing entered is lost (derived)
+    - output: Figures consistency
+      states:
+        rule: >-
+          BO-1081 finance dashboard shows the same variance figures; BO-090 "Settlements reconciled" close check uses the
+          same counts. Every figure shows its "as of" time (lag-tolerant reporting copy); a stale or partial figure says so
+          instead of showing a total.
+      failure_branches:
+      - what_goes_wrong: the operation behind this output fails (derived)
+        user_sees: the error state names what failed and keeps what was entered (package error-state rule) (derived)
+        recovery: retry (derived)
+    - output: BO-043 Daily Reconciliation
+      states:
+        loading: The daily reconciliation list.
+        error: Could not load. Names which read failed and leaves the daily reconciliation untouched.
+        emptyFirstRun: >-
+          No daily reconciliation yet. Offers no create action — this screen declares no operation that makes one — and says
+          so rather than showing an empty tab ...
+        emptyNoResults: >-
+          Nothing matches the filter on providerName, status and the daily reconciliation are still there. Names the active
+          filter and offers to clear it.
+        emptyNoAccess: >-
+          Shown when the caller lacks LEDGER_VIEW, which getTrialBalance requires to show this screen, and names that permission
+          (the screen's other reads need ...
+      failure_branches:
+      - at_step: 1
+        what: The acting principal lacks the permission at this scope.
+        user_sees: >-
+          Refused at the first step, not the last. ADR-0002 makes authorisation user-driven — a person who gets three steps
+          in and then cannot finish has been told the wrong thing.
+        recovery: resolvePermissions
+    - output: BO-074 Chart of Accounts
+      states:
+        loading: The chart accounts list.
+        error: Could not load. Names which read failed and leaves the chart accounts untouched.
+        emptyFirstRun: >-
+          No chart accounts yet. Offers Create account (createAccount); distinct from a filter that matched nothing.
+        emptyNoResults: >-
+          Nothing matches the filter on legalEntityId, type, isPostable and the chart accounts are still there. Names the
+          active filter and offers to clear it.
+        emptyNoAccess: >-
+          Shown when the caller lacks LEDGER_VIEW, which listAccounts requires to show this screen, and names that permission.
+      failure_branches:
+      - what_goes_wrong: error state on BO-074
+        user_sees: Could not load. Names which read failed and leaves the chart accounts untouched.
+        recovery: Retry; nothing entered is lost (derived)
+      - what_goes_wrong: emptyNoAccess state on BO-074
+        user_sees: >-
+          Shown when the caller lacks LEDGER_VIEW, which listAccounts requires to show this screen, and names that permission.
+        recovery: Ask an administrator for the permission the state names (derived)
+    - output: BO-075 Account Mapping
+      states:
+        loading: The account mapping figures; each tile loads on its own.
+        error: Could not load. Names which read failed and leaves the account mapping untouched.
+        emptyFirstRun: No account mapping yet. Offers Create tax code (createTaxCode).
+        emptyNoResults: >-
+          Never shown: listAccountMappings takes no filter, so an empty list is always the first-run state above.
+        emptyNoAccess: >-
+          Shown when the caller lacks LEDGER_VIEW, which listAccountMappings requires to show this screen, and names that
+          permission.
+      failure_branches:
+      - what_goes_wrong: error state on BO-075
+        user_sees: Could not load. Names which read failed and leaves the account mapping untouched.
+        recovery: Retry; nothing entered is lost (derived)
+      - what_goes_wrong: emptyNoAccess state on BO-075
+        user_sees: >-
+          Shown when the caller lacks LEDGER_VIEW, which listAccountMappings requires to show this screen, and names that
+          permission.
+        recovery: Ask an administrator for the permission the state names (derived)
+    steps:
+    - frame: 1
+      screen: BO-043 Daily Reconciliation
+      sees: >-
+        day + venue; sources against the ledger; Shifts of the day; settlement batches; exceptions (open first); month view
+      does: picks Tue 29 Sep, Aquaventure Waterpark
+      calls:
+      - finance#listSettlements
+      - shift#listShifts
+      result: 'POS cash AED 8,460.00 deposited vs 8,480.00 expected: short AED 20.00'
+    - frame: 2
+      screen: BO-043 Daily Reconciliation (upload)
+      sees: 'Ingest settlement file dialog: provider, day, file, format'
+      does: uploads the Network International file
+      calls:
+      - finance#ingestSettlementFile
+      result: batch row appears and advances Ingesting -> Parsing -> Matching -> Has exceptions
+    - frame: 3
+      screen: BO-043 Daily Reconciliation (exception)
+      sees: Amount differs - ref NI-88231907 - AED 449.00 against AED 499.00
+      does: resolves as Timing difference with a note
+      calls:
+      - finance#listSettlementExceptions
+      - finance#resolveSettlementException
+      result: exception closed with who and why; batch Resolved when none open
+    - frame: 4
+      screen: BO-043 Daily Reconciliation (ledger)
+      sees: Open ledger entries for a figure
+      does: reads the postings
+      calls:
+      - finance#listLedgerEntries
+      result: read-only postings for that day
+    - frame: 5
+      screen: BO-074 Chart of Accounts
+      sees: account tree per legal entity, suspense balance banner
+      does: checks the over/short and suspense accounts
+      calls:
+      - finance#getAccount (not Block A)
+      result: nothing unmapped left in suspense, or the banner names the events
+    - frame: 6
+      screen: BO-075 Account Mapping
+      sees: event -> debit / credit per venue
+      does: maps a missing event
+      calls:
+      - finance#setAccountMappings (not Block A)
+      result: future postings leave suspense
+    exits:
+    - completed
+    - refused
+    motion:
+    - >-
+      Batch status advances through Ingesting, Parsing, Matching to Matched / Has exceptions; the page updates when matching
+      finishes (no reload).
+    - Resolved exceptions collapse out of the open list.
+    decisions:
+    - id: CHG-FIN-009, DEC-215
+      says: daily per venue plus month view
+    - id: 'answers batch 6 #212-213'
+      says: daily per venue; settlement postings automatic when fully matched
+    - id: DEC-059
+      says: the daily cash reconciliation resolves each shift
+    sources:
+    - handoff/design-notes/finance-insights.yaml#BO-043
+    - >-
+      contracts/spine/finance.yaml#ingestSettlementFile, #resolveSettlementException, #getUnifiedReconciliation
+    - R110
+    - DI-268
+    - DI-275
+    - DI-258
+    - flows/F98
+    - ADR-0002
+    open:
+    - q: >-
+        getUnifiedReconciliation (the side-by-side sources read) is not a Block A operation and not declared on BO-043.
+      default: draw the panel; mark it later; flag to the lead
+    - q: Settlement file size and row limits are not in the package.
+      default: 20 MB per file
+    - q: The trial balance on a daily screen (design-note correction).
+      default: leave it off the daily view; it lives on BO-090
+    - q: BO-076 (step 4, revenue recognition) is not Block A.
+      default: later frame
+  F13:
+    title: Month end closes
+    process: finance-insights
+    trigger: The month has ended and the books must be closed before anyone reports on them.
+    actors:
+      role: financeController
+      apps:
+      - P08 Venue Management
+    inputs:
+    - name: Legal entity and period
+      formats:
+      - 'entity switcher; periods by year: Open / Closing / Closed'
+      limits: periods follow the entity fiscal year
+      validation:
+      - >-
+        Required as drawn; a value the server refuses is named inline with the server's reason and what was entered is kept
+        (package error-state rule) (derived)
+      source: BO-090
+    - name: Abandon or reopen reason
+      formats:
+      - text
+      limits: required
+      validation:
+      - empty -> "Give a reason"
+      source: BO-090
+    - name: Journal entry
+      formats:
+      - open period, posting date, description 3-500, reference, at least two lines
+      limits: approver is never the preparer; LEDGER_APPROVE needs MFA
+      validation:
+      - period closing -> "Period is closing; choose an open period"
+      - own entry -> "Waiting for another approver"
+      source: BO-089 (not Block A)
+    processing:
+    - input: Close
+      operations:
+      - finance#listFiscalPeriods (not Block A)
+      - finance#getTrialBalance
+      - finance#beginPeriodClose
+      - finance#closeFiscalPeriod (not Block A)
+      does: >-
+        seven close checks; open shifts and unresolved settlement exceptions block; sales during closing post to the next
+        period
+    outputs:
+    - output: Close checks
+      states:
+        blocking: each blocker named with a link (Under-review shift -> BO-043/BO-040, open exception -> BO-043)
+        pending: FX revaluation shown pending, not passed
+        restated: banner when a closed period is reopened
+      failure_branches:
+      - what_goes_wrong: pending state
+        user_sees: FX revaluation shown pending, not passed
+        recovery: Follow the action the state offers (derived)
+    failure_branches:
+    - at_step: 1
+      what: An open shift in the period
+      user_sees: >-
+        The close blocks. A shift with an uncounted drawer is a cash figure nobody has confirmed, and closing over it books
+        a number that will change.
+      recovery: Venue manager
+    - at_step: 1
+      what: A settlement exception is unresolved
+      user_sees: Blocks. The gateway says one figure and the ledger says another, and closing picks one arbitrarily.
+      recovery: Finance
+    - at_step: 3
+      what: A journal needs approval and the approver is away
+      user_sees: >-
+        approvals delegation. This is why delegation is time-bounded — a month end waiting on someone on leave is the case
+        it exists for.
+      recovery: Delegate
+    - at_step: 4
+      what: A sale arrives after the period began closing
+      user_sees: >-
+        Posts to the next period automatically with a reference to the date. It is not rejected — a guest buying a ticket
+        does not care that finance is closing.
+      recovery: Automatic
+    - at_step: 5
+      what: The trial balance does not balance
+      user_sees: >-
+        Stops. The close is abandoned, the period reopens for posting, and the difference is investigated. Closing an unbalanced
+        period moves the problem rather than solving it.
+      recovery: Finance controller
+    - at_step: 6
+      what: A correction is needed after closing
+      user_sees: >-
+        reopenPeriod, which requires approval and is recorded. Or a reversal in the current period, which is usually right
+        — reopening a closed period invalidates every report already issued from it.
+      recovery: Finance controller
+    - at_step: 2
+      what: FX revaluation is pending
+      user_sees: Inter-entity obligations in a foreign currency must be revalued before the balance means anything.
+      recovery: Automatic
+    steps:
+    - frame: 1
+      flowStep: 1
+      screen: BO-090 Period Close
+      block: later
+      sees: Close a fiscal period, and see what is stopping it.
+      does: Opens the period and sees what is blocking
+      calls:
+      - finance#listFiscalPeriods (not Block A)
+      - finance#getTrialBalance
+      result: Unposted journals, open shifts, unreconciled settlements — each named
+    - frame: 2
+      flowStep: 2
+      screen: BO-040 Variance Approval
+      block: later
+      sees: See which tills are waiting for a variance to be accepted at the till, and which were.
+      does: Clears outstanding shift variances
+      calls:
+      - shift#listShifts
+      result: A shift left open in the period blocks the close
+    - frame: 3
+      flowStep: 3
+      screen: BO-089 Journal Entries
+      block: later
+      sees: Every posting, and the ones waiting for approval.
+      does: Posts the remaining journals
+      calls:
+      - finance#listJournalEntries (not Block A)
+      - finance#approveJournalEntry (not Block A)
+      result: Accruals, adjustments, corrections
+    - frame: 4
+      flowStep: 4
+      screen: BO-090 Period Close
+      block: later
+      sees: Close a fiscal period, and see what is stopping it.
+      does: Begins the close
+      calls:
+      - finance#beginPeriodClose
+      result: >-
+        The period stops accepting postings. Sales continue — the period is a ledger boundary, not a trading one
+    - frame: 5
+      flowStep: 5
+      screen: BO-090 Period Close
+      block: later
+      sees: Close a fiscal period, and see what is stopping it.
+      does: Reviews the trial balance
+      calls:
+      - finance#getTrialBalance
+      result: It balances, or the close does not proceed
+    - frame: 6
+      flowStep: 6
+      screen: BO-090 Period Close
+      block: later
+      sees: Close a fiscal period, and see what is stopping it.
+      does: Closes
+      calls:
+      - finance#closeFiscalPeriod (not Block A)
+      result: Locked. Later corrections post to the next period with a reference
+    exits:
+    - completed
+    - deferred
+    - escalated
+    motion: none
+    decisions:
+    - ids:
+      - CHG-WIR-008
+      - R080
+    sources:
+    - flows/F13
+    open:
+    - q: >-
+        listFiscalPeriods and closeFiscalPeriod are not Block A while beginPeriodClose and getTrialBalance are.
+      default: draw the close as later beyond "Begin close"
+  F107:
+    title: A report is defined, scheduled and delivered
+    process: finance-insights
+    trigger: Somebody wants the same numbers every Monday without asking for them.
+    actors:
+      role: venueManager
+      apps:
+      - P08
+    inputs:
+    - name: Report definition
+      formats:
+      - category pick list
+      - 'run prompts: date range within the report maximum, site, area, channel, workstation, user'
+      limits: from the governed catalogue
+      validation:
+      - range beyond maximum -> "This report covers at most 93 days" (proposed)
+      source: BO-058
+    - name: Schedule
+      formats:
+      - cadence (e.g. daily 07:00 region time)
+      - recipients / groups
+      - format PDF / Excel / CSV
+      - include personal data (permission)
+      limits:
+      - no size or count limit in the package; the bound contract field applies (derived)
+      validation:
+      - personal data without the export permission -> option hidden
+      source: BO-061 (not Block A)
+    processing:
+    - input: Report
+      operations:
+      - reporting#createReport
+      - reporting#runReport
+      - reporting#createReportSchedule (not Block A)
+      - reporting#listReportExecutions (not Block A)
+      does: run against the reporting copy; REPORT_VIEW_VENUE sees every run in scope; "mine only" is a filter
+    outputs:
+    - output: Figures consistency
+      states:
+        rule: >-
+          Same-numbers rule (DEC-559, CHG-DOC-022; docs/active/block-test-strategy.md): the till day view POS-008, the back-office
+          reports BO-058/BO-059 and Analytics P16 are windows onto one reporting area. For one scope, one period and one as-of
+          time they show the same takings, gross sales excluding VAT and refunds; a frontend comparison test fails on any
+          difference. Every figure carries its "as of" time; scope comes from the person's rights, never from a filter.
+      failure_branches:
+      - what_goes_wrong: the operation behind this output fails (derived)
+        user_sees: the error state names what failed and keeps what was entered (package error-state rule) (derived)
+        recovery: retry (derived)
+    failure_branches:
+    - at_step: 1
+      what: The acting principal lacks the permission at this scope.
+      user_sees: >-
+        Refused at the first step, not the last. ADR-0002 makes authorisation user-driven — a person who gets three steps
+        in and then cannot finish has been told the wrong thing.
+      recovery: resolvePermissions
+    steps:
+    - frame: 1
+      flowStep: 1
+      screen: BO-058 Reporting Home
+      block: later
+      sees: Find the report rather than build it.
+      does: The report is defined.
+      calls:
+      - reporting#createReport
+      - reporting#runReport
+      result: Built once and run to check it shows the right numbers.
+    - frame: 2
+      flowStep: 2
+      screen: BO-061 Scheduled Reports
+      block: later
+      sees: Send a report to somebody without them asking.
+      does: It is scheduled to the people who need it.
+      calls:
+      - reporting#createReportSchedule (not Block A)
+      - reporting#listReportSchedules (not Block A)
+      result: Every Monday, to these people, without anybody remembering to run it.
+    - frame: 3
+      flowStep: 3
+      screen: BO-061 Scheduled Reports
+      block: later
+      sees: Send a report to somebody without them asking.
+      does: Each delivery is checked.
+      calls:
+      - reporting#listReportExecutions (not Block A)
+      result: Delivered, or failed and said so. A schedule that silently stops is worse than none.
+    exits:
+    - completed
+    - refused
+    motion: none
+    decisions:
+    - id: DEC-559
+      says: same numbers as POS-008 and P16
+    - id: 3 Oct business rules
+      says: 'report runs: REPORT_VIEW_VENUE sees every run in scope; REPORT_MANAGE edits and schedules'
+    - ids:
+      - R261
+    sources:
+    - flows/F107
+    - ADR-0002
+    open:
+    - q: Scheduling (createReportSchedule, listReportExecutions, BO-061) is not Block A.
+      default: step 1 in Block A; scheduling frames later
+  F20:
+    title: A manager asks a question and gets an answer
+    process: finance-insights
+    trigger: A venue manager wants to know something the platform knows and does not want to find the report.
+    actors:
+      role: venueManager
+      apps:
+      - P08 Venue Management
+      - P06 Venue Staff App
+    inputs:
+    - name: Question
+      formats:
+      - free text, Arabic or English
+      limits: answered only within the person's role; personal data masked before the prompt leaves the platform
+      validation:
+      - out-of-scope data -> a narrower answer, not a refusal
+      - nothing retrieved -> "I couldn't find that in your data."
+      source: manager on BO-058 / EMP-020
+    processing:
+    - input: Grounded answer
+      operations:
+      - reporting#listReports
+      - reporting#runReport
+      - ai#sendAiMessage
+      does: retrieval runs as the caller; answer cites sources; proposals are proposedAction, never applied
+    - input: Save as report
+      operations:
+      - reporting#createReport
+      does: the generated query is saved, not the answer
+    outputs:
+    - output: Answer
+      states:
+        streaming: tokens stream (server-sent events), then sources and any proposed action
+        noSources: shown as a guess
+        providersDown: reported, not retried indefinitely
+      failure_branches:
+      - what_goes_wrong: the operation behind this output fails (derived)
+        user_sees: the error state names what failed and keeps what was entered (package error-state rule) (derived)
+        recovery: retry (derived)
+    - output: Figures consistency
+      states:
+        rule: >-
+          Same-numbers rule (DEC-559, CHG-DOC-022; docs/active/block-test-strategy.md): the till day view POS-008, the back-office
+          reports BO-058/BO-059 and Analytics P16 are windows onto one reporting area. For one scope, one period and one as-of
+          time they show the same takings, gross sales excluding VAT and refunds; a frontend comparison test fails on any
+          difference. Every figure carries its "as of" time; scope comes from the person's rights, never from a filter.
+      failure_branches:
+      - what_goes_wrong: the operation behind this output fails (derived)
+        user_sees: the error state names what failed and keeps what was entered (package error-state rule) (derived)
+        recovery: retry (derived)
+    failure_branches:
+    - at_step: 1
+      what: The question needs data the manager may not see
+      user_sees: >-
+        Retrieval runs as the caller. The assistant sees exactly what that person could read directly, so the answer is narrower
+        rather than refused.
+      recovery: Automatic
+    - at_step: 2
+      what: Nothing relevant was retrieved
+      user_sees: >-
+        Says so rather than answering from general knowledge. A confident answer about a venue the model has never seen is
+        the failure that stops people trusting it.
+      recovery: Automatic
+    - at_step: 2
+      what: The answer proposes a change
+      user_sees: >-
+        A proposedAction, not an applied one. Pricing and financial proposals need approval before execution.
+      recovery: Approver
+    - at_step: 2
+      what: Every provider is unavailable
+      user_sees: Reported rather than retried indefinitely. An assistant that hangs is worse than one that says no.
+      recovery: Automatic
+    - at_step: 1
+      what: The question contains guest personal data
+      user_sees: >-
+        Masked before the prompt leaves the platform. The masking list fails closed — an unset list sends nothing rather than
+        everything.
+      recovery: Automatic
+    - at_step: 3
+      what: The saved report returns different numbers tomorrow
+      user_sees: >-
+        Expected. It runs against the analytical replica and the data moved. The generated query is saved, not the answer,
+        which is why the query is returned in the first place.
+      recovery: Automatic
+    steps:
+    - frame: 1
+      flowStep: 1
+      screen: BO-058 Reporting Home
+      block: later
+      sees: Find the report rather than build it.
+      does: Asks in plain language
+      calls:
+      - reporting#runReport
+      - reporting#listReports
+      result: Grounded in the tenant’s own data
+    - frame: 2
+      flowStep: 2
+      screen: EMP-020 AI assistant — answer
+      block: later
+      sees: Answer with the operation behind it visible.
+      does: The answer arrives with its sources
+      calls:
+      - ai#sendAiMessage
+      result: An answer with no sources is a guess, and the interface shows it as one
+    - frame: 3
+      flowStep: 3
+      screen: BO-058 Reporting Home
+      block: later
+      sees: Find the report rather than build it.
+      does: Saves it as a report
+      calls:
+      - reporting#createReport
+      result: A one-off question becomes schedulable
+    exits:
+    - completed
+    - deferred
+    - abandoned
+    motion:
+    - >-
+      AI answer streams token by token (SSE for sendAiMessage: tokens, then sources, then any proposed action; decided 3 Oct).
+    - Source chips appear after the text completes.
+    decisions:
+    - id: 3 Oct business rules
+      says: stream answers; the full message is stored
+    - id: DEC-559
+      says: same numbers
+    sources:
+    - flows/F20
+    open:
+    - q: EMP-020 (step 2) is not Block A; the answer surface on BO-058 is.
+      default: draw the answer on BO-058
+  F303:
+    title: 'TICVAI Finance Backend Structure Reference v1.0 board 1: Finance Dashboard'
+    process: finance-insights
+    trigger: >-
+      The work the client grouped as TICVAI Finance Backend Structure Reference v1.0 board 1. This route is read from the
+      screens' own navigation, and the reason anyone walks it has still to be written.
+    actors:
+      role: venueManager
+      apps:
+      - P08 Venue Management
+    inputs:
+    - name: Period
+      formats:
+      - day, week, month (default), quarter, year (legal entity fiscal year), custom range
+      limits:
+      - no size or count limit in the package; the bound contract field applies (derived)
+      validation:
+      - >-
+        the recognition run for the period has not completed -> Recognised and Deferred tiles say "Recognition for September
+        not yet run" instead of showing a low number. (derived)
+      - >-
+        the period was closed and later reopened -> A banner "Restated: September reopened on 6 Oct by Omar Haddad" because
+        issued figures have changed. (derived)
+      source: BO-1081
+    - name: Legal entity
+      formats:
+      - single choice, first in the filter bar
+      limits: fixes base currency (shown read-only)
+      validation:
+      - >-
+        the legal entity trades in two currencies -> One figure per currency on each tile, never a cross-currency sum. (derived)
+      source: BO-1081
+    - name: Venue
+      formats:
+      - venues the user may see; a venue manager is locked to theirs (shown as text)
+      limits:
+      - no size or count limit in the package; the bound contract field applies (derived)
+      validation:
+      - >-
+        Required as drawn; a value the server refuses is named inline with the server's reason and what was entered is kept
+        (package error-state rule) (derived)
+      source: BO-1081
+    processing:
+    - input: Finance position
+      operations:
+      - reporting#getKpiValues
+      - finance#getUnifiedReconciliation (not Block A)
+      - finance#listTaxInvoices
+      - finance#listCreditMemos
+      does: six finance measures as separate tiles; one figure per currency, never a cross-currency sum
+    outputs:
+    - output: Finance tiles
+      states:
+        recognitionNotRun: '"Recognition for September not yet run" instead of a low number'
+        noLedgerAccess: '"Not available with your access" in place of zeros'
+        restated: '"Restated: September reopened on 6 Oct by Omar Haddad"'
+        rule: >-
+          Same numbers as BO-043 variances and P16. Every figure shows its "as of" time (lag-tolerant reporting copy); a stale
+          or partial figure says so instead of showing a total.
+      failure_branches:
+      - what_goes_wrong: the operation behind this output fails (derived)
+        user_sees: the error state names what failed and keeps what was entered (package error-state rule) (derived)
+        recovery: retry (derived)
+    failure_branches:
+    - at_step: 1
+      what: Nothing has been set up on Finance Dashboard yet
+      user_sees: >-
+        The screen declares emptyFirstRun. On a new tenant this is the expected state, and it is a different situation from
+        an empty result on an established one.
+      recovery: Automatic
+    - at_step: 1
+      what: The operator does not hold the permission this screen requires
+      user_sees: >-
+        The screen declares emptyNoAccess. The journey stops here rather than failing later, which is the right shape -- but
+        the permission that would satisfy it is not granted by any role in roles.yaml.
+      recovery: Unresolved -- see the permission join
+    steps:
+    - frame: 1
+      flowStep: 1
+      screen: BO-1081 Finance Dashboard
+      block: later
+      sees: Finance Dashboard
+      does: Opens Finance Dashboard
+      calls:
+      - reporting#getKpiValues
+      - finance#getUnifiedReconciliation (not Block A)
+      - finance#listTaxInvoices
+      - finance#listCreditMemos
+      result: >-
+        The finance team's one-glance position for one legal entity and one period: Gross sales, Discounts, Refunds, Net revenue,
+        Recognised revenue and Deferred revenue as six separate tiles, then where the money stands (POS, g ...
+    - frame: 2
+      flowStep: 2
+      screen: ANL-072 Finance Dashboard
+      block: later
+      sees: >-
+        The finance team's one-glance position for one legal entity and one period: the six finance measures as separate tiles,
+        where the money stands, and the health o ...
+      does: Works in Finance Dashboard
+      calls:
+      - reporting#getKpiValues
+      - finance#getUnifiedReconciliation (not Block A)
+      - finance#listTaxInvoices
+      - finance#listCreditMemos
+      result: >-
+        The finance team's one-glance position for one legal entity and one period: the six finance measures as separate tiles,
+        where the money stands, and the health of tax documents.
+    exits:
+    - completed
+    motion:
+    - Tiles show as-of time; no live counter.
+    decisions:
+    - >-
+      BO-1081: Drawn default stands (answer: "Excluding VAT; fees on their own line with a footnote"): Draw excluding VAT,
+      with fees as their own line under Gross sales and a footnote saying so. (Chinmay 2026-10-02) (derived)
+    - >-
+      BO-1081: Drawn default stands (answer: "Product category (venue + category filters)"): Leave it out; offer Venue plus
+      Product category. (Chinmay 2026-10-02) (derived)
+    - >-
+      BO-1081: One P16 Finance dashboard; Orders & Money (P08) shows a link card to it. (Chinmay 2026-10-02) (derived)
+    - >-
+      answers-2-oct-batch1.md L227: 217 | BO-1081 | Is Gross sales shown excluding VAT, and are service fees inside it or
+      a separate line? | Excluding VAT; fees on their own line with a footnote (derived)
+    - >-
+      answers-2-oct-batch1.md L228: 218 | BO-1081 | What is the pack's "Attraction" filter in scope terms (a scope node below
+      venue, or a product category)? | Product category (venue + category filters) (derived)
+    - >-
+      answers-2-oct-batch1.md L229: 219 | BO-1081 | Does BO-1081 stay as its own P08 screen (DI-260) or become the Finance
+      standard dashboard in P16 opened from Orders & Money (DI-721)? | One P16 Finance dashboard; Orders & Money shows a link
+      card (derived)
+    sources:
+    - flows/F303
+    open:
+    - q: >-
+        BO-1081 itself is not a Block A screen; the flow is in scope through Block A operations (getKpiValues etc.).
+      default: brief kept for the operations; frames drawn as later
+  F82:
+    title: A month is analysed from incrementality to a scheduled report
+    process: finance-insights
+    trigger: Somebody has to explain last month.
+    actors:
+      role: venueManager
+      apps:
+      - P08
+      - P16
+    inputs: []
+    processing:
+    - 'none: no operation on a Block A screen in this flow'
+    outputs:
+    - output: Figures consistency
+      states:
+        rule: >-
+          Same-numbers rule (DEC-559, CHG-DOC-022; docs/active/block-test-strategy.md): the till day view POS-008, the back-office
+          reports BO-058/BO-059 and Analytics P16 are windows onto one reporting area. For one scope, one period and one as-of
+          time they show the same takings, gross sales excluding VAT and refunds; a frontend comparison test fails on any
+          difference. Every figure carries its "as of" time; scope comes from the person's rights, never from a filter.
+      failure_branches:
+      - what_goes_wrong: the operation behind this output fails (derived)
+        user_sees: the error state names what failed and keeps what was entered (package error-state rule) (derived)
+        recovery: retry (derived)
+    failure_branches:
+    - at_step: 1
+      what: A step in the chain is not licensed for this tenant.
+      user_sees: >-
+        The chain stops at the module boundary. requiresModule on each screen decides — a tenant without the retail licence
+        does not see the retail half, and the journey is shorter rather than broken.
+      recovery: getModuleEnablement
+    steps:
+    - frame: 1
+      flowStep: 1
+      screen: ANL-005 Cost, Margin & Profitability
+      block: later
+      sees: Cost, Margin & Profitability — across F&B, retail, ticketing and frontline, filtered by domain.
+      does: Cost, Margin & Profitability.
+      calls:
+      - inventory#getStockValuation (not Block A)
+      result: >-
+        Cost, margin and profitability for F&B and retail managers: food cost %, gross margin %, and a bridge from gross sales
+        to contribution margin, plus promotion and pricing margin erosion.
+    - frame: 2
+      flowStep: 2
+      screen: ANL-007 Guest & Conversion Intelligence
+      block: later
+      sees: Guest & Conversion Intelligence — across F&B, retail, ticketing and frontline, filtered by domain.
+      does: Guest & Conversion Intelligence.
+      calls:
+      - marketing-crm#createSegment
+      - marketing-crm#listSegments (not Block A)
+      - marketing-crm#previewSegment (not Block A)
+      result: >-
+        Guest and conversion intelligence for a commercial or CRM manager: how visits convert to purchases, where carts are
+        abandoned, basket size, and which guest segments buy what.
+    - frame: 3
+      flowStep: 3
+      screen: ANL-004 Product Performance
+      block: later
+      sees: Product Performance — across F&B, retail, ticketing and frontline, filtered by domain.
+      does: Product Performance.
+      calls:
+      - reporting#getDashboard
+      - catalogue#listProducts
+      - reporting#runReport
+      result: >-
+        Product performance for a commercial, F&B or retail manager: which products, price points and promotions earn the
+        revenue and the margin, and which sell in volume but earn little (menu engineering / SKU performance).
+    - frame: 4
+      flowStep: 4
+      screen: ANL-006 Inventory & Waste Intelligence
+      block: later
+      sees: Inventory & Waste Intelligence — across F&B, retail, ticketing and frontline, filtered by domain.
+      does: Inventory & Waste Intelligence.
+      calls:
+      - inventory#listExpiringBatches (not Block A)
+      result: >-
+        Inventory and waste intelligence for F&B and retail managers: theoretical against actual usage, waste %, expiring
+        batches, count variances and waste-risk suggestions.
+    - frame: 5
+      flowStep: 5
+      screen: BO-058 Reporting Home
+      block: later
+      sees: Find the report rather than build it.
+      does: Reporting Home.
+      calls:
+      - reporting#createReportSchedule (not Block A)
+      - reporting#deleteReport
+      - finance#getFinancialReport (not Block A)
+      - reporting#getReport
+      - reporting#listReportExecutions (not Block A)
+      - reporting#saveNaturalLanguageQuery
+      result: >-
+        The report library: find the report rather than build it, run it with its prompts, see recent runs, and schedule it
+        to people.
+    exits:
+    - completed
+    - stoppedAtModule
+    motion: none
+    decisions:
+    - >-
+      ANL-005: Drawn default accepted: Fixed order, stage omitted when it has no value. (Chinmay 2026-10-02) (derived)
+    - >-
+      ANL-007: Drawn default accepted: Five stages as drawn, visits labelled "from web analytics". (Chinmay 2026-10-02) (derived)
+    - >-
+      ANL-004: Drawn default accepted: Margin shown only where a cost exists. (Chinmay 2026-10-02) (derived)
+    sources:
+    - flows/F82
+    open:
+    - q: Only operations (not screens) on this flow are Block A.
+      default: frames drawn as later
+    inputs_note: 'none: the flow takes no typed input on its Block A screens'
+  F99:
+    title: A chargeback arrives and is defended
+    process: finance-insights
+    trigger: A bank reverses a payment and the venue has days to answer.
+    actors:
+      role: financeController
+      apps:
+      - P08
+      - P10
+    inputs:
+    - name: Chargeback
+      formats:
+      - provider, case reference, amount, reason, evidence due date
+      limits: matched to the payment by reference
+      validation:
+      - responding after decided -> "This case is already closed (won/lost/accepted/expired)"
+      source: BO-025
+    - name: Response
+      formats:
+      - 'Represent (evidence: order, admitting scan, delivery, terms) / Accept the loss'
+      limits: before the bank deadline
+      validation:
+      - deadline passed -> Expired (lost)
+      source: BO-025
+    processing:
+    - input: step 2 on BO-024
+      operations:
+      - orders#capturePayment
+      - shift#closeDepositBoxes
+      - orders#inquirePaymentStatus
+      - finance#settleDeposit
+      does: 6 operations, 0 of them previously unwalked.
+    outputs:
+    - output: BO-024 Payment Exceptions
+      states:
+        loading: The saved payment exceptions.
+        error: Could not load. Names which read failed and leaves the payment exceptions untouched.
+        emptyFirstRun: >-
+          No payment exceptions configured. The form opens empty; it says what the platform does in the meantime.
+        emptyNoAccess: >-
+          Shown when the caller lacks ORDER_VIEW, which listPaymentReconciliationException requires to show this screen, and
+          names that permission.
+      failure_branches:
+      - what_goes_wrong: error state on BO-024
+        user_sees: Could not load. Names which read failed and leaves the payment exceptions untouched.
+        recovery: Retry; nothing entered is lost (derived)
+      - what_goes_wrong: emptyNoAccess state on BO-024
+        user_sees: >-
+          Shown when the caller lacks ORDER_VIEW, which listPaymentReconciliationException requires to show this screen, and
+          names that permission.
+        recovery: Ask an administrator for the permission the state names (derived)
+    failure_branches:
+    - at_step: 1
+      what: The acting principal lacks the permission at this scope.
+      user_sees: >-
+        Refused at the first step, not the last. ADR-0002 makes authorisation user-driven — a person who gets three steps
+        in and then cannot finish has been told the wrong thing.
+      recovery: resolvePermissions
+    steps:
+    - frame: 1
+      flowStep: 1
+      screen: BO-025 Chargebacks & Disputes
+      block: later
+      sees: Answer the acquirer with the evidence attached.
+      does: Chargebacks & Disputes.
+      calls:
+      - finance#getSettlement
+      - finance#ingestSettlementFile
+      - finance#listSettlementExceptions
+      - finance#listSettlements
+      - finance#resolveSettlementException
+      result: >-
+        A chargeback is a bank's decision on a clock the venue does not control: the money is already gone, evidence is due
+        by a date, and a missed date loses the case regardless of merit.
+    - frame: 2
+      flowStep: 2
+      screen: BO-024 Payment Exceptions
+      block: A
+      sees: Resolve payments that never resolved themselves.
+      does: Payment Exceptions.
+      calls:
+      - orders#capturePayment
+      - shift#closeDepositBoxes
+      - orders#inquirePaymentStatus
+      - finance#settleDeposit
+      result: 6 operations, 0 of them previously unwalked.
+    - frame: 3
+      flowStep: 3
+      screen: PTR-014 Settlement & Payment History
+      block: later
+      sees: Take the money, and be unambiguous about whether it worked.
+      does: Settlement & Payment History.
+      calls:
+      - finance#getSettlement
+      - finance#ingestSettlementFile
+      - finance#listSettlementExceptions
+      - finance#listSettlements
+      - finance#resolveSettlementException
+      result: >-
+        A partner's own money with the venue: how it pays (credit account invoiced monthly, prepaid wallet drawn down per
+        sale, or card per transaction), what it has paid, what is due, and its statement of account.
+    exits:
+    - completed
+    - refused
+    motion:
+    - Deadline countdown on each case (days left).
+    decisions:
+    - ids:
+      - CHG-WIR-025
+    sources:
+    - flows/F99
+    - ADR-0002
+    open:
+    - q: BO-025 is not Block A; BO-024 is.
+      default: BO-024 frames in full; BO-025 later
+  F106:
+    title: A security dashboard surfaces something and it is investigated
+    process: finance-insights
+    trigger: An anomaly appears — a login pattern, an override rate, a spend spike.
+    actors:
+      role: platformAdmin
+      apps:
+      - P08
+      - P09
+    inputs:
+    - name: Tenant and grant
+      formats:
+      - tenant pick; grant reason, permissions, expiry; MFA first
+      limits: nothing tenant-specific shows until a grant is open
+      validation:
+      - grant expires -> figures stay, labelled; actions disable
+      source: ADM-031
+    processing:
+    - input: step 1 on ADM-031
+      operations:
+      - reporting#createDashboard
+      - reporting#listDashboards (not Block A)
+      - reporting#updateDashboard
+      does: >-
+        The platform's security and compliance picture: who holds sensitive rights without a second factor, open platform-staff
+        access into tenants, unusual sign-in patterns and override rates, personal-data exports, and retenti ...
+    outputs:
+    - output: ADM-031 Security & Compliance Dashboard
+      states:
+        loading: The security compliance list.
+        error: Could not load. Names which read failed and leaves the security compliance untouched.
+        emptyFirstRun: >-
+          No security compliance yet. Offers Create dashboard (createDashboard); distinct from a filter that matched nothing.
+        emptyNoResults: >-
+          Nothing matches the filter on module, includeArchived and the security compliance are still there. Names the active
+          filter and offers to clear it.
+        emptyNoAccess: >-
+          Shown when the caller lacks PLATFORM_TENANT_VIEW, which listTenants requires to show this screen, and names that
+          permission (the screen's other reads ...
+        grantRequired: >-
+          No access into this tenant yet. A tenant is picked and no platform-staff grant into it is open, so every tenant
+          action is disabled and the screen offe ...
+      failure_branches:
+      - at_step: 1
+        what: The acting principal lacks the permission at this scope.
+        user_sees: >-
+          Refused at the first step, not the last. ADR-0002 makes authorisation user-driven — a person who gets three steps
+          in and then cannot finish has been told the wrong thing.
+        recovery: resolvePermissions
+    steps:
+    - frame: 1
+      flowStep: 1
+      screen: ADM-031 Security & Compliance Dashboard
+      block: A
+      sees: >-
+        See a tenant's security and compliance position from the console: second-factor coverage, failed sign-ins, open grants
+        and exports.
+      does: Security & Compliance Dashboard.
+      calls:
+      - reporting#createDashboard
+      - reporting#listDashboards (not Block A)
+      - reporting#updateDashboard
+      result: >-
+        The platform's security and compliance picture: who holds sensitive rights without a second factor, open platform-staff
+        access into tenants, unusual sign-in patterns and override rates, personal-data exports, and retenti ...
+    - frame: 2
+      flowStep: 2
+      screen: ADM-004 Platform Audit Log
+      block: later
+      sees: Find platform audit log for this venue.
+      does: Platform Audit Log.
+      calls:
+      - ai#listAiInteractions (not Block A)
+      result: 1 operations, 1 of them previously unwalked.
+    - frame: 3
+      flowStep: 3
+      screen: BO-068 Audit Log
+      block: later
+      sees: See who changed what at this venue.
+      does: Audit Log.
+      calls:
+      - tenancy#listAuditRecords
+      result: >-
+        Who did what, where and when in the venues in scope, including every action a TICVAI platform operator took under
+        a grant into the tenant. Audit records are read-only and immutable;
+    exits:
+    - completed
+    - refused
+    motion: none
+    decisions:
+    - ids:
+      - CHG-WIR-021
+    sources:
+    - flows/F106
+    - ADR-0002
+    open:
+    - q: Audit log screens (ADM-004, BO-068) are not Block A.
+      default: later frames
+  F145:
+    title: 'Pricing   Revenue Management board 3: Tax, Fee & Calculation Command Center'
+    process: finance-insights
+    trigger: >-
+      The work the client grouped as Pricing Revenue Management board 3. This route is read from the screens' own navigation,
+      and the reason anyone walks it has still to be written.
+    actors:
+      role: platformAdmin
+      apps:
+      - P09 TICVAI Web
+      - P08 Venue Management
+    inputs:
+    - name: Tax type
+      formats: as the rule says
+      limits: >-
+        One select: VAT, GST, Sales tax, Entertainment tax, Tourism tax, Municipality tax, Service tax, Custom regulatory
+        tax. Not five buttons.
+      validation:
+      - >-
+        Required as drawn; a value the server refuses is named inline with the server's reason and what was entered is kept
+        (package error-state rule) (derived)
+      source: ADM-069 Tax Profile & Jurisdiction Configuration (design note)
+    - name: Rate
+      formats: as the rule says
+      limits: Percent (e.g. 5 for UAE VAT); empty when the tax is a fixed amount set on the tax rule.
+      validation:
+      - >-
+        Required as drawn; a value the server refuses is named inline with the server's reason and what was entered is kept
+        (package error-state rule) (derived)
+      source: ADM-069 Tax Profile & Jurisdiction Configuration (design note)
+    - name: Taxable base
+      formats: as the rule says
+      limits: >-
+        Discounted price (default) or Price before discount. Explain with a live example under the control: >- "AED 100 ticket,
+        20% off: guest pays AED 80; VAT is charged on AED 100".
+      validation:
+      - >-
+        Required as drawn; a value the server refuses is named inline with the server's reason and what was entered is kept
+        (package error-state rule) (derived)
+      source: ADM-069 Tax Profile & Jurisdiction Configuration (design note)
+    - name: Jurisdiction level and applicability
+      formats: as the rule says
+      limits: >-
+        Country, region or municipality; applies to legal entity, country, market, venue, product category, product, service
+        or channel (a channel only where legally applicable). Multiple applicability rows allowed.
+      validation:
+      - >-
+        Required as drawn; a value the server refuses is named inline with the server's reason and what was entered is kept
+        (package error-state rule) (derived)
+      source: ADM-069 Tax Profile & Jurisdiction Configuration (design note)
+    - name: Effective from / to
+      formats: as the rule says
+      limits: >-
+        Dates, not selects. From must be in the future for a change to an active profile; empty "to" means open-ended.
+      validation:
+      - >-
+        Required as drawn; a value the server refuses is named inline with the server's reason and what was entered is kept
+        (package error-state rule) (derived)
+      source: ADM-069 Tax Profile & Jurisdiction Configuration (design note)
+    - name: Tax registration number, legal entity, currency
+      formats: as the rule says
+      limits: Text and pick lists; currency follows the legal entity.
+      validation:
+      - >-
+        A three-decimal currency legal entity -> Preview and examples at three decimals (BHD 12.500 + VAT 10% = BHD 13.750).
+        (derived)
+      source: ADM-069 Tax Profile & Jurisdiction Configuration (design note)
+    - name: Invoice template (per legal entity and document kind)
+      formats: as the rule says
+      limits: >-
+        Number prefix (INV-, SINV-, CN-), yearly reset, next number (may be raised, never lowered below the last issued),
+        padding, languages in order (en, ar), title per language (prescribed wording is law), footer, logo, "issue a VAT receipt
+        on ev ...
+      validation:
+      - >-
+        A three-decimal currency legal entity -> Preview and examples at three decimals (BHD 12.500 + VAT 10% = BHD 13.750).
+        (derived)
+      source: ADM-069 Tax Profile & Jurisdiction Configuration (design note)
+    - name: E-invoicing provider
+      formats: as the rule says
+      limits: >-
+        Provider name, endpoint and test endpoint, credential reference (never the secret), participant id, format, mode Disabled
+        / Test / Live, transmit-within hours.
+      validation:
+      - >-
+        Required as drawn; a value the server refuses is named inline with the server's reason and what was entered is kept
+        (package error-state rule) (derived)
+      source: ADM-069 Tax Profile & Jurisdiction Configuration (design note)
+    - name: Filters
+      formats: as the rule says
+      limits: >-
+        Findings or scenario results; area (Tax, Fees, Formula, Currency, Reconciliation, Test suite); severity; passed or
+        failed.
+      validation:
+      - >-
+        Required as drawn; a value the server refuses is named inline with the server's reason and what was entered is kept
+        (package error-state rule) (derived)
+      source: ADM-077 Calculation Validation, Reconciliation & Service Interface (design note)
+    processing:
+    - input: step 2 on ADM-069
+      operations:
+      - catalogue#setTaxProfileJurisdiction (not Block A)
+      does: >-
+        Define reusable tax profiles per legal entity, country and jurisdiction: tax type, rate, where the profile applies,
+        and the taxable base, including the region-configurable rule that tax is charged on the price before dis ...
+    - input: step 18 on ADM-077
+      operations:
+      - catalogue#listCalculationValidationReconciliation (not Block A)
+      does: >-
+        The last check before pricing and tax changes go live: configuration findings (missing profiles, invalid rates, overlapping
+        rules, rounding problems) and the results of stored test scenarios, each compared against expect ...
+    outputs:
+    - output: ADM-069 Tax Profile & Jurisdiction Configuration
+      states:
+        loading: The tax profile jurisdiction configuration as saved.
+        error: Could not load. Names which read failed and leaves the tax profile jurisdiction untouched.
+        emptyFirstRun: >-
+          No tax profile jurisdiction configured yet. Carries the create action and says what the platform does in the meantime.
+        emptyNoAccess: >-
+          Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support
+          with the wrong question.
+      failure_branches:
+      - what_goes_wrong: error state on ADM-069
+        user_sees: Could not load. Names which read failed and leaves the tax profile jurisdiction untouched.
+        recovery: Retry; nothing entered is lost (derived)
+      - what_goes_wrong: emptyNoAccess state on ADM-069
+        user_sees: >-
+          Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support
+          with the wrong question.
+        recovery: Ask an administrator for the permission the state names (derived)
+    - output: ADM-077 Calculation Validation, Reconciliation & Service Interface
+      states:
+        loading: The calculation validation reconciliation list.
+        error: >-
+          Could not load. Names which read failed and leaves the calculation validation reconciliation untouched.
+        emptyFirstRun: >-
+          No calculation validation reconciliation yet. Carries the create action; distinct from a filter that matched nothing.
+        emptyNoResults: >-
+          The filter narrowed it and the calculation validation reconciliation are still there. Names the active filter and
+          offers to clear it.
+        emptyNoAccess: >-
+          Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support
+          with the wrong question.
+      failure_branches:
+      - what_goes_wrong: error state on ADM-077
+        user_sees: >-
+          Could not load. Names which read failed and leaves the calculation validation reconciliation untouched.
+        recovery: Retry; nothing entered is lost (derived)
+      - what_goes_wrong: emptyNoAccess state on ADM-077
+        user_sees: >-
+          Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support
+          with the wrong question.
+        recovery: Ask an administrator for the permission the state names (derived)
+    failure_branches:
+    - at_step: 1
+      what: Nothing has been set up on Tax, Fee & Calculation Command Center yet
+      user_sees: >-
+        The screen declares emptyFirstRun. On a new tenant this is the expected state, and it is a different situation from
+        an empty result on an established one.
+      recovery: Automatic
+    - at_step: 1
+      what: The operator does not hold the permission this screen requires
+      user_sees: >-
+        The screen declares emptyNoAccess. The journey stops here rather than failing later, which is the right shape -- but
+        the permission that would satisfy it is not granted by any role in roles.yaml.
+      recovery: Unresolved -- see the permission join
+    steps:
+    - frame: 1
+      flowStep: 1
+      screen: ADM-068 Tax, Fee & Calculation Command Center
+      block: later
+      sees: >-
+        Provide Finance, Commercial and Pricing administrators with one central view of TICVAI's price-calculation configuration.
+      does: Opens Tax, Fee & Calculation Command Center
+      calls:
+      - catalogue#listTaxFeeCalculation (not Block A)
+      result: >-
+        The hub of the tax, fee and calculation board: how many tax profiles, jurisdictions, fees, surcharges, exemptions
+        and calculation profiles are active, what is broken (products with no tax, conflicts, validation issues) a ...
+    - frame: 2
+      flowStep: 2
+      screen: ADM-069 Tax Profile & Jurisdiction Configuration
+      block: A
+      sees: >-
+        Define reusable tax profiles according to legal entity, country, jurisdiction and commercial context.
+      does: Works in Tax Profile & Jurisdiction Configuration
+      calls:
+      - catalogue#setTaxProfileJurisdiction (not Block A)
+      result: >-
+        Define reusable tax profiles per legal entity, country and jurisdiction: tax type, rate, where the profile applies,
+        and the taxable base, including the region-configurable rule that tax is charged on the price before dis ...
+    - frame: 3
+      flowStep: 18
+      screen: ADM-077 Calculation Validation, Reconciliation & Service Interface
+      block: A
+      sees: >-
+        Provide final technical and commercial validation of the pricing calculation engine and define how other TICVAI modules
+        consume it.
+      does: Works in Calculation Validation, Reconciliation & Service Interface
+      calls:
+      - catalogue#listCalculationValidationReconciliation (not Block A)
+      result: >-
+        The last check before pricing and tax changes go live: configuration findings (missing profiles, invalid rates, overlapping
+        rules, rounding problems) and the results of stored test scenarios, each compared against expect ...
+    later_frames:
+    - ADM-070 Tax Rule & Treatment Builder
+    - ADM-071 Fee & Surcharge Library
+    - ADM-072 Fee Applicability & Charging Rule Builder
+    - ADM-073 Fee Waiver, Tax Exemption & Exception Rules
+    - ADM-074 Price Calculation Sequence & Formula Engine
+    - ADM-075 Currency Precision, Rounding & Monetary Rules
+    - ADM-076 Price Breakdown, Calculation Simulation & Explainability
+    exits:
+    - completed
+    motion: none
+    decisions:
+    - >-
+      ADM-068: Drawn default stands (answer: "TICVAI staff maintain country tax templates; tenants run VAT returns and invoices
+      in VM"): TICVAI staff maintaining templates per country; the VAT return and invoices are drawn on the tenant's finance
+      screens instead. (Chinmay 2026-10-02) (derived)
+    - >-
+      ADM-068: Drawn default stands (answer: "Leave the AI panel out of phase one"): Leave the AI panel out of phase one.
+      (Chinmay 2026-10-02) (derived)
+    - >-
+      ADM-069: Drawn default accepted: The client's finance team enters rates and registrations (the contract says so); platform
+      staff only under a grant. (Chinmay 2026-10-02) (derived)
+    - >-
+      ADM-069: Drawn default accepted: On for UAE legal entities (the template default is off). (Chinmay 2026-10-02) (derived)
+    - >-
+      answers-2-oct-batch1.md L213: 207 | ADM-068 | Who uses ADM-068, TICVAI staff maintaining jurisdiction templates, or
+      tenant finance administrators? | TICVAI staff maintain country tax templates; tenants run VAT returns and invoices in
+      VM (derived)
+    - >-
+      answers-2-oct-batch1.md L214: 208 | ADM-068 | The aiInsights field on the summary, is it in phase one, given AI-assisted
+      finance reporting is phase two? | Leave the AI panel out of phase one (derived)
+    - >-
+      answers-2-oct-batch1.md L264: 318 | ANL-009 | DI-278 makes AI-assisted finance reporting phase two. Should finance-ledger
+      questions (deferred revenue, journals) be refused in phase one? | From ADM-068: AI finance reporting in phase two; ledger
+      questions answer 'not available yet' (derived)
+    sources:
+    - flows/F145
+    open:
+    - q: >-
+        Client design board flow: hub-and-spoke with no operations; only the Block A spokes are storyboarded.
+      default: draw the Block A spokes from their screen specs; others are later_frames
+  F176:
+    title: 'Unified BI Reporting and AI Analytics Platform board 2: Dashboard Library'
+    process: finance-insights
+    trigger: >-
+      The work the client grouped as Unified BI Reporting and AI Analytics Platform board 2. This route is read from the screens'
+      own navigation, and the reason anyone walks it has still to be written.
+    actors:
+      role: venueManager
+      apps:
+      - P16 Venue Analytics
+    inputs:
+    - name: Grid and tile position
+      formats: as the rule says
+      limits: >-
+        A 12-column grid (the client's spec; not yet fixed in the contract); tiles snap to whole columns and rows; position
+        is row, column, width, height. At most 24 tiles per dashboard.
+      validation:
+      - >-
+        Required as drawn; a value the server refuses is named inline with the server's reason and what was entered is kept
+        (package error-state rule) (derived)
+      source: ANL-023 Drag-and-Drop Dashboard Canvas (design note)
+    - name: Visual per tile
+      formats: as the rule says
+      limits: >-
+        One of the contracted marks (number, line, area, bar, stacked bar, 100% stacked bar, combo, pie, donut, table, matrix,
+        gauge, heatmap, funnel, waterfall, treemap, scatter, map, ribbon, decomposition tree).
+      validation:
+      - >-
+        The chosen visual needs more than one dimension and one measure (combo, scatter, map, matrix…) -> Not bindable yet:
+        report columns carry no axis, series, size or colour role. Show these visuals in the gallery as unavailable with that
+        reason until the field-well model exists. (derived)
+      source: ANL-023 Drag-and-Drop Dashboard Canvas (design note)
+    - name: Refresh
+      formats: as the rule says
+      limits: Per tile, 30 seconds minimum; the dashboard shows its combined load (low, medium, high).
+      validation:
+      - >-
+        Required as drawn; a value the server refuses is named inline with the server's reason and what was entered is kept
+        (package error-state rule) (derived)
+      source: ANL-023 Drag-and-Drop Dashboard Canvas (design note)
+    - name: Module and audience
+      formats: as the rule says
+      limits: >-
+        The module the dashboard belongs to decides who may see it (required; "Core" when it belongs to none); shared or personal;
+        optionally one venue.
+      validation:
+      - >-
+        Required as drawn; a value the server refuses is named inline with the server's reason and what was entered is kept
+        (package error-state rule) (derived)
+      source: ANL-023 Drag-and-Drop Dashboard Canvas (design note)
+    - name: Code and name
+      formats: as the rule says
+      limits: >-
+        Code unique in the company; the seeded system KPIs (takings, admissions and the accreditation ones) are shown read-only.
+      validation:
+      - >-
+        Required as drawn; a value the server refuses is named inline with the server's reason and what was entered is kept
+        (package error-state rule) (derived)
+      source: ANL-025 KPI Builder (design note)
+    - name: Formula
+      formats: as the rule says
+      limits: Built from catalogue measures and fields with a formula editor that validates as you type; no SQL.
+      validation:
+      - >-
+        Required as drawn; a value the server refuses is named inline with the server's reason and what was entered is kept
+        (package error-state rule) (derived)
+      source: ANL-025 KPI Builder (design note)
+    - name: Unit
+      formats: as the rule says
+      limits: >-
+        Currency, Count, Percentage, Duration, Ratio, Score. Currency takes the region's currency and decimals; it is not
+        chosen here.
+      validation:
+      - >-
+        Required as drawn; a value the server refuses is named inline with the server's reason and what was entered is kept
+        (package error-state rule) (derived)
+      source: ANL-025 KPI Builder (design note)
+    - name: Direction
+      formats: as the rule says
+      limits: >-
+        One toggle "Higher is better" (on by default). Refund rate, queue time and gate rejection rate set it off.
+      validation:
+      - >-
+        Required as drawn; a value the server refuses is named inline with the server's reason and what was entered is kept
+        (package error-state rule) (derived)
+      source: ANL-025 KPI Builder (design note)
+    - name: Domain, default period, owner, active
+      formats: as the rule says
+      limits: Domain from the catalogue's domains; default period (today, week, month); owner is a person.
+      validation:
+      - >-
+        Required as drawn; a value the server refuses is named inline with the server's reason and what was entered is kept
+        (package error-state rule) (derived)
+      source: ANL-025 KPI Builder (design note)
+    processing:
+    - 'none: no operation on a Block A screen in this flow'
+    outputs:
+    - output: Figures consistency
+      states:
+        rule: >-
+          Same-numbers rule (DEC-559, CHG-DOC-022; docs/active/block-test-strategy.md): the till day view POS-008, the back-office
+          reports BO-058/BO-059 and Analytics P16 are windows onto one reporting area. For one scope, one period and one as-of
+          time they show the same takings, gross sales excluding VAT and refunds; a frontend comparison test fails on any
+          difference. Every figure carries its "as of" time; scope comes from the person's rights, never from a filter.
+      failure_branches:
+      - what_goes_wrong: the operation behind this output fails (derived)
+        user_sees: the error state names what failed and keeps what was entered (package error-state rule) (derived)
+        recovery: retry (derived)
+    - output: ANL-023 Drag-and-Drop Dashboard Canvas
+      states:
+        loading: The dashboard and its tiles.
+        error: Could not load. Names which read failed (the dashboard or a report) and leaves the canvas as it was.
+        emptyFirstRun: >-
+          A new dashboard with no tiles yet. The gallery is open and says "Drag a visual onto the grid"; nothing is created
+          until Save dashboard.
+        emptyNoResults: The report search matched nothing. Names the search and offers to clear it.
+        emptyNoAccess: >-
+          Shown when the caller lacks REPORT_VIEW_VENUE, which listReports requires to show this screen, and names that permission.
+      failure_branches:
+      - what_goes_wrong: error state on ANL-023
+        user_sees: Could not load. Names which read failed (the dashboard or a report) and leaves the canvas as it was.
+        recovery: Retry; nothing entered is lost (derived)
+      - what_goes_wrong: emptyNoAccess state on ANL-023
+        user_sees: >-
+          Shown when the caller lacks REPORT_VIEW_VENUE, which listReports requires to show this screen, and names that permission.
+        recovery: Ask an administrator for the permission the state names (derived)
+    - output: ANL-025 KPI Builder
+      states:
+        loading: The KPIs already defined.
+        error: Could not load. Names which read failed and leaves the form untouched.
+        emptyFirstRun: >-
+          Only the seeded KPIs exist (takings, admissions and the finance measures). Offers Create KPI (createKpi) for the
+          tenant's first own KPI.
+        emptyNoAccess: >-
+          Without REPORT_VIEW_TENANT, which listKpis requires, the screen does not load and this state names that permission.
+      failure_branches:
+      - what_goes_wrong: error state on ANL-025
+        user_sees: Could not load. Names which read failed and leaves the form untouched.
+        recovery: Retry; nothing entered is lost (derived)
+      - what_goes_wrong: emptyNoAccess state on ANL-025
+        user_sees: >-
+          Without REPORT_VIEW_TENANT, which listKpis requires, the screen does not load and this state names that permission.
+        recovery: Ask an administrator for the permission the state names (derived)
+    failure_branches:
+    - at_step: 1
+      what: Nothing has been set up on Dashboard Library yet
+      user_sees: >-
+        The screen declares emptyFirstRun. On a new tenant this is the expected state, and it is a different situation from
+        an empty result on an established one.
+      recovery: Automatic
+    - at_step: 1
+      what: The operator does not hold the permission this screen requires
+      user_sees: >-
+        The screen declares emptyNoAccess. The journey stops here rather than failing later, which is the right shape -- but
+        the permission that would satisfy it is not granted by any role in roles.yaml.
+      recovery: Unresolved -- see the permission join
+    steps:
+    - frame: 1
+      flowStep: 1
+      screen: ANL-021 Dashboard Library
+      block: later
+      sees: >-
+        Provide a centralized catalogue for all standard, custom, AI-generated and embedded TICVAI dashboards.
+      does: Opens Dashboard Library
+      calls:
+      - none
+      result: >-
+        The one catalogue of dashboards, inside the single permission-based reporting area (no copies of it inside each module).
+        A login sees only the dashboards of modules it is entitled to, narrowed to its own scope;
+    - frame: 2
+      flowStep: 4
+      screen: ANL-023 Drag-and-Drop Dashboard Canvas
+      block: A
+      sees: Provide the main visual workspace for dashboard construction.
+      does: Works in Drag-and-Drop Dashboard Canvas
+      calls:
+      - none
+      result: >-
+        The canvas where a dashboard is laid out: tiles on a grid, each bound to a report and drawn as one visual.
+    - frame: 3
+      flowStep: 8
+      screen: ANL-025 KPI Builder
+      block: A
+      sees: Allow authorized business users to create standardized enterprise KPIs.
+      does: Works in KPI Builder
+      calls:
+      - none
+      result: >-
+        Where an authorised business user defines a company-wide KPI once, so "revenue" means the same on every dashboard.
+    later_frames:
+    - ANL-022 Dashboard Creation Wizard
+    - ANL-024 Widget & Visualization Library
+    - ANL-026 Targets, Thresholds & KPI Status Rules
+    - ANL-027 Data & Filter Configuration
+    - ANL-028 Drill-Down & Interaction Designer
+    - ANL-029 Dashboard Access, Publishing & Versioning
+    - ANL-030 Dashboard Preview, Validation & Health
+    exits:
+    - completed
+    motion:
+    - Canvas tiles snap to a 12-column grid while dragged (ANL-023).
+    - Per-tile refresh, 30 s minimum; combined load shown low / medium / high.
+    - Tiles stack in reading order at narrow widths.
+    decisions:
+    - id: answers batch 3 (ANL-023)
+      says: build all the charts
+    - id: 3 Oct business rules
+      says: first Save createDashboard, later saves updateDashboard; refresh budget checked on both
+    sources:
+    - flows/F176
+    open:
+    - q: >-
+        Client design board flow: hub-and-spoke with no operations; only the Block A spokes are storyboarded.
+      default: draw the Block A spokes from their screen specs; others are later_frames
+  F180:
+    title: >-
+      Unified BI Reporting and AI Analytics Platform board 10: BI & Analytics Administration Command Center
+    process: finance-insights
+    trigger: >-
+      The work the client grouped as Unified BI Reporting and AI Analytics Platform board 10. This route is read from the
+      screens' own navigation, and the reason anyone walks it has still to be written.
+    actors:
+      role: venueManager
+      apps:
+      - P16 Venue Analytics
+    inputs:
+    - name: Dataset grain
+      formats: as the rule says
+      limits: >-
+        A required sentence "One row is one …" for each dataset; the most common cause of a wrong report is a silently multiplied
+        grain.
+      validation:
+      - >-
+        A personal-data field is added to a dataset used by scheduled reports -> Warn that exports of it need the personal-data
+        export permission and are audited. (derived)
+      source: ANL-066 Semantic Model & Business Data Catalogue (design note)
+    - name: Field
+      formats: as the rule says
+      limits: Code, business label, data type, default aggregation, description, and Personal data on or off.
+      validation:
+      - >-
+        A personal-data field is added to a dataset used by scheduled reports -> Warn that exports of it need the personal-data
+        export permission and are audited. (derived)
+      source: ANL-066 Semantic Model & Business Data Catalogue (design note)
+    - name: Relationship
+      formats: as the rule says
+      limits: >-
+        From dataset, to dataset, cardinality (one-to-one, one-to-many, many-to-one, many-to-many); many-to-many shown with
+        a warning.
+      validation:
+      - >-
+        Required as drawn; a value the server refuses is named inline with the server's reason and what was entered is kept
+        (package error-state rule) (derived)
+      source: ANL-066 Semantic Model & Business Data Catalogue (design note)
+    processing:
+    - 'none: no operation on a Block A screen in this flow'
+    outputs:
+    - output: ANL-066 Semantic Model & Business Data Catalogue
+      states:
+        loading: The semantic model.
+        error: Could not load. Names which read failed and leaves the model untouched.
+        emptyFirstRun: >-
+          No model published yet. Offers Publish model (setSemanticModel); until then reports read the seeded catalogue.
+        emptyNoResults: Nothing in the model matches the search. Names it and offers to clear it.
+        emptyNoAccess: >-
+          Shown when the caller lacks REPORT_VIEW_TENANT, which getSemanticModel requires to show this screen, and names that
+          permission.
+      failure_branches:
+      - what_goes_wrong: error state on ANL-066
+        user_sees: Could not load. Names which read failed and leaves the model untouched.
+        recovery: Retry; nothing entered is lost (derived)
+      - what_goes_wrong: emptyNoAccess state on ANL-066
+        user_sees: >-
+          Shown when the caller lacks REPORT_VIEW_TENANT, which getSemanticModel requires to show this screen, and names that
+          permission.
+        recovery: Ask an administrator for the permission the state names (derived)
+    failure_branches:
+    - at_step: 1
+      what: Nothing has been set up on BI & Analytics Administration Command Center yet
+      user_sees: >-
+        The screen declares emptyFirstRun. On a new tenant this is the expected state, and it is a different situation from
+        an empty result on an established one.
+      recovery: Automatic
+    - at_step: 1
+      what: The operator does not hold the permission this screen requires
+      user_sees: >-
+        The screen declares emptyNoAccess. The journey stops here rather than failing later, which is the right shape -- but
+        the permission that would satisfy it is not granted by any role in roles.yaml.
+      recovery: Unresolved -- see the permission join
+    steps:
+    - frame: 1
+      flowStep: 1
+      screen: ANL-061 BI & Analytics Administration Command Center
+      block: later
+      sees: >-
+        Provide administrators with one consolidated view of the health and governance of the TICVAI analytics platform.
+      does: Opens BI & Analytics Administration Command Center
+      calls:
+      - none
+      result: >-
+        The analytics administrator's one view of platform health: data freshness, failed refreshes, usage, KPIs in force,
+        open alerts.
+    - frame: 2
+      flowStep: 10
+      screen: ANL-066 Semantic Model & Business Data Catalogue
+      block: A
+      sees: >-
+        Create the governed business layer between raw data and dashboards/AI. This is one of the most important technical
+        screens in Board 10.
+      does: Works in Semantic Model & Business Data Catalogue
+      calls:
+      - none
+      result: >-
+        The governed business layer between raw data and dashboards, reports and AI: domains, datasets with their grain, fields
+        with labels, types, default aggregation and a personal-data flag, and how datasets relate.
+    later_frames:
+    - ANL-062 Enterprise KPI Library
+    - ANL-063 KPI Targets, Thresholds & Scorecards
+    - ANL-064 Benchmark & Comparative Analytics Configuration
+    - ANL-065 Data Source & Integration Registry
+    - ANL-067 Data Refresh, Pipeline & Data Health Monitor
+    - ANL-068 Embedded BI, Workspace & Tenant Administration
+    - ANL-069 Analytics Performance, Usage & Cost Monitor
+    - ANL-070 Analytics Governance, Security & Audit Center
+    exits:
+    - completed
+    motion: none
+    decisions:
+    - >-
+      No decision in the package names this flow or its screens (ANL-061, ANL-066); checked flows/F180, the screens' design
+      notes and answers-2-oct-batch1.md (derived)
+    sources:
+    - flows/F180
+    open:
+    - q: >-
+        Client design board flow: hub-and-spoke with no operations; only the Block A spokes are storyboarded.
+      default: draw the Block A spokes from their screen specs; others are later_frames

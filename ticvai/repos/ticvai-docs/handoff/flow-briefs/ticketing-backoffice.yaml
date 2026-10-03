@@ -1,0 +1,1475 @@
+# Flow design briefs: ticketing-backoffice (Ticketing & Guest Commerce on Venue Management P08 and the
+# TICVAI Console P09). Block A flows only. Written 3 October 2026 for the Claude Design storyboards and
+# wireframes (TODO step 9b), from the shared brief audit/ticvai/apply/FLOW-BRIEF-BRIEF.md.
+#
+# Read with: flows/F*.yaml (the flow), screens/P08 and P09 (the screen), handoff/design-notes/
+# ticketing-backoffice.yaml (rules PR-1 to PR-10 and per-screen notes), the contracts named in each
+# `processing` entry. Where this file and a contract disagree, the contract wins and the gap is under `open`.
+#
+# Scope rule used. A flow is in scope when its trigger belongs to ticketing-backoffice (its entry screen,
+# or its first step's screen, is a ticketing-backoffice screen in the design notes) AND at least one of its
+# steps is on a Block A screen (a `screen` build under BLOCK-A in handoff/service-docs/op-release.json).
+# Steps on screens that are not Block A are kept in the storyboard where the flow passes through them, and
+# are marked `blockA: false` so Claude Design draws them as context frames only.
+process: ticketing-backoffice
+written: 2026-10-03
+writtenBy: flow-brief agent (Claude) for ticketing-guest and ticketing-backoffice
+coverage:
+  covered: ["F09", "F26", "F77", "F86", "F89", "F90", "F156", "F169", "F234", "F240", "F257", "F260", "F270"]
+  skipped:
+    - flows: ["F137", "F140", "F141", "F142", "F154", "F155", "F174"]
+      reason: >-
+        Client board walk-throughs (provenance derived-from-board) whose every screen is a later-block screen.
+        They match Block A only through a shared operation that the flow reaches from a later screen
+        (F137 listGroupArrivalCheck; F140 getOrder, getOrderStatement, createOrderSourceChannel,
+        setCustomerGuestAccount; F141 modifyOrder, setRefundPolicy and 8 more; F142 listOrderPaymentDetail,
+        listPaymentReconciliationException; F154 getPromotion, listPromotions, getPromotionUsage,
+        listApprovalRequests, decideApprovalRequest; F155 evaluatePromotions; F174
+        createUpgradeCredentialRegeneration, listBulkGroupAssisted, listPersonTypeProduct). Those operations
+        are drawn on the Block A screen that owns them (BO-010, BO-023, POS-002 and the guest checkout), which
+        the covered briefs carry. Lead can override by asking for them.
+    - flows: [F126, F136, F143, F144, F146, F147, F148, F149, F152, F153, F157, F158, F159, F160, F161, F162,
+              F163, F166, F167, F171, F172, F173, F189, F192, F235, F236, F237, F238, F239, F241, F242, F256,
+              F258, F259, F261, F263, F274, F275, F276, F277, F278, F279, F280, F281, F282, F283, F284, F285,
+              F287, F288, F289, F290, F291, F292, F293, F294, F295, F296, F297, F298, F299, F300, F301]
+      reason: No step touches a Block A screen or a Block A operation.
+  ownershipNotes:
+    - F145, F246, F247 pass through ticketing-backoffice screens but their entry screens belong to finance-insights and customer-marketing; left to those processes.
+    - F26 ends on the guest app (GST-021); its trigger (a venue maps its site on BO-092) is back office, so it is here and not in ticketing-guest.
+
+flows:
+
+  F09:
+    title: Event is cancelled and refunded
+    process: ticketing-backoffice
+    trigger: >-
+      A performance is cancelled (weather, a technical failure, an artist). Every ticket sold for it needs
+      handling, and guests must be told before they travel. Entry points: duty manager cancels; automatic on a
+      safety closure; promoter withdraws. Entry screen BO-015.
+    actors:
+      - {role: "venueManager (duty manager)", app: "P08 Venue Management (venue-management-web)", screens: ["BO-015", "BO-023"]}
+      - {role: "supervisor", app: "P08", does: "enters the supervisor PIN on the device for the real cancellation run"}
+      - {role: "financeController", app: "P08", does: "second approver when the refund is above the venue threshold (CF-36)"}
+      - {role: "guest", app: "P01 Guest Web / P02 Guest App", does: "receives the cancellation notice and the refund"}
+    inputs:
+      - name: performance to cancel
+        formats: ["selection on the BO-015 calendar (day, week, month, agenda views)"]
+        limits: one performance per cancellation run
+        validation: A performance that has already happened offers the next performance of the same event instead.
+        source: venue manager, BO-015
+      - name: cancellation form (confirmCancelPerformance)
+        formats: ["reason text", "guest message text", "refund percentage", "alternative performance (picker)"]
+        limits: reason 3 to 1000 characters (required); refundPercentage 0 to 100; credential up to 512 characters (required)
+        validation: >-
+          Dry run first: shows affected orders, guests and refund exposure before anything changes. The real run
+          needs a supervisor PIN on the device (the `credential` field). Reason under 3 characters is refused.
+        source: venue manager on BO-015, PIN by supervisor
+      - name: bulk refund (formCreateBulkRefund, "Refund every order")
+        formats: ["scope (this performance)", "percentage", "reason"]
+        limits: percentage 0 to 100; reason 3 to 500 characters (required)
+        validation: >-
+          Amount proposed from the venue refund policy (getRefundPolicy). Above the venue's approval threshold the
+          refund is submitted for approval (status pendingApproval) and names the approver; above the "second user
+          above" threshold a second user signs in inline.
+        source: venue manager on BO-023
+    processing:
+      - {input: "performance to cancel", does: "lists performances with sold of capacity", operation: "catalogue#listPerformances"}
+      - {input: "cancellation form", does: "stops sales at once, cancels the performance and returns sold seats to available; posts to the current fiscal period with a reference when the original period is closed", operation: "catalogue#cancelPerformance"}
+      - {input: "performance id", does: "counts orders, money and cross-venue redemptions exposed; reads the refund bands", operation: ["orders#listOrders", "orders#getRefundPolicy"]}
+      - {input: "bulk refund", does: "queues a refund for every order against the original payment method (async, 202): pendingApproval, processing, completed, failed", operation: "orders#createBulkRefund"}
+    outputs:
+      - name: cancelled performance on the calendar
+        states: {loading: "calendar skeleton", ready: "slot shows Cancelled with the reason and the sold count frozen", error: "names the read that failed and keeps the calendar", emptyNoAccess: "permission named (PERFORMANCE_CONFIGURE), never an empty calendar"}
+        failure_branches:
+          - {what: "performance is part of a bundle", sees: "only the bundle component is cancelled; the rest of the bundle stands (ticket lost, not the evening)", recover: "Finance handles component refund"}
+          - {what: "fiscal period closed over the original sale", sees: "refund posts to the current period with a reference", recover: "automatic"}
+      - name: refund exposure summary
+        states: {loading: "counting", ready: "orders, money (AED), guests, and how many redeem at other venues", partial: "cross-cell counts pending when another cell is unreachable"}
+        failure_branches:
+          - {what: "refund exceeds the manager threshold", sees: "second approver required (finance controller)", recover: "approval in the approvals inbox"}
+      - name: bulk refund job
+        states: {pendingApproval: "awaiting the named approver", processing: "progress count of orders refunded", completed: "all refunded", failed: "list of failed refunds"}
+        failure_branches:
+          - {what: "original payment method no longer valid (card expired, account closed)", sees: "those refunds fall to a manual queue", recover: "Finance refunds by another tender"}
+          - {what: "some tickets already scanned (show abandoned at the interval)", sees: "flow escalates: partial-performance policy is a decision, not a rule", recover: "venue manager decides the split"}
+          - {what: "entitlement redeemable at another venue", sees: "revoke pending in the other cell", recover: "platform admin when the cell is reachable"}
+      - name: guest notification confirmation
+        states: {ready: "confirmation that guests were told", empty: "no read exists yet (see open)"}
+        failure_branches:
+          - {what: "guest has no contact details (anonymous counter sale)", sees: "nothing to notify", recover: "venue signage only"}
+    steps:
+      - {frame: 1, screen: "BO-015", blockA: true, sees: "calendar of performances, each slot a fill bar sold/capacity and its status", does: "finds the performance", operation: "catalogue#listPerformances", result: "what is sold and what it is worth"}
+      - {frame: 2, screen: "BO-015", blockA: true, sees: "Cancel performance dialog: reason, guest message, refund %, alternative performance; Dry run", does: "runs the dry run", operation: "none (dry run)", result: "affected orders, guests, refund exposure"}
+      - {frame: 3, screen: "BO-015", blockA: true, sees: "dry-run figures and a supervisor PIN field", does: "supervisor enters PIN and confirms", operation: "catalogue#cancelPerformance", result: "sales stop immediately; slot shows Cancelled"}
+      - {frame: 4, screen: "BO-023", blockA: true, sees: "refund exposure (orders, AED, cross-venue count) and the policy band applied", does: "reviews", operation: "orders#listOrders, orders#getRefundPolicy", result: "exposure understood"}
+      - {frame: 5, screen: "BO-023", blockA: true, sees: "Refund every order dialog: percentage, reason; approver named if above threshold", does: "authorises the bulk refund", operation: "orders#createBulkRefund", result: "refunds queued against the original payment methods (pendingApproval or processing)"}
+      - {frame: 6, screen: "BO-023", blockA: true, sees: "job progress and the manual queue of failed refunds", does: "confirms guests were notified", operation: "none (no dispatch read exists, CHG-WIR-004)", result: "told before they travel"}
+    motion:
+      - Bulk refund progress counter (orders refunded of total) while the job is processing; poll, no animation beyond the count and a progress bar.
+      - Calendar slot changes to Cancelled in place after the call returns (no page reload).
+    decisions: ["CHG-WIR-001 (steps repointed from queue screens to BO-015 and BO-023)", "CHG-WIR-004 (no dispatch read yet)", "CF-36 (refund approval threshold at venue level)", "DI-995 (preview before creating slots on BO-015)"]
+    sources: ["flows/F09-*.yaml", "screens/P08-venue-back-office.yaml#BO-015 and BO-023", "design-notes ticketing-backoffice BO-015 and BO-023", "contracts/spine/catalogue.yaml#cancelPerformance", "contracts/spine/orders.yaml#createBulkRefund"]
+    open:
+      - {question: "Which operation sends and lists the transactional cancellation notice?", default: "Frame 6 shows a static confirmation line 'Guests with contact details will be emailed and sent an SMS' and no list; contract gap CHG-WIR-004 stays open."}
+      - {question: "Exact error copy for a dry run with no affected orders or a PIN refused", default: "'No tickets were sold for this performance; cancelling stops sales only.' and 'Supervisor PIN not recognised. Try again.'"}
+      - {question: "Partial performance (some tickets scanned) refund split", default: "escalate; frame shows 'Referred for a policy decision' with the scanned count"}
+
+  F26:
+    title: A venue maps its site
+    process: ticketing-backoffice
+    trigger: A venue is opening, or has rebuilt an area. Somebody has a drawing and needs guests to be able to find
+      a toilet. Entry screen BO-092.
+    actors:
+    - role: venueManager (map author)
+      app: P08 Venue Management
+      screens:
+      - BO-092
+      - BO-093
+      - BO-094
+      permissions:
+      - VENUE_MAP_MANAGE
+      - VENUE_MAP_PUBLISH
+      - ASSET_LIBRARY_MANAGE for uploads
+    - role: AI labelling assistant
+      app: server (ai contract)
+      does: proposes what each extracted shape is
+    - role: guest
+      app: P02 Guest App
+      screens:
+      - GST-021
+    inputs:
+    - name: new map record
+      formats:
+      - 'form: name'
+      - kind (park, floor, zone, parking)
+      - floor level
+      limits: id, status and scope are the server's and are not shown; anchors 2 to 4 points
+      validation:
+      - Only name, kind and floor level are asked. A park map and a building floor are separate maps, never layers
+        of one.
+      - Only name, kind and floor level are asked; id, status and scope are the server's. The upload happens next
+        on BO-093.
+      source:
+      - map author, BO-092 (formCreateVenueMap)
+      - venueManager on BO-092 Venue Maps
+      also_named:
+      - new map
+      ref: contracts/satellite/venue-map.yaml#createVenueMap | F26 step 1
+    - name: the plan (drawing)
+      formats:
+      - DWG or DXF preferred (native CAD, layer names kept)
+      - 'PDF: a vector PDF is read by its layer names; a scanned PDF goes through the OCR step (r1, answers L435)'
+      - SVG
+      - 'PNG/JPG, including a plan with hand-marked paths: the AI proposes the path network from the marks and each
+        segment is accepted or rejected one at a time (r1, answers L435)'
+      - DXF (format dwgPlan / dxfPlan)
+      limits:
+      - format enum pdfPlan, svgPlan, dwgPlan, dxfPlan, rasterPlan; uploaded first through assets#createUpload / completeUpload
+        (signed URL, maxSizeBytes returned by the server); passed as sourceRef
+      - one file per map (park, floor, zone, parking)
+      - layers named by role (venue-map-input-spec §2); each role accepts a list of layer names
+      - 'size: not set in the contract for plans (see open); a GLB is at most 40 MB (assets#createUpload refuses
+        a larger model3d asset, 3 Oct)'
+      validation:
+      - 'Layers matched by role, case-insensitive, VC- prefix ignored (Paths/Walkways/Circulation/Footpath; Water/Planting/BackOfHouse/Plant
+        keep-out; Steps/VC-Steps/Stairs; Buildings; Seats; Accessible; Sections; Stage; Exits; EmergencyExits/FireExits;
+        VC-Resources/Cabanas/Loungers/Tables). Each role takes a list. Outcomes: parsed, parsedWithFindings, nothingFound,
+        noLayersMatched, unreadable. A file that yields no shapes says "nothing found" with the layers it did see,
+        never an empty success. rasterOnly is a warning, not an error. Findings include duplicateLayerName, geometryOnLayerZero,
+        unmappedLayer, mixedLayerContent, sectionCodeMismatch, digitScriptMismatch.'
+      - 'File yields no shapes → outcome nothingFound: "We read the file and found no shapes. Check it is the plan,
+        not a cover sheet."'
+      - 'No layer matched any role → noLayersMatched: "None of the layer names matched. Map them below." with every
+        decoded layer listed (layersFound)'
+      - 'Findings by code, each with severity error/warning/info: duplicateLayerName, geometryOnLayerZero, unmappedLayer,
+        mixedLayerContent, exitLayerNotSplit, layerNameUndecodable, noGeoreference (warning)'
+      - Native CAD (DWG, DXF) preferred because PDF loses layer names; PDF and raster accepted with a note that results
+        will be weaker.
+      source:
+      - venue drawing office via the map author, BO-093
+      - Venue manager / drawing office, uploaded on BO-093 through assets.createUpload → completeUpload, then importVenueGeometry(sourceRef)
+      - venueManager on BO-093 Map Import & Labelling
+      also_named:
+      - Site plan, native CAD
+      - import file
+      ref: contracts/satellite/venue-map.yaml#importVenueGeometry | DI-145
+    - name: seating manifest
+      formats:
+      - XLSX
+      - one sheet per section
+      - header on row 3
+      - columns Description / Section / Row / Seat
+      - 'XLSX, one sheet per section, header on row 3: Description, Section, Row, Seat'
+      limits:
+      - Description one of Seating, Wheelchair, Companion, Restricted view, House seat (others import as plain seat
+        and are reported)
+      - Section must match the drawing character for character after digit normalisation
+      validation:
+      - Section must match the drawing's section label character for character after digit normalisation (A١ = A1).
+      - sectionCodeMismatch, digitScriptMismatch, mergedCells, totalRowDetected, manifestSectionMissingFromPlan, planSectionMissingFromManifest
+      - manifestRowsJoined shown against manifestRowsRead ("396 read, 220 joined")
+      source:
+      - venue, BO-093 (manifestRef)
+      - Venue on BO-093 (manifestRef)
+    - name: resource manifest (cabanas, loungers, tables)
+      formats:
+      - XLSX
+      - one sheet
+      - header on row 3
+      - columns Label / Kind / Zone / Capacity / Price band
+      - 'XLSX, one sheet, header on row 3: Label, Kind, Zone, Capacity, Price band'
+      limits:
+      - Kind cabana, lounger, table, pitch, other; capacity 1 to 500; label up to 40 characters in Western digits
+      - 'Kind: cabana, lounger, table, pitch …; Price band must name a band in priceBands'
+      validation:
+      - 'Findings: resourceLabelMissing, resourceLabelDuplicate, resourceManifestMissingFromPlan, resourcePlanMissingFromManifest,
+        resourceCodeUnmatched, resourcePriceBandUnknown'
+      - resourcesFound vs resourceRowsJoined shown ("38 on the plan, 36 joined")
+      source:
+      - venue, BO-093 (resourceManifestRef)
+      - Venue on BO-093 (resourceManifestRef)
+    - name: georeference points
+      formats:
+      - two rows (drawing X, drawing Y, latitude, longitude)
+      - '2-4 anchors: drawing X/Y with latitude/longitude'
+      limits:
+      - anchors 2 to 4; pick two points far apart
+      - anchors far apart (entrance and a far corner)
+      validation:
+      - Without them the map is a picture (no "you are here"); the map is still accepted.
+      - 'Missing → noGeoreference (warning): "No georeference: guests will not see their own position."'
+      - 'Two anchors close together: flagged'
+      source:
+      - venue, BO-093
+      - Venue on BO-093
+    - name: illustrated base map
+      formats:
+      - PNG or JPG plus source if available
+      - PNG or JPG, plus four alignment points (pixel ↔ plan)
+      limits:
+      - up to about 12,000 px wide; the platform tiles it; four alignment points between illustration and plan
+      - 12,000 px wide is fine; the platform tiles it
+      validation:
+      - Without alignment points a placed toilet can land in a lake; a guidance panel shows the placeholder recommendation
+        (DEC-103).
+      - Without alignment points a plan-placed point can land off the illustration
+      source:
+      - venue design agency, BO-093
+      - 'Venue (spec §6), on BO-094 "Guest map artwork": assets#createUpload / completeUpload, then
+        venue-map#setVenueMapArtwork with two to four alignment pairs (3 Oct, CHG-RONEC-001)'
+      also_named:
+      - Illustrated map
+    - name: 3D venue model and navigation file (ADR-0069)
+      formats:
+      - GLB (binary glTF 2.0)
+      - plus a JSON pathway/location metadata file
+      - GLB (binary glTF 2.0), metres, +Y up, Draco or meshopt geometry, KTX2 textures, zones as named nodes with
+        __LOD0/1/2 meshes
+      - 'navigation JSON (formatVersion 1.0): anchor (originLat, originLng, headingDegrees, scale, 2-8 controlPoints),
+        nodes, edges (polyline, isStepFree, isIndoor, throughAccessPointCode), locations (ref, kind, name, nodeId,
+        catalogue codes)'
+      - one per venue map
+      limits:
+      - ≤ 25 MB compressed per map (a zone ≤ 6 MB), over 40 MB refused at import; ≤ 300,000 triangles at LOD0, ≤ 1.5
+        million across LODs; ≤ 150 draw calls; textures ≤ 2048 px, ≤ 128 MB after KTX2
+      - GLB ≤ 25 MB per map (zone ≤ 6 MB); over 40 MB refused at import
+      - ≤ 300k triangles on screen at LOD0, ≤ 1.5 M park-wide; ≤ 150 draw calls; textures ≤ 2048 px, ≤ 128 MB after
+        transcoding
+      - node id pattern ^[A-Za-z0-9_-]{1,64}$; edges ≥ 1; nodes ≥ 2
+      validation:
+      - The import measures the budget and reports an over-budget file as a finding with the number. No embedded cameras,
+        lights or animations are relied on.
+      - Uncompressed textures refused at import
+      - Over-budget file is a finding naming the number (triangles, draw calls, texture size)
+      - 'Anchor residual > 3 m at a control point: warning; > 10 m: the 3D layer will not publish (2D still publishes)'
+      - 'Unresolved productCode/outletCode/facilityCode: import finding, never a silent drop'
+      - 'Two control points close together: flagged'
+      source: venue or a commissioned 3D studio; uploaded on BO-093 in its own "3D model + navigation file" slot (.glb
+        plus the pathway .json), supported in r1 (answers L435)
+      also_named:
+      - 3D venue model + navigation file (ADR-0069)
+    - name: label decisions
+      formats:
+      - per proposal Accept / Edit (move point or change kind) / Reject; bulk "accept all above 90%"
+      limits: bulk selection still lists what it accepts
+      validation:
+      - Low-confidence proposals are shown, not filtered. emergencyExit is its own kind, never merged with exit.
+      - Per proposal Accept, Edit (move the point or change the kind) or Reject; never all-or-nothing, though "accept
+        all above 90%" is allowed as a bulk selection that still lists what it accepts.
+      source:
+      - map author, BO-093 (formAcceptVenueLabelProposals)
+      - venueManager on BO-093 Map Import & Labelling
+      also_named:
+      - decisions
+      ref: contracts/satellite/venue-map.yaml#acceptVenueLabelProposals | R275
+    - name: points and placed resources
+      formats:
+      - point form (kind, name EN/AR, link, isStepFree, media up to 12, typical duration 1-600 min, interest tags
+        up to 12); place form (label, kind, zone up to 80 chars, capacity 1-500, price band)
+      limits: point name unique per venue across all its maps, compared without case
+      validation:
+      - 'Link depends on kind: outlet (restaurant, cafe, shop, kiosk), product (ride, show), access point (entrance,
+        exit). isStepFree defaults yes. Bookable place label unique on the map; ''not bookable'' keeps it greyed;
+        the map holds no price.'
+      - The link field depends on the kind (outlet for restaurant, cafe, shop, kiosk; product for ride and show; access
+        point for entrance and exit); a featured offer (product or bundle) can be set on any kind.
+      - Unique per venue across all its maps, compared without case; English and Arabic.
+      - The field to get right; default yes, and the validator reports points reachable only by steps.
+      - Label unique on the map (B09), kind, zone, capacity 1 to 500, price band from the import's bands; "not bookable"
+        keeps it on the map greyed. The map holds no price.
+      source:
+      - map author, BO-094 (formSetVenuePoint, formSetPlacedResource)
+      - venueManager on BO-094 Map Editor & Publish
+      also_named:
+      - point link
+      - point name
+      - isStepFree
+      - bookable place
+      ref: contracts/satellite/venue-map.yaml#setVenuePoint | F26 step 4 | contracts/satellite/venue-map.yaml#setVenuePoint
+        | R108 | contracts/satellite/venue-map.yaml#validateVenueMapGraph | contracts/satellite/venue-map.yaml#setPlacedResource
+        | REV3-15
+    - name: path closure
+      formats:
+      - reason maintenance
+      - incident
+      - event
+      - weather
+      - crowding
+      - other (note required); expected reopen time
+      limits: note up to 500 characters
+      validation:
+      - Refused with wouldStrandPoints when the closure leaves a point unreachable.
+      - Maintenance, incident, event, weather, crowding, other (note required); expected reopen time.
+      source:
+      - map author or duty manager, BO-094 (formSetPathClosure)
+      - venueManager on BO-094 Map Editor & Publish
+      also_named:
+      - path closure reason
+      ref: contracts/satellite/venue-map.yaml#setPathClosure | R222
+    - name: Site plan, PDF
+      formats:
+      - 'PDF (pdfPlan): vector PDF read by layer names (decoded from UTF-16BE)'
+      - 'scanned PDF: read through the OCR step (r1, answers L435); recognised text and labels feed the label proposals
+        (ai#proposeVenueLabels), and the geometry is proposed as for a raster plan'
+      limits:
+      - layer names flatten if CAD was exported to PDF; native CAD preferred
+      validation:
+      - Undecodable layer names → layerNameUndecodable
+      - 'No vector geometry → rasterOnly (warning, not an error): "This plan is an image. Seats and the map still
+        work; paths will be proposed for you to check."'
+      source: Venue manager on BO-093
+      merged: merged from the venue-operations brief (3 Oct)
+    - name: Raster plan with hand-marked paths
+      formats:
+      - PNG
+      - JPG (rasterPlan)
+      - paths hand-marked on the image
+      - supported in r1 (answers L435)
+      limits:
+      - largest size available; 12,000 px wide is fine (spec §6)
+      validation:
+      - Always rasterOnly (warning)
+      - ai.proposeWalkways proposes a path network with a confidence per segment; refuses to run where vector geometry
+        exists
+      - Each segment accepted or rejected one at a time (acceptWalkwayProposals); low-confidence segments shown, not
+        hidden
+      source: Venue manager on BO-093
+      merged: merged from the venue-operations brief (3 Oct)
+    - name: SVG plan
+      formats:
+      - SVG (svgPlan)
+      limits:
+      - 'as CAD: layers/groups named by role'
+      validation:
+      - as CAD
+      source: Venue manager on BO-093
+      merged: merged from the venue-operations brief (3 Oct)
+    processing:
+    - input: new map record
+      does: creates a draft map (server-owned id, status draft, scope)
+      operation: venue-map#createVenueMap
+    - input: plan + manifests + anchors
+      does: 'extracts shapes deterministically into the working draft (202 job: parsing → previewReady or failed);
+        derives walkways from negative space when no path layer exists; reports every layer found, mapped or not'
+      operation: venue-map#importVenueGeometry
+    - input: extracted shapes
+      does: AI proposes a kind per shape with a confidence
+      operation: ai#proposeVenueLabels
+    - input: label decisions
+      does: creates points from accepted or edited proposals
+      operation: venue-map#acceptVenueLabelProposals
+    - input: points and resources
+      does: places and links points and bookable resources
+      operation:
+      - venue-map#setVenuePoint
+      - venue-map#setPlacedResource
+    - input: draft graph
+      does: 'builds and validates the navigation graph: unreachable points, dead ends, orphan components, points reachable
+        only by steps'
+      operation: venue-map#validateVenueMapGraph
+    - input: validated draft
+      does: publishes a new version; the previous version stays readable
+      operation: venue-map#publishVenueMap
+    - input: published map
+      does: guest reads the whole map and the routable graph (cached, offline-capable)
+      operation:
+      - venue-map#getVenueMap
+      - venue-map#getVenueMapGraph
+    - input: path closure
+      does: bumps the graph version so cached clients know a route may cross a closure
+      operation: venue-map#setPathClosure
+    - input: scanned PDF
+      does: 'OCR step inside the import (r1): reads text and labels off the image; the labels feed the label proposals
+        and the geometry is proposed as for a raster plan'
+      operation:
+      - venue-map#importVenueGeometry
+      - ai#proposeVenueLabels
+    - input: PNG/JPG with hand-marked paths
+      does: AI proposes the path network from the marks with a confidence per segment; each segment is accepted or
+        rejected one at a time (r1)
+      operation:
+      - ai#proposeWalkways
+      - venue-map#acceptWalkwayProposals
+    - input: GLB + pathway file
+      does: 'imports the 3D model and the navigation graph (nodes, edges, locations, anchor) with format glbModel and
+        navigationFileRef; a GLB over 40 MB is refused (422 modelTooLarge, and at upload); measures the budget and
+        reports each line as a number on VenueMapImportJob.model; the 3D layer publishes only when no model finding
+        is an error (over 300,000 triangles at LOD0, uncompressed textures, anchor residual over 10 m, invalid
+        navigation file), else VenueMap.model3dStatus is blocked and the 2D map still publishes (r1, ADR-0069 as
+        amended 3 Oct, CHG-RONEC-001)'
+      operation: venue-map#importVenueGeometry
+    - input: draft graph and points (for a 3D studio)
+      does: exports them in the navigation-file format, codes not ids, so the studio builds the GLB around the graph
+        the venue already checked (ADR-0069 section 8, closed 3 Oct)
+      operation: venue-map#getVenueNavigationFile
+    outputs:
+    - name: map list (BO-092)
+      states:
+        loading: table skeleton
+        emptyFirstRun: No maps yet. Create your first map
+        ready: name, kind, status, published version, graph status (Connected, Partial, Disconnected, Not built),
+          georeferenced (guests can be located)
+        error: names the failed read
+        emptyNoResults: 'Never shown: `listVenueMaps` takes no filter, so an empty list is always the first-run state
+          above.'
+        emptyNoAccess: Shown when the caller lacks `VENUE_MAP_VIEW`, which `listVenueMaps` requires to show this screen,
+          and names that permission. Never an empty table — that reads as *there is no …
+      failure_branches: []
+      shows:
+      - element: map list
+        rule: Name, kind (Park, Floor and level, Zone, Parking), status, published version, graph status (Connected,
+          Partial, Disconnected, Not built) and whether it is georeferenced ("guests can be located").
+      package_states:
+        loading: The venue maps list.
+        error: Could not load. Names which read failed and leaves the venue maps untouched.
+        emptyFirstRun: No venue maps yet. Offers Create venue map (`createVenueMap`).
+      also_named:
+      - Venue Maps
+    - name: import result (BO-093)
+      states:
+        parsing: job running with layer count so far
+        previewReady: shapes over the plan with the layer report
+        nothingFound: Nothing found, with the layers it did see
+        noLayersMatched: layers listed with a role-mapping control
+        unreadable: file could not be read
+        parsedWithFindings: findings grouped by severity
+        loading: The saved map import labelling.
+        error: Could not load. Names which read failed and leaves the map import labelling untouched.
+        emptyNoResults: An import that read no resources on a map meant to carry them says so (`resourcesFound` 0)
+          and names the resource layer it looked for, rather than showing an empty price-band …
+        emptyFirstRun: No map import labelling configured. The form opens empty and `importVenueGeometry` saves the
+          first one; it says what the platform does in the meantime.
+        emptyNoAccess: Shown when the caller lacks `VENUE_MAP_MANAGE`, which `importVenueGeometry` requires, and names
+          that permission. Never an empty table — that reads as *there is no data* and sends …
+      failure_branches:
+      - what: scan or photo with no vector geometry (rasterOnly)
+        sees: amber warning; manifest still gives seats; image still works as a map
+        recover: propose walkways (proposeWalkways) or continue as picture map
+      - what: no layer matched any role
+        sees: noLayersMatched with every layer listed
+        recover: map a layer to a role (layerMapping) and re-import
+      - screen: BO-093
+        what_goes_wrong: File yields nothing
+        user_sees: Says "nothing found" or "no layers matched" with the layers it did see, not an empty success.
+      - screen: BO-093
+        what_goes_wrong: Walkway proposals
+        user_sees: A stricter gate than labels; accepted walkways are validated as paths immediately and any unreachable
+          point is reported.
+      shows:
+      - element: extraction report
+        rule: Outcome (parsed, parsed with findings, nothing found, no layers matched, unreadable), shapes found,
+          layers found and unmapped layers as chips, manifest rows read and joined.
+      - element: proposals
+        rule: Each with the proposed kind and its confidence; low-confidence proposals are shown, not filtered, sorted
+          to the top.
+      also_named:
+      - Map Import & Labelling
+    - name: label proposals (BO-093)
+      states:
+        loading: proposing
+        ready: each shape with a proposed kind and confidence
+        partial: some decided
+      failure_branches:
+      - what: assistant proposes a fire exit as an ordinary exit
+        sees: proposal with its confidence
+        recover: reject and place as emergencyExit
+    - name: graph validation report (BO-094)
+      states:
+        ready-clean: connected
+        ready-findings: lists unreachable points, dead ends, orphan components and separately points reachable only
+          by steps
+        loading: The map editor publish, read by `getVenueMap`.
+        error: Could not load. Names which read failed and leaves the map editor publish untouched.
+        emptyFirstRun: No map editor publish yet. Offers no create action — this screen declares no operation that
+          makes one — and says so rather than showing an empty table.
+        emptyNoAccess: Shown when the caller lacks `VENUE_MAP_VIEW`, which `getVenueMap` requires to show this screen,
+          and names that permission. Never an empty table — that reads as *there is no data* …
+      failure_branches:
+      - what: point reachable only by steps
+        sees: listed apart from unreachable points
+        recover: add a step-free path or mark the point
+      shows:
+      - element: validation
+        rule: Unreachable points, points reachable only by steps, dead-end paths and critical unreachable points (exits,
+          first aid) listed with "show on map".
+      - element: draft vs published
+        rule: A persistent banner "Editing draft. Guests see version 7 (published 2 Oct)" with the number of unpublished
+          changes.
+      also_named:
+      - Map Editor & Publish
+    - name: publish result (BO-094)
+      states:
+        published: new version number
+        publishedNotNavigable: published with points and no paths (shows a picture map with points)
+        refused: reason named
+      failure_branches:
+      - what: point links to a closed outlet
+        sees: publish refused (brokenLink) naming the point
+        recover: relink or remove the point
+      - what: placed cabana has no linked resource, no price band, or a duplicate label
+        sees: refused with resourceUnlinked, resourcePriceBandMissing or duplicateResourceLabel naming the place
+        recover: fix on BO-094
+      - what: unresolved proposals or a disconnected area
+        sees: refused (unresolvedProposal, disconnectedArea)
+        recover: decide proposals; connect the area
+    - name: guest interactive map (GST-021)
+      states:
+        loading: map loading
+        ready: 3D or 2D map with points
+        offline: cached map and graph stay usable; waits marked out of date
+        map3dUnavailable: 2D map with the same route; 2D/3D toggle hidden
+        weakGps: dot dims, ring labelled 'Position approximate', 'I am at…' re-anchor
+        emptyFirstRun: no published map
+        error: Could not load. Names which read failed and leaves the interactive map untouched.
+        emptyNoResults: No point of that category on this map; the other categories stay.
+        emptyNoAccess: 'There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what
+          a staff caller must hold; a guest call resolves to the guest''s own data; decided by …'
+      failure_branches:
+      - what: path closed after the guest cached the graph
+        sees: route flagged as possibly crossing a closure
+        recover: re-route on the newer graph version when signal returns
+      - screen: GST-021
+        what_goes_wrong: No 3D model, a weak phone or rendering below 20 fps
+        user_sees: The 2D map with the same route; never an error.
+      shows:
+      - element: navigation mode
+        rule: 'After Start on a destination card: a banner with the next turn and its distance, metres to go, arrival
+          time and a progress bar; the dot moves along the route; End navigation stops it.'
+      - element: weak position
+        rule: The dot dims with an approximate ring labelled "Position approximate"; the turn list stays; "I am at…"
+          lets the guest tap a nearby place.
+      package_states:
+        loading: The interactive map list.
+        emptyFirstRun: No interactive map yet. Offers no create action — this screen declares no operation that makes
+          one — and says so rather than showing an empty table.
+        offline: The offline banner shows. A map and route graph already loaded stay usable, so directions do not
+          need a signal. Wait times show their last reading marked out of date, never as …
+        map3dUnavailable: 'No 3D model for this map: the 2D map, same route (ADR-0069; client meeting 30 September,
+          MoM 4.8). The venue has not published a GLB model for this map (the default for every …'
+        weakGps: 'Position approximate (ADR-0069, section 4): reported GPS accuracy worse than 30 metres, or the route
+          runs along an indoor path. The dot dims and an approximate-position ring is …'
+    - name: Flow outcome (exit states)
+      states:
+        published: The map is live, the graph is connected, and guests can route on it.
+        publishedNotNavigable: Published with points and no paths. A legitimate outcome — the map shows a guest where
+          things are and cannot tell them how to get there, which is better than no map and should be visible rather
+          than silent.
+        draft: Imported and never published. The current map keeps serving.
+      failure_branches:
+      - at_step: 1
+        what_goes_wrong: The plan is a scan or a photograph with no vector geometry.
+        user_sees: '`rasterOnly` is a warning, not an error. The manifest still gives seats and the image still works
+          as a map; only automatic geometry is lost. Refusing a venue that sent everything it had is the wrong answer.
+          Where there is nothing to subtract, `ai.proposeWalkways` sees the paths instead — and it refuses to run
+          where vector geometry exists, because running a model where subtraction is available is how a worse answer
+          …'
+        recovery: recoverable; resolved by ai#proposeWalkways
+      - at_step: 1
+        what_goes_wrong: No layer matched any role.
+        user_sees: '`noLayersMatched`, separated from `nothingFound` deliberately. It almost always means a role needed
+          a second entry or a name needed decoding, not that the file is wrong — and `layersFound` lists every decoded
+          name so an operator maps a role by reading rather than guessing.'
+        recovery: recoverable; resolved by venue-map#importVenueGeometry
+      - at_step: 3
+        what_goes_wrong: The assistant proposes a fire exit as an ordinary exit.
+        user_sees: The operator rejects it and places it correctly. A map that cannot tell them apart routes a normal
+          departure through a fire door, which is why `emergencyExit` is a separate kind and why proposals are accepted
+          one at a time rather than in bulk.
+        recovery: requiresStaff; resolved by venue-map#acceptVenueLabelProposals
+      - at_step: 5
+        what_goes_wrong: A point is reachable only by steps.
+        user_sees: Listed separately from unreachable points. The map works perfectly until a wheelchair user opens
+          it, and nothing in the drawing makes it visible — which is the whole reason this check runs before publication
+          rather than after.
+        recovery: requiresStaff; resolved by venue-map#validateVenueMapGraph
+      - at_step: 6
+        what_goes_wrong: A point links to an outlet that has closed.
+        user_sees: Publish is refused and the response names which point. A restaurant point pointing nowhere is worse
+          than no point, because a guest walks there.
+        recovery: recoverable; resolved by venue-map#publishVenueMap
+      - at_step: 6
+        what_goes_wrong: A placed cabana has no linked resource or no price band, or two places share a label.
+        user_sees: Publish is refused with `resourceUnlinked`, `resourcePriceBandMissing` or `duplicateResourceLabel`,
+          naming the place (decided 29 September, rev 3 REV3-15). A cabana a guest can tap and cannot buy is worse
+          than no cabana on the map. `validateVenueMapGraph` reports the same before anyone presses Publish.
+        recovery: recoverable; resolved by venue-map#setPlacedResource
+      - at_step: 7
+        what_goes_wrong: A path closes after the guest cached the graph.
+        user_sees: '`setPathClosure` bumps the graph version, and the client holding an older version knows its route
+          may cross something closed. A guest holding an offline route across a path that closed this morning gets
+          told, rather than walking into a barrier.'
+        recovery: recoverable; resolved by venue-map#setPathClosure
+      merged: merged from the venue-operations brief (3 Oct)
+    steps:
+    - frame: 1
+      screen: BO-092
+      blockA: true
+      sees: map list with status and graph status
+      does: 'Create venue map: name, kind, floor level'
+      operation: venue-map#createVenueMap
+      result: a draft map; nothing is live
+    - frame: 2
+      screen: BO-093
+      blockA: true
+      sees: 'upload panel with four source kinds: DWG/DXF (preferred), PDF (vector, or scanned via OCR), PNG/JPG with
+        hand-marked paths, and 3D model (GLB) + navigation file; the format guidance says what each gives'
+      does: uploads plan, manifests and anchors
+      operation: assets#createUpload, assets#completeUpload, venue-map#importVenueGeometry
+      result: import job parsing
+    - frame: 3
+      screen: BO-093
+      blockA: true
+      sees: 'shapes over the plan; layer report: every layer found, mapped or not; findings by severity'
+      does: reviews extraction
+      operation: venue-map#importVenueGeometry (job poll)
+      result: previewReady or nothingFound / noLayersMatched
+    - frame: 4
+      screen: BO-093
+      blockA: true
+      sees: proposals list with confidence (low-confidence shown, not filtered)
+      does: Accept / Edit / Reject per shape, or accept all above 90%
+      operation: ai#proposeVenueLabels, venue-map#acceptVenueLabelProposals
+      result: points created
+    - frame: 5
+      screen: BO-094
+      blockA: true
+      sees: map editor with point palette and bookable places
+      does: places toilets, exits, prayer rooms and links each point (outlet, product, access point); places cabanas
+        with price band
+      operation: venue-map#setVenuePoint, venue-map#setPlacedResource, assets#createUpload, assets#completeUpload, venue-map#setVenueMapArtwork
+      result: linked points; the guest map artwork lined up with the plan
+    - frame: 6
+      screen: BO-094
+      blockA: true
+      sees: validation panel
+      does: Validate graph
+      operation: venue-map#validateVenueMapGraph
+      result: unreachable, dead-end, orphan and steps-only findings highlighted on the map
+    - frame: 7
+      screen: BO-094
+      blockA: true
+      sees: publish dialog with an optional note (300 chars)
+      does: Publish
+      operation: venue-map#publishVenueMap
+      result: new version live; previous stays readable
+    - frame: 8
+      screen: GST-021
+      blockA: true
+      sees: the guest map (3D where a model exists, else 2D) with points
+      does: taps Nearest toilets then Start
+      operation: venue-map#getVenueMap, venue-map#getVenueMapGraph
+      result: routed on the device, works with no signal
+    motion:
+    - what: Import job progress (BO-093)
+      how: Status chip parsing → previewReady (or failed) while polling getVenueMapImportJob; shapes and layers counters
+        roll up as the job reports; the layer list reveals row by row with mapped/unmapped tags.
+      timing: Poll about every 2 s (default); reveal 30 ms per row
+    - what: Label proposals
+      how: Each proposed shape outlines on the plan in the proposal colour with a confidence bar; Accept fills it
+        solid, Reject fades it out; low-confidence ones are drawn dashed, not hidden.
+      timing: 150 ms per decision
+    - what: Graph validation (BO-094)
+      how: Unreachable points pulse red on the map; step-only points pulse amber; critical points (first aid, exits,
+        assembly) listed apart.
+      timing: Validation returns under 5 s; pulse 1 s loop until fixed
+    - what: Publish
+      how: Version badge increments (v3 → v4) and the Draft ribbon clears.
+      timing: 300 ms
+    - what: Guest route line (GST-021)
+      how: Route drawn along the graph edges from the snapped position to the destination, then a dash pattern flows
+        along it in the walking direction.
+      timing: Draw-on about 600 ms; dash flow continuous
+    - what: Position dot
+      how: Blue dot follows GPS snapped to the nearest edge (hysteresis, prefers the route); accuracy halo; dims and
+        shows an approximate ring when accuracy is worse than 30 m or indoors.
+      timing: Per GPS fix (about 1 s in walking mode)
+    - what: Camera follow
+      how: In walking navigation the camera follows the dot, heading-up, and eases ahead of the next turn; with no
+        location permission it follows the route from the chosen start.
+      timing: Ease 300-500 ms
+    - what: 3D ↔ 2D transition
+      how: Toggle tilts the camera from top-down 2D to a perspective 3D view (and back) with the same route and dot;
+        automatic fallback to 2D below 20 fps or without a GLB, with the toggle hidden and nothing said. The layers
+        crossfade during the tilt.
+      timing: About 600 ms tilt; LOD drops below 24 fps for 5 s
+    - what: Turn banner
+      how: '"Turn left at Canyon Rapids · 60 m" banner above the map updates distance continuously and slides to the
+        next instruction at each turn. Metres to go, arrival time and a progress bar update as the guest walks.'
+      timing: Slide 200 ms
+    - what: Re-route
+      how: 'Off route > 20 m for > 5 s, or a newer graphVersion with a closure on the route: route redraws and a banner
+        says why.'
+      timing: Redraw 400 ms
+    - what: Layer and proposal hover (BO-093)
+      how: Hover over a layer row highlights its shapes on the plan; hover a proposal highlights its shape.
+      timing: immediate
+    - what: Finding focus (BO-094)
+      how: Validation findings pulse once on the map where they are; clicking a finding pans and zooms to it.
+      timing: pan and zoom about 300 ms
+    - what: Walkway proposals (BO-093, hand-marked PNG/JPG)
+      how: Proposed segments draw over the marks with a confidence colour; Accept turns a segment solid, Reject fades
+        it; one segment at a time.
+      timing: 150 ms per decision
+    - what: Guest map performance (GST-021)
+      how: 30 fps sustained while walking, 60 where the device allows; LOD changes are invisible (LOD0 within 80 m);
+        first render from cache <= 3 s.
+      timing: below 24 fps for 5 s drop a LOD; below 20 fps fall back to 2D
+    decisions:
+    - DEC-103 (accept PDF, SVG, DWG, DXF and raster; guidance panel with placeholder recommendation)
+    - DEC-104 (draw rental points as kiosk points linked to the rental outlet until decided)
+    - ADR-0069 (native 3D navigation, GLB plus pathway metadata, 2D fallback)
+    - REV3-15 and GAP-C2 (bookable resources picked on the map)
+    - CHG-SBO-010 (create form drops id and status)
+    - CHG-SBO-005 (listVenueMaps paging logged)
+    - CHG-SGU-026 (3D-unavailable and weak-GPS frames needed)
+    - 'ADR-0069: in-park 3D navigation built natively (GLB + navigation file + GPS), 2D until a model is supplied;
+      client meeting 30 Sep, MoM 4.8'
+    - 'REV3-15, GAP-C2: bookable places placed on the map with setPlacedResource (29 Sep)'
+    - 'ids in the flow: REV3-15, GAP-C2, R073 (c)'
+    - 'BO-092: Drawn default accepted: Accept PDF, SVG, DWG, DXF and raster for geometry; show a guidance panel with
+      a placeholder recommendation until agreed. (Chinmay 2026-10-02)'
+    - 'BO-094: Drawn default accepted: Draw them as kiosk points linked to the rental outlet until decided. (Chinmay
+      2026-10-02)'
+    - 'answers-2-oct-batch1.md L435 (Chinmay, 3 Oct, r1 additions): venue map in r1; the import accepts DXF/DWG, PDF
+      with an OCR step, PNG/JPG with hand-marked paths (AI path proposal, accepted segment by segment) and GLB plus
+      a pathway (navigation) file; ADR-0069 open items closed'
+    sources:
+    - flows/F26-*.yaml
+    - handoff/venue-map-input-spec.md (sections 1, 2, 3, 3a, 5, 6)
+    - docs/adr/0069-in-park-3d-navigation-is-built-natively.md (sections 4-6)
+    - contracts/satellite/venue-map.yaml
+    - contracts/satellite/ai.yaml#proposeVenueLabels
+    - MoM 30 Sep 4.8 and 5
+    - DI-203
+    - DI-1102
+    - DI-1103
+    - TRACKER Actions row 74
+    - handoff/venue-map-input-spec.md
+    - docs/adr/0069-in-park-3d-navigation-is-built-natively.md
+    - contracts/satellite/venue-map.yaml#importVenueGeometry
+    - contracts/satellite/ai.yaml#proposeWalkways
+    - flows/F26-a-venue-maps-its-site.yaml
+    - CF-122
+    - ADR-0020
+    - DI-145
+    - DI-773
+    - TRACKER Actions row 173
+    - handoff/design-notes (screens BO-092, BO-093, BO-094, GST-021)
+    open:
+    - question: Exact layout of the 3D model upload on BO-093 (r1 supports GLB plus the pathway file, answers L435).
+      default: A "3D model + navigation file" slot on BO-093 beside the plan, accepting .glb plus .json, with the
+        ADR-0069 budget figures as helper text.
+    - question: Maximum upload size for the plan and the illustrated map
+      default: Show the server's maxSizeBytes from createUpload; helper text 'Up to 200 MB; 12,000 px wide images
+        are fine'. (The venue-operations brief proposed plans and manifests <= 50 MB and the illustrated map <= 100
+        MB; the GLB refusal over 40 MB is ADR-0069's and stands.)
+    - question: Exact error copy for unreadable and wouldStrandPoints
+      default: '''We could not read this file. Send it as DWG or DXF if you can.'' and ''Closing this path would leave
+        {n} points unreachable: {names}.'''
+    - question: Exact copy for the finding codes is not in the package (the server sends message).
+      default: Use the wording drafted in inputs.validation; one line per finding, linked to the spec section.
+    offline: The authoring side cannot go offline and the guest side must. Import, labelling and publish are back-office
+      acts at a desk. The published map, its points and its graph ship in the offline package — a guest standing in
+      the middle of a park with no signal is the guest who most needs directions.
+    block_a:
+      screens:
+      - BO-092
+      - BO-093
+      - BO-094
+      - GST-021
+      operations:
+      - venue-map#acceptVenueLabelProposals
+      - venue-map#createVenueMap
+      - venue-map#getVenueMap
+      - venue-map#getVenueMapGraph
+      - venue-map#importVenueGeometry
+      - venue-map#getVenueMapImportJob
+      - ai#proposeVenueLabels
+      - ai#proposeWalkways
+      - venue-map#acceptWalkwayProposals
+      - venue-map#getVenueNavigationFile
+      - venue-map#setVenueMapArtwork
+      - assets#createUpload
+      - assets#completeUpload
+      - venue-map#publishVenueMap
+      - venue-map#setPlacedResource
+      - venue-map#setVenuePoint
+      - venue-map#validateVenueMapGraph
+      screens_outside_block_a: []
+    merged_from:
+    - the venue-operations copy of this flow (3 Oct dedupe)
+    merged_detail:
+      from: the venue-operations copy (lifted from flows/, screens/ and contracts/; the storyboard above is the one
+        to draw)
+      trigger:
+        description: A venue is opening, or has rebuilt an area. Somebody has a drawing and needs guests to be able
+          to find a toilet.
+        entry_screen: BO-092
+      steps:
+      - frame: 1
+        screen: BO-092
+        screen_name: Venue Maps
+        block_a: true
+        user_sees: Every venue map of the venue (park map, a floor per building, zones, parking) and which version
+          guests see.
+        user_does: The manager creates a map.
+        operations:
+        - venue-map#createVenueMap
+        result: A draft, with the kind and floor level set. Nothing is live.
+      - frame: 2
+        screen: BO-093
+        screen_name: Map Import & Labelling
+        block_a: true
+        user_sees: Upload a drawing, see what was read, then review what the assistant suggests each shape is.
+        user_does: The plan is uploaded and read.
+        operations:
+        - venue-map#importVenueGeometry
+        result: Shapes extracted, deterministically. Every layer name reported back, decoded, mapped or not — and
+          a file that yields nothing says `nothingFound` rather than reporting success, which is the defect CF-122
+          found in the seat importer. Where the map carries bookable places (decided 29 September, rev 3 REV3-15 and
+          GAP-C2), the resource layer and the resource manifest (label, kind, zone, capacity, price band) are read
+          too, …
+      - frame: 3
+        screen: BO-093
+        screen_name: Map Import & Labelling
+        block_a: true
+        user_sees: Upload a drawing, see what was read, then review what the assistant suggests each shape is.
+        user_does: The assistant proposes what each shape is; the operator accepts, edits or rejects.
+        operations:
+        - ai#proposeVenueLabels
+        - venue-map#acceptVenueLabelProposals
+        result: Points created from accepted proposals. Low-confidence proposals are shown, not filtered — the shape
+          the assistant is unsure about is the one most worth a human looking at.
+      - frame: 4
+        screen: BO-094
+        screen_name: Map Editor & Publish
+        block_a: true
+        user_sees: Place and link what the drawing did not carry (toilets, exits, rides, restaurants, shops, prayer
+          rooms, first aid) and the cabanas, loungers and tables guests book, then validate and publish.
+        user_does: The operator places what the drawing did not carry and links each point to what it is.
+        operations:
+        - venue-map#setVenuePoint
+        - venue-map#setPlacedResource
+        result: A restaurant point carries its outlet id, a ride its product id, a gate its access point. Tapping
+          a restaurant on the map should open its menu, and that only works if the map knows which outlet it is. A
+          cabana, lounger or table is placed with `setPlacedResource` and linked to its `resources.Resource`, so a
+          guest can pick that one on the map and buy it (rev 3 REV3-15, superseding audit R073 (c) for resources on
+          an …
+      - frame: 5
+        screen: BO-094
+        screen_name: Map Editor & Publish
+        block_a: true
+        user_sees: Place and link what the drawing did not carry (toilets, exits, rides, restaurants, shops, prayer
+          rooms, first aid) and the cabanas, loungers and tables guests book, then validate and publish.
+        user_does: The graph is validated before anybody publishes.
+        operations:
+        - venue-map#validateVenueMapGraph
+        result: Unreachable points, dead-end paths, orphan components — and points reachable only by steps, which
+          is the finding nothing in the drawing makes visible.
+        timing: under 5s
+      - frame: 6
+        screen: BO-094
+        screen_name: Map Editor & Publish
+        block_a: true
+        user_sees: Place and link what the drawing did not carry (toilets, exits, rides, restaurants, shops, prayer
+          rooms, first aid) and the cabanas, loungers and tables guests book, then validate and publish.
+        user_does: The manager publishes.
+        operations:
+        - venue-map#publishVenueMap
+        result: A new version. The previous one stays readable so a guest mid-route on version 3 finishes on version
+          3.
+      - frame: 7
+        screen: GST-021
+        screen_name: Interactive Map
+        block_a: true
+        user_sees: The venue map with walking navigation (the Map view of At the Venue, one implementation with GST-038).
+        user_does: A guest opens the map and is routed.
+        operations:
+        - venue-map#getVenueMap
+        - venue-map#getVenueMapGraph
+        result: The whole map in one call, cached, and the graph small enough to route over on the device. The platform
+          guarantees the graph and the client walks it — a phone with it cached routes with no signal.
+      processing:
+      - operation: venue-map#createVenueMap
+        what: Start a map
+        steps:
+        - 1
+        block_a: true
+        writes: true
+      - operation: venue-map#importVenueGeometry
+        what: Read a drawing into shapes
+        steps:
+        - 2
+        block_a: true
+        writes: true
+      - operation: ai#proposeVenueLabels
+        what: Suggest what each extracted shape is
+        steps:
+        - 3
+        block_a: true
+        writes: true
+      - operation: venue-map#acceptVenueLabelProposals
+        what: Accept, edit or reject what the assistant suggested
+        steps:
+        - 3
+        block_a: true
+        writes: true
+      - operation: venue-map#setVenuePoint
+        what: Place or amend a point of interest
+        steps:
+        - 4
+        block_a: true
+        writes: true
+      - operation: venue-map#setPlacedResource
+        what: Place or amend a bookable resource on the map
+        steps:
+        - 4
+        block_a: true
+        writes: true
+      - operation: venue-map#validateVenueMapGraph
+        what: What is unreachable, before anyone publishes it
+        steps:
+        - 5
+        block_a: true
+        writes: true
+      - operation: venue-map#publishVenueMap
+        what: Make the draft the one guests see
+        steps:
+        - 6
+        block_a: true
+        writes: true
+      - operation: venue-map#getVenueMap
+        what: A map with its points and paths
+        steps:
+        - 7
+        block_a: true
+        offline_capable: true
+      - operation: venue-map#getVenueMapGraph
+        what: The navigation graph, ready to route over
+        steps:
+        - 7
+        block_a: true
+        offline_capable: true
+      ticketing_backoffice_motion_before_merge:
+      - BO-093 import progress while the job is parsing (indeterminate bar, then the layer count), polling getVenueMapImportJob.
+      - BO-093 hover over a layer row highlights its shapes on the plan; hover a proposal highlights its shape.
+      - BO-094 validation findings pulse once on the map where they are; clicking a finding pans and zooms to it.
+      - 'GST-021 3D route line drawn along the path from the guest''s dot to the destination; the dot moves along
+        the snapped route; camera follows the route (not the guest) when location is off; 3D↔2D toggle crossfades
+        and keeps the same route; LOD changes are invisible (no pop-in by design target: LOD0 within 80 m).'
+      - GST-021 navigation banner updates the next turn and its distance, metres to go, arrival time and a progress
+        bar as the guest walks; re-route when more than 20 m off route for more than 5 s.
+      - 'GST-021 weak GPS: the dot dims and an approximate ring fades in (accuracy worse than 30 m).'
+      - 'Performance targets: 30 fps sustained while walking, 60 where the device allows; below 24 fps for 5 s drop
+        a LOD; below 20 fps fall back to 2D; first render from cache ≤ 3 s.'
+      open_not_kept:
+      - question: Upload size limits for plans, manifests and the illustrated map are not in assets.createUpload.
+        default: Plans and manifests ≤ 50 MB, illustrated map ≤ 100 MB, GLB ≤ 40 MB (ADR-0069); state the limit before
+          the picker opens.
+      replaced_on_3_oct:
+      - PDF (via text/vector read; layer names often lost)
+      - raster PNG/JPG scan or photo (no vector geometry)
+      - venue or a commissioned 3D studio; upload screen not yet specified (see open)
+      - Venue (or its 3D contractor), uploaded on BO-093; contract support pending (see open)
+      - 'scanned PDF: treated as raster (see open on OCR)'
+      - upload panel with format guidance (DWG/DXF preferred; PDF and raster weaker) and the 3D model note
+    resolved:
+    - q: No screen is named for the illustrated map upload and its four alignment points.
+      was_default: A section on BO-094 "Guest map artwork" with the upload and four alignment-point pairs.
+      resolved_by: 'the lead, 3 Oct (CHG-RONEC-001): BO-094 "Guest map artwork" binds assets#createUpload / completeUpload
+        and the new venue-map#setVenueMapArtwork (two to four alignment pairs, four recommended)'
+    - q: GLB and the navigation JSON are not yet accepted by importVenueGeometry (format enum is pdf/svg/dwg/dxf/raster);
+        VenueMap.modelAssetId/modelTransform and an assets model3d kind are ADR-0069 action items 3-5, still open.
+      was_default: Draw BO-093 with a fourth source kind, "3D model + navigation file", two upload slots and the budget/anchor
+        findings from ADR-0069; mark it pending the contract change.
+      resolved_by: 'answers-2-oct-batch1.md L435 (Chinmay, 3 Oct, r1 additions): venue map in r1; the import accepts
+        DXF/DWG, PDF with an OCR step, PNG/JPG with hand-marked paths (AI path proposal, accepted segment by segment)
+        and GLB plus a pathway (navigation) file; ADR-0069 open items closed'
+    - q: '"PDF via OCR": the contract reads PDF layer names and has no OCR step; a scanned PDF has no layers.'
+      was_default: A scanned PDF is imported as a raster plan (rasterOnly warning); text in the image feeds the label
+        proposals (proposeVenueLabels) as hints. No separate OCR screen.
+      resolved_by: 'answers-2-oct-batch1.md L435 (Chinmay, 3 Oct, r1 additions): venue map in r1; the import accepts
+        DXF/DWG, PDF with an OCR step, PNG/JPG with hand-marked paths (AI path proposal, accepted segment by segment)
+        and GLB plus a pathway (navigation) file; ADR-0069 open items closed'
+    - q: Hand-marked paths on a PNG are not described as an input distinct from a plain raster.
+      was_default: Treat as rasterPlan; proposeWalkways uses the marks as the visible paths; every segment accepted
+        one at a time.
+      resolved_by: 'answers-2-oct-batch1.md L435 (Chinmay, 3 Oct, r1 additions): venue map in r1; the import accepts
+        DXF/DWG, PDF with an OCR step, PNG/JPG with hand-marked paths (AI path proposal, accepted segment by segment)
+        and GLB plus a pathway (navigation) file; ADR-0069 open items closed'
+    - q: Where is the GLB and navigation file uploaded? ADR-0069 action items 3-5 (VenueMap.modelAssetId, a model3d
+        media kind, the input-spec section) are not done.
+      was_default: Draw a '3D model (optional)' upload slot on BO-093 beside the plan, accepting .glb plus .json,
+        with the budget figures as helper text; mark the frame 'contract pending'.
+      resolved_by: 'answers-2-oct-batch1.md L435 (Chinmay, 3 Oct, r1 additions): venue map in r1; the import accepts
+        DXF/DWG, PDF with an OCR step, PNG/JPG with hand-marked paths (AI path proposal, accepted segment by segment)
+        and GLB plus a pathway (navigation) file; ADR-0069 open items closed'
+
+  F77:
+    title: A promotion is built, bundled, published and measured
+    process: ticketing-backoffice
+    trigger: A venue wants to shift stock or fill a quiet Tuesday. (Client chain RET-5G, RET-5H, RET-5K, RET-5A.)
+    actors:
+      - {role: "marketer", app: "P08 Venue Management", screens: ["BO-013", "BO-011", "BO-010"]}
+      - {role: "marketer", app: "P16 Venue Analytics", screens: ["ANL-009"]}
+    inputs:
+      - name: channel capacity and allocations
+        formats: ["per channel a number of units; OTA listing (Viator, Klook, Headout, GetYourGuide, Tiqets, Expedia, other) with external product reference", "allocation", "price list", "push interval"]
+        limits: total cannot exceed capacity; push interval default 15 minutes
+        validation: "Reducing a channel below what it has sold is refused with the sold count named, e.g. 'B2B has sold 42; minimum 42'."
+        source: marketer, BO-013
+      - name: bundle definition
+        formats: ["code (≤ 64)", "name (≤ 200)", "description (≤ 1000)", "kind fixed / dynamic / mandatory / optional / promotional", "price", "components", "choice groups (\"choose 3 of 5\")", "allocation"]
+        limits: "component quantity ≥ 1; choice group choose ≥ 1 from ≥ 2 options; redeem at up to 20 outlets"
+        validation: "Allocation required before save; defaults proportional to list prices and must total the bundle price exactly (rounding remainder shown on one line). A bundle that has sold locks components and allocation ('sold since 12 Oct')."
+        source: marketer, BO-011 (formCreateBundle)
+      - name: promotion
+        formats: ["code (≤ 64, A-Z a-z 0-9 _ -), name (≤ 200), kind first: Percentage, Fixed amount off, Fixed price, Buy X get Y, Free item, Tiered percentage; stacking mode; budget cap; A/B variants"]
+        limits: percentage 0 to 100; buy/get quantities ≥ 1; A/B traffic totals exactly 100
+        validation: "Only the chosen kind's inputs show. Stacking mode is required and never defaulted (Exclusive, Stackable, Best only, Stack within group + group name). A live promotion locks conditions and discount (pause, extend or end only)."
+        source: marketer, BO-010 (formCreatePromotion)
+      - name: coupon campaign and codes
+        formats: ["one shared code with a redemption limit", "or a batch of unique single-use codes"]
+        limits: up to 50,000 codes per generation; prefix ≤ 16; length 6 to 32
+        validation: Generation is asynchronous and produces a file to download.
+        source: marketer, BO-010 (formCreateCouponCampaign, formGenerateCouponCodes)
+      - name: reporting question
+        formats: ["natural-language text"]
+        limits: 3 to 1000 characters
+        validation: Under 3 characters refused (400).
+        source: marketer, ANL-009
+    processing:
+      - {input: "allocations", does: "sets channel envelopes and OTA listings", operation: ["catalogue#createChannelCapacity", "catalogue#updateChannelCapacity", "catalogue#relinquishChannelAllocation", "subscription#setChannelListing", "subscription#listChannelListings"]}
+      - {input: "bundle", does: "creates the sellable bundle", operation: "promotions#createBundle"}
+      - {input: "question", does: "answers from reporting data; raises and acknowledges alerts; AI proposes actions to approve or reject", operation: ["reporting#askReportingQuestion", "reporting#setAlertRule", "reporting#acknowledgeAlert", "ai#listProposedActions", "ai#decideProposedAction"]}
+      - {input: "promotion and campaign", does: "creates the promotion, the coupon campaign and its codes; reads cost on the dashboard", operation: ["promotions#createPromotion", "promotions#createCouponCampaign", "promotions#generateCouponCodes", "promotions#getPromotion", "promotions#endPromotion", "reporting#getDashboard"]}
+    outputs:
+      - name: channel allocation bar
+        states: {ready: "stacked bar against capacity, remainder labelled 'General pool, any channel once its own share is used'", error: "refusal with sold count"}
+        failure_branches: [{what: "reduce below sold", sees: "'B2B has sold 42; minimum 42'", recover: "set ≥ sold"}]
+      - name: bundle
+        states: {draft: "saved", onSale: "sellable", soldLocked: "components read-only"}
+        failure_branches: [{what: "combo slot with no default", sees: "warning that every till needs extra taps", recover: "set a default per slot"}]
+      - name: promotion and codes
+        states: {draft: "created", live: "locked except pause/extend/end", generating: "code batch progress (queued, generating, complete, failed)", complete: "download file"}
+        failure_branches: [{what: "code generation failed", sees: "failed status on the batch", recover: "retry generation"}]
+      - name: dashboard / AI answer
+        states: {loading: "answering", ready: "figures and the answer", empty: "no data yet for a new promotion"}
+        failure_branches: [{what: "a step not licensed for the tenant", sees: "chain stops at the module boundary (stoppedAtModule)", recover: "none needed; licence boundary, not a failure"}]
+    steps:
+      - {frame: 1, screen: "BO-013", blockA: true, sees: "channel allocation bars and OTA listings", does: "sets channel capacity for the quiet Tuesday", operation: "catalogue#createChannelCapacity / catalogue#updateChannelCapacity", result: "envelopes per channel"}
+      - {frame: 2, screen: "BO-011", blockA: true, sees: "bundle canvas (components, choice groups, allocation)", does: "builds ticket + meal bundle", operation: "promotions#createBundle", result: "bundle drafted"}
+      - {frame: 3, screen: "ANL-009", blockA: false, sees: "AI assistant and action centre", does: "asks a question and decides a proposed action", operation: "reporting#askReportingQuestion, ai#decideProposedAction", result: "answer and decision"}
+      - {frame: 4, screen: "BO-010", blockA: true, sees: "promotion form (kind first) and coupon campaign", does: "creates promotion, campaign, generates codes; reads cost", operation: "promotions#createPromotion, promotions#createCouponCampaign, promotions#generateCouponCodes, reporting#getDashboard", result: "promotion live and measured"}
+    motion:
+      - Code generation progress (queued → generating → complete) with a count; the download button appears on complete.
+      - Channel allocation stacked bar resizes live as numbers are typed.
+    decisions: ["CHG-WIR-025 (publishBundle is the catalogue release, not the sellable bundle)", "Answers 2 Oct line 19 and 34: workshop-pack commercial screens are venue screens merged with BO-008 to BO-011"]
+    sources: ["flows/F77-*.yaml", "client boards RET-5G", "RET-5H", "RET-5K", "RET-5A", "design-notes BO-010", "BO-011", "BO-013", "contracts/satellite/promotions.yaml"]
+    open:
+      - {question: "Is the reporting answer on ANL-009 streamed?", default: "Static reply with a typing indicator; ANL-009 is not Block A."}
+      - {question: "Step 1's publishBundle on BO-013 publishes the catalogue release (CHG-WIR-025); should it stay on this step?", default: "Draw 'Publish catalogue release' as a secondary action on BO-014, not on BO-013."}
+
+  F86:
+    title: A POS layout is designed, previewed and deployed
+    process: ticketing-backoffice
+    trigger: A venue wants its tills to look different (new buttons, a new tender, a new discount rule). Client chain POS-4A to POS-4F.
+    actors:
+      - {role: "venueManager", app: "P08 Venue Management", screens: ["BO-115", "BO-116", "BO-117", "BO-118", "BO-126"]}
+      - {role: "AI configuration assistant", app: "server (ai contract)", screens: ["BO-117"]}
+    inputs:
+      - name: catalogue import file
+        formats: ["CSV", "XLSX", "JSON"]
+        limits: "mode createOnly, upsert, replaceCategory; uploaded through assets first (sourceRef)"
+        validation: "Preview reports counts before any commit ('2,847 products, 14 with no price, 3 duplicate codes'); findings grouped by severity with row number and field; errors block commit, warnings do not; commit refused when nothing was found or the file was unreadable."
+        source: venue manager, BO-117 (formImportProductCatalogue)
+      - name: assistant prompt
+        formats: ["conversational text; images (OCR)"]
+        limits: description 5 to 4000 characters; kind product, membership, pass, promotion, discountRule, pricingCalendar, seatingZone, operatingHours, campaign
+        validation: The assistant asks for the type, validity, dates and capacity and refuses to proceed while required information is missing.
+        source: venue manager, BO-117 (formGenerateConfiguration)
+      - name: categories, merchandise, campaign, deployment target
+        formats: ["category tree", "merchandise presentation", "campaign", "configuration profile + workstations"]
+        limits: per contract
+        validation: none beyond the contracts (screens not Block A)
+        source: venue manager, BO-115, BO-116, BO-118, BO-126
+    processing:
+      - {input: "import file", does: "parses into a preview job (parsing → previewReady → committing → committed or failed; outcome parsed, parsedWithFindings, nothingFound, unreadable); commit creates or updates drafts", operation: ["catalogue#importProductCatalogue", "catalogue#commitCatalogueImport"]}
+      - {input: "assistant prompt", does: "drafts a configuration blueprint: what will be created, assumptions (each editable), clarifications needed, confidence", operation: "ai#generateConfiguration"}
+      - {input: "categories and layout", does: "sets categories, merchandise, campaign; deploys the profile to workstations", operation: ["catalogue#listProductCategories", "catalogue#setProductCategories", "retail#updateMerchandise", "marketing-crm#createCampaign", "tenancy#deployConfigurationProfile", "tenancy#listSaleBoards", "tenancy#listWorkstations", "tenancy#listAuditRecords"]}
+    outputs:
+      - name: import preview and findings
+        states: {parsing: "progress", previewReady: "counts + findings table", nothingFound: "commit refused, 'nothing found'", unreadable: "commit refused", committed: "counts of drafts created and updated"}
+        failure_branches: [{what: "errors in rows", sees: "error findings with row and field", recover: "fix the file and re-import"}]
+      - name: assistant blueprint
+        states: {asking: "follow-up question", ready: "blueprint with 'Create as draft'", partial: "clarifications still needed"}
+        failure_branches: [{what: "proposal touches prices", sees: "shown with who suggested it; approval and publication follow the normal path", recover: "approve via normal path"}]
+      - name: deployment
+        states: {ready: "deployed to selected tills", partial: "some tills pending"}
+        failure_branches: [{what: "a step not licensed for the tenant", sees: "chain stops at the module boundary", recover: "none (licence boundary)"}]
+    steps:
+      - {frame: 1, screen: "BO-115", blockA: false, sees: "category and brand hierarchy", does: "sets categories", operation: "catalogue#setProductCategories", result: "categories saved"}
+      - {frame: 2, screen: "BO-116", blockA: false, sees: "merchandising presentation", does: "updates merchandise", operation: "retail#updateMerchandise", result: "presentation saved"}
+      - {frame: 3, screen: "BO-117", blockA: true, sees: "two tabs: Import file and Configuration assistant", does: "imports a file or describes the products to the assistant", operation: "catalogue#importProductCatalogue, ai#generateConfiguration", result: "preview or blueprint; nothing is live"}
+      - {frame: 4, screen: "BO-117", blockA: true, sees: "findings by severity or blueprint with assumptions", does: "commits import or 'Create as draft'", operation: "catalogue#commitCatalogueImport", result: "drafts created with counts"}
+      - {frame: 5, screen: "BO-118", blockA: false, sees: "campaign and audience", does: "creates a campaign", operation: "marketing-crm#createCampaign", result: "campaign"}
+      - {frame: 6, screen: "BO-126", blockA: false, sees: "deployment preview and audit", does: "deploys the profile", operation: "tenancy#deployConfigurationProfile", result: "tills updated together"}
+    motion:
+      - Import job progress bar while parsing and committing.
+      - Assistant replies appear as a chat; streaming is not specified for generateConfiguration (see open).
+    decisions: ["CHG-WIR-021 (setRolePermissions moved off BO-116)"]
+    sources: ["flows/F86-*.yaml", "client boards POS-4A to POS-4F", "design-notes BO-117", "contracts/spine/catalogue.yaml#importProductCatalogue", "contracts/satellite/ai.yaml#generateConfiguration"]
+    open:
+      - {question: "Does the configuration assistant stream its replies like the concierge (SSE)?", default: "Show a typing indicator, then the full reply; streaming decided only for sendAiMessage (answers 3 Oct)."}
+      - {question: "Import file size and row limits", default: "Helper text 'CSV, XLSX or JSON, up to 50,000 rows'; the server's maxSizeBytes governs."}
+
+  F89:
+    title: Offline policy is set, cached, monitored and reconciled
+    process: ticketing-backoffice
+    trigger: A venue decides how much trading it will tolerate with no network.
+    actors:
+      - {role: "technician / venue manager", app: "P08 Venue Management", screens: ["BO-130", "BO-131", "BO-037", "BO-128"]}
+      - {role: "supervisor", app: "P08", does: "resolves refused offline sales remotely"}
+    inputs:
+      - name: offline policy
+        formats: ["checklist grouped Safe offline (sale, entitlement validate, no sale) and Risky offline (refund, exchange, price override, discount, wallet spend, loyalty redemption); ceilings; action at breach; manager may extend"]
+        limits: maximum hours offline 1 to 72 (default 24); transaction ceiling 1 to 5,000; value ceiling in the venue currency; scope path ^[a-z0-9_]+(\.[a-z0-9_]+)*$
+        validation: Risky group unticked by default with a one-line reason each. Policy set at a node (venue, department, workstation group) and inherited below (PR-4).
+        source: technician, BO-130 (formSetOfflinePolicy)
+      - name: connectivity thresholds
+        formats: ["thresholds for when a device counts as offline rather than slow"]
+        limits: per contract
+        validation: per contract (screen not Block A)
+        source: technician, BO-131
+      - name: rejection resolution
+        formats: ["Resolve rejection per refused offline entry"]
+        limits: one entry at a time
+        validation: none
+        source: supervisor, BO-130 (formResolveSyncRejection)
+    processing:
+      - {input: "offline policy", does: "stores the policy for the node and its children", operation: "tenancy#setOfflinePolicy"}
+      - {input: "thresholds", does: "sets when a device switches to offline", operation: "tenancy#setConnectivityThresholds"}
+      - {input: none, does: "lists each device's cached package (what it enforces now) and fleet health", operation: ["catalogue#listCatalogueBundles", "tenancy#getWorkstationHealth", "tenancy#listWorkstations"]}
+      - {input: "rejections", does: "lists and resolves offline sales the server refused", operation: ["orders#listSyncRejections", "orders#syncOrders"]}
+    outputs:
+      - name: offline policy
+        states: {ready: "policy with inherited-from label", error: "refused (403 or 404)"}
+        failure_branches: [{what: "a step not licensed for the tenant", sees: "chain stops at the module boundary", recover: none}]
+      - name: sync rejections
+        states: {emptyFirstRun: "no refused offline sales", ready: "each refused entry with device, time recorded, product, amount and the reason (a to-do, never retried)", resolved: "removed from the unresolved view"}
+        failure_branches: [{what: "sale against a retired product", sees: "Resolve posts it against the retired product at the price paid", recover: "Resolve rejection"}]
+      - name: fleet health
+        states: {ready: "which tills are offline and since when", partial: "some devices unreported"}
+        failure_branches: []
+    steps:
+      - {frame: 1, screen: "BO-130", blockA: true, sees: "Safe / Risky offline checklist and ceilings", does: "sets the policy for the venue node", operation: "tenancy#setOfflinePolicy", result: "what a till may do offline and for how long"}
+      - {frame: 2, screen: "BO-131", blockA: false, sees: "connectivity thresholds", does: "sets thresholds", operation: "tenancy#setConnectivityThresholds", result: "offline vs slow defined"}
+      - {frame: 3, screen: "BO-037", blockA: false, sees: "offline package per device", does: "checks what each device enforces", operation: "catalogue#listCatalogueBundles", result: "enforced package visible"}
+      - {frame: 4, screen: "BO-128", blockA: false, sees: "live workstation health", does: "monitors the fleet", operation: "tenancy#getWorkstationHealth, tenancy#listWorkstations", result: "offline tills and since when"}
+      - {frame: 5, screen: "BO-130", blockA: true, sees: "sync rejections list", does: "resolves each refused sale", operation: "orders#listSyncRejections, orders#syncOrders", result: "every rejected offline sale seen by a person"}
+    motion:
+      - Fleet health on BO-128 refreshes live (status dots change colour; 'offline since' timer counts up).
+    decisions: ["CHG-WIR-021 (thresholds on BO-131)", "CHG-WIR-025 and CHG-WIR-027 (package read is listCatalogueBundles)", "PR-4 (policy inheritance)"]
+    sources: ["flows/F89-*.yaml", "design-notes BO-130", "contracts/spine/tenancy.yaml#setOfflinePolicy", "ADR-0013 (POS offline position)"]
+    open:
+      - {question: "Flow step 5 resolves on BO-037 but the resolve form lives on BO-130; which screen draws it?", default: "Draw the rejections list and Resolve on BO-130 (Block A)."}
+
+  F90:
+    title: An audience is built, offered to, and the result is judged
+    process: ticketing-backoffice
+    trigger: A venue wants to reach a particular kind of guest with a particular offer. Client chain RET-5D, RET-5E, RET-5C.
+    actors:
+      - {role: "marketer", app: "P08 Venue Management", screens: ["BO-119", "BO-010"]}
+      - {role: "marketer", app: "P16 Venue Analytics", screens: ["ANL-009"]}
+    inputs:
+      - name: upsell rule and recommendation decisions
+        formats: ["rule form; approve or reject recommendations"]
+        limits: per contract
+        validation: per contract (BO-119 not Block A)
+        source: marketer, BO-119
+      - name: promotion publish / pause / simulate
+        formats: ["Publish", "Pause", "Simulate on a promotion"]
+        limits: one promotion at a time
+        validation: Publish refused (409) when it conflicts; a live promotion locks conditions and discount.
+        source: marketer, BO-010
+      - name: reporting question
+        formats: ["natural-language text"]
+        limits: 3 to 1000 characters
+        validation: Under 3 characters refused.
+        source: marketer, ANL-009
+    processing:
+      - {input: "rule", does: "creates an upsell rule; decides AI recommendations", operation: ["promotions#createUpsellRule", "ai#decideRecommendations"]}
+      - {input: "promotion", does: "simulates, publishes, pauses; reads usage, campaigns and codes", operation: ["promotions#simulatePromotion", "promotions#publishPromotion", "promotions#pausePromotion", "promotions#getPromotionUsage", "promotions#listCouponCampaigns", "promotions#listCouponCodes"]}
+      - {input: "question", does: "answers and lists alerts; AI proposed actions decided", operation: ["reporting#askReportingQuestion", "reporting#listAlerts", "reporting#acknowledgeAlert", "ai#decideProposedAction"]}
+    outputs:
+      - name: promotion usage
+        states: {loading: "reading", empty: "no redemptions yet", ready: "redemptions and discount given against the budget cap"}
+        failure_branches: [{what: "a step not licensed", sees: "chain stops at the module boundary", recover: none}]
+      - name: simulation result
+        states: {ready: "projected effect before publishing"}
+        failure_branches: [{what: "publish conflict", sees: "refusal names the conflict", recover: "change stacking or end the other promotion"}]
+    steps:
+      - {frame: 1, screen: "BO-119", blockA: false, sees: "cross-sell and upsell rules", does: "builds an audience rule and decides recommendations", operation: "promotions#createUpsellRule, ai#decideRecommendations", result: "who gets the offer"}
+      - {frame: 2, screen: "BO-010", blockA: true, sees: "promotion with Simulate and Publish", does: "simulates then publishes; later reads usage", operation: "promotions#simulatePromotion, promotions#publishPromotion, promotions#getPromotionUsage", result: "offer live; usage visible"}
+      - {frame: 3, screen: "ANL-009", blockA: false, sees: "AI assistant and alerts", does: "asks how it performed; acknowledges alerts", operation: "reporting#askReportingQuestion, reporting#listAlerts", result: "result judged"}
+    motion:
+      - Usage counters on BO-010 update on refresh (no live push specified).
+    decisions: ["Answers 2 Oct line 19 and 34 (commercial pack screens merge into BO-008 to BO-011)"]
+    sources: ["flows/F90-*.yaml", "client boards RET-5D", "RET-5E", "RET-5C", "design-notes BO-010"]
+    open:
+      - {question: "Where is the audience (segment) itself built in Block A?", default: "BO-119 is later; draw the audience as the promotion's eligibility conditions on BO-010."}
+
+  F156:
+    title: "Promotions & Bundles board 3: Coupon & Promo Code Command Center (Block A segment: code distribution)"
+    process: ticketing-backoffice
+    trigger: Client board walk-through (derived from the screens' navigation; the business reason is not written). Block A touches only ADM-164 Code Distribution & Assignment Manager, reached from the board hub ADM-158.
+    actors:
+      - {role: "venueManager / marketer", app: "P08 Venue Management (ADM- workshop screens moved to the venue, answers 2 Oct line 19)", screens: ["ADM-158", "ADM-164"]}
+    inputs:
+      - name: code assignment
+        formats: ["assignee type first (individual customer, customer segment, membership account, B2B company, reseller, travel agency, school, hotel, bank, corporate partner, marketing campaign), then a picker of that type's records; quantity; channel (email, SMS, WhatsApp, mobile app, CRM journey, guest portal, B2B portal, partner portal, POS, call centre, API, exported batch)"]
+        limits: quantity cannot exceed the unassigned codes in the batch
+        validation: "Over-quantity refused; default message 'Only {n} codes are unassigned in this batch.' (see open)"
+        source: marketer, ADM-164
+    processing:
+      - {input: "code assignment", does: "assigns codes and records the distribution channel", operation: "promotions#setCodeDistributionManager"}
+      - {input: none, does: "lists the batch's codes", operation: "promotions#listCouponCodes"}
+    outputs:
+      - name: distribution funnel
+        states: {loading: "reading", emptyFirstRun: "no batches yet (expected on a new tenant)", ready: "Generated, assigned, sent, delivered, viewed, redeemed, expired, cancelled as a horizontal funnel per batch", emptyNoAccess: "permission named (PRICE_CONFIGURE)"}
+        failure_branches: [{what: "operator lacks the permission", sees: "emptyNoAccess", recover: "an admin grants PRICE_CONFIGURE"}]
+    steps:
+      - {frame: 1, screen: "ADM-158", blockA: false, sees: "board hub with coupon activity", does: "opens Code Distribution", operation: "promotions#listCouponCodes", result: "navigates"}
+      - {frame: 2, screen: "ADM-164", blockA: true, sees: "batches with the distribution funnel", does: "picks assignee type, records, quantity and channel; saves", operation: "promotions#setCodeDistributionManager", result: "codes assigned; funnel moves"}
+    motion:
+      - Funnel bars animate to new widths after an assignment (300 ms ease).
+    decisions: ["Answers 2 Oct line 19 (ADM workshop screens are venue screens, P08)"]
+    sources: ["flows/F156-*.yaml", "design-notes ADM-164", "contracts/satellite/promotions.yaml#setCodeDistributionManager"]
+    open:
+      - {question: "The board's reason for walking it is unwritten; other ten frames are later blocks.", default: "Storyboard only the hub and ADM-164."}
+      - {question: "Exact over-quantity message", default: "'Only {n} codes are unassigned in this batch.'"}
+
+  F169:
+    title: "Ticket Media & Credential board 2: Media Design Studio (Block A segment: PDF, printable and POS ticket designer)"
+    process: ticketing-backoffice
+    trigger: Client board walk-through (reason not written). Block A touches BO-346 PDF, Printable & POS Ticket Designer, reached from the hub BO-344.
+    actors:
+      - {role: "venueManager", app: "P08 Venue Management", screens: ["BO-344", "BO-346"]}
+    inputs:
+      - name: ticket template
+        formats: ["media type thermalTicket, a4Pdf, wristband, rfidCard, walletPass, qrOnly, sms; background artwork image; dynamic fields placed by drag and drop (guest name, ticket number, media code, QR, date, terms); locale variants English and Arabic (RTL mirrored) or bilingual"]
+        limits: name ≤ 200; channels pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice, b2b, ota; recycleAfterDays ≥ 0
+        validation: "Two active templates with the same priority for the same kind, channel and media type are refused (duplicateSelectionPriority); show the clash inline. Ticket ID and media code are different fields."
+        source: venue manager, BO-346
+    processing:
+      - {input: "template", does: "creates or updates the template", operation: ["orders#createTicketTemplate", "orders#updateTicketTemplate", "orders#listTicketTemplates"]}
+      - {input: "template + sample product", does: "prints a proof marked PROOF on the artefact", operation: "orders#printTicketProof"}
+      - {input: "printable media profile", does: "saves the board's printable/POS settings", operation: "access#setPdfPrintablePos"}
+    outputs:
+      - name: template list and designer
+        states: {loading: "reading", emptyFirstRun: "no templates", ready: "templates with which sale each would be selected for", emptyNoAccess: "permission named"}
+        failure_branches: [{what: "priority clash", sees: "inline clash naming the other template", recover: "change priority or retire one"}]
+      - name: proof
+        states: {ready: "sample marked PROOF on the artefact itself"}
+        failure_branches: []
+    steps:
+      - {frame: 1, screen: "BO-344", blockA: false, sees: "media studio hub", does: "opens the PDF/POS designer", operation: "none in Block A", result: "navigates"}
+      - {frame: 2, screen: "BO-346", blockA: true, sees: "canvas with background and a field palette", does: "drags fields, sets media type, channels, priority and locale variant", operation: "orders#createTicketTemplate", result: "template saved or clash shown"}
+      - {frame: 3, screen: "BO-346", blockA: true, sees: "Print proof", does: "prints a proof", operation: "orders#printTicketProof", result: "PROOF sample"}
+    motion:
+      - Drag and drop of dynamic fields on the canvas with snap guides; EN↔AR toggle mirrors the layout.
+    decisions: ["No decision in the package names this flow or its screens (BO-344, BO-346); checked flows/F169, the screens' design notes and answers-2-oct-batch1.md (derived)"]
+    sources: ["flows/F169-*.yaml", "design-notes BO-346", "contracts/spine/orders.yaml#createTicketTemplate"]
+    open:
+      - {question: "Artwork image formats and size", default: "PNG or SVG, up to 5 MB, at 203 dpi for thermal and 300 dpi for A4."}
+
+  F234:
+    title: "Event Management board 1 (Block A segment: event duplication and clone)"
+    process: ticketing-backoffice
+    trigger: Client board walk-through (reason not written). Block A touches BO-696 Event Duplication & Clone Configuration from the hub BO-694. Most events are last year's event, so cloning is frequent.
+    actors:
+      - {role: "venueManager", app: "P08 Venue Management", screens: ["BO-694", "BO-696"]}
+    inputs:
+      - name: what to copy
+        formats: ["checklist of parts with counts (e.g. 212 performances, 2 price lists, 1 seat map, 1 resource plan): schedule, pricing, seatMap, capacityProfile, resourceRequirements, staffPlan, registrationForm, accessRules"]
+        limits: all ticked except staff roster by default; dates shifted by a chosen offset
+        validation: Sales never copy.
+        source: venue manager, BO-696
+    processing:
+      - {input: "event", does: "reads the event", operation: "catalogue#getEvent"}
+      - {input: "what to copy", does: "creates a draft event; nothing goes on sale", operation: "catalogue#cloneEvent"}
+    outputs:
+      - name: cloned draft event
+        states: {loading: "cloning", ready: "draft event opens", error: "names what failed"}
+        failure_branches: [{what: "operator lacks EVENT_CONFIGURE", sees: "emptyNoAccess", recover: "grant permission"}]
+    steps:
+      - {frame: 1, screen: "BO-694", blockA: false, sees: "event catalogue hub", does: "picks last season's event", operation: "none in Block A", result: "navigates"}
+      - {frame: 2, screen: "BO-696", blockA: true, sees: "short checklist with counts and a date offset", does: "Clone", operation: "catalogue#getEvent, catalogue#cloneEvent", result: "draft event opened"}
+    motion: none
+    decisions: ["No decision in the package names this flow or its screens (BO-694, BO-696); checked flows/F234, the screens' design notes and answers-2-oct-batch1.md (derived)"]
+    sources: ["flows/F234-*.yaml", "design-notes BO-696", "contracts/spine/catalogue.yaml#cloneEvent"]
+    open:
+      - {question: "The flow's step outcomes are copied from another board (invoice text) and are wrong.", default: "Use the design-notes summary; flagged for the flow owner."}
+
+  F240:
+    title: "Event Management board 7: Event Lifecycle & Change (Block A segment: lifecycle command centre)"
+    process: ticketing-backoffice
+    trigger: Client board walk-through (reason not written). Block A touches BO-716, the board's own hub.
+    actors:
+      - {role: "venueManager", app: "P08 Venue Management", screens: ["BO-716"]}
+      - {role: "approver", app: "P08", does: "approves a change above the threshold"}
+    inputs:
+      - name: lifecycle transition
+        formats: ["state draft", "planned", "onSale", "live", "closed", "cancelled", "archived; effectiveFrom date-time"]
+        limits: one transition at a time
+        validation: "Preconditions listed as a checklist, unmet ones linked to where they are fixed: on sale needs a price, a capacity and a schedule; live needs a resource plan; cancel needs a treatment (refund, reschedule, credit) and shows how many guests are affected. Refused with 409 when a precondition is unmet."
+        source: venue manager, BO-716
+    processing:
+      - {input: "transition", does: "moves the event or submits for approval above the impact threshold", operation: ["catalogue#getEvent", "catalogue#setEventLifecycleState"]}
+    outputs:
+      - name: event lifecycle
+        states: {ready: "current state with the next transition button", awaitingApproval: "'Awaiting approval' with the approver", refused: "unmet preconditions listed"}
+        failure_branches: [{what: "change above the approval threshold (e.g. moving a sold-out performance)", sees: "submitted for approval rather than applied", recover: "approver decides"}]
+    steps:
+      - {frame: 1, screen: "BO-716", blockA: true, sees: "event with state chips and the next-state button with its checklist", does: "clicks Go on sale", operation: "catalogue#getEvent", result: "preconditions shown"}
+      - {frame: 2, screen: "BO-716", blockA: true, sees: "all preconditions met", does: "confirms", operation: "catalogue#setEventLifecycleState", result: "on sale, or Awaiting approval"}
+    motion: none
+    decisions: ["No decision in the package names this flow or its screens (BO-716); checked flows/F240, the screens' design notes and answers-2-oct-batch1.md (derived)"]
+    sources: ["flows/F240-*.yaml", "design-notes BO-716", "contracts/spine/catalogue.yaml#setEventLifecycleState"]
+    open:
+      - {question: "Flow step outcomes are copied from another board and wrong; steps 2-8 are later blocks.", default: "Storyboard BO-716 only."}
+
+  F257:
+    title: "Payment Orchestration board 2 (Block A segment: gateway, PSP and acquirer directory)"
+    process: ticketing-backoffice
+    trigger: Client board walk-through (reason not written). Block A touches ADM-570 from the hub ADM-569.
+    actors:
+      - {role: "venueManager / finance admin", app: "P08 Venue Management", screens: ["ADM-569", "ADM-570"], permission: "PAYMENT_PROVIDER_MANAGE"}
+    inputs:
+      - name: provider connection
+        formats: ["provider kind gateway, psp, acquirer, walletProvider, bnplProvider; environment sandbox or production; merchant account; credentials"]
+        limits: credentials write-only
+        validation: "After save only the fingerprint shows ('key ending ...4f2a, set 1 Oct by Fatima') with Replace credentials. A production connection starts in Testing until a successful test."
+        source: finance admin, ADM-570
+    processing:
+      - {input: "connection", does: "connects the provider (status draft → testing → active; degraded, disabled)", operation: "payments#createPaymentProviderConnection"}
+      - {input: none, does: "lists connections and capabilities", operation: "payments#listPaymentProviderConnections"}
+    outputs:
+      - name: capability matrix
+        states: {emptyFirstRun: "no providers", ready: "providers as rows, capabilities as columns (card, Apple Pay, Google Pay, AED, OMR, partial capture, multi-capture, refund window) with ticks", testing: "production connection awaiting a successful test"}
+        failure_branches: [{what: "test fails", sees: "status stays Testing with the error", recover: "replace credentials and retest"}]
+    steps:
+      - {frame: 1, screen: "ADM-569", blockA: false, sees: "orchestration hub", does: "opens the directory", operation: "none in Block A", result: "navigates"}
+      - {frame: 2, screen: "ADM-570", blockA: true, sees: "capability matrix, Sandbox and Production visibly distinct (badge and colour)", does: "connects a provider", operation: "payments#createPaymentProviderConnection", result: "connection in Testing"}
+    motion: none
+    decisions: ["No decision in the package names this flow or its screens (ADM-569, ADM-570); checked flows/F257, the screens' design notes and answers-2-oct-batch1.md (derived)"]
+    sources: ["flows/F257-*.yaml", "design-notes ADM-570", "contracts/satellite/payments.yaml#createPaymentProviderConnection"]
+    open:
+      - {question: "Which operation runs the connection test?", default: "Draw 'Test connection' and mark it contract pending."}
+
+  F260:
+    title: "Payment Orchestration board 5 (Block A segment: B2B invoice, on-account and payment terms)"
+    process: ticketing-backoffice
+    trigger: Client board walk-through (reason not written). Block A touches ADM-603 from the hub ADM-599.
+    actors:
+      - {role: "finance admin", app: "P08 Venue Management", screens: ["ADM-599", "ADM-603"], permission: "CREDIT_MANAGE"}
+    inputs:
+      - name: B2B payment terms
+        formats: ["credit limit (money), billing cycle perBooking, weekly, fortnightly, monthly; purchase order; deposit percent; balance due onArrival, beforeArrival, onTerms; at limit Refuse, Warn, Allow with override"]
+        limits: amount ^-?\d+(\.\d{1,4})?$, currency ISO 4217 (3 letters), scale 0 to 4
+        validation: "The override approval role appears only for Allow with override. Worked example under the deposit ('AED 12,000 booking, 25% now = AED 3,000.00'). 412 when the record changed since read."
+        source: finance admin, ADM-603
+      - name: instalment policy
+        formats: ["eligible product kinds", "minimum order value", "maximum instalments", "frequencies", "share due at purchase", "fee", "stored card required"]
+        limits: per contract
+        validation: per contract
+        source: finance admin, ADM-603
+    processing:
+      - {input: "terms", does: "sets and reads terms", operation: ["payments#setB2bPaymentTerms", "payments#getB2bPaymentTerms"]}
+      - {input: "instalment policy", does: "sets and reads the policy", operation: ["payments#setInstalmentPolicy", "payments#getInstalmentPolicy"]}
+    outputs:
+      - name: terms
+        states: {loading: "reading", emptyFirstRun: "no terms set", ready: "terms with the worked example"}
+        failure_branches: [{what: "stale write (412)", sees: "'Someone changed these terms; reload to see them'", recover: "reload and re-apply"}]
+    steps:
+      - {frame: 1, screen: "ADM-599", blockA: false, sees: "mixed tender hub", does: "opens B2B terms", operation: "none in Block A", result: "navigates"}
+      - {frame: 2, screen: "ADM-603", blockA: true, sees: "terms form with the at-limit choice and the deposit example", does: "sets 25% deposit and Warn at limit", operation: "payments#setB2bPaymentTerms", result: "terms saved"}
+    motion: ["Deposit worked example recalculates as the percentage is typed."]
+    decisions: ["Client gave 20 to 30% upfront for schools and corporates (design-notes ADM-603)"]
+    sources: ["flows/F260-*.yaml", "design-notes ADM-603", "contracts/satellite/payments.yaml#setB2bPaymentTerms"]
+    open: []
+
+  F270:
+    title: "Resource Management board 7 (Block A segment: AI event resource forecasting)"
+    process: ticketing-backoffice
+    trigger: Client board walk-through (reason not written). Block A touches BO-919 from the hub BO-913. The screen's notes are owned by the ai process.
+    actors:
+      - {role: "venueManager", app: "P08 Venue Management", screens: ["BO-913", "BO-919"], permission: "AI_USE for what-ifs"}
+    inputs:
+      - name: what-if scenario
+        formats: ["built on a published forecast version (baseVersionId, chosen from the event's date); typed changes with lever price, capacity, openingHours, weather, event, marketing, staffing, closure"]
+        limits: "at least one change; name optional, default 'What-if: <event> <date>'"
+        validation: Never changes production.
+        source: venue manager, BO-919 (formCreateForecastScenario, 'Run a what-if')
+    processing:
+      - {input: "event date", does: "reads the forecast and operational requirements", operation: ["ai#getForecast", "ai#listOperationalRequirements"]}
+      - {input: "scenario", does: "computes the scenario (202: computing → ready or failed)", operation: "ai#createForecastScenario"}
+    outputs:
+      - name: configured vs AI recommended
+        states: {loading: "reading", ready: "two columns per resource (lifeguards, cashiers, gate lanes, golf carts, cabanas): configured, and recommended at most-likely with busy case P90 beside it, e.g. '14 (busy case 17)'; differences highlighted, not corrected", emptyFirstRun: "no published forecast for the date: says so and offers to run one", stale: "'Forecast is out of date' with the publication time (more than 36 hours)", computing: "scenario running"}
+        failure_branches:
+          - {what: "venue profile missing a setting (e.g. no productivity standard for a role)", sees: "the row names the missing setting and links to the AI venue profile; other rows still show", recover: "set it in the venue profile"}
+      - name: basis and maturity
+        states: {ready: "'Starting - Based on: your venue profile, water-park pattern, UAE calendar, weather. Limited historical data.' with a range, not a single number"}
+        failure_branches: []
+    steps:
+      - {frame: 1, screen: "BO-913", blockA: false, sees: "event resource planning hub", does: "opens the forecast", operation: "none in Block A", result: "navigates"}
+      - {frame: 2, screen: "BO-919", blockA: true, sees: "configured vs recommended table with busy case and the basis line", does: "reads", operation: "ai#getForecast, ai#listOperationalRequirements", result: "gaps highlighted"}
+      - {frame: 3, screen: "BO-919", blockA: true, sees: "Run a what-if dialog", does: "adds 'rain' and '+20% attendance'", operation: "ai#createForecastScenario", result: "What-if column beside the base, changes listed"}
+      - {frame: 4, screen: "BO-919", blockA: true, sees: "Open in staffing requirements", does: "opens BO-927 for the staff rows", operation: none, result: "navigates to accept, modify or reject"}
+    motion:
+      - Scenario computing state (spinner on the What-if column) until ready.
+    decisions: ["DEC-009 (forecast covers every requirement kind, curated model per task with 3-4 alternatives)", "TBF-2 (Block A forecast baseline runs on the calendar only; weather joins in Block B)"]
+    sources: ["flows/F270-*.yaml", "design-notes ai BO-919", "answers 2 Oct line 50", "contracts/satellite/ai.yaml#createForecastScenario"]
+    open:
+      - {question: "Weather is a what-if lever, but the Block A baseline has no weather (TBF-2).", default: "Show the weather lever disabled with 'Weather joins in a later release'; the basis line omits weather in Block A."}

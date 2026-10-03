@@ -52,7 +52,10 @@ steps:
   action: What the tills did offline is reconciled.
   operations:
   - listSyncRejections
-  - syncOrders
+  note: '**Corrected 3 October (CHG-R1S-013, a design-batch cross-check).** The step also called `syncOrders`,
+    which is the till''s own replay (`orders.yaml`: workstation scope, `ORDER_CREATE`; bound on POS-013), not
+    a back-office action: the tills replay on reconnect, and a person reads here what was refused. Resolving
+    a refusal is `resolveSyncRejection` on BO-130.'
   outcome: '**Every rejected offline sale is seen by a person.** A rejection nobody reads is money nobody
     collects.'
 branches:

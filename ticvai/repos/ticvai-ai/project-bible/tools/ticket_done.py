@@ -19,22 +19,45 @@ import re
 SCREEN = re.compile(r"([A-Z]+-\d{3,4})(?:-REST)?$")
 # A Venue Management screen is built on the backend track (P08 is VM) and is still a screen: "[BE] ADM-247 ...".
 BE_SCREEN = re.compile(r"^\[BE\] ([A-Z]+-\d{3,4}) ")
+# **A ticket written by hand names what it builds** (CHG-RONEP-001/003, 3 October): the tasks of block-a-extra-tasks.json
+# (`operations` an AI engine task serves, `builds` any task lists) and the module tests (their app-module's artefacts)
+# lead their text with "Builds: `operation ai#setAiProvider`, `table platform.outbox`, `adr ADR-0058`." Before it,
+# a hand-written backend task's title was read as an operation list: PLATFORM-SAGA-PAID built "operation the saga
+# proven end to end" and OFFLINE-JOURNAL "operation record" (r1 gate, G2).
+BUILDS = re.compile(r"Builds: ((?:`[^`]+`(?:, )?)+)")
+OP_ID = re.compile(r"^[a-z][A-Za-z0-9]+$")
+
+
+def listed_builds(text):
+    """The artefacts a "Builds:" lead names, as written ("operation ai#x", "table s.t", "screen S", "adr ADR-0058")."""
+    m = BUILDS.search(text or "")
+    return re.findall(r"`([^`]+)`", m.group(1)) if m else []
 
 
 def builds_of(r, part, lineage):
     """The artefact ids a ticket builds, as ADAM names them: operation contract#operationId, table schema.name,
-    screen id, service. Setup, onboarding and AI tasks build nothing ADAM indexes by id: their key is enough."""
+    screen id, service, ADR. A task whose text leads with "Builds:" builds what it lists (a hand-written task, a
+    module test); setup and onboarding tasks build nothing ADAM indexes by id: their key is enough."""
     def op_id(op):
         c = lineage.get(op, {}).get("contract")
         return f"{c}#{op}" if c else op
 
+    if r["type"] == "Task" and not part and listed_builds(r.get("description")):
+        out = []
+        for b in listed_builds(r.get("description")):
+            kind, _, name = b.partition(" ")
+            out.append(f"operation {op_id(name)}" if kind == "operation" and "#" not in name else b)
+        return out
     if r["type"] == "Task" and r["track"] == "Backend" and part in ("", "build", "wire", "test"):
         m, k = BE_SCREEN.match(r["subject"] or ""), SCREEN.search(r["key"])
         if m and k and k.group(1) == m.group(1):
             return [f"screen {m.group(1)}"]
     if r["type"] == "Task" and r["track"] == "Backend":
         ops = [part] if part else (r["subject"].split(": ", 1)[1].split(", ") if ": " in r["subject"] else [])
-        return [f"operation {op_id(op)}" for op in ops]
+        # only a generated operations task (SVC-, VM-) lists operations in its title; a hand-written one lists none
+        if not part and not r["key"].startswith(("SVC-", "VM-")):
+            return []
+        return [f"operation {op_id(op)}" for op in ops if OP_ID.match(op)]
     if r["type"] == "Task" and r["track"] == "Database":
         if part:
             return [f"table {part}"]

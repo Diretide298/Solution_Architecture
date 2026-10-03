@@ -105,7 +105,7 @@ def superseded_ids(inputs: list[dict]) -> dict:
     return out
 
 
-SUPERSEDED_BY_REF = re.compile(r"^(DI-\d{3,4}|ADR-\d{4}|DEC-\d+|CHG-[A-Z]{2,6}-\d{3})$")
+SUPERSEDED_BY_REF = re.compile(r"^(DI-\d{3,4}|ADR-\d{4}|DEC-\d+|CHG-[A-Z][A-Z0-9]{1,5}-\d{3})$")
 
 
 def active(inputs: list[dict] | None = None) -> list[dict]:

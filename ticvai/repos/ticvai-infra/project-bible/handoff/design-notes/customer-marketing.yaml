@@ -3247,6 +3247,8 @@ screens:
       - what: Only endKioskAssist is declared; nothing starts the assist session or notifies staff.
         why: The screen's purpose is to call a person; add the operation that opens the assist session (KioskAssistSession).
         source: contracts/satellite/marketing-crm.yaml#endKioskAssist; contracts/satellite/marketing-crm.yaml#/components/schemas/KioskAssistSession
+        status: fixed
+        by: CHG-R1S-022
 
   EMP-028:
     summary: >-

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Public API and developer access
   version: 1.0.0
-  x-ticvai-screen-count: 30
+  x-ticvai-screen-count: 34
   x-ticvai-tier: satellite
   x-ticvai-module: "13 — Developer & API Management"
   x-ticvai-platforms:
@@ -105,6 +105,40 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
+  /developers/{developerId}:
+    get:
+      operationId: getDeveloperAccount
+      x-ticvai-consumed-by:
+        - "P14 DEV-002 Register & Organisation"
+      x-ticvai-audience: [partner, staff]
+      x-ticvai-read-routing: replica
+      summary: A registered developer organisation
+      description: >
+        **Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.**
+        DEV-002 registers an organisation (`registerDeveloper`) and sets its members; it had no read of the
+        organisation it then shows. A partner reads only its own (`x-ticvai-self-scoped`). Returns what the
+        write stores, in the write's own shape.
+      x-ticvai-permission: DEVELOPER_VIEW
+      x-ticvai-self-scoped: principal
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: developerId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: A registered developer organisation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeveloperAccount'
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /developers/{developerId}/members:
     parameters:
       - name: developerId
@@ -759,6 +793,42 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /api-quotas:
+    get:
+      operationId: listApiQuotas
+      x-ticvai-consumed-by:
+        - "P14 DEV-008 Programme Administration"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: The rate limits and quotas set per client
+      description: >
+        **Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.**
+        DEV-008 and ADM-015 set quotas with `setApiQuota` and nothing read them. `DEVELOPER_ADMIN`, as the
+        write: `DEVELOPER_VIEW` is held by developers themselves, who must not read other clients' limits.
+        Returns what the write stores, in the write's own shape. Ordered by creation (`id`, a UUIDv7), oldest first.
+      x-ticvai-permission: DEVELOPER_ADMIN
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: The rate limits and quotas set per client
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ApiQuota'
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setApiQuota
       x-ticvai-consumed-by:
@@ -1041,6 +1111,41 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /api-licensing:
+    get:
+      operationId: listApiLicences
+      x-ticvai-consumed-by:
+        - "P14 DEV-008 Programme Administration"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: The API licences granted, per client
+      description: >
+        **Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.**
+        DEV-008 sets licences with `setApiLicensing`; `listApiScopes` lists the scopes a licence may grant,
+        not the licences. Returns what the write stores, in the write's own shape. Ordered by creation (`id`, a UUIDv7), oldest first.
+      x-ticvai-permission: DEVELOPER_ADMIN
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: The API licences granted, per client
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ApiLicence'
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setApiLicensing
       x-ticvai-consumed-by:
@@ -1214,6 +1319,9 @@ paths:
                 eventType: { $ref: '#/components/schemas/WebhookEventType' }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: The test delivery and what the endpoint answered
           content:
             application/json:
@@ -1492,6 +1600,41 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /api-anomaly-rules:
+    get:
+      operationId: listApiAnomalyRules
+      x-ticvai-consumed-by:
+        - "P14 DEV-008 Programme Administration"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: The rules that flag abnormal API traffic
+      description: >
+        **Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.**
+        DEV-008 and ADM-015 set anomaly rules with `setApiAnomalyRule` and nothing read them. Returns what
+        the write stores, in the write's own shape. Ordered by creation (`id`, a UUIDv7), oldest first.
+      x-ticvai-permission: DEVELOPER_ADMIN
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: The rules that flag abnormal API traffic
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ApiAnomalyRule'
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setApiAnomalyRule
       x-ticvai-consumed-by:

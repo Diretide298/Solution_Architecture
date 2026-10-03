@@ -1618,6 +1618,7 @@ paths:
             (`subscription-expired`, audit STATE-SUBSCRIPTION); start a new one.
 
             '
+          x-ticvai-problem-types: [subscription-expired]
           content:
             application/problem+json:
               schema:
@@ -3235,6 +3236,9 @@ paths:
                   default: 30
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Requested
           content:
             application/json:
@@ -3270,6 +3274,9 @@ paths:
       - *id002
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Draining
           content:
             application/json:
@@ -8095,6 +8102,9 @@ paths:
                     type: string
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Running
           content:
             application/json:

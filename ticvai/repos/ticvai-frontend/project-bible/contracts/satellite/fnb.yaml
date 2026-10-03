@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Food & Beverage
   version: 0.1.0
-  x-ticvai-screen-count: 124
+  x-ticvai-screen-count: 127
   x-ticvai-tier: satellite
   x-ticvai-module: 7 — F&B POS  ·  5 — F&B & Guest Management (service)
   x-ticvai-requirements: 151
@@ -242,6 +242,42 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /substitution-rules:
+    get:
+      operationId: listSubstitutionRules
+      x-ticvai-consumed-by:
+        - "P08 BO-111 Ingredient Substitution, Allergen & Nutrition"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: What may replace what, as saved
+      description: >
+        **Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.**
+        BO-111 replaces the substitution rules with `setSubstitutionRules` (a whole-set PUT under
+        `If-Match`) and could not read the set, or its ETag, before replacing it. Returns what the write
+        stores, in the write's own shape. Ordered by creation (`id`, a UUIDv7), oldest first.
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: What may replace what, as saved
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/SubstitutionRule'
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setSubstitutionRules
       x-ticvai-consumed-by:
@@ -347,6 +383,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: The verdict, and where any discrepancy came from. Recorded as the item's latest
             verdict (`trigger` is `manual`), readable with `getAllergenVerification`.
           content:
@@ -1098,6 +1137,42 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /combos:
+    get:
+      operationId: listCombos
+      x-ticvai-consumed-by:
+        - "P08 BO-011 Packages & Bundles"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: The combos defined at the venue, with their slots
+      description: >
+        **Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.**
+        BO-011 sets a combo's slots with `setComboSlots` and `createCombo` makes one; nothing listed them,
+        so the screen could not show the slots it was about to replace. Returns what the write stores, in
+        the write's own shape. Ordered by creation (`id`, a UUIDv7), oldest first.
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: The combos defined at the venue, with their slots
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Combo'
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createCombo
       x-ticvai-consumed-by:
@@ -1537,6 +1612,9 @@ paths:
         '412':
           $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -1935,6 +2013,19 @@ paths:
         **The kitchen is not re-fired.** Food already made does not get made again because the bill moved
         — a transfer that re-fires is a transfer that doubles food cost.
 
+
+        **What moves, and where** (3 October 2026, CHG-R1S-018; the r1 gate found `lineIds` named two
+        tables). `lineIds` are F&B order lines (`FnbOrder.lines[].id`, rows of `fnb.service_order_line`),
+        never `orders.order_line`. Each line is re-parented to an open service order on `toVisitId` (one is
+        opened there if the visit has none) and both visits'' totals are recomputed; the sales order and its
+        lines are written at settlement, as for any F&B bill, so nothing in `orders` changes here. The answer
+        is the **target** visit, as it now stands.
+
+        **Refused:** a line that is not on `visitId`, or is already paid, voided or comped
+        (`422 line-not-transferable`, naming the lines); `toVisitId` equal to `visitId`, or a target visit
+        that is `settled`, `merged` or `cancelled`, or in another outlet (`409 target-visit-not-open`).
+        **Replayed offline** (`serverWins`): a line already on the target is skipped, so a replay is a no-op.
+
         '
       tags:
       - fnb
@@ -1975,11 +2066,24 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Transferred
+          description: Transferred. The target visit (`toVisitId`) as it now stands.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TableVisit'
+        '409':
+          description: The target visit is the source, or is settled, merged, cancelled or in another outlet.
+          x-ticvai-problem-types: [target-visit-not-open]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '422':
+          description: A line is not on the source visit, or is already paid, voided or comped (named in the
+            problem's detail).
+          x-ticvai-problem-types: [line-not-transferable]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /waitlist/{entryId}/quote:
@@ -2017,6 +2121,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: The quote, and how it was reached
           content:
             application/json:
@@ -2173,6 +2280,9 @@ paths:
                   nullable: true
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Recorded. No expected quantity and no variance until the count is submitted (audit
             R110 (a)).
           content:
@@ -2236,6 +2346,9 @@ paths:
                   type: string
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Reopened for recount
           content:
             application/json:
@@ -2737,6 +2850,7 @@ paths:
     get:
       operationId: getCourseRules
       x-ticvai-consumed-by:
+        - "P08 BO-136 F&B Global Settings & Controls"
         - "P15 KIT-009 SLA, Priority & Service Rules"
       x-ticvai-audience:
       - staff
@@ -4172,6 +4286,8 @@ paths:
     get:
       operationId: listMyTableReservations
       x-ticvai-consumed-by:
+        - "P01 WEB-031 My Reservations"
+        - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-070 Reserve a Table"
       x-ticvai-agreed: '3 October: Chinmay, Block A business rules, GST-070 ("bind the guest''s own reservations/waitlist
         list, self-scoped"); CHG-RUL-013; shape follows listTableReservations (paged)'
@@ -4247,6 +4363,7 @@ paths:
         - "P02 GST-031 AI Concierge – Home"
         - "P02 GST-061 Menu Item Detail"
         - "P04 POS-021 Sell — Food & Drink"
+        - "P04 POS-024 Outlet Setup"
         - "P05 KSK-016 Order Food"
       x-ticvai-audience:
       - guest
@@ -4326,6 +4443,8 @@ paths:
         - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-024 F&B – Browse & Order"
         - "P02 GST-029 Venue Info & Services"
+        - "P08 BO-044 F&B Outlets"
+        - "P08 BO-065 Venue Configuration"
       x-ticvai-audience:
       - guest
       - staff
@@ -5852,6 +5971,7 @@ paths:
             where it is served, collected or delivered.
 
             '
+          x-ticvai-problem-types: [illegal-status-transition, order-already-fulfilled]
           content:
             application/problem+json:
               schema:
@@ -7264,6 +7384,8 @@ paths:
   /recipes/{recipeId}/substitutes:
     get:
       operationId: listIngredientSubstitutes
+      x-ticvai-consumed-by:
+        - "P08 BO-111 Ingredient Substitution, Allergen & Nutrition"
       summary: Approved substitutions for a recipe's ingredients
       description: >
         **A kitchen out of an ingredient substitutes it whether or not the system says so.**
@@ -9895,7 +10017,7 @@ components:
             deprecated alias.'
     GuestMenu:
       type: object
-      x-ticvai-persistence: none — projection over menu, item and availability
+      x-ticvai-persistence: none — projection over fnb.menu, fnb.menu_item and availability
       required:
       - outletId
       - menuId
@@ -9971,6 +10093,12 @@ components:
                       description: Always present. Not a field a tenant may choose to omit.
                       items:
                         $ref: '#/components/schemas/AllergenCode'
+                    allergenDetail:
+                      allOf:
+                      - $ref: '#/components/schemas/Allergen'
+                      description: '**What the dish contains and what it may contain, told apart** (3 October 2026,
+                        CHG-R1S-022: the kiosk and guest menus promise the difference and the flat list cannot
+                        carry it). `allergens` stays the flat list.'
                     preparationMinutes:
                       type: integer
                       nullable: true
@@ -12051,13 +12179,27 @@ components:
                 nullable: true
     KitchenSla:
       type: object
+      x-ticvai-persistence: fnb.kitchen_sla
+      x-ticvai-primary-key:
+      - outletId
       description: '**How long a ticket may sit, per service mode, and what pushes it up the rail**
         (`setKitchenSla`). The priority weights are the ones `listKitchenTickets` orders the rail by.
 
+
+        **Stored per outlet in `fnb.kitchen_sla`** (3 October 2026, CHG-R1S-005: the HLD/LLD cross-check found
+        `setKitchenSla` wrote no table). One row per outlet; the targets and weights are held whole.
+
         '
       properties:
+        outletId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: The outlet, from the path. The row's key.
         targets:
           type: array
+          x-ticvai-persistence-kind: valueObject
+          x-ticvai-persistence-column: jsonb
           items:
             type: object
             required:
@@ -12074,6 +12216,8 @@ components:
                 default: 80
         priorityWeights:
           type: object
+          x-ticvai-persistence-kind: valueObject
+          x-ticvai-persistence-column: jsonb
           description: The weight of each signal the board names — age, promise time, table stage, a VIP marker.
           properties:
             age:

@@ -52,6 +52,7 @@ paths:
     get:
       operationId: listAccreditationProgrammes
       x-ticvai-consumed-by:
+        - "P08 BO-618 Accreditation Form Builder"
         - "P08 BO-619 Accreditation Category Management"
         - "P08 BO-620 Accreditation Program Setup"
         - "P08 BO-667 Event & Venue Accreditation Assignment"

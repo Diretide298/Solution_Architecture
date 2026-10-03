@@ -13,6 +13,9 @@ emittedBy:
 - orders.capturePayment
 - orders.syncOrders
 - payments.receivePaymentProviderWebhook
+# A pending payment resolved by inquiry captures the order as the webhook would (states/payment.yaml:
+# pendingConfirmation -> captured by inquirePaymentStatus; CHG-R1S-009, found by check-write-lineage W-EMITS).
+- orders.inquirePaymentStatus
 payload:
 - field: orderId
   type: uuid

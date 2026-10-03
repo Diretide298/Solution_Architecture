@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Marketing & CRM
   version: 0.1.0
-  x-ticvai-screen-count: 230
+  x-ticvai-screen-count: 232
   x-ticvai-tier: satellite
   x-ticvai-module: 22 — Marketing & CRM
   x-ticvai-requirements: 319
@@ -864,6 +864,9 @@ paths:
                   default: true
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Added
           content:
             application/json:
@@ -3027,6 +3030,7 @@ paths:
         - "P02 GST-031 AI Concierge – Home"
         - "P02 GST-032 AI Concierge – Chat"
         - "P02 GST-033 AI Concierge – Contextual Help"
+        - "P05 KSK-013 Call staff"
         - "P05 KSK-015 Assistant"
       security:
       - guestAuth: []
@@ -3639,6 +3643,9 @@ paths:
                   pattern: '^[\p{L}\p{N}][\p{L}\p{N} _.-]{0,22}[\p{L}\p{N}]$'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -6113,6 +6120,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-043 Loyalty & Rewards"
         - "P02 GST-036 Loyalty & Rewards"
+        - "P08 BO-828 Milestones & Reward Rules"
         - "P08 BO-833 Gamification Analytics & Audit"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
@@ -9827,6 +9835,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: The recommendation; nothing is stored
           content:
             application/json:
@@ -10358,6 +10369,33 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /customer-service-copilot:
+    get:
+      operationId: getCustomerServiceCopilot
+      x-ticvai-consumed-by:
+        - "P08 BO-798 Intent & Knowledge Management"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: The customer-service copilot configuration as saved
+      description: >
+        **Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.**
+        BO-798 saves the copilot's configuration with `setCustomerServiceCopilot` and had no way to read it
+        back. Gated by `AI_CONFIGURE`, as the write is: the vocabulary has no AI view permission for
+        configuration. Returns what the write stores, in the write's own shape.
+      x-ticvai-permission: AI_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The customer-service copilot configuration as saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiCustomerServiceCopilotKnowledgeWorkspaceView'
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setCustomerServiceCopilot
       x-ticvai-consumed-by:
@@ -10670,6 +10708,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-800 Routing & Queue Management"
         - "P08 BO-808 Assignment & Workload"
+        - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-023 Agent Workload, Availability & Workforce Control"
       x-ticvai-audience:
         - staff
@@ -14604,6 +14643,9 @@ paths:
                   nullable: true
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Decided
           content:
             application/json:
@@ -15024,6 +15066,8 @@ paths:
   /loyalty/campaigns:
     get:
       operationId: listLoyaltyCampaigns
+      x-ticvai-consumed-by:
+        - "P08 BO-827 Points & Activity Rules"
       summary: Time-boxed campaigns inside a programme
       description: '**A campaign is how a rule gets a start and an end.** Double points in August is
         the programme''s earning rule plus a window, and without this table it is a rule somebody has
@@ -15173,6 +15217,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-043 Loyalty & Rewards"
         - "P02 GST-036 Loyalty & Rewards"
+        - "P08 BO-828 Milestones & Reward Rules"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -17859,7 +17904,7 @@ components:
       - provider
       - technologyType
       - isThirdParty
-      - preConsentViolation
+      - isPreConsentViolation
       properties:
         id:
           type: string
@@ -17935,7 +17980,7 @@ components:
           - platformCatalogue
           - none
           nullable: true
-        preConsentViolation:
+        isPreConsentViolation:
           type: boolean
           description: Seen with no decision or after reject-all, and its category (the registry's, else the
             suggested one) is not `strictlyNecessary`. An unclassified technology counts as a violation, as

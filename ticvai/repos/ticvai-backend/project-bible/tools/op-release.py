@@ -211,7 +211,11 @@ def build(rows, mp, sched, lineage, retire_plan, unexplained, release):
             "sprint": n, "version_key": f"VERSION-S{n}" if n else None,
             "version": mp.get(f"VERSION-S{n}") if n else None, "set_version": task,
             "summary": summ, "builds": builds,
-            "pointer": pointer(key, summ, builds, release, what="" if builds else (r.get("description") or ""),
+            # a hand-written task or a module test lists its builds itself ("Builds:", CHG-RONEP-003): ADAM holds no spec
+            # of its work beyond that text, so the pointer keeps it
+            "pointer": pointer(key, summ, builds, release,
+                               what=(r.get("description") or "") if (not builds or (typ != "Sub Task"
+                                     and _done.listed_builds(r.get("description")))) else "",
                                done=done_when(r, part, builds) if typ != "Sub Task" or builds else "")})
 
     for r in rows:

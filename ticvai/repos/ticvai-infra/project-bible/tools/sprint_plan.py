@@ -214,7 +214,17 @@ POOL_OF_PLATFORM = {"P02": "mob", "P05": "mob", "P06": "mob", "P07": "mob", "P04
 SCHEMA_CONTRACT = {"pii": "identity", "ledger": "finance", "control": "tenancy", "venuemap": "venue-map",
                    "whitelabel": "white-label", "marketing": "marketing-crm", "subscription": "subscription",
                    "platform": "platform-ops", "baseline": None, "seating": "seating"}
-BLOCKS = ["A", "B", "C", "D"]
+# **Block A ships in two drops** (Chinmay, 3 October 2026, CHG-RONEP-007): A (A1, the first release by 27 November)
+# and A2 (the completion work that does not fit in it, right after and ahead of Block B). A2 sorts after A and before
+# B everywhere a block is ranked; its tickets keep their keys.
+BLOCKS = ["A", "A2", "B", "C", "D"]
+BLOCK_A_FAMILY = ("A", "A2")
+LATER_BLOCKS = ["B", "C", "D"]
+
+
+def block_label(b):
+    """'A1' for Block A (its first drop, key BLOCK-A), else the block's own code."""
+    return "A1" if b == "A" else b
 
 
 def am_name(module, platform, part=None, parts=1, variant=""):
@@ -264,7 +274,7 @@ def load_team(team=None):
 def sprint_settings(team):
     sp = team.get("sprintPlan") or {}
     targets = {b["block"]: int(b["endSprint"]) for b in sp.get("blocks") or []}
-    for b, n in zip(BLOCKS, (4, 7, 10, 13)):
+    for b, n in {"A": 4, "A2": 5, "B": 7, "C": 10, "D": 13}.items():
         targets.setdefault(b, n)
     return {"targets": targets, "ticketBlocks": list(sp.get("ticketBlocks") or ["A", "B"]),
             "fePointsPerAppModule": int(sp.get("fePointsPerAppModule") or 45),
@@ -286,7 +296,11 @@ def pace_model(team, items):
     A scenario (Chinmay, 1 October: "5 tasks per day ... ramp up towards the next block ... 2x by Block D"):
     tasksPerDevDay x the average points of a non-AI task in the plan, held through Sprint rampFromSprint - 1,
     then rising linearly sprint by sprint to rampTo x that at Sprint rampFullSprint, and held. Per-person pace
-    (Surendra 60%) still applies on top; AI engine tasks are sized in days and are not affected."""
+    (Surendra 60%) still applies on top; AI engine tasks are sized in days and are not affected.
+
+    **Block A at 6 tasks a day** (Chinmay, 3 October, CHG-RONEP-009): `tasksPerDevDayBlockA` replaces tasksPerDevDay in the
+    sprints before the ramp (Sprints 1-4); the ramp after them still starts from tasksPerDevDay, so it is unchanged. A
+    task-a-day is per developer: N average tasks (the average points of a non-AI task) a working day, each."""
     cfg = sprint_settings(team)["pace"]
     tpd = cfg.get("tasksPerDevDay")
     if not tpd:
@@ -296,9 +310,11 @@ def pace_model(team, items):
     base = float(tpd) * avg
     to, a, b = float(cfg.get("rampTo") or 1.0), int(cfg.get("rampFromSprint") or 5), int(cfg.get("rampFullSprint") or 11)
 
+    early = float(cfg.get("tasksPerDevDayBlockA") or tpd) / float(tpd)
+
     def factor(n):
         if n < a:
-            return 1.0
+            return early
         if n >= b:
             return to
         return 1.0 + (to - 1.0) * (n - a + 1) / (b - a + 1)
@@ -307,8 +323,9 @@ def pace_model(team, items):
 
     def at(i):
         return by_sprint.get(sprint_of_index(max(i, 0.0)), base * to)
-    return at, (f"{tpd:g} tasks per developer per day x {avg:.2f} points a task = {base:.1f} points, through Sprint "
-                f"{a - 1}; rising to {to:g}x ({base * to:.1f}) by Sprint {b}, then held"), base
+    return at, (f"{tpd * early:g} tasks per developer per day x {avg:.2f} points a task = {base * early:.1f} points, through "
+                f"Sprint {a - 1}; from Sprint {a} the ramp from {tpd:g} ({base:.1f}) rises to {to:g}x ({base * to:.1f}) by "
+                f"Sprint {b}, then held"), base
 
 
 def release_number(tag):
@@ -367,6 +384,12 @@ def test_settings(team):
             "minPoints": int(bt.get("moduleTestMinPoints") or TEST_MIN_POINTS)}
 
 
+def test_pair(b, tests):
+    """The block-test pair of a block, rotating over A, B, C and D as before A2 existed; A2 keeps Block A's pair."""
+    order = ["A", "B", "C", "D"]
+    return tests["pairs"][order.index("A" if b == "A2" else b) % len(tests["pairs"])]
+
+
 def window_of(n, days=BLOCK_TEST_DAYS):
     """The block-test window of sprint n: its last `days` working days, as (start index, end index)."""
     end = sprint_end_index(n)
@@ -418,6 +441,61 @@ def flow_claims(flows, screen_block, op_block):
         out[f["id"]] = {"name": f.get("name", ""), "criticality": f.get("criticality", ""), "complete": complete,
                         "partlyFrom": first if first and first != complete else "",
                         "missing": sorted(set(missing))}
+    return out
+
+
+# The operations that open a session: a screen calling one is a door, where its app starts (check-doors, CHG-DOOR-004).
+DOOR_OPS = {"login", "verifyGuestOtp", "guestSocialLogin", "guestUaePassLogin"}
+
+
+def is_entry(s):
+    """Where an app starts: `navigation.isEntryPoint`, or a door (a screen calling an operation that opens a session)."""
+    return bool((s.get("navigation") or {}).get("isEntryPoint")
+                or {a.get("operationId") for a in s.get("apis") or [] if isinstance(a, dict)} & DOOR_OPS)
+
+
+def nav_exits(s):
+    """The screens a screen leads to: `navigation.exitTo` and `navigation.transitions[].to`."""
+    nav = s.get("navigation") or {}
+    out = [x if isinstance(x, str) else (x or {}).get("to") for x in nav.get("exitTo") or []]
+    out += [t.get("to") for t in nav.get("transitions") or [] if isinstance(t, dict)]
+    return [x for x in out if x]
+
+
+def nav_paths(app_screens, a_set, targets):
+    """**How a Block A screen is reached** (CHG-RONEP-006, 3 October). Over one app's screens ({id: screen}), from its
+    entries (`navigation.isEntryPoint`, and every door: a screen calling an operation that opens a session), the path to each target that passes the fewest screens outside `a_set` (a 0-1
+    shortest path: a screen in `a_set` costs nothing). Returns {target: [entry, ..., target]} for every target with a path;
+    a target with none is left out. Shared by build-service-docs.py (which pulls the screens on these paths into Block A)
+    and check-plan-closure.py (C-REACH)."""
+    import heapq
+    entries = sorted(sid for sid, s in app_screens.items() if is_entry(s))
+    dist, prev, pq = {}, {}, []
+    for e in entries:
+        c = 0 if e in a_set else 1
+        if c < dist.get(e, 1e9):
+            dist[e] = c
+            heapq.heappush(pq, (c, e))
+    while pq:
+        c, u = heapq.heappop(pq)
+        if c > dist.get(u, 1e9):
+            continue
+        for v in nav_exits(app_screens[u]):
+            if v not in app_screens:
+                continue
+            nc = c + (0 if v in a_set else 1)
+            if nc < dist.get(v, 1e9):
+                dist[v], prev[v] = nc, u
+                heapq.heappush(pq, (nc, v))
+    out = {}
+    for t in targets:
+        if t not in dist:
+            continue
+        path, x = [t], prev.get(t)
+        while x is not None:
+            path.append(x)
+            x = prev.get(x)
+        out[t] = path[::-1]
     return out
 
 

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Order & Payment
   version: 0.1.0
-  x-ticvai-screen-count: 205
+  x-ticvai-screen-count: 207
   x-ticvai-tier: spine
   x-ticvai-module: 2 — Ticketing Sales
   x-ticvai-requirements: 343
@@ -613,6 +613,7 @@ paths:
         '409':
           description: The status change goes backwards (`statusBackwards`), or the group is already
             cancelled or complete (`groupClosed`).
+          x-ticvai-problem-types: [status-backwards, group-closed]
           content:
             application/problem+json:
               schema:
@@ -788,6 +789,7 @@ paths:
             silently, because **part of a booking is usually still worth having.**
 
             '
+          x-ticvai-problem-types: [lines-unavailable]
           content:
             application/problem+json:
               schema:
@@ -1003,6 +1005,15 @@ paths:
         Where a venue does not want this, the answer is not to open accounts — the model does not force
         it on anybody.
 
+
+        **Stored, and its rules** (3 October 2026, CHG-R1S-007; the r1 gate found the account stored nowhere
+        and its rules unstated). The account is a row of `orders.guest_credit_account`. **One live account per
+        guest**: a second while one is `pendingApproval` or `active` is `409 guest-credit-account-exists`.
+        **The 25,000 AED of BL-051 is the ceiling**: a `creditLimit` above it is `422 credit-limit-exceeded`.
+        **`requiresApproval: false` needs the escalated permission** (`ORDER_DISCOUNT`): without it the account
+        opens `pendingApproval` whatever the body says. A pending account is released by a supervisor holding
+        `ORDER_DISCOUNT` through the approvals inbox (`decideApprovalRequest`); until then it extends no credit.
+
         '
       tags:
       - orders
@@ -1038,11 +1049,26 @@ paths:
                   default: true
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Opened
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/GuestCreditAccount'
+        '409':
+          description: The guest already has a live account (pending or active).
+          x-ticvai-problem-types: [guest-credit-account-exists]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '422':
+          description: The limit is above the 25,000 AED ceiling (BL-051).
+          x-ticvai-problem-types: [credit-limit-exceeded]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /orders/{orderId}/split:
@@ -1339,6 +1365,7 @@ paths:
                 $ref: '#/components/schemas/EntitlementShare'
         '409':
           description: The share is already revoked or has expired (`shareNotActive`).
+          x-ticvai-problem-types: [share-not-active]
           content:
             application/problem+json:
               schema:
@@ -1864,6 +1891,7 @@ paths:
         '409':
           description: Another active template has the same priority for the same product kind, channel
             and media type (`duplicateSelectionPriority`).
+          x-ticvai-problem-types: [duplicate-selection-priority]
           content:
             application/problem+json:
               schema:
@@ -2044,6 +2072,8 @@ paths:
   /payment-providers:
     get:
       operationId: listPaymentProviders
+      x-ticvai-consumed-by:
+        - "P09 ADM-412 Payment Method & Settlement Setup"
       summary: Gateways configured for this scope
       tags:
       - orders
@@ -2243,6 +2273,7 @@ paths:
             their behalf that they never agreed to.
 
             '
+          x-ticvai-problem-types: [tokenisation-not-supported, consent-not-given]
           content:
             application/problem+json:
               schema:
@@ -2694,6 +2725,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Released
           content:
             application/json:
@@ -2704,6 +2738,7 @@ paths:
             `expired` (`authorisationNotHeld`).
 
             '
+          x-ticvai-problem-types: [authorisation-not-held]
           content:
             application/problem+json:
               schema:
@@ -2728,6 +2763,7 @@ paths:
         - "P02 GST-009 Review & Payment"
         - "P02 GST-032 AI Concierge – Chat"
         - "P02 GST-041 Checkout Entry"
+        - "P02 GST-048 Upsell / Cross-Sell"
         - "P02 GST-053 Your Plan"
         - "P04 POS-010 Add to Existing Ticket"
         - "P05 KSK-006 Review"
@@ -2781,6 +2817,7 @@ paths:
             link needs to know their cart existed and lapsed, not that it never was.
 
             '
+          x-ticvai-problem-types: [cart-expired]
           content:
             application/problem+json:
               schema:
@@ -2840,6 +2877,7 @@ paths:
     post:
       operationId: addCartLine
       x-ticvai-consumed-by:
+        - "P01 WEB-005 Ticket Type Selection"
         - "P01 WEB-006 Date & Performance Selection"
         - "P01 WEB-008 Add-ons & Upsell"
         - "P01 WEB-010 Shopping Cart"
@@ -2868,7 +2906,7 @@ paths:
         - "P04 POS-023 Sell — Merchandise"
         - "P04 POS-030 Sales Journal"
         - "P05 KSK-005 Choose a performance"
-        - "P05 KSK-006 Review"
+        - "P05 KSK-015 Assistant"
         - "P05 KSK-017 Shop"
         - "P10 PTR-010 Cart & Quote"
       x-ticvai-api-scope: ticketing.write
@@ -3235,6 +3273,7 @@ paths:
         '409':
           description: Extension cap reached (`extensionCapReached`), or a lease could not be extended
             because the capacity has gone (`noCapacity`, naming the lines in `lineIds`).
+          x-ticvai-problem-types: [extension-cap-reached, no-capacity]
           content:
             application/problem+json:
               schema:
@@ -3676,6 +3715,7 @@ paths:
             that. Any other state that is not `authorised` is `notAuthorised`.
 
             '
+          x-ticvai-problem-types: [already-captured, not-authorised]
           content:
             application/problem+json:
               schema:
@@ -4067,8 +4107,10 @@ paths:
         - "P02 GST-018 Add to Calendar / Reminders"
         - "P02 GST-019 Order History"
         - "P02 GST-028 Parking – Reservation Confirmed"
+        - "P02 GST-067 Refunds & Resale"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
+        - "P04 POS-014 Sales Exceptions, Controls & Operational Actions"
         - "P04 POS-030 Sales Journal"
         - "P05 KSK-009 Ticket issued"
         - "P05 KSK-011 Collect a booking"
@@ -4819,6 +4861,7 @@ paths:
             window has closed (`refundWindowClosed`). The problem names the policy, as `createRefund` would.
 
             '
+          x-ticvai-problem-types: [exceeds-refundable, refund-window-closed]
           content:
             application/problem+json:
               schema:
@@ -5857,6 +5900,9 @@ paths:
               $ref: '#/components/schemas/ResolveSyncRejectionRequest'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Resolved. The rejection, with `resolvedAt`, `resolvedByPrincipalId`, `resolution`
             and `resolvedRecordId` set.
           content:
@@ -6543,6 +6589,8 @@ paths:
   /ticket-transfers:
     get:
       operationId: listTicketTransfers
+      x-ticvai-consumed-by:
+        - "P02 GST-045 Ticket Delivery & Sharing"
       x-ticvai-audience:
       - guest
       summary: The ticket transfers this guest sent or received
@@ -13752,6 +13800,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           description: The booking is cancelled (`groupClosed`).
+          x-ticvai-problem-types: [group-closed]
           content:
             application/problem+json:
               schema:
@@ -22952,9 +23001,13 @@ components:
           description: When the new validity period starts — `startFrom`, or today where it was omitted.
     GuestCreditAccount:
       type: object
-      x-ticvai-persistence: 'none — where a guest credit account is stored is not yet decided: the
-        lineage for openGuestCreditAccount writes no table'
-      description: A credit limit opened for an individual guest (BL-051). The request's terms, as opened.
+      x-ticvai-persistence: orders.guest_credit_account
+      description: 'A credit limit opened for an individual guest (BL-051). The request''s terms, as opened.
+
+
+        **Stored in `orders.guest_credit_account`** (3 October 2026, CHG-R1S-007: the r1 gate found
+        `openGuestCreditAccount` returned an id that nothing stored, so no later read or approval could
+        find it). One row per account; the B2B `CreditPosition` stays the partner''s.'
       required:
       - id
       - subjectId

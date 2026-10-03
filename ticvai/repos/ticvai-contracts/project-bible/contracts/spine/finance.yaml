@@ -6131,6 +6131,13 @@ components:
             while the law sets it per jurisdiction. The base now comes from the tax profile of each tax
             code; the response says which base was used (`TaxCalculation.lines[].taxBase`).
 
+
+            **How the profile is found** (3 October 2026, CHG-R1S-019; the r1 gate): the profile is the
+            `catalogue.tax_profile` row whose `taxCodeId` is the line''s tax code, read through Catalogue''s
+            published read view (ADR-0028); `ledger.tax_code` carries no profile column and needs none. With
+            `accountId`, the account''s active `ledger.tax_exemption` rows are applied. Both are reads of this
+            operation (its lineage lists them).
+
             '
         lines:
           type: array

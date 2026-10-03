@@ -340,6 +340,7 @@ paths:
             subject went out while this one was a draft (`requestId` names it).
 
             '
+          x-ticvai-problem-types: [not-draft, open-request-exists]
           content:
             application/problem+json:
               schema:
@@ -643,6 +644,7 @@ paths:
           description: 'Already decided or closed. `refusedReason` is `alreadyDecided` and `currentStatus` names the status.
 
             '
+          x-ticvai-problem-types: [already-decided]
           content:
             application/problem+json:
               schema:
@@ -704,6 +706,7 @@ paths:
             `withdrawn`; `currentStatus` names it.
 
             '
+          x-ticvai-problem-types: [open-request-exists, already-decided]
           content:
             application/problem+json:
               schema:
@@ -914,6 +917,7 @@ paths:
         - "P08 ADM-083 Pricing Approval Workflow & Authority Matrix"
         - "P08 ADM-129 Approval Workflow Designer"
         - "P08 ADM-223 Campaign Approval Workflow Designer"
+        - "P08 ADM-243 Roles, Authority, Delegation & Approval Limits"
         - "P08 ADM-329 Approval Matrix Command Center"
         - "P08 ADM-338 AI Routing Advisor & Matrix Optimization"
         - "P08 BO-086 Approval Matrix"
@@ -1151,6 +1155,7 @@ paths:
             after `from`, or `delegateIsDelegator` where both principals are the same person.
 
             '
+          x-ticvai-problem-types: [invalid-window, delegate-is-delegator]
           content:
             application/problem+json:
               schema:
@@ -1163,6 +1168,7 @@ paths:
             `APPROVAL_DECIDE`.
 
             '
+          x-ticvai-problem-types: [delegate-lacks-permission, exceeds-delegator-authority]
           content:
             application/problem+json:
               schema:
@@ -2032,6 +2038,13 @@ paths:
         **Overlaps `decideApprovalRequest`,** which stays the operation of record for that write; this one
         serves the screen''s composite view of it.
 
+
+        **It decides the request it names, through the same rules** (3 October 2026, CHG-R1S-017; the r1
+        gate): `approvalRequestId` in the body names the request, and the decision is applied by the same code
+        path as `decideApprovalRequest` on that id (the same permission, segregation, MFA where the rule
+        demands it, and the same writes), then answers with the workspace view. A missing id is
+        `400 approval-request-required`; a request not open to this approver is `409 approval-not-open`.
+
         '
       tags:
       - approvals
@@ -2058,6 +2071,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnifiedApprovalInboxDecisionWorkspaceView'
+        '400':
+          description: No `approvalRequestId` in the body (CHG-R1S-017).
+          x-ticvai-problem-types: [approval-request-required]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '409':
+          description: The named request is not open for this approver (decided, withdrawn, expired, or not
+            theirs to decide).
+          x-ticvai-problem-types: [approval-not-open]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
@@ -2925,6 +2951,9 @@ paths:
                   nullable: true
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Signed
           content:
             application/json:
@@ -3203,6 +3232,9 @@ paths:
                   default: true
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Being assembled
           content:
             application/json:
@@ -3778,6 +3810,7 @@ paths:
             to) or `approverIsRequester`. Carries `refusedReason`.
 
             '
+          x-ticvai-problem-types: [not-external-provider, approver-is-requester]
           content:
             application/problem+json:
               schema:
@@ -3787,6 +3820,7 @@ paths:
         '409':
           description: The request is no longer open for a decision (`alreadyDecided`, `withdrawn`,
             `expired`, `cancelled`), or the level already fell back to people on timeout.
+          x-ticvai-problem-types: [already-decided]
           content:
             application/problem+json:
               schema:
@@ -4371,14 +4405,16 @@ components:
           writeOnly: true
           nullable: true
           description: The credential TICVAI presents to the provider. Write-only, never returned, kept on a
-            replace that omits it.
+            replace that omits it. **Held in Key Vault**; the row's `outbound_credential` column keeps the secret's
+            reference, never the value (CHG-R1S-020).
         signingSecret:
           type: string
           format: password
           writeOnly: true
           nullable: true
           description: 'Signs every request TICVAI sends, as webhook deliveries are signed, so the provider
-            can tell it came from TICVAI. Write-only.
+            can tell it came from TICVAI. Write-only. **Held in Key Vault**; the `signing_secret` column keeps the
+            secret''s reference, never the value (CHG-R1S-020).
 
             '
         apiClientId:
@@ -4390,7 +4426,10 @@ components:
             '
         requestMapping:
           type: array
-          description: 'Which request fields go to the provider, under which names. **Only mapped fields
+          x-ticvai-persistence-kind: valueObject
+          x-ticvai-persistence-column: jsonb
+          description: 'Stored whole on the provider row (`request_mapping`, jsonb; 3 October 2026, CHG-R1S-020:
+            the r1 gate found no column held it). Which request fields go to the provider, under which names. **Only mapped fields
             leave TICVAI** — a provider receives the amount and the subject it needs, not the whole
             request.
 
@@ -4411,8 +4450,11 @@ components:
         decisionMapping:
           type: array
           minItems: 2
+          x-ticvai-persistence-kind: valueObject
+          x-ticvai-persistence-column: jsonb
           description: The provider's outcome values and the decision each means. At least one maps to
-            `approve` and one to `reject`.
+            `approve` and one to `reject`. Stored whole on the provider row (`decision_mapping`, jsonb;
+            CHG-R1S-020).
           items:
             type: object
             required:
@@ -6990,6 +7032,14 @@ components:
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
       properties:
+        approvalRequestId:
+          type: string
+          format: uuid
+          description: '**The request this decides** (3 October 2026, CHG-R1S-017; the r1 gate found the
+            operation could not name it: the path has no id and the body had none). The row the inbox selected
+            (`listApprovalRequests`). Optional in the schema so a client built at r1 still validates; **a call
+            without it is refused `400 approval-request-required`**, and one naming a request not open for the
+            caller is `409 approval-not-open`.'
         decision:
           type: string
           enum:
@@ -6997,7 +7047,10 @@ components:
           - reject
           - return
           - requestInformation
-          description: The approver's decision
+          description: 'The approver''s decision, applied exactly as `decideApprovalRequest` applies it (the
+            operation of record): `approve` and `reject` write the `approvals.decision` row (whose `decision` is
+            only ever approve or reject); `return` moves the request to `returned` and `requestInformation` to
+            `informationRequested`, and neither writes a decision row (CHG-R1S-017).'
         comment:
           type: string
         reason:

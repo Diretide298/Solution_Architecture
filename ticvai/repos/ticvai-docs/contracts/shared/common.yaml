@@ -401,8 +401,9 @@ components:
 
         `uaeOnly` is the **default** and is **mandatory for government, bank and health tenants**: inference stays
         in the UAE. The Small tier is Core42 Compass GPT-4.1 mini (or Seraj, if it wins the Arabic golden set), the
-        Strong tier Compass GPT-5, reached through `AiProviderKind` `openaiCompatible`; the fallback is OpenAI UAE,
-        then the in-cell open-weights model (gpt-oss-120b).
+        Strong tier Compass GPT-5, reached through `AiProviderKind` `openaiCompatible`; the fallback is OpenAI UAE.
+        **No in-cell model** (Chinmay, 3 October: "We are not hosting anything unless client asks it";
+        CHG-R1S-002): the earlier in-cell gpt-oss-120b fallback is dropped.
 
         `globalAllowed`: a private venue that opts in under PDPL Art. 23 (a vendor contract, a DPIA and a notice
         to guests). Azure gpt-5-mini and gpt-6-sol on Global deployments, or the tenant''s own key (BYOK); the
@@ -410,10 +411,21 @@ components:
         BYOK fits this class only: a tenant key outside OpenAI UAE is a cross-border transfer.
 
         `onPrem`: inference on the tenant''s own hardware (Qwen3.5 or gpt-oss; Strong tier Qwen3.5-122B,
-        Falcon-H1 Arabic or Jais 2), nothing leaves the site.
+        Falcon-H1 Arabic or Jais 2), nothing leaves the site. Only where the client asks for it (CHG-R1S-002).
 
         **Whatever the class, every prompt is scrubbed first** (mandatory offline PII scrubbing, CHG-CSA-003):
         the class decides where a scrubbed prompt may go, never whether it is scrubbed.
+
+
+        **Added 3 October 2026 (CHG-R1S-016; the legal research `docs/active/research/openai-key-uae-3-october.md`, "What this means
+        for TICVAI"; Chinmay''s residency and hosting decisions).** **OpenAI''s UAE-region API project**
+        (`ae.api.openai.com`, processing in the UAE, enabled by OpenAI sales on approval) is a `uaeOnly` provider
+        beside Core42 Compass and Azure OpenAI UAE North; a BYOK OpenAI key fits `uaeOnly` only on that endpoint
+        and a model from its UAE regional list. **Only a `private` tenant may take `globalAllowed`** (tenancy
+        `RegionSettings.tenantCategory`). **Failover never widens residency**: a `uaeOnly` call never falls over to
+        a global endpoint (`residencyRefused`, ADR-0034); `globalAllowed` may fall back to the UAE chain. **Global
+        endpoints are stateless**: no Assistants, Threads or Conversations API, `store=false`, no file upload, no
+        fine-tuning with tenant data.
 
         '
       enum:

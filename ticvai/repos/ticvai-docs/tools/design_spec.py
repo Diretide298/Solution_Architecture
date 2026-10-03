@@ -322,11 +322,17 @@ class Package:
             src = PLAN_TASKS if PLAN_TASKS.exists() else TASKS
             if not src.exists():
                 return out
+            # Every task that builds a screen counts, its earliest block winning (CHG-RONEP-001): a four-digit id
+            # (BO-1065), a Venue Management task (VM-BO-043) and the rest of a setup screen (APP-SETUP-BO-074-REST).
+            # The three-digit APP- pattern before 3 October showed BO-1065 and every VM screen of Block A as "B–D",
+            # so their Block A design was never asked for.
             with src.open(encoding="utf-8") as fh:
                 for r in csv.DictReader(fh):
-                    m = re.match(r"^APP-[A-Z]+-([A-Z]{2,4}-\d{3})$", r.get("key") or "")
-                    if m:
-                        out[m.group(1)] = ((r.get("block") or "A") if src == PLAN_TASKS else "A", r["key"])
+                    m = re.match(r"^(?:APP-[A-Z]+|VM)-([A-Z]{2,4}-\d{3,4})(?:-REST)?$", r.get("key") or "")
+                    if m and r.get("type", "Task") == "Task":
+                        b = (r.get("block") or "A") if src == PLAN_TASKS else "A"
+                        if m.group(1) not in out or b < out[m.group(1)][0]:
+                            out[m.group(1)] = (b, r["key"])
             return out
         return self._get("blocks", load)
 

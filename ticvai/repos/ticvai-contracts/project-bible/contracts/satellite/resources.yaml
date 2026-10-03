@@ -70,6 +70,7 @@ paths:
         - "P08 BO-095 Resources"
         - "P08 BO-854 Resource Management Command Center"
         - "P08 BO-874 Staff Resource Profile"
+        - "P08 BO-877 Qualification & Assignment Rule Engine"
         - "P08 BO-903 Equipment & Asset Command Center"
         - "P08 BO-923 AI Resource Intelligence Command Center"
         - "P08 BO-943 Resource Analytics Command Center"
@@ -1258,6 +1259,9 @@ paths:
                   additionalProperties: true
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Moved
           content:
             application/json:
@@ -1323,6 +1327,9 @@ paths:
                   nullable: true
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -1924,6 +1931,9 @@ paths:
                   nullable: true
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Changed
           content:
             application/json:
@@ -1972,6 +1982,9 @@ paths:
           type: string
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Cancelled
           content:
             application/json:
@@ -2277,6 +2290,9 @@ paths:
                   description: Omit to let the platform pick from the approved substitutes.
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Replaced
           content:
             application/json:
@@ -2479,6 +2495,7 @@ paths:
     get:
       operationId: getExperienceResourceRequirements
       x-ticvai-consumed-by:
+        - "P08 BO-877 Qualification & Assignment Rule Engine"
         - "P08 BO-893 Experience Resource Requirement Builder"
         - "P08 BO-894 Staff-to-Experience Qualification Mapping"
       summary: What an experience needs before it can run

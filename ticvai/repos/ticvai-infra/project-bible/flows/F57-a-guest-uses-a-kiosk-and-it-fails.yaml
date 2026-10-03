@@ -44,6 +44,7 @@ steps:
   screen: KSK-013
   action: They call for help.
   operations:
+  - handoverToAgent
   - endKioskAssist
   outcome: '**One button, always visible.** A guest stuck with no way to summon anybody is a guest who
     leaves and disputes the charge.'

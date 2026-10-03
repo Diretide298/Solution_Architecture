@@ -1,0 +1,888 @@
+# Flow design briefs for the AI & Intelligence process, Block A (TODO step 9b).
+# Shape: audit/ticvai/apply/FLOW-BRIEF-BRIEF.md. Checked by tools/check-flow-briefs.py.
+# Written 3 October 2026 by the ai brief agent (Claude). Source of record: the package in this
+# worktree, the answers file answers-2-oct-batch1.md (2 and 3 Oct sections) and design-notes/ai.yaml.
+process: ai
+title: AI & Intelligence
+coverage:
+  covered:
+    F24: Concierge chat with streamed answers and handover to a person (web WEB-044, app GST-031/GST-032/GST-033, kiosk KSK-015; agent SUP-004/SUP-005).
+    F100: AI provider, residency class, BYOK, compatibility test, policy and spend (ADM-037, BO-091, BO-1065).
+    F101: Staff assistant (EMP-019/020/040); screens are later, its operations are Block A.
+    F228: Forecasting board; Block A frames only (ADM-500, ADM-506, ADM-508).
+    F230: Governance board 1; Block A frames only (ADM-523, ADM-527, ADM-528).
+    F233: Governance monitoring board; Block A frames only (ADM-554, ADM-556).
+    NEW-HELP-ME-CHOOSE: proposed. The package has no flow for Help me choose (AI-ENGINE-GUIDED); drawn from CMS-101 and WEB-002.
+    NEW-AI-CALL-PIPELINE: proposed. The engine path every LLM call takes (residency routing, offline scrubber, guard, streaming). AI-ENGINE-GATEWAY and AI-ENGINE-SCRUB-GUARD.
+  skipped:
+    F49: The planner agent (GST-054) sits in it, but its trigger is GST-051, so it belongs to venue-operations. Their brief should draw the planner chat with the streaming motion of F24.
+    F20: Trigger BO-058 belongs to finance-insights (it calls ai#sendAiMessage from EMP-020).
+    F106: Trigger ADM-031 belongs to finance-insights.
+    F247, F249: Triggers belong to customer-marketing. F249 holds BO-793, the translations that AI-ENGINE-TRANSLATE drafts.
+    F270: Trigger belongs to ticketing-backoffice (it holds BO-919).
+    F271: Trigger belongs to venue-operations (the AI resource intelligence board).
+    F226, F229, F231, F175: These touch no Block A screen or operation.
+flows:
+  F24:
+    title: A guest asks Sahli, and gets a person when Sahli cannot help
+    process: ai
+    trigger: >-
+      The guest taps "Ask Sahli" (the floating button on every web page, the app's concierge tab, contextual help, or the
+      kiosk Assistant tile) and types a question. Handover happens when the guest asks for a person, when Sahli refuses
+      or fails, when the question is outside guestCapabilityScope, or on negative sentiment.
+    actors:
+    - role: guest (signed in or anonymous)
+      apps: [P01 Guest Web Storefront, P02 Guest App, P05 Guest Kiosk]
+    - role: support agent (CASE_VIEW, CASE_MANAGE)
+      apps: [P12 Venue Support]
+    - role: Sahli, the concierge (AI engine, guest-concierge profile)
+      apps: [AI gateway]
+    inputs:
+    - name: question (message content)
+      formats: [plain text, English or Arabic (RTL flips per bubble automatically), emoji allowed]
+      limits: 1 to 8,000 characters (ai#sendAiMessage content); the counter shows only past 7,500; one message in flight at a time.
+      validation:
+      - rule: An empty or whitespace-only message cannot be sent.
+        message: The Send button stays disabled. There is no error text.
+      - rule: More than 8,000 characters.
+        message: Shorten your question to 8,000 characters.
+      - rule: The guard model blocks the message (422 guard-refused).
+        message: Sahli can't help with that. You can ask something else or talk to a person.
+      - rule: The question is outside the venue's guest scope.
+        message: I can help with tickets, food, opening times and getting around. For anything else, a person can help. [Talk to a person]
+      source: The guest types it in the composer on WEB-044, GST-031, GST-032, GST-033 or KSK-015 (on the kiosk, with the on-screen keyboard).
+    - name: starter chip
+      formats: [tap on a suggested question]
+      limits: 3 to 4 chips, drawn from guestCapabilityScope, shown only under an empty conversation.
+      validation:
+      - rule: A chip is sent as an ordinary question.
+        message: none
+      source: The concierge home (WEB-044, GST-031, KSK-015).
+    - name: handover request
+      formats: ["tap Talk to a person (reason guestRequested)", "automatic (reason assistantRefused, assistantFailed, outOfScope, negativeSentiment, complexIntent, paymentIssue)"]
+      limits: One open handover per conversation.
+      validation:
+      - rule: No agent is available (409).
+        message: No one is available to chat right now. We can raise a case and get back to you. [Raise a case]
+      - rule: The guest is at a kiosk and no chat agent is available.
+        message: We're calling a member of staff to help you here.
+      source: The panel header on every concierge screen. It is always visible, not only after a failure.
+    - name: message to the agent (after handover)
+      formats: [plain text, attachments (image, video, document, ticket, qr, paymentLink) from the guest's own uploads or tickets]
+      limits: 1 to 4,000 characters (marketing-crm#sendGuestConversationMessage body).
+      validation:
+      - rule: More than 4,000 characters.
+        message: Shorten your message to 4,000 characters.
+      - rule: The conversation is not the guest's (404).
+        message: This conversation isn't available.
+      - rule: Still with Sahli (409, no person has it yet).
+        message: There is no message; the composer keeps sending to Sahli until an agent joins.
+      source: The guest types it in the same composer on WEB-044, GST-031 or GST-032, once the panel has turned into the agent chat.
+    - name: answer feedback
+      formats: [thumbs up / thumbs down, reason chip (wrong, outdated, incomplete, notGrounded, unsafe, other), optional comment]
+      limits: One rating per answer per person; the comment is 0 to 1,000 characters.
+      validation:
+      - rule: The comment is more than 1,000 characters.
+        message: Keep your comment to 1,000 characters.
+      source: Under each Sahli answer on every concierge screen.
+    processing:
+    - input: question
+      does: >-
+        Opens the conversation silently on the first question (module guest concierge, session locale; the scope comes from
+        the session). Retrieval runs as the guest over the venue's guest-readable collections. The prompt goes through
+        NEW-AI-CALL-PIPELINE (residency routing, offline scrubber, guard), and the answer streams back as server-sent events.
+        Wait-time and upsell answers come from ai#requestSuggestion. Product cards are priced from Pricing and added through
+        the normal cart.
+      operations: [ai#createAiConversation, ai#sendAiMessage, ai#requestSuggestion, catalogue#listProducts, catalogue#getAvailability]
+    - input: handover request
+      does: >-
+        Hands the whole thread and Sahli's own summary to the agent queue. The guest panel turns into the agent chat, and
+        the guest reads the queue position, wait and replies from the guest view. The agent claims the conversation, reads
+        it with the summary, answers, transfers, closes or raises a case.
+      operations: [marketing-crm#handoverToAgent, marketing-crm#getGuestConversation, marketing-crm#sendGuestConversationMessage, marketing-crm#listConversations, marketing-crm#claimConversation, marketing-crm#getConversation, marketing-crm#sendConversationMessage, marketing-crm#transferConversation, marketing-crm#closeConversation, marketing-crm#escalateCase]
+    - input: answer feedback
+      does: Stores the label for the golden sets and the knowledge gaps. Nothing is learned online.
+      operations: [ai#recordAnswerFeedback]
+    - input: earlier conversations (signed in only)
+      does: Lists the guest's own past conversations, newest first.
+      operations: [ai#listAiConversations]
+    outputs:
+    - name: Sahli's answer
+      states:
+        loading: The question shows at once and a typing indicator appears under it.
+        streaming: Text grows in short checked runs (tokens released after re-fill and guard).
+        ready: The full answer, then a citation row (document or page titles), then a product card where one is proposed, then the feedback thumbs.
+        noSource: The answer has no citation row (never an empty one).
+        refused: The out-of-scope or guard text, with Talk to a person.
+        error: Sahli can't answer right now. [Try again] [Talk to a person]
+      failure_branches:
+      - what: Every provider fails, or the scrubber or guard is down (503 provider-unavailable / scrubber-unavailable).
+        sees: Sahli can't answer right now. [Try again] [Talk to a person]
+        recover: Try again, or hand over (reason assistantFailed).
+      - what: The guard blocks the reply part-way (SSE error guard-refused).
+        sees: The partial text is removed and replaced by "Sahli can't help with that."; nothing is stored.
+        recover: Rephrase, or Talk to a person.
+      - what: The venue's AI ceiling is reached with ceilingBehaviour warn (the default).
+        sees: Nothing; Sahli keeps answering and the venue manager is warned.
+        recover: none needed
+      - what: The ceiling is reached with warnThenDisable or block (429), or the capability is paused.
+        sees: Sahli isn't available right now. A person can help. The panel opens on Talk to a person.
+        recover: Hand over.
+      - what: Offline.
+        sees: The loaded conversation stays readable, and the composer is disabled with "You're offline".
+        recover: Reconnect; the composer re-enables by itself.
+    - name: agent chat (guest side)
+      states:
+        queued: You're number 3 in line. About 4 min. The transcript stays above.
+        claimed: An agent's first name and "is helping you"; the queue line disappears.
+        noAgent: The 409 text with Raise a case.
+        closed: This chat has ended, with an outcome line (resolved / case raised) and "Ask Sahli again".
+        timedOut: Chat ended after no reply. The guest may simply have been satisfied.
+      failure_branches:
+      - what: Nobody claims before the guest leaves (abandoned).
+        sees: Nothing more for the guest. The venue sees abandoned, counted apart from resolved.
+        recover: The venue manager reviews staffing; the guest can start again.
+      - what: Kiosk with no chat agent.
+        sees: We're calling a member of staff to help you here. (KSK-013 Call staff path)
+        recover: The staff member arrives; ends with marketing-crm#endKioskAssist.
+    - name: agent workspace
+      states:
+        queue: Conversations with reason, wait time and Sahli's summary; Claim.
+        working: The full thread with the summary pinned on top, and the composer.
+        claimConflict: Someone else took this conversation. (The second claim is refused.)
+        closed: The outcome chosen (resolved / case raised).
+      failure_branches:
+      - what: Two agents claim at once.
+        sees: Someone else took this conversation.
+        recover: Back to the queue.
+      - what: Needs another team.
+        sees: The transfer dialog; the context travels.
+        recover: The other team claims it.
+    steps:
+    - screen: WEB-044
+      sees: The floating "Ask Sahli" button (mascot art when the Concierge mascot setting is on, a plain round chat button when off) on any storefront page.
+      does: Taps it. The panel slides in from the inline-end edge.
+      operations: [ai#listAiConversations]
+      result: An empty conversation with 3 to 4 starter chips. Signed in, the earlier conversations show; anonymous, "Sign in to keep your conversations".
+    - screen: WEB-044
+      sees: The composer, focused.
+      does: Types "Which rides suit a 6-year-old?" and presses Enter.
+      operations: [ai#createAiConversation, ai#sendAiMessage]
+      result: The question bubble appears, then the typing indicator, then the answer streams in.
+    - screen: WEB-044
+      sees: The answer complete, with citations ("Rides and height limits - Summit Peaks") and a product card ("Junior Explorer pass, AED 95, suits ages 4-8").
+      does: Taps thumbs up, or Add on the card.
+      operations: [ai#recordAnswerFeedback]
+      result: A small "Thanks" acknowledgement. Add goes through the normal cart; Sahli never checks out.
+    - screen: WEB-044
+      sees: 'The answer to "How long is the wait for Wave Rider?" as "About 25 min", with "Based on: Wave Rider''s capacity and the queue now".'
+      does: Reads it.
+      operations: [ai#requestSuggestion]
+      result: A range or "about" value, never a bare number.
+    - screen: WEB-044
+      sees: A question about a refund on yesterday's order. Sahli answers it is outside what it can do and offers a person.
+      does: Taps Talk to a person (the header button is visible throughout).
+      operations: [marketing-crm#handoverToAgent]
+      result: The panel turns into the agent chat with "You're number 3 in line. About 4 min."; the transcript stays above.
+    - screen: SUP-004
+      sees: The conversation in the queue, with reason outOfScope, wait time and Sahli's one-paragraph summary.
+      does: The agent claims it.
+      operations: [marketing-crm#listConversations, marketing-crm#claimConversation]
+      result: The conversation opens in the workspace; a second claimer is refused.
+    - screen: SUP-005
+      sees: The full thread, Sahli's summary pinned, and the guest's order.
+      does: The agent replies.
+      operations: [marketing-crm#getConversation, marketing-crm#sendConversationMessage]
+      result: The reply appears on the guest's panel.
+    - screen: WEB-044
+      sees: The agent's name and reply; the queue line has gone.
+      does: The guest answers.
+      operations: [marketing-crm#getGuestConversation, marketing-crm#sendGuestConversationMessage]
+      result: The message is sent as the guest. The guest never repeated the question.
+    - screen: SUP-005
+      sees: The issue resolved, or needing follow-up.
+      does: The agent closes with outcome resolved, or raises a case.
+      operations: [marketing-crm#closeConversation, marketing-crm#escalateCase]
+      result: The guest panel shows "This chat has ended" and "Ask Sahli again".
+    - screen: GST-031
+      sees: The same journey in the app's concierge tab. GST-032 is the full chat, and GST-033 the contextual help opened from a screen with that screen's context.
+      does: As steps 2 to 8.
+      operations: [ai#createAiConversation, ai#sendAiMessage, marketing-crm#handoverToAgent, marketing-crm#sendGuestConversationMessage]
+      result: The same answers and handover as the web.
+    - screen: KSK-015
+      sees: The kiosk Assistant with large tiles and the on-screen keyboard; no history (shared device).
+      does: Asks. On handover with no chat agent, the kiosk falls back to Call staff.
+      operations: [ai#createAiConversation, ai#sendAiMessage, marketing-crm#handoverToAgent]
+      result: An answer, or "We're calling a member of staff to help you here." The conversation clears on the idle timeout.
+    motion:
+    - what: Panel open/close
+      how: Slides in from the inline-end edge (right in LTR, left in RTL), 240 ms ease-out; the scrim fades to 40%. On a small screen it is full-height.
+    - what: Typing indicator
+      how: Three dots pulsing in sequence (1.2 s loop) from send until the first token event.
+    - what: Streaming answer
+      how: Text appends in short checked runs as SSE token events arrive (re-filled and guard-passed in the cell, so the runs are uneven, not per character). A caret blinks at the end. The citation row fades in (150 ms) on the sources event, and the product card slides up on proposedAction. The bubble settles on done.
+    - what: Guard stop part-way
+      how: The partial text fades out (150 ms) and the refusal line fades in; no shake.
+    - what: Handover transition
+      how: The header morphs from Sahli to "Connecting you to a person". The queue line counts down live as getGuestConversation is re-read, and the agent's avatar slides in when claimed.
+    - what: Queue position / wait
+      how: The live counter re-reads while queued (default every 5 s, see open). The number ticks down without a page reload.
+    - what: Feedback
+      how: The thumb fills and a "Thanks" toast shows for 2 s. Thumbs down expands the reason chips (180 ms).
+    - what: Mascot
+      how: Ask Sahli mascot idle animation on the button when the mascot setting is on; static when reduced motion is on.
+    decisions:
+    - CHG-RUL-002 (3 Oct, Block A business rules) - stream answers as SSE (tokens, then sources, then any proposed action); the full message is stored.
+    - CHG-GCF-004 / CHG-SPF-013 (3 Oct, Pattern 4 group 4) - sendGuestConversationMessage replaces sendConversationMessage on guest screens; createAiConversation, listAiConversations and sendAiMessage are self-scoped.
+    - CHG-CSA-003 (2 Oct, PII scrubbing) - the scrubber and guard on every call; 422 guard-refused and 503 scrubber-unavailable.
+    - DEC-016 (2 Oct) - concierge drawn as designed; billing has no guest-visible effect.
+    - DEC-017 (2 Oct) - signed-in guests see their own history on web and app; anonymous visitors only the current conversation.
+    - GFIX-6 (2 Oct) - listAiConversations only when signed in.
+    sources:
+    - flows/F24 (CF-99, CF-101)
+    - MATRIX 22.8.5 (seamless handover), 22.8.16 (sentiment)
+    - DI-1069 (Sahli name and mascot), DI-207, DI-195
+    - ADR-0020, ADR-0051, ADR-0052 (AI-D09)
+    - handoff/design-notes/ai.yaml#WEB-044, GST-031, GST-033
+    - contracts/satellite/ai.yaml#sendAiMessage (x-ticvai-sse-events)
+    - contracts/satellite/marketing-crm.yaml#handoverToAgent, getGuestConversation, sendGuestConversationMessage
+    open:
+    - question: marketing-crm#getGuestConversation is bound on no guest screen, and neither it nor sendGuestConversationMessage is in a Block A ticket's builds (handoverToAgent is).
+      default: Bind getGuestConversation on WEB-044, GST-031 and GST-032, and add both operations to the AI-ENGINE-CONCIERGE (or the support) Block A ticket.
+    - question: How the guest's panel learns of agent replies and queue moves (no push channel is named).
+      default: Poll getGuestConversation every 5 s while queued or claimed, and every 30 s when the tab is hidden.
+    - question: The flow file still says wave 2 (CF-101, kiosk assistant), while KSK-015, WEB-044 and GST-031/033 are in Block A.
+      default: Draw web and app as Block A, and the kiosk frames as Block A since KSK-015 is in the builds; update the flow's wave when the package is next regenerated.
+    - question: Agent hours (after 18:00), and whether Sahli may take a conversation back when no agent comes.
+      default: Outside hours, handover shows the 409 Raise a case path; Sahli does not take conversations back.
+  F100:
+    title: A tenant's AI is set up - residency class, provider, BYOK, policy and spend
+    process: ai
+    trigger: A tenant is onboarded or wants its concierge on. TICVAI staff must decide where inference may run, which provider and models serve which tasks, and whether the tenant may bring its own key. The venue then sets policy and the spend ceiling.
+    actors:
+    - role: TICVAI platform staff (PLATFORM_AI_MANAGE, PLATFORM_TENANT_MANAGE, AI_CONFIGURE, under an open platform-staff grant)
+      apps: [P09 Platform Admin Console]
+    - role: tenant administrator (TENANT_CONFIGURE)
+      apps: [P08 Venue Back Office]
+    - role: venue manager (AI_CONFIGURE; AI_AUDIT_VIEW for spend)
+      apps: [P08 Venue Back Office]
+    inputs:
+    - name: AI residency class
+      formats: ["one of uaeOnly (default) / globalAllowed / onPrem"]
+      limits: One per tenant region settings. uaeOnly is mandatory for government, bank and health tenants.
+      validation:
+      - rule: globalAllowed without the three opt-in references (422 residency-opt-in-required).
+        message: To allow global AI, name your vendor contract, DPIA and guest notice (PDPL Article 23).
+      - rule: A change on a tenant TICVAI locked to uaeOnly (409 residency-class-locked).
+        message: This tenant must keep AI inside the UAE.
+      source: The tenant administrator on BO-1065 (Currency, Timezone & Channels), or TICVAI staff on ADM-426 at set-up.
+    - name: PDPL Art. 23 opt-in evidence (aiResidencyOptIn)
+      formats: [three text references - vendorContractReference, dpiaReference, guestNoticeReference]
+      limits: Each 1 to 200 characters. The platform records who confirmed them and when; it holds no documents.
+      validation:
+      - rule: Any of the three is missing when globalAllowed is chosen.
+        message: Add the {missing reference} to continue.
+      source: The tenant administrator, the same form as the class.
+    - name: BYOK enablement
+      formats: ["enabled on/off", "coverage perTask / allTasks", "allowedTasks (task keys)", "reason (text)"]
+      limits: One row per tenant; an empty allowedTasks means any task.
+      validation:
+      - rule: No open platform-staff grant into the tenant (403 platform-grant-required).
+        message: Open access to {tenant} to continue. [Open access]
+      source: TICVAI staff on ADM-037 (the platform-only switch).
+    - name: provider (kind, endpoint, residency, tasks, priority, failover)
+      formats: ["kind - Azure OpenAI, OpenAI, Gemini, Anthropic, local LLM, OpenAI-compatible", "endpoint URL (https)", "residency", "taskKeys", "priority (integer)", "failover provider"]
+      limits: One provider per kind and endpoint per tenant. The task keys come from the gateway's task list.
+      validation:
+      - rule: Residency not allowed in the tenant's region (409 residency-refused).
+        message: This provider is hosted outside what {region} allows. (Shown on the residency field.)
+      - rule: The provider's residencyClasses exclude the tenant's class (409 residency-class-refused).
+        message: This provider can't serve a {UAE-only} tenant.
+      - rule: managedBy tenant while BYOK is off (409 byok-not-enabled).
+        message: Bring-your-own-key isn't enabled for this tenant.
+      - rule: Activated before a passing compatibility test (409 compatibility-test-required).
+        message: Run the compatibility test before activating.
+      - rule: A model outside the curated map for the task (modelNotCurated).
+        message: Pick one of the curated models for {task}. (The field lists them.)
+      source: TICVAI staff on ADM-037.
+    - name: API key (secret)
+      formats: [write-only password field]
+      limits: Entered once; never shown again. expiresAt is optional. graceMinutes is 0 to 1,440 (default 1,440 = 24 h).
+      validation:
+      - rule: An empty key.
+        message: Enter the key.
+      - rule: graceMinutes is outside 0 to 1,440.
+        message: The grace period is 0 to 1,440 minutes.
+      source: TICVAI staff (or the tenant's key handed over through them) on ADM-037. It is stored in the cell's Key Vault per tenant and provider.
+    - name: venue AI policy and spend ceiling
+      formats: ["monthly ceiling (amount in the tenant's billing currency, AED for UAE tenants)", "ceilingBehaviour warn / warnThenDisable / block", "warning percent", "per-capability overrides", "guestCapabilityScope", "enabled capabilities", "autonomy overrides", "maskedFields"]
+      limits: The warning percent is 1 to 100 (default 80). An empty ceiling means no ceiling. A venue can only lower or switch off what the tenant allows.
+      validation:
+      - rule: Widens the tenant's policy or raises autonomy above the ceiling.
+        message: Your organisation doesn't allow this. (Shown on the field, with the tenant value.)
+      - rule: A ceiling lower than the spend so far.
+        message: You've already spent {amount} this month. Saving this will {behaviour} now. [Save anyway]
+      source: The venue manager on BO-091.
+    processing:
+    - input: AI residency class and opt-in
+      does: Stores the class on the region settings. allowedAiResidencies is derived from it (it can narrow, never widen). The AI gateway routes every call of the tenant by class (NEW-AI-CALL-PIPELINE).
+      operations: [tenancy#updateRegionSettings, tenancy#getRegionSettings]
+    - input: BYOK enablement
+      does: Records the switch. The engine builds taskModelMap (the provider's equivalent model per task from the curated range); usage is billed to the client's key and metered for visibility.
+      operations: [identity#openPlatformStaffGrant, ai#setAiByokEnablement, ai#getAiByokEnablement, ai#listAiModels]
+    - input: provider and key
+      does: Saves the provider (inactive), puts the key in Key Vault (only a credentialRef is stored), and runs the compatibility probes per task (tool calling, structured output, Arabic, context, latency band, endpoint residency). It activates only the passing tasks; a failing task stays on the TICVAI-managed model.
+      operations: [ai#setAiProvider, ai#setAiCredential, ai#testAiProvider, ai#listAiProviders]
+    - input: venue AI policy and spend ceiling
+      does: Saves the venue policy row, resolves the effective policy against the tenant's, and meters usage against the ceiling.
+      operations: [ai#getAiPolicy, ai#setAiPolicy, ai#getEffectiveAiPolicy, ai#getAiUsage, ai#getAiSpendCeiling, ai#setAiSpendCeiling]
+    outputs:
+    - name: provider row and compatibility result
+      states:
+        loading: Skeleton rows.
+        empty: No provider set. TICVAI-managed models serve every task. (This is never an error.)
+        notTested: A grey badge "Not tested" with the Activate button disabled.
+        testing: A spinner on the Test button, "Testing 6 tasks...".
+        passed: A per-task list of ticks with latency, and Activate enabled for the passing tasks.
+        partial: Some tasks failed. Those stay on TICVAI's models.
+        failed: Each failing probe is named (e.g. Arabic, structured output).
+      failure_branches:
+      - what: The grant lapsed mid-edit (403 platform-grant-required).
+        sees: Your access to {tenant} has ended. [Reopen access]
+        recover: Reopen the grant; the edits are kept.
+      - what: The provider is unreachable on test.
+        sees: Couldn't reach the provider - {status}. The last verified date stays.
+        recover: Fix the endpoint or key and test again.
+    - name: venue policy and spend panel
+      states:
+        loading: Skeleton.
+        inherited: Using your organisation's AI settings. [Customise for this venue]
+        ready: The month-to-date spend and month-end forecast, staff and guest shown apart, and the ceiling bar.
+        warning: You've used 80% of this month's AI budget.
+        ceilingReached: You've reached this month's AI budget. Assistants keep working until you change it. [Change ceiling] [Switch off guest concierge]
+        noSpendPermission: The policy is editable; the spend panel names AI_AUDIT_VIEW.
+      failure_branches:
+      - what: The save widens the tenant policy.
+        sees: An error on the field with the tenant's value.
+        recover: Lower the value.
+    steps:
+    - screen: BO-1065
+      sees: The AI residency section, set to "UAE only (default)", with what each class means.
+      does: The tenant administrator picks "Global allowed" and enters the vendor contract, DPIA and guest-notice references.
+      operations: [tenancy#getRegionSettings, tenancy#updateRegionSettings]
+      result: Saved, with confirmedBy and the time. Or 422 naming the missing reference, or 409 if the tenant is locked to UAE only.
+    - screen: ADM-037
+      sees: A tenant picker. The actions stay disabled until a grant is open.
+      does: TICVAI staff pick the tenant and open a grant (reason, ticket reference, expiry).
+      operations: [subscription#listTenants, identity#openPlatformStaffGrant, tenancy#getRegionSettings]
+      result: The provider list loads with the region's allowed residencies and the tenant's class shown above the form.
+    - screen: ADM-037
+      sees: The BYOK switch (platform only).
+      does: Enables it per task for the concierge and analytics tasks, with a reason.
+      operations: [ai#setAiByokEnablement, ai#getAiByokEnablement]
+      result: BYOK is on; the provider rows show managedBy.
+    - screen: ADM-037
+      sees: The provider form.
+      does: Adds the tenant's provider (any vendor, or OpenAI-compatible with an endpoint), binds tasks, and pastes the key once.
+      operations: [ai#setAiProvider, ai#setAiCredential, ai#listAiModels]
+      result: Saved inactive. The key shows only as a reference, with the rotation and expiry dates.
+    - screen: ADM-037
+      sees: Compatibility test - "Costs a few tokens, billed to the tenant".
+      does: Runs the test.
+      operations: [ai#testAiProvider]
+      result: A per-task pass/fail. Activate is offered for the passing tasks, and the equivalent model per task shows (taskModelMap).
+    - screen: BO-091
+      sees: AI Policy & Spend. The organisation's values sit beside each venue value, and "Scrubbing - mandatory, Qwen3Guard" is read-only.
+      does: The venue manager sets the ceiling of AED 4,000 a month with Warn at 80%, and narrows the guest scope.
+      operations: [ai#getAiPolicy, ai#setAiPolicy, ai#getEffectiveAiPolicy, ai#setAiSpendCeiling]
+      result: Saved. The spend panel shows month-to-date against the ceiling.
+    - screen: BO-091
+      sees: Spend this month, staff against guest, and the month-end forecast.
+      does: Reads it.
+      operations: [ai#getAiUsage, ai#getAiSpendCeiling]
+      result: The 80% and ceiling banners appear as spend crosses them.
+    motion:
+    - what: Compatibility test
+      how: Each task row turns from grey to a spinner, then to a tick or cross, in turn as its probes finish (live list, no reload).
+    - what: Spend bar
+      how: Fills to month-to-date on load (400 ms ease-out). The forecast segment is hatched; the bar turns amber at the warning percent and red at the ceiling.
+    - what: Grant countdown
+      how: The remaining time of the open grant counts down in the header (minutes), and turns amber in the last 10 minutes.
+    decisions:
+    - DEC-539 / CHG-CSP-009 / CHG-CSA-002 (2 Oct) - per-tenant residency class uaeOnly / globalAllowed / onPrem; PDPL Art. 23 opt-in.
+    - ADM-037 answer (2 Oct) - BYOK maps each task to the provider's equivalent model from the curated range; billed to the client's key.
+    - CHG-FUP-008 (2 Oct, contract follow-ups) - BYOK accepts any provider; the key is in Key Vault per tenant, never shown again; compatibility test before activation.
+    - CHG-CSA-001 (2 Oct) - the curated range (setAiModel curatedRange).
+    - Block A business rules (3 Oct) - the AI spend ceiling defaults to the tenant's billing currency (AED for UAE tenants).
+    - TBF-1 (3 Oct, default) - Compass is not signed yet (DEC-541). Dev and staging use Azure Global Standard with synthetic data; Compass is switched on per tenant after signing.
+    sources:
+    - flows/F100
+    - ADR-0009, ADR-0020, ADR-0050
+    - audit R203, R098, R096
+    - handoff/design-notes/ai.yaml#ADM-037, BO-091
+    - audit/ticvai/research/ai-ml-model-selection-2-october.md section 2A
+    open:
+    - question: The residency class is set on BO-1065 / ADM-426, neither of which is a Block A screen, although updateRegionSettings is.
+      default: Draw the residency section on BO-1065 in Block A. Until then, platform staff set it at onboarding.
+    - question: ai#setAiProvider and ai#setAiCredential are not in any Block A ticket's builds, while testAiProvider and the BYOK operations are.
+      default: Add both to AI-ENGINE-GATEWAY; without them BYOK cannot be completed in Block A.
+    - question: Who keys in the tenant's own secret - TICVAI staff on ADM-037 (the only screen with the field), or the tenant.
+      default: TICVAI staff, under the grant, with the tenant present; there is no tenant self-service in Block A.
+  F101:
+    title: A staff member asks the assistant and it answers from the venue
+    process: ai
+    trigger: A staff member opens the AI tab of the Staff App and asks a work question (procedures, menus, schedules).
+    actors:
+    - role: staff member (AI_USE)
+      apps: [P04 Staff App]
+    inputs:
+    - name: question
+      formats: [plain text, English or Arabic]
+      limits: 1 to 8,000 characters (ai#sendAiMessage).
+      validation:
+      - rule: Empty.
+        message: The Send button is disabled.
+      - rule: The guard blocks it (422 guard-refused).
+        message: The assistant can't help with that.
+      - rule: The usage limit is reached (429).
+        message: AI use is paused for this venue. Ask your manager. (Names the limit.)
+      source: The staff member types it on EMP-019 or EMP-020.
+    - name: knowledge search terms
+      formats: [plain text]
+      limits: 1 to 500 characters (designer default; the contract sets no maximum on the query).
+      validation:
+      - rule: Empty.
+        message: Search stays disabled.
+      source: The staff member on EMP-040.
+    processing:
+    - input: question
+      does: Retrieval runs as the staff member (their grants at send time) over the collections they may read, through NEW-AI-CALL-PIPELINE, and streams the answer with its sources.
+      operations: [ai#createAiConversation, ai#listAiConversations, ai#sendAiMessage, ai#recordAnswerFeedback]
+    - input: knowledge search terms
+      does: A semantic search over the venue's knowledge collections.
+      operations: [ai#semanticSearch]
+    outputs:
+    - name: answer
+      states:
+        loading: Typing indicator.
+        streaming: Text grows in checked runs.
+        ready: The answer, the sources, and a proposed action as a draft card.
+        error: The assistant can't answer right now. [Try again]
+      failure_branches:
+      - what: 503 provider-unavailable / scrubber-unavailable.
+        sees: The assistant can't answer right now. [Try again]
+        recover: Retry later; the knowledge base search still works.
+    steps:
+    - screen: EMP-019
+      sees: The AI home with recent conversations.
+      does: Starts a new question.
+      operations: [ai#listAiConversations, ai#createAiConversation]
+      result: The answer view opens.
+    - screen: EMP-020
+      sees: The answer streaming with its sources.
+      does: Reads it and rates it.
+      operations: [ai#sendAiMessage, ai#recordAnswerFeedback]
+      result: The answer is stored and the feedback recorded.
+    - screen: EMP-040
+      sees: The knowledge base search.
+      does: Opens a cited document.
+      operations: [ai#semanticSearch]
+      result: The document, with the matched passage highlighted.
+    motion:
+    - what: Streaming answer
+      how: As F24 (typing dots, checked runs, sources fade in).
+    decisions:
+    - CHG-RUL-002 (3 Oct) - streamed answers.
+    - CHG-CSA-003 (2 Oct) - scrubber and guard.
+    sources:
+    - flows/F101
+    - ADR-0051
+    open:
+    - question: EMP-019/020/040 are not Block A screens, though their operations are.
+      default: No Block A frames; the engine is built and the staff frames are drawn with their block.
+  F228:
+    title: Forecasting - configure, explain and publish a forecast (Block A frames)
+    process: ai
+    trigger: A platform AI lead opens the Forecasting Command Center for a tenant.
+    actors:
+    - role: platform AI lead (PLATFORM_AI_MANAGE, under a platform-staff grant)
+      apps: [P09 Platform Admin Console]
+    inputs:
+    - name: forecast definition
+      formats: ["subject (attendance, timeslot demand, channel pace, revenue, occupancy, queue, staffing)", "grain", "breakdowns", "horizon", "refresh cadence", "cold-start basis", "auto-publish on/off"]
+      limits: One definition per subject and scope. The horizon and cadence come from the contract enums.
+      validation:
+      - rule: No grant into the tenant.
+        message: Open access to {tenant} to continue.
+      - rule: Auto-publish without the quality gate set.
+        message: Set the accuracy gate before turning on auto-publish.
+      source: ADM-500.
+    - name: publish decision
+      formats: [Publish button on a forecast version]
+      limits: One published version per definition at a time.
+      validation:
+      - rule: The version is already published.
+        message: This version is already in use.
+      source: ADM-508.
+    processing:
+    - input: forecast definition
+      does: Saves the definition and runs it. The baseline-first estimator answers from day one (venue profile, starting pattern, UAE calendar; weather joins in Block B per TBF-2).
+      operations: [ai#setForecastDefinition, ai#runForecast]
+    - input: publish decision
+      does: Publishes the version for the rest of TICVAI. Accuracy is measured against actuals and the baseline rule.
+      operations: [ai#listForecastVersions, ai#getForecastAccuracy, ai#publishForecastVersion, ai#exportForecastVersion]
+    outputs:
+    - name: forecast with explanation
+      states:
+        loading: Skeleton chart.
+        starting: Badge Starting, "Limited historical data", a range band, and "Based on" a line.
+        ready: The band, drivers with direction and strength, and the change against the previous version.
+        error: Couldn't run the forecast. [Retry]
+      failure_branches:
+      - what: The run fails.
+        sees: The run row turns red with the reason.
+        recover: Fix the definition and run again.
+    steps:
+    - screen: ADM-500
+      sees: The definition form for a tenant.
+      does: Sets the attendance forecast, daily grain, a 28-day horizon, the calendar baseline, and auto-publish off.
+      operations: [subscription#listTenants, identity#openPlatformStaffGrant, ai#setForecastDefinition, ai#runForecast]
+      result: The run is queued, then a version appears.
+    - screen: ADM-506
+      sees: Drivers and uncertainty by horizon.
+      does: Reads why the forecast changed.
+      operations: [ai#getForecast, ai#explainMetricChange, ai#listForecastVersions]
+      result: The drivers list with direction arrows, and the uncertainty widening with the horizon.
+    - screen: ADM-508
+      sees: Measured accuracy by horizon against the baseline rule, and the unpublished versions.
+      does: Publishes a version.
+      operations: [ai#getForecastAccuracy, ai#publishForecastVersion]
+      result: Published. Other screens read it.
+    motion:
+    - what: Forecast band
+      how: The range band draws left to right (300 ms) when a version loads. A hover shows the 10th-90th percentile and the most likely value.
+    - what: Run status
+      how: A queued, running, then done chip updates live.
+    decisions:
+    - TBF-2 (3 Oct, default) - the Block A forecast baseline runs on the calendar only.
+    - ADR-0051 - baseline first, then it learns; ranges, not bare percentages.
+    sources:
+    - flows/F228
+    - handoff/design-notes/ai.yaml#ADM-508
+    open:
+    - question: The design notes mark ADM-500 and ADM-506 as later, but op-release builds them in Block A.
+      default: Follow op-release and draw all three frames in Block A.
+  F230:
+    title: AI governance policy - build, simulate, publish (Block A frames)
+    process: ai
+    trigger: A governance lead drafts a rule on what an AI capability may do.
+    actors:
+    - role: AI governance lead (PLATFORM_AI_MANAGE / per-module AI publish)
+      apps: [P09 Platform Admin Console]
+    - role: a second approver (not the author)
+      apps: [P09 Platform Admin Console]
+    inputs:
+    - name: policy rule
+      formats: ["capability", "action verb (read ... delete)", "data", "environment", "roles", "amount limit", "outcome (allow / allow with conditions / prepare only / approval required / block)"]
+      limits: Autonomy can never exceed the capability ceiling (L0 to L4).
+      validation:
+      - rule: Autonomy above the ceiling.
+        message: "{capability} can't go above {ceiling}."
+      source: ADM-523.
+    - name: simulation window
+      formats: [date range, test-case set]
+      limits: Up to 90 days (designer default).
+      validation:
+      - rule: An empty window.
+        message: Pick a window with recorded decisions.
+      source: ADM-527.
+    processing:
+    - input: policy rule
+      does: Saves it as a new draft version.
+      operations: [ai#createAiGovernancePolicyDraft, ai#listAiGovernancePolicyVersions, ai#listAiTools]
+    - input: simulation window
+      does: Replays the draft over recorded decisions and test cases.
+      operations: [ai#simulateAiGovernancePolicy]
+    - input: publish
+      does: Publishes (the author cannot publish) and shows the effective policy.
+      operations: [ai#publishAiGovernancePolicy, ai#getEffectiveAiPolicy]
+    outputs:
+    - name: simulation result
+      states:
+        loading: Replaying N decisions...
+        ready: Counts allowed / prepared / routed / blocked, and the change against today.
+        empty: No recorded decisions in this window.
+      failure_branches:
+      - what: The author tries to publish.
+        sees: Someone other than the author must publish.
+        recover: Ask a second approver.
+    steps:
+    - screen: ADM-523
+      sees: The rule builder.
+      does: Drafts "Upsell suggestions may prepare, never execute".
+      operations: [ai#createAiGovernancePolicyDraft]
+      result: Draft v4.
+    - screen: ADM-527
+      sees: The simulation set-up.
+      does: Replays the last 30 days.
+      operations: [ai#simulateAiGovernancePolicy]
+      result: 12 decisions would move from executed to prepared.
+    - screen: ADM-528
+      sees: Final review and the effective policy map.
+      does: A second approver publishes.
+      operations: [ai#publishAiGovernancePolicy, ai#getEffectiveAiPolicy]
+      result: v4 is in force. The map shows autonomy against the ceiling per capability and scope.
+    motion:
+    - what: Simulation progress
+      how: A progress bar fills as decisions are replayed, and the counters tick up live.
+    decisions:
+    - ADR-0050 (AI-D04) - one autonomy scale L0 to L4 with first-release ceilings.
+    - Contract follow-ups (2 Oct) - per-module AI publish permission replaces AI_APPROVE for publishing.
+    sources:
+    - flows/F230
+    - handoff/design-notes/ai.yaml#ADM-523, ADM-527, ADM-528
+    open:
+    - question: The design notes list ADM-520 and ADM-526 for Block A; op-release does not build them.
+      default: Follow op-release; ADM-520 and ADM-526 are not drawn in Block A.
+  F233:
+    title: AI quality, promotion and incidents (Block A frames)
+    process: ai
+    trigger: A governance alert (promotionReady, drift) or an incident reported by hand.
+    actors:
+    - role: AI governance lead
+      apps: [P09 Platform Admin Console]
+    inputs:
+    - name: incident report
+      formats: ["title", "capability", "severity", "description"]
+      limits: Title up to 200 characters (designer default).
+      validation:
+      - rule: No capability.
+        message: Pick the capability involved.
+      source: ADM-556.
+    - name: promotion decision
+      formats: [Promote / Roll back on a release]
+      limits: One stage at a time (shadow, then canary, then production). A shadow run must be at least six weeks.
+      validation:
+      - rule: The gate has not passed.
+        message: This model hasn't beaten the baseline yet.
+      source: ADM-554.
+    processing:
+    - input: promotion decision
+      does: Evaluates the release, then promotes or rolls it back one stage.
+      operations: [ai#runAiEvaluation, ai#listAiEvaluations, ai#promoteAiRelease, ai#rollbackAiRelease, ai#listAiGovernanceAlerts, ai#listAiTrainingRuns]
+    - input: incident report
+      does: Opens the incident, contains it (pause a capability or roll back), and closes it with a root cause.
+      operations: [ai#openAiIncident, ai#containAiIncident, ai#pauseAiCapability, ai#closeAiIncident, ai#listAiIncidents]
+    outputs:
+    - name: release and incident boards
+      states:
+        loading: Skeleton.
+        readyToPromote: A "Ready to promote" badge.
+        backgroundRun: Running in the background.
+        contained: The incident is contained; the capability is paused (degradation - offer a person).
+      failure_branches:
+      - what: Rollback fails.
+        sees: The error with the release id.
+        recover: Pause the capability instead.
+    steps:
+    - screen: ADM-554
+      sees: A release marked "Ready to promote" after its shadow run.
+      does: Promotes it to canary.
+      operations: [ai#listAiGovernanceAlerts, ai#listAiEvaluations, ai#promoteAiRelease]
+      result: Canary. The badge moves one stage.
+    - screen: ADM-556
+      sees: The incident list.
+      does: Opens an incident and pauses the guest concierge capability.
+      operations: [ai#openAiIncident, ai#pauseAiCapability, ai#containAiIncident]
+      result: Sahli panels open on Talk to a person (F24 degradation).
+    motion:
+    - what: Stage badge
+      how: The badge slides from one stage to the next on promotion (200 ms).
+    decisions:
+    - ADR-0051 (AI-D16) - a person promotes, one stage at a time; never automatic.
+    sources:
+    - flows/F233
+    - handoff/design-notes/ai.yaml#ADM-554, ADM-556
+    open: []
+  NEW-HELP-ME-CHOOSE:
+    proposed: true
+    title: Help me choose - AI proposes the questions, a person publishes, guests filter
+    process: ai
+    trigger: A venue's products are uploaded or published (catalogue productPublished), a mapped product is withdrawn, or the venue asks for a suggestion.
+    actors:
+    - role: workers job (AI engine, autonomy suggest)
+      apps: [ai workers]
+    - role: venue content manager (TENANT_PUBLISH)
+      apps: [P08 Venue Back Office]
+    - role: guest
+      apps: [P01 Guest Web Storefront, P02 Guest App, P05 Guest Kiosk]
+    inputs:
+    - name: venue product catalogue
+      formats: [published products, categories and events read through the catalogue API with the venue's permissions]
+      limits: Whole venue catalogue.
+      validation:
+      - rule: No products on sale.
+        message: Add products before Help me choose can suggest questions.
+      source: The catalogue (no screen; the trigger is the event).
+    - name: question set (edit of the AI draft)
+      formats: ["1 to 4 questions, kind choice / yesNo / age / level / certification", "2 to 4 answers each, with title, a one-liner of up to 140 characters per language, an icon, and a badge of up to 24 characters", "filter (products, categories, segment tags, age range, swimmer, certification) or target", "consentPrefill"]
+      limits: The name is up to 80 characters, and the icon and certificationCode up to 40.
+      validation:
+      - rule: An answer's target is not on sale, or a module is not enabled (422).
+        message: The answer "{answer}" points to something that isn't on sale.
+      - rule: behaviour filter without a filter, or recommend without a last-question target (422).
+        message: The answer "{answer}" needs a filter. / The last question needs a result for each answer.
+      - rule: Editing a published set-up (409).
+        message: Unpublish to edit, or duplicate as a draft.
+      - rule: A service caller publishes (403).
+        message: (Never shown; only a person publishes.)
+      source: The content manager on CMS-101.
+    - name: guest answers
+      formats: [tap on answer tiles]
+      limits: One answer per question.
+      validation:
+      - rule: The answers leave no product.
+        message: Nothing matches your answers. [Show everything]
+      source: The guest on WEB-002 (and the app and kiosk equivalents).
+    processing:
+    - input: venue product catalogue
+      does: Rules first - picks the one or two attributes that split the products most evenly and maps each answer. A model then only words the questions (through NEW-AI-CALL-PIPELINE). The proposal is stored as a draft with source aiSuggested.
+      operations: [ai#suggestGuidedChoice, white-label#proposeGuidedChoice]
+    - input: question set
+      does: The person reviews why these questions (the attributes chosen and dropped), edits and publishes. Publishing returns the previous published set-up to draft.
+      operations: [white-label#listGuidedChoices, ai#getGuidedChoiceSuggestion, white-label#updateGuidedChoice, white-label#publishGuidedChoice, white-label#unpublishGuidedChoice]
+    - input: guest answers
+      does: Filters the listing on the server (guidedAnswerIds), so web, app and kiosk agree.
+      operations: [white-label#getPublishedGuidedChoice, catalogue#searchCatalogue]
+    outputs:
+    - name: AI draft on CMS-101
+      states:
+        empty: No set-up yet. [Suggest questions]
+        generating: Suggesting questions from your products...
+        draft: An "AI suggested" badge, "Why these questions", and the "Nothing is applied until you publish it" note.
+        published: Live at {venue}.
+        error: Couldn't suggest questions. [Try again]
+      failure_branches:
+      - what: The job finds no attribute that splits the catalogue.
+        sees: Your products are too alike to split by questions. Build one by hand.
+        recover: Create manually (createGuidedChoice).
+      - what: A target goes off sale after publishing.
+        sees: For guests, the list narrows; the next publish flags the answer.
+        recover: Edit the answer.
+    - name: filtered listing
+      states:
+        overlay: 1 to 4 question cards, one at a time.
+        filtered: A banner showing the answers as chips, with Show everything.
+        emptyNoResults: Nothing matches your answers, with the chips and Show everything.
+      failure_branches:
+      - what: No published set-up (404).
+        sees: No Help me choose button.
+        recover: none
+    steps:
+    - screen: CMS-101
+      sees: "A new draft: \"AI suggested - 2 questions\"."
+      does: Opens "Why these questions".
+      operations: [white-label#listGuidedChoices, ai#getGuidedChoiceSuggestion]
+      result: The attributes chosen (age, swimmer) and dropped, each with the split it makes.
+    - screen: CMS-101
+      sees: The questions and answers in English and Arabic.
+      does: Edits a one-liner, adds a consent pre-fill, and publishes.
+      operations: [white-label#updateGuidedChoice, white-label#publishGuidedChoice]
+      result: Live at once at this venue. Or a 422 naming the answer.
+    - screen: WEB-002
+      sees: The Help me choose button (or the arrival pop-up).
+      does: Answers "Can everyone swim? - No" and "Youngest age - 6".
+      operations: [white-label#getPublishedGuidedChoice, catalogue#searchCatalogue]
+      result: The listing narrows; a banner shows the answers with Show everything.
+    motion:
+    - what: Question cards
+      how: Each answer advances to the next card with a horizontal slide (220 ms, mirrored in RTL), and the progress dots fill.
+    - what: Listing filter
+      how: Cards that drop out fade and collapse (180 ms); the remaining cards reflow.
+    - what: Generating
+      how: A shimmer on the draft card while the job runs (it takes seconds, so no live tokens).
+    decisions:
+    - TBF-3 (3 Oct, default) - an internal workers job calling proposeGuidedChoice; no new public operation in Block A.
+    - REV3-11 (29 Sep) - a suggestion is never published by the system; a person publishes.
+    - MoM 29 Sep W4 - 1 to 4 questions; a server-side filter; never a consent step.
+    sources:
+    - AI system design 3.11
+    - handoff/design-notes/white-label.yaml#CMS-101
+    - handoff/design-notes/ticketing-guest.yaml#WEB-002
+    open:
+    - question: The package has no flow for this journey.
+      default: Add one (F-next) from this brief when the flows are next regenerated.
+    - question: The answer-tile layout on the kiosk (KSK-003 is not Block A).
+      default: Web and app only in Block A.
+  NEW-AI-CALL-PIPELINE:
+    proposed: true
+    title: Every LLM call - residency routing, offline scrubber, guard, stream
+    process: ai
+    trigger: Any AI feature calls the gateway (concierge, staff assistant, planner, Help me choose wording, translations).
+    actors:
+    - role: AI gateway (in-cell)
+      apps: [ai service]
+    - role: the end user of the calling screen
+      apps: [P01, P02, P04, P05, P08]
+    inputs:
+    - name: prompt with context
+      formats: [text plus retrieved passages and query results (never raw tables)]
+      limits: Up to 8,000 characters of user text per message. The context fits the task's tier window.
+      validation:
+      - rule: The scrubber or guard is down.
+        message: 503 scrubber-unavailable - "Sahli can't answer right now." (fails closed, never sent raw)
+      - rule: The guard blocks the input or output.
+        message: 422 guard-refused - "Sahli can't help with that."
+      - rule: No provider in the tenant's residency class answers.
+        message: 503 provider-unavailable - "Sahli can't answer right now."
+      source: The calling screen (e.g. WEB-044 composer).
+    processing:
+    - input: prompt with context
+      does: >-
+        1) The policy decision point checks capability, autonomy and the ceiling. 2) Presidio (offline), with the UAE
+        recognisers (Emirates ID, UAE phone, passport, IBAN, Luhn card, email) and Arabic NER, replaces PII with reversible
+        placeholders [GUEST_1]; the map stays in the cell. 3) Qwen3Guard checks the input. 4) The call is routed by the
+        tenant's residency class (uaeOnly - Compass, then OpenAI UAE, then in-cell gpt-oss-120b; globalAllowed - Azure Global
+        or the BYOK provider; onPrem - in-cell models). 5) The reply is guard-checked, re-filled and released in checked
+        runs as SSE. 6) A decision record and metered usage are stored.
+      operations: [ai#evaluateAiGovernance, ai#sendAiMessage, ai#getAiPolicy]
+    outputs:
+    - name: streamed, re-filled answer
+      states:
+        streaming: token events (re-filled, guard-passed runs)
+        sources: one sources event
+        proposedAction: optional draft
+        done: The stored AiMessage.
+        error: An SSE error (guard-refused / provider-unavailable); the partial text is discarded and nothing is stored.
+      failure_branches:
+      - what: The scrubber or guard is down before the first token.
+        sees: The HTTP 503 refusal text on the calling screen.
+        recover: Try again later, or hand over (concierge).
+    steps:
+    - screen: WEB-044
+      sees: The guest asks with their own name and phone in the question.
+      does: Sends.
+      operations: [ai#sendAiMessage]
+      result: The answer uses the name correctly (re-filled in the cell). The provider only ever saw [GUEST_1] and [PHONE_1].
+    - screen: BO-091
+      sees: "Scrubbing: mandatory. Recognisers listed. Guard: Qwen3Guard. Residency class: UAE only."
+      does: Reads it; nothing can be switched off.
+      operations: [ai#getAiPolicy]
+      result: The manager knows what leaves the platform.
+    motion:
+    - what: Released runs
+      how: The stream arrives in uneven checked runs, not per character. Designs must not promise typewriter smoothness.
+    decisions:
+    - CHG-CSA-003 (2 Oct) - mandatory offline scrubber with reversible tokens, and Qwen3Guard on input and output.
+    - DEC-539 / CHG-CSA-002 (2 Oct) - residency class routing.
+    - TBF-4 (3 Oct, default) - Qwen3Guard 0.6B on CPU in dev; measure the 4B before staging.
+    - TBF-1 (3 Oct, default) - dev and staging run on Azure Global Standard with synthetic data until Compass is signed.
+    sources:
+    - answers-2-oct-batch1.md - AI residency, PII scrubbing
+    - ADR-0020 (amended)
+    - contracts/satellite/ai.yaml#/components/schemas/AiPolicy (scrubbing)
+    open:
+    - question: The run length of a checked run (latency against smoothness) is not set.
+      default: Release on the sentence boundary, or every 40 tokens, whichever comes first.
+    - question: The package has no flow for this; it is engine-only.
+      default: Keep it as a brief only; the frames sit in F24 and BO-091.

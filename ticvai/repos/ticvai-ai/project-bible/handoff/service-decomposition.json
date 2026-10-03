@@ -65,7 +65,8 @@
     "workforce",
     "approvals",
     "accreditation",
-    "tenancy"
+    "tenancy",
+    "kernel"
    ],
    "operations": 209,
    "tables": 108,
@@ -90,7 +91,8 @@
     "percent": 62
    },
    "screens": 71,
-   "flows": 18
+   "flows": 18,
+   "kernelNote": "**`kernel` is owned here** (3 October 2026, CHG-R1S-011; the HLD/LLD cross-check found it owned by no service). It holds the shared consumer inbox (`kernel.inbox`) the platform kernel gives every module, beside `platform.outbox`; the workers host runs the consumers that write it and owns no module (ADR-0055), so the table belongs with the platform schema TenancyService already owns."
   },
   "CatalogueService": {
    "tier": "commerce",

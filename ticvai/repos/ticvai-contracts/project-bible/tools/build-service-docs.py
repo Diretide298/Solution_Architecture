@@ -70,6 +70,33 @@ TEAM = ROOT / "docs" / "active" / "team.json"
 EXTRA = ROOT / "docs" / "active" / "block-a-extra-tasks.json"
 MAX_DEPTH = 3
 
+
+def block_a_decisions() -> dict:
+    """**Block A completes its apps** (Chinmay, 3 October 2026, CHG-RONEP-001; docs/active/decisions/answers-3-october-r1-plan.md).
+    The decided parts of Block A's scope that no screen binding derives, from block-a-extra-tasks.json:
+
+      aiEngineOperations  operation -> the AI engine task that serves it (a task's `operations`: AI-ENGINE-GATEWAY,
+                          AI-ENGINE-CONCIERGE); built in ticvai-ai by the AI engineers, so no back-end task builds it
+      blockA1Operations   operation -> why Block A's first drop (A1) needs it although no Block A screen binds it
+                          (the payment configuration guests cannot pay without)
+      blockAOperations    operation -> why Block A builds it although no Block A screen binds it in this tree
+                          (completion work: A1 if it fits, else A2; CHG-RONEP-007)
+      navHomes            screen -> why it is an app's home (a section home): the only screens besides an app's entry
+                          the navigation closure pulls into Block A (lever A, CHG-RONEP-007)
+      blockAScreens       screen -> why Block A builds the whole screen (its setup part and the rest)
+      screenNotes         screen -> a sentence its Block A tasks carry (BO-1065: the AI residency section)
+
+    tools/check-plan-closure.py reads the same file and checks that the plan holds them."""
+    if not EXTRA.exists():
+        return {"aiEngineOperations": {}, "blockA1Operations": {}, "blockAOperations": {}, "blockAScreens": {},
+                "screenNotes": {}, "navHomes": {}}
+    ex = json.loads(EXTRA.read_text(encoding="utf-8"))
+    ai = {o: t["key"] for t in ex.get("tasks") or [] for o in t.get("operations") or []}
+    return {"aiEngineOperations": ai, "blockA1Operations": dict(ex.get("blockA1Operations") or {}),
+            "blockAOperations": dict(ex.get("blockAOperations") or {}),
+            "blockAScreens": dict(ex.get("blockAScreens") or {}), "screenNotes": dict(ex.get("screenNotes") or {}),
+            "navHomes": dict(ex.get("navHomes") or {})}
+
 # **The one authored table in this file.** The decomposition explains each service to an architect
 # ("platform.org_unit is reached by 304 of 379 tables"); a client needs what it does for the venue.
 # A service missing from here fails the run rather than falling back to the architect's sentence.
@@ -1296,9 +1323,16 @@ def main() -> int:
     op_task: dict[str, str] = {}
     svc_points = defaultdict(int)
     chunks = []
+    # **An operation the AI engine serves is built by its AI engine task** (CHG-RONEP-001, 3 October): sendGuestConversationMessage
+    # and getGuestConversation by AI-ENGINE-CONCIERGE, setAiProvider and setAiCredential by AI-ENGINE-GATEWAY
+    # (block-a-extra-tasks.json `operations`). They take no back-end chunk; the task is created with the extra tasks below.
+    decided = block_a_decisions()
+    ai_ops = {o: k for o, k in decided["aiEngineOperations"].items() if o in ops}
     for n, olist in sorted(by_service.items()):
         groups = defaultdict(list)
         for o in olist:
+            if o in ai_ops:
+                continue
             groups[ops[o]["tag"]].append(o)
         for g, gl in sorted(groups.items()):
             gl = sorted(gl)
@@ -1310,6 +1344,7 @@ def main() -> int:
                     op_task[o] = tk
                 svc_points[n] += pts
                 chunks.append((n, g, tk, part, pts))
+    op_task.update(ai_ops)
     # **A service has one owner**, so its tasks stay in one head; whole services are balanced across
     # the backend developers, largest first, counting the DevOps load already carried.
     load = defaultdict(int)
@@ -1693,6 +1728,25 @@ def main() -> int:
             x["assignee"] = who
             load[who] += int(x["points"] or 0)
 
+    def extra_lead(t_):
+        """**What a hand-written task builds leads its text** (CHG-RONEP-001, CHG-RONEP-003): the operations an AI engine task
+        serves (`operations`) and the artefacts it lists (`builds`: operation, table, screen, service or adr ids), in the
+        "Builds:" form ticket_done.builds_of reads. Without it the task's title was read as operations (r1 gate, G2)."""
+        served = sorted(o for o in t_.get("operations") or [] if o in ops)
+        items = [f"operation {ops[o]['contract']}#{o}" for o in served]
+        for b in t_.get("builds") or []:
+            kind, _, name = b.partition(" ")
+            b = f"operation {ops[name]['contract']}#{name}" if kind == "operation" and name in ops else b
+            if b not in items:
+                items.append(b)
+        if not items:
+            return ""
+        lead = "Builds: " + ", ".join(f"`{b}`" for b in items) + ". "
+        if served:
+            lead += (f"{', '.join(served)} {'is' if len(served) == 1 else 'are'} served by ticvai-ai behind the AI gateway, "
+                     "to their contracts at the release tag in ADAM; no back-end task builds them. ")
+        return lead
+
     # **Tasks no screen or operation implies** (docs/active/block-a-extra-tasks.json, 30 September): the
     # platform kernel and offline machinery the system-design review found unticketed (SD-047, SD-063), and
     # the AI engine work the two AI engineers carry. Backend-pool tasks go to the least-loaded owner, as
@@ -1713,8 +1767,8 @@ def main() -> int:
             who = t_.get("assignee") or (min(backend_, key=lambda x: load[x]) if backend_ else "")
             if not is_ai and who:
                 load[who] += pts
-            task(t_["key"], t_["epic"], "Task", t_["subject"], t_["subject"] + ". " + t_["detail"], 1, pts=pts,
-                 area="ai" if is_ai else "backend", assignee=who, depends=t_.get("depends") or ())
+            task(t_["key"], t_["epic"], "Task", t_["subject"], t_["subject"] + ". " + extra_lead(t_) + t_["detail"], 1,
+                 pts=pts, area="ai" if is_ai else "backend", assignee=who, depends=t_.get("depends") or ())
 
     # ================================================================ the rest of the package (1 October)
     # **Every block is planned task by task now**, not only Block A: the PM's replan wants module-wise completion
@@ -1739,6 +1793,34 @@ def main() -> int:
     def screen_ops(sid):
         return [a["operationId"] for a in screens[sid].get("apis") or []
                 if isinstance(a, dict) and a.get("operationId") in ops]
+
+    def nav_hubs(a_set):
+        """The entries and app homes outside `a_set` on the shortest paths (fewest screens outside it) from each app's
+        entry to its screens in `a_set`; repeated until nothing more is added. tools/check-plan-closure.py's C-REACH
+        checks the result."""
+        added = set()
+        while True:
+            hubs = set()
+            for pf, theirs in sorted(screens_by_plat(a_set | added).items()):
+                for path in shortest_paths(pf, a_set | added, theirs).values():
+                    # **app homes only** (lever A, Chinmay, 3 October, CHG-RONEP-007): an entry or a section home
+                    # (block-a-extra-tasks.json `navHomes`); a screen reached only through another hub (a command
+                    # centre) gets a link from its section home in the screens instead (C-REACH reports it until then)
+                    hubs |= {x for x in path if x not in a_set and x not in added
+                             and (sp.is_entry(screens[x]) or x in decided["navHomes"])}
+            if not hubs:
+                return added
+            added |= hubs
+
+    def screens_by_plat(sids):
+        out = defaultdict(set)
+        for sid in sids:
+            if sid in screens:
+                out[plat_of(sid)].add(sid)
+        return out
+
+    def shortest_paths(pf, a_set, targets):
+        return sp.nav_paths({sid: s_ for sid, s_ in screens.items() if plat_of(sid) == pf}, a_set, targets)
 
     built_screen = {}
     for t_ in tasks:
@@ -1783,6 +1865,10 @@ def main() -> int:
         for br in fd.get("branches") or []:
             if isinstance(br, dict) and br.get("resolvedBy") in screens:
                 need_screens.add(br["resolvedBy"])
+            # a branch resolved by an operation needs it too (CHG-RONEP-002): F02's hold-expiry branches are resolved by
+            # extendSeatHold, which r2 built in Block A only by riding along and the fresh plan dropped to Block C
+            elif isinstance(br, dict) and str(br.get("resolvedBy") or "").split(" ")[0] in ops:
+                need_ops.add(str(br["resolvedBy"]).split(" ")[0])
     # **Block A takes the door of every app it puts a screen in** (CHG-DOOR-004, Chinmay, 2 October 2026: fix
     # the Block A blockers now). Block A's Venue Management screens (BO-084, BO-085, BO-124 and the setup
     # screens) were planned with SUP-001, the only way into Venue Management, in Block B: nothing in this
@@ -1791,17 +1877,58 @@ def main() -> int:
     # the slice builds -- the door of its own platform comes too, or, where its platform has none (P08, P13,
     # P16, P14), every door of its shipped app (`platform.targetApp.app`). A door is a screen calling an
     # operation that opens a session, the same test tools/check-session-entry.py and tools/check-doors.py use.
+    # **Every operation a Block A screen binds is built in Block A or earlier** (Chinmay, 3 October 2026: "Block A
+    # completes its apps"; CHG-RONEP-001, docs/active/decisions/answers-3-october-r1-plan.md). The closure above took the
+    # screens of the Block A apps and of their flows, but not the other screens Block A builds: the setup screens
+    # (APP-SETUP-*, built "only as far as the slice needs") and the slice's own screens on other apps. A setup screen is
+    # drawn whole in Block A, so its Create, Edit and list buttons reached the Block A design and the tickets while
+    # their operations were planned in Blocks B to D: BO-074's createAccount, DEV-003's requestProductionAccess,
+    # ADM-037's setAiProvider. So every screen a Block A task builds is in the closure -- its whole binding set (`apis`,
+    # onLoad and onAction alike), and the rest of the screen with it, in Block A -- and so are the screens and
+    # operations Chinmay decided on although nothing in this tree binds them yet (block-a-extra-tasks.json
+    # `blockAScreens`, `blockAOperations`). tools/check-plan-closure.py checks the plan that comes out.
+    #
+    # **Block A ships in two drops** (Chinmay, 3 October, CHG-RONEP-007): A1 by 27 November is the closure of 1 October
+    # (the Block A apps, their flows -- branches resolved by an operation included -- the slice's own screens and their
+    # doors) and the payment configuration (`blockA1Operations`); the completion work this rule adds (the rest of the
+    # setup screens, the decided screens and operations, the app homes) is planned in app-modules of its own, marked
+    # `completion`, which go to A1 app by app while A1 still ends by its window, and to A2 otherwise (below).
     door_ops = {"login", "verifyGuestOtp", "guestSocialLogin", "guestUaePassLogin"}
     doors_of_plat, doors_of_app = defaultdict(set), defaultdict(set)
     for sid_, s_ in screens.items():
         if str(s_.get("wave")) != "4" and set(screen_ops(sid_)) & door_ops:
             doors_of_plat[plat_of(sid_)].add(sid_)
             doors_of_app[((s_["_platform"].get("targetApp") or {}).get("app"))].add(sid_)
-    for sid_ in sorted(need_screens | set(setup_screens)):
-        app_ = (screens[sid_]["_platform"].get("targetApp") or {}).get("app")
-        need_screens |= doors_of_plat.get(plat_of(sid_)) or doors_of_app.get(app_) or set()
+    def add_doors():
+        for sid_ in sorted(need_screens | set(setup_screens)):
+            app_ = (screens[sid_]["_platform"].get("targetApp") or {}).get("app")
+            need_screens.update(doors_of_plat.get(plat_of(sid_)) or doors_of_app.get(app_) or set())
+
+    need_screens |= {sid for sid, k in built_screen.items() if by_key[k]["phase"] == 1 and not k.startswith("APP-SETUP-")}
+    add_doors()
+    # the homes an A1 screen is reached through are A1 too (CHG-RONEP-006, -007): the screens A1 builds are the core
+    # and the setup screens (their setup part)
+    need_screens |= nav_hubs(need_screens | set(setup_screens))
+    add_doors()
+    core_screens = set(need_screens)
+    core_ops = set(need_ops) | {o for o in decided["blockA1Operations"] if o in ops}
+    for sid in core_screens:
+        core_ops |= set(screen_ops(sid))
+    need_screens |= {sid for sid, k in built_screen.items() if by_key[k]["phase"] == 1}
+    need_screens |= set(decided["blockAScreens"]) & set(screens)
+    need_ops |= core_ops | {o for o in decided["blockAOperations"] if o in ops}
+    # **Every Block A screen is reachable from its app's entry through Block A screens** (CHG-RONEP-006, 3 October; the
+    # lead, from the design batches: eight of the nine Block A staff-app screens were reachable only through EMP-003, the
+    # home on duty, in no block, and EMP-002 in Block B). From each app's entry (`navigation.isEntryPoint`), the path to
+    # every Block A screen that passes the fewest screens outside Block A is found (0-1 shortest path over `exitTo` and
+    # `transitions`), and those screens -- the homes and hubs -- join Block A with their bindings. A screen with no path at
+    # all is a navigation gap, reported by tools/check-plan-closure.py (C-REACH), not something the plan can fix.
+    need_screens |= nav_hubs(need_screens)
+    add_doors()
     for sid in need_screens:
         need_ops |= set(screen_ops(sid))
+    print(f"Block A closure: {len(core_screens)} screens and {len(core_ops)} operations in its core (A1), "
+          f"{len(need_screens - core_screens)} screens and {len(need_ops - core_ops)} operations of completion work")
     gone_screens = replaced_screens()
     for sid in sorted(screens):
         s_ = screens[sid]
@@ -1817,8 +1944,11 @@ def main() -> int:
             continue
         if have:
             # **A setup screen is built in Block A only as far as the slice needs** (its setup operations); the rest
-            # of the screen comes with its app-module, as one more task on the same screen.
-            rest = [o for o in screen_ops(sid) if o not in planned_ops]
+            # of the screen comes with its app-module, as one more task on the same screen -- in Block A since
+            # CHG-RONEP-001, as the closure above holds it. The rest is every operation beyond the setup ones, also those
+            # another task builds: until 3 October it was only the unplanned ones, so a screen whose other operations
+            # were all planned elsewhere (BO-1065: listDenominations, getRegionSettings) had nobody wiring them.
+            rest = [o for o in screen_ops(sid) if o not in setup_screens.get(sid, ())]
             if not rest:
                 continue
             pts = max(1, points_of(screen_raw(s_)) - setup_sizes.get(sid, 1))
@@ -1844,6 +1974,29 @@ def main() -> int:
                           "order": order or sp.am_order(module, platform, part, variant)}
         return k
 
+    def setup_am(sid, rest=False):
+        """Block A's setup screens (only their setup operations) are one app-module per package and app:
+        "Ticketing & Guest Commerce · Venue Management (setup)", not one per module (often one screen). The rest of
+        those screens (CHG-RONEP-001) is completion work in an app-module of its own beside it, "... (setup, the rest
+        of the screens)", so it can ship in A1 or A2 (CHG-RONEP-007)."""
+        mod, pf = screen_module(sid), plat_of(sid)
+        pkg = sp.PACKAGE_OF.get(mod, "Platform Foundation")
+        pi = [x[0] for x in sp.PACKAGES].index(pkg)
+        code = re.sub(r"[^A-Z0-9]+", "-", pkg.upper()).strip("-")
+        k = add_am(pkg, pf, None, 1, block="A", key=f"AM-SETUP-{code}-{pf}" + ("-REST" if rest else ""),
+                   name=f"{pkg} · {sp.PLATFORM_NAME.get(pf, pf)} (setup" + (", the rest of the screens)" if rest else ")"),
+                   order=(min(sp.MODULE_PHASE.get(m, 3) for m in sp.PACKAGES[pi][2]), 50 + pi,
+                          sp.PLATFORM_ORDER.index(pf) if pf in sp.PLATFORM_ORDER else 99, 0, 1 if rest else 0))
+        if rest:
+            am_info[k]["completion"] = True
+        return k
+
+    def comp_am(module, platform):
+        """A Block A completion app-module (CHG-RONEP-007): "<module> · <app> (Block A completion)"."""
+        k = add_am(module, platform, None, 1, variant="Block A completion", block="A")
+        am_info[k]["completion"] = True
+        return k
+
     a_plain = set()           # (module, platform) with a Block A app-module of the same name
     parts_total = {}          # (module, platform) -> how many parts it has, Block A's included
     for t_ in tasks:
@@ -1857,6 +2010,12 @@ def main() -> int:
         # one, else a "(Block A)" part of its own
         mine = [x for x in lst if x[0] in need_screens]
         lst = [x for x in lst if x[0] not in need_screens]
+        # completion work (CHG-RONEP-007): the rest of a setup screen beside its setup part, the decided screens and
+        # app homes in "(Block A completion)"; the core keeps its place below
+        for sid, key, pts, kind in [x for x in mine if x[0] not in core_screens]:
+            later_items.append((key, sid, setup_am(sid, rest=True) if kind == "rest" else comp_am(module, platform),
+                                kind, pts))
+        mine = [x for x in mine if x[0] in core_screens]
         if mine:
             if (module, platform) in a_plain:
                 ka = sp.am_key(module, platform, 1)
@@ -1900,6 +2059,8 @@ def main() -> int:
                 callers[o].add(k)
     home = {}
     for k, a in sorted(am_info.items(), key=lambda x: x[1]["order"]):
+        if a.get("completion"):
+            continue                     # an operation no screen calls is no completion work (CHG-RONEP-007)
         if a["platform"] == "P08":
             home.setdefault((a["module"], "P08"), k)
         home.setdefault((a["module"], "*"), k)
@@ -1915,7 +2076,25 @@ def main() -> int:
     for o in sorted(ops):
         if o in planned_ops or ops[o]["provisional"]:
             continue
-        if callers.get(o):
+        # **An operation Block A needs is planned with a Block A app-module** (CHG-RONEP-001), so the four-operation
+        # tasks it is cut into hold only Block A work. Until 3 October it went with its first caller in build order
+        # and the closure pulled that whole task into Block A, three other operations riding along: when new
+        # operations re-cut the chunks, listPaymentMethods and setPaymentRules (r2: SVC-ORDER-PAYMENTS-8 and -9, Block A)
+        # fell to Block C with nobody deciding it.
+        # a core operation goes with a core Block A app-module, completion work with a completion one (CHG-RONEP-007)
+        comp_ = o not in core_ops
+        a_callers = [x for x in callers.get(o, ()) if am_info[x]["block"] == "A"
+                     and bool(am_info[x].get("completion")) == comp_] if o in need_ops else []
+        a_home = [a["key"] for a in am_info.values() if a["block"] == "A" and a["module"] == op_module[o]
+                  and a["platform"] != "AI" and not a["key"].startswith("AM-SETUP-")
+                  and bool(a.get("completion")) == comp_] if o in need_ops else []
+        if a_callers:
+            k = min(a_callers, key=lambda x: am_info[x]["order"])
+        elif o in need_ops:
+            k = (min(a_home, key=lambda x: am_info[x]["order"]) if a_home
+                 else comp_am(op_module[o], "API") if comp_
+                 else add_am(op_module[o], "API", None, 1, variant="Block A", block="A"))
+        elif callers.get(o):
             k = min(callers[o], key=lambda x: am_info[x]["order"])
         else:
             m_ = op_module[o]
@@ -2059,8 +2238,8 @@ def main() -> int:
             pf = t_.get("platform") or "API"
             k = add_am(m_, pf, None, 1, variant="" if pf != "API" else "platform",
                        name=None if pf != "API" else f"{sp.MODULE_SHORT.get(m_, m_)} · platform (later blocks)")
-            task(t_["key"], k, "Task", t_["subject"], t_["subject"] + ". " + t_["detail"], 3, pts=int(t_["points"]),
-                 area="backend", assignee=t_.get("assignee") or "", depends=t_.get("depends") or ())
+            task(t_["key"], k, "Task", t_["subject"], t_["subject"] + ". " + extra_lead(t_) + t_["detail"], 3,
+                 pts=int(t_["points"]), area="backend", assignee=t_.get("assignee") or "", depends=t_.get("depends") or ())
             am_of[t_["key"]] = k
     later_keys = set(am_of) | set(later_op_task.values()) | set(later_mig.values())
     for t_ in tasks:
@@ -2101,6 +2280,8 @@ def main() -> int:
     # to show and nothing to test against. Readers write nothing, so this can never close a loop.
     writers_of = defaultdict(set)
     for k, found in ops_of.items():
+        if k in by_key and by_key[k]["track"] != "Backend":
+            continue                     # an AI engine task serving operations (CHG-RONEP-001) holds no report back
         for o in found:
             for w in (lineage.get(o) or {}).get("writes") or []:
                 if not w.startswith(("cache:", "qdrant")):
@@ -2200,9 +2381,16 @@ def main() -> int:
            name="AI engine · Block A: gateway and guest AI (concierge, Help me choose, translations, planner)")
     add_am("AI & Intelligence", "AI", None, 1, key="AM-AI-ENGINE-A-BASELINE", block="A", order=(0, 10, 0, 0, 0),
            name="AI engine · Block A: baseline layer, day-one suggestions, Qdrant tenancy, evaluation")
-    ai_part = {}
+    ai_part, ai_drop = {}, {}
     if EXTRA.exists():
         ai_part = {e["key"]: e.get("appModule") for e in json.loads(EXTRA.read_text(encoding="utf-8")).get("tasks") or []}
+        # **AI engine work moved to A2** (Chinmay, 3 October, CHG-RONEP-010): a Block A AI engine task marked `drop: A2`
+        # is built in "AI engine · Block A2", so the two AI engineers end their A1 work before 24 November
+        ai_drop = {e["key"]: e.get("drop") for e in json.loads(EXTRA.read_text(encoding="utf-8")).get("tasks") or []}
+    if "A2" in ai_drop.values():
+        add_am("AI & Intelligence", "AI", None, 1, key="AM-AI-ENGINE-A2", block="A2", order=(0, 11, 0, 0, 0),
+               name="AI engine · Block A2: the AI work moved out of A1 (" + ", ".join(
+                   sorted(k.replace("AI-ENGINE-", "").lower() for k, v in ai_drop.items() if v == "A2")) + ")")
 
     def foundation_am(k):
         if k.startswith("SETUP-"):
@@ -2212,6 +2400,8 @@ def main() -> int:
         if k.startswith(("OFFLINE-", "POS-KDS")):
             return "AM-FOUNDATION-OFFLINE"
         if k.startswith("AI-ENGINE-"):
+            if ai_drop.get(k) == "A2":
+                return "AM-AI-ENGINE-A2"
             return "AM-AI-ENGINE-A-BASELINE" if ai_part.get(k) == "baseline" else "AM-AI-ENGINE-A"
         if k.startswith(("PLATFORM-", "KERNEL-", "ARCH-", "OBS-", "EDGE-")):
             return "AM-FOUNDATION-PLATFORM"
@@ -2233,15 +2423,7 @@ def main() -> int:
             sid = key_identity(k)[1]
             mod, pf = screen_module(sid), plat_of(sid)
             if k.startswith("APP-SETUP-"):
-                # Block A's setup screens (only their setup operations) are one app-module per package and app:
-                # "Ticketing & Guest Commerce · Venue Management (setup)", not one per module (often one screen)
-                pkg = sp.PACKAGE_OF.get(mod, "Platform Foundation")
-                pi = [x[0] for x in sp.PACKAGES].index(pkg)
-                code = re.sub(r"[^A-Z0-9]+", "-", pkg.upper()).strip("-")
-                am_of[k] = add_am(pkg, pf, None, 1, block="A", key=f"AM-SETUP-{code}-{pf}",
-                                  name=f"{pkg} · {sp.PLATFORM_NAME.get(pf, pf)} (setup)",
-                                  order=(min(sp.MODULE_PHASE.get(m, 3) for m in sp.PACKAGES[pi][2]), 50 + pi,
-                                         sp.PLATFORM_ORDER.index(pf) if pf in sp.PLATFORM_ORDER else 99, 0, 0))
+                am_of[k] = setup_am(sid)
             else:
                 am_of[k] = add_am(mod, pf, 1, parts_total.get((mod, pf), 1), block="A")
     a_keys = {t_["key"] for t_ in leaf if t_["phase"] == 1}
@@ -2276,14 +2458,18 @@ def main() -> int:
     # only (Block A)"; the migrations and same-service work it needs follow it (pull, below).
     for t_ in leaf:
         k = t_["key"]
-        if k in a_keys or not (ops_of.get(k, set()) & need_ops) or am_info[am_of[k]]["block"] == "A":
+        comp_ = not (ops_of.get(k, set()) & core_ops)          # completion work only (CHG-RONEP-007)
+        if k in a_keys or not (ops_of.get(k, set()) & need_ops) or (
+                am_info[am_of[k]]["block"] == "A" and (comp_ or not am_info[am_of[k]].get("completion"))):
             continue
-        users = [am_info[am_of[d]] for d in dependents[k] if d in am_of and am_info[am_of[d]]["block"] == "A"]
+        users = [am_info[am_of[d]] for d in dependents[k] if d in am_of and am_info[am_of[d]]["block"] == "A"
+                 and bool(am_info[am_of[d]].get("completion")) == comp_]
         mods = Counter(op_module[o] for o in ops_of.get(k, ()) if o in op_module)
         mod = mods.most_common(1)[0][0] if mods else sp.FOUNDATION
-        cand = users or [a for a in am_info.values() if a["block"] == "A" and a["module"] == mod]
+        cand = users or [a for a in am_info.values() if a["block"] == "A" and a["module"] == mod
+                         and bool(a.get("completion")) == comp_]
         am_of[k] = (min(cand, key=lambda a: a["order"])["key"] if cand
-                    else add_am(mod, "API", None, 1, variant="Block A", block="A"))
+                    else comp_am(mod, "API") if comp_ else add_am(mod, "API", None, 1, variant="Block A", block="A"))
     for t_ in leaf:
         t_["tier"] = tier(t_)
     step.clear()
@@ -2354,22 +2540,83 @@ def main() -> int:
                            open_blocks=settings["fixed"], pace_at=pace_at)
 
     BRANK = {b: i for i, b in enumerate(sp.BLOCKS)}
+    targets = settings["targets"]
+    tests = sp.test_settings(team)
+
+    # **Block A ships in two drops: A1 by 27 November, A2 right after** (Chinmay, 3 October, CHG-RONEP-007). The
+    # completion app-modules start in A2. Then, app by app in the order below, an app's completion work moves into A1
+    # if A1 still ends by its block-test window with no more overtime than the plan already carries or team.json
+    # `acceptedOvertimeHours` (43 h, accepted 3 October), whichever is more -- so every app in A1 works end to end.
+    # Overtime is the developers' hours of A1 work (and of what it waits on, which pull() brings into A1) still
+    # running when Block A's window opens, the measure of build-plan-deck.py.
+    comp_ams = {k for k, a in am_info.items() if a and a.get("completion")}
+    for k in comp_ams:
+        am_info[k]["block"] = "A2"
+    leaf_by = {t_["key"]: t_ for t_ in leaf}
+    a_cut = sp.window_of(targets["A"], tests["days"])[0]
+    accepted = float(next((b_.get("acceptedOvertimeHours") for b_ in (team.get("sprintPlan") or {}).get("blocks") or []
+                           if b_.get("block") == "A"), 0) or 0)
+
+    def a1_closure():
+        base = {k for k in leaf_by if am_of.get(k) and am_info[am_of[k]]["block"] == "A"}
+        stack = list(base)
+        while stack:
+            for d in leaf_by[stack.pop()]["dependsOn"].split():
+                if d in leaf_by and d not in base:
+                    base.add(d)
+                    stack.append(d)
+        return base
+
+    def a1_overtime():
+        a1 = a1_closure()
+        res = run_schedule(topo(lambda t_: (0 if t_["key"] in a1 else
+                                            1 if am_info[am_of[t_["key"]]]["block"] == "A2" else 2,
+                                            am_info[am_of[t_["key"]]]["order"], t_["tier"], int(t_["wave"] or 9),
+                                            step[t_["key"]], TRACK_ORDER[t_["track"]], t_["key"])))
+        h = 0.0
+        for k in a1:
+            r_ = res.get(k)
+            if not r_ or leaf_by[k]["track"] == "AI" or r_["end"] <= a_cut or not r_.get("dur"):
+                continue
+            h += r_["dur"] * sp.HOURS_PER_DAY * (r_["end"] - max(r_["start"], a_cut)) / max(r_["end"] - r_["start"], 1e-6)
+        return h
+
+    APP_PRIORITY = ["P01", "P02", "P04", "P15", "P05", "P06", "P07", "P13", "P12", "P10", "P11", "P17", "P14", "P16",
+                    "P09", "P08", "API"]
+    groups = defaultdict(list)
+    for k in comp_ams:
+        groups[am_info[k]["platform"] or "API"].append(k)
+    base_ot = a1_overtime() if comp_ams else 0.0
+    allow = max(base_ot, accepted) + 1.0
+    a1_apps = []
+    for pf in sorted(groups, key=lambda x: (APP_PRIORITY.index(x) if x in APP_PRIORITY else 99, x)):
+        for k in groups[pf]:
+            am_info[k]["block"] = "A"
+        ot = a1_overtime()
+        if ot <= allow:
+            a1_apps.append(pf)
+            base_ot = max(base_ot, ot)
+        else:
+            for k in groups[pf]:
+                am_info[k]["block"] = "A2"
+    print(f"Block A in two drops: completion work of {', '.join(a1_apps) or 'no app'} in A1 "
+          f"({base_ot:.0f} h of developer overtime to end A1 by its window, {accepted:g} h accepted); "
+          f"A2 takes {', '.join(sorted(pf for pf in groups if pf not in a1_apps)) or 'nothing'}")
 
     # **Pass 1: where each later app-module finishes**, with Block A first and the rest in build order. B, C and D
     # are then the app-modules that finish by each block's target sprint (team.json sprintPlan.blocks).
-    first_run = run_schedule(topo(lambda t_: (0 if am_info[am_of[t_["key"]]]["block"] == "A" else 1,
+    first_run = run_schedule(topo(lambda t_: (BRANK[am_info[am_of[t_["key"]]]["block"]]
+                                              if am_info[am_of[t_["key"]]]["block"] in sp.BLOCK_A_FAMILY else 2,
                                               am_info[am_of[t_["key"]]]["order"],
                                               t_["tier"], int(t_["wave"] or 9), step[t_["key"]],
                                               TRACK_ORDER[t_["track"]], t_["key"])))
     am_end = defaultdict(float)
     for k, r_ in first_run.items():
         am_end[am_of[k]] = max(am_end[am_of[k]], r_["end"])
-    targets = settings["targets"]
-    tests = sp.test_settings(team)
     def earliest_block(k):
-        # the first block whose test window starts after the app-module is done
-        return next((i for i, b in enumerate(sp.BLOCKS) if i > 0
-                     and sp.window_of(targets[b], tests["days"])[0] >= am_end.get(k, 0.0) - 1e-6), len(sp.BLOCKS) - 1)
+        # the first later block (B, C, D) whose test window starts after the app-module is done
+        return next((sp.BLOCKS.index(b) for b in sp.LATER_BLOCKS
+                     if sp.window_of(targets[b], tests["days"])[0] >= am_end.get(k, 0.0) - 1e-6), len(sp.BLOCKS) - 1)
 
     # **Blocks are filled to their target sprints in build order** (Chinmay, 1 October: "similar sizes"): B, C and D
     # take consecutive runs of app-modules in the order they are built, each up to where its work no longer finishes
@@ -2380,7 +2627,7 @@ def main() -> int:
     # window (whatever block they belong to) is how much that block, with the ones before it, can hold.
     dev_pts = {t_["key"]: float(t_["points"] or 0) for t_ in leaf if t_["track"] != "AI"}
     done_by = {}
-    for b_ in sp.BLOCKS[1:]:
+    for b_ in sp.LATER_BLOCKS:
         cut = sp.window_of(targets[b_], tests["days"])[0]
         tot = 0.0
         for k, r_ in first_run.items():
@@ -2393,15 +2640,16 @@ def main() -> int:
     am_pts = defaultdict(float)
     for t_ in leaf:
         am_pts[am_of[t_["key"]]] += dev_pts.get(t_["key"], 0.0)
-    run = sum(v for k, v in am_pts.items() if am_info[k]["block"] == "A")
+    run = sum(v for k, v in am_pts.items() if am_info[k]["block"] in sp.BLOCK_A_FAMILY)
     # **Comparable sizes** (Chinmay, 1 October): B, C and D each take about a third of the work after Block A, never
     # more than the team completes by the block's target (so each still ends on it); D takes what is left.
-    rest = sum(v for k, v in am_pts.items() if am_info[k]["block"] != "A" and am_info[k]["platform"] != "AI")
-    later_b = sp.BLOCKS[1:]
+    rest = sum(v for k, v in am_pts.items() if am_info[k]["block"] not in sp.BLOCK_A_FAMILY
+               and am_info[k]["platform"] != "AI")
+    later_b = sp.LATER_BLOCKS
     budget = {b_: min(done_by[b_], run + rest * (i + 1) / len(later_b)) for i, b_ in enumerate(later_b)}
-    cur = 1
+    cur = sp.BLOCKS.index("B")
     for k, a in sorted(am_info.items(), key=lambda x: x[1]["order"]):
-        if a["block"] == "A":
+        if a["block"] in sp.BLOCK_A_FAMILY:
             continue
         if a["platform"] == "AI":
             a["block"] = sp.BLOCKS[earliest_block(k)]
@@ -2424,8 +2672,15 @@ def main() -> int:
         if t_["track"] == "Frontend":
             return dt_["track"] in ("Backend", "Database")
         if t_["track"] in ("Backend", "Database"):
-            return dt_["track"] == "Database" or (dt_["track"] == "Backend" and dt_["service"] == t_["service"])
+            # a read waiting on its own service's writer does not tie the blocks either (lever B, CHG-RONEP-007)
+            return dt_["track"] == "Database" or (dt_["track"] == "Backend" and dt_["service"] == t_["service"]
+                                                  and not reads_only(t_))
         return False
+
+    def reads_only(t_):
+        """A back-end task none of whose operations writes a table: a list, a report, a lookup."""
+        return t_["track"] == "Backend" and bool(ops_of.get(t_["key"])) and not any(
+            not w.startswith(("cache:", "qdrant")) for o in ops_of[t_["key"]] for w in (lineage.get(o) or {}).get("writes") or [])
 
     def pull():
         for _ in range(40):
@@ -2454,7 +2709,10 @@ def main() -> int:
         """**A read is not a reason to wait for a later block** (1 October). A back-end task waits on another
         service's writer only to have data to read (a report, a dashboard, a read-only list); when that writer is in
         a later block, the read is built and tested on seeded data in its own block and reports more as the later
-        module lands, so the wait is dropped -- otherwise one report pulled into Block A waits for Block D."""
+        module lands, so the wait is dropped -- otherwise one report pulled into Block A waits for Block D.
+        **Inside one service too** (lever B, Chinmay, 3 October, CHG-RONEP-007: "don't pull a service's writers into
+        Block A just because its reads are there"): a read-only task's wait on a writer of its own service in a later
+        block is dropped, and it does not pull that writer (binds)."""
         for t_ in leaf:
             if t_["track"] != "Backend" or not am_of.get(t_["key"]):
                 continue
@@ -2462,7 +2720,8 @@ def main() -> int:
             keep = []
             for d in t_["dependsOn"].split():
                 dt_ = by_key.get(d)
-                if (dt_ and am_of.get(d) and dt_["track"] == "Backend" and dt_["service"] != t_["service"]
+                if (dt_ and am_of.get(d) and dt_["track"] == "Backend"
+                        and (dt_["service"] != t_["service"] or reads_only(t_))
                         and not d.startswith(("PLATFORM-", "KERNEL-", "SETUP-", "MIG-"))
                         and BRANK[am_info[am_of[d]]["block"]] > mine):
                     continue
@@ -2482,6 +2741,8 @@ def main() -> int:
     for t_ in leaf:
         am_tasks[am_of[t_["key"]]].append(t_)
 
+    # AM-AI-ENGINE-A2 (CHG-RONEP-010) is AI engine work like a later capability: accepted on its own module test, it
+    # does not hold Block A2 open
     A_AI = {"AM-AI-ENGINE-A", "AM-AI-ENGINE-A-BASELINE"}
 
     def is_ai_engine(k):
@@ -2499,12 +2760,26 @@ def main() -> int:
         tk = f"TEST-{k}"
         a = am_info[k]
         is_a = a["block"] == "A"
+        # **A module test names what it tests** (r1 gate G1, CHG-RONEP-003): the screens, operations and tables its
+        # app-module's tasks build, as its builds (so ADAM links them) and in its done-when. It said "every screen state
+        # its YAML lists" and named no screen, so the judge could not tell what to test.
+        arts = []
+        for x in sorted(ch, key=lambda x: (TRACK_ORDER.get(x["track"], 9), x["key"])):
+            for b_ in ticket_done.builds_of(x, "", lineage):
+                if b_ not in arts and not b_.startswith(("service ", "adr ")):
+                    arts.append(b_)
+        arts.sort(key=lambda b_: ({"screen": 0, "operation": 1, "table": 2}.get(b_.split(" ")[0], 3), b_))
+        names_ = [b_.split(" ", 1)[1] for b_ in arts]
+        named = (", ".join(f"`{n_}`" for n_ in names_[:12]) + (f" and {len(names_) - 12} more" if len(names_) > 12 else "")
+                 if names_ else "")
         task(tk, k, "Task", f"Module test: {a['name']}",
+             (("Builds: " + ", ".join(f"`{b_}`" for b_ in arts) + ". ") if arts else "") +
              f"The module test of {a['name']} on the integration environment (docs/active/block-test-strategy.md): "
              "every screen state its YAML lists, every navigation link, every permission (an allowed and a refused "
              "user), every operation's error responses, and for an offline app its offline behaviour with the network "
-             "cut. Done when it passes with no open severity 1 or 2 defect. By a peer in the module's stack who did not "
-             f"build most of it. {len(ch)} tickets, {pts} points" + (f", {days:g} AI-engineer days" if days else "") + ".",
+             "cut. Done when it passes " + (f"for {named} " if named else "") + "with no open severity 1 or 2 defect. "
+             f"By a peer in the module's stack who did not build most of it. {len(ch)} tickets, {pts} points"
+             + (f", {days:g} AI-engineer days" if days else "") + ".",
              min((int(x["wave"]) for x in ch if str(x["wave"]).isdigit()), default=3), area="test",
              pts=max(tests["minPoints"], round(tests["share"] * pts)) if pts else "",
              depends=[x["key"] for x in ch])
@@ -2525,7 +2800,7 @@ def main() -> int:
         later_set.add(tk) if not is_a else a_keys.add(tk)
     block_tests = {}
     for i, b in enumerate(sp.BLOCKS):
-        be_, fe_ = tests["pairs"][i % len(tests["pairs"])]
+        be_, fe_ = sp.test_pair(b, tests)
         for side, who in (("BE", be_), ("FE", fe_)):
             tk = f"TEST-BLOCK-{b}-{side}"
             task(tk, f"BLOCK-{b}", "Task", f"Block {b} test ({'back end' if side == 'BE' else 'front end'})",
@@ -2546,12 +2821,26 @@ def main() -> int:
             block_tests[tk] = b
             leaf.append(t_)
 
+    # **An AI engine task another AI engine task of its block waits on goes first in its engineer's queue** (CHG-RONEP-010):
+    # the second AI engineer built the 15-day baseline before Qdrant tenancy, so the concierge waited until day 31 and
+    # the A1 AI work ran past 24 November.
+    ai_waiters = Counter()
+    for t_ in leaf:
+        if t_["track"] == "AI" and am_of.get(t_["key"]):
+            for d in t_["dependsOn"].split():
+                if d in by_key and by_key[d]["track"] == "AI" and am_of.get(d)                         and am_info[am_of[d]]["block"] == am_info[am_of[t_["key"]]]["block"]:
+                    ai_waiters[d] += 1
+
     def block_first(t_):
         if t_["key"] in block_tests:
-            return (BRANK[block_tests[t_["key"]]], (9, 99, 99, 9, 99), 9, 9, 999, 7, t_["key"])
+            return (BRANK[block_tests[t_["key"]]], (9, 99, 99, 9, 99), (9, 0), 9, 999, 7, t_["key"])
         a_ = am_info[am_of[t_["key"]]]
-        return (BRANK[a_["block"]], a_["order"], t_["tier"], int(t_["wave"] or 9), step[t_["key"]],
-                TRACK_ORDER[t_["track"]], t_["key"])
+        if t_["track"] == "Test" and t_.get("pool") == "ai":
+            # an AI engine module test is placed after every AI engine task of its block, so the peer engineer
+            # finishes their own block's work (the evaluation harness) before testing the other's (CHG-RONEP-010)
+            return (BRANK[a_["block"]], (8, 99, 99, 9, 99), (9, 0), 9, step[t_["key"]], 6, t_["key"])
+        return (BRANK[a_["block"]], a_["order"], (t_["tier"], -ai_waiters.get(t_["key"], 0)), int(t_["wave"] or 9),
+                step[t_["key"]], TRACK_ORDER[t_["track"]], t_["key"])
 
     # **Pass 2: each block on a sprint boundary, its test in the last three days.** Scheduled block first, with each
     # block's test window frozen. An app-module of B or C that still finishes after its block's target window opens,
@@ -2576,7 +2865,7 @@ def main() -> int:
             if k not in block_tests:
                 fin[am_of[k]] = max(fin[am_of[k]], r_["end"])
         moved = 0
-        for b in sp.BLOCKS[1:-1]:
+        for b in sp.LATER_BLOCKS[:-1]:
             limit = sp.window_of(targets[b], tests["days"])[0]
             late = {k for k, a in am_info.items() if a["block"] == b and fin.get(k, 0.0) > limit + 1e-6}
             if not late:
@@ -2894,12 +3183,13 @@ def main() -> int:
                 break
         w0, w1 = windows[b]
         ai_late = [x for x in feats if is_ai_engine(x["key"])]
-        t_["subject"] = (f"Block {b}: the first release (Sprints {first_sp}-{end_sp})" if b == "A"
-                         else f"Block {b} (Sprints {first_sp}-{end_sp})")
+        t_["subject"] = (f"Block A1: the first release, first drop (Sprints {first_sp}-{end_sp})" if b == "A"
+                         else f"Block A2: the rest of Block A, its second drop (Sprints {first_sp}-{end_sp})"
+                         if b == "A2" else f"Block {b} (Sprints {first_sp}-{end_sp})")
         t_["points"] = sum(int(x["points"] or 0) for x in feats)
         t_["accountable"] = tests["lead"]
         t_["description"] = (
-            f"Block {b}: {len(feats)} app-modules, each complete and testable end to end (screens, back end, module "
+            f"Block {sp.block_label(b)}: {len(feats)} app-modules, each complete and testable end to end (screens, back end, module "
             f"test done), ending Friday {fmt(sp.SPRINTS_ALL[end_sp - 1]['end'])}, the end of Sprint {end_sp} (target: "
             f"Sprint {settings['targets'][b]}). Block test {fmt(sp.day(w0))} to {fmt(sp.day(w1 - 1))}: no new feature "
             "work starts in those days. Apps: " + ", ".join(f"{sp.PLATFORM_NAME.get(p_, p_ or 'platform')} ({n})"
@@ -2914,6 +3204,14 @@ def main() -> int:
     # row and the pointer say the same thing. Written last, after every edit to the descriptions above, and after a
     # full stop: a setup task's "In the slice: a, b" ended the text, and check-ticket-scope reads that list up to
     # the first full stop (S-SETUP-COUNT read none of them in the first refresh with this rule).
+    # A decided sentence a screen's tasks carry comes just before it (block-a-extra-tasks.json `screenNotes`, CHG-RONEP-001:
+    # BO-1065's AI residency section is drawn and built in Block A).
+    for t_ in tasks:
+        m_ = ticket_done.SCREEN.search(t_["key"]) if t_["type"] == "Task" and t_["track"] == "Frontend" else None
+        note_ = decided["screenNotes"].get(m_.group(1)) if m_ else None
+        if note_ and note_ not in (t_["description"] or ""):
+            d_ = (t_["description"] or "").rstrip()
+            t_["description"] = (d_ + ("" if not d_ or d_[-1] in ".!?" else ".") + " " + note_).strip()
     for t_ in tasks:
         if t_["type"] == "Task" and not ticket_done.DONE_WHEN.search(t_["description"] or ""):
             d_ = (t_["description"] or "").rstrip()

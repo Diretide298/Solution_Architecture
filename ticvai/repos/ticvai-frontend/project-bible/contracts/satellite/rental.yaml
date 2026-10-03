@@ -332,6 +332,9 @@ paths:
                   nullable: true
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Moved
           content:
             application/json:
@@ -1061,6 +1064,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: The quote
           content:
             application/json:
@@ -1401,6 +1407,7 @@ paths:
         '422':
           description: '`quoteExpired` or `quoteMismatch`: the `acceptedQuoteId` has expired or was
             given for a different product, location, window or quantity.'
+          x-ticvai-problem-types: [quote-expired, quote-mismatch]
           content:
             application/problem+json:
               schema:
@@ -1503,6 +1510,9 @@ paths:
                   nullable: true
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Changed
           content:
             application/json:
@@ -1617,6 +1627,9 @@ paths:
               $ref: '#/components/schemas/RentalCheckOut'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Active
           content:
             application/json:
@@ -1779,6 +1792,7 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           description: '`quoteExpired` or `quoteMismatch` on `acceptedQuoteId`.'
+          x-ticvai-problem-types: [quote-expired, quote-mismatch]
           content:
             application/problem+json:
               schema:
@@ -1837,6 +1851,9 @@ paths:
                   default: true
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Swapped
           content:
             application/json:

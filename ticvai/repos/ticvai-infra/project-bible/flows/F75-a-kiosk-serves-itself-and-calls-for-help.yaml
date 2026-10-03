@@ -46,8 +46,6 @@ steps:
   action: They review the basket.
   operations:
   - getCart
-  - addCartLine
-  - evaluatePromotions
   - checkoutCart
   outcome: '**The only chance to correct anything without a member of staff.** Promotions are shown
     here rather than at payment — a discount a guest discovers on the receipt is a discount they did
@@ -71,6 +69,7 @@ steps:
   screen: KSK-013
   action: Something goes wrong and they call staff.
   operations:
+  - handoverToAgent
   - endKioskAssist
   outcome: '**One button, always visible.** A guest stuck at a kiosk with no way to summon help is a
     guest who leaves.'

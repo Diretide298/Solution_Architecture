@@ -48,6 +48,8 @@ steps:
   screen: BO-093
   action: The plan is uploaded and read.
   operations:
+  - createUpload
+  - completeUpload
   - importVenueGeometry
   outcome: 'Shapes extracted, **deterministically**. Every layer name reported back, decoded, mapped
     or not — and **a file that yields nothing says `nothingFound` rather than reporting success**, which
@@ -58,6 +60,12 @@ steps:
     joined to the catalogue variant that prices it, and `resourcesFound` and `resourceRowsJoined` report the
     join. A table on a map is a non-dining spot sold like a cabana; restaurant tables stay F&B reservations.
 
+
+    **The file is uploaded first** (`assets.createUpload`, `completeUpload`) and its id passed to the import.
+    **Since 3 October 2026** (Chinmay, r1 additions; CHG-RONEC-001) the source may be DWG or DXF, a PDF (a
+    scanned page read through the OCR step), SVG, a PNG or JPG with hand-marked paths, or a GLB with its
+    navigation file (ADR-0069).
+
     '
 - step: 3
   screen: BO-093
@@ -65,8 +73,12 @@ steps:
   operations:
   - proposeVenueLabels
   - acceptVenueLabelProposals
+  - proposeWalkways
+  - acceptWalkwayProposals
   outcome: 'Points created from accepted proposals. **Low-confidence proposals are shown, not filtered**
-    — the shape the assistant is unsure about is the one most worth a human looking at.
+    — the shape the assistant is unsure about is the one most worth a human looking at. On a raster plan
+    (or a scanned PDF) the assistant also proposes the walkways, from the hand-marked paths where there are
+    any, and the operator accepts or rejects **each segment** (3 October 2026, CHG-RONEC-001).
 
     '
 - step: 4
@@ -75,11 +87,18 @@ steps:
   operations:
   - setVenuePoint
   - setPlacedResource
+  - createUpload
+  - completeUpload
+  - setVenueMapArtwork
   outcome: 'A restaurant point carries its outlet id, a ride its product id, a gate its access point.
     **Tapping a restaurant on the map should open its menu, and that only works if the map knows which
     outlet it is.** A cabana, lounger or table is placed with `setPlacedResource` and linked to its
     `resources.Resource`, so a guest can pick that one on the map and buy it (rev 3 REV3-15, superseding
     audit R073 (c) for resources on an ingested map).
+
+
+    The guest map artwork is uploaded here and lined up with the plan by two to four alignment points
+    (`setVenueMapArtwork`; 3 October 2026, CHG-RONEC-001).
 
     '
 - step: 5

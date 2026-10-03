@@ -103,7 +103,7 @@ branches:
   resolvedBy: Automatic
 - at: 3
   condition: The CNAME no longer points at TICVAI while the domain is active.
-  behaviour: '**Flagged by the scheduled check** (`cnameLost`): guests on that hostname no longer reach the
+  behaviour: '**Flagged by the scheduled check** (`isCnameLost`): guests on that hostname no longer reach the
     storefront, and the tenant is told which record to restore.'
   severity: requiresStaff
   resolvedBy: Tenant, at their DNS provider
@@ -115,7 +115,7 @@ branches:
   resolvedBy: setPrimaryDomain on another domain first
 - at: 4
   condition: The tenant leaves the CNAME in place after releasing the domain.
-  behaviour: '**A takeover risk, flagged** (`cnameLost` on the released hostname) until the record is removed.'
+  behaviour: '**A takeover risk, flagged** (`isCnameLost` on the released hostname) until the record is removed.'
   severity: requiresStaff
   resolvedBy: Tenant, at their DNS provider
 exitStates:

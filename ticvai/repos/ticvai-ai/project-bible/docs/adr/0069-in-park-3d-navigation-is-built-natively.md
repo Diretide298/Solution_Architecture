@@ -1,10 +1,32 @@
 # ADR-0069: In-park 3D navigation is built natively, from a venue model, a pathway file and GPS
 
-**Status:** Accepted · 30 September 2026 · agreed with the client in the meeting of 30 September
+**Status:** Accepted · 30 September 2026 · agreed with the client in the meeting of 30 September · open items closed 3 October 2026 (Chinmay, r1 additions; see the amendment below): the formats are contract, the import also takes DWG/DXF, PDF with OCR and hand-marked PNG/JPG, and venue maps ship in r1
 **Date:** 2026-09-30 · **Deciders:** Chinmay Parab (Softlabs), with Qossai and Allam (TICVAI)
 **Source:** client meeting of 30 September 2026, MoM section 4.8 and section 5 ("In-park 3D navigation can be built natively within the platform (React Three.js, a venue GLB model plus a pathway/location metadata file, and live GPS), without external mapping integration")
 **Related:** `contracts/satellite/venue-map.yaml` (`VenueMap`, `VenuePoint`, `VenuePath`, `getVenueMapGraph`) · `handoff/venue-map-input-spec.md` · screens GST-021 Interactive Map and GST-038 At the Venue (P02) · ADR-0007 (React Native guest app) · ADR-0013 (local-first, the offline pattern) · ADR-0038, amended by ADR-0040 (data stays in the tenant's region)
-**Scope:** the file formats below are our proposal inside the accepted decision; the decision itself (native, no external mapping integration) is the client's agreement
+**Scope:** the file formats below are our proposal inside the accepted decision; the decision itself (native, no external mapping integration) is the client's agreement. Since 3 October 2026 the formats are fixed in `contracts/satellite/venue-map.yaml` (`VenueNavigationFile`, `importVenueGeometry`)
+
+---
+
+## Amended 3 October 2026: the open items closed, venue maps in r1
+
+**Decided by Chinmay, 3 October 2026** (r1 additions, `docs/active/decisions/answers-3-october-r1-additions.md`:
+*"Venue map in r1: close ADR-0069's open items; the import contract accepts DXF/DWG, PDF with an OCR step, PNG/JPG
+with hand-marked paths (AI path proposal, accepted segment by segment) and GLB plus a pathway (navigation) file"*).
+Change entry CHG-RONEC-001. The decision above stands; this closes what it left open.
+
+| Open item | Closed as |
+|---|---|
+| The navigation file's `$id` (section 2) | Fixed as `urn:ticvai:venue-navigation-file:1.0`, and the schema is now the contract's `VenueNavigationFile` (carried as `x-ticvai-schema-id`, because a `$id` inside an OpenAPI 3.1 component re-bases its references). The schema in section 2 is that contract schema; where they differ, the contract wins |
+| Action item 3, the venue-map contract | Done. `importVenueGeometry` takes `glbModel` (the GLB as `sourceRef`, the navigation file as `navigationFileRef`) and `navigationFile` (the file alone, 2D); `VenueMap.modelAssetId`, `navigationFileAssetId`, `modelTransform` (`VenueModelTransform`, the anchor) and `model3dStatus`; the measured budget and the model findings on `VenueMapImportJob.model`; the 3D layer of a version on `VenueMapVersion.model3d` and `VenueMapDetail.model3d`; the export as `getVenueNavigationFile` (section 8) |
+| Action item 4, the asset kind | Done. `assets.MediaKind` gains `model3d` (`model/gltf-binary`), refused at `createUpload` over 40 MB (BC-029 to BC-033: a response enum gained a value, approved for r1) |
+| Action item 5, the input spec | Done. `handoff/venue-map-input-spec.md` section 11 (the GLB and the navigation file) and section 12 (scanned PDFs and hand-marked plans) |
+| Action item 6, the guest app | Not a specification item: it is the build of GST-021 and GST-038 in Block A, from this ADR and the contract |
+| What a budget breach does | **Hard limits:** a GLB over **40 MB** is refused (at upload and at import). Over **300,000 triangles at LOD0** in any zone, uncompressed textures, a control point more than **10 m** out, or an invalid navigation file is an `error` finding: the model imports, `VenueMap.model3dStatus` is `blocked`, and the next publish carries the 2D map without the 3D layer. Every other line of section 6 is a `warning` with the number. The model never blocks the map |
+| Which sources the import takes besides the model | DWG and DXF (preferred); PDF, a vector page by its layers and **a scanned page through an OCR step** whose text becomes label hints for `proposeVenueLabels` (`ocrHint`), never labels; SVG; PNG and JPG, including **a plan with hand-marked paths**, from which `ai.proposeWalkways` proposes one segment per marked stretch (`basis: handMarked`) and the operator accepts or rejects **each segment** with `acceptWalkwayProposals` |
+| Section 8, the client's model | Unchanged: the request stays with the client, and the default until a model arrives is the 2D map |
+
+**Revisit** stays as written: when the first real venue model arrives, and if indoor positioning is asked for.
 
 ---
 
@@ -74,7 +96,7 @@ geometry, GST-021 as specified). The 3D view is a per-map upgrade, not a precond
 
 ### 2. The navigation file (pathways and locations)
 
-JSON, one per venue map, UTF-8. **Proposed schema** (JSON Schema 2020-12; `$id` to be fixed when the
+JSON, one per venue map, UTF-8. **Schema** (JSON Schema 2020-12; fixed 3 October 2026 as the contract's `VenueNavigationFile`, id `urn:ticvai:venue-navigation-file:1.0`; was: `$id` to be fixed when the
 contract is updated):
 
 ```json
@@ -341,7 +363,7 @@ positioning (beacons) is asked for.
 
 1. [x] Record the decision (this ADR) and reference it from GST-021 and GST-038 (P02).
 2. [x] Ask the client for the model and the navigation file per venue, or who produces them (Decisions Register).
-3. [ ] Contract `venue-map.yaml`: `VenueMap.modelAssetId` and `VenueMap.modelTransform` (the anchor); `importVenueGeometry` accepts the navigation file as a source format; import findings for budget, anchor residual and unresolved codes; export of the graph in the navigation-file format.
-4. [ ] Contract `assets.yaml`: a `model3d` media kind (`model/gltf-binary`) with its size limit.
-5. [ ] `handoff/venue-map-input-spec.md`: a section for the GLB and the navigation file.
-6. [ ] Guest app: react-three-fiber scene, LOD and zone loading, snapping, approximate mode, 2D fallback; test on the reference devices.
+3. [x] (3 October 2026, CHG-RONEC-001) Contract `venue-map.yaml`: `VenueMap.modelAssetId` and `VenueMap.modelTransform` (the anchor); `importVenueGeometry` accepts the navigation file as a source format; import findings for budget, anchor residual and unresolved codes; export of the graph in the navigation-file format.
+4. [x] (3 October 2026, CHG-RONEC-001) Contract `assets.yaml`: a `model3d` media kind (`model/gltf-binary`) with its size limit.
+5. [x] (3 October 2026, CHG-RONEC-001) `handoff/venue-map-input-spec.md`: a section for the GLB and the navigation file.
+6. [x] (3 October 2026: a build item, carried by the GST-021 and GST-038 tickets in Block A, not a specification item) Guest app: react-three-fiber scene, LOD and zone loading, snapping, approximate mode, 2D fallback; test on the reference devices.

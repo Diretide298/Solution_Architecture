@@ -3202,10 +3202,14 @@ screens:
       why: Collecting a booking is ticketing (core). A kiosk cannot hand over shop-and-drop goods (collectShopAndDrop is
         staff-only). At most it could show where to collect them, which is a separate decision.
       source: screens/P05-guest-kiosk.yaml#KSK-011 | contracts/satellite/retail.yaml#collectShopAndDrop | R254
+      status: fixed
+      by: CHG-R1S-022
     - what: The order panel lists every Order field (scopePath, principalId, channel, totalPriceVariance), and the states
         name ORDER_VIEW.
       why: Plumbing on a guest kiosk.
       source: screens/P05-guest-kiosk.yaml#KSK-011
+      status: fixed
+      by: CHG-R1S-022
   KSK-016:
     summary: 'Order food at the kiosk and collect it at the counter. A guest at a kiosk with a queue behind them is not
       reading descriptions: photos, prices and allergens on the card, sold-out dishes visible, and an order number to listen
@@ -3248,14 +3252,20 @@ screens:
       why: Payment is required before the kitchen sees a guest order. The kiosk needs its review and payment steps (KSK-006,
         KSK-007) and an order-placed screen.
       source: contracts/satellite/fnb.yaml#createGuestFnbOrder | screens/P05-guest-kiosk.yaml#KSK-016
+      status: fixed
+      by: CHG-R1S-022
     - what: The allergen banner promises that "contains" and "may contain" are told apart, but the guest menu carries one
         flat allergen list.
       why: See WEB-037. GuestMenu should carry the Allergen object.
       source: contracts/satellite/fnb.yaml#/components/schemas/Allergen | contracts/satellite/fnb.yaml#/components/schemas/GuestMenu
+      status: fixed
+      by: CHG-R1S-022
     - what: The order modal collects id, recordedAt, quotedTotal, locationSessionId and fulfilment; the pattern is a status
         tracker.
       why: Plumbing; the screen is a menu, a basket and pay.
       source: screens/P05-guest-kiosk.yaml#KSK-016 | R254
+      status: fixed
+      by: CHG-R1S-022
     decisions:
     - question: Are F&B kiosks only inside the gate? A kiosk outside would sell food without admission (DI-292). Do food and
         tickets bought together at a kiosk go on one receipt (DI-293)?

@@ -7,8 +7,12 @@ publisher: seating
 description: A specific seat is no longer available for a performance.
 aggregate: seat
 emittedWhen: SeatStatus held to sold
+# **Published by seating, from inside the order transaction** (3 October 2026, CHG-R1S-010; the HLD/LLD
+# cross-check found createPayment, an OrderService operation, named for a seating event). The payment calls
+# catalogue.convertInventoryHold (CatalogueService, which owns seating), and that converts the order's seat
+# holds and writes seat.sold to the outbox, one per seat.
 emittedBy:
-- createPayment
+- catalogue.convertInventoryHold
 payload:
 - field: seatId
   type: uuid

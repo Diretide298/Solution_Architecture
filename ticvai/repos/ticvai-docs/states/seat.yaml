@@ -35,9 +35,10 @@ transitions:
   - seat.released
 - from: held
   to: sold
-  operation: createPayment
+  operation: convertInventoryHold
   trigger: cascade
-  guard: Payment captured on the order carrying this hold
+  guard: Payment captured on the order carrying this hold. `createPayment` (and `checkoutCart`) call
+    `catalogue.convertInventoryHold` inside the order transaction; it converts the seat holds too (CHG-R1S-010)
   emits:
   - seat.sold
 - from: available

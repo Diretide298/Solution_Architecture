@@ -1705,7 +1705,9 @@ screens:
     - listQueueEntries
   - operationId: requestSuggestion
     contract: ai
-    purpose: 'Queue-balancing suggestion (kind queueBalancing): return-slot allocation and redirection'
+    purpose: 'Queue-balancing suggestion (kind queueBalancing): return-slot allocation and redirection.
+      Later (CHG-RONEP-010): the queue-balancing suggestion of the day-one suggestions (AI-ENGINE-SUGGESTIONS)
+      ships in Block A2 (Chinmay, 3 October); until then the control shows ''Later''.'
     trigger: onAction
     provenance: build, 29 September 2026
   entryState:
@@ -2021,6 +2023,15 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: cardList
+        label: Load the product's attribute axes before they are replaced
+        operation: getProductAttributes
+        bindsTo: VariantDimension
+        columns:
+        - VariantDimension.code
+        - VariantDimension.name
+        - VariantDimension.values
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: multiSelect
         label: Kind
         operation: listProducts
@@ -2250,6 +2261,11 @@ screens:
     purpose: Change many products at once, with a preview
     trigger: onAction
     provenance: design-note correction, 2 October 2026 (BO-007)
+  - operationId: getProductAttributes
+    contract: catalogue
+    purpose: Load the product's attribute axes before they are replaced
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: productId
@@ -2473,6 +2489,15 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: cardList
+        label: Load the product's attribute axes before they are replaced
+        operation: getProductAttributes
+        bindsTo: VariantDimension
+        columns:
+        - VariantDimension.code
+        - VariantDimension.name
+        - VariantDimension.values
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: dataTable
         label: Every product variant
         bindsTo: ProductVariant
@@ -2699,6 +2724,11 @@ screens:
     purpose: The PDF ticket and the Apple and Google Wallet pass proofs of this product (DEC-151, CHG-CSP-038)
     trigger: onLoad
     provenance: design-note correction, 2 October 2026 (BO-008)
+  - operationId: getProductAttributes
+    contract: catalogue
+    purpose: Load the product's attribute axes before they are replaced
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: venueId
@@ -3860,6 +3890,44 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: cardList
+        label: Load the package pricing as saved
+        operation: getPackagePricingDefinition
+        bindsTo: PackagePricing
+        columns:
+        - PackagePricing.recordKind
+        - PackagePricing.name
+        - PackagePricing.pricingModel
+        - PackagePricing.addOnType
+        - PackagePricing.packagePrice
+        - PackagePricing.components
+        - PackagePricing.componentPriceVisibility
+        - PackagePricing.status
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
+      - kind: cardList
+        label: Load the bundle being edited
+        operation: getBundle
+        bindsTo: Bundle
+        columns:
+        - Bundle.code
+        - Bundle.name
+        - Bundle.description
+        - Bundle.kind
+        - Bundle.price
+        - Bundle.savingsAmount
+        - Bundle.savingsPercentage
+        - Bundle.hasBeenSold
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
+      - kind: cardList
+        label: List the combos and their slots
+        operation: listCombos
+        bindsTo: Combo
+        columns:
+        - Combo.name
+        - Combo.price
+        - Combo.availability
+        - Combo.isActive
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: dataTable
         label: Every bundle
         bindsTo: BundleSummary
@@ -4057,6 +4125,21 @@ screens:
     - listCatalogueBundles
     - getLatestBundle
     - listCommercialCampaigns
+  - operationId: listCombos
+    contract: fnb
+    purpose: List the combos and their slots
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
+  - operationId: getBundle
+    contract: promotions
+    purpose: Load the bundle being edited
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
+  - operationId: getPackagePricingDefinition
+    contract: catalogue
+    purpose: Load the package pricing as saved
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: version
@@ -4238,6 +4321,15 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: cardList
+        label: Load the product's attribute axes before they are replaced
+        operation: getProductAttributes
+        bindsTo: VariantDimension
+        columns:
+        - VariantDimension.code
+        - VariantDimension.name
+        - VariantDimension.values
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: textField
         label: Venue id
         operation: listProducts
@@ -4423,6 +4515,11 @@ screens:
     trigger: onAction
     invalidates:
     - listProducts
+  - operationId: getProductAttributes
+    contract: catalogue
+    purpose: Load the product's attribute axes before they are replaced
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: productId
@@ -10086,6 +10183,14 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: cardList
+        label: Show the rule's entry points before they are replaced
+        operation: listEntryRulePoints
+        bindsTo: AccessEntryRulePoint
+        columns:
+        - AccessEntryRulePoint.isActive
+        - AccessEntryRulePoint.createdAt
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: dataTable
         label: Admission profiles
         bindsTo: AdmissionRules
@@ -10161,6 +10266,11 @@ screens:
     provenance: decided 29 September, VM close-out (venue management and configuration)
     invalidates:
     - listAdmissionRules
+  - operationId: listEntryRulePoints
+    contract: access
+    purpose: Show the rule's entry points before they are replaced
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: profileId
@@ -12963,6 +13073,18 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: cardList
+        label: Show the delivery locations and the outlets mapped to them
+        operation: listDeliveryLocations
+        bindsTo: DeliveryLocation
+        columns:
+        - DeliveryLocation.kind
+        - DeliveryLocation.label
+        - DeliveryLocation.zone
+        - DeliveryLocation.isServiceable
+        - DeliveryLocation.unserviceableReason
+        - DeliveryLocation.walkTimeMinutes
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: multiSelect
         label: Kind
         operation: listOutlets
@@ -13169,6 +13291,11 @@ screens:
     purpose: Assign serving outlets to delivery locations
     trigger: onAction
     provenance: build, 29 September 2026
+  - operationId: listDeliveryLocations
+    contract: fnb
+    purpose: Show the delivery locations and the outlets mapped to them
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: outletId
@@ -18763,7 +18890,19 @@ screens:
     regions:
     - name: contentBody
       slot: collection
-      components: []
+      components:
+      - kind: cardList
+        label: Show the delivery locations and the outlets mapped to them
+        operation: listDeliveryLocations
+        bindsTo: DeliveryLocation
+        columns:
+        - DeliveryLocation.kind
+        - DeliveryLocation.label
+        - DeliveryLocation.zone
+        - DeliveryLocation.isServiceable
+        - DeliveryLocation.unserviceableReason
+        - DeliveryLocation.walkTimeMinutes
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
     - name: contextPanel
       slot: selection
       components:
@@ -18879,6 +19018,11 @@ screens:
     purpose: Set the rules every till in the venue opens and closes to
     trigger: onAction
     provenance: design-note correction, 2 October 2026 (BO-065)
+  - operationId: listDeliveryLocations
+    contract: fnb
+    purpose: Show the delivery locations and the outlets mapped to them
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: venueId
@@ -25211,12 +25355,43 @@ screens:
         notes: '**Accept, edit or reject, per proposal** (decided 28 September, audit R275 (f)) — each
           row of the review carries its own decision; an edit sends the operator''s corrected point.'
         provenance: contract venue-map.yaml POST /venue-maps/{mapId}/proposals
+      - kind: secondaryButton
+        label: Propose walkways
+        operation: proposeWalkways
+        notes: '**A raster plan or a scanned PDF only** (the AI contract refuses a map with vector geometry, 409).
+          On a plan with hand-marked paths it traces one segment per marked stretch (`basis: handMarked`);
+          otherwise it proposes what it can see. Proposes and stops (3 October 2026, r1 additions, CHG-RONEC-001).
+          Hidden when AI is off; the operator then draws paths on BO-094.'
+        provenance: contract ai.yaml POST /ai/venue-map/{mapId}/propose-walkways
+      - kind: secondaryButton
+        label: Accept or reject segment
+        operation: acceptWalkwayProposals
+        notes: '**One segment at a time** (Chinmay, 3 October 2026: accepted segment by segment). Each proposed
+          segment is drawn over the plan with its confidence, low confidence shown, not hidden; Accept, Edit
+          (move the centreline) or Reject sends one decision, and the graph validation that comes back is shown
+          at once, so a rejected segment that strands a point says so. No accept-all.'
+        provenance: contract venue-map.yaml POST /venue-maps/{mapId}/walkway-proposals
     - name: contentBody
       slot: carried
       components:
       - kind: fileUpload
-        notes: The geometry file being imported.
-        provenance: carried from the previous definition
+        label: Plan, model or navigation file
+        operation: createUpload
+        notes: 'The file being imported, uploaded before `importVenueGeometry` is called: `assets.createUpload`
+          gives a signed URL (it refuses a GLB over 40 MB, or any file over the limit for its kind, before the
+          transfer starts), the file goes straight to storage, and `assets.completeUpload` returns the
+          `MediaAsset.id` sent as `sourceRef` (or `manifestRef`, `resourceManifestRef`). **The 3D model source
+          takes two files** (ADR-0069): the GLB ("GLB, at most 40 MB; about 300,000 triangles at LOD0") as
+          `sourceRef` and its navigation (pathway) JSON as `navigationFileRef`, each in its own slot of this
+          upload. Needs `ASSET_LIBRARY_MANAGE` as well as `VENUE_MAP_MANAGE` (3 October 2026, CHG-RONEC-001).'
+        provenance: contract assets.yaml POST /media/uploads and /media/uploads/{uploadId}/complete
+      - kind: progressIndicator
+        label: Upload progress
+        operation: completeUpload
+        notes: The transfer to storage, per file; when it ends the screen confirms it with `assets.completeUpload`
+          and holds the `MediaAsset.id` the import takes. A file refused at `createUpload` (too large for its kind)
+          says so before anything is sent.
+        provenance: contract assets.yaml POST /media/uploads/{uploadId}/complete
       - kind: progressIndicator
         notes: 'Import is long enough to leave the screen. **A spinner with no proportion is a screen
           people reload**, and reloading an import is how a venue gets two of everything.
@@ -25226,7 +25401,10 @@ screens:
       - kind: selectField
         label: Format
         operation: importVenueGeometry
-        notes: Required.
+        notes: 'Required. Four source kinds (3 October 2026, r1 additions): DWG or DXF (preferred); PDF (a vector
+          page by its layers, a scanned page through the OCR step); PNG or JPG, with or without hand-marked paths;
+          and a 3D model (GLB) with its navigation file. SVG stays accepted. The guidance beside it says what each
+          gives (native CAD keeps layer names; a scan gives hints and proposed paths, not geometry).'
         provenance: contract venue-map.yaml POST /venue-maps/{mapId}/import
       - kind: textField
         label: Source ref
@@ -25248,6 +25426,20 @@ screens:
       - kind: textField
         label: Manifest ref
         operation: importVenueGeometry
+        provenance: contract venue-map.yaml POST /venue-maps/{mapId}/import
+      - kind: toggle
+        label: Read text on a scanned plan (OCR)
+        bindsTo: VenueMapOcrOptions.mode
+        operation: importVenueGeometry
+        notes: '`ocr.mode`, on (`auto`) by default for a scanned PDF or an image; off for a dimensioned drawing whose
+          text is noise. The text found becomes hints for the label proposals, never labels.'
+        provenance: contract venue-map.yaml POST /venue-maps/{mapId}/import
+      - kind: textField
+        label: Paths marked by hand, marker colour
+        bindsTo: VenueMapHandMarkedPaths.markColour
+        operation: importVenueGeometry
+        notes: '`handMarkedPaths`, for a PNG, JPG or scanned PDF with the walkways drawn in marker: a tick that the
+          paths are marked, the marker colour if known (optional) and a note on what the marks mean.'
         provenance: contract venue-map.yaml POST /venue-maps/{mapId}/import
       - kind: textField
         label: Resource layer
@@ -25297,6 +25489,32 @@ screens:
           no variant), each naming the row or the label, so an operator can fix the sheet rather than
           guess.
         provenance: contract venue-map.yaml GET /venue-maps/{mapId}/import/{jobId}
+      - kind: detailPanel
+        label: What the scan, the marks and the model gave
+        bindsTo: VenueMapImportJob
+        columns:
+        - VenueMapImportJob.ocr
+        - VenueMapImportJob.handMarkedPaths
+        - VenueMapImportJob.model
+        operation: getVenueMapImportJob
+        notes: 'The text the OCR step read (with its confidence, offered to the label proposals as hints), the
+          hand-marked strokes found, and for a GLB the measured budget line by line with the model findings and
+          whether the 3D layer will publish (3 October 2026, CHG-RONEC-001). Each part shows only when the source
+          had it.'
+        provenance: contract venue-map.yaml GET /venue-maps/{mapId}/import/{jobId}
+      - kind: cardList
+        label: Open walkway proposals
+        bindsTo: ProposedAction
+        columns:
+        - ProposedAction.summary
+        - ProposedAction.status
+        - ProposedAction.proposedAt
+        - ProposedAction.expiresAt
+        operation: listProposedActions
+        notes: 'The walkway segments `proposeWalkways` proposed and nobody has decided yet (one `ai.proposed_action`
+          each), read again when the operator comes back to the import; each is accepted or rejected on its own
+          with `acceptWalkwayProposals` (3 October 2026, CHG-RONEC-001).'
+        provenance: contract ai.yaml GET /proposed-actions
   states:
     loading: The saved map import labelling.
     error: Could not load. Names which read failed and leaves the map import labelling untouched.
@@ -25326,11 +25544,32 @@ screens:
     trigger: onAction
   - operationId: acceptWalkwayProposals
     contract: venue-map
-    purpose: Accept or reject proposed walkways
+    purpose: Accept or reject proposed walkways, one segment at a time
     trigger: onAction
-    provenance: decided 29 September, VM close-out (venue management and configuration)
+    provenance: decided 29 September, VM close-out (venue management and configuration); segment by segment
+      decided 3 October 2026 (r1 additions, CHG-RONEC-001)
     invalidates:
     - getVenueMapImportJob
+  - operationId: createUpload
+    contract: assets
+    purpose: 'Upload the plan, the GLB, the navigation file or a manifest before importVenueGeometry takes its id'
+    trigger: onAction
+    provenance: decided 3 October 2026 (the lead, CHG-RONEC-001)
+  - operationId: completeUpload
+    contract: assets
+    purpose: Confirm the upload and get the MediaAsset id the next call takes
+    trigger: onAction
+    provenance: decided 3 October 2026 (the lead, CHG-RONEC-001)
+  - operationId: listProposedActions
+    contract: ai
+    purpose: Re-read the walkway proposals still open (one per segment) to follow proposeWalkways, which answers 202
+    trigger: onAction
+    provenance: decided 3 October 2026 (CHG-RONEC-001)
+  - operationId: proposeWalkways
+    contract: ai
+    purpose: Propose the path network of a raster or scanned plan, from hand-marked paths where there are any
+    trigger: onAction
+    provenance: decided 3 October 2026, r1 additions (CHG-RONEC-001)
   entryState:
     params:
     - name: mapId
@@ -25498,6 +25737,40 @@ screens:
           Bookings follow the resource, not the placement, so moving a cabana on a later version keeps
           its bookings.
         provenance: contract venue-map.yaml POST /venue-maps/{mapId}/resources
+      - kind: secondaryButton
+        label: Export navigation file
+        operation: getVenueNavigationFile
+        notes: 'Downloads the draft''s paths and points as a navigation file (ADR-0069 section 8, closed 3 October
+          2026, CHG-RONEC-001), the JSON a 3D studio builds the GLB around and BO-093 imports back with the model.
+          Codes, never ids.'
+        provenance: contract venue-map.yaml GET /venue-maps/{mapId}/navigation-file
+      - kind: fileUpload
+        label: Guest map artwork
+        bindsTo: VenueMap.baseAssetId
+        operation: createUpload
+        notes: '**The illustrated map guests see** (input spec section 6; the F26 brief''s open item, closed
+          3 October 2026 here, CHG-RONEC-001): PNG or JPG up to about 12,000 px wide, uploaded through
+          `assets.createUpload` and `completeUpload`, then set with `setVenueMapArtwork`.'
+        provenance: contract assets.yaml POST /media/uploads and /media/uploads/{uploadId}/complete
+      - kind: secondaryButton
+        label: Save artwork and alignment
+        operation: setVenueMapArtwork
+        notes: 'Sends the artwork''s `baseAssetId` and two to four alignment-point pairs (a pixel on the image
+          matched to a point on the plan; four recommended). Takes effect for guests at the next publish.'
+        provenance: contract venue-map.yaml POST /venue-maps/{mapId}/artwork
+      - kind: progressIndicator
+        label: Artwork upload
+        operation: completeUpload
+        notes: The transfer to storage; when it ends the screen confirms it with `assets.completeUpload` and holds the
+          `MediaAsset.id` that `setVenueMapArtwork` takes.
+        provenance: contract assets.yaml POST /media/uploads/{uploadId}/complete
+      - kind: banner
+        label: 3D layer
+        bindsTo: VenueMap.model3dStatus
+        operation: getVenueMap
+        notes: 'None, publishable or blocked (ADR-0069 as amended 3 October 2026). Blocked names the import job''s
+          model findings on BO-093; the 2D map still publishes and guests see 2D until a corrected model is imported.'
+        provenance: contract venue-map.yaml VenueMap.model3dStatus
     - name: contentBody
       slot: record
       components:
@@ -25559,8 +25832,8 @@ screens:
       and sends somebody to support with the wrong question. A caller who can see the screen but lacks
       what an action needs sees that action disabled, naming its permission: `ASSET_LIBRARY_VIEW` for
       `searchMedia`; `PRODUCT_VIEW` for `listProducts`, `listCatalogueBundles`; `VENUE_MAP_MANAGE` for
-      `setVenuePoint`, `validateVenueMapGraph`, `setPathClosure`, `setPlacedResource`; `VENUE_MAP_PUBLISH`
-      for `publishVenueMap`.'
+      `setVenuePoint`, `validateVenueMapGraph`, `setPathClosure`, `setPlacedResource`, `setVenueMapArtwork`;
+      `VENUE_MAP_PUBLISH` for `publishVenueMap`; `ASSET_LIBRARY_MANAGE` for `createUpload`, `completeUpload`.'
   apis:
   - operationId: searchMedia
     contract: assets
@@ -25607,6 +25880,28 @@ screens:
     trigger: onAction
     invalidates:
     - getVenueMap
+  - operationId: createUpload
+    contract: assets
+    purpose: 'Upload the guest map artwork before setVenueMapArtwork takes its id'
+    trigger: onAction
+    provenance: decided 3 October 2026 (the lead, CHG-RONEC-001)
+  - operationId: completeUpload
+    contract: assets
+    purpose: Confirm the upload and get the MediaAsset id the next call takes
+    trigger: onAction
+    provenance: decided 3 October 2026 (the lead, CHG-RONEC-001)
+  - operationId: setVenueMapArtwork
+    contract: venue-map
+    purpose: Set the guest map artwork and its alignment points (input spec section 6)
+    trigger: onAction
+    provenance: decided 3 October 2026 (the lead, CHG-RONEC-001)
+    invalidates:
+    - getVenueMap
+  - operationId: getVenueNavigationFile
+    contract: venue-map
+    purpose: Export the draft's graph and points as a navigation file for a 3D studio (ADR-0069 section 8)
+    trigger: onAction
+    provenance: decided 3 October 2026, r1 additions (CHG-RONEC-001)
   entryState:
     params:
     - name: mapId
@@ -25633,6 +25928,22 @@ screens:
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
+  - id: formSetVenueMapArtwork
+    component: modal
+    trigger: Save artwork and alignment
+    body: '**Collects what `setVenueMapArtwork` sends before it is called.** Required: `baseAssetId` (the uploaded
+      artwork, or none to remove it) and, with an image, `baseImageAlignment`: the image size and two to four
+      alignment pairs, each a point clicked on the artwork and the same point clicked on the plan. Dismissing
+      sends nothing; the map keeps the artwork it had.'
+    confirm:
+      label: Save artwork and alignment
+      operation: setVenueMapArtwork
+    dismiss:
+      label: Cancel
+      discards:
+      - baseAssetId
+      - baseImageAlignment
+    provenance: contract venue-map.yaml POST /venue-maps/{mapId}/artwork; decided 3 October 2026 (CHG-RONEC-001)
   - id: formSetVenuePoint
     component: modal
     trigger: Save venue point
@@ -26675,6 +26986,10 @@ screens:
     - PTR-039
     - PTR-047
     - PTR-048
+    - ADM-243
+    - ADM-342
+    - ADM-354
+    - BO-1065
     entryFrom:
     - BO-108
     - BO-594
@@ -27283,6 +27598,22 @@ screens:
       trigger: Commission Calculation & Settlement Management
       provenance: moved to Venue Management 2 October 2026 (CHG-CLN-004); its board's hub PTR-042 stays
         on the partner portal
+    - to: ADM-243
+      trigger: Opens Roles, Authority, Delegation & Approval Limits
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: ADM-342
+      trigger: Opens Authentication & MFA Policy Manager
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: ADM-354
+      trigger: Opens External Workflow System Integration
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-1065
+      trigger: Opens Currency, Timezone & Channels
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
   notes: '**Built 20 August because P08 had none.** `BO-001 Queue Directory` was the declared entry point
     to a 99-screen back office — it exits to four queue screens, and **93 screens hung off nothing.**
     A back office entered through a queue list. **The module was also one bucket holding 72 of 99 screens**,
@@ -27494,6 +27825,11 @@ screens:
     - BO-077
     - BO-089
     - BO-090
+    - BO-1094
+    - BO-1111
+    - BO-1146
+    - BO-1162
+    - BO-1179
     transitions:
     - to: BO-008
       trigger: Product Detail & Variants
@@ -27619,6 +27955,26 @@ screens:
       provenance: 'derived — BO-028 declares entryState.params refundId and BO-101 holds none of them.
         The edge carries nothing: refundId only pre-selects (deep link or optional), and BO-028 opens
         on its own'
+    - to: BO-1094
+      trigger: Opens Funding Method Configuration
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-1111
+      trigger: Opens Credit Expiry, Extension & Forfeiture Operations
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-1146
+      trigger: Opens Refund-to-Wallet Policy Configuration
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-1162
+      trigger: Opens Security Governance, Audit & Rule Publication
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-1179
+      trigger: Opens Integration Monitoring & Exception Workbench
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
   notes: Section landing. **28 screens reach the entry point through here** — before 20 August they reached
     it through nothing. **Given its section's own operations on 4 September.** It sat on `getVenueSettings`
     alone, which made it identical to every other section landing page — a hub that shows nothing of its
@@ -27806,6 +28162,10 @@ screens:
     - BO-142
     - BO-143
     - BO-1190
+    - ADM-164
+    - ADM-570
+    - ADM-603
+    - BO-696
     transitions:
     - to: BO-007
       trigger: Product Directory
@@ -27974,6 +28334,22 @@ screens:
     - to: BO-1190
       trigger: Donation Campaigns
       provenance: decided 29 September, VM close-out (venue management and configuration)
+    - to: ADM-164
+      trigger: Opens Code Distribution & Assignment Manager
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: ADM-570
+      trigger: Opens Gateway, PSP & Acquirer Directory
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: ADM-603
+      trigger: Opens B2B Invoice, On-Account & Payment Terms Configuration
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-696
+      trigger: Opens Event Duplication & Clone Configuration
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
   notes: Section landing. **14 screens reach the entry point through here** — before 20 August they reached
     it through nothing.
   density: compact
@@ -28139,6 +28515,23 @@ screens:
     - BO-097
     - BO-098
     - BO-099
+    - BO-1045
+    - BO-1062
+    - BO-151
+    - BO-155
+    - BO-161
+    - BO-166
+    - BO-167
+    - BO-168
+    - BO-185
+    - BO-186
+    - BO-188
+    - BO-189
+    - BO-201
+    - BO-230
+    - BO-335
+    - BO-346
+    - BO-618
     transitions:
     - to: BO-001
       trigger: Queue Directory
@@ -28233,6 +28626,74 @@ screens:
       provenance: 'derived — BO-099 declares entryState.params performanceId and BO-103 holds none of
         them. The edge carries nothing: BO-103 is the Access & Venue hub and this is its menu entry; BO-099
         has no source yet for performanceId'
+    - to: BO-1045
+      trigger: Opens Price Bands & Categories
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-1062
+      trigger: Opens Tenant & Brand Context
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-151
+      trigger: Opens Access Location Grouping
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-155
+      trigger: Opens Visual Access Rule Builder
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-161
+      trigger: Opens Guest, Companion & Eligibility Rules
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-166
+      trigger: Opens Credential Activation & Display Rules
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-167
+      trigger: Opens Device Binding & Session Security
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-168
+      trigger: Opens BLE Beacon & Geofence Configuration
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-185
+      trigger: Opens Biometric Verification Profile Builder
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-186
+      trigger: Opens Face Pass Enrollment Configuration
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-188
+      trigger: Opens Face Tag Temporary Enrollment
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-189
+      trigger: Opens Face Matching & Verification Thresholds
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-201
+      trigger: Opens Gate Modes, Free Spin & Emergency Controls
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-230
+      trigger: Opens Live Gate Mode & Lane Control
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-335
+      trigger: Opens Virtual Ticket Identity & Master Record Configuration
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-346
+      trigger: Opens PDF, Printable & POS Ticket Designer
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-618
+      trigger: Opens Accreditation Form Builder
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
   notes: Section landing. **24 screens reach the entry point through here** — before 20 August they reached
     it through nothing. **Given its section's own operations on 4 September.** It sat on `getVenueSettings`
     alone, which made it identical to every other section landing page — a hub that shows nothing of its
@@ -28966,6 +29427,16 @@ screens:
     - BO-068
     - BO-073
     - BO-091
+    - BO-755
+    - BO-766
+    - BO-772
+    - BO-785
+    - BO-798
+    - BO-799
+    - BO-825
+    - BO-826
+    - BO-827
+    - BO-828
     transitions:
     - to: BO-073
       trigger: Lost & Found Register
@@ -28978,6 +29449,46 @@ screens:
         of them. The edge carries nothing: profileKey only pre-selects (deep link or optional); BO-091
         opens on listIndexFailures, and tenantId has no source on BO-091 yet (a gap in BO-091, not in
         this edge)'
+    - to: BO-755
+      trigger: Opens Dynamic Segment Builder
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-766
+      trigger: Opens Campaign Builder
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-772
+      trigger: Opens A/B & AI Optimization
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-785
+      trigger: Opens Template Library
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-798
+      trigger: Opens Intent & Knowledge Management
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-799
+      trigger: Opens Agent Workspace
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-825
+      trigger: Opens Challenge Builder
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-826
+      trigger: Opens Achievement & Badge Engine
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-827
+      trigger: Opens Points & Activity Rules
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-828
+      trigger: Opens Milestones & Reward Rules
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
   notes: Section landing. **3 screens reach the entry point through here** — before 20 August they reached
     it through nothing.
   density: compact
@@ -29171,6 +29682,15 @@ screens:
     - BO-1184
     - BO-1183
     - BO-070
+    - BO-395
+    - BO-857
+    - BO-861
+    - BO-866
+    - BO-870
+    - BO-877
+    - BO-911
+    - BO-919
+    - BO-927
     transitions:
     - to: BO-036
       trigger: Device Registry
@@ -29248,6 +29768,42 @@ screens:
         an id'
       carries:
       - workOrderId
+    - to: BO-395
+      trigger: Opens Game & Ride Directory
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-857
+      trigger: Opens Resource Creation & Profile
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-861
+      trigger: Opens Resource Package & Bundle Configuration
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-866
+      trigger: Opens Resource Availability Schedule Configuration
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-870
+      trigger: Opens Operational Time & Resource Blocking
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-877
+      trigger: Opens Qualification & Assignment Rule Engine
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-911
+      trigger: Opens Inspection, Condition & Compliance Management
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-919
+      trigger: Opens AI Event Resource Forecasting
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-927
+      trigger: Opens AI Staffing Requirement Forecast
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
   notes: Section landing. **6 screens reach the entry point through here** — before 20 August they reached
     it through nothing. **Given its section's own operations on 4 September.** It sat on `getVenueSettings`
     alone, which made it identical to every other section landing page — a hub that shows nothing of its
@@ -29758,6 +30314,27 @@ screens:
     - name: contentBody
       slot: fields
       components:
+      - kind: cardList
+        label: Show the substitution rules before they are replaced
+        operation: listSubstitutionRules
+        bindsTo: SubstitutionRule
+        columns:
+        - SubstitutionRule.ratio
+        - SubstitutionRule.requiresApproval
+        - SubstitutionRule.isActive
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
+      - kind: cardList
+        label: Show the recipe's approved substitutions
+        operation: listIngredientSubstitutes
+        bindsTo: FnbIngredientSubstitute
+        columns:
+        - FnbIngredientSubstitute.substitutionRatio
+        - FnbIngredientSubstitute.conditionsJson
+        - FnbIngredientSubstitute.allergensAddedJson
+        - FnbIngredientSubstitute.allergensRemovedJson
+        - FnbIngredientSubstitute.requiresApproval
+        - FnbIngredientSubstitute.isActive
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: searchField
         label: Search ingredient substitution, allergen
         provenance: carried from the previous definition
@@ -29875,6 +30452,16 @@ screens:
     purpose: List recipes
     trigger: onLoad
     provenance: merged from BO-110, 2 October 2026
+  - operationId: listIngredientSubstitutes
+    contract: fnb
+    purpose: Show the recipe's approved substitutions
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
+  - operationId: listSubstitutionRules
+    contract: fnb
+    purpose: Show the substitution rules before they are replaced
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: venueId
@@ -30890,6 +31477,20 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: detailPanel
+        label: Show the import's progress and its findings
+        operation: getCatalogueImportJob
+        bindsTo: CatalogueImportJob
+        columns:
+        - CatalogueImportJob.status
+        - CatalogueImportJob.outcome
+        - CatalogueImportJob.parsedCount
+        - CatalogueImportJob.createCount
+        - CatalogueImportJob.updateCount
+        - CatalogueImportJob.jobKind
+        - CatalogueImportJob.warningCount
+        - CatalogueImportJob.errorCount
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: searchField
         label: Search product import, governance
         provenance: carried from the previous definition
@@ -30914,9 +31515,11 @@ screens:
       distinct from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on venueId, kind and the product import governance are
       still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_CONFIGURE`, which `importProductCatalogue` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `getCatalogueImportJob` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `generateConfiguration`;
+      `PRODUCT_CONFIGURE` for `importProductCatalogue`, `commitCatalogueImport`.'
   apis:
   - operationId: importProductCatalogue
     contract: catalogue
@@ -30931,6 +31534,11 @@ screens:
     purpose: Apply a parsed catalogue import
     trigger: onAction
     provenance: decided 29 September, VM close-out (venue management and configuration)
+  - operationId: getCatalogueImportJob
+    contract: catalogue
+    purpose: Show the import's progress and its findings
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: venueId
@@ -33065,6 +33673,18 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: cardList
+        label: Load the offline policy saved at this scope
+        operation: getOfflinePolicy
+        bindsTo: OfflinePolicy
+        columns:
+        - OfflinePolicy.maxOfflineHours
+        - OfflinePolicy.allowedOffline
+        - OfflinePolicy.offlineValueCeiling
+        - OfflinePolicy.offlineTransactionCeiling
+        - OfflinePolicy.onCeilingBreach
+        - OfflinePolicy.requiresManagerToExtend
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: textField
         label: Workstation id
         operation: listSyncRejections
@@ -33151,6 +33771,11 @@ screens:
     purpose: Record what was done about each refused entry
     trigger: onAction
     provenance: wiring fix, 2 October 2026 (CHG-WIR-025)
+  - operationId: getOfflinePolicy
+    contract: tenancy
+    purpose: Load the offline policy saved at this scope
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: venueId
@@ -34165,6 +34790,16 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: cardList
+        label: Load the outlet's course rules as saved
+        operation: getCourseRules
+        bindsTo: CourseRules
+        columns:
+        - CourseRules.defaultCoursing
+        - CourseRules.courseNames
+        - CourseRules.autoFireMinutes
+        - CourseRules.serviceModeOverrides
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: searchField
         label: Search f
         provenance: carried from the previous definition
@@ -34215,6 +34850,11 @@ screens:
     purpose: How each outlet courses by default
     trigger: onAction
     provenance: wiring fix, 2 October 2026 (CHG-WIR-008)
+  - operationId: getCourseRules
+    contract: fnb
+    purpose: Load the outlet's course rules as saved
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: venueId
@@ -36269,6 +36909,7 @@ screens:
   navigation:
     entryFrom:
     - BO-144
+    - BO-103
     exitTo:
     - BO-144
     inferred: false
@@ -36906,6 +37547,7 @@ screens:
   navigation:
     entryFrom:
     - BO-154
+    - BO-103
     exitTo:
     - BO-154
     inferred: false
@@ -37621,6 +38263,7 @@ screens:
   navigation:
     entryFrom:
     - BO-154
+    - BO-103
     exitTo:
     - BO-154
     inferred: false
@@ -38293,6 +38936,7 @@ screens:
   navigation:
     entryFrom:
     - BO-164
+    - BO-103
     exitTo:
     - BO-164
     inferred: false
@@ -38416,6 +39060,7 @@ screens:
   navigation:
     entryFrom:
     - BO-164
+    - BO-103
     exitTo:
     - BO-164
     inferred: false
@@ -38589,6 +39234,7 @@ screens:
   navigation:
     entryFrom:
     - BO-164
+    - BO-103
     exitTo:
     - BO-164
     inferred: false
@@ -38614,6 +39260,20 @@ screens:
     - name: contentBody
       slot: fields
       components:
+      - kind: detailPanel
+        label: Load the configuration as saved
+        operation: getBleBeaconGeofence
+        bindsTo: BleBeaconGeofenceConfigurationView
+        columns:
+        - BleBeaconGeofenceConfigurationView.beaconName
+        - BleBeaconGeofenceConfigurationView.venue
+        - BleBeaconGeofenceConfigurationView.zone
+        - BleBeaconGeofenceConfigurationView.gate
+        - BleBeaconGeofenceConfigurationView.proximityThreshold
+        - BleBeaconGeofenceConfigurationView.activeInactive
+        - BleBeaconGeofenceConfigurationView.health
+        - BleBeaconGeofenceConfigurationView.lastDetected
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: textField
         label: Beacon name
         provenance: pack Access Control Module_Reference.pdf, page 34 §Configure
@@ -38680,6 +39340,11 @@ screens:
     contract: access
     purpose: BLE Beacon & Geofence Configuration
     trigger: onAction
+  - operationId: getBleBeaconGeofence
+    contract: access
+    purpose: Load the configuration as saved
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   wireframe:
     status: notStarted
     provenance: generated
@@ -40541,6 +41206,7 @@ screens:
   navigation:
     entryFrom:
     - BO-184
+    - BO-103
     exitTo:
     - BO-184
     inferred: false
@@ -40566,6 +41232,16 @@ screens:
     - name: contentBody
       slot: fields
       components:
+      - kind: detailPanel
+        label: Load the profile as saved
+        operation: getBiometricVerificationProfile
+        bindsTo: BiometricVerificationProfileBuilderView
+        columns:
+        - BiometricVerificationProfileBuilderView.faceRequirement
+        - BiometricVerificationProfileBuilderView.biometricType
+        - BiometricVerificationProfileBuilderView.selectType
+        - BiometricVerificationProfileBuilderView.name
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: selectField
         label: Ticket Product
         provenance: pack Access Control Module_Reference.pdf, page 58 §Select
@@ -40608,6 +41284,11 @@ screens:
     contract: access
     purpose: Biometric Verification Profile Builder
     trigger: onAction
+  - operationId: getBiometricVerificationProfile
+    contract: access
+    purpose: Load the profile as saved
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   wireframe:
     status: notStarted
     provenance: generated
@@ -40640,6 +41321,7 @@ screens:
   navigation:
     entryFrom:
     - BO-184
+    - BO-103
     exitTo:
     - BO-184
     inferred: false
@@ -40663,6 +41345,20 @@ screens:
     - name: contentBody
       slot: fields
       components:
+      - kind: detailPanel
+        label: Load the configuration as saved
+        operation: getFacePassEnrollmentConfiguration
+        bindsTo: FacePassEnrollmentConfigurationView
+        columns:
+        - FacePassEnrollmentConfigurationView.enrollmentChannels
+        - FacePassEnrollmentConfigurationView.accountLoginRequired
+        - FacePassEnrollmentConfigurationView.validTicketPassRequired
+        - FacePassEnrollmentConfigurationView.identityCheckRequired
+        - FacePassEnrollmentConfigurationView.numberOfCaptureAttempts
+        - FacePassEnrollmentConfigurationView.minimumImageQuality
+        - FacePassEnrollmentConfigurationView.operatorVerification
+        - FacePassEnrollmentConfigurationView.enrollmentExpiry
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: multiSelect
         label: Enrolment channels
         provenance: pack Access Control Module_Reference.pdf, page 59 §Capture Required Consent
@@ -40725,6 +41421,11 @@ screens:
     contract: access
     purpose: Face Pass Enrollment Configuration
     trigger: onAction
+  - operationId: getFacePassEnrollmentConfiguration
+    contract: access
+    purpose: Load the configuration as saved
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   wireframe:
     status: notStarted
     provenance: generated
@@ -40905,6 +41606,7 @@ screens:
   navigation:
     entryFrom:
     - BO-184
+    - BO-103
     exitTo:
     - BO-184
     inferred: false
@@ -41033,6 +41735,7 @@ screens:
   navigation:
     entryFrom:
     - BO-184
+    - BO-103
     exitTo:
     - BO-184
     inferred: false
@@ -42715,6 +43418,7 @@ screens:
   navigation:
     entryFrom:
     - BO-194
+    - BO-103
     exitTo:
     - BO-194
     inferred: false
@@ -46266,6 +46970,7 @@ screens:
   navigation:
     entryFrom:
     - BO-224
+    - BO-103
     exitTo:
     - BO-224
     inferred: false
@@ -60341,6 +61046,7 @@ screens:
   navigation:
     entryFrom:
     - BO-334
+    - BO-103
     exitTo:
     - BO-334
     inferred: false
@@ -60365,6 +61071,20 @@ screens:
     - name: contentBody
       slot: fields
       components:
+      - kind: detailPanel
+        label: Load the configuration as saved
+        operation: getVirtualTicketIdentity
+        bindsTo: VirtualTicketIdentityMasterRecordConfigurationView
+        columns:
+        - VirtualTicketIdentityMasterRecordConfigurationView.idGenerationPattern
+        - VirtualTicketIdentityMasterRecordConfigurationView.ticketClassification
+        - VirtualTicketIdentityMasterRecordConfigurationView.ticketOwnershipModel
+        - VirtualTicketIdentityMasterRecordConfigurationView.holderAssignmentRequirements
+        - VirtualTicketIdentityMasterRecordConfigurationView.transferabilityReference
+        - VirtualTicketIdentityMasterRecordConfigurationView.validityModel
+        - VirtualTicketIdentityMasterRecordConfigurationView.consumptionModel
+        - VirtualTicketIdentityMasterRecordConfigurationView.entitlementModel
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: selectField
         label: ID generation pattern
         provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 6 §Configure
@@ -60410,6 +61130,11 @@ screens:
     contract: access
     purpose: Virtual Ticket Identity & Master Record Configuration
     trigger: onAction
+  - operationId: getVirtualTicketIdentity
+    contract: access
+    purpose: Load the configuration as saved
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   wireframe:
     status: notStarted
     provenance: generated
@@ -61787,6 +62512,7 @@ screens:
   navigation:
     entryFrom:
     - BO-344
+    - BO-103
     exitTo:
     - BO-344
     inferred: false
@@ -61812,6 +62538,20 @@ screens:
     - name: contentBody
       slot: fields
       components:
+      - kind: detailPanel
+        label: Load the design as saved
+        operation: getPdfPrintablePos
+        bindsTo: PdfPrintablePosTicketDesignerView
+        columns:
+        - PdfPrintablePosTicketDesignerView.outputFormat
+        - PdfPrintablePosTicketDesignerView.pageSize
+        - PdfPrintablePosTicketDesignerView.orientation
+        - PdfPrintablePosTicketDesignerView.margins
+        - PdfPrintablePosTicketDesignerView.header
+        - PdfPrintablePosTicketDesignerView.footer
+        - PdfPrintablePosTicketDesignerView.qrBarcode
+        - PdfPrintablePosTicketDesignerView.paperStockType
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: selectField
         label: Orientation
         provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure
@@ -61913,6 +62653,11 @@ screens:
     contract: access
     purpose: PDF, Printable & POS Ticket Designer
     trigger: onAction
+  - operationId: getPdfPrintablePos
+    contract: access
+    purpose: Load the design as saved
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   wireframe:
     status: notStarted
     provenance: generated
@@ -67709,6 +68454,7 @@ screens:
   navigation:
     entryFrom:
     - BO-394
+    - BO-108
     exitTo:
     - BO-394
     transitions:
@@ -71405,7 +72151,7 @@ screens:
       a game entitlement.'
     source: contracts/satellite/games.yaml#createGameEntitlement
   notes: '**An all-games pass covers games added after sale unless the venue says not; type-based passes
-    cover new games by default (decided 2 October 2026 by Chinmay, DEC-397; CHG-CSA-028, `coversGamesAddedLater`).**'
+    cover new games by default (decided 2 October 2026 by Chinmay, DEC-397; CHG-CSA-028, `includesGamesAddedLater`).**'
 - id: BO-428
   name: Specific Game/Ride Unlimited Entitlement
   module: Games & Rides
@@ -91473,6 +92219,7 @@ screens:
   navigation:
     entryFrom:
     - BO-615
+    - BO-103
     exitTo:
     - BO-615
     transitions:
@@ -91497,6 +92244,18 @@ screens:
     - name: contentBody
       slot: fields
       components:
+      - kind: cardList
+        label: Show the programmes, the one being changed among them
+        operation: listAccreditationProgrammes
+        bindsTo: AccreditationProgramme
+        columns:
+        - AccreditationProgramme.code
+        - AccreditationProgramme.name
+        - AccreditationProgramme.applicationsOpenAt
+        - AccreditationProgramme.applicationsCloseAt
+        - AccreditationProgramme.isTemplate
+        - AccreditationProgramme.status
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: selectField
         label: Field requirement
         provenance: pack ACCREDITATION.pdf, page 5 §Fields may be configured as
@@ -91541,6 +92300,11 @@ screens:
     purpose: Open one form at a version
     trigger: onAction
     provenance: wiring fix, 2 October 2026 (CHG-WIR-005)
+  - operationId: listAccreditationProgrammes
+    contract: accreditation
+    purpose: Show the programmes, the one being changed among them
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-618
@@ -99256,6 +100020,7 @@ screens:
   navigation:
     entryFrom:
     - BO-694
+    - BO-102
     exitTo:
     - BO-694
     transitions:
@@ -105794,6 +106559,7 @@ screens:
   navigation:
     entryFrom:
     - BO-754
+    - BO-107
     exitTo:
     - BO-754
     transitions:
@@ -107001,6 +107767,7 @@ screens:
   navigation:
     entryFrom:
     - BO-764
+    - BO-107
     exitTo:
     - BO-764
     transitions:
@@ -107656,6 +108423,7 @@ screens:
   navigation:
     entryFrom:
     - BO-764
+    - BO-107
     exitTo:
     - BO-764
     transitions:
@@ -109002,6 +109770,7 @@ screens:
   navigation:
     entryFrom:
     - BO-784
+    - BO-107
     exitTo:
     - BO-784
     transitions:
@@ -110284,6 +111053,7 @@ screens:
   navigation:
     entryFrom:
     - BO-794
+    - BO-107
     exitTo:
     - BO-794
     transitions:
@@ -110319,6 +111089,15 @@ screens:
     regions:
     - name: contentBody
       components:
+      - kind: cardList
+        label: Load the copilot configuration as saved
+        operation: getCustomerServiceCopilot
+        bindsTo: AiCustomerServiceCopilotKnowledgeWorkspaceView
+        columns:
+        - AiCustomerServiceCopilotKnowledgeWorkspaceView.configuration
+        - AiCustomerServiceCopilotKnowledgeWorkspaceView.effective
+        - AiCustomerServiceCopilotKnowledgeWorkspaceView.knowledgeCollections
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: primaryButton
         derived: true
         impliedBy: setCustomerServiceCopilot
@@ -110371,6 +111150,11 @@ screens:
     purpose: Add a document to a collection
     trigger: onAction
     provenance: wiring fix, 2 October 2026 (CHG-WIR-005)
+  - operationId: getCustomerServiceCopilot
+    contract: marketing-crm
+    purpose: Load the copilot configuration as saved
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-798
@@ -110402,7 +111186,7 @@ screens:
   name: Agent Workspace
   module: Engagement & Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '7'
@@ -110416,6 +111200,7 @@ screens:
   navigation:
     entryFrom:
     - BO-794
+    - BO-107
     exitTo:
     - BO-794
     transitions:
@@ -113121,6 +113906,7 @@ screens:
   navigation:
     entryFrom:
     - BO-824
+    - BO-107
     exitTo:
     - BO-824
     transitions:
@@ -113289,6 +114075,7 @@ screens:
   navigation:
     entryFrom:
     - BO-824
+    - BO-107
     exitTo:
     - BO-824
     transitions:
@@ -113405,6 +114192,7 @@ screens:
   navigation:
     entryFrom:
     - BO-824
+    - BO-107
     exitTo:
     - BO-824
     transitions:
@@ -113447,6 +114235,18 @@ screens:
     regions:
     - name: contentBody
       components:
+      - kind: cardList
+        label: Show the loyalty campaigns
+        operation: listLoyaltyCampaigns
+        bindsTo: MarketingLoyaltyCampaign
+        columns:
+        - MarketingLoyaltyCampaign.code
+        - MarketingLoyaltyCampaign.name
+        - MarketingLoyaltyCampaign.startAt
+        - MarketingLoyaltyCampaign.endAt
+        - MarketingLoyaltyCampaign.isActive
+        - MarketingLoyaltyCampaign.createdAt
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: detailPanel
         label: Rules in force
         bindsTo: LoyaltyRuleSet
@@ -113488,6 +114288,11 @@ screens:
     purpose: Every rule the programme runs on
     trigger: onLoad
     provenance: wiring fix, 2 October 2026 (CHG-WIR-005)
+  - operationId: listLoyaltyCampaigns
+    contract: marketing-crm
+    purpose: Show the loyalty campaigns
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-827
@@ -113518,6 +114323,7 @@ screens:
   navigation:
     entryFrom:
     - BO-824
+    - BO-107
     exitTo:
     - BO-824
     transitions:
@@ -113552,7 +114358,29 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: cardList
+        label: Show the rewards a milestone can give
+        operation: listRewards
+        bindsTo: MarketingReward
+        columns:
+        - MarketingReward.code
+        - MarketingReward.name
+        - MarketingReward.type
+        - MarketingReward.pointsCost
+        - MarketingReward.discountValue
+        - MarketingReward.validityDays
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
+      - kind: dataTable
+        label: Show the programmes and their milestones
+        operation: listLoyaltyProgrammes
+        bindsTo: LoyaltyProgramme
+        columns:
+        - LoyaltyProgramme.code
+        - LoyaltyProgramme.name
+        - LoyaltyProgramme.pointsExpireAfterMonths
+        - LoyaltyProgramme.isActive
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
     - name: actionBar
       slot: rowActions
       components:
@@ -113586,6 +114414,16 @@ screens:
     purpose: Define a reward and its points cost
     trigger: onAction
     provenance: decided 29 September, VM close-out (venue management and configuration)
+  - operationId: listLoyaltyProgrammes
+    contract: marketing-crm
+    purpose: Show the programmes and their milestones
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
+  - operationId: listRewards
+    contract: marketing-crm
+    purpose: Show the rewards a milestone can give
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-828
@@ -116683,6 +117521,7 @@ screens:
   navigation:
     entryFrom:
     - BO-854
+    - BO-108
     exitTo:
     - BO-854
     transitions:
@@ -117195,6 +118034,7 @@ screens:
   navigation:
     entryFrom:
     - BO-854
+    - BO-108
     exitTo:
     - BO-854
     transitions:
@@ -117941,6 +118781,7 @@ screens:
   navigation:
     entryFrom:
     - BO-864
+    - BO-108
     exitTo:
     - BO-864
     transitions:
@@ -118524,6 +119365,7 @@ screens:
   navigation:
     entryFrom:
     - BO-864
+    - BO-108
     exitTo:
     - BO-864
     transitions:
@@ -119378,6 +120220,7 @@ screens:
   navigation:
     entryFrom:
     - BO-873
+    - BO-108
     exitTo:
     - BO-873
     transitions:
@@ -119422,6 +120265,28 @@ screens:
         provenance: contract resources.yaml PUT /experiences/{experienceId}/resource-requirements
     - name: contentBody
       components:
+      - kind: cardList
+        label: List the resources the assignment rules choose from
+        operation: listResources
+        bindsTo: Resource
+        columns:
+        - Resource.code
+        - Resource.name
+        - Resource.setupMinutes
+        - Resource.teardownMinutes
+        - Resource.depositAmount
+        - Resource.status
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
+      - kind: cardList
+        label: Load the experience's resource requirements
+        operation: getExperienceResourceRequirements
+        bindsTo: ResourceRequirement
+        columns:
+        - ResourceRequirement.quantity
+        - ResourceRequirement.mandatory
+        - ResourceRequirement.requiredQualifications
+        - ResourceRequirement.requiredAttributes
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: dataTable
         label: Requirement rules
         operation: setExperienceResourceRequirements
@@ -119456,6 +120321,16 @@ screens:
       action(s) Minimum requirement, Preferred requirement, Mandatory requirement'
     invalidates:
     - suggestResources
+  - operationId: getExperienceResourceRequirements
+    contract: resources
+    purpose: Load the experience's resource requirements
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
+  - operationId: listResources
+    contract: resources
+    purpose: List the resources the assignment rules choose from
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-877
@@ -123806,6 +124681,7 @@ screens:
   navigation:
     entryFrom:
     - BO-903
+    - BO-108
     exitTo:
     - BO-903
     transitions:
@@ -124967,6 +125843,7 @@ screens:
   navigation:
     entryFrom:
     - BO-913
+    - BO-108
     exitTo:
     - BO-913
     transitions:
@@ -125914,6 +126791,7 @@ screens:
   navigation:
     entryFrom:
     - BO-923
+    - BO-108
     exitTo:
     - BO-923
     transitions:
@@ -139217,7 +140095,7 @@ screens:
   name: Price Bands & Categories
   module: Access & Venue
   requiresModule: seating
-  wave: 3
+  wave: 1
   source:
     pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf
     board: '10'
@@ -139231,6 +140109,7 @@ screens:
   navigation:
     entryFrom:
     - BO-1043
+    - BO-103
     exitTo:
     - BO-1043
     transitions:
@@ -141029,7 +141908,7 @@ screens:
   name: Tenant & Brand Context
   module: Access & Venue
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf
     board: '12'
@@ -141043,6 +141922,7 @@ screens:
   navigation:
     entryFrom:
     - BO-1061
+    - BO-103
     exitTo:
     - BO-1061
     transitions:
@@ -141402,7 +142282,7 @@ screens:
   name: Currency, Timezone & Channels
   module: Setup
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf
     board: '12'
@@ -141416,6 +142296,7 @@ screens:
   navigation:
     entryFrom:
     - BO-1061
+    - BO-100
     exitTo:
     - BO-1061
     transitions:
@@ -141428,8 +142309,9 @@ screens:
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
-  purpose: Set the region's currency, rounding, date and number formats, time zone and fiscal year, and
-    the notes and coins every till counts.
+  purpose: Set the region's currency, rounding, date and number formats, time zone and fiscal year, the
+    notes and coins every till counts, and the AI residency class the AI engine routes this tenant's calls
+    by (the residency section, drawn and built in Block A; Chinmay, 3 October 2026, r1 additions).
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -141463,6 +142345,42 @@ screens:
         label: Notes and coins
         operation: listDenominations
         provenance: contract shift.yaml GET /denominations
+      - kind: detailPanel
+        label: AI residency
+        bindsTo: RegionSettings
+        operation: getRegionSettings
+        columns:
+        - RegionSettings.aiResidencyClass
+        - RegionSettings.allowedAiResidencies
+        - RegionSettings.aiResidencyOptIn
+        notes: '**The residency section, real since 3 October 2026** (Chinmay, r1 additions: "The residency section
+          on BO-1065 is drawn and built in Block A"; CHG-RONEC-004). Where the AI engine may send this tenant''s
+          calls (ADR-0009 as amended 2 October; DEC-539): UAE only (the default, and mandatory for government,
+          bank and health tenants), global allowed (a private venue''s PDPL Article 23 opt-in) or on-premises.
+          Every call is scrubbed of personal data in-cell first, whatever the class (DEC-542); the panel says so.'
+        provenance: contract tenancy.yaml GET /regions/{regionId}/settings; decided 3 October 2026 (CHG-RONEC-004)
+      - kind: selectField
+        label: AI residency class
+        bindsTo: RegionSettings.aiResidencyClass
+        operation: updateRegionSettings
+        notes: 'UAE only, Global allowed, On-premises. Moving from UAE only to Global allowed without the opt-in
+          evidence below is refused (`422 residency-opt-in-required`) and the form says which reference is missing.'
+        provenance: contract tenancy.yaml PUT /regions/{regionId}/settings (aiResidencyClass)
+      - kind: multiSelect
+        label: Allowed AI residencies
+        bindsTo: RegionSettings.allowedAiResidencies
+        operation: updateRegionSettings
+        notes: Narrows the class further where the region needs it; never widens it. Empty means the class alone
+          decides. `ai.setAiProvider` refuses a provider outside it (`409 residency-refused`).
+        provenance: contract tenancy.yaml PUT /regions/{regionId}/settings (allowedAiResidencies)
+      - kind: textField
+        label: Opt-in evidence (PDPL Article 23)
+        bindsTo: RegionSettings.aiResidencyOptIn
+        operation: updateRegionSettings
+        notes: 'Shown only for Global allowed: the vendor contract, DPIA and guest notice references
+          (`vendorContractReference`, `dpiaReference`, `guestNoticeReference`, up to 200 characters each). Who
+          confirmed it and when are the server''s and shown read-only.'
+        provenance: contract tenancy.yaml PUT /regions/{regionId}/settings (aiResidencyOptIn)
     - name: actionBar
       slot: rowActions
       components:
@@ -141474,6 +142392,13 @@ screens:
         label: Save notes and coins
         operation: setDenominations
         provenance: contract shift.yaml PUT /denominations
+      - kind: secondaryButton
+        label: Save AI residency
+        operation: updateRegionSettings
+        notes: 'Saves the residency section with `updateRegionSettings`. PUT semantics (audit R103): the request
+          carries the region''s settings in force from `getRegionSettings` with only the residency fields changed,
+          so saving the residency never resets the currency or the time zone.'
+        provenance: contract tenancy.yaml PUT /regions/{regionId}/settings; decided 3 October 2026 (CHG-RONEC-004)
   states:
     loading: The currency timezone channels list.
     error: Could not load. Names which read failed and leaves the currency timezone channels untouched.
@@ -141495,9 +142420,12 @@ screens:
     - listDenominations
   - operationId: updateRegionSettings
     contract: tenancy
-    purpose: Currency, timezone and channels
+    purpose: Currency, timezone and channels, and the AI residency section (class, allowed residencies, opt-in
+      evidence; Block A, decided 3 October 2026, CHG-RONEC-004)
     trigger: onAction
-    provenance: board reading, 19 September 2026
+    provenance: board reading, 19 September 2026; residency section 3 October 2026 (CHG-RONEC-004)
+    invalidates:
+    - getRegionSettings
   - operationId: getRegionSettings
     contract: tenancy
     purpose: The region's settings in force
@@ -141546,6 +142474,24 @@ screens:
       - minorAgeThreshold
       - placement
     provenance: contract tenancy.yaml PUT /regions/{regionId}/settings
+  - id: formUpdateAiResidency
+    component: modal
+    trigger: Save AI residency
+    body: '**Collects the residency section before `updateRegionSettings` is called** (3 October 2026, CHG-RONEC-004).
+      Asks for `aiResidencyClass`, `allowedAiResidencies` and, for `globalAllowed`, the three `aiResidencyOptIn`
+      references; every other field is sent as `getRegionSettings` returned it. A move to a wider class says
+      what changes for guests (calls may leave the UAE) and asks the operator to confirm. Dismissing sends
+      nothing; the screen behind is unchanged.'
+    confirm:
+      label: Save AI residency
+      operation: updateRegionSettings
+    dismiss:
+      label: Cancel
+      discards:
+      - aiResidencyClass
+      - allowedAiResidencies
+      - aiResidencyOptIn
+    provenance: contract tenancy.yaml PUT /regions/{regionId}/settings; decided 3 October 2026 (CHG-RONEC-004)
   - id: formSetDenominations
     component: modal
     trigger: Save notes and coins
@@ -145052,7 +145998,7 @@ screens:
   name: Funding Method Configuration
   module: Orders & Money
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Wallet_Configuration_Backend_Structure_v1.0.pdf
     board: '2'
@@ -145066,6 +146012,7 @@ screens:
   navigation:
     entryFrom:
     - BO-1093
+    - BO-101
     exitTo:
     - BO-1093
     transitions:
@@ -145162,7 +146109,7 @@ screens:
     purpose: Which methods may fund a wallet
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id029
+    invalidates:
     - getWalletFundingRules
   - operationId: getWalletFundingRules
     contract: wallet
@@ -145304,7 +146251,8 @@ screens:
     purpose: Amounts, presets and bonus rules
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id029
+    invalidates:
+    - getWalletFundingRules
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -145447,7 +146395,8 @@ screens:
     purpose: Channel and funding-source mapping
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id029
+    invalidates:
+    - getWalletFundingRules
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -145576,7 +146525,8 @@ screens:
     purpose: Auto-reload on a threshold
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id029
+    invalidates:
+    - getWalletFundingRules
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -145708,7 +146658,8 @@ screens:
     purpose: Recurring funding on a date
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id029
+    invalidates:
+    - getWalletFundingRules
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -145855,7 +146806,8 @@ screens:
     purpose: Approval above a threshold
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id029
+    invalidates:
+    - getWalletFundingRules
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -146165,7 +147117,8 @@ screens:
     purpose: Limits and velocity controls
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id029
+    invalidates:
+    - getWalletFundingRules
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -147329,7 +148282,7 @@ screens:
   name: Credit Expiry, Extension & Forfeiture Operations
   module: Orders & Money
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Wallet_Configuration_Backend_Structure_v1.0.pdf
     board: '3'
@@ -147343,6 +148296,7 @@ screens:
   navigation:
     entryFrom:
     - BO-1103
+    - BO-101
     exitTo:
     - BO-1103
     transitions:
@@ -147418,7 +148372,7 @@ screens:
     purpose: Expire, extend or forfeit
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id033
+    invalidates:
     - listCreditLots
     - getWalletLiability
   - operationId: listCreditLots
@@ -150130,7 +151084,9 @@ screens:
     purpose: Gift card and voucher expiry
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id033
+    invalidates:
+    - listCreditLots
+    - getWalletLiability
   - operationId: listCreditLots
     contract: wallet
     purpose: The tranches behind a balance, with their expiry
@@ -152186,7 +153142,7 @@ screens:
   name: Refund-to-Wallet Policy Configuration
   module: Orders & Money
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Wallet_Configuration_Backend_Structure_v1.0.pdf
     board: '7'
@@ -152200,6 +153156,7 @@ screens:
   navigation:
     entryFrom:
     - BO-1143
+    - BO-101
     exitTo:
     - BO-1143
     transitions:
@@ -154379,7 +155336,7 @@ screens:
   name: Security Governance, Audit & Rule Publication
   module: Orders & Money
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Wallet_Configuration_Backend_Structure_v1.0.pdf
     board: '8'
@@ -154393,6 +155350,7 @@ screens:
   navigation:
     entryFrom:
     - BO-1153
+    - BO-101
     exitTo:
     - BO-1153
     transitions:
@@ -157015,6 +157973,7 @@ screens:
   navigation:
     entryFrom:
     - BO-1173
+    - BO-101
     exitTo:
     - BO-1173
     transitions:
@@ -157551,7 +158510,7 @@ screens:
   name: Transport Stations
   module: Transport
   requiresModule: transport
-  wave: 2
+  wave: 1
   implementation:
     app: venue-management-web
     route: /transport/stations
@@ -157727,7 +158686,7 @@ screens:
   name: Transport Routes & Stops
   module: Transport
   requiresModule: transport
-  wave: 2
+  wave: 1
   implementation:
     app: venue-management-web
     route: /transport/routes
@@ -157983,7 +158942,7 @@ screens:
   name: Transport Fares & Passenger Types
   module: Transport
   requiresModule: transport
-  wave: 2
+  wave: 1
   implementation:
     app: venue-management-web
     route: /transport/fares
@@ -158146,7 +159105,7 @@ screens:
   name: Transport Timetables
   module: Transport
   requiresModule: transport
-  wave: 2
+  wave: 1
   implementation:
     app: venue-management-web
     route: /transport/timetables
@@ -158567,7 +159526,7 @@ screens:
   name: Transport Pass Types
   module: Transport
   requiresModule: transport
-  wave: 2
+  wave: 1
   implementation:
     app: venue-management-web
     route: /transport/pass-types
@@ -158736,7 +159695,7 @@ screens:
   name: Transport Network Import
   module: Transport
   requiresModule: transport
-  wave: 2
+  wave: 1
   implementation:
     app: venue-management-web
     route: /transport/import
@@ -161833,6 +162792,20 @@ screens:
     - name: contentBody
       slot: fields
       components:
+      - kind: detailPanel
+        label: Load the tax profile and jurisdiction as saved
+        operation: getTaxProfileJurisdiction
+        bindsTo: TaxProfileJurisdictionConfigurationView
+        columns:
+        - TaxProfileJurisdictionConfigurationView.taxProfileName
+        - TaxProfileJurisdictionConfigurationView.taxProfileCode
+        - TaxProfileJurisdictionConfigurationView.country
+        - TaxProfileJurisdictionConfigurationView.taxRegistrationNumber
+        - TaxProfileJurisdictionConfigurationView.status
+        - TaxProfileJurisdictionConfigurationView.ratePercent
+        - TaxProfileJurisdictionConfigurationView.consumingProductCount
+        - TaxProfileJurisdictionConfigurationView.consumingVenueCount
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: selectField
         label: Tax Profile Name
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 40 §Configure
@@ -161942,6 +162915,11 @@ screens:
     purpose: Configure the e-invoicing provider
     trigger: onAction
     provenance: build, 29 September 2026
+  - operationId: getTaxProfileJurisdiction
+    contract: catalogue
+    purpose: Load the tax profile and jurisdiction as saved
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   wireframe:
     status: notStarted
     provenance: generated
@@ -175248,6 +176226,7 @@ screens:
   navigation:
     entryFrom:
     - ADM-158
+    - BO-102
     exitTo:
     - ADM-158
     inferred: false
@@ -184663,6 +185642,7 @@ screens:
   navigation:
     entryFrom:
     - ADM-238
+    - BO-100
     exitTo:
     - ADM-238
     - BO-087
@@ -184710,6 +185690,15 @@ screens:
     - name: contentBody
       slot: fields
       components:
+      - kind: dataTable
+        label: Show the approval matrices, the one being changed among them
+        operation: listApprovalMatrices
+        bindsTo: ApprovalMatrix
+        columns:
+        - ApprovalMatrix.kind
+        - ApprovalMatrix.scopeLevel
+        - ApprovalMatrix.isActive
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: selectField
         label: User
         provenance: pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 13 §Define
@@ -184792,6 +185781,11 @@ screens:
     purpose: Set role authority and approval limits
     trigger: onAction
     provenance: decided 29 September, readiness close-out (QA wiring note)
+  - operationId: listApprovalMatrices
+    contract: approvals
+    purpose: Show the approval matrices, the one being changed among them
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   wireframe:
     status: notStarted
     provenance: generated
@@ -196451,6 +197445,7 @@ screens:
   navigation:
     entryFrom:
     - ADM-569
+    - BO-102
     exitTo:
     - ADM-569
     transitions:
@@ -199225,10 +200220,20 @@ screens:
       components:
       - kind: banner
         label: Permissions this screen separates
-        notes: '**The pack separates these permissions and no action on the screen claims them yet:**
-          Resend, Change approved delivery channel, Extend expiry, Cancel. Each needs attaching to the
-          control it gates, or the screen needs the control.'
+        notes: '**The pack separates these permissions:** Resend, Change approved delivery channel, Extend
+          expiry, Cancel. Resend is `resendPaymentLink` (ORDER_MODIFY) and Cancel is `cancelPaymentLink`
+          (ORDER_CREATE, 3 October 2026); changing the channel and extending expiry still have no control.'
         provenance: pack Payment_Payment_Orchestration.pdf, page 73 §Authorized users can
+      - kind: destructiveButton
+        label: Cancel link
+        operation: cancelPaymentLink
+        notes: '**Withdraws a live link** (Chinmay, 3 October 2026: cancelPaymentLink bound on the screen that
+          manages payment links; CHG-RUL-021, CHG-RONEC-005). Shown on an `issued` or `viewed` link only; asks for
+          a reason (kept in the audit trail, never shown to the guest). The token stops working at once and a
+          guest holding it is told it was withdrawn; a hold the link kept is released. The order stays: a new
+          link can be created straight after on ADM-592. A link that is no longer live answers `409
+          payment-link-not-live`, and the screen refreshes its state.'
+        provenance: contract orders.yaml POST /payment-links/{linkId}/cancel; decided 3 October 2026 (CHG-RONEC-005)
     - name: contentBody
       components:
       - kind: primaryButton
@@ -199264,6 +200269,13 @@ screens:
     purpose: Its state
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: cancelPaymentLink
+    contract: orders
+    purpose: Cancel a live link with a reason; the order stays and a new link may follow (CHG-RUL-021)
+    trigger: onAction
+    provenance: decided 3 October 2026, r1 additions (CHG-RONEC-005)
+    invalidates:
+    - getPaymentLink
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-593
@@ -199282,6 +200294,21 @@ screens:
         it.'
     - name: token
       from: deepLink
+  overlays:
+  - id: formCancelPaymentLink
+    component: modal
+    trigger: Cancel link
+    body: '**Collects what `cancelPaymentLink` sends before it is called.** Required: `reason` (3 to 500 characters,
+      kept in the audit trail, never shown to the guest). Says that the guest''s link stops working at once and that
+      the order is not cancelled. Dismissing sends nothing; the link stays live.'
+    confirm:
+      label: Cancel link
+      operation: cancelPaymentLink
+    dismiss:
+      label: Keep the link
+      discards:
+      - reason
+    provenance: contract orders.yaml POST /payment-links/{linkId}/cancel; decided 3 October 2026 (CHG-RONEC-005)
 - id: ADM-594
   name: Hosted Checkout, Redirect & Return Flow Configuration
   module: Commercial
@@ -200440,6 +201467,7 @@ screens:
   navigation:
     entryFrom:
     - ADM-599
+    - BO-102
     exitTo:
     - ADM-599
     transitions:
@@ -215116,6 +216144,7 @@ screens:
   navigation:
     entryFrom:
     - ADM-339
+    - BO-100
     exitTo:
     - ADM-339
     transitions:
@@ -216425,6 +217454,7 @@ screens:
   navigation:
     entryFrom:
     - ADM-349
+    - BO-100
     exitTo:
     - ADM-349
     transitions:

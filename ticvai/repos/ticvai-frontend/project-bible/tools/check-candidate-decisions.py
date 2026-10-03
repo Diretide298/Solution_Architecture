@@ -37,7 +37,7 @@ RULES = {
     "CD-UNDECIDED": "a design candidate differs from the spec and carries no decision",
     "CD-UNKNOWN-REF": "a design candidate cites a decision that does not exist",
 }
-REF = re.compile(r"\b(POSV2-\d+|R\d{3}|CHG-[A-Z]{2,6}-\d{3})\b")
+REF = re.compile(r"\b(POSV2-\d+|R\d{3}|CHG-[A-Z][A-Z0-9]{1,5}-\d{3})\b")
 NONE = re.compile(r"^\s*(none|no differences?|identical|matches the spec)\b", re.I)
 
 
@@ -53,7 +53,7 @@ def known_refs() -> set:
     if rc.exists():
         out |= set(re.findall(r"\bR\d{3}\b", rc.read_text(encoding="utf-8", errors="replace")))
     for p in (ROOT / "changes" / "entries").glob("CHG-*.yaml"):
-        m = re.match(r"(CHG-[A-Z]{2,6}-\d{3})-", p.name)
+        m = re.match(r"(CHG-[A-Z][A-Z0-9]{1,5}-\d{3})-", p.name)
         if m:
             out.add(m.group(1))
     return out

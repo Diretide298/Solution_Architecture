@@ -9,18 +9,24 @@ frequency: >
   scan** — and the one where the money is counted.
 criticality: financial
 primaryContract: shift
-contracts: [shift, orders, tenancy, identity, approvals]
+contracts: [shift, orders, tenancy, identity, approvals, catalogue, finance]
 platforms: [P04, P08]
 
 trigger:
   description: >
-    A cashier arrives for a shift and signs into a till. **Nothing on this platform is navigated to
-    — a till is signed into**, which is why every entry state on P04 resolves from the session.
-  operations: [selectRole, openShift]
+    A cashier arrives for a shift and signs into a till **at the door, POS-000**. **Nothing on this
+    platform is navigated to — a till is signed into**, which is why every entry state on P04 resolves
+    from the session. Rewritten 3 October 2026 to the decided shift flow (Chinmay, r1 additions,
+    CHG-RONEC-002): POS-000 sign-in, blind close, "Under review" over the threshold, the next cashier never
+    blocked, a supervisor PIN for accept, reject, close and reopen only, and sessions on POS-000 behind
+    the PIN.
+  entryScreen: POS-000
+  operations: [login, selectRole, openShift]
 
 offlineBehaviour: >
-  **Steps 3 to 6 work offline and the whole platform is built for it** (ADR-0013 local-first).
-  A till that stops selling because the network dropped is a queue at the door.
+  **Selling, drops and no-sales work offline and the whole platform is built for it** (ADR-0013
+  local-first). A till that stops selling because the network dropped is a queue at the door. Sign-in
+  works offline against the cached operator list.
 
   **Opening and settling do not.** An opening float declared offline is a float nobody can
   reconcile against the safe, and **a settlement computed against a stale catalogue is a variance
@@ -28,42 +34,72 @@ offlineBehaviour: >
 
 steps:
   - step: 1
+    screen: POS-000
+    action: >
+      The cashier signs in at the till door: taps their tile among the recent cashiers (or types the
+      cashier ID) and keys the PIN.
+    operations: [login, getCurrentSession]
+    outcome: >
+      **One principal, one session per workstation.** The session is bound to this till; a second
+      factor is asked only where a permission requires it (`createMfaChallenge`, `verifyMfaChallenge`;
+      R135). A till already held by someone else refuses the sign-in (409) and never ends the other
+      session (branch at step 1).
+
+  - step: 2
+    screen: POS-000
+    action: Where the person holds several roles, they pick Cashier for this shift.
+    operations: [selectRole]
+    outcome: >
+      **The role decides the surface**: a cashier lands on POS-001, a kitchen role on its own screen.
+      One role goes straight in.
+
+  - step: 3
     screen: POS-001
-    action: The cashier signs in and picks their role for the shift.
-    operations: [selectRole, getWorkstationHealth]
+    action: The readiness check runs, then the cashier counts the opening float into the drawer.
+    operations: [getWorkstationHealth, listDenominations, getCurrentShift]
     outcome: >
       **The readiness check runs before the float, not after.** A till with a dead printer or a
       stale catalogue is a till that should not open — and finding that out after the cash is
-      counted means counting it twice.
+      counted means counting it twice. **`listDenominations` orders the count for the drawer, not by
+      value**, and the float total is the cashier's own figure.
 
-  - step: 2
+  - step: 4
     screen: POS-001
-    action: They count the opening float into the drawer.
-    operations: [listDenominations, openShift]
+    action: They confirm the float and open the shift.
+    operations: [openShift]
     outcome: >
-      Shift `open`. **`listDenominations` orders the count for the drawer, not by value** — a
-      cashier counts notes highest first and coins as they sit in the tray, and a screen that
-      matches the physical drawer is counted faster and wrong less often.
+      Shift `open` (or `pendingApproval` where the venue requires open approval), with its own
+      deposit box. **A previous shift on this till that is `pendingVariance` or `pendingClosure` does
+      not block it**; only an `open` or `suspended` one does.
 
-  - step: 3
+  - step: 5
+    screen: POS-025
+    action: Till Home shows the open shift and the sale boards; the cashier starts selling.
+    operations: [getWorkstationShift, listSaleBoards]
+    outcome: The shift chip reads "Shift open 08:02"; POS-002 sells from the local bundle (F81).
+
+  - step: 6
     screen: POS-002
-    action: The till pulls its catalogue and starts selling.
+    action: The till pulls its catalogue and sells.
     operations: [getLatestBundle, createOrder, createPayment]
     outcome: >
       **The bundle is the catalogue.** Wired to this screen on 24 August — ADR-0013 makes the POS
       local-first and **no P04 screen polled for one**, so a published menu would have reached no
       till.
 
-  - step: 4
+  - step: 7
     screen: POS-018
-    action: A guest wants cash back and the drawer is heavy. A safe drop is recorded.
+    action: The drawer is over its limit. A safe drop is recorded.
     operations: [createCashMovement, withdrawFromDepositBox]
     outcome: >
-      **The drawer never holds more than the venue's ceiling.** A safe drop mid-shift is a security
-      control, not bookkeeping, and it is recorded as a movement so the settlement adds up.
+      **The drawer limit warns and offers a cash lift; it never blocks a sale** (DEC-179). A safe drop
+      is a security control recorded as a movement, so the count adds up. A withdrawal from the deposit
+      box (`withdrawFromDepositBox`, made by whoever lifts the cash) is countersigned by the cashier the
+      cash came from with their own PIN on the same device (`witnessStepUp`; DEC-178, CHG-RUL-019): a
+      witness, not one of the supervisor's shift acts below, and never part of the cashier's count.
     note: 'Repointed 2 October (CHG-WIR-008): a safe drop is POS-018''s act; POS-013 carried the cash operations by bulk attach.'
 
-  - step: 5
+  - step: 8
     screen: POS-020
     action: A no-sale is recorded — the drawer opened with nothing sold.
     operations: [recordNoSale]
@@ -71,33 +107,87 @@ steps:
       **Every drawer opening is accounted for.** A no-sale with no reason is the single most
       reliable indicator of till theft, and it is recorded rather than prevented.
 
-  - step: 6
+  - step: 9
     screen: POS-007
-    action: End of shift. The cashier counts the drawer.
+    action: End of shift. The cashier counts the drawer, blind.
     operations: [listDenominations, listCashMovements]
     outcome: >
-      Counted against expected. **Expected is float plus takings minus drops** — computed
-      server-side, never typed, because a cashier who can see the expected figure counts to it.
+      **A blind count** (CHG-FIN-003): the denomination counter only. **No expected figure, no running
+      variance, no takings** and nothing from which they could be worked out, because a cashier who can
+      see the expected figure counts to it. A reason and a note are offered, never required. **No PIN**:
+      the cashier's own count never takes the supervisor's.
 
-  - step: 7
+  - step: 10
     screen: POS-007
-    action: There is a variance of 40 dirhams short.
-    operations: [acceptShiftVariance, submitShiftCount]
+    action: The cashier submits the blind count and signs out.
+    operations: [submitShiftCount]
     outcome: >
-      **The variance is accepted with a reason, not corrected.** A till that balances every night
-      is a till nobody is counting, and **a variance silently adjusted away is the shrinkage the
-      count exists to find.**
+      **The server computes expected (float plus cash takings minus drops) and the variance**, and
+      answers the cashier only with what happened: within the venue's `shiftVarianceThreshold` the
+      shift is `closed` ("Shift closed"); beyond it the shift is `pendingVariance` and the cashier sees
+      **"Your count is with your supervisor"** and the chip **"Under review"**, never the amount.
+      Supervisors holding OVERSHORT_ACCEPT are alerted. The cashier signs out either way.
 
-  - step: 8
+  - step: 11
+    screen: POS-000
+    action: The next cashier signs in at the same till.
+    operations: [login, getCurrentSession]
+    outcome: >
+      The till door again, the previous cashier signed out. **A shift under review never blocks the
+      next cashier** (DEC-059, DEC-173; CHG-CSP-012, CHG-CSP-013).
+
+  - step: 12
+    screen: POS-001
+    action: The next cashier counts their own float and opens a new shift.
+    operations: [openShift]
+    outcome: >
+      A new shift with its own drawer and deposit box. **Each shift settles its own drawer**, so one
+      cashier never answers for another's variance.
+
+  - step: 13
+    screen: POS-007
+    action: >
+      A supervisor, at any till of the venue, enters their PIN and resolves the shift under review:
+      accept the variance, ask for a recount, or close the shift for the cashier.
+    operations: [getShiftCountLines, acceptShiftVariance, rejectShiftVariance, closeShift]
+    outcome: >
+      **The supervisor PIN is asked for these acts only** (accept, reject, close; reopen at step 14),
+      and it travels in the body (`supervisorStepUp`; RUL-1, RUL-2, CHG-RUL-019). Only after it does
+      the screen show counted, expected, the variance and the count lines note by note. Accept: the
+      shift is `closed`, its deposit boxes reconciled and the over/short posted. Reject: the cashier is
+      asked to recount, blind again (DEC-175). Close: closed with expected and variance recorded. The
+      same acts are open in the daily cash reconciliation (BO-043; F74).
+
+  - step: 14
+    screen: POS-025
+    action: A shift was closed in error. A supervisor reopens it from Till Home with their PIN and a reason.
+    operations: [reopenShift]
+    outcome: >
+      The shift is reopened and **the first count is kept beside the new one**. A cashier sees the
+      Reopen action locked.
+
+  - step: 15
     screen: BO-024
-    action: The supervisor reviews the shift and the deposit reconciles.
+    action: The deposit boxes of the settled shifts close and the cash reaches the safe.
     operations: [closeDepositBoxes, settleDeposit]
     outcome: >
-      Cash to the safe, shift `closed`, and the ledger posted. **`shift` writes `ledger.posting`
-      here** — a till closing is a ledger act, which is why that cross-contract write is correct.
+      Cash to the safe and the ledger posted. **`shift` writes `ledger.posting` here** — a till
+      closing is a ledger act, which is why that cross-contract write is correct.
 
 branches:
   - at: 1
+    condition: The till is already held by another cashier's session.
+    behaviour: >
+      The sign-in is refused (409, "This till is in use by Sara A.") and **never ends the other session**
+      (R184). **Session management stays on POS-000 behind a supervisor PIN** (CHG-SPF-012, the
+      business rules of 3 October): the supervisor keys their PIN in the session panel (a sessionless
+      step-up, since no one is signed in), sees who holds the till and whether their shift is open, and
+      takes the till over. The other session ends; **their float and shift do not move**. BO-053 keeps the
+      same act for the back office.
+    severity: medium
+    resolvedBy: forceLogout
+
+  - at: 3
     condition: The workstation health check fails — a dead printer, a stale bundle.
     behaviour: >
       **The shift can still open with a manager's approval**, and the reason is recorded. A venue
@@ -106,7 +196,7 @@ branches:
     severity: medium
     resolvedBy: approveShiftOpen
 
-  - at: 3
+  - at: 6
     condition: The network drops mid-service.
     behaviour: >
       **The till keeps selling from its local journal** (ADR-0013). `setOfflinePolicy` bounds what
@@ -115,52 +205,77 @@ branches:
     severity: high
     resolvedBy: setOfflinePolicy
 
-  - at: 7
-    condition: The variance is above the venue's threshold.
+  - at: 10
+    condition: The variance is beyond the venue's threshold.
     behaviour: >
-      The blind count is submitted (`submitShiftCount`, which shows the cashier no figure; CHG-FIN-003)
-      and the shift waits in `pendingVariance` while the supervisor is alerted. **A supervisor accepts the
-      variance with `acceptShiftVariance`** (OVERSHORT_ACCEPT, PIN step-up): no approval request is
-      raised and nothing holds the close for a Duty Manager PIN beforehand (decided 28 September, audit
-      R080 (e)). **Since 2 October the supervisor may do it at any till of the venue or in the daily
-      cash reconciliation (BO-043)**, or reject it so the cashier recounts (`rejectShiftVariance`); the
-      cashier may sign out meanwhile, the shift shows "Under review", and **it never blocks the next
-      cashier opening a shift on that till** (decided 2 October 2026, Chinmay, DEC-059, DEC-173,
-      DEC-175; CHG-CSP-012, CHG-CSP-013). F74 walks the day this feeds.
+      The shift waits in `pendingVariance`, shown to the cashier only as **"Under review"**; the cashier
+      signs out and **the next cashier opens a shift on that till as usual** (step 11). The supervisor
+      resolves it at any till (step 13) or in the daily cash reconciliation (BO-043). No approval request
+      is raised and nothing holds the close for a PIN beforehand (decided 28 September, audit R080 (e);
+      2 October 2026, DEC-059, DEC-173, DEC-174, DEC-175; CHG-CSP-012, CHG-CSP-013). F74 walks the day
+      this feeds.
     severity: high
-    resolvedBy: acceptShiftVariance, or rejectShiftVariance and a recount
+    resolvedBy: acceptShiftVariance, rejectShiftVariance or closeShift
 
-  - at: 6
-    condition: The cashier's shift ends and the till stays open for the next one.
+  - at: 13
+    condition: The supervisor asks for a recount.
     behaviour: >
-      `submitShiftCount` on the operator, not the workstation (the cashier's blind count; CHG-FIN-003). **A workstation runs three shifts a day
-      and each one settles its own drawer** — conflating them means one cashier answering for
-      another's variance.
+      `rejectShiftVariance` with the PIN: the cashier sees **"Recount requested"** and counts blind
+      again (count 2, 3 ...), still without any figure. The earlier counts are kept.
     severity: medium
-    resolvedBy: submitShiftCount
+    resolvedBy: rejectShiftVariance
+
+  - at: 13
+    condition: The cashier left without counting, or the count cannot be finished.
+    behaviour: >
+      The supervisor closes the shift for them (`closeShift`, PIN). **Recorded as a force-close** — sometimes
+      right and never routine. Expected and the variance go to the supervisor only.
+    severity: medium
+    resolvedBy: closeShift
+
+  - at: 14
+    condition: A shift was closed in error.
+    behaviour: >
+      `reopenShift` with the PIN of a supervisor who is not the one who closed it, and a reason; the first
+      count is kept.
+    severity: medium
+    resolvedBy: reopenShift
 
 exitStates:
   - state: settled
-    description: Counted, variance accepted, deposit reconciled, ledger posted. **The ordinary night.**
-  - state: settledWithVariance
+    description: Counted within threshold, closed, deposit reconciled, ledger posted. **The ordinary night.**
+  - state: underReview
     description: >
-      Above threshold and accepted on the till by a supervisor. **A separate exit because it is a different conversation** —
+      Beyond threshold: the shift is `pendingVariance`, "Under review" on the cashier's side, resolved later
+      by a supervisor at any till or in BO-043. **A separate exit because it is a different conversation** —
       the money reconciles either way and only one of the two gets looked at.
+  - state: recountRequested
+    description: The supervisor rejected the variance; the cashier counts again, blind.
   - state: forceClosed
     description: >
       A supervisor closed a shift the cashier did not. **Recorded as such** — a force-close is
       sometimes right and it is never routine.
+  - state: sessionTakenOver
+    description: A supervisor ended another cashier's session on POS-000 with their PIN; that cashier's shift and float did not move.
   - state: openWithUnsynced
     description: >
       The shift closed while transactions were still journalled offline. **Settlement waits for the
       sync**, and the exposure is visible rather than assumed away.
 
 notes: >
-  **Written 24 August from the client's POS pack, boards 2 and 3.** The operations were almost all
-  already there — 125 of the pack's 137 resolved to existing ones — but **no flow walked a till
-  from sign-in to settlement**, and that is where the money is.
+  **Written 24 August from the client's POS pack, boards 2 and 3; rewritten 3 October 2026** (CHG-RONEC-002,
+  Chinmay's r1 additions, `docs/active/decisions/answers-3-october-r1-additions.md`) to the decided shift flow
+  the Block A flow brief draws (`handoff/flow-briefs/platform-foundation.yaml`, F32). The earlier text signed
+  in on POS-001, showed the cashier the expected figure and had the cashier accept their own variance; all
+  three were superseded by the blind close (CHG-FIN-003), "Under review" (DEC-059) and the supervisor PIN on any
+  till (DEC-174, PRE-1).
 
-  **Step 1 is the ordering that matters.** The readiness check runs before the float. Every real
+  **On the shift, the supervisor PIN is for four acts only**: accept, reject, close and reopen a shift (Chinmay,
+  3 October, r1 additions; `check-step-up` holds the carrier). The cashier's own count never takes it. The
+  cashier's witness PIN on a deposit-box withdrawal (step 7, `witnessStepUp`) is a separate cash control
+  (DEC-178, CHG-RUL-019).
+
+  **Step 3 is the ordering that matters.** The readiness check runs before the float. Every real
   POS puts it there and the obvious design puts it after, because a health check reads like a
   diagnostic rather than a gate.
 

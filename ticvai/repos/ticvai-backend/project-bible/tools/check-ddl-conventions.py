@@ -38,7 +38,8 @@ RULES = {
     "D-JSONB-TWIN": "a jsonb column and a child table holding the same data (R111)",
     "D-RENAME-RESIDUE": "a DDL comment or contract description naming a table by its pre-rename name (R160)",
 }
-BOOL_OK = re.compile(r"^(is|has|can|requires|allows|allow|should|was|were|did|does|must|needs|include|includes|"
+# `require_` beside `requires_`, as `allow_` beside `allows_` (CHG-GTRB-006: till_shift_policy.require_open_approval).
+BOOL_OK = re.compile(r"^(is|has|can|require|requires|allows|allow|should|was|were|did|does|must|needs|include|includes|"
                      r"show|shows|auto|use|uses|supports|accepts|enable|enabled|send|notify|override)_|"
                      r"_(enabled|required|allowed|visible|active|locked|verified|confirmed|approved)$")
 # A key may name its target's concept rather than its table (ADR-0056 venue keys, principal actors).
@@ -248,7 +249,9 @@ def main() -> int:
 
     # R082: a key named for one table that references another.
     for t, cols, target in fks:
-        stem = re.sub(r"_ids?$", "", cols[-1])
+        # `_ref` is the package's name for a key to an asset (`imageAssetRef`, `sourceRef`): strip it like `_id`
+        # (CHG-GTRB-006: maintenance.incident_media.asset_ref references assets.media_asset).
+        stem = re.sub(r"_(?:ids?|refs?)$", "", cols[-1])
         tname = target.split(".")[-1]
         if stem in ("current", "previous", "next", "original", "source", "target", "replacement", "parent"):
             continue  # a role within one table's own history, not a table name

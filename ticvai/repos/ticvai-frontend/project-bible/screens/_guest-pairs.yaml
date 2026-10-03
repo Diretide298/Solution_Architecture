@@ -399,6 +399,10 @@ groups:
     multi-trip and favourites as tabs of one screen with the route beside the price card, as its prototype
     does; the app draws four screens (search and departures, route and passengers, multi-trip cards,
     favourite routes), as its prototype does. The real network is an open value from the client.'
+  sanctioned:
+    operations: 'CHG-GTRB-007 - GST-077 is a screen of its own, opened on one departure, so it reloads that departure
+      (getTransportDeparture, CHG-R1S-004); WEB-049 draws the departures beside the route from searchTransportDepartures
+      and never opens one by id. The two shells read the same records through different operations.'
   offline: >-
     **The offline banner shows.** A route's stop list and schematic line already loaded stay readable
     with their age; the street map needs the connection. Searching departures, buying a trip or a pass

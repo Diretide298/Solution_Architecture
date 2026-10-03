@@ -32,7 +32,7 @@ and usually enough to predict what an ADR says.
 | [0017](0017-deployment-models.md) | Deployment models — shared, dedicated, additional region, on-premise | Accepted — amended by 0038 | — |
 | [0018](0018-configuration-scope.md) | Configuration scope — three levels, nearest ancestor wins, venue is the floor | Accepted | — |
 | [0019](0019-dynamic-bundle-pricing.md) | A dynamic bundle has a fixed price and a variable allocation | Proposed | — |
-| [0020](0020-ai-isolation-boundary.md) | Where AI runs, and what it is isolated from | Accepted 30 September — **amended by 0049** (Qdrant, a collection and a scoped token per tenant); section 2 **amended 2 October** (mandatory offline PII scrubbing and an in-cell guard model on every LLM call) | — |
+| [0020](0020-ai-isolation-boundary.md) | Where AI runs, and what it is isolated from | Accepted 30 September — **amended by 0049** (Qdrant, a collection and a scoped token per tenant); section 2 **amended 2 October** (mandatory offline PII scrubbing and a guard on every LLM call) and **3 October** (the guard is the provider's content-safety service; no model hosted) | — |
 | [0021](0021-qdrant-partitioning.md) | Qdrant — one collection per embedding model, tenant is the shard, scope is the filter | Accepted in part 30 September — **amended by 0049**: a collection per tenant replaces the shard | — |
 | [0022](0022-conflict-policy.md) | Conflict policy is declared per operation, from a closed set of four | Accepted | — |
 | [0023](0023-pii-separation.md) | Personal data lives apart from the append-only ledger | Accepted | — |

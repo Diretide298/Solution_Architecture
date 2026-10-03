@@ -88,6 +88,24 @@ CHECKS = [
     # required entry parameter is carried, no screen wears another's route, a Block A screen is wave 1 and
     # says so, and Chinmay's 3 October screen decisions stay made.
     "check-screen-patterns",
+    # 3 October (TODO step 9b, CHG-RONEC-006): the Block A flow design briefs (handoff/flow-briefs/*.yaml) carry
+    # every required key, and every screen, flow and contract#operation they name exists, so a brief cannot
+    # send Claude Design to an operation the contracts do not have.
+    "check-flow-briefs",
+    # 3 October (Chinmay's r1 additions, CHG-RONEC-001..005): the venue-map import formats and ADR-0069's closed
+    # items, the blind close in every flow and the decided F32, the concierge's conversation polling, the
+    # BO-1065 residency section and the payment-link cancel.
+    "check-r1-additions",
+    # 3 October (the r1 gate and the HLD/LLD cross-check, CHG-R1S-002..021): every write writes a table or
+    # says why not and every emitter writes the outbox; the AI residency and scrubbing safeguards stay in the
+    # contracts; an operation-specific error names its problem types (a falling ceiling).
+    "check-write-lineage",
+    "check-ai-residency",
+    "check-problem-types",
+    # 3 October (Chinmay's r1 additions and the r1 gate, CHG-RONEP-001..003): every operation a Block A screen binds is
+    # built in Block A, and no artefact the last released plan built leaves the tickets without a reason; a ticket's
+    # builds are real ids, a module test names what it tests, a setup ticket links only its own part.
+    "check-plan-closure", "check-ticket-builds",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.

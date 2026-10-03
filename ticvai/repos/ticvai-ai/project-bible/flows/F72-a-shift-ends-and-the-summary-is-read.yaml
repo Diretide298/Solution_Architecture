@@ -43,7 +43,9 @@ steps:
   - submitShiftCount
   - acceptShiftVariance
   - listCashMovements
-  outcome: '**Closing and accepting a variance are supervisor acts** and now live only here.'
+  outcome: '**Closing and accepting a variance are supervisor acts** and now live only here. The steward''s
+    count is blind (no expected figure, no running variance, no takings; CHG-FIN-003) and takes no PIN; the
+    supervisor''s accept carries the supervisor PIN (the decided shift flow, F32; CHG-RONEC-002).'
   crossesDevice: true
 branches:
 - at: 2

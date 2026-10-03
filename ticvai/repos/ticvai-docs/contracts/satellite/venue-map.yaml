@@ -116,6 +116,16 @@ info:
     Arabic anywhere else. A manifest of Description, Section, Row, Seat with the header on row 3.
     Two georeference points far apart. The illustrated map separately, with four alignment points.
 
+    **What the import accepts in r1** (Chinmay, 3 October 2026, r1 additions; ADR-0069 amended the
+    same day): DWG or DXF (preferred: the layer names survive); a vector PDF, read by its layers, and
+    a scanned PDF, read through an **OCR step** whose text becomes label hints for the assistant; SVG;
+    a PNG or JPG, including **a plan with hand-marked paths**, from which `ai.proposeWalkways`
+    proposes the path network and the operator accepts it **segment by segment** with
+    `acceptWalkwayProposals`; and **a GLB model with its navigation (pathway) file** (ADR-0069), whose
+    graph and locations import into this map and whose model becomes the map's 3D layer. A GLB over
+    40 MB is refused; one over 300,000 triangles at LOD0 imports, and its 3D layer does not publish
+    until it is reduced. The 2D map always publishes.
+
     **Each part is independently useful and none blocks the next**, which is the property that
     matters: a venue that can only send a manifest still gets sellable seats.
 
@@ -294,6 +304,40 @@ paths:
         **Returns `202` with the job, which is still `parsing`.** Poll `getVenueMapImportJob` until
         it is `previewReady` or `failed`. The shapes it extracts go into the working draft, never
         into the published map.
+
+        **The sources accepted in r1** (Chinmay, 3 October 2026, r1 additions; ADR-0069 as amended
+        on 3 October):
+
+        - **`dwgPlan`, `dxfPlan`**: native CAD, preferred, read by layer as above.
+        - **`pdfPlan`**: a vector PDF is read by its layers. **A scanned PDF (a page with no vector
+          geometry) goes through the OCR step** (`ocr`, on by default): the text on the image is read
+          in English and Arabic, each block placed on the plan with its confidence, and returned as
+          `VenueMapImportJob.ocr`. **The text is a hint, never a label**: `ai.proposeVenueLabels`
+          reads the blocks near a shape ("WC", "First Aid", a ride's name) and says which one it used
+          (`VenueLabelProposal.ocrHint`); nothing is named until a person accepts it. The geometry of
+          a scanned page is a raster's (`rasterOnly`), so its paths come from `ai.proposeWalkways`.
+        - **`svgPlan`**: read by its named layers or groups, as CAD.
+        - **`rasterPlan`**: a PNG or JPG. **A plan with paths marked by hand** (a marker line along
+          each walkway) says so in `handMarkedPaths`; the import finds the marks
+          (`VenueMapImportJob.handMarkedPaths`), `ai.proposeWalkways` proposes a segment per marked
+          stretch with its confidence, and the operator accepts or rejects **each segment** with
+          `acceptWalkwayProposals`. A plain raster with no marks still works: the proposal then
+          follows what it can see.
+        - **`glbModel`**: the venue's 3D model (ADR-0069 section 1) as `sourceRef`, **with its
+          navigation file** (section 2, the `VenueNavigationFile` schema) as `navigationFileRef`.
+          The navigation file's nodes, edges and locations import into the working draft as paths and
+          points, exactly as a CAD walkway layer would (codes resolve to outlets and products, an
+          unresolved one is a finding); its anchor becomes `VenueMap.modelTransform`; the model
+          becomes the draft's 3D layer (`VenueMap.modelAssetId`). **The budget is measured here**
+          (`VenueMapImportJob.model`): a GLB over **40 MB** is refused (`422 modelTooLarge`, and
+          `assets.createUpload` refuses it first); over **300,000 triangles** at LOD0 in any zone,
+          uncompressed textures, or an anchor residual over 10 m at a control point is an `error`
+          finding that keeps the 3D layer out of the next publish (the 2D map still publishes); the
+          other budget lines (25 MB, 1.5 million triangles in all, 150 draw calls, 2048 px and
+          128 MB of textures, a 3 m residual) are `warning`s with the number.
+        - **`navigationFile`**: the navigation file alone, as `sourceRef`: its graph and locations
+          import as above, with no 3D layer. The file `getVenueNavigationFile` exports is this format,
+          so a venue (or its 3D studio) starts from the graph the platform already holds.
       tags: [venueMap]
       x-ticvai-permission: VENUE_MAP_MANAGE
       x-ticvai-audience: [staff]
@@ -310,14 +354,40 @@ paths:
               type: object
               required: [format, sourceRef]
               properties:
-                format: { type: string, enum: [pdfPlan, svgPlan, dwgPlan, dxfPlan, rasterPlan] }
+                format:
+                  type: string
+                  enum: [pdfPlan, svgPlan, dwgPlan, dxfPlan, rasterPlan, glbModel, navigationFile]
+                  description: >
+                    `glbModel` and `navigationFile` added 3 October 2026 (r1 additions, ADR-0069): a
+                    GLB with its navigation file, or the navigation file alone. See the list above.
                 sourceRef:
                   type: string
                   format: uuid
                   description: >
                     **The drawing, as the `MediaAsset.id` from `assets.completeUpload`.** Not a URL
-                    and not a storage path; the file itself is never posted through this API.
+                    and not a storage path; the file itself is never posted through this API. For
+                    `glbModel` it is the GLB (a `model3d` asset); for `navigationFile` the JSON.
                   x-ticvai-references: assets.MediaAsset
+                navigationFileRef:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  x-ticvai-references: assets.MediaAsset
+                  description: >
+                    **The navigation (pathway) file that goes with a GLB** (ADR-0069 section 2; the
+                    `VenueNavigationFile` schema), uploaded like `sourceRef` as JSON. Required with
+                    `glbModel` (refused `422 navigationFileMissing` without it) and ignored for every
+                    other format. Added 3 October 2026 (r1 additions).
+                ocr:
+                  nullable: true
+                  description: The OCR step (3 October 2026, r1 additions); `VenueMapOcrOptions`.
+                  allOf:
+                    - $ref: '#/components/schemas/VenueMapOcrOptions'
+                handMarkedPaths:
+                  nullable: true
+                  description: A raster plan with hand-marked paths (3 October 2026, r1 additions); `VenueMapHandMarkedPaths`.
+                  allOf:
+                    - $ref: '#/components/schemas/VenueMapHandMarkedPaths'
                 layerMapping:
                   type: object
                   description: >
@@ -480,6 +550,16 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/VenueMapImportJob' }
+        '422':
+          description: >
+            **Refused before any parsing** (3 October 2026, r1 additions): `glbModel` with no
+            `navigationFileRef` (`navigationFileMissing`), a `sourceRef` whose asset kind does not
+            fit the format (`formatMismatch`: a GLB sent as `pdfPlan`, a PDF as `glbModel`), or a GLB
+            over 40 MB (`modelTooLarge`, ADR-0069 section 6). The reason names the file.
+          x-ticvai-problem-types: [navigation-file-missing, format-mismatch, model-too-large]
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/VenueMapImportProblem' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -503,6 +583,10 @@ paths:
         `seating.getImportJob`. The screen polls it until `status` leaves `parsing`, then shows
         `outcome`, `layersFound`, `unmappedLayers` and `findings`, so an operator can tell a
         misread file from an empty one before any proposal is reviewed.
+
+        Since 3 October 2026 (r1 additions) it also carries what the OCR step read (`ocr`), the
+        hand-marked strokes it found (`handMarkedPaths`) and, for a GLB, the measured budget and the
+        model findings (`model`), each null where the source had none.
       tags: [venueMap]
       x-ticvai-permission: VENUE_MAP_VIEW
       x-ticvai-audience: [staff]
@@ -516,6 +600,140 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/VenueMapImportJob' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /venue-maps/{mapId}/artwork:
+    parameters:
+      - name: mapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: setVenueMapArtwork
+      summary: Set the illustrated map guests see, and how it lines up with the plan
+      description: >
+        **The guest map artwork** (`handoff/venue-map-input-spec.md` section 6; the F26 flow brief's open item
+        "no screen is named for the illustrated map upload and its alignment points", closed 3 October 2026 on
+        BO-094). The illustration is uploaded first through `assets.createUpload` and `completeUpload`, like a
+        drawing, and its `MediaAsset.id` sent here as `baseAssetId` with the alignment points that place it on
+        the plan. **Two points at least, four recommended** (spec section 6): without them a point placed on the
+        plan lands in the wrong place on the painting. `baseAssetId: null` removes the artwork, and the map
+        renders as plain geometry.
+
+        **Set on the working draft; guests see it from the next publish**, which records it on the version
+        (`VenueMapVersion.baseAssetId`), so a guest mid-route keeps the artwork they started with. Tiles for a
+        large image (`tileSetRef`) are generated after the call returns.
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_MANAGE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [baseAssetId]
+              properties:
+                baseAssetId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  x-ticvai-references: assets.MediaAsset
+                  description: The illustrated map (an `image` asset, PNG or JPG, up to about 12,000 px wide). Null removes it.
+                baseImageAlignment:
+                  type: object
+                  nullable: true
+                  description: Required with an image. Pixel positions on the image matched to plan coordinates.
+                  required: [imageWidthPx, imageHeightPx, anchors]
+                  properties:
+                    imageWidthPx: { type: integer, minimum: 1 }
+                    imageHeightPx: { type: integer, minimum: 1 }
+                    anchors:
+                      type: array
+                      minItems: 2
+                      maxItems: 4
+                      items:
+                        type: object
+                        required: [planX, planY, imageX, imageY]
+                        properties:
+                          planX: { type: number }
+                          planY: { type: number }
+                          imageX: { type: number }
+                          imageY: { type: number }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set on the draft
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VenueMap' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '422':
+          description: >
+            An image with no `baseImageAlignment`, an asset that is not an image, or alignment points too
+            close together to place the plan (`artwork-alignment-required`, `artwork-not-image`,
+            `artwork-anchors-too-close`).
+          x-ticvai-problem-types: [artwork-alignment-required, artwork-not-image, artwork-anchors-too-close]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '409':
+          description: The map is archived (`map-archived`); an archived map takes no new artwork.
+          x-ticvai-problem-types: [map-archived]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /venue-maps/{mapId}/navigation-file:
+    parameters:
+      - name: mapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getVenueNavigationFile
+      summary: The map's graph and points as a navigation file
+      description: >
+        **ADR-0069 section 8, closed 3 October 2026: the venue does not describe its paths twice.**
+        Exports the working draft's (or, with `version`, a published version's) nodes, edges and
+        points in the navigation-file format (`VenueNavigationFile`, the format `importVenueGeometry`
+        reads as `glbModel` or `navigationFile`), with the map's `modelTransform` as the anchor where
+        it has one. A venue hands it to its 3D studio as the starting point; the studio builds the GLB
+        around it and sends both back.
+
+        Points carry their catalogue codes (product, outlet, facility), never ids, so the file can be
+        edited outside the platform and re-imported. Coordinates are the map's drawing coordinates
+        mapped as ADR-0069 section 3 says (`x = planX`, `z = -planY`).
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_VIEW
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: version
+          in: query
+          required: false
+          description: A published version to export. Absent, the working draft.
+          schema: { type: integer, minimum: 1 }
+      responses:
+        '200':
+          description: The navigation file
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VenueNavigationFile' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -717,6 +935,13 @@ paths:
         **Accepted paths go into the working draft**, and the validation is of the draft's graph.
         On an `edit`, the `path` sent is the corrected segment; its `id`, `mapId` and the other
         `readOnly` fields are assigned by the server.
+
+        **Segment by segment** (Chinmay, 3 October 2026, r1 additions: a plan with hand-marked paths,
+        the AI proposes, the operator accepts each segment). Every decision names one proposed
+        segment; there is no "accept all" and no confidence threshold that accepts for the operator.
+        BO-093 sends one decision per action and shows the graph validation that comes back, so the
+        operator sees an unreachable point appear the moment a segment is rejected. A proposal not
+        decided stays open and blocks the publish (`unresolvedProposal`), as a label proposal does.
       tags: [venueMap]
       x-ticvai-permission: VENUE_MAP_MANAGE
       x-ticvai-audience: [staff]
@@ -1001,6 +1226,11 @@ paths:
         Publishing copies placed resources into the snapshot with the points and paths; from then on
         a guest can pick them. Holds and bookings on a resource survive a republish because they
         are keyed by `resourceId`, not by the placement.
+
+        **The 3D layer publishes with the map only when it is `publishable`** (ADR-0069, amended
+        3 October 2026). A draft whose `model3dStatus` is `blocked` publishes its 2D map and graph
+        and carries no model (`VenueMapVersion.model3d` null); the model is never a reason to refuse
+        the map. A `publishable` model is copied into the version with its transform.
       tags: [venueMap]
       x-ticvai-permission: VENUE_MAP_PUBLISH
       x-ticvai-audience: [staff]
@@ -2168,6 +2398,242 @@ components:
             a toilet that does not exist. `partial` means every point is reachable and at least one
             only by steps, which is a different and quieter failure: **the map works until a
             wheelchair user opens it.**
+        modelAssetId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: assets.MediaAsset
+          description: >
+            **The 3D layer of the working draft** (ADR-0069, contract item closed 3 October 2026): the
+            GLB (`model3d` asset) the last `glbModel` import brought in. Set by `importVenueGeometry`,
+            never by sending a value. Null for a 2D-only map, which is the default and needs nothing.
+            The 3D model is a rendering of the map, never the source of its truth: routes come from
+            the graph.
+        navigationFileAssetId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: assets.MediaAsset
+          description: The navigation file imported with the model, kept so the import can be re-run and audited.
+        modelTransform:
+          readOnly: true
+          description: >
+            **How the model's local frame sits on the earth** (ADR-0069 section 3): the navigation
+            file's anchor, stored once and used both ways. Null without a model. It maps onto the
+            plan's georeference as the ADR says, so a map with a model is georeferenced.
+          allOf:
+            - $ref: '#/components/schemas/VenueModelTransform'
+        model3dStatus:
+          type: string
+          readOnly: true
+          enum: [none, publishable, blocked]
+          description: >
+            **Whether the next publish carries the 3D layer.** `none`: no model. `publishable`: the
+            last model import had no `error` finding. `blocked`: it had one (over 300,000 triangles at
+            LOD0, uncompressed textures, a control point more than 10 m out, an invalid navigation
+            file), named in that job's `model.findings`; the 2D map still publishes and guests see
+            2D until a corrected model is imported (ADR-0069 sections 3 and 6).
+
+    VenueMapOcrOptions:
+      x-ticvai-persistence: "none — part of the importVenueGeometry request"
+      type: object
+      description: >
+        **The OCR step for a scanned PDF or a raster plan** (3 October 2026, r1 additions).
+        Absent means `auto`: a PDF page with no vector geometry, and every raster, is read
+        for text; a vector page is read by its layers and never OCR'd. The text found is
+        returned on the job (`VenueMapImportJob.ocr`) and offered to
+        `ai.proposeVenueLabels` as hints; it never names a point by itself.
+      properties:
+        mode:
+          type: string
+          enum: [auto, 'off']
+          default: auto
+          description: '`off` skips it, for a plan whose text is noise (a dimensioned drawing).'
+        languages:
+          type: array
+          items: { type: string, enum: [en, ar] }
+          description: The scripts to read. Absent means both.
+
+    VenueMapHandMarkedPaths:
+      x-ticvai-persistence: "none — part of the importVenueGeometry request"
+      type: object
+      description: >
+        **A raster plan (or a scanned PDF) with the walkways marked by hand** (3 October
+        2026, r1 additions). The import finds the marks and reports them
+        (`VenueMapImportJob.handMarkedPaths`); `ai.proposeWalkways` then proposes a path
+        segment per marked stretch, and each segment is accepted or rejected on its own
+        with `acceptWalkwayProposals`. Nothing becomes a path without a person.
+      properties:
+        markColour:
+          type: string
+          nullable: true
+          pattern: '^#[0-9A-Fa-f]{6}$'
+          description: >
+            The marker's colour, where the operator knows it (`#E53935` for a red pen).
+            Absent, the import looks for the strokes that differ from the printed plan.
+        note:
+          type: string
+          nullable: true
+          maxLength: 300
+          description: Anything the marks mean that the image does not say ("dashed = staff only").
+
+    VenueModelTransform:
+      type: object
+      x-ticvai-persistence: "none — jsonb column"
+      description: >
+        ADR-0069 section 3: the navigation file's `anchor`. Local to WGS84: rotate (x, z) by
+        `headingDegrees` into east/north metres, scale, offset from the origin on a local tangent
+        plane; GPS to local is the inverse, done on the phone for every fix.
+      required: [originLat, originLng, headingDegrees]
+      properties:
+        originLat: { type: number, minimum: -90, maximum: 90 }
+        originLng: { type: number, minimum: -180, maximum: 180 }
+        originAltitudeMetres: { type: number, default: 0 }
+        headingDegrees:
+          type: number
+          minimum: 0
+          exclusiveMaximum: 360
+          description: True-north bearing of the model's -Z axis, clockwise.
+        scale:
+          type: number
+          default: 1
+          description: Metres per model unit; 1 for a model in metres.
+        controlPoints:
+          type: array
+          minItems: 2
+          maxItems: 8
+          description: Surveyed checks, far apart. They verify the anchor; they do not define it.
+          items:
+            type: object
+            required: [label, x, z, lat, lng]
+            properties:
+              label: { type: string }
+              x: { type: number }
+              z: { type: number }
+              lat: { type: number }
+              lng: { type: number }
+              residualMetres:
+                type: number
+                nullable: true
+                readOnly: true
+                description: Measured at import. Over 3 m is a warning; over 10 m blocks the 3D layer.
+
+    VenueModel3d:
+      type: object
+      x-ticvai-persistence: "none — jsonb column"
+      description: >
+        **The 3D layer a guest app loads** (ADR-0069): the model and the transform of the version it
+        read. The app downloads the GLB through the asset delivery rules (UAE-hosted for a UAE tenant,
+        ADR-0069 section 7) and caches it with the graph.
+      required: [modelAssetId, transform]
+      properties:
+        modelAssetId:
+          type: string
+          format: uuid
+          x-ticvai-references: assets.MediaAsset
+        sizeBytes: { type: integer, nullable: true }
+        transform: { $ref: '#/components/schemas/VenueModelTransform' }
+
+    VenueNavigationFile:
+      # Not `$id`: in OpenAPI 3.1 a `$id` re-bases the `#/components/...` references inside this schema.
+      x-ticvai-schema-id: 'urn:ticvai:venue-navigation-file:1.0'
+      type: object
+      x-ticvai-persistence: "none — a file format: imported by importVenueGeometry, exported by getVenueNavigationFile"
+      description: >
+        **The navigation (pathway) file of ADR-0069 section 2**, fixed as a contract schema on
+        3 October 2026 (the ADR's `$id` open item: `urn:ticvai:venue-navigation-file:1.0`). JSON,
+        UTF-8, one per venue map, in the model's local frame (metres, +Y up). Codes, not ids:
+        `productCode`, `outletCode` and `facilityCode` resolve at import, and an unresolved code is a
+        finding (`unresolvedCatalogueCode`), never a silent drop. Point names stay unique per venue
+        (audit R108).
+      required: [formatVersion, venueCode, mapName, anchor, nodes, edges, locations]
+      properties:
+        formatVersion: { type: string, enum: ['1.0'] }
+        venueCode: { type: string, description: The venue's code on the platform. }
+        mapName: { type: string, description: Matches VenueMap.name; a floor plan is its own file. }
+        floorLevel: { type: integer, nullable: true }
+        modelFile:
+          type: string
+          nullable: true
+          description: The GLB this file belongs to (park-2026-10.glb). Null in a file exported from a 2D map.
+        anchor: { $ref: '#/components/schemas/VenueModelTransform' }
+        nodes:
+          type: array
+          minItems: 2
+          description: Graph vertices in model coordinates. A junction, or the door of a location.
+          items:
+            type: object
+            required: [id, x, z]
+            properties:
+              id: { type: string, pattern: '^[A-Za-z0-9_-]{1,64}$' }
+              x: { type: number }
+              y: { type: number, default: 0 }
+              z: { type: number }
+              zone: { type: string, nullable: true, description: The GLB zone node it sits in. }
+        edges:
+          type: array
+          minItems: 1
+          description: Walkable connections. Undirected; a one-way passage names the access point that makes it one-way.
+          items:
+            type: object
+            required: [from, to]
+            properties:
+              from: { type: string }
+              to: { type: string }
+              polyline:
+                type: array
+                description: Intermediate [x, z] or [x, y, z] points along the centreline; straight when absent.
+                items:
+                  type: array
+                  minItems: 2
+                  maxItems: 3
+                  items: { type: number }
+              isStepFree: { type: boolean, default: true }
+              isIndoor: { type: boolean, default: false }
+              throughAccessPointCode: { type: string, nullable: true }
+        locations:
+          type: array
+          description: Points of interest. Each becomes a VenuePoint.
+          items:
+            type: object
+            required: [ref, kind, name, nodeId]
+            properties:
+              ref: { type: string, description: Stable key; also the name of the GLB node drawn for it. }
+              kind: { type: string, description: 'One of VenuePoint.kind; junction is not allowed here.' }
+              name: { type: string }
+              nameLocalised:
+                type: object
+                additionalProperties: { type: string }
+              nodeId: { type: string, description: 'The node a guest is routed to: the entrance, not the centre.' }
+              labelPosition:
+                type: array
+                minItems: 3
+                maxItems: 3
+                items: { type: number }
+              catalogue:
+                type: object
+                properties:
+                  productCode: { type: string, nullable: true }
+                  outletCode: { type: string, nullable: true }
+                  facilityCode: { type: string, nullable: true }
+
+    VenueMapImportProblem:
+      x-ticvai-persistence: none — error shape
+      description: The `422` from `importVenueGeometry` (3 October 2026, r1 additions).
+      allOf:
+        - $ref: '../shared/common.yaml#/components/schemas/Problem'
+        - type: object
+          required: [refusedReason]
+          properties:
+            refusedReason:
+              type: string
+              enum: [navigationFileMissing, formatMismatch, modelTooLarge]
+            sizeBytes:
+              type: integer
+              nullable: true
+              description: With `modelTooLarge`, the GLB's size; the limit is 41,943,040 bytes (40 MB).
 
     VenueMapDetail:
       type: object
@@ -2194,6 +2660,14 @@ components:
             The bookable resources placed on this version of the map (rev 3 REV3-15). Empty on a map
             that carries none.
           items: { $ref: '#/components/schemas/PlacedResource' }
+        model3d:
+          nullable: true
+          description: >
+            **The 3D layer of the version read** (ADR-0069; 3 October 2026, r1 additions). Null when
+            that version has none, and then the guest app shows the 2D map with the same route, as it
+            does on a phone that cannot hold 30 fps.
+          allOf:
+            - $ref: '#/components/schemas/VenueModel3d'
 
     VenuePoint:
       type: object
@@ -2781,6 +3255,100 @@ components:
                 type: array
                 description: The layers, sections or rows involved. **Named, not counted.**
                 items: { type: string }
+        ocr:
+          type: object
+          nullable: true
+          description: >
+            **What the OCR step read** off a scanned PDF or a raster (3 October 2026, r1 additions).
+            Null for a vector source or with `ocr.mode: off`. Each block sits on the plan, so
+            `ai.proposeVenueLabels` can use the text near a shape as a hint; the text names nothing
+            by itself. Low-confidence blocks are returned, not dropped.
+          properties:
+            pagesRead: { type: integer }
+            meanConfidence: { type: number, minimum: 0, maximum: 1, nullable: true }
+            textBlocks:
+              type: array
+              items:
+                type: object
+                required: [text, confidence]
+                properties:
+                  text: { type: string, maxLength: 500 }
+                  language: { type: string, enum: [en, ar], nullable: true }
+                  confidence: { type: number, minimum: 0, maximum: 1 }
+                  planX: { type: number, nullable: true }
+                  planY: { type: number, nullable: true }
+                  widthUnits: { type: number, nullable: true }
+                  heightUnits: { type: number, nullable: true }
+        handMarkedPaths:
+          type: object
+          nullable: true
+          description: >
+            **The hand-marked strokes the import found** on a raster plan sent with
+            `handMarkedPaths` (3 October 2026, r1 additions). `ai.proposeWalkways` reads them and
+            proposes one segment per marked stretch; nothing is a path until a person accepts it.
+          properties:
+            strokesFound: { type: integer }
+            markColourUsed: { type: string, nullable: true, description: The colour the import matched. }
+            totalLengthUnits: { type: number, nullable: true, description: In drawing units. }
+        model:
+          type: object
+          nullable: true
+          description: >
+            **The GLB and navigation file, measured** (`glbModel` and `navigationFile` imports;
+            ADR-0069 sections 1, 2, 3 and 6; 3 October 2026). Every budget line is a number, so an
+            over-budget model is a finding a 3D studio can act on, not a slow app. Null for any other
+            source.
+          properties:
+            sizeBytes: { type: integer, nullable: true, description: The GLB. Over 41,943,040 (40 MB) is refused before import. }
+            lod0TrianglesMaxZone:
+              type: integer
+              nullable: true
+              description: The most LOD0 triangles any one zone carries, which is what is on screen near the camera. Over 300,000 is an error.
+            trianglesTotal: { type: integer, nullable: true, description: 'Across every zone and LOD. Over 1,500,000 is a warning.' }
+            drawCalls: { type: integer, nullable: true, description: Over 150 is a warning. }
+            textureMemoryBytes: { type: integer, nullable: true, description: After KTX2 transcoding. Over 128 MB is a warning. }
+            maxTexturePx: { type: integer, nullable: true, description: Over 2048 is a warning. }
+            zones: { type: integer, nullable: true }
+            nodes: { type: integer }
+            edges: { type: integer }
+            locations: { type: integer }
+            anchorResidualMaxMetres: { type: number, nullable: true, description: The worst control point. Over 3 m warns; over 10 m is an error. }
+            publishable3d:
+              type: boolean
+              description: >
+                **True when no finding below is an `error`**: the next publish carries the 3D layer.
+                False keeps it out (`VenueMap.model3dStatus` `blocked`); the 2D map still publishes.
+            findings:
+              type: array
+              items:
+                type: object
+                required: [code, severity, message]
+                properties:
+                  code:
+                    type: string
+                    enum: [modelOverDownloadBudget, zoneOverDownloadBudget, triangleBudgetExceeded,
+                           triangleTotalExceeded, drawCallBudgetExceeded, textureBudgetExceeded,
+                           textureTooLarge, uncompressedTextures, missingLevelsOfDetail, notMetres,
+                           anchorResidualHigh, anchorResidualTooHigh, controlPointsTooClose,
+                           unresolvedCatalogueCode, unknownNodeInEdge, locationNodeMissing,
+                           navigationFileInvalid, navigationFileMismatch, nodeRefWithoutLocation]
+                    description: >
+                      **A closed set, separate from `findings`** so the plan importer's codes stay as
+                      they were. Errors (keep the 3D layer out of the publish): `triangleBudgetExceeded`
+                      (over 300,000 at LOD0 in a zone), `uncompressedTextures`, `anchorResidualTooHigh`
+                      (over 10 m), `navigationFileInvalid`, `unknownNodeInEdge`, `locationNodeMissing`.
+                      Warnings: the other budget lines, `anchorResidualHigh` (over 3 m),
+                      `controlPointsTooClose`, `unresolvedCatalogueCode`, `missingLevelsOfDetail`,
+                      `notMetres`, `navigationFileMismatch` (venue, map or model file differ).
+                      Info: `nodeRefWithoutLocation` (a named GLB node with no location is scenery).
+                  severity: { type: string, enum: [error, warning, info] }
+                  message: { type: string }
+                  measured: { type: number, nullable: true, description: The number found. }
+                  limit: { type: number, nullable: true, description: The budget it was measured against. }
+                  affected:
+                    type: array
+                    description: The zones, nodes, locations or codes involved. Named, not counted.
+                    items: { type: string }
 
     VenueMapVersion:
       type: object
@@ -2804,6 +3372,38 @@ components:
           nullable: true
           maxLength: 300
           description: The `note` sent to `publishVenueMap`.
+        baseAssetId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: assets.MediaAsset
+          description: >
+            The illustrated map this version published with (`setVenueMapArtwork`, 3 October 2026), so a guest
+            mid-route keeps the artwork they started with. Null for plain geometry.
+        baseImageAlignment:
+          type: object
+          nullable: true
+          description: The alignment published with `baseAssetId`, as `VenueMap.baseImageAlignment`.
+          properties:
+            imageWidthPx: { type: integer }
+            imageHeightPx: { type: integer }
+            anchors:
+              type: array
+              items:
+                type: object
+                properties:
+                  planX: { type: number }
+                  planY: { type: number }
+                  imageX: { type: number }
+                  imageY: { type: number }
+        model3d:
+          nullable: true
+          description: >
+            **The 3D layer this version published** (ADR-0069; 3 October 2026): the model and transform
+            checked with this graph, so a published 3D map is always the model and the graph that were
+            checked together. Null when the draft had no model or its model was `blocked`.
+          allOf:
+            - $ref: '#/components/schemas/VenueModel3d'
         snapshot:
           type: object
           description: >

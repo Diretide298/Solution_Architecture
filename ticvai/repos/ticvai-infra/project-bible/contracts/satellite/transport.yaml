@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Transport Ticketing
   version: 0.1.0
-  x-ticvai-screen-count: 31
+  x-ticvai-screen-count: 32
   x-ticvai-tier: satellite
   x-ticvai-module: "1 — Ticketing Catalogue (Transport)"
   x-ticvai-platforms:
@@ -1218,6 +1218,36 @@ paths:
         in: path
         required: true
         schema: { type: string, format: uuid }
+    get:
+      operationId: getTransportDeparture
+      x-ticvai-consumed-by:
+        - "P02 GST-077 Intercity Trip — Route & Passengers"
+      x-ticvai-audience: [guest, public]
+      x-ticvai-read-routing: replica
+      summary: One departure, as a guest books it
+      description: >
+        **Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.**
+        GST-077 is opened on a departure (`departureId` from GST-076) and never read it: the r1 gate found
+        the trip page showing a departure it had no read of. Published network data, as
+        `getNextTransportDeparture` is. Returns what the write stores, in the write's own shape.
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security:
+        - guestAuth: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: One departure, as a guest books it
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepartureOffer'
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updateTransportDeparture
       x-ticvai-consumed-by:

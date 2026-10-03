@@ -355,3 +355,72 @@ changes:
     tag: r2
     producer-tickets: [SVC-PLATFORM-DRAFTED-3]
     consumer-tickets: [VM-PTR-048]
+
+# BC-029 to BC-033 are one decision (CHG-RONEC-001): `MediaKind` gains `model3d`, so every operation that returns a
+# MediaAsset reports it. Chinmay, 3 October 2026, r1 additions: the venue-map import accepts a GLB plus a pathway file,
+# and ADR-0069 action item 4 names a `model3d` media kind. It ships in the fresh r1, before any ticket is built.
+  - id: BC-029
+    contract: assets
+    operation: searchMedia
+    change: "`items[].kind` gained enum value(s) ['model3d']"
+    reason: >-
+      A GLB venue model (ADR-0069) is neither an image nor a document: it has its own content type (model/gltf-binary),
+      its own size limit (40 MB) and no renditions, so it needs its own kind (ADR-0069 action item 4, closed 3 October,
+      CHG-RONEC-001). A response enum cannot gain a value additively; a media-library client shows an unknown kind as a
+      plain file until it is rebuilt at r1.
+    approved-by: Chinmay Parab, 3 October 2026 (r1 additions, docs/active/decisions/answers-3-october-r1-additions.md)
+    tag: r1
+    producer-tickets: [SVC-VENUEOPS-ASSET-1]
+    consumer-tickets: [AM-DIGITAL-ASSETS-P13]
+  - id: BC-030
+    contract: assets
+    operation: getMediaAsset
+    change: "`kind` gained enum value(s) ['model3d']"
+    reason: >-
+      A GLB venue model (ADR-0069) is neither an image nor a document: it has its own content type (model/gltf-binary),
+      its own size limit (40 MB) and no renditions, so it needs its own kind (ADR-0069 action item 4, closed 3 October,
+      CHG-RONEC-001). A response enum cannot gain a value additively; a media-library client shows an unknown kind as a
+      plain file until it is rebuilt at r1.
+    approved-by: Chinmay Parab, 3 October 2026 (r1 additions, docs/active/decisions/answers-3-october-r1-additions.md)
+    tag: r1
+    producer-tickets: [SVC-VENUEOPS-ASSET-1]
+    consumer-tickets: [AM-DIGITAL-ASSETS-P13]
+  - id: BC-031
+    contract: assets
+    operation: updateMediaAsset
+    change: "`kind` gained enum value(s) ['model3d']"
+    reason: >-
+      A GLB venue model (ADR-0069) is neither an image nor a document: it has its own content type (model/gltf-binary),
+      its own size limit (40 MB) and no renditions, so it needs its own kind (ADR-0069 action item 4, closed 3 October,
+      CHG-RONEC-001). A response enum cannot gain a value additively; a media-library client shows an unknown kind as a
+      plain file until it is rebuilt at r1.
+    approved-by: Chinmay Parab, 3 October 2026 (r1 additions, docs/active/decisions/answers-3-october-r1-additions.md)
+    tag: r1
+    producer-tickets: [SVC-VENUEOPS-ASSET-2]
+    consumer-tickets: [AM-DIGITAL-ASSETS-P13]
+  - id: BC-032
+    contract: assets
+    operation: replaceMediaAsset
+    change: "`asset.kind` gained enum value(s) ['model3d']"
+    reason: >-
+      A GLB venue model (ADR-0069) is neither an image nor a document: it has its own content type (model/gltf-binary),
+      its own size limit (40 MB) and no renditions, so it needs its own kind (ADR-0069 action item 4, closed 3 October,
+      CHG-RONEC-001). A response enum cannot gain a value additively; a media-library client shows an unknown kind as a
+      plain file until it is rebuilt at r1.
+    approved-by: Chinmay Parab, 3 October 2026 (r1 additions, docs/active/decisions/answers-3-october-r1-additions.md)
+    tag: r1
+    producer-tickets: [SVC-VENUEOPS-ASSET-1]
+    consumer-tickets: [AM-DIGITAL-ASSETS-P13]
+  - id: BC-033
+    contract: assets
+    operation: completeUpload
+    change: "`kind` gained enum value(s) ['model3d']"
+    reason: >-
+      A GLB venue model (ADR-0069) is neither an image nor a document: it has its own content type (model/gltf-binary),
+      its own size limit (40 MB) and no renditions, so it needs its own kind (ADR-0069 action item 4, closed 3 October,
+      CHG-RONEC-001). A response enum cannot gain a value additively; a media-library client shows an unknown kind as a
+      plain file until it is rebuilt at r1.
+    approved-by: Chinmay Parab, 3 October 2026 (r1 additions, docs/active/decisions/answers-3-october-r1-additions.md)
+    tag: r1
+    producer-tickets: [SVC-VENUEOPS-UPLOAD-1]
+    consumer-tickets: [AM-DIGITAL-ASSETS-P13]

@@ -1,0 +1,26 @@
+id: CHG-GTRB-010
+date: '2026-10-04'
+source: cr
+kind: process
+summary: check-ai-residency looks for AiProvider.isStatelessOnly, the name CHG-GTRB-005 gave the field.
+decision:
+  what: 'R-STATELESS in tools/check-ai-residency.py checks AiProvider.isStatelessOnly instead of statelessOnly.'
+  by: Chinmay
+  date: '2026-10-04'
+why: 'The final r1 refresh on dbb395c6 failed only check-ai-residency (R-STATELESS: AiProvider.statelessOnly is missing):
+  CHG-GTRB-005 renamed the boolean to read as an assertion, and the check still named the old field.'
+keys_touched:
+  files:
+  - tools/check-ai-residency.py
+root_class: A00 TOOLING
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-ai-residency.py
+status: open
+notes: A rename that a checker reads by name must update the checker in the same change; the full refresh caught it.

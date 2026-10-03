@@ -405,6 +405,16 @@ screens:
     - ADM-549
     - ADM-619
     - ADM-699
+    - ADM-412
+    - ADM-424
+    - ADM-500
+    - ADM-506
+    - ADM-508
+    - ADM-523
+    - ADM-527
+    - ADM-528
+    - ADM-554
+    - ADM-556
     inferred: true
     transitions:
     - to: ADM-001
@@ -686,6 +696,46 @@ screens:
       provenance: flow F109 step 2→3
       carries:
       - tenantId
+    - to: ADM-412
+      trigger: Opens Payment Method & Settlement Setup
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: ADM-424
+      trigger: Opens Module Activation & Dependency Validation
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: ADM-500
+      trigger: Opens Forecast Configuration & Forecasting Strategy
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: ADM-506
+      trigger: Opens Forecast Drivers, Confidence & Explainability
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: ADM-508
+      trigger: Opens Forecast Accuracy, Review & Publication Center
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: ADM-523
+      trigger: Opens AI Action & Permission Policy Builder
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: ADM-527
+      trigger: Opens AI Policy Testing & Governance Simulation
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: ADM-528
+      trigger: Opens AI Governance Policy Publication & Effective Policy Map
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: ADM-554
+      trigger: Opens AI Quality, Behavior & Governance Drift Monitoring
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: ADM-556
+      trigger: Opens AI Incident & Remediation Management
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
     entryFrom: []
   notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **Removed 24 August**: generateInvoice, getSubscription, getUsageMetering, listSubscriptionInvoices,
@@ -15896,6 +15946,7 @@ screens:
   navigation:
     entryFrom:
     - ADM-409
+    - ADM-002
     exitTo:
     - ADM-409
     transitions:
@@ -15944,6 +15995,18 @@ screens:
         provenance: contract orders.yaml PUT /payment-providers
     - name: contentBody
       components:
+      - kind: cardList
+        label: Show the payment providers as configured
+        operation: listPaymentProviders
+        bindsTo: PaymentProvider
+        columns:
+        - PaymentProvider.name
+        - PaymentProvider.kind
+        - PaymentProvider.supportsTokenisation
+        - PaymentProvider.supportsPartialCapture
+        - PaymentProvider.supports3ds
+        - PaymentProvider.scopeLevel
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: selectField
         label: Tenant
         bindsTo: Tenant.id
@@ -16046,6 +16109,11 @@ screens:
     purpose: The picked tenant's venues, to pick the venue the payment provider is set for
     trigger: onLoad
     provenance: design-note correction, 2 October 2026 (ADM-412)
+  - operationId: listPaymentProviders
+    contract: orders
+    purpose: Show the payment providers as configured
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-412
@@ -17488,6 +17556,7 @@ screens:
   navigation:
     entryFrom:
     - ADM-419
+    - ADM-002
     exitTo:
     - ADM-419
     transitions:
@@ -26602,6 +26671,7 @@ screens:
   navigation:
     entryFrom:
     - ADM-499
+    - ADM-002
     exitTo:
     - ADM-499
     transitions:
@@ -27825,6 +27895,7 @@ screens:
   navigation:
     entryFrom:
     - ADM-499
+    - ADM-002
     exitTo:
     - ADM-499
     transitions:
@@ -28240,6 +28311,7 @@ screens:
   navigation:
     entryFrom:
     - ADM-499
+    - ADM-002
     exitTo:
     - ADM-499
     transitions:
@@ -31290,6 +31362,7 @@ screens:
   navigation:
     entryFrom:
     - ADM-519
+    - ADM-002
     exitTo:
     - ADM-519
     transitions:
@@ -32140,6 +32213,7 @@ screens:
   navigation:
     entryFrom:
     - ADM-519
+    - ADM-002
     exitTo:
     - ADM-519
     transitions:
@@ -32344,6 +32418,7 @@ screens:
   navigation:
     entryFrom:
     - ADM-519
+    - ADM-002
     exitTo:
     - ADM-519
     transitions:
@@ -37875,6 +37950,7 @@ screens:
   navigation:
     entryFrom:
     - ADM-549
+    - ADM-002
     exitTo:
     - ADM-549
     transitions:
@@ -38357,6 +38433,7 @@ screens:
   navigation:
     entryFrom:
     - ADM-549
+    - ADM-002
     exitTo:
     - ADM-549
     transitions:

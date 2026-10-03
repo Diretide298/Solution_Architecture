@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Seating & Venue Mapping
   version: 0.1.0
-  x-ticvai-screen-count: 54
+  x-ticvai-screen-count: 55
   x-ticvai-tier: satellite
   x-ticvai-module: 21 — Seat Management & Venue Mapping
   x-ticvai-requirements: 112
@@ -1492,8 +1492,14 @@ paths:
         format: uuid
     post:
       operationId: extendSeatHold
+      x-ticvai-consumed-by:
+        - "P01 WEB-011 Guest Details & Attendee Forms"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
+      - guest
       summary: Extend a hold
       description: 'For a guest still completing payment. Bounded by the venue''s maximum, so a hold cannot
         be renewed indefinitely against a busy performance.
@@ -1503,10 +1509,18 @@ paths:
         `VenueSettings.seating.seatHoldMaxExtensions` times. **Proposed defaults 300 seconds and 2
         extensions, client to correct (audit R094).**
 
+
+        **A guest extends their own hold within their own session** (3 October 2026, CHG-R1S-023; as
+        `createSeatHold`, Chinmay, 3 October, Pattern 4 group 3: purchase actions are guest-callable within the
+        guest''s own session). WEB-011 offers it from the warning before the hold lapses; a guest needs no
+        permission and extends only a hold of their own cart. `ORDER_CREATE` is what a staff caller holds to do it
+        for a guest.
+
         '
       tags:
       - hold
       x-ticvai-permission: ORDER_CREATE
+      x-ticvai-guest-callable: true
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -2306,6 +2320,9 @@ paths:
                   nullable: true
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
           content:
             application/json:
@@ -2826,6 +2843,9 @@ paths:
                   default: true
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Reassigned
           content:
             application/json:

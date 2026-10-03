@@ -975,6 +975,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Deploying
           content:
             application/json:
@@ -1189,6 +1192,9 @@ paths:
               $ref: '#/components/schemas/GameplayAuthorisationRequest'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: The decision, with its reason
           content:
             application/json:
@@ -1476,6 +1482,9 @@ paths:
                   nullable: true
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
           content:
             application/json:
@@ -2413,7 +2422,7 @@ components:
           items:
             type: string
             format: uuid
-        coversGamesAddedLater:
+        includesGamesAddedLater:
           type: boolean
           default: true
           description: '**Whether a pass sold today covers a game added tomorrow** (Chinmay, 2 October, workbook Q397:
@@ -3025,7 +3034,7 @@ components:
           nullable: true
           readOnly: true
           description: When the reader lost its connection; null while online.
-        refusingOfflineTaps:
+        isRefusingOfflineTaps:
           type: boolean
           readOnly: true
           description: '**True once the reader has been offline longer than the venue''s maximum offline duration**

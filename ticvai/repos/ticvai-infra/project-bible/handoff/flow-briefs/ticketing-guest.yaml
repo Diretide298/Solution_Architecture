@@ -1,0 +1,1620 @@
+# Flow design briefs: ticketing-guest (Ticketing & Guest Commerce as the guest and the partner meet it:
+# guest web P01, guest app P02, POS ticket sale P04, kiosk P05, staff handheld P06, partner portal P10).
+# Block A flows only. Written 3 October 2026 for the Claude Design storyboards and wireframes (TODO step 9b),
+# from the shared brief audit/ticvai/apply/FLOW-BRIEF-BRIEF.md.
+#
+# Read with: flows/F*.yaml, screens/P01, P02, P04, P05, P06, P10, handoff/design-notes/ticketing-guest.yaml
+# (process summary, vocabulary: Booking, Session, QR), and the contracts named in each `processing` entry.
+# Where this file and a contract disagree, the contract wins and the gap is under `open`.
+#
+# Scope rule used. A flow is in scope when its trigger belongs to ticketing-guest (entry screen, or first
+# step's screen, is a ticketing-guest screen in the design notes, or the lead assigned it) AND a step touches
+# a Block A screen or a Block A operation (BLOCK-A builds in handoff/service-docs/op-release.json). Steps on
+# screens that are not Block A are kept and marked `blockA: false`. The kiosk is drawn in full (answers 3 Oct,
+# "Claude Design batches, clarified": the kiosk is pending and gets its navigable HTML and board), so kiosk
+# flows carry every kiosk screen they touch even though only KSK-015 is a Block A ticket.
+#
+# Rules every guest frame follows (design-notes ticketing-guest processSummary, MoM 29 Sep W1-W12, MoM 30 Sep):
+#  - Order of a dated booking: date, then time (hidden until a date), then tickets (hidden until a time).
+#  - Nothing is held on a look. Capacity is held when a quantity goes into the basket: 15-minute basket
+#    hold, 8 minutes for seats and cabanas, one extension. ONE countdown is shown: Cart.expiresAt.
+#  - Sign-in or the six-digit guest code is asked when the guest leaves Add-ons (settings.signInAt
+#    afterAddOns, default) or at payment (atPayment); after the code only the T&Cs tick remains (W1).
+#  - The order is created before payment; an unknown payment outcome reads "We're checking with your bank.
+#    You won't be charged twice." and never offers a retry.
+#  - Guest surfaces are white-label with "Powered by TICVAI" kept; the till and the handheld stay TICVAI-branded.
+#  - Arabic mirrors the layout; the basket stays on the right unless the venue chose Mirror to left.
+process: ticketing-guest
+written: 2026-10-03
+writtenBy: flow-brief agent (Claude) for ticketing-guest and ticketing-backoffice
+coverage:
+  covered: ["F01", "F02", "F03", "F07", "F10", "F14", "F17", "F19", "F25", "F33", "F34", "F48", "F50", "F51", "F52", "F55", "F57", "F58", "F59", "F66", "F75"]
+  skipped:
+    - flows: ["F11", "F18", "F21", "F31", "F32", "F49", "F53", "F67", "F71", "F81", "F108"]
+      reason: >-
+        They pass through ticketing-guest screens but their trigger belongs to another process (entry or first
+        screen owned by fnb-retail, venue-operations, customer-marketing or platform-foundation in the design
+        notes): F11, F18, F31, F32, F108 fnb-retail; F21, F49, F67 venue-operations; F53 customer-marketing;
+        F71, F81 platform-foundation.
+    - flows: "every other flow whose trigger is ticketing-guest"
+      reason: No step touches a Block A screen or a Block A operation.
+  ownershipNotes:
+    - F01 enters on WEB-001 (a white-label screen in the design notes); the lead assigned it here because its trigger is a ticket purchase.
+    - F07 and F75 (kiosk) were assigned here by the lead; F57 (kiosk failure) follows them.
+    - F52 enters on GST-074 (venue-operations notes) but its trigger is a guest booking a cabana; covered here with F25. Venue-operations may also brief it.
+    - F33 and F34 run on the till (POS-002, a ticketing-guest screen) and are covered here; fnb-retail may also touch F34's retail return.
+
+flows:
+
+  F01:
+    title: Guest buys a ticket online
+    process: ticketing-guest
+    trigger: >-
+      A guest arrives wanting to visit. Most arrive on a product page from search or a campaign link, not the
+      homepage, so the flow works from any entry point: organic search to a product page; campaign link with a
+      promotion code; QR code in venue or on print; direct to the homepage. Entry screen WEB-001.
+    actors:
+      - {role: "guest (anonymous, guest-code or signed in)", app: "P01 Guest Web Storefront (guest-web)", screens: ["WEB-001", "WEB-004", "WEB-006", "WEB-005", "WEB-010", "WEB-011", "WEB-012", "WEB-013", "WEB-016"]}
+      - {role: "payment provider", app: "Stripe or Network International (embedded fields or hosted page)", does: "authorises the card, Apple Pay or Google Pay"}
+    inputs:
+      - name: venue choice
+        formats: ["venue picker (name, city, today's hours) from the tenant's published active venues"]
+        limits: skipped when the tenant has one venue; remembered on the device; Change venue in the header
+        validation: none
+        source: guest, WEB-001 on first open
+      - name: language
+        formats: ["EN / العربية header button", "only the tenant's enabled languages"]
+        limits: whole page mirrors in Arabic
+        validation: none
+        source: guest, header on every page
+      - name: date
+        formats: ["strip of the next dateStripDays days (default 7, venue range 3 to 31) plus a calendar icon for the month"]
+        limits: days with no performance, sold out online or outside the channel's sales window are disabled with the reason, never hidden
+        validation: "Sold-out day hover: the reason, e.g. 'Sold out online for today, tomorrow has space'."
+        source: guest, WEB-006 (or the WEB-004 single-event date strip)
+      - name: time (session)
+        formats: ["up to 8 large tiles; more than 8 as compact tiles paged timesPerPage (default 24) with Earlier / Later and Morning", "Afternoon", "Evening"]
+        limits: hidden until a date is picked, hint "Choose a date to see times"
+        validation: "Sold out between load and tap: '19:30 has just sold out' with the next available time pre-selected; 'Sold out online' tile while the gate still sells (per-channel, not a bug)."
+        source: guest, WEB-006
+      - name: consent and eligibility questions
+        formats: ["venue questions such as 'Are you able to swim?' as an on-page three-way question (All, Some, None of us); age and height bands per person"]
+        limits: asked once, right after the session or date is picked; per person or once per booking as the question says
+        validation: "A person who does not qualify is flagged 'Can't take part, too short' with Remove this guest or Change ticket. A required question blocks Continue."
+        source: guest, WEB-006 overlays consentQuestions and eligibilityDeclaration
+      - name: ticket and guest counters
+        formats: ["ticket cards first", "then counters Adult", "Child", "Senior", "Infant", "Person of determination priced from the chosen ticket"]
+        limits: steppers start at 0, minus disabled at 0; plus stops at the remaining count
+        validation: "'Only 4 left for 19:30' when raising past what is left; Continue stays off until a time and a quantity are chosen; info-only products show 'Contact sales to book' (server 409)."
+        source: guest, WEB-005
+      - name: promotion code
+        formats: ["one text field with Apply in the basket"]
+        limits: one field; entered only in the basket (WEB-005 shows near-miss offers only)
+        validation: "Two refusals read differently: 'This code doesn't exist or has been used up' (promoCodeInvalid) and 'This code is valid, but nothing in your basket qualifies' (promoCodeNotApplicable); the failed condition is named (expired, already used, wrong channel, membership required)."
+        source: guest (often pre-filled from a campaign link), WEB-010
+      - name: guest contact and six-digit code
+        formats: ["only the fields the venue configured (email only by default; email + name; email + mobile + name)", "then a code of exactly six digits"]
+        limits: asked when the guest leaves Add-ons (signInAt afterAddOns) or at payment (atPayment)
+        validation: "Email or mobile, at least one, never both forced. The copy says six digits. After the code nothing about the guest is asked again."
+        source: guest, WEB-016 pop-up
+      - name: attendee details and marketing opt-in
+        formats: ["holder blocks \"Ticket 2 of 4 - Child\" for name-bound tickets only; unticked opt-in per configured channel (\"by email\", \"by WhatsApp\"); ID document upload only when eligibility needs it"]
+        limits: holder with no date of birth on an age-ruled product is treated as a minor and asked inline
+        validation: Skipped for a guest who proved the contact with the code or is signed in, when the cart needs no holder details or answers (W1).
+        source: guest, WEB-011
+      - name: terms tick and payment method
+        formats: ["required T&Cs tick; card (embedded fields or hosted page)", "Apple Pay", "Google Pay; wallet balance and split with card for signed-in guests"]
+        limits: Pay stays off until the T&Cs are ticked
+        validation: "Declined: the order persists unpaid and Retry reuses the same idempotency key. Offline: Pay unavailable with the reason; typed values stay."
+        source: guest, WEB-012
+    processing:
+      - {input: "entry", does: "renders the tenant's published branding and what is on; maintenance or not-configured pages replace the home", operation: ["white-label#getPublishedTenantConfig", "white-label#getTenantAppStatus", "catalogue#listProducts"]}
+      - {input: "product", does: "reads product and performances", operation: ["catalogue#getProduct", "catalogue#listPerformances"]}
+      - {input: "date and time", does: "reads availability for every time of the event in the window in one call, from a one-second cache (ADR-0065); holds nothing", operation: "catalogue#getAvailability"}
+      - {input: "tickets and counters", does: "prices each guest type from the chosen ticket and evaluates promotions for a running total; adding to the basket takes a 15-minute cart hold (acquireInventoryHold, holder kind cart)", operation: ["catalogue#listProductVariants", "promotions#evaluatePromotions", "orders#addCartLine"]}
+      - {input: "promotion code", does: "validates and applies the code", operation: ["promotions#getCouponCode", "promotions#evaluatePromotions"]}
+      - {input: "details", does: "prefills from the profile; lists consent purposes; records answers", operation: ["marketing-crm#getMyProfile", "marketing-crm#listConsentPurposes", "marketing-crm#recordConsentAnswers"]}
+      - {input: "terms and payment", does: "creates the order first, then the payment; payment converts the cart's holds into entitlements; unknown outcome is inquired, never retried", operation: ["orders#createOrder", "orders#createPayment", "orders#inquirePaymentStatus"]}
+      - {input: "order", does: "shows the order and resends tickets by the chosen channel", operation: ["orders#getOrder", "orders#reprintOrder"]}
+    outputs:
+      - name: availability (WEB-006)
+        states: {loading: "date strip skeleton", ready: "dates then times with remaining capacity", emptyNoResults: "no performances in the window", offline: "cannot start: the storefront needs a connection", error: "names the failed read"}
+        failure_branches:
+          - {what: "session sells out between load and selection", sees: "'19:30 has just sold out', next time pre-selected", recover: "pick the offered time"}
+          - {what: "online share sold out while the gate still sells", sees: "'Sold out online' on the tile", recover: "another time or date"}
+      - name: basket with running total and countdown (WEB-010)
+        states: {emptyFirstRun: "empty basket", ready: "lines '<ticket> · <guest type> × <n>', promotion applied, total, one countdown", expiring: "countdown near zero with Extend (one extension)", expired: "'Your basket has expired' with Start again (410 cartExpired)"}
+        failure_branches:
+          - {what: "a line became unavailable while the basket sat", sees: "line marked 'No longer available' with Remove; a lapsed hold says 'Your hold ended', not 'Sold out'; Checkout off", recover: "remove or re-add"}
+          - {what: "promotion code does not apply", sees: "one of the two refusal messages naming the failed condition", recover: "another code or continue"}
+      - name: payment result (WEB-012)
+        states: {processing: "paying", paid: "goes to confirmation", declined: "order kept unpaid with Retry", unknown: "'We're checking with your bank. You won't be charged twice.' then paid, declined or still unknown (result emailed, order reference shown)"}
+        failure_branches:
+          - {what: "payment taken but no response (the failure to build for)", sees: "inquiry state, never a retry", recover: "orders#inquirePaymentStatus; background reconciler resolves abandoned inquiries"}
+          - {what: "a hold lapsed before Pay", sees: "line re-acquired before charging, or refused with the reason", recover: "card never charged for capacity that is gone"}
+      - name: confirmation and tickets (WEB-013)
+        states: {ready: "order number first; tickets to Apple Wallet, Google Wallet, email, SMS, WhatsApp; dynamic-QR events say the working code is in the app", error: "order number and a support route; never implies the purchase failed", unpaid: "'Unpaid, pay by 14:32' with Pay now (WEB-014)"}
+        failure_branches:
+          - {what: "confirmation fails to load after payment", sees: "order number and support route", recover: "Resend my tickets (reprintOrder)"}
+    steps:
+      - {frame: 1, screen: "WEB-001", blockA: true, sees: "the tenant's branded home, venue picker on first visit, Powered by TICVAI in the footer", does: "picks the venue and opens a product", operation: "white-label#getPublishedTenantConfig, white-label#getTenantAppStatus, catalogue#listProducts", result: "sees what is on"}
+      - {frame: 2, screen: "WEB-004", blockA: true, sees: "product page: video (poster if it cannot play), what is included, Book", does: "decides and taps Book", operation: "catalogue#getProduct, catalogue#listPerformances", result: "understands what and roughly when"}
+      - {frame: 3, screen: "WEB-006", blockA: true, sees: "date strip; times hidden with 'Choose a date to see times'", does: "picks a date", operation: "catalogue#getAvailability", result: "that day's times appear"}
+      - {frame: 4, screen: "WEB-006", blockA: true, sees: "time tiles with remaining capacity", does: "picks a time; answers 'Are you able to swim?' once if the venue asks", operation: "catalogue#getAvailability", result: "nothing held yet"}
+      - {frame: 5, screen: "WEB-005", blockA: true, sees: "ticket cards, then guest counters for the chosen ticket; running total; near-miss offer ('Add one more child for the family rate')", does: "chooses 1-park ticket, 2 adults and 1 child", operation: "catalogue#listProductVariants, promotions#evaluatePromotions, orders#addCartLine", result: "basket line added; 15-minute countdown starts"}
+      - {frame: 6, screen: "WEB-016", blockA: true, sees: "sign in or continue as guest pop-up: email, then the six-digit code", does: "enters email and the code", operation: "identity#requestGuestOtp, identity#verifyGuestOtp, orders#claimCart", result: "contact proved; nothing asked again"}
+      - {frame: 7, screen: "WEB-010", blockA: true, sees: "basket sidebar with lines, promo field and the one countdown", does: "applies a code from the campaign link", operation: "promotions#getCouponCode, promotions#evaluatePromotions", result: "final price or a named refusal"}
+      - {frame: 8, screen: "WEB-011", blockA: true, sees: "holder details only for name-bound tickets; unticked opt-in", does: "completes what the cart still needs (skipped when nothing is needed)", operation: "marketing-crm#getMyProfile, marketing-crm#listConsentPurposes", result: "details complete"}
+      - {frame: 9, screen: "WEB-012", blockA: true, sees: "T&Cs tick, card fields, Apple Pay and Google Pay buttons", does: "ticks T&Cs and pays", operation: "orders#createOrder, orders#createPayment", result: "paid, declined or checking with your bank"}
+      - {frame: 10, screen: "WEB-013", blockA: true, sees: "order number, Add to Apple Wallet / Google Wallet, email and WhatsApp resend", does: "adds tickets to the wallet", operation: "orders#getOrder, orders#reprintOrder", result: "tickets delivered"}
+    motion:
+      - "Staged reveal on WEB-006/WEB-005: times slide in under the date strip once a date is picked; ticket cards then counters reveal once a time is picked (200-250 ms ease-out); earlier stages stay visible."
+      - "Running total in the basket counts to the new value when a counter changes; promotion savings line fades in."
+      - "Basket countdown ticks every second (mm:ss) from Cart.expiresAt; at 2 minutes it turns amber and offers Extend once."
+      - "WEB-004 product video plays inline with no loader; poster shown while buffering (videoBuffering state)."
+      - "WEB-012 unknown outcome: a calm progress indicator with 'We're checking with your bank'; it resolves in place to paid or declined."
+      - Arabic switch mirrors the layout without a page reload.
+    decisions: ["W1 (sign-in or code when leaving Add-ons; after the code only the T&Cs)", "W12 (published booking flow settings)", "REV3-2 (date first, then time, then tickets)", "ADR-0065 (availability from a one-second cache; the hold decides)", "DEC-023 and DEC-119 (opt-in unticked by default)", "DEC-120 (a verified match attaches automatically)", "DEC-115 (free guest type up to 1 per 10)", "DEC-116 (group minimum default 10)", "DEC-117 (swim vest is an add-on)", "DEC-118 (All / Some / None of us filter)", "DEC-163 (client-approved wireframes are the layout)"]
+    sources: ["flows/F01-guest-online-purchase.yaml", "design-notes ticketing-guest WEB-004 to WEB-013", "design-notes white-label WEB-001", "design-notes customer-marketing WEB-011", "MoM 29 Sep 1 (W1-W12)", "CLIENT-RESPONSE-30SEP", "CLIENT-RESPONSE-REV3-25SEP"]
+    open:
+      - {question: "Sandbox credentials for Stripe and Network International are outstanding (flow open question).", default: "Draw the embedded card fields generic (no provider logo) with Apple Pay and Google Pay buttons; the unknown-outcome branch is drawn regardless."}
+      - {question: "Exact copy for a declined card", default: "'Your bank declined this payment. Nothing was charged. Try again or use another card.'"}
+
+  F02:
+    title: Guest buys seated tickets
+    process: ticketing-guest
+    trigger: A guest choosing a specific seat rather than general admission. Entry screen WEB-004.
+    actors:
+      - {role: "guest", app: "P01 Guest Web Storefront", screens: ["WEB-004", "WEB-006", "WEB-007", "WEB-010", "WEB-011", "WEB-012"]}
+    inputs:
+      - name: performance
+        formats: ["inline date and time step (seatEventDateMode inlineStep, default), a date-then-time pop-up over the map (popupOnSeatMap), or the time bar above the map (seatTimeBar on)"]
+        limits: an event with exactly one on-sale performance skips the step and opens on the seat map
+        validation: "Switching performance with seats held confirms 'Changing the show releases your 4 seats' then releases them (relinquishSeatHold)."
+        source: guest, WEB-006 or WEB-007
+      - name: section
+        formats: ["map sections coloured by price band with the price on the map; standing sections (\"fan pit\") as a block with a quantity stepper"]
+        limits: none
+        validation: Tap zooms in place on the same map, never a modal or a new page.
+        source: guest, WEB-007
+      - name: seats
+        formats: ["equal-size dots; available in the section's price colour", "taken grey", "picked highlighted; tap picks and holds", "tap again releases"]
+        limits: at most VenueSettings.seating.maxSeatsPerGuestOrder per booking on a guest channel (default 10, bounds 1 to 50)
+        validation: "11th seat refused (422 seat-limit-exceeded). Orphan seat refused: 'Please don't leave a single seat between bookings'. Taken between draw and tap: 'Seat A4 was just taken', dot turns grey, other held seats kept."
+        source: guest, WEB-007
+      - name: recommend seats
+        formats: ["preference best available or together; party size is the tickets already chosen"]
+        limits: per contract (strategy, categoryIds, maxPrice, accessibleCount, maxOptions)
+        validation: none beyond the contract
+        source: guest, WEB-007 overlay formRecommendSeats (GFIX-3)
+      - name: contact, details, terms and payment
+        formats: ["as F01 frames 6", 8, 9]
+        limits: as F01
+        validation: as F01
+        source: guest, WEB-016, WEB-011, WEB-012
+    processing:
+      - {input: "performance", does: "reads availability; routes seated performances to the map", operation: "catalogue#getAvailability"}
+      - {input: "map", does: "reads seat status; renderMode list when the map has no geometry", operation: "seating#getSeatAvailability"}
+      - {input: "seats", does: "holds the seats for 8 minutes (one extension); the basket shows one countdown from Cart.expiresAt", operation: ["seating#createSeatHold", "seating#extendSeatHold", "seating#relinquishSeatHold", "seating#recommendSeats"]}
+      - {input: "basket", does: "evaluates promotions", operation: "promotions#evaluatePromotions"}
+      - {input: "details", does: "prefills and lists consents", operation: ["marketing-crm#getMyProfile", "marketing-crm#listConsentPurposes"]}
+      - {input: "payment", does: "creates the order then the payment; the hold converts to entitlements", operation: ["orders#createOrder", "orders#createPayment"]}
+    outputs:
+      - name: seat map (WEB-007)
+        states: {loading: "map skeleton", ready: "sections coloured by price band", zoomed: "seats as dots", list: "no geometry: price categories and best-available groups as a list, saying so", offline: "banner; loaded map stays", error: "names the read that failed"}
+        failure_branches:
+          - {what: "map has no geometry", sees: "list mode, never an empty frame", recover: "sell from categories"}
+          - {what: "selection would leave an orphan seat", sees: "refusal with the reason", recover: "pick another seat"}
+      - name: seat hold countdown
+        states: {holding: "one countdown", expiring: "Extend offered before expiry (one extension)", expired: "seats return to the map; basket lines removed with a notice"}
+        failure_branches:
+          - {what: "hold expires while reading the basket", sees: "what was lost with one action to re-select", recover: "re-select"}
+          - {what: "hold expires during the details form (most likely place)", sees: "extension offered proactively near zero", recover: "Extend"}
+          - {what: "hold lapsed between basket and payment and the seats are gone", sees: "which seats and the nearest equivalent", recover: "accept the nearest equivalent"}
+      - name: paid order
+        states: {paid: "seats sold and hold converted", unknown: "as F01"}
+        failure_branches: []
+    steps:
+      - {frame: 1, screen: "WEB-004", blockA: true, sees: "seated event page", does: "taps Book", operation: "catalogue#getProduct", result: "goes to the date/time step or the map"}
+      - {frame: 2, screen: "WEB-006", blockA: true, sees: "dates then times", does: "picks a performance", operation: "catalogue#getAvailability", result: "routed to the seat map"}
+      - {frame: 3, screen: "WEB-007", blockA: true, sees: "whole venue with sections coloured by price band, prices on the map, time bar above", does: "taps a section", operation: "seating#getSeatAvailability", result: "zooms in place into the section"}
+      - {frame: 4, screen: "WEB-007", blockA: true, sees: "seat dots in the section's price colour", does: "taps 4 seats (or Recommend seats)", operation: "seating#createSeatHold", result: "seats held; basket lists each seat; countdown starts (8 minutes)"}
+      - {frame: 5, screen: "WEB-007", blockA: true, sees: "a refusal toast ('Please don't leave a single seat between bookings' or 'Seat A4 was just taken')", does: "picks again", operation: "seating#createSeatHold", result: "valid selection"}
+      - {frame: 6, screen: "WEB-010", blockA: true, sees: "one line per seat with the countdown", does: "reviews; applies a code", operation: "promotions#evaluatePromotions", result: "final price"}
+      - {frame: 7, screen: "WEB-011", blockA: true, sees: "details with the countdown visible and Extend offered near zero", does: "completes details; extends once", operation: "marketing-crm#getMyProfile, seating#extendSeatHold", result: "hold kept"}
+      - {frame: 8, screen: "WEB-012", blockA: true, sees: "T&Cs and payment", does: "pays", operation: "orders#createOrder, orders#createPayment", result: "seats sold"}
+    motion:
+      - "Section tap zooms the same map into the section (about 300 ms, ease-in-out); pinch or scroll zooms out to compare sections; nearby sections show their seats as dots at the same size."
+      - "Seat dot state changes: tap fills the dot with the highlight colour; a seat taken by someone else fades to grey; released seats return to the price colour."
+      - "Single countdown (mm:ss) ticks every second on the map, the basket and the details step; amber with Extend at 2 minutes (default, see open); red in the last 30 s."
+      - "Hold expired: held seats animate back to available on the map and the basket lines collapse with a notice."
+    decisions: ["CHG-SGU-020 (one countdown Cart.expiresAt; no transition to back office)", "REV3-6 (switching time releases the old hold)", "GFIX-3 (recommend seats form)", "Seat hold 8 minutes, basket 15, one extension (design-notes processSummary, 29 Sep)", "maxSeatsPerGuestOrder default 10, bounds 1-50 (29 Sep)"]
+    sources: ["flows/F02-guest-buys-seated-tickets.yaml", "screens/P01-guest-web-storefront.yaml WEB-007 (drawn 26 Aug, Seat Board 3 frame seat-3b)", "design-notes ticketing-guest WEB-007", "contracts/satellite/seating.yaml#createSeatHold"]
+    open:
+      - {question: "When does the extension offer appear?", default: "At 2 minutes remaining on the single countdown; one extension of the seat hold's length (8 minutes)."}
+      - {question: "Exact copy for the seat-limit refusal", default: "'You can book up to 10 seats in one booking.'"}
+
+  F59:
+    title: A seat is picked, held and sold at a window
+    process: ticketing-guest
+    trigger: A guest wants a specific seat and is standing at a box-office window while somebody else may be buying it online. Entry POS-004 (from the POS-002 sell drawer).
+    actors:
+      - {role: "cashier", app: "P04 Point of Sale (venue-pos)", screens: ["POS-002", "POS-004", "POS-005"]}
+      - {role: "guest", app: "none (watches the customer display)", does: "chooses the seat and pays"}
+    inputs:
+      - name: performance
+        formats: ["performance picked in the POS-002 sell drawer"]
+        limits: live availability only; never a cached map
+        validation: "Offline: the seat map is not available ('Seats need the server'); the till sells unreserved admission only."
+        source: cashier, POS-002
+      - name: seats
+        formats: ["tap to hold on the seat plan; \"Keep the party together\"; Best available for a group"]
+        limits: up to 10 seats per sale on the till; four seat states exactly (available, selected, sold, accessible)
+        validation: "Another till or the web holds the seat first: createSeatHold fails and the map refreshes. Zone sells out while choosing: zone struck out, map reloads, cart stays. No extend at the till (POSV2-11, DEC-552)."
+        source: cashier with the guest, POS-004
+      - name: tender
+        formats: ["card", "cash", "Apple Pay or Google Pay", "gift card or voucher", "wallet; split with Add to split", "Exact", "Half and quick amounts"]
+        limits: buyer name, address and TRN required above AED 10,000 for a full tax invoice
+        validation: "Card outcome unknown: 'Check payment status', never a second charge. Offline: cash only, card disabled with the reason. Hold expired while paying: payment refused rather than the seat taken back."
+        source: cashier, POS-005
+    processing:
+      - {input: "performance", does: "reads the performance and live seat status", operation: ["catalogue#getPerformance", "seating#getSeatAvailability"]}
+      - {input: "seats", does: "holds for the venue-set time; on lapse re-holds if the seat is still free", operation: ["seating#createSeatHold", "seating#getSeatHold"]}
+      - {input: "tender", does: "creates the order then the payment; the hold converts server-side on payment success", operation: ["orders#createOrder", "orders#createPayment"]}
+    outputs:
+      - name: seat plan (POS-004)
+        states: {loading: "plan loading", ready: "four seat states by category colour", offline: "not available; seats need the server", denied: "seat lost to another channel", zoneUnavailable: "zone struck out", error: "names the failed read"}
+        failure_branches:
+          - {what: "another channel holds the seat first", sees: "hold fails and the map refreshes (contended)", recover: "pick another seat"}
+          - {what: "hold lapses while the guest is slow", sees: "seat re-held if free; if sold the map shows it sold", recover: "pick again"}
+      - name: payment (POS-005)
+        states: {ready: "tenders and split", processing: "card in progress", unknown: "Check payment status", paid: "entitlements issued; tickets printed or sent"}
+        failure_branches:
+          - {what: "hold expired while paying", sees: "payment refused", recover: "re-pick the seat before paying"}
+    steps:
+      - {frame: 1, screen: "POS-002", blockA: true, sees: "sell board with the event tile", does: "taps the seated performance", operation: none, result: "seat map drawer opens"}
+      - {frame: 2, screen: "POS-004", blockA: true, sees: "seat plan with categories and live availability", does: "taps two seats with the guest watching", operation: "catalogue#getPerformance, seating#getSeatAvailability, seating#createSeatHold", result: "seats held (a hold, not a reservation)"}
+      - {frame: 3, screen: "POS-004", blockA: true, sees: "hold lapsed indicator; seat re-held, or shown sold", does: "continues or re-picks", operation: "seating#getSeatHold, seating#createSeatHold", result: "hold current"}
+      - {frame: 4, screen: "POS-005", blockA: true, sees: "tender options and split", does: "takes card payment", operation: "orders#createOrder, orders#createPayment", result: "seat sold; tickets issued"}
+    motion:
+      - Seat state changes in place (selected highlight; a seat taken elsewhere flips to sold as the map refreshes).
+      - Hold timer on the drawer ticks down (venue-set time); no extend button.
+    decisions: ["POSV2-11 and DEC-552 (no extend at the till)", "Up to 10 seats per sale on the till (design notes POS-004)"]
+    sources: ["flows/F59-*.yaml", "design-notes ticketing-guest POS-004 and POS-005", "contracts/satellite/seating.yaml"]
+    open:
+      - {question: "Venue-set hold time at the till", default: "8 minutes (as the guest seat hold)."}
+
+  F03:
+    title: Partner books on credit
+    process: ticketing-guest
+    trigger: A reseller books against an agreed credit line rather than paying up front. Entry PTR-002 (after signing in on PTR-001).
+    actors:
+      - {role: "partner (reseller or tour operator)", app: "P10 Partner & Reseller Portal", screens: ["PTR-001", "PTR-002", "PTR-007", "PTR-008", "PTR-016"]}
+      - {role: "supervisor", app: "P08", does: "authorises a single-order credit override"}
+    inputs:
+      - name: sign-in
+        formats: ["partner credentials on the portal door PTR-001"]
+        limits: the door reads no credit (CHG-DOOR-003)
+        validation: per identity contract
+        source: partner, PTR-001
+      - name: availability search
+        formats: ["product", "date", "quantity"]
+        limits: shows the B2B channel's allocation, not the total
+        validation: "B2B allocation exhausted: 'Sold out for partners on this date' while other channels may still sell (correct under channel allocation)."
+        source: partner, PTR-007
+      - name: booking
+        formats: ["products and quantities against the partner account"]
+        limits: within available credit
+        validation: "Exceeds available credit: refused with the shortfall stated. Account suspended: refused with the reason, worded as commercial, not a fault."
+        source: partner, PTR-008
+    processing:
+      - {input: none, does: "reads the credit position before an order is built", operation: "orders#getB2bCredit"}
+      - {input: "search", does: "reads B2B availability", operation: "catalogue#getAvailability"}
+      - {input: "booking", does: "raises the order against the partner account", operation: "orders#createOrder"}
+      - {input: "order", does: "issues vouchers for onward distribution", operation: "orders#reprintOrder"}
+    outputs:
+      - name: credit position
+        states: {ready: "available credit, used, limit (AED)", error: "cannot start without the primary"}
+        failure_branches: []
+      - name: booking result
+        states: {created: "order on credit", refused: "shortfall or suspension stated", escalated: "awaiting a credit override decision"}
+        failure_branches:
+          - {what: "order exceeds available credit", sees: "refusal with the shortfall (e.g. 'Short by AED 2,400')", recover: "supervisor single-order override (overrideCreditLimit) that records who and expires"}
+      - name: vouchers
+        states: {ready: "download PDF per ticket or as a batch"}
+        failure_branches: []
+    steps:
+      - {frame: 1, screen: "PTR-001", blockA: true, sees: "partner sign-in", does: "signs in", operation: "identity#login, identity#createMfaChallenge, identity#verifyMfaChallenge, identity#getCurrentSession", result: "lands on the dashboard"}
+      - {frame: 2, screen: "PTR-002", blockA: false, sees: "credit position card first", does: "reviews credit", operation: "orders#getB2bCredit", result: "knows available credit before building an order"}
+      - {frame: 3, screen: "PTR-007", blockA: false, sees: "B2B allocation per date", does: "searches", operation: "catalogue#getAvailability", result: "what partners may sell"}
+      - {frame: 4, screen: "PTR-008", blockA: false, sees: "booking form with the credit remaining", does: "creates the booking", operation: "orders#createOrder", result: "order on credit or a stated refusal"}
+      - {frame: 5, screen: "PTR-016", blockA: false, sees: "voucher download", does: "downloads vouchers", operation: "orders#reprintOrder", result: "tickets for onward distribution"}
+    motion: none
+    decisions: ["CHG-DOOR-003 (the door reads no credit)", "CHG-WIR-021 (credit read on PTR-002)"]
+    sources: ["flows/F03-partner-books-on-credit.yaml", "contracts/spine/orders.yaml#createOrder"]
+    open:
+      - {question: "Partner portal screens other than PTR-001 are later blocks; are they drawn now?", default: "Draw PTR-002 to PTR-016 as context frames on the partner board (the partner portal is a Block A app through PTR-001)."}
+      - {question: "Exact credit refusal copy", default: "'This booking is AED 2,400 over your available credit. Ask your account manager for an override.'"}
+
+  F10:
+    title: Partner books, uses and settles
+    process: ticketing-guest
+    trigger: >-
+      A tour operator books a block, distributes vouchers to its customers, those customers arrive over weeks, and
+      at month end the two businesses reconcile. Entry points: contracted allocation, ad-hoc block booking, API
+      integration. Entry PTR-002.
+    actors:
+      - {role: "partner", app: "P10 Partner Web", screens: ["PTR-001", "PTR-002", "PTR-008", "PTR-015"]}
+      - {role: "steward (gate)", app: "P07 Venue Scanner", screens: ["SCN-003"]}
+      - {role: "finance or venue manager", app: "P08 Staff Web", screens: ["BO-008"]}
+    inputs:
+      - name: block booking
+        formats: ["products", "dates", "quantities against the allocation"]
+        limits: within allocation and credit
+        validation: "Over the credit limit: refused or needs an override (overrideCreditLimit records who and why). Allocation exhausted: refused; the partner may buy at retail, shown as a different price."
+        source: partner, PTR-008
+      - name: voucher at the gate
+        formats: ["QR or barcode voucher on paper or phone"]
+        limits: read by camera or RFID/NFC reader; no typing on SCN-003
+        validation: "Expired voucher denied naming the expiry date. Already redeemed: denied, scan history says which. Gate offline: admitted from the bundle if the voucher is in it; a voucher issued after the last sync needs a manual override."
+        source: partner's customer, SCN-003
+    processing:
+      - {input: none, does: "reads allocation and credit", operation: "orders#getB2bCredit"}
+      - {input: "booking", does: "holds the block on credit and issues vouchers", operation: ["orders#createOrder", "orders#listOrders"]}
+      - {input: "voucher scan", does: "validates and redeems; offline from the bundle when needed", operation: "access#validateAccess"}
+      - {input: none, does: "reviews usage and expiry", operation: "orders#listOrders"}
+    outputs:
+      - name: allocation and credit (PTR-002)
+        states: {ready: "what the partner may sell and what it owes"}
+        failure_branches: []
+      - name: scan outcome (SCN-003)
+        states: {ready: "armed reader", admitted: "green with name", denied: "red with the reason", overrideRequired: "amber with Override access", offline: "same loop in amber; every scan journalled"}
+        failure_branches:
+          - {what: "voucher expired", sees: "denied naming the expiry date", recover: "duty manager decides"}
+          - {what: "voucher already redeemed", sees: "denied with the scan history", recover: "duty manager"}
+          - {what: "gate offline and the voucher post-dates the last sync", sees: "overrideRequired", recover: "steward manual override"}
+      - name: reconciliation
+        states: {ready: "used, unused and expired counts per booking"}
+        failure_branches:
+          - {what: "usage disputed", sees: "scan records with recordedAt and syncedAt", recover: "finance settles on the evidence"}
+    steps:
+      - {frame: 1, screen: "PTR-001", blockA: true, sees: "partner sign-in", does: "signs in", operation: "identity#login, identity#createMfaChallenge, identity#verifyMfaChallenge, identity#getCurrentSession", result: "lands on PTR-002"}
+      - {frame: 2, screen: "PTR-002", blockA: false, sees: "allocation and credit", does: "reviews", operation: "orders#getB2bCredit", result: "knows what it may sell"}
+      - {frame: 3, screen: "PTR-008", blockA: false, sees: "booking form", does: "books the block and receives vouchers", operation: "orders#createOrder, orders#listOrders", result: "held on credit; vouchers to distribute"}
+      - {frame: 4, screen: "SCN-003", blockA: true, sees: "armed reader", does: "scans a customer's voucher", operation: "access#validateAccess", result: "admitted (possibly offline)"}
+      - {frame: 5, screen: "PTR-015", blockA: false, sees: "order history with used and expired", does: "reviews usage", operation: "orders#listOrders", result: "usage known"}
+      - {frame: 6, screen: "BO-008", blockA: true, sees: "product detail (reconciliation context only)", does: "venue reconciles and invoices", operation: "none (listInterEntityObligations removed from BO-008)", result: "usage becomes money owed"}
+    motion:
+      - "SCN-003 outcome flash: full-screen green (admitted) or red (denied) for about 1.5 s, then back to armed; amber loop when offline."
+    decisions: ["CHG-DOOR-003", "CHG-WIR-018 (booking on PTR-008)", "CHG-WIR-021 (credit on PTR-002)", "DEC-140 (scanner shows name only; photo for accreditation)"]
+    sources: ["flows/F10-partner-books-uses-and-settles.yaml", "design-notes venue-operations SCN-003", "contracts/spine/access.yaml#validateAccess"]
+    open:
+      - {question: "Unused allocation at expiry: released or forfeited (flow open question; a contract term with no platform default).", default: "Per-partner setting 'At expiry: release back' as the drawn default."}
+      - {question: "Which screen reconciles partner usage into an invoice? BO-008 is a product screen.", default: "Draw frame 6 as a context frame; the reconciliation screen is a finance gap."}
+
+  F07:
+    title: Guest buys at a kiosk
+    process: ticketing-guest
+    trigger: >-
+      A guest at the entrance chooses to buy from a machine rather than queue for a counter. Nobody is standing
+      beside them, which changes every failure. Entry points: attract loop; guest touches the screen; redirected
+      from a full counter queue. Entry KSK-001. Drawn in full (answers 3 Oct: the kiosk gets its navigable HTML
+      and board); only KSK-015 is a Block A ticket, so frames carry blockA false except KSK-015.
+    actors:
+      - {role: "guest (unattended)", app: "P05 Guest Kiosk (white-labelled kiosk layout, touchLarge density)", screens: ["KSK-001", "KSK-002", "KSK-003", "KSK-004", "KSK-005", "KSK-006", "KSK-007", "KSK-008", "KSK-009", "KSK-010", "KSK-011", "KSK-012", "KSK-013", "KSK-014"]}
+      - {role: "card terminal", app: "attached payment terminal", does: "tap, insert or swipe; Apple Pay and Google Pay by tap"}
+      - {role: "ticket printer", app: "kiosk thermal printer", does: "prints tickets or wristbands"}
+      - {role: "staff", app: "P06 Staff App", does: "answers Call staff"}
+    inputs:
+      - name: touch to start
+        formats: ["touch anywhere on the attract loop"]
+        limits: none; the loop is a local asset and calls nothing
+        validation: none
+        source: guest, KSK-001
+      - name: language and accessibility
+        formats: ["one large button per enabled language in its own script (default first); accessibility button (large text, high contrast, reachable height)"]
+        limits: touch targets at least 44 px; choice applies to this guest only and resets with the session
+        validation: none
+        source: guest, KSK-002
+      - name: what are you buying
+        formats: ["category tiles with image and from-price; Collect my booking tile; Order food tile"]
+        limits: three or four options; at most two levels before a product
+        validation: none
+        source: guest, KSK-003
+      - name: tickets and quantities
+        formats: ["ticket cards then guest-type steppers priced from the chosen ticket"]
+        limits: steppers at least 64 px; plus disabled at the channel purchase limit
+        validation: "'Up to 6 tickets per purchase' when the plus stops. Tickets first, then date and time, on the kiosk only (DEC-170)."
+        source: guest, KSK-004
+      - name: session
+        formats: ["session tiles with time and places left"]
+        limits: onsite sales stay open to sell-out or the venue cutoff (e.g. 15 minutes before a timed show)
+        validation: "Sold out greyed; past the cutoff removed; sells out while choosing: KSK-005 refreshes and says so."
+        source: guest, KSK-005
+      - name: purchase-gating answer
+        formats: ["tick confirmations the product needs, e.g. 'I confirm I am not pregnant'"]
+        limits: only where the product needs it
+        validation: Pay stays off until answered.
+        source: guest, KSK-006
+      - name: card
+        formats: ["tap", "insert or swipe at the attached terminal; Apple Pay and Google Pay by tap"]
+        limits: card only; no cash, no foreign notes
+        validation: "Declined: back to KSK-007 with the reason; the hold is kept for the remaining window."
+        source: guest, KSK-007
+      - name: booking reference (collect path)
+        formats: ["scan the QR on the confirmation email", "or type the order number (venue prefix plus number, e.g. AQP-104582) on a large keypad"]
+        limits: one booking per lookup
+        validation: "Not found: 'We couldn't find that booking. Check the number or ask at the desk.' (see open)"
+        source: guest, KSK-011
+    processing:
+      - {input: "language", does: "loads the tenant's published kiosk branding and app status", operation: ["white-label#getPublishedTenantConfig", "white-label#getTenantAppStatus"]}
+      - {input: "category", does: "lists the few products offered at the kiosk", operation: "catalogue#listProducts"}
+      - {input: "tickets", does: "prices guest types from the ticket; reads availability from a one-second cache", operation: ["catalogue#listProductVariants", "catalogue#getAvailability"]}
+      - {input: "session", does: "takes the hold server-side as the cart line is added", operation: "orders#addCartLine"}
+      - {input: "review", does: "shows promotions before payment", operation: "promotions#evaluatePromotions"}
+      - {input: "card", does: "pays; an unknown outcome is inquired, never retried; nothing prints until the outcome is known", operation: ["orders#createPayment", "orders#inquirePaymentStatus"]}
+      - {input: "order", does: "prints tickets; on print failure sends them to the phone", operation: ["orders#getOrder", "orders#reprintOrder"]}
+      - {input: "help", does: "opens and closes an assist session", operation: "marketing-crm#endKioskAssist"}
+    outputs:
+      - name: kiosk session
+        states: {attract: "idle video loop", loading: "brand loading", ready: "screen for the current step", idle: "back to KSK-001 and the default language after the inactivity timer (90 s × sessionTimeoutMultiplier); the lease is released", outOfService: "KSK-014: 'This kiosk is not selling right now. Tickets are at the Main Gate desk or scan to buy online.' in English and Arabic"}
+        failure_branches:
+          - {what: "kiosk cannot reach the server or the catalogue is stale", sees: "KSK-014 out of service", recover: "staff; never a cached sale"}
+          - {what: "guest abandons mid-flow", sees: "times out to KSK-001", recover: "lease released automatically"}
+      - name: review and countdown (KSK-006)
+        states: {ready: "same line wording as the web basket, total in AED, a countdown for the held capacity"}
+        failure_branches: []
+      - name: payment (KSK-007, KSK-008)
+        states: {waiting: "'Tap, insert or swipe your card below' with an arrow to the reader and the amount", approved: "goes to KSK-009", declined: "reason and try again", unresolved: "KSK-008 'We're checking your payment. Please don't pay again.' with the order reference and Call staff"}
+        failure_branches:
+          - {what: "payment outcome unknown", sees: "KSK-008", recover: "automatic inquiry; then Call staff (KSK-013)"}
+      - name: ticket issued (KSK-009, KSK-010)
+        states: {printed: "order number, what printed, where to enter; email or SMS a copy", dynamicQr: "instructions to link the ticket in the app", printFailed: "KSK-010: the sale stands; Send to my phone (email or SMS) or Call staff to print at the desk"}
+        failure_branches:
+          - {what: "printer out of paper or jammed", sees: "KSK-010; kiosk marks itself degraded", recover: "tickets emailed and shown as a QR on screen"}
+    steps:
+      - {frame: 1, screen: "KSK-001", blockA: false, sees: "venue clips (6 to 12 s, no audio) and 'Touch to buy tickets' in English and Arabic; a line for collecting an online booking", does: "touches the screen", operation: "none (local asset)", result: "language choice"}
+      - {frame: 2, screen: "KSK-002", blockA: false, sees: "language buttons in their own scripts and the accessibility button; tenant logo; Powered by TICVAI at the foot", does: "taps العربية", operation: "white-label#getPublishedTenantConfig, white-label#getTenantAppStatus", result: "whole kiosk mirrors to Arabic for this guest"}
+      - {frame: 3, screen: "KSK-003", blockA: false, sees: "three or four large tiles plus Collect my booking and Order food; Help me choose", does: "taps Day pass", operation: "catalogue#listProducts", result: "product chosen"}
+      - {frame: 4, screen: "KSK-004", blockA: false, sees: "ticket cards then 64 px steppers", does: "sets 2 adults and 2 children", operation: "catalogue#listProductVariants, catalogue#getAvailability", result: "quantities set"}
+      - {frame: 5, screen: "KSK-005", blockA: false, sees: "session tiles with places left", does: "picks 14:00", operation: "catalogue#getAvailability, orders#addCartLine", result: "capacity held"}
+      - {frame: 6, screen: "KSK-006", blockA: false, sees: "lines and total in AED with promotions applied and the countdown", does: "confirms", operation: "promotions#evaluatePromotions", result: "ready to pay"}
+      - {frame: 7, screen: "KSK-007", blockA: false, sees: "terminal prompt with an arrow to the reader and the amount", does: "taps a card", operation: "orders#createPayment", result: "Approved, Declined or unknown"}
+      - {frame: 8, screen: "KSK-008", blockA: false, sees: "'We're checking your payment. Please don't pay again.' with the reference and Call staff", does: "waits", operation: "orders#inquirePaymentStatus", result: "resolves to approved or calls staff"}
+      - {frame: 9, screen: "KSK-009", blockA: false, sees: "order number and the printed tickets", does: "takes the tickets; optionally emails a copy", operation: "orders#getOrder, orders#reprintOrder", result: "ticket in hand"}
+      - {frame: 10, screen: "KSK-010", blockA: false, sees: "print failure with Send to my phone and Call staff", does: "sends to phone", operation: "orders#reprintOrder", result: "paid guest still leaves with a ticket"}
+      - {frame: 11, screen: "KSK-011", blockA: false, sees: "(collect path from frame 3) scan QR or type the order number on a large keypad", does: "scans the confirmation QR", operation: "orders#getOrder", result: "booking found"}
+      - {frame: 12, screen: "KSK-012", blockA: false, sees: "guest's name, date and the items to print in large type", does: "prints", operation: "orders#reprintOrder", result: "tickets or wristbands printed"}
+      - {frame: 13, screen: "KSK-013", blockA: false, sees: "'Help is on the way' with the kiosk number; keep using the kiosk", does: "presses the always-visible Call staff", operation: "marketing-crm#endKioskAssist (on end)", result: "a person comes"}
+      - {frame: 14, screen: "KSK-014", blockA: false, sees: "out-of-service message with where to buy instead and a website QR", does: "walks to the desk", operation: "white-label#getTenantAppStatus", result: "nobody stranded"}
+    motion:
+      - "KSK-001 attract loop: venue clips crossfade every 6 to 12 s, no audio; 'Touch to buy tickets' pulses gently."
+      - "KSK-007 terminal prompt: an animated arrow points to the card reader; Approved shows a tick animation."
+      - "KSK-008: a slow progress indicator while the payment is checked; never a retry button."
+      - "KSK-006 countdown for the held capacity ticks every second."
+      - "Inactivity: after the timer a 10-second 'Are you still there?' overlay counts down before the reset to KSK-001 (see open)."
+      - Language switch mirrors the whole layout immediately.
+    decisions: ["DEC-170 and CHG-SGU-015 (kiosk keeps tickets first, then date and time; supersedes REV3-2 for the kiosk only)", "CHG-SOT-005", "ADR-0065 (one-second availability cache)", "SPF-3 (KSK-015 stays in Block A although the rest of the kiosk is later)", "Answers 3 Oct, Claude Design batches: the kiosk is pending and is included with its own navigable HTML and board"]
+    sources: ["flows/F07-guest-buys-at-a-kiosk.yaml", "design-notes ticketing-guest KSK-001 and KSK-003 to KSK-010 and KSK-014", "white-label KSK-002", "fnb-retail KSK-011", "customer-marketing KSK-013", "contracts/satellite/white-label.yaml (sessionTimeoutMultiplier, 90-second inactivity timer)"]
+    open:
+      - {question: "Is there a warning before the inactivity reset?", default: "Yes: 10-second 'Are you still there?' with Continue."}
+      - {question: "Exact copy for a declined card", default: "'Your card was declined. Try another card or ask at the desk.'"}
+
+  F57:
+    title: A guest uses a kiosk and it fails
+    process: ticketing-guest
+    trigger: A guest is mid-purchase at an unattended machine and something breaks. Nobody is there. Entry KSK-006.
+    actors:
+      - {role: "guest", app: "P05 Guest Kiosk", screens: ["KSK-006", "KSK-007", "KSK-008", "KSK-010", "KSK-013", "KSK-014"]}
+      - {role: "staff", app: "P06 Staff App", does: "answers the assist request"}
+    inputs:
+      - name: review confirmation
+        formats: ["Pay on the review screen"]
+        limits: the last point a guest can correct anything alone
+        validation: as F07 frame 6
+        source: guest, KSK-006
+      - name: call staff
+        formats: ["one button", "always visible"]
+        limits: one assist session at a time per kiosk
+        validation: none
+        source: guest, KSK-013
+    processing:
+      - {input: "review", does: "reads and checks out the cart", operation: ["orders#getCart", "orders#checkoutCart"]}
+      - {input: "unresolved payment", does: "asks the provider what happened, never retries", operation: "orders#inquirePaymentStatus"}
+      - {input: "print failure", does: "resends the tickets to the phone", operation: "orders#reprintOrder"}
+      - {input: "help", does: "closes the assist session when staff, guest or timeout ends it; the record says who", operation: "marketing-crm#endKioskAssist"}
+      - {input: "nobody came", does: "withdraws the kiosk from sale", operation: "white-label#getTenantAppStatus"}
+    outputs:
+      - name: unresolved payment (KSK-008)
+        states: {checking: "'We're checking your payment. Please don't pay again.' with the reference", resolved: "continues to the ticket", undetermined: "held as unresolved and a person is called"}
+        failure_branches:
+          - {what: "status cannot be determined at all", sees: "held as unresolved with Call staff", recover: "staff resolves; the machine never decides"}
+      - name: print failure (KSK-010)
+        states: {ready: "Send to my phone or Call staff"}
+        failure_branches:
+          - {what: "printer fails after payment", sees: "the sale stands", recover: "tickets sent to the phone"}
+      - name: assist (KSK-013)
+        states: {waiting: "'Help is on the way' with the kiosk number", ended: "ended by staff, guest or timeout"}
+        failure_branches:
+          - {what: "nobody comes", sees: "kiosk goes out of service (KSK-014) instead of serving the next guest", recover: "staff restores it"}
+    steps:
+      - {frame: 1, screen: "KSK-006", blockA: false, sees: "review with total and countdown", does: "confirms", operation: "orders#getCart, orders#checkoutCart", result: "to payment"}
+      - {frame: 2, screen: "KSK-008", blockA: false, sees: "'We're checking your payment. Please don't pay again.'", does: "waits", operation: "orders#inquirePaymentStatus", result: "resolved or unresolved"}
+      - {frame: 3, screen: "KSK-010", blockA: false, sees: "paid; the printer failed; Send to my phone", does: "enters a mobile number for SMS", operation: "orders#reprintOrder", result: "tickets on the phone"}
+      - {frame: 4, screen: "KSK-013", blockA: false, sees: "'Help is on the way' with the kiosk number", does: "presses Call staff", operation: "marketing-crm#endKioskAssist", result: "a person comes"}
+      - {frame: 5, screen: "KSK-014", blockA: false, sees: "out of service with where to buy instead", does: "next guest walks to the desk", operation: "white-label#getTenantAppStatus", result: "the failure is not repeated"}
+    motion:
+      - KSK-008 slow progress indicator; never a retry button.
+      - KSK-013 waiting state with a gentle pulse until staff arrive.
+    decisions: ["GFIX-3 (reprintOrder by email or SMS; nobody else becomes the ticket's owner)", "Answers 3 Oct Pattern 4 group 4 (reprintOrder and endKioskAssist are device-callable on the kiosk)"]
+    sources: ["flows/F57-*.yaml", "design-notes ticketing-guest KSK-008", "KSK-010", "KSK-014", "customer-marketing KSK-013"]
+    open:
+      - {question: "How long does KSK-013 wait before the kiosk withdraws itself?", default: "5 minutes with no staff response."}
+
+  F75:
+    title: A kiosk serves itself and calls for help
+    process: ticketing-guest
+    trigger: A guest walks up to an unattended machine. Nobody is there to explain anything. Entry KSK-001.
+    actors:
+      - {role: "guest", app: "P05 Guest Kiosk", screens: ["KSK-001", "KSK-002", "KSK-003", "KSK-015", "KSK-006", "KSK-007", "KSK-008", "KSK-009", "KSK-010", "KSK-013"]}
+      - {role: "Sahli kiosk assistant (AI)", app: "KSK-015", does: "helps choose tickets and pay, and nothing else; hands over to a person"}
+      - {role: "staff", app: "P06 Staff App", does: "answers a handover"}
+    inputs:
+      - name: language
+        formats: ["as F07 frame 2"]
+        limits: first choice, before anything else
+        validation: none
+        source: guest, KSK-002
+      - name: assistant choices
+        formats: ["tap-to-answer chips ('How many adults?', 'Today or another day?'), party-size steppers, date and interest chips; free text only behind 'Type a question' on an on-screen keyboard"]
+        limits: large tap targets only; Arabic and English toggle stays visible
+        validation: "Outside ticket selection, promotions, FAQs, recommendations and checkout: polite refusal and Call staff (reason outOfScope)."
+        source: guest, KSK-015
+      - name: card
+        formats: ["as F07"]
+        limits: card only
+        validation: as F07
+        source: guest, KSK-007
+    processing:
+      - {input: "language", does: "loads branding and app status (status decides out of service)", operation: ["white-label#getPublishedTenantConfig", "white-label#getTenantAppStatus"]}
+      - {input: "category", does: "lists three or four options", operation: "catalogue#listProducts"}
+      - {input: "assistant", does: "proposes product cards the guest adds with one tap; hands over to an agent with Sahli's summary", operation: ["ai#createAiConversation", "ai#sendAiMessage", "catalogue#listProducts", "catalogue#getAvailability", "marketing-crm#handoverToAgent"]}
+      - {input: "basket", does: "adds lines, shows promotions before payment, checks out", operation: ["orders#getCart", "orders#addCartLine", "promotions#evaluatePromotions", "orders#checkoutCart"]}
+      - {input: "card", does: "pays", operation: "orders#createPayment"}
+      - {input: "order", does: "prints or sends to a phone", operation: ["orders#getOrder", "orders#reprintOrder"]}
+      - {input: "help", does: "closes the assist session", operation: "marketing-crm#endKioskAssist"}
+    outputs:
+      - name: assistant conversation (KSK-015)
+        states: {loading: "thinking", ready: "short answers with product cards (name, price, availability for the chosen time)", handedOver: "'A team member is on the way'", busy: "409: 'Please visit the ticket desk'", reset: "idle timeout clears the conversation and the cart"}
+        failure_branches:
+          - {what: "guest walks away mid-conversation", sees: "nothing of the previous guest stays on screen", recover: "automatic reset"}
+          - {what: "question out of scope", sees: "polite refusal with Call staff", recover: "hand over"}
+      - name: purchase outcome
+        states: {served: "bought and issued unattended", paymentUnresolved: "held not retried (KSK-008)", printFailed: "media delivered another way (KSK-010)", staffCalled: "a person came"}
+        failure_branches:
+          - {what: "payment does not resolve", sees: "KSK-008", recover: "orders#inquirePaymentStatus"}
+          - {what: "ticket cannot be printed", sees: "KSK-010", recover: "tickets to the phone"}
+    steps:
+      - {frame: 1, screen: "KSK-001", blockA: false, sees: "attract loop", does: "touches", operation: none, result: "language choice"}
+      - {frame: 2, screen: "KSK-002", blockA: false, sees: "language buttons", does: "picks English", operation: "white-label#getPublishedTenantConfig, white-label#getTenantAppStatus", result: "kiosk in English"}
+      - {frame: 3, screen: "KSK-003", blockA: false, sees: "tiles and Help me choose", does: "taps Help me choose", operation: "catalogue#listProducts", result: "assistant opens"}
+      - {frame: 4, screen: "KSK-015", blockA: true, sees: "Sahli with chips 'How many adults?' and 'Today or another day?'; Call staff button always visible", does: "taps 2 adults, Today, Thrill", operation: "ai#createAiConversation, ai#sendAiMessage, catalogue#getAvailability", result: "product cards with price and availability"}
+      - {frame: 5, screen: "KSK-015", blockA: true, sees: "product card", does: "adds it with one tap", operation: "orders#addCartLine", result: "basket line"}
+      - {frame: 6, screen: "KSK-006", blockA: false, sees: "review with promotions shown before payment", does: "confirms", operation: "orders#getCart, promotions#evaluatePromotions, orders#checkoutCart", result: "to payment"}
+      - {frame: 7, screen: "KSK-007", blockA: false, sees: "terminal prompt", does: "taps card", operation: "orders#createPayment", result: "approved"}
+      - {frame: 8, screen: "KSK-009", blockA: false, sees: "ticket printed or sent to phone", does: "takes the ticket", operation: "orders#getOrder, orders#reprintOrder", result: "served unattended"}
+      - {frame: 9, screen: "KSK-013", blockA: false, sees: "(branch) 'A team member is on the way'", does: "hands over from Sahli or presses Call staff", operation: "marketing-crm#handoverToAgent, marketing-crm#endKioskAssist", result: "a person came"}
+    motion:
+      - "KSK-015 answers appear as short bubbles; streaming is decided for sendAiMessage (answers 3 Oct: tokens, then sources and any proposed action), so Sahli's text streams in, then the product cards slide up."
+      - Chips animate selected state on tap; product card 'Added' tick animation.
+      - Attract loop, terminal arrow and payment indicator as F07.
+    decisions: ["Answers 3 Oct: AI chat streams answers over server-sent events (tokens, then sources and any proposed action)", "SPF-3 (KSK-015 stays in Block A)", "Pattern 4 group 4 (endKioskAssist device-callable)", "GFIX-3"]
+    sources: ["flows/F75-*.yaml", "design-notes ai KSK-015", "ticketing-guest KSK-001 to KSK-010", "customer-marketing KSK-013"]
+    open:
+      - {question: "Does Sahli show availability that may be stale?", default: "Yes, display only, labelled; the sale is decided at checkout (design notes KSK-015)."}
+
+  F14:
+    title: A discount needs a manager
+    process: ticketing-guest
+    trigger: >-
+      A cashier applies a discount larger than their own authority, with a guest standing at the counter. Entry
+      points: manual discount at the till; price override; complimentary ticket. Entry POS-002.
+    actors:
+      - {role: "cashier", app: "P04 Venue POS", screens: ["POS-002", "POS-005"]}
+      - {role: "manager (approver)", app: "P08 Venue Management", screens: ["BO-084", "BO-085"]}
+      - {role: "manager on the floor", app: "P06 Staff App", screens: ["EMP-037"], does: "mobile approval"}
+    inputs:
+      - name: manual discount
+        formats: ["percentage", "amount", "promo code or staff code", "on the cart only (never on the payment screen)"]
+        limits: above the cashier's limit needs approval; reason free text at least 3 characters
+        validation: "The till says at once whether approval is needed and names who can grant it ('Needs approval from Sara Al Mansoori, Duty Manager'), never just 'needs approval'. No approver at this venue: noApproverAvailable, told now."
+        source: cashier, POS-002 (formApplyManualDiscount, formEvaluateApprovalRequirement, formCreateApprovalRequest)
+      - name: approval decision
+        formats: ["Approve with optional comment (up to 1000 characters) or Reject with a required reason (up to 500 characters); in-place MFA step-up (stepUpToken never shown)"]
+        limits: one decision per request
+        validation: "403 with refusedReason (approverIsRequester, notInApproverChain, missing permission or step-up), shown in words with who can decide; 409 alreadyDecided updates the row to who decided and how."
+        source: manager, BO-085 (formDecideApprovalRequest)
+      - name: tender
+        formats: ["as F59 POS-005"]
+        limits: as F59
+        validation: as F59
+        source: cashier, POS-005
+    processing:
+      - {input: "discount", does: "evaluates the discount and whether it needs approval (the matrix is in the offline bundle)", operation: ["promotions#evaluatePromotions", "approvals#evaluateApprovalRequirement"]}
+      - {input: "request", does: "raises the approval request to the named approver", operation: "approvals#createApprovalRequest"}
+      - {input: "inbox", does: "lists requests sorted by what breaches its SLA soonest", operation: "approvals#listApprovalRequests"}
+      - {input: "decision", does: "records who and why; does not apply the discount", operation: "approvals#decideApprovalRequest"}
+      - {input: "approved discount", does: "the till applies it under the cashier's permission with the approval referenced on the line, then sells", operation: ["orders#createOrder", "orders#createPayment"]}
+    outputs:
+      - name: approval needed banner (POS-002)
+        states: {notNeeded: "discount applied", needed: "approver named with Request approval", waiting: "request sent with a waiting timer", approved: "discount applied with the approval reference", rejected: "reason shown; sell at full price or not at all", offline: "approval needed but the request cannot be raised; venue policy decides"}
+        failure_branches:
+          - {what: "no approver available", sees: "noApproverAvailable at once", recover: "sell without the discount or not at all"}
+          - {what: "guest leaves before approval", sees: "order voided and approval withdrawn (not rejected)", recover: "none needed"}
+      - name: approval inbox and request (BO-084, BO-085)
+        states: {loading: "reading", emptyFirstRun: "nothing waiting", ready: "requests sorted by SLA breach; this one flagged 'guest waiting'", decided: "who decided and how", expired: "'Expired at 14:00, no decision recorded' read-only"}
+        failure_branches:
+          - {what: "manager is the cashier", sees: "refused (approverIsRequester)", recover: "another manager"}
+          - {what: "SLA breached (minutes at a till)", sees: "escalated to the next level", recover: "automatic"}
+    steps:
+      - {frame: 1, screen: "POS-002", blockA: true, sees: "cart with Discount", does: "applies 30% off", operation: "promotions#evaluatePromotions", result: "till knows immediately that approval is needed"}
+      - {frame: 2, screen: "POS-002", blockA: true, sees: "banner naming the approver and Request approval", does: "requests approval", operation: "approvals#evaluateApprovalRequirement, approvals#createApprovalRequest", result: "request waiting; cashier can go find Sara"}
+      - {frame: 3, screen: "BO-084", blockA: true, sees: "inbox sorted by breach time; this one flagged guest waiting", does: "opens it", operation: "approvals#listApprovalRequests", result: "request open"}
+      - {frame: 4, screen: "BO-085", blockA: true, sees: "subject with evidence, the chain, Approve / Reject; step-up challenge in place", does: "approves with a comment", operation: "approvals#decideApprovalRequest", result: "recorded with who and why"}
+      - {frame: 5, screen: "POS-005", blockA: true, sees: "discount line with the approval reference", does: "takes payment", operation: "orders#createOrder, orders#createPayment", result: "sale completed"}
+    motion:
+      - POS-002 approval banner shows a live waiting timer; it turns to Approved with a tick when the decision arrives (push or poll).
+      - BO-084 SLA countdown per row; rows re-sort as breach times approach.
+    decisions: ["DEC-113 (POS quick actions Refund, Check transaction, Print last receipt, plus search)", "Segregation of duties: approver cannot be the requester"]
+    sources: ["flows/F14-*.yaml", "design-notes ticketing-guest POS-002", "platform-foundation BO-084 and BO-085", "contracts/spine/approvals.yaml"]
+    open:
+      - {question: "How does the till learn of the decision (push or poll)?", default: "Poll every 5 seconds while the banner is waiting."}
+
+  F17:
+    title: A guest buys merchandise and collects later
+    process: ticketing-guest
+    trigger: A guest buys something at a shop and does not want to carry it round the park all day (4.4.7). Entry points at a shop till, in the guest app, or a kiosk. Entry POS-002.
+    actors:
+      - {role: "cashier", app: "P04 Venue POS", screens: ["POS-002", "POS-005", "POS-012"]}
+      - {role: "guest", app: "P02 Guest App", screens: ["GST-062"]}
+      - {role: "exit-desk staff", app: "P04", screens: ["POS-012"]}
+    inputs:
+      - name: merchandise
+        formats: ["barcode scan or tile on the sell board"]
+        limits: stock at this outlet, not the venue
+        validation: "Out of stock here but available at another outlet: the outlet gates the sale (14 August); sell from the other outlet for collection or transfer."
+        source: cashier, POS-002
+      - name: tender
+        formats: ["as F59"]
+        limits: as F59
+        validation: as F59
+        source: guest via cashier, POS-005
+      - name: drop and tag
+        formats: ["Leave it with us (Shop & Drop) on the payment screen; bag tag"]
+        limits: one reference per drop; the guest's ticket also claims it (CHG-CLN-005)
+        validation: none
+        source: cashier, POS-005 (formCreateShopAndDrop)
+      - name: claim at collection
+        formats: ["ticket QR or wristband", "drop reference", "receipt number", "order number", "guest name"]
+        limits: same code collects partial remainders later
+        validation: "Order not ready or closed: refused with its state. Past collect-by: 'Not collected' with the venue contact."
+        source: guest at the exit desk, POS-012; GST-062 fallback field "Drop reference or receipt number"
+    processing:
+      - {input: "scan", does: "lists and looks up merchandise at this outlet", operation: ["retail#listMerchandise", "retail#lookupMerchandise"]}
+      - {input: "tender", does: "pays; stock decrements", operation: "orders#createPayment"}
+      - {input: "drop", does: "creates the shop-and-drop with a reference", operation: "retail#createShopAndDrop"}
+      - {input: "guest", does: "shows what is waiting, where and until when", operation: "retail#lookupShopAndDrop"}
+      - {input: "claim", does: "hands the goods over and records it", operation: ["retail#lookupShopAndDrop", "retail#collectShopAndDrop"]}
+    outputs:
+      - name: drop reference (POS-005 receipt)
+        states: {ready: "reference and collection point with hours"}
+        failure_branches:
+          - {what: "guest loses the reference", sees: "lookup by order or ticket QR", recover: "staff lookup"}
+      - name: collection tracker (GST-062)
+        states: {loading: "reading", emptyFirstRun: "'Nothing waiting for you to collect' with a link to the shop", ready: "what, where, by when", partial: "items still waiting listed", notCollected: "past collect-by with venue contact", offline: "code already on screen stays visible"}
+        failure_branches: []
+      - name: handover (POS-012)
+        states: {ready: "drop found", collected: "signed for"}
+        failure_branches:
+          - {what: "guest leaves without collecting", sees: "lost property after the stated window (paid goods, not stock)", recover: "duty manager"}
+          - {what: "shop closed when the guest leaves", sees: "collection at an exit point with its own hours", recover: "venue operation decision"}
+    steps:
+      - {frame: 1, screen: "POS-002", blockA: true, sees: "retail tiles and scanner", does: "scans a plush toy", operation: "retail#listMerchandise, retail#lookupMerchandise", result: "line added; outlet stock"}
+      - {frame: 2, screen: "POS-005", blockA: true, sees: "tenders and Leave it with us", does: "guest pays by card", operation: "orders#createPayment", result: "paid"}
+      - {frame: 3, screen: "POS-005", blockA: true, sees: "Shop & Drop form", does: "drops and tags the bag", operation: "retail#createShopAndDrop", result: "reference printed; ticket claims it too"}
+      - {frame: 4, screen: "GST-062", blockA: true, sees: "what is waiting, collection point and collect-by", does: "checks in the app", operation: "retail#lookupShopAndDrop", result: "knows where and until when"}
+      - {frame: 5, screen: "POS-012", blockA: true, sees: "drop found by the ticket QR", does: "hands over and records Collected", operation: "retail#lookupShopAndDrop, retail#collectShopAndDrop", result: "signed for"}
+    motion: none
+    decisions: ["CHG-CLN-005 (the ticket claims the drop)", "CF-58 (append to an existing ticket QR, not a second wristband)", "14 August: the outlet gates the sale"]
+    sources: ["flows/F17-*.yaml", "design-notes fnb-retail GST-062 and POS-012", "contracts/satellite/retail.yaml"]
+    open:
+      - {question: "Where collection happens and what hours it keeps (flow open question)", default: "Draw the exit desk 'Collect on your way out' with its own hours (e.g. until park close + 30 min)."}
+
+  F51:
+    title: A guest shops in the venue and collects on the way out
+    process: ticketing-guest
+    trigger: A guest buys something heavy at 11am and does not want to carry it round the venue all day. Entry WEB-033.
+    actors:
+      - {role: "guest", app: "P01 Guest Web (and P02 app)", screens: ["WEB-033", "GST-062"]}
+      - {role: "exit-desk staff", app: "P04 Venue POS", screens: ["POS-012"]}
+    inputs:
+      - name: item, variant and quantity
+        formats: ["size and colour as variant chips; quantity stepper"]
+        limits: out-of-stock variants disabled
+        validation: same catalogue and price as the tills
+        source: guest, WEB-033
+      - name: collection point
+        formats: ["collect at the gate", "car park kiosk", "or home delivery"]
+        limits: home delivery shows the shipping fee by emirate (Dubai, Abu Dhabi, Ras Al Khaimah, international) before payment
+        validation: none
+        source: guest, WEB-033
+      - name: payment
+        formats: ["as F01 WEB-012"]
+        limits: as F01
+        validation: "Last one sold at a till while paying: checkout refuses the line (audit R236)."
+        source: guest, checkout
+    processing:
+      - {input: "item", does: "lists and looks up merchandise; adds to the cart (nothing reserved before payment)", operation: ["retail#listMerchandise", "retail#lookupMerchandise", "orders#addCartLine"]}
+      - {input: "payment", does: "checks out and pays; payment creates the shop-and-drop (28 September, R236)", operation: ["orders#checkoutCart", "orders#createPayment"]}
+      - {input: "guest", does: "one lookup, one code for every bag", operation: "retail#lookupShopAndDrop"}
+      - {input: "claim", does: "staff hand the goods over (collectShopAndDrop is staff-only)", operation: "retail#collectShopAndDrop"}
+    outputs:
+      - name: shop (WEB-033)
+        states: {loading: "reading", ready: "items with variants", emptyNoResults: "no items", offline: "browse from cache; paying unavailable"}
+        failure_branches:
+          - {what: "stock gone before payment", sees: "line refused at checkout", recover: "another variant or item"}
+      - name: collection (GST-062, POS-012)
+        states: {ready: "one code for all bags", collected: "handed over", uncollected: "held to the venue policy then returned to stock"}
+        failure_branches: []
+    steps:
+      - {frame: 1, screen: "WEB-033", blockA: true, sees: "shop under At the venue with variant chips", does: "picks a size and adds", operation: "retail#listMerchandise, retail#lookupMerchandise, orders#addCartLine", result: "in the basket"}
+      - {frame: 2, screen: "WEB-033", blockA: true, sees: "collection point choice and checkout", does: "chooses Collect at the gate and pays", operation: "orders#checkoutCart, orders#createPayment", result: "paid; shop-and-drop created"}
+      - {frame: 3, screen: "GST-062", blockA: true, sees: "one code for all bags with the collection point", does: "opens on the way out", operation: "retail#lookupShopAndDrop", result: "knows where to go"}
+      - {frame: 4, screen: "POS-012", blockA: true, sees: "drop found against the ticket", does: "staff hand over", operation: "retail#lookupShopAndDrop, retail#collectShopAndDrop", result: "collected"}
+    motion: none
+    decisions: ["28 September, audit R236 (payment creates the shop-and-drop; checkout refuses lines out of stock)"]
+    sources: ["flows/F51-*.yaml", "design-notes ticketing-guest WEB-033", "fnb-retail GST-062 and POS-012"]
+    open: []
+
+  F33:
+    title: A till goes offline and comes back
+    process: ticketing-guest
+    trigger: >-
+      The network drops. Nobody decides this and nobody is told: the workstation notices (three consecutive failed
+      requests by default) and obeys its ConnectivityPolicy. Entry POS-002.
+    actors:
+      - {role: "cashier", app: "P04 Venue POS", screens: ["POS-002", "POS-013"]}
+      - {role: "supervisor / finance", app: "P08 Venue Management", screens: ["BO-133", "BO-130"]}
+    inputs:
+      - name: connectivity (no user input)
+        formats: ["request failures and probes measured by the workstation"]
+        limits: "failuresBeforeOffline 1 to 10 (consecutive, not cumulative); probeIntervalSeconds 5 to 300; probeTimeoutMs 500 to 30,000; successesBeforeOnline 1 to 20; minimumStableSeconds 10 to 600 (default 30)"
+        validation: The till returns online only after the connection holds for minimumStableSeconds.
+        source: venue policy set on BO-131; evaluated on the device
+      - name: sales while offline
+        formats: ["ordinary sell flow from the local catalogue bundle"]
+        limits: "maxOfflineHours 1 to 72 (default 24); value and transaction ceilings (1 to 5,000); capacity products (seats, timed slots without a local lease) blocked"
+        validation: "Refund offline refused because the original sale cannot be verified (allowedOffline does not include refund by default). At maxOfflineHours the till refuses new sales."
+        source: cashier, POS-002
+      - name: resolution of a refused entry
+        formats: ["Post it", "Void it or Refund it", "with a note"]
+        limits: note up to 500 characters
+        validation: "Entry shown exactly as the till recorded it, never retyped. 409 refusedReason when the record cannot be resolved that way."
+        source: supervisor, BO-130 or BO-133 (formResolveSyncRejection)
+    processing:
+      - {input: "failures", does: "switches to offline locally (no call); keeps selling from the last bundle", operation: ["catalogue#getLatestBundle", "orders#createOrder", "orders#createPayment"]}
+      - {input: "refund request", does: "refused on the device against the policy it holds (no call)", operation: none}
+      - {input: "exposure", does: "raises alerts when offline value or count ceilings are crossed", operation: ["reporting#listAlerts", "orders#listSyncRejections"]}
+      - {input: "reconnect", does: "replays the journal in the order sales were taken (sequence over timestamp)", operation: "orders#syncOrders"}
+      - {input: "rejections", does: "posts against the retired product at the price paid; the catalogue moved, the transaction did not", operation: ["orders#listSyncRejections", "orders#resolveSyncRejection"]}
+    outputs:
+      - name: till connectivity banner (POS-002)
+        states: {online: "no banner", offline: "amber 'Offline: selling from this till' banner with the time since and unsynced count", returning: "'Reconnecting… stable in 30 s'", blockedAtCeiling: "red 'Offline limit reached: new sales stopped'"}
+        failure_branches:
+          - {what: "offline window passes maxOfflineHours", sees: "new sales refused", recover: "reconnect; supervisor"}
+          - {what: "connection flaps up and down", sees: "stays offline until stable for minimumStableSeconds", recover: "venue tunes the threshold"}
+      - name: offline sync (POS-013)
+        states: {pending: "unsynced sales listed", syncing: "progress count", syncedClean: "all posted", syncedWithRejections: "refused entries listed"}
+        failure_branches:
+          - {what: "shift closed with unsynced sales", sees: "settlement waits (openWithUnsynced)", recover: "sync then settle"}
+      - name: alerts and rejections (BO-133, BO-130)
+        states: {emptyFirstRun: "no refused entries", ready: "each refused entry with device, time recorded, product, amount and reason", resolved: "removed from the unresolved view"}
+        failure_branches:
+          - {what: "refused card payment for goods already handed over", sees: "flagged as money at risk with the amount", recover: "resolution explains the ledger effect"}
+          - {what: "rejected sale sold stock the venue no longer had", sees: "oversell stands; stock goes negative", recover: "stock movement written"}
+    steps:
+      - {frame: 1, screen: "POS-002", blockA: true, sees: "amber offline banner appears after three failed requests", does: "keeps selling", operation: "none (local)", result: "trading continues; the guest never knows"}
+      - {frame: 2, screen: "POS-002", blockA: true, sees: "offline sale of general admission; capacity products greyed with the reason", does: "completes a sale", operation: "catalogue#getLatestBundle, orders#createOrder, orders#createPayment", result: "sale journalled locally"}
+      - {frame: 3, screen: "POS-002", blockA: true, sees: "refund refused: 'Refunds need a connection. Send the guest to a connected till or the service desk.'", does: "redirects the guest", operation: "none (local policy)", result: "no unverifiable refund"}
+      - {frame: 4, screen: "BO-133", blockA: true, sees: "offline exposure alert (value and count ceilings)", does: "supervisor watches", operation: "reporting#listAlerts, orders#listSyncRejections", result: "exposure visible"}
+      - {frame: 5, screen: "POS-002", blockA: true, sees: "'Reconnecting… stable in 30 s'", does: "nothing", operation: "none (local thresholds)", result: "online after the stable window"}
+      - {frame: 6, screen: "POS-013", blockA: true, sees: "unsynced sales and the sync progress", does: "sync runs (or Sync orders)", operation: "orders#syncOrders", result: "posted in sequence; four rejected"}
+      - {frame: 7, screen: "BO-130", blockA: true, sees: "four refused entries (product retired while offline)", does: "reviews", operation: "orders#listSyncRejections", result: "a to-do, not a log"}
+      - {frame: 8, screen: "BO-130", blockA: true, sees: "Resolve rejection dialog", does: "posts each at the price the guest paid", operation: "orders#resolveSyncRejection", result: "reconciled"}
+    motion:
+      - Offline banner slides down from the top of POS-002; its 'offline for' timer counts up; unsynced count increments with each sale.
+      - "Reconnecting countdown (minimumStableSeconds) then the banner slides away."
+      - POS-013 sync progress bar with posted / total.
+    decisions: ["ADR-0013 (POS local-first)", "DEC-063 (capacity products blocked offline, DI-074)", "CHG-WIR-018 (replay from POS-013)", "CHG-WIR-025 (resolveSyncRejection, not createOrder)"]
+    sources: ["flows/F33-*.yaml", "design-notes finance-insights BO-133", "fnb-retail POS-013", "ticketing-backoffice BO-130", "contracts/spine/tenancy.yaml (setConnectivityThresholds and setOfflinePolicy)"]
+    open:
+      - {question: "Exact offline banner copy", default: "'Offline since 14:02 · 12 sales waiting to sync' (amber)."}
+
+  F34:
+    title: A retail sale, from scan to return
+    process: ticketing-guest
+    trigger: A guest brings items to a till. No booking, no reservation, no account; retail is the one path that starts with a person holding something. Entry POS-002.
+    actors:
+      - {role: "cashier", app: "P04 Venue POS", screens: ["POS-002", "POS-005", "POS-011"]}
+      - {role: "supervisor", app: "P04 (PIN on the till) or P08 approvals", does: "approves a discount or a return above limits"}
+    inputs:
+      - name: items
+        formats: ["barcode", "RFID tag or typed SKU (all resolve the same way)"]
+        limits: outlet stock
+        validation: Unknown code says so; nothing added.
+        source: cashier, POS-002
+      - name: membership card
+        formats: ["card", "QR or mobile number lookup"]
+        limits: optional and late
+        validation: "Two promotions with stacking forbidden: evaluatePromotions says which it applied and which it did not."
+        source: guest via cashier, POS-002
+      - name: manual discount
+        formats: ["as F14"]
+        limits: above the cashier limit is held for approval, not refused
+        validation: as F14
+        source: cashier, POS-002
+      - name: split tender
+        formats: ["loyalty points plus card (each tender its own payment)"]
+        limits: completes when the tenders sum to the total
+        validation: as F59 tender rules
+        source: guest, POS-005
+      - name: return
+        formats: ["find the sale: scan the receipt barcode, or type the receipt or order number (no receipt: order number only, R139 (c)); tick lines and quantities; condition Resaleable, Opened, Damaged, Faulty, Missing parts; reason (Changed mind, Wrong size, Wrong item, Faulty, Damaged in transit, Duplicate purchase, Gift return, Other); serial for serialised items; refund to"]
+        limits: refund to the original tender by default; store credit (a gift card, DEC-061) or cash against a card only where the policy allows
+        validation: "Each line says if returnable and if not why ('Window closed on 28 Oct'). Serial must match the sold unit. Above the self-authorise limit a supervisor enters their PIN on this till. Offline: refused; the guest is sent to a connected till or the service desk."
+        source: cashier, POS-011
+    processing:
+      - {input: "items", does: "resolves and adds lines", operation: ["retail#lookupMerchandise", "orders#addCartLine"]}
+      - {input: "member", does: "identifies, reads loyalty, evaluates promotions at basket level", operation: ["marketing-crm#identifyGuest", "marketing-crm#getGuestLoyalty", "promotions#evaluatePromotions"]}
+      - {input: "discount", does: "applies and raises approval", operation: ["orders#applyManualDiscount", "approvals#createApprovalRequest"]}
+      - {input: "tenders", does: "redeems points, pays, records the retail sale; stock moves as a consequence (the till does not call createStockMovement)", operation: ["marketing-crm#redeemLoyaltyPoints", "orders#createPayment", "retail#createRetailSale"]}
+      - {input: "return", does: "checks the policy before taking the goods; returns and refunds to the original tender", operation: ["retail#lookupRetailSale", "retail#getReturnPolicy", "retail#createRetailReturn", "orders#createRefund"]}
+    outputs:
+      - name: basket (POS-002)
+        states: {ready: "lines with member pricing and promotions named", heldForApproval: "discount line waiting", offline: "sale completes and journals"}
+        failure_branches:
+          - {what: "network drops mid-basket", sees: "sale completes offline; card still reaches the terminal (CF-131)", recover: "syncs later"}
+      - name: return (POS-011)
+        states: {lookup: "find the sale", eligible: "lines with returnable status", refused: "outside policy with the reason (recorded)", refunded: "refund to the original tender", offline: "refused with where to go"}
+        failure_branches:
+          - {what: "no receipt", sees: "order number lookup only", recover: "policy decides a no-receipt return"}
+          - {what: "serialised item serial mismatch", sees: "refused naming the serial", recover: none}
+    steps:
+      - {frame: 1, screen: "POS-002", blockA: true, sees: "scanner ready and the cart", does: "scans three items", operation: "retail#lookupMerchandise, orders#addCartLine", result: "lines added"}
+      - {frame: 2, screen: "POS-002", blockA: true, sees: "member lookup", does: "identifies the member", operation: "marketing-crm#identifyGuest, marketing-crm#getGuestLoyalty, promotions#evaluatePromotions", result: "member pricing; applied and not-applied promotions named"}
+      - {frame: 3, screen: "POS-002", blockA: true, sees: "discount above limit held for approval", does: "requests approval", operation: "orders#applyManualDiscount, approvals#createApprovalRequest", result: "held, then approved"}
+      - {frame: 4, screen: "POS-005", blockA: true, sees: "split tender (points then card)", does: "takes payment", operation: "marketing-crm#redeemLoyaltyPoints, orders#createPayment, retail#createRetailSale", result: "sold; stock moves"}
+      - {frame: 5, screen: "POS-011", blockA: true, sees: "three days later: find the sale by receipt barcode", does: "scans the receipt", operation: "retail#lookupRetailSale, retail#getReturnPolicy", result: "lines with returnable status"}
+      - {frame: 6, screen: "POS-011", blockA: true, sees: "line ticked, condition and reason, refund to original tender", does: "confirms (supervisor PIN if above limit)", operation: "retail#createRetailReturn, orders#createRefund", result: "refunded; resaleable item back in stock"}
+    motion: none
+    decisions: ["ADR-0013", "CF-131 (gateway is not the platform)", "28 September audit R139 (c): no receipt means order number only", "DEC-061 (store credit is a gift card)", "DEC-062"]
+    sources: ["flows/F34-*.yaml", "design-notes fnb-retail POS-011", "ticketing-guest POS-002 and POS-005", "contracts/satellite/retail.yaml"]
+    open: []
+
+  F58:
+    title: A ticket is sold at a till, added to, and refunded
+    process: ticketing-guest
+    trigger: A guest arrives at a window and wants to come in. The cashier is already signed in and the shift is open (F32 ends there). Entry POS-002.
+    actors:
+      - {role: "cashier", app: "P04 Venue POS", screens: ["POS-002", "POS-003", "POS-005", "POS-010", "POS-011"]}
+      - {role: "approver", app: "P08 or P06", does: "approves the manual discount"}
+    inputs:
+      - name: product and quantities
+        formats: ["category tiles (Attractions, Cinema, Events, Passes, Vouchers), product cards from the workstation's sale board, search, barcode"]
+        limits: the ticket drawer shows inclusions and rules first
+        validation: as POS-002
+        source: cashier, POS-002
+      - name: date and session
+        formats: ["seven-day strip in the region's date format; calendar for later; slots with remaining count and demand (High, Medium, Low, Sold out)"]
+        limits: sells to sell-out or the cutoff (e.g. 15 minutes before a timed show); offline only within the terminal's allocated lease
+        validation: "Slot sells out while deciding: acquireInventoryHold fails and alternatives are offered. Offline beyond the lease: refused, saying how many are left offline."
+        source: cashier, POS-003 (drawer step two)
+      - name: member identification
+        formats: ["mobile number or email lookup; card"]
+        limits: optional and late
+        validation: none
+        source: cashier, POS-002
+      - name: manual discount
+        formats: ["as F14"]
+        limits: as F14
+        validation: "Offline when the override is needed: refused (the approver is not on the device)."
+        source: cashier, POS-002
+      - name: ticket to add to
+        formats: ["scan or type the ticket's code"]
+        limits: online only
+        validation: "Offline: not available; entitlements must be read live."
+        source: cashier, POS-010
+      - name: refund
+        formats: ["as F34 return", "for the locker line"]
+        limits: policy read before the refund is offered
+        validation: "Offline: refused."
+        source: cashier, POS-011
+    processing:
+      - {input: "product", does: "lists and reads products; adds to the cart", operation: ["catalogue#listProducts", "catalogue#getProduct", "orders#addCartLine"]}
+      - {input: "slot", does: "leases the slot (contended inventory is leased, not reserved, CF-115)", operation: ["catalogue#getAvailability", "catalogue#acquireInventoryHold"]}
+      - {input: "member", does: "identifies, reads loyalty and existing entitlements", operation: ["marketing-crm#identifyGuest", "marketing-crm#getGuestLoyalty", "access#listMyEntitlements"]}
+      - {input: "cart", does: "evaluates promotions and surfaces conflicts", operation: ["promotions#evaluatePromotions", "promotions#analysePromotionConflicts"]}
+      - {input: "discount", does: "checks whether approval is needed and raises it", operation: ["orders#applyManualDiscount", "approvals#evaluateApprovalRequirement", "approvals#createApprovalRequest"]}
+      - {input: "tender", does: "creates order and payment; the lease converts server-side on payment success; a failed payment releases the slot at once", operation: ["orders#createOrder", "orders#createPayment", "catalogue#relinquishInventoryHold"]}
+      - {input: "ticket scan", does: "appends the locker to the existing media", operation: ["orders#getMediaEntitlements", "orders#appendEntitlementToMedia"]}
+      - {input: "refund", does: "reads the policy, then refunds the line", operation: ["retail#lookupRetailSale", "retail#getReturnPolicy", "orders#createRefund"]}
+    outputs:
+      - name: sale
+        states: {ready: "cart with lease timer", sold: "entitlement issued and media handed over", soldWithOverride: "approval referenced", abandoned: "cart left; lease released (recorded)"}
+        failure_branches:
+          - {what: "payment fails after the lease", sees: "slot returned immediately", recover: "retry payment or pick again"}
+          - {what: "two promotions both apply", sees: "conflict surfaced, not silently resolved", recover: "cashier picks per venue rule"}
+      - name: add to ticket (POS-010)
+        states: {ready: "what the ticket includes and what can be added", appended: "same QR now carries the locker", offline: "not available"}
+        failure_branches: []
+      - name: refund (POS-011)
+        states: {partiallyRefunded: "one line returned; the rest of the visit intact", refused: "policy reason"}
+        failure_branches:
+          - {what: "till offline", sees: "refund refused", recover: "connected till or service desk"}
+    steps:
+      - {frame: 1, screen: "POS-002", blockA: true, sees: "category tiles and product cards", does: "adds a day ticket", operation: "catalogue#listProducts, catalogue#getProduct, orders#addCartLine", result: "cart line"}
+      - {frame: 2, screen: "POS-003", blockA: true, sees: "drawer with date strip and slots with demand", does: "picks today 14:00", operation: "catalogue#getAvailability, catalogue#acquireInventoryHold", result: "slot leased"}
+      - {frame: 3, screen: "POS-002", blockA: true, sees: "member lookup", does: "identifies the member", operation: "marketing-crm#identifyGuest, marketing-crm#getGuestLoyalty, access#listMyEntitlements", result: "member pricing and existing entitlements"}
+      - {frame: 4, screen: "POS-002", blockA: true, sees: "promotions with a conflict surfaced", does: "resolves per venue rule", operation: "promotions#evaluatePromotions, promotions#analysePromotionConflicts", result: "price set"}
+      - {frame: 5, screen: "POS-002", blockA: true, sees: "discount above limit held for approval", does: "requests approval", operation: "orders#applyManualDiscount, approvals#evaluateApprovalRequirement, approvals#createApprovalRequest", result: "approved"}
+      - {frame: 6, screen: "POS-005", blockA: true, sees: "tenders", does: "takes payment", operation: "orders#createOrder, orders#createPayment", result: "entitlement issued; ticket handed over"}
+      - {frame: 7, screen: "POS-010", blockA: true, sees: "scanned ticket with what it includes", does: "adds a locker", operation: "orders#getMediaEntitlements, orders#appendEntitlementToMedia", result: "one QR, not a second ticket"}
+      - {frame: 8, screen: "POS-011", blockA: true, sees: "locker line with the refund policy", does: "refunds the locker", operation: "retail#lookupRetailSale, retail#getReturnPolicy, orders#createRefund", result: "partially refunded"}
+    motion:
+      - Drawer slides in from the right over the sell board for date and session (POS-003 is a drawer step, not a page).
+      - Lease timer on the cart line counts down.
+    decisions: ["ADR-0013", "ADR-0002 (authorisation is user-driven)", "CF-115 (contended inventory leased)", "CF-58 (append to existing media)"]
+    sources: ["flows/F58-*.yaml", "design-notes ticketing-guest POS-002", "POS-003", "POS-010", "fnb-retail POS-011"]
+    open: []
+
+  F19:
+    title: A membership works in another country
+    process: ticketing-guest
+    trigger: >-
+      A guest bought an annual pass in Dubai and arrives at a venue in Abu Dhabi, in a different cell because data
+      residency put it there. Entry points: membership bought in another region; guest travels; multi-region
+      pass sold as one product. Entry GST-015.
+    actors:
+      - {role: "guest", app: "P02 Guest App", screens: ["GST-015"]}
+      - {role: "steward", app: "P07 Venue Scanner", screens: ["SCN-003", "SCN-014"]}
+      - {role: "platform admin", app: "P09 TICVAI Console", screens: ["ADM-003"]}
+      - {role: "cells (service)", app: "server-to-server", does: "propagate the redemption right and reconcile redemptions"}
+    inputs:
+      - name: membership card in the app
+        formats: ["membership QR / media in the app"]
+        limits: shows where it is valid; valid here is not the same as bought here
+        validation: none on the guest side
+        source: guest, GST-015
+      - name: scan at the other venue
+        formats: ["camera or RFID/NFC read of the membership media"]
+        limits: validated against the propagated right in the local bundle
+        validation: "Right not in the bundle (arrived after the last sync): overrideRequired; the steward admits on a recorded manual override."
+        source: guest at the gate, SCN-003
+    processing:
+      - {input: none, does: "lists products and the guest's memberships with validity per region", operation: ["catalogue#listProducts", "catalogue#getMyMemberships"]}
+      - {input: "purchase", does: "propagates a copy of the redemption right (entitlement reference, no personal data) to the other cell at purchase; queued and retried if unreachable", operation: "propagateCrossRegionEntitlement (service audience)"}
+      - {input: "scan", does: "validates and consumes the cross-region right", operation: ["access#validateAccess", "cross-region#consumeCrossRegionEntitlement"]}
+      - {input: "scan journal", does: "syncs back; both cells must agree", operation: "access#syncScans"}
+      - {input: "redemptions", does: "reconciles; the owning cell wins", operation: "reconcileRedemptions (service audience)"}
+    outputs:
+      - name: membership card (GST-015)
+        states: {loading: "reading", ready: "card, benefits, members, 'Valid at: Dubai, Abu Dhabi'", offline: "card stays visible", emptyFirstRun: "no memberships"}
+        failure_branches: []
+      - name: gate outcome (SCN-003)
+        states: {admitted: "green", overrideRequired: "amber with Override access", denied: "red with the reason", offline: "amber loop from the bundle"}
+        failure_branches:
+          - {what: "right not in the bundle at the gate", sees: "overrideRequired", recover: "manual override recorded and reconciled after"}
+      - name: reconciliation (SCN-014, ADM-003)
+        states: {synced: "both cells agree", disagree: "difference named", deferred: "admitted on override; reconciliation pending"}
+        failure_branches:
+          - {what: "single-entry pass redeemed in two countries on one day", sees: "both scans with timestamps", recover: "platform admin decides"}
+          - {what: "cells disagree on remaining entitlement", sees: "difference on ADM-003", recover: "the owning cell wins"}
+    steps:
+      - {frame: 1, screen: "GST-015", blockA: true, sees: "annual pass card with where it is valid", does: "opens the pass", operation: "catalogue#listProducts, catalogue#getMyMemberships", result: "knows it works in Abu Dhabi"}
+      - {frame: 2, screen: "ADM-003", blockA: true, sees: "cross-tenant health (propagation status)", does: "nothing (service-to-service)", operation: "cross-region#propagateCrossRegionEntitlement (service-to-service, not called from the screen), subscription#getCellHealth", result: "right present in the other cell"}
+      - {frame: 3, screen: "SCN-003", blockA: true, sees: "armed reader at the Abu Dhabi gate", does: "scans the pass", operation: "access#validateAccess, cross-region#consumeCrossRegionEntitlement", result: "admitted from the propagated right"}
+      - {frame: 4, screen: "SCN-014", blockA: true, sees: "sync and reconciliation list", does: "sync runs", operation: "access#syncScans", result: "redemption posted"}
+      - {frame: 5, screen: "ADM-003", blockA: true, sees: "reconciliation result", does: "reviews any difference", operation: "cross-region#reconcileRedemptions (service-to-service, not called from the screen), subscription#getCellHealth", result: "agreed or difference named"}
+    motion:
+      - SCN-003 outcome flash as F10.
+    decisions: ["ADR-0010 (cross-region pseudonymous lookup is service audience)", "CHG-WIR-021 (propagation and reconciliation are service calls, ADM-003 shows them)", "CF-31"]
+    sources: ["flows/F19-*.yaml", "design-notes ticketing-guest GST-015", "platform-foundation ADM-003", "venue-operations SCN-003 and SCN-014"]
+    open:
+      - {question: "Who refunds a pass used in two regions, and out of whose revenue (flow open question, CF-31)", default: "The selling cell refunds under its policy; draw no refund action on GST-015 for a cross-region pass, only 'Contact the venue where you bought it'."}
+
+  F25:
+    title: A guest rents a cabana
+    process: ticketing-guest
+    trigger: >-
+      A guest at the poolside wants a cabana for the afternoon. They do not want cabana seven; they want a cabana,
+      and the platform picks the unit. Entry GST-021. (For picking a specific cabana on the map, see F52.)
+    actors:
+      - {role: "guest", app: "P02 Guest App", screens: ["GST-021"]}
+      - {role: "attendant", app: "P08 Venue Management", screens: ["BO-096", "BO-097"]}
+    inputs:
+      - name: cabana on the map
+        formats: ["tap on the cabana zone on the venue map"]
+        limits: venue with no map or the cabana not placed lists resources instead (listResources)
+        validation: none
+        source: guest, GST-021
+      - name: booking window
+        formats: ["window from-to", "guest or booking reference", "party size", "note"]
+        limits: setup and teardown already subtracted (a cabana booked until 16:00 with a 30-minute turnaround is not free at 16:00)
+        validation: "Nothing free: the response says why (booked, setup, teardown, maintenance, closed). Two attendants in the same second: one wins; the other is refused with the conflicting window named. Manual booking needs a reason."
+        source: attendant, BO-096 (formBookResource)
+      - name: deposit hold
+        formats: ["instrument card", "TICVAI wallet or gift card; amount"]
+        limits: shown as "held until" with the hold expiry
+        validation: "Declined or no card: the booking stands and the check-out does not. Hold expired before return: offer a new authorisation before capture."
+        source: attendant, BO-097 (formAuthoriseStoredValue)
+      - name: check-in condition
+        formats: ["condition good", "minor wear", "damaged", "missing; capture amount only when not good; note; block further bookings pre-ticked when damaged"]
+        limits: capture up to the held amount
+        validation: none
+        source: attendant, BO-097 (formCheckInResource)
+    processing:
+      - {input: "tap", does: "resolves the cabana zone to a bookable resource kind", operation: "venue-map#getVenueMap"}
+      - {input: "window", does: "returns free windows with setup and teardown subtracted", operation: "resources#getResourceAvailability"}
+      - {input: "booking", does: "books by kind; the platform picks and names the unit; refused on conflict", operation: "resources#bookResource"}
+      - {input: "handover", does: "checks out and holds the deposit (held, not taken)", operation: ["resources#checkOutResource", "orders#authoriseStoredValue"]}
+      - {input: "return", does: "checks in; releases or partly captures; damaged goes straight to maintenance", operation: ["resources#checkInResource", "orders#relinquishStoredValue"]}
+    outputs:
+      - name: resource calendar (BO-096)
+        states: {loading: "reading", ready: "bookings, holds, blocks, setup/teardown and cleaning bands (Day, Week, Month, Agenda)", noneFree: "reason per window"}
+        failure_branches:
+          - {what: "two bookings in the same second", sees: "refusal naming the conflicting window", recover: "another window or unit"}
+      - name: check-out and check-in (BO-097)
+        states: {checkedOut: "deposit held until", overdue: "due-back time shown (not a failure)", returned: "released or partly captured", maintenance: "damaged unit blocked"}
+        failure_branches:
+          - {what: "deposit declined", sees: "booking stands; check-out blocked", recover: "another instrument"}
+          - {what: "item damaged", sees: "partial capture and maintenance", recover: "none needed"}
+          - {what: "nobody brings it back", sees: "overdue then captured in full and retired", recover: "duty manager"}
+    steps:
+      - {frame: 1, screen: "GST-021", blockA: true, sees: "venue map with cabana zones", does: "taps the cabana area", operation: "venue-map#getVenueMap", result: "cabana kind resolved"}
+      - {frame: 2, screen: "BO-096", blockA: true, sees: "resource calendar with free windows", does: "attendant checks 13:00 to 17:00", operation: "resources#getResourceAvailability", result: "free units"}
+      - {frame: 3, screen: "BO-096", blockA: true, sees: "Book resource form", does: "books by kind", operation: "resources#bookResource", result: "'Cabana B07 booked 13:00-17:00'"}
+      - {frame: 4, screen: "BO-097", blockA: true, sees: "check-out with deposit", does: "hands over and holds AED 200", operation: "resources#checkOutResource, orders#authoriseStoredValue", result: "deposit held until 17:30"}
+      - {frame: 5, screen: "BO-097", blockA: true, sees: "check-in condition", does: "checks in as good", operation: "resources#checkInResource, orders#relinquishStoredValue", result: "deposit released; cabana available"}
+    motion: none
+    decisions: ["CHG-SGU-020 (no GST-021 to BO-096 navigation; it is a handover between people, not a tap)"]
+    sources: ["flows/F25-guest-rents-a-cabana.yaml", "design-notes venue-operations BO-096", "ticketing-backoffice BO-097", "ticketing-guest GST-021"]
+    open:
+      - {question: "F25 sells a cabana by kind; F52 (REV3-15) sells the specific unit from the map. Which is drawn for Block A?", default: "Both: F52 for 'Pick on the map' flows, F25 for 'Cabana: by size' flows (W6, CMS-103)."}
+
+  F52:
+    title: A guest books a cabana and uses it
+    process: ticketing-guest
+    trigger: A guest wants a cabana for the day and picks the one they want on the venue map (B09 on the beach), the
+      way a seat is picked (rewritten 29 September, REV3-15 and GAP-C2). Entry GST-074 (a venue-operations screen
+      in the design notes; covered here because the trigger is a booking).
+    actors:
+    - role: guest
+      app: P02 Guest App
+      screens:
+      - GST-074
+      - GST-016
+      - GST-017
+    inputs:
+    - name: date, party size and area
+      formats:
+      - top sheet that collapses once a spot is picked (as WEB-047)
+      limits: party size within the cabana capacity (1 to 500 per the map)
+      validation: As WEB-047, in a top sheet that collapses once a spot is picked.
+      source:
+      - guest, GST-074
+      - guest on GST-074 Map Booking — Cabanas & Spots
+      also_named:
+      - Date, party size, area
+      ref: contracts/satellite/resources.yaml#getMapResourceAvailability
+    - name: cabana spot
+      formats:
+      - tap a numbered spot on the ingested map; bottom sheet with number
+      - zone
+      - capacity
+      - price band
+      limits: one held spot; tapping a second asks to release the first (confirmReleaseHold)
+      validation: '409 names the cabana and the clash; the map refreshes and offers another cabana, area or day, never
+        an empty list. Hold runs out before payment: released and told; extendResourceHold within the seat-hold bounds
+        (R169).'
+      source: guest, GST-074
+    processing:
+    - input: date and area
+      does: 'returns every spot in one call joined on resourceId: number, zone, capacity, price band; held, booked
+        or unavailable greyed'
+      operation:
+      - venue-map#getVenueMap
+      - resources#getMapResourceAvailability
+    - input: spot
+      does: holds the unit (ResourceHold with expiresAt) and adds it to the basket
+      operation:
+      - resources#createResourceHold
+      - orders#addCartLine
+    - input: none
+      does: lists the reservation with every other booking
+      operation:
+      - orders#listReservations
+      - orders#getReservation
+    outputs:
+    - name: cabana map (GST-074)
+      states:
+        loading: map loading
+        ready: spots coloured free / held / booked
+        emptyNoResults: nothing free with alternatives offered
+        offline: availability needs the network
+        error: Could not load the map or the spots. Names which read failed; nothing is held.
+        emptyFirstRun: No bookable spots are placed on this map yet. Says so and offers the venue's other ways to
+          book, rather than an empty map.
+        emptyNoAccess: 'There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what
+          a staff caller must hold; a guest call resolves to the guest''s own data). No access …'
+      failure_branches:
+      - what: someone else holds the spot first
+        sees: 409 naming the cabana and the clash; map refreshes
+        recover: another cabana, area or day
+      - what: hold expires during payment
+        sees: hold ended with Hold again if still free
+        recover: hold again
+      - screen: GST-074
+        what_goes_wrong: Hold expires during payment
+        user_sees: Payment screen says the hold ended and offers to hold again if still free.
+      shows:
+      - element: Map and bottom sheet
+        rule: Tapping a spot opens a bottom sheet with the spot card and Add to basket; held time shows in the sheet
+          header and stays pinned as a chip through checkout.
+      package_states:
+        loading: The venue map and the status of every spot for the day, read together.
+        emptyNoResults: Every spot in this area is taken for the day. Names the area and offers another area or day.
+        offline: The offline banner shows. The map and the spots already loaded stay on screen with their age, never
+          shown as free now. Holding a spot and adding it to the basket need the …
+      also_named:
+      - Map Booking — Cabanas & Spots
+    - name: reservations (GST-016, GST-017)
+      states:
+        ready: cabana alongside every other booking
+        onTheDay: what is held, when, where, and what to show at arrival
+        loading: The reservations list.
+        error: Could not load. Names which read failed and leaves the reservations untouched.
+        emptyFirstRun: No reservations yet. Offers no create action — this screen declares no operation that makes
+          one — and says so rather than showing an empty table.
+        emptyNoResults: 'Never shown as a filter result: an empty tab says there is nothing upcoming (or past) and
+          offers to book.'
+        emptyNoAccess: 'There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what
+          a staff caller must hold; a guest call resolves to the guest''s own data; decided by …'
+        offline: The offline banner shows. Reservations already loaded stay visible with their age. Booking, changing
+          and cancelling need the connection — a table held offline is a table two …
+      failure_branches:
+      - what: guest cancels on the day
+        sees: cancellation against the venue policy
+        recover: unit returns to availability at once
+      shows:
+      - element: reservation card
+        rule: What, when, status in guest words, pay-by deadline as time remaining; cabanas show the hut number and
+          zone.
+      - element: deposit terms
+        rule: Amount, refundable until, late-cancel and no-show terms when the venue enabled dining deposits.
+      - element: arrival
+        rule: Where to go (map pin), the code to show, opening time.
+      also_named:
+      - My Reservations
+      - Reservation Details
+      package_states:
+        loading: The reservation, read by `getReservation`.
+        error: Could not load. Names which read failed and leaves the reservation untouched.
+        emptyFirstRun: No reservation yet. Offers no create action — this screen declares no operation that makes
+          one — and says so rather than showing an empty table.
+    - name: Flow outcome (exit states)
+      states:
+        used: Booked, assigned, used.
+        cancelled: Returned to availability.
+        noShow: Held then released. The hold window is a venue decision.
+      failure_branches:
+      - at_step: 2
+        what_goes_wrong: Someone else holds or books the tapped cabana first, or everything in the area is taken.
+        user_sees: '`409` names the cabana and the clash; the map refreshes and offers another cabana, another area
+          or another day, not an empty list (rev 3 REV3-15).'
+        recovery: medium; resolved by resources#getMapResourceAvailability
+      - at_step: 2
+        what_goes_wrong: The hold runs out before the guest pays.
+        user_sees: The cabana is released and the guest is told; `extendResourceHold` keeps it longer while paying,
+          within the seat-hold bounds (audit R169).
+        recovery: medium; resolved by resources#extendResourceHold
+      - at_step: 4
+        what_goes_wrong: They cancel on the day.
+        user_sees: '`cancelReservation` against the venue policy. The unit returns to availability immediately — a
+          cancelled cabana held until the system notices is an afternoon lost.'
+        recovery: high; resolved by orders#cancelReservation
+      - at_step: 2
+        what_goes_wrong: The venue's cabana flow is *by size* rather than *pick on the map*.
+        user_sees: 'Map booking is optional per flow (decided 29 September, W6): with the *Cabana: by size* flow (CMS-103)
+          the guest chooses a size on GST-050 and the unit is assigned; the resource selection policy (`guestMayChoose`,
+          REV3-15) decides whether the guest may choose the unit at all.'
+        recovery: low; resolved by Automatic (not in contracts)
+      merged: merged from the venue-operations brief (3 Oct)
+    steps:
+    - frame: 1
+      screen: GST-074
+      blockA: true
+      sees: beach map with numbered cabanas, held and booked ones greyed
+      does: sets date and party size
+      operation: venue-map#getVenueMap, resources#getMapResourceAvailability
+      result: free cabanas shown
+    - frame: 2
+      screen: GST-074
+      blockA: true
+      sees: bottom sheet for B09 (zone Beach, capacity 15, band Large)
+      does: holds B09
+      operation: resources#createResourceHold, orders#addCartLine
+      result: held with the countdown; in the basket
+    - frame: 3
+      screen: GST-016
+      blockA: true
+      sees: My Reservations with the cabana
+      does: opens it after paying (checkout as F01 frames 6-9)
+      operation: orders#listReservations
+      result: alongside other bookings
+    - frame: 4
+      screen: GST-017
+      blockA: true
+      sees: reservation details on the day with the credential
+      does: shows it on arrival
+      operation: orders#getReservation
+      result: the reservation is the credential
+    motion:
+    - Pinch to zoom the map; spot tap opens a bottom sheet (slide-up 250 ms); held spot pulses in the highlight colour.
+    - One countdown from the hold's expiresAt ticks in the basket (8 minutes for cabanas, one extension).
+    - what: Cabana availability on the map
+      how: Each spot is coloured free / held / booked; colours update when another guest holds one.
+      timing: Refresh on getMapResourceAvailability poll
+    - what: Hold countdown
+      how: After Hold, a remaining-time counter counts down on the spot and in the basket; at zero the spot releases
+        with a message.
+      timing: Ticks every 1 s
+    decisions:
+    - REV3-15 and GAP-C2 (pick the cabana on the map)
+    - W6 (map booking optional per flow; Cabana by size flow CMS-103)
+    - audit R169 (extend within seat-hold bounds)
+    - 'ids in the flow: REV3-15, GAP-C2, R073 (c), R169'
+    sources:
+    - flows/F52-*.yaml
+    - design-notes venue-operations GST-074
+    - ticketing-guest GST-016 and GST-017
+    - handoff/venue-map-input-spec.md section 3a
+    - flows/F52-a-guest-books-a-cabana-and-uses-it.yaml
+    - DI-1055
+    - DI-199
+    - DI-612
+    - DI-446
+    - handoff/design-notes (screens GST-074, GST-016, GST-017)
+    open: []
+    offline: Availability needs the network. Contended inventory cannot be judged from a cache.
+    block_a:
+      screens:
+      - GST-074
+      - GST-016
+      - GST-017
+      operations:
+      - orders#addCartLine
+      - resources#createResourceHold
+      - resources#getMapResourceAvailability
+      - orders#getReservation
+      - venue-map#getVenueMap
+      - orders#listReservations
+      screens_outside_block_a: []
+    merged_from:
+    - the venue-operations copy of this flow (3 Oct dedupe)
+    merged_detail:
+      from: the venue-operations copy (lifted from flows/, screens/ and contracts/; the storyboard above is the one
+        to draw)
+      trigger:
+        description: 'A guest wants a cabana for the day and picks the one they want on the venue map — B09 on the
+          beach, not whichever cabana is free. Rewritten 29 September (decided 29 September, rev 3 REV3-15 and GAP-C2,
+          superseding audit R073 (c) for resources on an ingested map): cabana maps work like the stadium seat map.
+          Until then this flow sold a cabana by kind and assigned the unit (GST-058, GST-050), which stays the path
+          at a venue with no map. The web runs the same flow on WEB-047.'
+      steps:
+      - frame: 1
+        screen: GST-074
+        screen_name: Map Booking — Cabanas & Spots
+        block_a: true
+        user_sees: 'The app version of map booking: the same ingested map, numbered spots, hold and countdown, tuned
+          for one hand - pinch to zoom, a bottom sheet for the picked spot, and the list view as the accessible alternative.'
+        user_does: They open the venue map for the day and see which cabanas are free.
+        operations:
+        - venue-map#getVenueMap
+        - resources#getMapResourceAvailability
+        result: 'Every spot in one call, joined to the map on `resourceId`: number, zone, capacity, price band, and
+          held, booked or unavailable ones greyed.'
+      - frame: 2
+        screen: GST-074
+        screen_name: Map Booking — Cabanas & Spots
+        block_a: true
+        user_sees: 'The app version of map booking: the same ingested map, numbered spots, hold and countdown, tuned
+          for one hand - pinch to zoom, a bottom sheet for the picked spot, and the list view as the accessible alternative.'
+        user_does: They tap a cabana, hold it and add it to the basket.
+        operations:
+        - resources#createResourceHold
+        - orders#addCartLine
+        result: The guest chooses the unit and it is held (`ResourceHold`, a remaining-time counter from `expiresAt`)
+          until the order converts the hold into a booking, so nobody takes it in between.
+        crosses_device: true
+      - frame: 3
+        screen: GST-016
+        screen_name: My Reservations
+        block_a: true
+        user_sees: 'My Reservations in the app: held bookings, table reservations, cabanas and group requests, distinct
+          from the Tickets tab.'
+        user_does: They see it in their reservations.
+        operations:
+        - orders#listReservations
+        - orders#getReservation
+        result: Alongside every other booking they hold, not in a separate resource list.
+        crosses_device: true
+      - frame: 4
+        screen: GST-017
+        screen_name: Reservation Details
+        block_a: true
+        user_sees: 'One reservation on the day: what is held, when, where, and what to show at arrival.'
+        user_does: On the day, they arrive.
+        operations:
+        - orders#getReservation
+        result: The reservation is the credential. No separate check-in — the same media that admits them opens the
+          cabana.
+        crosses_device: true
+      processing:
+      - operation: venue-map#getVenueMap
+        what: A map with its points and paths
+        steps:
+        - 1
+        block_a: true
+        offline_capable: true
+      - operation: resources#getMapResourceAvailability
+        what: Every bookable resource on a venue map, free or taken, in one call
+        steps:
+        - 1
+        block_a: true
+      - operation: resources#createResourceHold
+        what: Hold a specific resource picked on the map
+        steps:
+        - 2
+        block_a: true
+        writes: true
+      - operation: orders#addCartLine
+        what: Add something
+        steps:
+        - 2
+        block_a: true
+        writes: true
+      - operation: orders#listReservations
+        what: List reservations
+        steps:
+        - 3
+        block_a: true
+      - operation: orders#getReservation
+        what: Read a reservation
+        steps:
+        - 3
+        - 4
+        block_a: true
+
+  F48:
+    title: A guest finds it, queues for it, and eats
+    process: ticketing-guest
+    trigger: A guest is standing inside the venue with a phone and an afternoon. This is the journey the app exists for. Entry GST-021.
+    actors:
+      - {role: "guest", app: "P02 Guest App", screens: ["GST-021", "GST-022", "GST-023", "GST-024", "GST-025"]}
+      - {role: "kitchen and runner", app: "P15 Kitchen Display / staff", does: "prepare and deliver (F29 moves the status)"}
+    inputs:
+      - name: map and filters
+        formats: ["map pan and zoom; point categories; Nearest food / toilets / first aid"]
+        limits: none
+        validation: none
+        source: guest, GST-021
+      - name: wait filters
+        formats: ["area or zone chips", "category", "\"Suitable for my party\" using heights where known"]
+        limits: none
+        validation: "Offline: last readings marked out of date, never as live."
+        source: guest, GST-022
+      - name: join a virtual queue
+        formats: ["party", "heights", "accessibility", "promotion code (as WEB-040)"]
+        limits: a valid ticket for the venue is required; venue may cap active queues per guest
+        validation: "Height refusal before joining: 'Falcon Coaster needs 1.2 m; Omar (1.1 m) cannot ride', with join without him. Queue full or paused: told why and when it reopens. Cap reached: the cap is stated."
+        source: guest, GST-023 (formJoinQueue)
+      - name: location and food order
+        formats: ["scan the code where you are sitting with the app camera, or 'Type the number instead'; order type, time (ASAP first, then slots), cutlery, quantity, kitchen note"]
+        limits: only the order types the outlet supports
+        validation: "Every refusal (sold out mid-order, price changed, session expired, not serviceable, below minimum) names one cause and offers one way on; the basket is kept. No delivery to that spot: decided before the order (listDeliveryLocations)."
+        source: guest, GST-024
+    processing:
+      - {input: "map", does: "returns the map, the routable graph and live waits in one view", operation: ["venue-map#getVenueMap", "venue-map#getVenueMapGraph", "queue#getWaitTimes"]}
+      - {input: "waits", does: "compares waits (adaptor-first, ADR-0012; manual waits from F67 look the same)", operation: "queue#getWaitTimes"}
+      - {input: "join", does: "keeps the place while the guest walks away; polls its own status", operation: ["queue#joinQueue", "queue#getWaitingGuest"]}
+      - {input: "order", does: "binds the order to a place and places it", operation: ["fnb#listDiningOutlets", "fnb#getGuestMenu", "fnb#claimLocationSession", "fnb#createGuestFnbOrder"]}
+      - {input: "order", does: "shows the kitchen's real status and the bill", operation: ["fnb#getGuestOrderStatus", "fnb#getGuestBill"]}
+    outputs:
+      - name: map with waits (GST-021)
+        states: {ready: "points with wait badges", offline: "cached map; waits marked out of date", map3dUnavailable: "2D map", weakGps: "approximate ring"}
+        failure_branches: []
+      - name: queue status (GST-023)
+        states: {joined: "place, expected time, return window, persistent strip", ready: "'Your turn: return by 15:40'", full: "reason and reopening time"}
+        failure_branches:
+          - {what: "queue full or paused", sees: "why and when it reopens", recover: "another ride"}
+      - name: food order (GST-024, GST-025)
+        states: {placed: "confirmation", preparing: "kitchen status", ready: "pickup card or on its way", delivered: "done", offline: "order already placed; status resumes on reconnect"}
+        failure_branches:
+          - {what: "no delivery to this spot", sees: "delivery not offered before ordering", recover: "collect instead"}
+    steps:
+      - {frame: 1, screen: "GST-021", blockA: true, sees: "map with wait badges on rides", does: "opens the map", operation: "venue-map#getVenueMap, venue-map#getVenueMapGraph, queue#getWaitTimes", result: "what is near and how long it takes"}
+      - {frame: 2, screen: "GST-022", blockA: true, sees: "wait list with source and age of each number", does: "filters Suitable for my party", operation: "queue#getWaitTimes", result: "picks a ride"}
+      - {frame: 3, screen: "GST-023", blockA: true, sees: "join form (party, heights)", does: "joins", operation: "queue#joinQueue, queue#getWaitingGuest", result: "place kept; persistent queue strip"}
+      - {frame: 4, screen: "GST-024", blockA: true, sees: "queue strip still visible; outlets and menu; scan the table code", does: "orders lunch to the table", operation: "fnb#listDiningOutlets, fnb#getGuestMenu, fnb#claimLocationSession, fnb#createGuestFnbOrder", result: "order placed"}
+      - {frame: 5, screen: "GST-025", blockA: true, sees: "order status per dish and the bill", does: "watches", operation: "fnb#getGuestOrderStatus, fnb#getGuestBill", result: "food arrives"}
+      - {frame: 6, screen: "GST-023", blockA: true, sees: "'Your turn' with the return window (push if the app is closed)", does: "walks to the ride (Start navigation on GST-021)", operation: "queue#getWaitingGuest", result: "admitted at the attraction (redeemWaitingGuest)"}
+    motion:
+      - Wait badges on the map and the list refresh live (number cross-fades); stale readings grey out.
+      - Queue strip shows a live countdown to the expected time; 'Your turn' pulses and a push notification arrives.
+      - Order status steps advance (Received, Preparing, Ready, On its way) with a progress line.
+      - GST-021 navigation motion as F26 frame 8.
+    decisions: ["ADR-0012 (waits adaptor-first)", "DEC-052 (a guest F&B order keeps its own payment step and receipt)", "ADR-0069 (navigation)"]
+    sources: ["flows/F48-*.yaml", "design-notes venue-operations GST-022 and GST-023", "fnb-retail GST-024 and GST-025", "ticketing-guest GST-021"]
+    open:
+      - {question: "Push notification copy for 'Your turn'", default: "'Falcon Coaster: your turn. Come back by 15:40.'"}
+
+  F50:
+    title: A guest arrives, parks, and gets in
+    process: ticketing-guest
+    trigger: A guest is driving to the venue with a ticket on their phone. Every guest makes this journey. Entry GST-027.
+    actors:
+      - {role: "guest", app: "P02 Guest App", screens: ["GST-027", "GST-009", "GST-028", "GST-012", "GST-013", "GST-055"]}
+      - {role: "car park barrier and gate", app: "P07 Venue Scanner / ANPR", does: "reads the same media"}
+    inputs:
+      - name: parking
+        formats: ["car park (facility)", "date; plate with emirate only for ANPR car parks"]
+        limits: no live bay count in the first release; plate editable until entry
+        validation: "Full for the day: addCartLine refuses soldOutForDay; said after trying, with the other car parks."
+        source: guest, GST-027 (formAddCartLine, formUpdateParkingEntitlement)
+      - name: payment
+        formats: ["'Paying as fatima.h@example.ae' with Not you?; T&Cs tick; Apple Pay or Google Pay, card, wallet balance (split with card)"]
+        limits: T&Cs tick required
+        validation: "Offline: payment unavailable with the reason; the basket is kept on the device."
+        source: guest, GST-009
+    processing:
+      - {input: "parking", does: "adds parking as a product in the ordinary cart (28 September, R166)", operation: "orders#addCartLine"}
+      - {input: "payment", does: "checks out; payment issues the parking entitlement on the same media as the ticket", operation: ["orders#checkoutCart", "orders#createPayment"]}
+      - {input: "order", does: "confirms the facility (not a bay)", operation: ["orders#getOrder", "access#listParkingFacilities"]}
+      - {input: none, does: "lists entitlements; reads the credential and its history", operation: ["access#listMyEntitlements", "access#getEntitlement", "access#getEntitlementCredential", "access#getEntitlementHistory"]}
+    outputs:
+      - name: parking (GST-027, GST-028)
+        states: {ready: "car parks with price", soldOutForDay: "full for the day with the other car parks", confirmed: "pass with car park, date and plate"}
+        failure_branches:
+          - {what: "car park full", sees: "soldOutForDay with alternatives", recover: "another car park (parkedOffsite)"}
+      - name: tickets (GST-012, GST-013)
+        states: {ready: "Usable now / Upcoming / Past (default Usable now)", emptyFirstRun: "no tickets with Buy tickets", waiverNeeded: "'Waiver needed before entry' and Show code disabled"}
+        failure_branches:
+          - {what: "bind refused (ticket active on another phone)", sees: "'This ticket is already active on another phone.'", recover: "Move it to this phone when the policy allows"}
+      - name: dynamic QR (GST-055)
+        states: {ready: "full-screen code at maximum brightness with a countdown to the next rotation", offline: "code keeps rotating from the seed with 'Offline - code still valid'", seedExpired: "'Connect to refresh your code' with the last refresh time; code greyed", exempt: "static QR labelled 'Standard code'"}
+        failure_branches:
+          - {what: "no signal at the gate", sees: "code still rotating locally", recover: "none needed"}
+          - {what: "screenshot attempt", sees: "capture blocked (Android flag, iOS blur)", recover: none}
+    steps:
+      - {frame: 1, screen: "GST-027", blockA: true, sees: "car parks with price, plate field only for ANPR", does: "adds parking", operation: "orders#addCartLine", result: "in the basket"}
+      - {frame: 2, screen: "GST-009", blockA: true, sees: "'Paying as…', T&Cs, Apple Pay", does: "pays", operation: "orders#checkoutCart, orders#createPayment", result: "parking entitlement issued on the ticket's media"}
+      - {frame: 3, screen: "GST-028", blockA: true, sees: "parking pass with car park, date and plate", does: "reads it", operation: "orders#getOrder, access#listParkingFacilities", result: "facility, not a bay"}
+      - {frame: 4, screen: "GST-012", blockA: true, sees: "Usable now tickets", does: "opens today's ticket", operation: "access#listMyEntitlements, access#getEntitlement", result: "ticket open"}
+      - {frame: 5, screen: "GST-013", blockA: true, sees: "what it is, entries left, history", does: "taps Show code", operation: "access#getEntitlementCredential, access#getEntitlementHistory", result: "code screen"}
+      - {frame: 6, screen: "GST-055", blockA: true, sees: "full-screen rotating QR with a 30-second countdown", does: "holds it to the reader", operation: "access#getEntitlementCredential", result: "admitted (barrier and gate read the same media)"}
+    motion:
+      - "GST-055: the QR rotates every 30 seconds (DEC-136) with a circular countdown ring; screen brightness ramps to maximum on open; the new code cross-fades in (no spinner over the code, ever)."
+      - Offline label fades in when the device has no signal; the rotation continues.
+    decisions: ["DEC-136 and CHG-SGU-003 (rotation 30 seconds; answers 3 Oct confirm GST-055 rotates every 30 s)", "DEC-137 (static 'Standard code' for exempt products, DI-633)", "28 September audit R166 (parking in the ordinary cart, no live availability)", "GFIX-3"]
+    sources: ["flows/F50-*.yaml", "design-notes ticketing-guest GST-027", "GST-028", "GST-009", "venue-operations GST-012", "GST-013", "GST-055"]
+    open: []
+
+  F55:
+    title: A guest buys on the web and transfers to a friend
+    process: ticketing-guest
+    trigger: A guest buys four tickets and three are for other people. The platform has to get a ticket to somebody who has never used it. Entry WEB-010.
+    actors:
+      - {role: "buyer", app: "P01 Guest Web", screens: ["WEB-010", "WEB-011", "WEB-012", "WEB-030"]}
+      - {role: "recipient (friend)", app: "P02 Guest App", screens: ["GST-014"]}
+    inputs:
+      - name: basket
+        formats: ["as F01 basket"]
+        limits: one extension (extendCart) for a timed-entry lease
+        validation: as F01 WEB-010
+        source: buyer, WEB-010
+      - name: attendee details and consent
+        formats: ["per attendee holder blocks; consent per attendee", "not per purchase"]
+        limits: a buyer cannot consent for friends (CF-160)
+        validation: as F01 WEB-011
+        source: buyer, WEB-011
+      - name: transfer
+        formats: ["tick individual tickets (guest type and date shown); recipient channel email", "SMS or WhatsApp and address; message"]
+        limits: message up to 500 characters; used, name-bound or already-offered tickets disabled with the reason
+        validation: "A dynamic-QR ticket bound to the sender's device moves to the recipient's device and the sender's copy stops admitting; the copy says so before sending."
+        source: buyer, WEB-030 (formTransferOrderTickets)
+      - name: claim
+        formats: ["claim link opened in the app (sign in or create an account)"]
+        limits: one claim per transfer
+        validation: "Link expired or already claimed: says which, and that the tickets went back to the sender."
+        source: recipient, GST-014
+    processing:
+      - {input: "basket", does: "builds the cart, evaluates promotions, extends the lease", operation: ["orders#getCart", "orders#addCartLine", "promotions#evaluatePromotions", "promotions#getCouponCode", "orders#extendCart"]}
+      - {input: "details", does: "per-attendee consent", operation: ["marketing-crm#getMyProfile", "marketing-crm#listConsentPurposes"]}
+      - {input: "checkout", does: "the lease converts server-side on payment", operation: "orders#checkoutCart"}
+      - {input: "transfer", does: "offers the tickets to the recipient (transferred, not forwarded)", operation: ["orders#transferOrderTickets", "orders#listMyOrders"]}
+      - {input: "claim", does: "binds the tickets to the recipient", operation: "orders#claimTicketTransfer"}
+    outputs:
+      - name: transfer list (WEB-030)
+        states: {ready: "tickets with transfer status (Offered, Claimed, Returned)", emptyFirstRun: "nothing sent"}
+        failure_branches:
+          - {what: "friend never claims", sees: "still the buyer's and still valid", recover: "resend or use it"}
+      - name: claim (GST-014)
+        states: {ready: "tickets offered with the sender's message", claimed: "in the friend's Tickets tab", expired: "went back to the sender"}
+        failure_branches: []
+    steps:
+      - {frame: 1, screen: "WEB-010", blockA: true, sees: "basket with four tickets and the countdown", does: "extends once while deciding", operation: "orders#addCartLine, promotions#evaluatePromotions, orders#extendCart", result: "lease kept"}
+      - {frame: 2, screen: "WEB-011", blockA: true, sees: "holder blocks with consent per attendee", does: "enters the holders", operation: "marketing-crm#getMyProfile, marketing-crm#listConsentPurposes", result: "details captured"}
+      - {frame: 3, screen: "WEB-010", blockA: true, sees: "checkout", does: "checks out and pays (as F01 frames 9-10)", operation: "orders#checkoutCart", result: "paid"}
+      - {frame: 4, screen: "WEB-030", blockA: true, sees: "per-ticket checklist and recipient fields", does: "sends three tickets by WhatsApp", operation: "orders#transferOrderTickets, orders#listMyOrders", result: "offered"}
+      - {frame: 5, screen: "GST-014", blockA: true, sees: "tickets offered with the message", does: "friend claims", operation: "orders#claimTicketTransfer", result: "bound to the friend"}
+    motion:
+      - Basket countdown and Extend as F01.
+      - Transfer status chip changes from Offered to Claimed when the friend claims.
+    decisions: ["CF-160 (consent per attendee)", "W1"]
+    sources: ["flows/F55-*.yaml", "design-notes ticketing-guest WEB-030 and GST-014"]
+    open:
+      - {question: "How long a transfer stays claimable", default: "Until the ticket's date; then it returns to the sender."}
+
+  F66:
+    title: A walk-up sale is taken on a handheld
+    process: ticketing-guest
+    trigger: A queue is building at a window and a supervisor walks out to sell from a handheld. The device moves; the till does not. Entry EMP-034. (Screens are after Block A; in scope through Block A operations; drawn on the staff app board as context.)
+    actors:
+      - {role: "cashier or supervisor (roaming seller)", app: "P06 Staff App (TICVAI-branded)", screens: ["EMP-034", "EMP-035", "EMP-036"]}
+      - {role: "guest", app: "none (taps a card; receives a wristband or phone ticket)"}
+    inputs:
+      - name: product and quantities
+        formats: ["small catalogue (the same bundle the tills hold)", "quantity steppers"]
+        limits: capacity products blocked offline
+        validation: "Offline: cash only; capacity-bound products blocked with a notice."
+        source: seller, EMP-034
+      - name: card on the device
+        formats: ["tap on the handheld's reader; cash"]
+        limits: one payment per order
+        validation: "Reader lost signal mid-tap: status unknown; inquire before any retry ('Checking the payment. Do not tap again.')."
+        source: guest, EMP-035
+      - name: media
+        formats: ["wristband (scan or tap) or phone"]
+        limits: no printer on a roaming seller
+        validation: "No phone and no wristband: directed to a window for printed media."
+        source: seller, EMP-036
+    processing:
+      - {input: "product", does: "reads the product and takes the order", operation: ["catalogue#getProduct", "orders#createOrder"]}
+      - {input: "card", does: "pays and captures; an unknown outcome is inquired, never retried", operation: ["orders#createPayment", "orders#capturePayment", "orders#inquirePaymentStatus"]}
+      - {input: "media", does: "issues to a wristband or phone", operation: ["orders#appendEntitlementToMedia", "orders#getMediaEntitlements"]}
+    outputs:
+      - name: walk-up sale
+        states: {ready: "catalogue and quantities", offline: "cash only; capacity products blocked", sold: "paid and issued on the device", paymentUnresolved: "held pending inquiry", deferredToWindow: "sold; media issued elsewhere"}
+        failure_branches:
+          - {what: "payment status unknown", sees: "inquiry state", recover: "orders#inquirePaymentStatus"}
+          - {what: "guest has no phone or wristband", sees: "directed to a window", recover: "printed media at the window"}
+    steps:
+      - {frame: 1, screen: "EMP-034", blockA: false, sees: "small catalogue with steppers and an offline indicator", does: "sells 3 day tickets", operation: "catalogue#getProduct, orders#createOrder", result: "order taken"}
+      - {frame: 2, screen: "EMP-035", blockA: false, sees: "'Tap card on the device' with the amount", does: "guest taps", operation: "orders#createPayment, orders#capturePayment, orders#inquirePaymentStatus", result: "paid or held pending inquiry"}
+      - {frame: 3, screen: "EMP-036", blockA: false, sees: "issue media (scan wristband or send to phone)", does: "taps three wristbands", operation: "orders#getMediaEntitlements, orders#appendEntitlementToMedia", result: "issued on the spot"}
+    motion:
+      - EMP-035 tap animation pointing to the device's reader; inquiry progress indicator with no retry button.
+    decisions: ["ADR-0013 (local-first selling)", "DEC-063 (capacity products blocked offline)"]
+    sources: ["flows/F66-*.yaml", "design-notes ticketing-guest EMP-034"]
+    open:
+      - {question: "Are EMP-034 to EMP-036 drawn for Block A?", default: "Draw as context frames on the staff app board (the staff app is a Block A app through EMP-001 and others)."}

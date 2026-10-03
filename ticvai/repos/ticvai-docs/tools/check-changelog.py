@@ -10,7 +10,7 @@ them with an example. This enforces them, so nobody has to remember to read them
 
 **Every run** validates every entry file:
 
-  - the file name is `<id>-<slug>.yaml`; the id matches `^CHG-[A-Z]{2,6}-\\d{3}$`; ids are unique, and
+  - the file name is `<id>-<slug>.yaml`; the id matches `^CHG-[A-Z][A-Z0-9]{1,5}-\\d{3}$`; ids are unique, and
     numbered 001, 002, ... with no gap inside a batch (one batch per branch, so branches never collide);
   - every required field is there, every enum holds, dates are dates; `decision` says what, by whom and
     when; `why` cites a source a reader can open (a MoM, a DI, an R-root, an ADR, the council, a finding,
@@ -54,7 +54,7 @@ ENTRIES = CHANGES / "entries"
 SCHEMA = CHANGES / "schema.yaml"
 INDEX = CHANGES / "CHANGELOG.md"
 MANIFEST = ROOT / "handoff" / "refresh-manifest.json"
-ID_IN_TEXT = re.compile(r"\bCHG-[A-Z]{2,6}-\d{3}\b")
+ID_IN_TEXT = re.compile(r"\bCHG-[A-Z][A-Z0-9]{1,5}-\d{3}\b")
 EXEMPT = re.compile(r"(?mi)^CHG-exempt:\s*\S")
 SHA = re.compile(r"^[0-9a-f]{7,40}$")
 

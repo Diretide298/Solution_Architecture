@@ -170,6 +170,11 @@ ALT_BY_ID = {"theme.primaryColour": "#0077B6", "theme.buttonStyle": "pill", "the
 LABEL = {"brand.showPoweredBy": "Powered by TICVAI credit", "homepage.sections[].maxItems": "Sections: card count",
          "homepage.templateKey": "Landing-page template"}
 CONTROL = {"homepage.templateKey": "template picker: name and thumbnail (listLandingPageTemplates)"}
+# **Authored: a setting edited on one screen only, though others call the same write** (3 October,
+# CHG-R1S-012). `setBrandIdentity` is bound on CMS-002 and CMS-104, so every field it carries was listed as
+# editable on both; Chinmay decided the Powered-by toggle lives on CMS-104 and is shown read-only on CMS-002
+# (flow-brief defaults of 3 October). Listed here, the design batches draw the toggle on CMS-104 only.
+EDITED_ONLY_ON = {"brand.showPoweredBy": {"CMS-104", "ADM-016"}}
 EXAMPLES = ["theme.primaryColour", "theme.buttonStyle", "theme.surfaceStyle", "theme.cornerRadius",
             "brand.logoVariant", "header.layout", "navigation.buyButton.style", "languages.languages",
             "bookingFlow.stepIndicator", "bookingFlow.cardLayout", "bookingFlow.cardSize", "bookingFlow.cartLayout",
@@ -347,7 +352,9 @@ def build() -> dict:
                 # With no enum or limit, the format is what is allowed (#RRGGBB, PNG or SVG ≤ 2 MB).
                 "default": DS._default(r),
                 "allowed": DS._allowed(r) if DS._allowed(r) != "—" else (r["mask"] or "—"), "help": desc,
-                "effect": EFFECT.get(eid, ""), "configuredOn": where, "reach": kind,
+                "effect": EFFECT.get(eid, ""),
+                "configuredOn": [w for w in where if eid not in EDITED_ONLY_ON or w["screen"] in EDITED_ONLY_ON[eid]],
+                "reach": kind,
                 "reachesText": reaches_text, "specific": specific if (kind not in ("shell", "web") or named) else [],
                 "channel": chan, "change": change,
                 "venueOverride": key == "bookingFlow",

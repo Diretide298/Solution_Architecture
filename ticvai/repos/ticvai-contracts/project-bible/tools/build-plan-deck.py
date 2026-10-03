@@ -292,7 +292,7 @@ def main():
         pt = [fid for fid, c in claims.items() if c["partlyFrom"] == b]
         plats = collections.Counter(a["platform"] or "platform" for a in mine)
         n = x.get("endSprint") or settings["targets"][b]
-        pair = tests["pairs"][sp.BLOCKS.index(b) % len(tests["pairs"])]
+        pair = sp.test_pair(b, tests)
         blocks.append({
             "block": b, "targetSprint": settings["targets"][b], "endSprint": n,
             "endsOn": x.get("endsOn"), "targetEndsOn": x.get("targetEndsOn"), "lastWork": x.get("lastDay"),

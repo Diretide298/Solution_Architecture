@@ -3345,6 +3345,21 @@ paths:
                     - $ref: '#/components/schemas/Session'
         '401':
           $ref: ../shared/common.yaml#/components/responses/Unauthorized
+        '410':
+          description: The challenge has expired or was voided (by a fifth wrong code, or a newer challenge for the
+            same purpose). Ask for a new one (CHG-R1S-025; the r1 gate).
+          x-ticvai-problem-types: [mfa-challenge-expired]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '422':
+          description: 'A wrong code, attempts one to four (CHG-R1S-025; the r1 gate found only the fifth failure
+            specified). The problem''s detail says how many attempts remain; the fifth wrong code is the `429`
+            below.'
+          x-ticvai-problem-types: [mfa-code-invalid]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '429':
           description: '**Five wrong codes and step-up is locked** (decided 28 September, audit R126 (6)).
             The fifth failure voids the challenge, and no new challenge is issued to this principal for
@@ -3885,6 +3900,9 @@ paths:
                   nullable: true
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Moved
           content:
             application/json:
@@ -4220,6 +4238,9 @@ paths:
                   format: date-time
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Granted, logged and alerted
           content:
             application/json:
@@ -8354,7 +8375,14 @@ components:
         - expired           # idle past the timeout; the registry dropped it and freed the workstation
 
     ActiveSession:
-      x-ticvai-persistence: none — Redis session registry
+      x-ticvai-persistence: identity.session
+      description: '**The session record, in `identity.session`** (3 October 2026, CHG-R1S-008; the HLD/LLD
+        cross-check and the r1 gate). Until then it was "none — Redis session registry", and 11 operations
+        wrote a session no SQL created: nothing defined its columns, so `listActiveSessions` could not page,
+        filter by workstation or venue, or run under row-level security. The row is the record of record,
+        tenant-scoped and under RLS like every identity table; Redis stays the token cache in front of it
+        (ADR-0004: a session is a token with a validity window, and the cache answers that check). The
+        names and `hasOpenShift` are read with it, not stored.'
       type: object
       required:
       - sessionId
@@ -8377,6 +8405,8 @@ components:
           format: uuid
         principalName:
           type: string
+          x-ticvai-persisted: false
+          description: Read from `identity.principal` with the row.
         roleId:
           type: string
           format: uuid
@@ -8384,6 +8414,8 @@ components:
         roleName:
           type: string
           nullable: true
+          x-ticvai-persisted: false
+          description: Read from `identity.role` with the row.
         workstationId:
           type: string
           format: uuid
@@ -8391,6 +8423,8 @@ components:
         workstationName:
           type: string
           nullable: true
+          x-ticvai-persisted: false
+          description: Read from the workstation with the row.
         venueId:
           type: string
           format: uuid
@@ -8403,7 +8437,10 @@ components:
           nullable: true
         hasOpenShift:
           type: boolean
-          description: Revoking this session leaves cash unreconciled.
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: Revoking this session leaves cash unreconciled. **Computed on read** from the shift the
+            principal holds open at the workstation (`orders.pos_shift`), never stored here.
         mfaSatisfied:
           type: boolean
         startedAt:

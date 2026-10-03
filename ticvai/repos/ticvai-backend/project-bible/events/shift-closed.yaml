@@ -7,7 +7,14 @@ publisher: shift
 description: A till has been counted and closed.
 aggregate: shift
 emittedWhen: ShiftStatus pendingClosure or pendingVariance to closed
+# **Every close emits it** (3 October 2026, CHG-R1S-009; the HLD/LLD cross-check): a count within the threshold
+# closes in the same transaction as closeShift or submitShiftCount, a supervised close in approveShiftClose, a
+# variance in acceptShiftVariance. Only acceptShiftVariance was listed, so the ledger never heard of a shift that
+# closed cleanly.
 emittedBy:
+- closeShift
+- submitShiftCount
+- approveShiftClose
 - acceptShiftVariance
 payload:
 - field: shiftId

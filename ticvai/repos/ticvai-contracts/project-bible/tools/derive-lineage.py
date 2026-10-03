@@ -308,7 +308,25 @@ def stores_by_contract(stored: dict) -> dict:
     return out
 
 
+def event_emitters() -> set:
+    """**An operation that emits an event writes the outbox** (3 October 2026, CHG-R1S-005). The event is
+    written to `platform.outbox` in the same transaction as the change it reports, so the outbox is one of
+    the operation's writes. The HLD/LLD cross-check found ten emitters, `createOrder` among them, whose
+    lineage left it out; the emitters are `emittedBy` in `events/` and `x-ticvai-emits` on the operation."""
+    out = set()
+    for f in sorted((ROOT / "events").glob("*.yaml")):
+        if f.name.startswith("_"):
+            continue
+        try:
+            e = yaml.safe_load(f.read_text(encoding="utf-8")) or {}
+        except yaml.YAMLError:
+            continue
+        out |= {str(o).split(".")[-1] for o in e.get("emittedBy") or []}
+    return out
+
+
 def derive(stored: dict) -> dict:
+    emitting = event_emitters()
     persist = persistence_map()
     defs = schema_defs()
     svc = service_by_contract(stored)
@@ -326,17 +344,32 @@ def derive(stored: dict) -> dict:
                 if not isinstance(op, dict) or not op.get("operationId"):
                     continue
                 aud = op.get("x-ticvai-audience")
+                body_writes = (set(tables_in(op.get("requestBody"), persist, defs))
+                               | set(child_writes(op, path, persist, defs, known)))
+                # **A new write whose body is not the record writes what it returns** (CHG-GTRB-004). A body of a
+                # few inline fields (`setVenueMapArtwork` sends `baseAssetId` and alignment points, returns the
+                # `VenueMap` it changed) derived no table, and check-write-lineage failed the r1 merge refresh on it
+                # (W-NOTABLE). The one-off of CHG-R1S-005 gave the stored entries the same reading: "the table the
+                # operation changes, read off its response schema's persistence". Kept apart as `_response_writes`
+                # and used only for an operation the lineage does not have yet: a stored entry's writes, `pure` and
+                # `storageUndecided` are judgements the ref-following repair below must not widen.
+                response_writes = []
+                if verb != "get" and not body_writes:
+                    response_writes = sorted(tables_in({c: r for c, r in (op.get("responses") or {}).items()
+                                                        if str(c).startswith("2")}, persist, defs))
                 out[op["operationId"]] = {
                     "contract": contract,
                     "verb": verb.upper(),
                     "path": path,
                     "reads": tables_in(op.get("responses"), persist, defs),
-                    "writes": sorted(set(tables_in(op.get("requestBody"), persist, defs))
-                                     | set(child_writes(op, path, persist, defs, known))),
+                    "writes": sorted(body_writes
+                                     | ({"platform.outbox"} if (op["operationId"] in emitting
+                                        or op.get("x-ticvai-emits")) and contract != "ai" else set())),
                     # Kept only long enough for the repair below to tell which tables are new
                     # *because refs are now followed*, and stripped before anything is written.
                     "_direct_reads": tables_in(op.get("responses"), persist),
                     "_direct_writes": tables_in(op.get("requestBody"), persist),
+                    "_response_writes": response_writes,
                     "routing": op.get("x-ticvai-read-routing"),
                     "scope": op.get("x-ticvai-scope-level"),
                     "perm": op.get("x-ticvai-permission"),
@@ -490,6 +523,7 @@ def main() -> int:
         return 0
     for o in missing:
         stored[o] = {k: v for k, v in fresh[o].items() if not k.startswith("_")}
+        stored[o]["writes"] = sorted(set(stored[o]["writes"]) | set(fresh[o].get("_response_writes") or []))
     # **A name that is not `<schema>.<table>` is not a table, and is removed** (SD-007, 29
     # September). The one exception to "never removed": authored entries carried the prose after
     # `none —` (`embedded as attributes (jsonb) on orders.cart_line ...`) and table names with a

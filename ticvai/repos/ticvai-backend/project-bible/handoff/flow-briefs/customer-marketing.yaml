@@ -1,0 +1,487 @@
+# Flow design briefs: Customer & Marketing (Block A). Input to Claude Design storyboards and wireframes.
+# Brief: audit/ticvai/apply/FLOW-BRIEF-BRIEF.md. Written 3 October 2026 by the customer-marketing brief agent.
+# Read with handoff/design-notes/customer-marketing.yaml and contracts/satellite/marketing-crm.yaml.
+process: customer-marketing
+title: Customer & Marketing
+written: '2026-10-03'
+scope:
+  rule: >-
+    Block A flows whose trigger belongs to customer-marketing (trigger screen's process in handoff/design-notes, read with
+    the trigger description) and whose steps touch a Block A screen or operation (BLOCK-A builds in
+    handoff/service-docs/op-release.json). Board flows (F150, F246-F253) are hub-and-spoke navigation walks with no
+    operations in the flow file: only their Block A frames are briefed, with the operations the screens declare
+    (screens/P08, P13 `apis`).
+  covered:
+  - {flow: F05, why: 'Trigger SUP-005; all 3 steps Block A.'}
+  - {flow: F53, why: 'Trigger GST-036; all 5 steps on Block A screens.'}
+  - {flow: F54, why: 'Trigger is a guest with a problem (cases, primaryContract marketing-crm); step 1 GST-040 is a white-label screen. All 4 steps Block A.'}
+  - {flow: F70, why: 'Trigger EMP-029; no Block A screen (P06 staff app is later) but 6 Block A case operations. Briefed so the case object is drawn once; frames are for later batches.'}
+  - {flow: F150, why: 'Trigger CMS-021; Block A slice CMS-025, CMS-026.'}
+  - {flow: F246, why: 'Trigger BO-754; Block A slice BO-755.'}
+  - {flow: F247, why: 'Trigger BO-764; Block A slice BO-766, BO-772.'}
+  - {flow: F249, why: 'Trigger BO-784; Block A slice BO-785.'}
+  - {flow: F250, why: 'Trigger BO-794; Block A slice BO-798.'}
+  - {flow: F253, why: 'Trigger BO-824; Block A slice BO-825 to BO-828.'}
+  skipped:
+  - {flow: F24, why: 'Trigger KSK-015 is the ai process (assistant hands over to SUP-004/SUP-005); ai brief.'}
+  - {flow: 'F01, F02, F55', why: 'Purchase flows, trigger ticketing-guest; WEB-011 checkout opt-in is drawn there (DEC-023).'}
+  - {flow: F56, why: 'Trigger GST-042 is platform-foundation (registration).'}
+  - {flow: 'F21, F118, F217, F223, F272', why: 'Trigger is venue-operations.'}
+  - {flow: 'F86, F124, F213', why: 'Trigger is ticketing-backoffice or platform-foundation.'}
+  - {flow: 'F133, F134, F135, F151, F181, F182, F244, F245, F248, F251, F252, F255', why: 'Customer-marketing trigger but no Block A screen or operation.'}
+  - {flow: 'F57, F75', why: 'Kiosk, trigger ticketing-guest.'}
+
+flows:
+  # ---------------------------------------------------------------------------------------------------------------
+  F05:
+    title: Agent resolves a guest complaint
+    process: customer-marketing
+    trigger: A guest contacts support about an order (chat handed over from the assistant, or a case already raised).
+    actors:
+    - {role: 'Support agent (CASE_VIEW, CASE_MANAGE)', app: 'P12 Support Console'}
+    - {role: 'Supervisor / internal team (escalation target)', app: P12}
+    - {role: 'Guest (receives replies by the consented channel)', app: 'P01/P02'}
+    inputs:
+    - name: Case message
+      formats: ['body text <= 10,000 chars', 'isInternal boolean (required, never defaulted)', 'channel (MessageChannel)', 'attachmentRefs[]']
+      limits: 'body max 10,000'
+      validation:
+      - {rule: 'Reply target not chosen', message: 'Send disabled: "Choose Reply to guest or Internal note."'}
+      source: 'Agent, SUP-005 composer'
+    - name: Resolution
+      formats: ['status open|inProgress|awaitingGuest|escalated|resolved|closed', 'priority low|normal|high|urgent', 'resolutionNote <= 2,000 chars']
+      limits: 'resolutionNote required to resolve'
+      validation:
+      - {rule: 'Resolve without a note (400)', message: '"Add a resolution note: what was found and done."'}
+      source: SUP-005
+    - name: Escalation
+      formats: ['reason <= 500 chars (required)', 'assignToPrincipalId', 'newPriority']
+      limits: ["reason up to 500 characters (required); assignee and priority picked from lists (derived)"]
+      validation:
+      - {rule: 'No reason', message: '"Say why you are escalating."'}
+      source: SUP-005
+    processing:
+    - {does: 'Queue with SLA state, breached first', ops: ['marketing-crm#listCases']}
+    - {does: 'Thread and context; reply or internal note', ops: ['marketing-crm#getCase', 'marketing-crm#addCaseMessage']}
+    - {does: 'Resolve / reassign / escalate; reopen if needed', ops: ['marketing-crm#updateCase', 'marketing-crm#escalateCase', 'marketing-crm#reopenCase']}
+    - {does: 'Refund asked: raise a refund request (approval above the venue threshold), never refund directly', ops: ['createRefundRequest (orders; outside this process)']}
+    outputs:
+    - name: Case queue and workspace
+      states: {loading: 'listCases', empty: 'No open cases', ready: 'Cases with SLA due/breached, priority, kind', error: 'Read failed, named', slaPaused: 'Shown only while awaitingGuest'}
+      failure_branches:
+      - {what: 'Internal note sent to the guest by mistake', user_sees: 'Prevented by the required choice and the reply target shown in the composer; cannot be recalled', recover: 'n/a (prevention is the control)'}
+      - {what: 'SLA breaches while awaiting an internal team', user_sees: 'Clock keeps running; breached badge', recover: 'Escalate'}
+      - {what: 'Guest asks for a refund', user_sees: '"Raise refund request" action instead of refund', recover: 'Approval queue'}
+    steps:
+    - {frame: 1, screen: SUP-005, sees: 'Live Chat Workspace: case list sorted breached first, SLA chips', does: 'Picks up a case', op: 'marketing-crm#listCases', result: 'Case assigned and open'}
+    - {frame: 2, screen: SUP-005, sees: 'Thread (with the assistant handover), guest context, composer with Reply/Internal toggle', does: 'Reads history, replies to the guest', op: 'marketing-crm#getCase, marketing-crm#addCaseMessage', result: 'Guest reply sent (or internal note saved)'}
+    - {frame: 3, screen: SUP-005, sees: 'Resolve panel (note required) and Escalate dialog (reason required)', does: 'Resolves with a note, or escalates', op: 'marketing-crm#updateCase, marketing-crm#escalateCase', result: 'Resolved, or escalated with new priority/assignee'}
+    motion:
+    - {what: 'SLA countdown', how: 'Live timer per case; turns red at breach; paused icon while awaitingGuest'}
+    - {what: 'New messages', how: 'Thread auto-scrolls; typing indicator for the guest'}
+    decisions: ['CHG-WIR-005 (case picked up on SUP-005, not SUP-004)', 'Pattern 4, 3 Oct: guest screens use sendGuestConversationMessage (answers line 369)']
+    sources: [flows/F05, handoff/design-notes/customer-marketing.yaml#SUP-005, contracts/satellite/marketing-crm.yaml#addCaseMessage, F05 branches, DI-256]
+    open:
+    - {q: 'Refund threshold value and where it is set', default: 'Venue setting; show "Above AED 500 needs approval" as sample.'}
+
+  # ---------------------------------------------------------------------------------------------------------------
+  F53:
+    title: A guest earns, sees and spends loyalty
+    process: customer-marketing
+    trigger: A returning guest checks their loyalty position and what it buys them.
+    actors:
+    - {role: Guest (signed in), app: 'P02 Guest App, P01 Guest Web'}
+    inputs:
+    - name: Programme switch
+      formats: ['programme id (when the guest holds more than one)']
+      limits: ["one position per programme; the switcher shows only when the guest holds more than one (GST-036 design note) (derived)"]
+      validation: ["only the guest's own programmes are offered; nothing is typed, so nothing is refused (derived)", "offline -> \"The last known balance stays with its age; points earned since are not shown and that is said\" (GST-036 edge case) (derived)"]
+      source: GST-036
+    - name: Reward redemption
+      formats: ['reward id, points']
+      limits: 'Needs a connection; tier gate shown before confirming'
+      validation:
+      - {rule: 'Balance short (409 insufficientPoints)', message: '"You need 340 more points for this reward." Nothing is held.'}
+      - {rule: 'Offline', message: 'Redeem disabled: "Needs a connection."'}
+      source: GST-036
+    - name: Consent decisions (rewards/account)
+      formats: ['purpose, decision Given|Withdrawn, channels[], noticeVersion, source']
+      limits: 'Append-only; withdrawing is one step'
+      validation:
+      - {rule: 'Unknown notice version / purpose not configured (400)', message: '"This choice is out of date. Reload to see the current notice."'}
+      source: WEB-024
+    - name: Wishlist save/remove
+      formats: ['variant + performance (or date-less)']
+      limits: 'Idempotent; same product on two dates = two entries'
+      validation: ["offline -> Book and Remove are disabled with \"Needs a connection\" (GST-020 edge case) (derived)", "saving an item already saved changes nothing (idempotent) (derived)"]
+      source: 'GST-020 (heart on product/date cards)'
+    processing:
+    - {does: 'Position: tier, points, pending, distance to next tier, expiring', ops: ['marketing-crm#getLoyaltyPosition', 'marketing-crm#listLoyaltyProgrammes']}
+    - {does: 'Rewards, badges, leaderboard, redemption, referral', ops: ['marketing-crm#listRewards', 'marketing-crm#listCustomerBadges', 'marketing-crm#redeemLoyaltyPoints', 'marketing-crm#createReferral']}
+    - {does: 'Consent and devices on the account', ops: ['marketing-crm#recordConsent', 'marketing-crm#getGuestConsents', 'marketing-crm#listGuestDevices', 'marketing-crm#getWishlist']}
+    - {does: 'Member offers listed (evaluated at checkout, R292)', ops: ['promotions#listPromotions']}
+    - {does: 'Stored value (money, distinct from points)', ops: ['getWallet', 'listWalletTransactions']}
+    - {does: 'Wishlist', ops: ['marketing-crm#getWishlist', 'marketing-crm#addToWishlist', 'marketing-crm#removeFromWishlist']}
+    outputs:
+    - name: Position card
+      states: {loading: skeleton, ready: 'Tier badge, spendable points, pending points separately, progress bar "660 points to Gold", expiring-in-30-days warning', offline: 'Last known balance with its age; redeem/refer disabled', empty: 'Not a member yet: join'}
+      failure_branches:
+      - {what: 'Offer expired between showing and using', user_sees: 'Refused at checkout with "This offer ended at <time>"', recover: 'Pick another offer'}
+    - name: Consent state rows
+      states: {ready: 'Given / Withdrawn / Not asked / Needs renewing'}
+      failure_branches: []
+    - name: Wishlist
+      states: {ready: 'Items with price, availability', unavailable: 'Withdrawn item greyed "No longer available"', offline: 'Cached with age; Book/Remove disabled'}
+      failure_branches: []
+    steps:
+    - {frame: 1, screen: GST-036, sees: 'Loyalty & Rewards: position card (Silver, 1,840 pts, 150 pending), progress to Gold, badges, rewards', does: 'Checks points; redeems a reward', op: 'marketing-crm#getLoyaltyPosition, marketing-crm#listLoyaltyProgrammes, marketing-crm#redeemLoyaltyPoints', result: 'Position shown; reward redeemed or 409'}
+    - {frame: 2, screen: WEB-024, sees: 'Devices, Wishlist & Consent: consent rows per purpose/channel, cookie preferences, devices', does: 'Opts in to marketing by WhatsApp', op: 'marketing-crm#recordConsent, marketing-crm#listGuestDevices, marketing-crm#getWishlist', result: 'New consent record (append-only)'}
+    - {frame: 3, screen: GST-037, sees: 'Member offers against what they hold', does: 'Browses offers', op: 'promotions#listPromotions', result: 'Listed; evaluated at checkout'}
+    - {frame: 4, screen: GST-011, sees: 'Wallet stored value and transactions (money, not points)', does: 'Checks balance', op: 'getWallet, listWalletTransactions', result: 'Balance shown'}
+    - {frame: 5, screen: GST-020, sees: 'Wishlist cards; swipe to remove with Undo', does: 'Saves/removes items', op: 'marketing-crm#getWishlist, marketing-crm#addToWishlist, marketing-crm#removeFromWishlist', result: 'List updated'}
+    motion:
+    - {what: 'Tier progress bar', how: 'Fills to the current position on load (600 ms ease-out); points count up'}
+    - {what: 'Redemption', how: 'Confirm sheet, then points decrement animation and reward card flip to "Redeemed"'}
+    - {what: 'Wishlist remove', how: 'Swipe-to-remove with Undo snackbar (5 s)'}
+    decisions: [DEC-020 (Bronze/Silver/Gold/Platinum, 12-month expiry, sample catalogue), DEC-018, R292, CF-160]
+    sources: [flows/F53, 'handoff/design-notes/customer-marketing.yaml#GST-036,WEB-024,GST-020', contracts/satellite/marketing-crm.yaml#getLoyaltyPosition]
+    open:
+    - {q: 'GST-037 and GST-011 are ticketing-guest screens', default: 'Draw them per the ticketing-guest notes; this brief only fixes the hand-offs.'}
+
+  # ---------------------------------------------------------------------------------------------------------------
+  F54:
+    title: Something goes wrong in the venue
+    process: customer-marketing
+    trigger: 'A guest has a problem: something lost, something wrong with an order, a question nobody answered.'
+    actors:
+    - {role: Guest, app: 'P02 Guest App, P01 Guest Web'}
+    - {role: 'Staff working the case', app: 'P12 / P06 (F05, F70)'}
+    inputs:
+    - name: Case
+      formats: ['kind lostProperty|complaint|question|accessibility|refundRequest|other', 'summary <= 200 chars (required)', 'detail (required when kind other)', 'venueId', 'orderRef']
+      limits: 'Needs the connection (R148): not queued offline'
+      validation:
+      - {rule: 'kind other without detail (400 validation, R222)', message: '"Tell us a bit more about the problem."'}
+      - {rule: 'Offline', message: 'Raise disabled: "Raising a case needs a connection. Visit Guest Services near the main gate or ask any member of staff."'}
+      source: 'Guest, GST-040 (Help & Support) / WEB-034 / GST-034'
+    - name: Lost item report
+      formats: ['item kind chips (Bag, Phone, Wallet, Keys, Clothing, Jewellery, Documents, Toy, Buggy, Other)', 'colour, brand', 'area last seen (venue points list) and approximate time', 'photos (JPEG/PNG via camera or gallery)']
+      limits: 'A few photos (exact count open)'
+      validation:
+      - {rule: 'No item kind or area', message: '"Choose what you lost and where you last had it."'}
+      source: 'Guest, WEB-034 / GST-034'
+    - name: Reply on own case
+      formats: ['message <= 10,000 chars']
+      limits: 'Only on the caller''s own case (404 otherwise)'
+      validation: ["offline -> replying is disabled with \"Visit Guest Services near the main gate or ask any member of staff\" (GST-034 edge case) (derived)", "over 10,000 characters -> refused at the limit; another guest's case -> 404, shown as not found (derived)"]
+      source: 'GST-034 / WEB-034'
+    processing:
+    - {does: 'FAQ and policies first (self-serve), app status', ops: ['white-label#listPublishedFaqs', 'white-label#listPublishedPolicies', 'white-label#getTenantAppStatus']}
+    - {does: 'Raise, list, reply on own cases (one Case object for all kinds)', ops: ['marketing-crm#raiseMyCase', 'marketing-crm#listMyCases', 'marketing-crm#replyToMyCase']}
+    - {does: 'Lost-item detail attached to the case', ops: ['marketing-crm#recordLostItem']}
+    outputs:
+    - name: Help hub
+      states: {ready: 'Tabs FAQ, My cases (signed in), Policies, Accessibility; app status line and What''s new', offline: 'FAQ cached and readable; case buttons disabled with in-person directions'}
+      failure_branches:
+      - {what: 'Urgent (child, medical)', user_sees: 'Not a case: "Find the nearest staff member" with location and venue phone', recover: 'Staff reportIncident (F69)'}
+    - name: My cases / report status
+      states: {loading: listMyCases, empty: 'No cases yet', ready: 'Case number and status', possibleMatch: '"Possible match - is this yours?" with found item photo', notFound: '"Not found by 30 Nov 2026"; reply to reopen within the venue window', offline: 'Read-only'}
+      failure_branches:
+      - {what: 'Guest has left the venue', user_sees: 'Case follows by the consented channel; if none, the case says so', recover: 'Guest opens the app'}
+    steps:
+    - {frame: 1, screen: GST-040, sees: 'Help & Support: FAQ search and categories', does: 'Looks for an answer', op: 'white-label#listPublishedFaqs', result: 'Self-served, or continues'}
+    - {frame: 2, screen: GST-040, sees: 'Raise a case form (kind, summary, detail)', does: 'Raises a case', op: 'marketing-crm#raiseMyCase', result: 'Case number shown'}
+    - {frame: 3, screen: WEB-034, sees: 'Lost & Found form: item chips, colour, brand, where/when, photo', does: 'Reports a lost bag', op: 'marketing-crm#raiseMyCase, marketing-crm#recordLostItem', result: 'Lost-property case open'}
+    - {frame: 4, screen: GST-034, sees: 'Case status and thread; possible match card', does: 'Tracks it, replies, confirms the match', op: 'marketing-crm#listMyCases, marketing-crm#replyToMyCase', result: 'Collection point shown once confirmed'}
+    motion:
+    - {what: 'Case status', how: 'Status chip transitions Open -> In progress -> Possible match -> Resolved; new reply badge'}
+    - {what: 'Offline', how: 'Buttons fade to disabled with an inline banner when the connection drops'}
+    decisions: [R148 (needs connection, not queued), R222, DEC-026 (item fields as case detail), DI-256]
+    sources: [flows/F54, 'handoff/design-notes/customer-marketing.yaml#WEB-034,GST-034', 'handoff/design-notes/white-label.yaml#GST-040', contracts/satellite/marketing-crm.yaml#raiseMyCase]
+    open:
+    - {q: 'Photo count and size limit for lost items', default: 'Up to 3 photos, 10 MB each, JPEG/PNG/HEIC.'}
+
+  # ---------------------------------------------------------------------------------------------------------------
+  F70:
+    title: A guest needs help and something is lost
+    process: customer-marketing
+    trigger: 'A guest approaches a member of staff: lost, lost something, or something went wrong.'
+    block_a_note: 'EMP-028/029/030 (P06 Staff App) are not Block A; the case operations are. Draw in the staff-app batch.'
+    actors:
+    - {role: 'Steward / supervisor', app: 'P06 Staff App'}
+    - {role: 'Guest', app: 'in person; later P02 by consented channel'}
+    inputs:
+    - name: Staff-created case
+      formats: ['subject <= 200', 'description <= 10,000', 'kind', 'channel inPerson', 'venueId', 'attachmentRefs (photos)']
+      limits: 'createCase and addCaseMessage are offline-capable (queued with recordedAt)'
+      validation:
+      - {rule: 'Missing subject/description', message: '"Add what was lost and where."'}
+      source: 'Steward, EMP-028'
+    processing:
+    - {does: 'Existing case first', ops: ['marketing-crm#listCases', 'marketing-crm#getCase']}
+    - {does: 'Directions with live closures and queues (map cached offline)', ops: ['venue-map#getVenueMap', 'getVenueMapLive']}
+    - {does: 'Log, match, return; escalate high value or ID documents', ops: ['marketing-crm#createCase', 'marketing-crm#addCaseMessage', 'marketing-crm#updateCase', 'marketing-crm#escalateCase']}
+    outputs:
+    - name: Case on the staff app
+      states: {ready: 'Case with status', queuedOffline: 'Saved, will sync', resolved: 'Closed with the guest told'}
+      failure_branches:
+      - {what: 'Passport or high-value item', user_sees: 'Escalated immediately', recover: 'Case escalation path'}
+      - {what: 'Guest left, no consented channel', user_sees: 'Case open, flagged "no contact consent"', recover: 'Guest contacts venue'}
+    steps:
+    - {frame: 1, screen: EMP-029, sees: 'Guest assistance: existing cases for this guest', does: 'Opens assistance', op: 'marketing-crm#listCases, marketing-crm#getCase', result: 'Existing case or none'}
+    - {frame: 2, screen: EMP-030, sees: 'Venue map with closures and queues', does: 'Shows the way', op: 'venue-map#getVenueMap, getVenueMapLive', result: 'Guest directed'}
+    - {frame: 3, screen: EMP-028, sees: 'Lost item form with photo', does: 'Logs the item', op: 'marketing-crm#createCase, marketing-crm#addCaseMessage', result: 'Case created (or queued offline)'}
+    - {frame: 4, screen: EMP-028, sees: 'Match and return', does: 'Matches and closes with a message to the guest', op: 'marketing-crm#updateCase, marketing-crm#addCaseMessage', result: 'Resolved, guest told'}
+    motion:
+    - {what: 'Map', how: 'Route line from staff position to destination; closures greyed'}
+    decisions: [R148]
+    sources: [flows/F70, contracts/satellite/marketing-crm.yaml#createCase]
+    open:
+    - {q: 'Is F70 drawn in Block A at all?', default: 'No; only the shared case states are reused from F54/F05.'}
+
+  # ---------------------------------------------------------------------------------------------------------------
+  F150:
+    title: 'Privacy & Consent configuration board (Block A slice: cookie registry and banner)'
+    process: customer-marketing
+    trigger: 'Board walk from CMS-021 (not Block A). The flow file leaves the reason unwritten; Block A reason: the guest web and app must not load a non-essential tracker before consent, and the banner must be configured before go-live.'
+    actors:
+    - {role: 'Privacy / CMS administrator (GUEST_MANAGE)', app: 'P13 Venue CMS'}
+    - {role: 'Bought scanner API (hybrid, DEC-019)', app: 'background, feeds recordCookieScan'}
+    - {role: 'Guest / visitor', app: 'P01, P02 (banner, preference centre, WEB-024)'}
+    inputs:
+    - name: Tracking technology
+      formats: ['name, provider, domain or app + version, type (first-party cookie, third-party cookie, mobile SDK, analytics tracker, advertising pixel, session technology, ...), category necessary|functional|analytics|personalisation|marketing, purpose, expiry days']
+      limits: 'consentRequired can be false only for strictly necessary'
+      validation:
+      - {rule: 'Approved without category, or non-essential marked no-consent (422)', message: '"Only strictly necessary technologies can load without consent."'}
+      source: 'Administrator, CMS-025'
+    - name: Scan result
+      formats: ['scanner API payload (scheduled)', 'manual "Upload scan report" file (format per scanner; JSON/CSV)']
+      limits: 'Schedule per channel/domain: daily|weekly|monthly|off'
+      validation:
+      - {rule: 'Malformed report (400)', message: '"This file is not a scan report we can read."'}
+      source: 'Scanner API, or administrator on CMS-025'
+    - name: Banner design
+      formats: ['channel (B2C website, customer portal, mobile app, embedded checkout, white-label site, partner microsite) and brand', 'title/body per language (EN and AR required)', 'position top|bottom|pop-up|modal', 'theme from the brand', 'regimes (ccpaCpra adds Do not sell or share)']
+      limits: 'Each save is a new draft version; published through privacy testing and approval (CMS-030, not Block A)'
+      validation:
+      - {rule: 'Rejecting harder than accepting, pre-ticked non-essential, or ccpaCpra without doNotSellOrShare (422)', message: '"Reject non-essential must be as easy as Accept all; non-essential categories start off."'}
+      source: 'Administrator, CMS-026'
+    processing:
+    - {does: 'Registry, scans, findings (with the consent state each was seen in), platform catalogue of known cookies', ops: ['marketing-crm#listCookieTrackingDigital', 'marketing-crm#setTrackingTechnology', 'marketing-crm#recordCookieScan', 'marketing-crm#listCookieScans', 'marketing-crm#listCookieScanPolicies', 'marketing-crm#setCookieScanPolicy', 'marketing-crm#listCookieScanFindings', 'marketing-crm#listTrackingTechnologyCatalogue']}
+    - {does: 'Banner design versions', ops: ['marketing-crm#listCookieBannerPreference', 'marketing-crm#setCookieBannerDesign']}
+    - {does: 'Guest runtime: banner, device decision, claim on sign-in; white-label analytics load only after their consentCategory is granted', ops: ['marketing-crm#getCookieConsentRuntime', 'marketing-crm#recordDeviceConsent', 'marketing-crm#claimDeviceConsent', 'white-label#getPublishedTenantConfig']}
+    outputs:
+    - name: Registry
+      states: {loading: '', emptyFirstRun: 'No technologies yet; offers scan schedule and upload', ready: 'Detected (blocked, needs review) first, then approved, blocked, retired', emptyNoResults: 'Filter matched nothing', emptyNoAccess: 'Names GUEST_MANAGE'}
+      failure_branches:
+      - {what: 'Scan detects a new tracker', user_sees: 'Detected row, blocked until classified; alert to recipients', recover: 'Classify and approve or block'}
+    - name: Banner live preview
+      states: {ready: 'Desktop and mobile, EN and AR (RTL), banner and preference centre', draft: 'New version saved', refused: '422 reason'}
+      failure_branches: []
+    steps:
+    - {frame: 1, screen: CMS-021, sees: 'Board hub (not Block A; drawn as a stub link)', does: 'Opens the cookie registry', op: '-', result: navigates}
+    - {frame: 2, screen: CMS-025, sees: 'Cookie, Tracking & Digital Technology Registry; scan runs; "Upload scan report"', does: 'Reviews a detected pixel, classifies it as marketing, approves', op: 'marketing-crm#listCookieTrackingDigital, marketing-crm#listCookieScanFindings, marketing-crm#setTrackingTechnology', result: 'Approved; loads only after marketing consent'}
+    - {frame: 3, screen: CMS-026, sees: 'Cookie Banner & Preference Center Designer with live preview EN/AR', does: 'Sets text, position bottom, saves', op: 'marketing-crm#listCookieBannerPreference, marketing-crm#setCookieBannerDesign', result: 'New draft version'}
+    motion:
+    - {what: 'Banner preview', how: 'Banner slides in from the chosen edge; toggles in the preference centre animate; LTR/RTL switch mirrors'}
+    - {what: 'Scan run', how: 'Progress state on a new run; newly detected count badge'}
+    decisions: [DEC-019 (buy scanner API, hybrid; manual upload stays), 'Cookie scan consent state + platform catalogue (answers line 360)', DEC-282/DEC-023 (checkout opt-in), DEC-549 (consent-form builder, not Block A)]
+    sources: [flows/F150, 'handoff/design-notes/customer-marketing.yaml#CMS-025,CMS-026', contracts/satellite/marketing-crm.yaml, PDPL]
+    open:
+    - {q: 'Banner publish goes through CMS-030 (not Block A)', default: 'In Block A a saved banner version is published by an approve action on CMS-026; CMS-030 later.'}
+    - {q: 'Scanner vendor', default: 'Generic "Scanner API" label; no vendor branding.'}
+
+  # ---------------------------------------------------------------------------------------------------------------
+  F246:
+    title: 'Audience Intelligence board (Block A slice: Dynamic Segment Builder)'
+    process: customer-marketing
+    trigger: 'A marketer needs a self-refreshing audience before planning a send.'
+    actors: [{role: 'Marketer (MARKETING_MANAGE; MARKETING_VIEW for preview)', app: 'P08 Venue Management'}]
+    inputs:
+    - name: Segment rules
+      formats: ['rows attribute / operator (equals, not equals, >, <, between, in, not in, exists, not exists, within days) / value', 'exclude segments[]']
+      limits: 'Restricted attributes (dietary, accessibility, minors) refused for marketing'
+      validation:
+      - {rule: 'Contradictory criteria or unknown attribute (400)', message: '"These rules contradict each other" / "Unknown attribute <x>".'}
+      - {rule: 'Restricted attribute', message: '"Health-adjacent and minors'' data cannot be used for marketing."'}
+      - {rule: 'Household total used in a send segment', message: 'Warning: "A household total would message every member."'}
+      source: BO-755
+    processing:
+    - {does: 'Live count on unsaved criteria; reachable per channel after consent and suppression', ops: ['marketing-crm#previewSegmentDraft']}
+    - {does: 'Save and list', ops: ['marketing-crm#createSegment', 'marketing-crm#listSegments']}
+    outputs:
+    - name: Counts and sample
+      states: {loading: 'Evaluating', ready: 'Matching count, reachable per channel (email, SMS, WhatsApp, push), "evaluated at 10:42", up to 10 masked sample guests', zero: 'Shows 0 with the rule that removed the most highlighted'}
+      failure_branches: []
+    steps:
+    - {frame: 1, screen: BO-754, sees: 'Board hub (not Block A)', does: 'Opens the segment builder', op: '-', result: navigates}
+    - {frame: 2, screen: BO-755, sees: 'Rule rows, exclusions, live counts', does: 'Builds "Visited 3+ times, spent > AED 500, not complained in 30 days"', op: 'marketing-crm#previewSegmentDraft, marketing-crm#createSegment', result: 'Segment saved; 50,000 match, 3,000 reachable by email'}
+    motion:
+    - {what: 'Counts', how: 'Numbers tween on each rule change (debounced preview, default 500 ms); reachable bars per channel'}
+    decisions: [DEC-279 (CSV/XLSX list import template), 'MoM 2026-08-20 4.x']
+    sources: [flows/F246, handoff/design-notes/customer-marketing.yaml#BO-755]
+    open: []
+
+  # ---------------------------------------------------------------------------------------------------------------
+  F247:
+    title: 'Campaign Command Center board (Block A slice: Campaign Builder, A/B and AI Optimization)'
+    process: customer-marketing
+    trigger: 'A venue wants to reach a segment with a pre-configured offer.'
+    actors:
+    - {role: 'Marketer (MARKETING_MANAGE; MARKETING_SEND to launch)', app: 'P08 Venue Management'}
+    - {role: 'AI content and recommendation services', app: 'ai contract'}
+    inputs:
+    - name: Campaign stages
+      formats: ['objective + measurable target', 'kind one-off|scheduled|triggered|recurring', 'audience: one segment (required)', 'offer: pre-configured coupon / dynamic discount / auto-discount link only (no free-text discount)', 'consent purpose (default marketing)', 'channels + content per language', 'send window start/end hours, GST default']
+      limits: 'Each stage validates before the next'
+      validation:
+      - {rule: 'No template body in a guest language', message: 'Review flag "No Arabic version - 1,204 Arabic-speaking guests"; never sent in English silently'}
+      - {rule: 'Reachable is zero on the chosen channel', message: 'Schedule stage blocked; suggests channels with reach'}
+      - {rule: 'Launch conflicts (409 alreadyLaunched | audienceSizeChanged | noReachableRecipients)', message: '"Already launched" / "Audience changed by more than the tolerance; review again" / "Nobody can receive this."'}
+      source: BO-766
+    - name: A/B set-up
+      formats: ['variants', 'winnerRule manual']
+      limits: ["up to 5 variants (maxItems 5); test share 5-100 % of the audience (default 20); decide after 1-168 h (default 4); minimum sample per variant default 500 (contracts/satellite/marketing-crm.yaml abTest) (derived)"]
+      validation: ["two or more variants and no test settings -> refused: abTest is required (contract) (derived)", "below the minimum sample per variant no winner is declared automatically; a person picks (contract) (derived)"]
+      source: BO-772
+    processing:
+    - {does: 'Create, test send, launch (consent and suppression applied at send; exclusions reported before launch)', ops: ['marketing-crm#listCampaigns', 'marketing-crm#createCampaign', 'marketing-crm#testSendCampaign', 'marketing-crm#launchCampaign']}
+    - {does: 'AI drafts subject lines and bodies for the author to edit', ops: ['ai#proposeMarketingContent']}
+    - {does: 'Variants, performance, recommendations, send-time', ops: ['marketing-crm#updateCampaign', 'marketing-crm#getCampaignPerformance', 'ai#listMarketingRecommendations', 'ai#decideAiInsight', 'ai#requestSuggestion']}
+    outputs:
+    - name: Review stage
+      states: {ready: 'Matching, reachable per channel, exclusions by reason (no consent, suppressed, withdrawn since built), offer, schedule', blocked: 'Stage errors listed'}
+      failure_branches:
+      - {what: 'Guest-checkout buyers without the opt-in', user_sees: 'Excluded with reason "no consent"', recover: 'n/a (DEC-275)'}
+    - name: Launch
+      states: {queued: '202', scheduled: 'Scheduled for <time GST>', refused: '409 reason'}
+      failure_branches: []
+    steps:
+    - {frame: 1, screen: BO-764, sees: 'Board hub (not Block A)', does: 'New campaign', op: '-', result: navigates}
+    - {frame: 2, screen: BO-766, sees: 'Stepper: objective, audience, offer, channels and content, schedule, review, activation', does: 'Builds the campaign, asks AI for subject lines, test-sends, launches', op: 'marketing-crm#createCampaign, ai#proposeMarketingContent, marketing-crm#testSendCampaign, marketing-crm#launchCampaign', result: 'Queued or scheduled'}
+    - {frame: 3, screen: BO-772, sees: 'A/B variants, pacing, AI recommendations with expected impact', does: 'Sets two variants, accepts a send-time suggestion, picks the winner by hand', op: 'marketing-crm#updateCampaign, ai#listMarketingRecommendations, ai#decideAiInsight, ai#requestSuggestion, marketing-crm#getCampaignPerformance', result: 'Winner applied'}
+    motion:
+    - {what: 'Stepper', how: 'Stage advance with validation tick; blocked stage shakes and lists errors'}
+    - {what: 'AI drafts', how: 'Suggestions appear streaming into cards (as sendAiMessage SSE, default) with Apply buttons'}
+    - {what: 'Performance', how: 'Live pacing counters (sent, delivered, opened) after launch'}
+    decisions: [DEC-275 (guest-checkout marketing only with ticked opt-in), DEC-023, DEC-282, DEC-280, 'MoM 2026-08-20 4.6 (pre-configured offers only)', 'MoM 2026-08-31 4.6 (one communications module)']
+    sources: [flows/F247, 'handoff/design-notes/customer-marketing.yaml#BO-766,BO-772', contracts/satellite/marketing-crm.yaml#launchCampaign]
+    open:
+    - {q: 'Does proposeMarketingContent stream?', default: 'Draw streaming like the chat (SSE); the contract says a draft is returned.'}
+    - {q: 'BO-772 design note has no summary', default: 'Use the screen apis and purposes listed here.'}
+
+  # ---------------------------------------------------------------------------------------------------------------
+  F249:
+    title: 'Communications Center board (Block A slice: Template Library)'
+    process: customer-marketing
+    trigger: 'A venue needs reusable message templates per channel and purpose, in every enabled language.'
+    actors: [{role: 'Marketer / comms admin (MARKETING_MANAGE)', app: 'P08 Venue Management'}]
+    inputs:
+    - name: Template
+      formats: ['channel email|SMS|WhatsApp|push|in-app', 'kind transactional|marketing (+ purpose)', 'bodies per language (EN and AR side by side, AR RTL), email subject per language', 'merge fields from a picker only', 'provider template id (WhatsApp only)', 'header, logo, footer per channel and brand; sender identity read-only']
+      limits: 'Transactional templates cannot hold promotional blocks; SMS segment count and WhatsApp limits shown'
+      validation:
+      - {rule: 'Unknown merge field or required language missing (400)', message: '"Add the Arabic body" / "Unknown field {{x}}".'}
+      source: BO-785
+    processing:
+    - {does: 'Library, create, AI draft and translation proposals for review', ops: ['marketing-crm#listMessageTemplates', 'marketing-crm#createMessageTemplate', 'ai#proposeMarketingContent', 'ai#proposeTranslations']}
+    outputs:
+    - name: Library and preview
+      states: {ready: 'Rows with missing-language chips', preview: 'EN LTR and AR RTL with test data', emptyFirstRun: 'No templates; Create'}
+      failure_branches: []
+    steps:
+    - {frame: 1, screen: BO-784, sees: 'Board hub (not Block A)', does: 'Opens templates', op: '-', result: navigates}
+    - {frame: 2, screen: BO-785, sees: 'Template Library with bilingual editor and preview', does: 'Creates a WhatsApp marketing template, gets an Arabic draft, reviews, saves', op: 'marketing-crm#createMessageTemplate, ai#proposeTranslations', result: 'Template saved'}
+    motion:
+    - {what: 'Preview', how: 'Phone mock updates as typed; SMS segment counter ticks'}
+    decisions: ['DI-019 (Arabic RTL everywhere, incl. messages)', 'MoM 2026-08-31 4.6']
+    sources: [flows/F249, handoff/design-notes/customer-marketing.yaml#BO-785]
+    open: []
+
+  # ---------------------------------------------------------------------------------------------------------------
+  F250:
+    title: 'Omnichannel Command Center board (Block A slice: Intent & Knowledge Management)'
+    process: customer-marketing
+    trigger: 'The assistant must answer from approved knowledge, and unanswered questions must reach a content owner.'
+    actors: [{role: 'Service / content owner', app: 'P08 Venue Management'}]
+    inputs:
+    - name: Knowledge document
+      formats: ['document into a collection (PDF, DOCX, HTML, TXT per ai#ingestKnowledgeDocument)']
+      limits: 'Per ai contract'
+      validation:
+      - {rule: 'Unsupported file', message: '"This file type cannot be added."'}
+      source: BO-798
+    - name: Intents and copilot settings
+      formats: ['intents, example phrases, entities, synonyms, approved FAQs']
+      limits: ["no size or count limit in the design note or contract; lists of phrases, entities, synonyms and approved FAQs (derived)"]
+      validation: ["an intent needs a name and at least one example phrase; an approved FAQ needs its answer (default, Chinmay to review) (derived)"]
+      source: BO-798
+    processing:
+    - {does: 'Gaps, collections, ingest, copilot settings', ops: ['ai#listKnowledgeGaps', 'ai#listKnowledgeCollections', 'ai#ingestKnowledgeDocument', 'marketing-crm#setCustomerServiceCopilot']}
+    outputs:
+    - name: Knowledge gaps
+      states: {ready: 'Unanswered questions grouped and counted, newest first', empty: 'No gaps'}
+      failure_branches: []
+    steps:
+    - {frame: 1, screen: BO-794, sees: 'Board hub (not Block A)', does: 'Opens knowledge', op: '-', result: navigates}
+    - {frame: 2, screen: BO-798, sees: 'Gaps queue, collections, test console with citations', does: 'Adds a parking FAQ document to fix a gap', op: 'ai#listKnowledgeGaps, ai#ingestKnowledgeDocument', result: 'Document ingesting, then indexed'}
+    motion:
+    - {what: 'Ingest', how: 'Progress state Ingesting -> Indexed'}
+    - {what: 'Test console', how: 'Streaming answer with citation chips (SSE, as sendAiMessage)'}
+    decisions: ['AI concierge streams answers (answers line 375)', DEC-541 (Compass not signed; synthetic data in dev/staging)]
+    sources: [flows/F250, handoff/design-notes/customer-marketing.yaml#BO-798]
+    open:
+    - {q: 'File formats and size limits for ingestKnowledgeDocument', default: 'PDF, DOCX, HTML, TXT up to 20 MB.'}
+
+  # ---------------------------------------------------------------------------------------------------------------
+  F253:
+    title: 'Gamification Command Center board (Block A slice: challenges, badges, points rules, rewards)'
+    process: customer-marketing
+    trigger: 'A venue sets up what guests earn for behaviour (gamification) and for spend (loyalty).'
+    actors: [{role: 'Marketer / loyalty administrator (MARKETING_MANAGE; MARKETING_SEND to activate)', app: 'P08 Venue Management'}]
+    inputs:
+    - name: Challenge
+      formats: ['action visit|spend|ride|collect|streak|refer|survey|social|milestone|scan|activity|purchase', 'scope individual|family|group|team', 'reward (catalogue reward, points or badge) with budget cap', 'name and terms EN+AR, image from asset library']
+      limits: 'Reward budget cap validated before activation'
+      validation:
+      - {rule: 'Overlap with a live challenge, budget, legal terms', message: 'Each problem names the other challenge or the limit'}
+      - {rule: 'Activate a non-draft (409 challenge-not-draft)', message: '"Only a draft can be activated."'}
+      source: BO-825
+    - name: Badge
+      formats: ['name and description EN+AR, alt text, image, unlock criteria, tier, rarity']
+      limits: ["name up to 150 characters, description up to 500, code up to 100, icon URL up to 1000, type up to 30 (MarketingBadge) (derived)"]
+      validation: ["name and description in English and Arabic, alt text, image and unlock criteria are all required (BO-826 design note, DI-392) (derived)"]
+      source: BO-826
+    - name: Points rules (one set)
+      formats: ['per action base points, multiplier, day/month caps, rounding, posting timing', 'campaign bonus windows', 'tiers and redemption rules']
+      limits: 'Saved as one set'
+      validation:
+      - {rule: 'Rule references a missing reward or product (409)', message: '"<rule> points at a reward that does not exist."'}
+      source: BO-827
+    - name: Reward
+      formats: ['kind points|wallet credit|voucher|product offer|badge|membership benefit', 'points cost or milestone', 'validity, stock, per-guest limit']
+      limits: ["name up to 200 characters, code up to 100, type up to 30; kind one of the listed values (MarketingReward) (derived)"]
+      validation: ["programme, code, name, type and active are required; a points cost or a trigger milestone is required (BO-828 design note, contract) (derived)"]
+      source: BO-828
+    processing:
+    - {does: 'Challenges', ops: ['marketing-crm#createChallenge', 'marketing-crm#listChallenges', 'marketing-crm#getChallenge', 'marketing-crm#activateChallenge']}
+    - {does: 'Badges', ops: ['marketing-crm#setBadge', 'marketing-crm#awardBadge', 'marketing-crm#listBadges']}
+    - {does: 'Points rules', ops: ['marketing-crm#getLoyaltyRules', 'marketing-crm#setLoyaltyRules', 'marketing-crm#setLoyaltyCampaign']}
+    - {does: 'Programme and rewards', ops: ['marketing-crm#createLoyaltyProgramme', 'marketing-crm#setReward']}
+    outputs:
+    - name: Rules editor
+      states: {ready: 'Ratio hint "2,500 points = 50 visits"; liability note (points post when earned)', saved: 'Set applied whole', refused: '409'}
+      failure_branches: []
+    steps:
+    - {frame: 1, screen: BO-824, sees: 'Board hub (not Block A)', does: 'Opens builders', op: '-', result: navigates}
+    - {frame: 2, screen: BO-825, sees: 'Challenge Builder', does: 'Creates "Visit 3 times in Ramadan", reward 500 points, activates', op: 'marketing-crm#createChallenge, marketing-crm#activateChallenge', result: 'Active'}
+    - {frame: 3, screen: BO-826, sees: 'Badge Engine: Explorer, Adventurer, Legend', does: 'Defines a badge', op: 'marketing-crm#setBadge', result: Saved}
+    - {frame: 4, screen: BO-827, sees: 'Points & Activity Rules with ratio hints', does: 'Sets base points and a double-points window', op: 'marketing-crm#getLoyaltyRules, marketing-crm#setLoyaltyRules, marketing-crm#setLoyaltyCampaign', result: 'Rules set as one'}
+    - {frame: 5, screen: BO-828, sees: 'Milestones & Reward Rules', does: 'Defines a reward and its cost', op: 'marketing-crm#setReward', result: Saved}
+    motion:
+    - {what: 'Badge preview', how: 'Unlock animation preview (scale + shine, 600 ms)'}
+    decisions: [DEC-018 (sample rules; 12-month expiry), DEC-020]
+    sources: [flows/F253, 'handoff/design-notes/customer-marketing.yaml#BO-825,BO-826,BO-827,BO-828']
+    open:
+    - {q: 'BO-829 to BO-833 on the same board are not Block A', default: 'Stub tiles on the hub.'}

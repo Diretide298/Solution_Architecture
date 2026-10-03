@@ -227,7 +227,7 @@ def block_a_screens(root: str = ROOT) -> set | None:
         return k
     out = set()
     for t in rel["tickets"]:
-        if t.get("type") == "Task" and root_of(t["key"]) == "BLOCK-A":
+        if t.get("type") == "Task" and root_of(t["key"]) in ("BLOCK-A", "BLOCK-A2"):    # both drops (CHG-RONEP-007)
             for b in t.get("builds") or []:
                 kind, _, val = b.partition(" ")
                 if kind == "screen":
@@ -670,4 +670,138 @@ def p8(pk: Package, sid: str, s: dict, block_a: set, exempt: dict) -> list:
                 continue
             out.append(("P8", sid, f"{k} says '{m.group(0)}': …{ctx}…"))
             break
+    return out
+
+
+# ── G3 (READ): a screen that shows or edits data but binds no read that returns it ──────────────
+#
+# **Found by the r1 gate on 3 October** (CHG-R1S-004): ADM-069 edits a tax profile with a PUT and
+# nothing on the screen reads one back; POS-024's "86 an item" picker had no operation returning the
+# outlet's menu; GST-077 never read the departure it was opened on. A developer handed such a screen
+# builds a form that opens empty and overwrites what was saved. Two rules:
+#
+#   READ  no-read    the screen has a loading state (every screen does) or a data pattern, and binds
+#                    no read at all (a GET, or a POST the lineage says writes nothing)
+#   READ  edit       the screen binds a PUT or PATCH (it edits existing data) and no bound read returns
+#                    that data: the write's response schema by name, or a table the write stores to
+#
+# A read covers a table when its response schemas persist to it, when a projection names it
+# (`none — projection of fnb.menu_item`), or when its lineage entry reads it.
+
+READ_PATTERNS = {"listDetail", "configEditor", "statusTracker", "commandCentre", "approvalInbox",
+                 "detail", "dashboard"}
+_TABLE = re.compile(r"\b([a-z][a-z0-9_]*\.[a-z][a-z0-9_]*)\b")
+_LINEAGE: dict | None = None
+
+
+def _lineage(pk: Package) -> dict:
+    global _LINEAGE
+    if _LINEAGE is None:
+        p = os.path.join(pk.root, "handoff", "api-data-lineage.json")
+        _LINEAGE = json.load(open(p, encoding="utf-8")) if os.path.exists(p) else {}
+    return _LINEAGE
+
+
+def _schema_tables(pk: Package, name: str, projections: bool) -> set:
+    _, node = pk.schema(name)
+    c = next((c for c in pk.contracts if name in (((pk.contracts[c].get("components") or {})
+                                                   .get("schemas") or {}))), None)
+    raw = ((((pk.contracts.get(c) or {}).get("components") or {}).get("schemas") or {}).get(name)
+           or {}) if c else {}
+    p = str(raw.get("x-ticvai-persistence") or "").strip("\"'")
+    if not p:
+        return set()
+    if p.lower().startswith("none"):
+        return set(_TABLE.findall(p)) if projections else set()
+    return {t.strip() for t in re.split(r"\s*\+\s*", p) if _TABLE.fullmatch(t.strip())}
+
+
+def _resp_schemas(pk: Package, op_id: str, deep: bool) -> set:
+    o = pk.ops.get(op_id) or {}
+    out: set = set()
+
+    def walk(c, node, depth):
+        if depth > (4 if deep else 1) or not isinstance(node, dict):
+            return
+        if "$ref" in node:
+            n = node["$ref"].rsplit("/", 1)[-1]
+            if "/schemas/" in node["$ref"] and n not in out:
+                out.add(n)
+                c2, tgt = pk.deref(c, node)
+                if deep:
+                    walk(c2, tgt, depth + 1)
+            return
+        for k in ("allOf", "oneOf", "anyOf"):
+            for sub in node.get(k) or []:
+                walk(c, sub, depth + (1 if deep else 0))
+        if isinstance(node.get("items"), dict):
+            walk(c, node["items"], depth)
+        for v in (node.get("properties") or {}).values():
+            if deep:
+                walk(c, v, depth + 1)
+            elif isinstance(v, dict) and isinstance(v.get("items"), dict):
+                walk(c, v["items"], depth)
+
+    for code, r in (o.get("responses") or {}).items():
+        if not str(code).startswith("2"):
+            continue
+        c, r = pk.deref(o.get("_contract"), r)
+        for media in ((r or {}).get("content") or {}).values():
+            if isinstance(media, dict) and media.get("schema"):
+                walk(c, media["schema"], 0)
+        if not deep:
+            break
+    return out
+
+
+def is_read(pk: Package, op_id: str) -> bool:
+    o = pk.ops.get(op_id)
+    if not o:
+        return False
+    if o["_method"] == "get":
+        return True
+    e = _lineage(pk).get(op_id) or {}
+    real = [w for w in e.get("writes") or [] if ":" not in w]
+    return o["_method"] == "post" and not real and bool(e.get("reads"))
+
+
+def read_covers(pk: Package, op_id: str):
+    names = _resp_schemas(pk, op_id, deep=True)
+    tabs = set()
+    for n in names:
+        tabs |= _schema_tables(pk, n, projections=True)
+    tabs |= {t for t in (_lineage(pk).get(op_id) or {}).get("reads") or [] if ":" not in t}
+    return names, tabs
+
+
+def write_targets(pk: Package, op_id: str):
+    names = _resp_schemas(pk, op_id, deep=False)
+    tabs = set()
+    for n in names:
+        tabs |= _schema_tables(pk, n, projections=False)
+    tabs |= {t for t in (_lineage(pk).get(op_id) or {}).get("writes") or []
+             if ":" not in t and t not in ("platform.outbox", "platform.idempotency_record")}
+    return names, tabs
+
+
+def p_read(pk: Package, sid: str, s: dict) -> list:
+    bound = [a["operationId"] for a in apis(s) if a["operationId"] in pk.ops]
+    reads = [o for o in bound if is_read(pk, o)]
+    shows = bool((s.get("states") or {}).get("loading")) or s.get("pattern") in READ_PATTERNS
+    if shows and not reads:
+        return [("READ", sid, "no-read: the screen shows data (a loading state) and binds no read")]
+    cn, ct = set(), set()
+    for o in reads:
+        n, t = read_covers(pk, o)
+        cn |= n
+        ct |= t
+    out = []
+    for o in bound:
+        if pk.ops[o]["_method"] not in ("put", "patch"):
+            continue
+        n, t = write_targets(pk, o)
+        if (not n and not t) or n & cn or t & ct:
+            continue
+        out.append(("READ", sid, f"edit: {o} edits {', '.join(sorted(n)) or '-'} "
+                                 f"({', '.join(sorted(t)) or '-'}) and no bound read returns it"))
     return out

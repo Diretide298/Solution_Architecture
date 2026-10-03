@@ -1,6 +1,6 @@
 # ADR-0020 — Where AI runs, and what it is isolated from
 
-**Status:** Accepted · 30 September 2026 · Chinmay Parab — amended by [ADR-0049](0049-vectors-live-in-qdrant-one-collection-per-tenant.md): Qdrant per tenant on every tier (a collection and a scoped token per tenant); the analytical store is the AI log database. Proposed 17 August 2026 · section 2 amended 2 October 2026 (Chinmay): **every LLM call is scrubbed offline first, and an in-cell guard model reads both ways**, whatever the tenant's residency class
+**Status:** Accepted · 30 September 2026 · Chinmay Parab — amended by [ADR-0049](0049-vectors-live-in-qdrant-one-collection-per-tenant.md): Qdrant per tenant on every tier (a collection and a scoped token per tenant); the analytical store is the AI log database. Proposed 17 August 2026 · section 2 amended 2 October 2026 (Chinmay): **every LLM call is scrubbed offline first, and an in-cell guard model reads both ways**, whatever the tenant's residency class · amended 3 October 2026 (Chinmay): **the guard is the provider's content-safety service, not a model we host**; the Presidio scrubber stays in our worker
 **Relates to:** ADR-0001 (cells — **superseded in part by ADR-0014**), ADR-0009 (residency),
 ADR-0016 (read routing), CF-64 (retention)
 
@@ -40,6 +40,29 @@ considered.
 **Prompt content is personal data in the transactional store.** A guest's question contains
 whatever they typed. Putting it beside `pii.subject` is defensible; putting it there
 *accidentally*, with no retention and no erasure path, is not.
+
+---
+
+## Amended 3 October 2026: the guard is the provider's content-safety service; we host no model
+
+**Decided by Chinmay, 3 October 2026** (`docs/active/decisions/answers-3-october-gate-and-hosting.md`; change
+entry CHG-R1S-002): *"We are not hosting anything unless client asks it."* A guard model is itself an LLM and
+needs a GPU host, so item 3 of the amendment above changes; items 1, 2, 4 and 5 stand.
+
+- **Item 3 now reads:** the guard on input and output is **the provider's content-safety service**: Azure AI
+  Content Safety in UAE North for a `uaeOnly` tenant, the provider's own moderation for BYOK and
+  `globalAllowed`. Qwen3Guard is not hosted; a self-hosted guard comes back only if a client asks for
+  self-hosting (Chinmay may drop the guard altogether). The Arabic gap the 2 October text names is covered by
+  the golden set: Arabic harmful prompts run against the safety service before each release.
+- **The scrubber stays, unchanged:** Microsoft Presidio and the Arabic NER model are **a CPU library inside our
+  own worker**, not a hosted model, and scrubbing is mandatory in every residency class.
+- **Still fails closed:** with the scrubber or the safety service down the call is refused
+  (`503 scrubber-unavailable`), never sent raw; a blocked message or reply is `422 guard-refused`.
+- **No GPU pool, no in-cell model.** The cell runs no LLM; the AI goes through providers (Core42 Compass by
+  default, OpenAI UAE as fallback, BYOK), ADR-0009 as amended the same day.
+- **Embeddings too** (later the same evening, CHG-R1S-026): the provider's embedding model on the UAE route
+  (OpenAI UAE `text-embedding-3-large` or Core42), through the scrubber and the residency class like any call;
+  no embedding model and no CPU embeddings in the cell. The vectors stay in our Qdrant (ADR-0049).
 
 ---
 
@@ -116,8 +139,8 @@ is a residency boundary here and not a tenant one. ADR-0021 carries the tenant b
 The provider is called from inside the cell. **What crosses a border is the prompt and the
 retrieved context, never the store**, and `ai.policy.maskedFields` is what governs it — failing
 closed, so an unset masking list sends nothing rather than everything. *(Amended 2 October 2026:
-every prompt is also scrubbed offline and checked by an in-cell guard model, both failing closed; see
-the amendment above.)*
+every prompt is also scrubbed offline and checked by a guard, both failing closed; see the amendments
+above: since 3 October the guard is the provider's content-safety service.)*
 
 `x-ticvai-scope-level: region` on `setAiProvider` is what makes this enforceable: which
 providers a region may use is a residency decision, and a region with no adequacy finding gets a

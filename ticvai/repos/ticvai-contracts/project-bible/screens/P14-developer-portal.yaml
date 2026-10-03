@@ -64,7 +64,7 @@ screens:
   name: API Reference
   module: Developer & API
   requiresModule: developerApi
-  wave: 2
+  wave: 1
   implementation:
     app: developer-portal-web
     route: /developer/reference
@@ -255,6 +255,18 @@ screens:
     - name: contentBody
       slot: fields
       components:
+      - kind: cardList
+        label: Show the registered organisation and its members
+        operation: getDeveloperAccount
+        bindsTo: DeveloperAccount
+        columns:
+        - DeveloperAccount.organisationName
+        - DeveloperAccount.contactEmail
+        - DeveloperAccount.websiteUrl
+        - DeveloperAccount.countryCode
+        - DeveloperAccount.status
+        - DeveloperAccount.verifiedAt
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: textField
         label: Organisation name
         bindsTo: DeveloperAccount.organisationName
@@ -318,6 +330,11 @@ screens:
     contract: public-api
     purpose: Manage members
     trigger: onAction
+  - operationId: getDeveloperAccount
+    contract: public-api
+    purpose: Show the registered organisation and its members
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: developerId
@@ -1343,6 +1360,39 @@ screens:
     - name: contentBody
       slot: fields
       components:
+      - kind: cardList
+        label: Show the licences per client
+        operation: listApiLicences
+        bindsTo: ApiLicence
+        columns:
+        - ApiLicence.callAllowancePerMonth
+        - ApiLicence.overageRatePerThousand
+        - ApiLicence.revenueSharePercent
+        - ApiLicence.effectiveFrom
+        - ApiLicence.effectiveTo
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
+      - kind: cardList
+        label: Show the anomaly rules
+        operation: listApiAnomalyRules
+        bindsTo: ApiAnomalyRule
+        columns:
+        - ApiAnomalyRule.ruleKey
+        - ApiAnomalyRule.measure
+        - ApiAnomalyRule.comparison
+        - ApiAnomalyRule.threshold
+        - ApiAnomalyRule.windowMinutes
+        - ApiAnomalyRule.action
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
+      - kind: cardList
+        label: Show the quotas per client
+        operation: listApiQuotas
+        bindsTo: ApiQuota
+        columns:
+        - ApiQuota.sustainedPerMinute
+        - ApiQuota.burstPerSecond
+        - ApiQuota.dailyCap
+        - ApiQuota.onBreach
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: selectField
         label: API client
         bindsTo: ApiQuota.clientId
@@ -1473,6 +1523,21 @@ screens:
     purpose: When API traffic is flagged
     trigger: onAction
     provenance: 29 September pass (group A)
+  - operationId: listApiQuotas
+    contract: public-api
+    purpose: Show the quotas per client
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
+  - operationId: listApiAnomalyRules
+    contract: public-api
+    purpose: Show the anomaly rules
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
+  - operationId: listApiLicences
+    contract: public-api
+    purpose: Show the licences per client
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: listingId

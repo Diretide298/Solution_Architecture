@@ -1651,6 +1651,7 @@
    "orders.order_line",
    "orders.payment",
    "orders.sales_order",
+   "platform.outbox",
    "promotions.promotion_evaluation_trace"
   ],
   "routing": "",
@@ -3545,7 +3546,8 @@
    "cache:idempotency",
    "ledger.journal_entry",
    "orders.cash_count_line",
-   "orders.pos_shift"
+   "orders.pos_shift",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "workstation",
@@ -4496,7 +4498,8 @@
   "isComputation": true,
   "audience": [
    "staff"
-  ]
+  ],
+  "pure": "computes effective permissions; nothing is granted"
  },
  "registerGuest": {
   "contract": "identity",
@@ -5444,7 +5447,9 @@
   "path": "/tax/calculate",
   "reads": [
    "cache:idempotency",
+   "catalogue.tax_profile",
    "ledger.tax_code",
+   "ledger.tax_exemption",
    "platform.region_settings"
   ],
   "writes": [
@@ -5464,7 +5469,8 @@
   "isComputation": true,
   "audience": [
    "staff"
-  ]
+  ],
+  "pure": "computes tax for the lines sent; the order's own write stores it"
  },
  "listRecognitionSchedules": {
   "contract": "finance",
@@ -7977,7 +7983,8 @@
   "isComputation": true,
   "audience": [
    "staff"
-  ]
+  ],
+  "pure": "a preview of a plan change; setSubscription makes it"
  },
  "getTenantLicences": {
   "contract": "subscription",
@@ -8849,7 +8856,8 @@
    "cache:idempotency",
    "fnb.kitchen_ticket",
    "fnb.order_fulfilment",
-   "fnb.service_order"
+   "fnb.service_order",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "venue",
@@ -9210,7 +9218,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.service_order"
+   "fnb.service_order",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "venue",
@@ -9518,7 +9527,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.bill_split"
+   "fnb.bill_split",
+   "fnb.sub_bill"
   ],
   "routing": "",
   "scope": "venue",
@@ -10505,7 +10515,8 @@
   "audience": [
    "staff",
    "guest"
-  ]
+  ],
+  "pure": "computed; seats are held only by createSeatHold"
  },
  "listInventoryItems": {
   "contract": "inventory",
@@ -12028,6 +12039,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "platform.outbox",
    "wallet.wallet"
   ],
   "routing": "",
@@ -12079,6 +12091,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "platform.outbox",
    "wallet.wallet"
   ],
   "routing": "",
@@ -15396,7 +15409,8 @@
   "audience": [
    "staff",
    "guest"
-  ]
+  ],
+  "pure": "computed suggestions; nothing is stored"
  },
  "evaluatePromotions": {
   "contract": "promotions",
@@ -17854,7 +17868,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "pure": "a validation: reports what it finds, stores nothing"
  },
  "publishTenantConfig": {
   "contract": "white-label",
@@ -17868,6 +17883,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "platform.outbox",
    "whitelabel.config_version"
   ],
   "routing": "",
@@ -18208,7 +18224,8 @@
   "isComputation": true,
   "audience": [
    "staff"
-  ]
+  ],
+  "pure": "says whether approval is needed and from whom; no request is raised"
  },
  "decideApprovalRequest": {
   "contract": "approvals",
@@ -21369,7 +21386,8 @@
   "audience": [
    "staff",
    "device"
-  ]
+  ],
+  "pure": "a lookup: resolves and returns, nothing is created or merged"
  },
  "updateMyProfile": {
   "contract": "marketing-crm",
@@ -22016,7 +22034,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "pure": "a validation: reports what it finds, stores nothing (reachability over the map's points and paths)"
  },
  "setPathClosure": {
   "contract": "venue-map",
@@ -22623,6 +22642,7 @@
   "writes": [
    "cache:idempotency",
    "marketing.message_dispatch",
+   "orders.payment_link",
    "orders.sales_order"
   ],
   "routing": "",
@@ -22839,7 +22859,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "pure": "renders the settlement in an ERP format from stored data"
  },
  "listAlertRules": {
   "contract": "reporting",
@@ -23311,7 +23332,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "pure": "a validation: reports what it finds, stores nothing"
  },
  "assignSeats": {
   "contract": "seating",
@@ -23434,7 +23456,8 @@
    "staff"
   ],
   "guestCallable": true,
-  "audienceNote": "Narrowed 31 August: staff quote; the guest accepts."
+  "audienceNote": "Narrowed 31 August: staff quote; the guest accepts.",
+  "pure": "a quote: priced on request and returned, not stored"
  },
  "printTicketProof": {
   "contract": "orders",
@@ -23461,7 +23484,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "pure": "renders a document from data already stored; nothing is written"
  },
  "setReaderProfile": {
   "contract": "games",
@@ -24066,7 +24090,8 @@
    "staff",
    "guest"
   ],
-  "guestCallable": true
+  "guestCallable": true,
+  "pure": "assembles the subject's data for download; the request is audited by the platform's audit trail, not a table of this operation"
  },
  "simulatePromotion": {
   "contract": "promotions",
@@ -24091,7 +24116,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "pure": "a simulation: computes what would happen and stores nothing"
  },
  "setPromotionVariants": {
   "contract": "promotions",
@@ -24150,7 +24176,8 @@
    "staff"
   ],
   "guestCallable": true,
-  "audienceNote": "Narrowed 31 August: called server-side to populate a surface."
+  "audienceNote": "Narrowed 31 August: called server-side to populate a surface.",
+  "pure": "computed suggestions; the decision record is written by the AI engine, not here"
  },
  "splitOrder": {
   "contract": "orders",
@@ -24434,7 +24461,8 @@
   "audience": [
    "partner",
    "service"
-  ]
+  ],
+  "pure": "a signed, short-lived token; nothing is stored per issue"
  },
  "listSandboxes": {
   "contract": "public-api",
@@ -24936,10 +24964,12 @@
   "path": "/guest-credit-accounts",
   "reads": [
    "cache:idempotency",
+   "orders.guest_credit_account",
    "pii.subject"
   ],
   "writes": [
-   "cache:idempotency"
+   "cache:idempotency",
+   "orders.guest_credit_account"
   ],
   "routing": "",
   "scope": "venue",
@@ -24954,7 +24984,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "createInvitationCampaign": {
   "contract": "marketing-crm",
@@ -26062,7 +26093,8 @@
    "fnb.table_visit"
   ],
   "writes": [
-   "cache:idempotency"
+   "cache:idempotency",
+   "fnb.waitlist_entry"
   ],
   "routing": "",
   "scope": "venue",
@@ -26077,7 +26109,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "notifyWaitlistParty": {
   "contract": "fnb",
@@ -26117,7 +26150,8 @@
    "inventory.movement"
   ],
   "writes": [
-   "cache:idempotency"
+   "cache:idempotency",
+   "inventory.count_line"
   ],
   "routing": "",
   "scope": "venue",
@@ -26132,7 +26166,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "requestRecount": {
   "contract": "fnb",
@@ -26142,7 +26177,8 @@
    "cache:idempotency"
   ],
   "writes": [
-   "cache:idempotency"
+   "cache:idempotency",
+   "inventory.count_line"
   ],
   "routing": "",
   "scope": "venue",
@@ -26156,7 +26192,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "publishMenu": {
   "contract": "fnb",
@@ -26348,13 +26385,13 @@
    "fnb.kitchen_ticket_line",
    "fnb.service_order",
    "fnb.service_order_line",
-   "fnb.table_visit",
-   "orders.order_line"
+   "fnb.table_visit"
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.table_visit",
-   "orders.order_line"
+   "fnb.service_order",
+   "fnb.service_order_line",
+   "fnb.table_visit"
   ],
   "routing": "",
   "scope": "venue",
@@ -26460,11 +26497,13 @@
   "verb": "PUT",
   "path": "/outlets/{outletId}/kitchen-sla",
   "reads": [
-   "cache:idempotency"
+   "cache:idempotency",
+   "fnb.kitchen_sla"
   ],
   "writes": [
    "cache:idempotency",
-   "cache:resolution"
+   "cache:resolution",
+   "fnb.kitchen_sla"
   ],
   "routing": "",
   "scope": "venue",
@@ -26478,7 +26517,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "list86Events": {
   "contract": "fnb",
@@ -26759,7 +26799,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "pure": "a lookup: resolves and returns, nothing is created or merged"
  },
  "mergeGuests": {
   "contract": "marketing-crm",
@@ -26801,7 +26842,8 @@
    "marketing.guest_profile"
   ],
   "writes": [
-   "cache:idempotency"
+   "cache:idempotency",
+   "marketing.guest_note"
   ],
   "routing": "",
   "scope": "venue",
@@ -26816,7 +26858,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "updateGuestPreferences": {
   "contract": "marketing-crm",
@@ -26986,7 +27029,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "pure": "renders a document from data already stored; nothing is written"
  },
  "sendOrderNotification": {
   "contract": "fnb",
@@ -27056,7 +27100,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "cache:resolution"
+   "cache:resolution",
+   "inventory.item"
   ],
   "routing": "",
   "scope": "venue",
@@ -27071,7 +27116,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "bulkUpdateProducts": {
   "contract": "inventory",
@@ -27245,7 +27291,9 @@
    "fnb.recipe",
    "fnb.substitution_rule"
   ],
-  "writes": [],
+  "writes": [
+   "fnb.allergen_verdict"
+  ],
   "routing": "",
   "scope": "venue",
   "perm": "PRODUCT_VIEW",
@@ -27258,7 +27306,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "buildProductionPlan": {
   "contract": "fnb",
@@ -27967,7 +28016,8 @@
    "control.cell"
   ],
   "writes": [
-   "cache:idempotency"
+   "cache:idempotency",
+   "control.burst_environment"
   ],
   "routing": "",
   "scope": "tenant",
@@ -27981,7 +28031,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "drainBurstEnvironment": {
   "contract": "subscription",
@@ -27991,7 +28042,8 @@
    "control.burst_environment"
   ],
   "writes": [
-   "cache:idempotency"
+   "cache:idempotency",
+   "control.burst_environment"
   ],
   "routing": "",
   "scope": "tenant",
@@ -28005,7 +28057,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "reconcileBurstEnvironment": {
   "contract": "subscription",
@@ -28811,7 +28864,8 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "Approval routing lives in the approvals engine (approvals service, by operation; see approveDecision agreed note); nothing stored in promotions"
+  "lineageNote": "Approval routing lives in the approvals engine (approvals service, by operation; see approveDecision agreed note); nothing stored in promotions",
+  "storageUndecided": "generated workspace write: no table covers its fields and none has been decided"
  },
  "approveDecision": {
   "contract": "promotions",
@@ -28838,7 +28892,8 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "Decision recorded in the approvals engine (agreed note); promotion read for the workspace figures; a resulting publish goes through publishPromotion"
+  "lineageNote": "Decision recorded in the approvals engine (agreed note); promotion read for the workspace figures; a resulting publish goes through publishPromotion",
+  "storageUndecided": "generated workspace write: no table covers its fields and none has been decided"
  },
  "approveExceptionServiceRecovery": {
   "contract": "orders",
@@ -29137,7 +29192,9 @@
   "reads": [
    "marketing.privacy_change_set"
   ],
-  "writes": [],
+  "writes": [
+   "marketing.privacy_change_set"
+  ],
   "routing": "primary",
   "scope": "venue",
   "perm": "MARKETING_MANAGE",
@@ -29151,7 +29208,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "approveReviewDecision": {
   "contract": "catalogue",
@@ -29241,7 +29299,7 @@
   ],
   "routing": "primary",
   "scope": "venue",
-  "perm": "APPROVAL_REQUEST",
+  "perm": "APPROVAL_DECIDE",
   "offline": false,
   "summary": "Unified Approval Inbox & Decision Workspace",
   "source": "hand-mapped 29 September (readiness close-out)",
@@ -29293,7 +29351,9 @@
   "reads": [
    "marketing.waiver_version_control"
   ],
-  "writes": [],
+  "writes": [
+   "marketing.waiver_version_control"
+  ],
   "routing": "primary",
   "scope": "venue",
   "perm": "MARKETING_MANAGE",
@@ -29307,7 +29367,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "approveWorkflow": {
   "contract": "catalogue",
@@ -29383,7 +29444,8 @@
    "marketing.sla_policy"
   ],
   "writes": [
-   "cache:idempotency"
+   "cache:idempotency",
+   "marketing.case"
   ],
   "routing": "primary",
   "scope": "venue",
@@ -29399,7 +29461,8 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "computed from case, sla_policy, agent_availability, agent_service_profile, case_routing_rule, case_category (default priority, subcategory) and service_queue (recommendedQueue code); stores nothing"
+  "lineageNote": "computed from case, sla_policy, agent_availability, agent_service_profile, case_routing_rule, case_category (default priority, subcategory) and service_queue (recommendedQueue code); stores nothing",
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "createChannelProfile": {
   "contract": "catalogue",
@@ -40915,7 +40978,8 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "financial consequence of an after-sale request (orders.after_sale_request) computed from the order, payments, refunds, fees and discounts; nothing stored, refunds go through createRefund"
+  "lineageNote": "financial consequence of an after-sale request (orders.after_sale_request) computed from the order, payments, refunds, fees and discounts; nothing stored, refunds go through createRefund",
+  "storageUndecided": "generated workspace write on a Block A screen: no table covers its fields and none has been decided (a question for the lead, R1S report)"
  },
  "setAgreementContractTerm": {
   "contract": "subscription",
@@ -41377,7 +41441,9 @@
   "reads": [
    "marketing.communication_preference_type"
   ],
-  "writes": [],
+  "writes": [
+   "marketing.communication_preference_type"
+  ],
   "routing": "primary",
   "scope": "venue",
   "perm": "MARKETING_MANAGE",
@@ -41391,7 +41457,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "setConsentCapturePoint": {
   "contract": "marketing-crm",
@@ -41400,7 +41467,9 @@
   "reads": [
    "marketing.consent_capture_point"
   ],
-  "writes": [],
+  "writes": [
+   "marketing.consent_capture_point"
+  ],
   "routing": "primary",
   "scope": "venue",
   "perm": "MARKETING_MANAGE",
@@ -41414,7 +41483,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "setContextTimeEvent": {
   "contract": "access",
@@ -42301,7 +42371,8 @@
    "postgres-analytical",
    "redis"
   ],
-  "lineageNote": "Idempotent PUT carrying one action; Freeze/Resume/Suspend execute via catalogue freezeEntitlement/suspendEntitlement/reinstateEntitlement and Renew via orders renewMembership, which write the change; view reads subscription.membership_product for the product rules. Member record and lifecycle history come from identity getMembership (identity.customer_membership, membership_history), not read here."
+  "lineageNote": "Idempotent PUT carrying one action; Freeze/Resume/Suspend execute via catalogue freezeEntitlement/suspendEntitlement/reinstateEntitlement and Renew via orders renewMembership, which write the change; view reads subscription.membership_product for the product rules. Member record and lifecycle history come from identity getMembership (identity.customer_membership, membership_history), not read here.",
+  "storageUndecided": "generated workspace write: no table covers its fields and none has been decided"
  },
  "setMembershipEligibilityQualification": {
   "contract": "subscription",
@@ -42405,7 +42476,9 @@
   "reads": [
    "marketing.minor_privacy_rule"
   ],
-  "writes": [],
+  "writes": [
+   "marketing.minor_privacy_rule"
+  ],
   "routing": "primary",
   "scope": "venue",
   "perm": "MARKETING_MANAGE",
@@ -42419,7 +42492,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "setMultiPaymentSplit": {
   "contract": "orders",
@@ -42577,7 +42651,8 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "360 view of one order; the input matches no table (closest cart_line 14%), so line changes go through modifyOrder, not this write"
+  "lineageNote": "360 view of one order; the input matches no table (closest cart_line 14%), so line changes go through modifyOrder, not this write",
+  "storageUndecided": "generated workspace write on a Block A screen: no table covers its fields and none has been decided (a question for the lead, R1S report)"
  },
  "setOrderReservationStatus": {
   "contract": "orders",
@@ -43345,7 +43420,8 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "Simulation workspace, never changes a live rule (agreed note); evaluates promotions against catalogue price/product as simulatePromotion/evaluatePromotions neighbours do; IdempotencyKey parameter"
+  "lineageNote": "Simulation workspace, never changes a live rule (agreed note); evaluates promotions against catalogue price/product as simulatePromotion/evaluatePromotions neighbours do; IdempotencyKey parameter",
+  "storageUndecided": "generated workspace write: no table covers its fields and none has been decided"
  },
  "setSecurityInvestigationEvidence": {
   "contract": "access",
@@ -43640,7 +43716,8 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "the screen writes nothing (per its description); media rows come from credential_binding"
+  "lineageNote": "the screen writes nothing (per its description); media rows come from credential_binding",
+  "storageUndecided": "generated workspace write: no table covers its fields and none has been decided"
  },
  "setVirtualTicketIdentity": {
   "contract": "access",
@@ -43853,7 +43930,8 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "Preview computes individual vs bundle value, saving, margin and validation from bundle tables + catalogue price/capacity; advisory AI, nothing stored; IdempotencyKey parameter"
+  "lineageNote": "Preview computes individual vs bundle value, saving, margin and validation from bundle tables + catalogue price/capacity; advisory AI, nothing stored; IdempotencyKey parameter",
+  "pure": "a simulation: computes what would happen and stores nothing"
  },
  "simulateOfflineResilienceTesting": {
   "contract": "access",
@@ -43884,7 +43962,8 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "Runs an outage scenario against the same data the offline package carries (neighbour getOfflinePackage) plus entitlements; results are computed, nothing stored besides idempotency"
+  "lineageNote": "Runs an outage scenario against the same data the offline package carries (neighbour getOfflinePackage) plus entitlements; results are computed, nothing stored besides idempotency",
+  "pure": "a simulation: computes what would happen and stores nothing"
  },
  "simulatePolicyConflictImpact": {
   "contract": "access",
@@ -43916,7 +43995,8 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "Evaluates the named access.dynamic_policy_version with its scope assignments; writes nothing"
+  "lineageNote": "Evaluates the named access.dynamic_policy_version with its scope assignments; writes nothing",
+  "pure": "a simulation: computes what would happen and stores nothing"
  },
  "simulatePriceBreakdownCalculation": {
   "contract": "catalogue",
@@ -43959,7 +44039,8 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "DM3: runs the calculation profile over rates, fees, taxes and rounding; stores nothing | L2: a simulation never creates an order: reads base price (price/price_list/variant) and rules (pricing.dynamic_price_*); only the idempotency record is written"
+  "lineageNote": "DM3: runs the calculation profile over rates, fees, taxes and rounding; stores nothing | L2: a simulation never creates an order: reads base price (price/price_list/variant) and rules (pricing.dynamic_price_*); only the idempotency record is written",
+  "pure": "a simulation: computes what would happen and stores nothing"
  },
  "simulateWorkflowTestingImpact": {
   "contract": "approvals",
@@ -44389,7 +44470,9 @@
   "reads": [
    "orders.stored_value_authorisation"
   ],
-  "writes": [],
+  "writes": [
+   "orders.stored_value_authorisation"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "ORDER_CREATE",
@@ -44404,7 +44487,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "relinquishWalletAuthorisation": {
   "contract": "cross-region",
@@ -44462,7 +44546,9 @@
   "reads": [
    "catalogue.channel_allocation"
   ],
-  "writes": [],
+  "writes": [
+   "catalogue.channel_allocation"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "CAPACITY_CONFIGURE",
@@ -44477,7 +44563,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "setStepUpPolicy": {
   "contract": "approvals",
@@ -44706,7 +44793,9 @@
   "reads": [
    "games.authorisation"
   ],
-  "writes": [],
+  "writes": [
+   "games.authorisation"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "ACCESS_VALIDATE",
@@ -44720,7 +44809,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "bulkUpdateMediaAssets": {
   "contract": "assets",
@@ -44761,7 +44851,9 @@
   "reads": [
    "resources.booking"
   ],
-  "writes": [],
+  "writes": [
+   "resources.booking"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "RESOURCE_BOOK",
@@ -44775,7 +44867,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "checkOutRental": {
   "contract": "rental",
@@ -44785,7 +44878,9 @@
    "rental.booking",
    "rental.participant"
   ],
-  "writes": [],
+  "writes": [
+   "rental.booking"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "RENTAL_OPERATE",
@@ -44798,7 +44893,8 @@
   "service": "VenueOpsService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "claimOpenShift": {
   "contract": "workforce",
@@ -44807,7 +44903,9 @@
   "reads": [
    "workforce.open_shift"
   ],
-  "writes": [],
+  "writes": [
+   "workforce.open_shift"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "WORKFORCE_VIEW",
@@ -44821,7 +44919,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "cloneEvent": {
   "contract": "catalogue",
@@ -44868,7 +44967,9 @@
   "reads": [
    "resources.resource"
   ],
-  "writes": [],
+  "writes": [
+   "resources.resource"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "RESOURCE_MANAGE",
@@ -44882,7 +44983,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "concludeRecommendationExperiment": {
   "contract": "promotions",
@@ -44998,7 +45100,9 @@
   "reads": [
    "approvals.evidence_package"
   ],
-  "writes": [],
+  "writes": [
+   "approvals.evidence_package"
+  ],
   "routing": null,
   "scope": "tenant",
   "perm": "APPROVAL_VIEW",
@@ -45012,7 +45116,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "createB2bCreditAccount": {
   "contract": "payments",
@@ -45093,7 +45198,9 @@
   "reads": [
    "identity.access_override"
   ],
-  "writes": [],
+  "writes": [
+   "identity.access_override"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "PERMISSION_MANAGE",
@@ -45107,7 +45214,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "createGameEntitlement": {
   "contract": "games",
@@ -45732,7 +45840,9 @@
   "reads": [
    "marketing.duplicate_candidate"
   ],
-  "writes": [],
+  "writes": [
+   "marketing.duplicate_candidate"
+  ],
   "routing": null,
   "scope": "tenant",
   "perm": "GUEST_MANAGE",
@@ -45746,7 +45856,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "deployReaderConfiguration": {
   "contract": "games",
@@ -45755,7 +45866,9 @@
   "reads": [
    "games.reader_deployment"
   ],
-  "writes": [],
+  "writes": [
+   "games.reader_deployment"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "DEVICE_CONFIGURE",
@@ -45769,7 +45882,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "enrolDevice": {
   "contract": "tenancy",
@@ -45887,7 +46001,8 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "Trace: strategy (weights, guardrails), suppression caps, relationships/upsell rules, recent outcomes for cooldowns, availability (getRecommendations neighbour reads catalogue.product/channel_capacity)"
+  "lineageNote": "Trace: strategy (weights, guardrails), suppression caps, relationships/upsell rules, recent outcomes for cooldowns, availability (getRecommendations neighbour reads catalogue.product/channel_capacity)",
+  "pure": "an explanation: computes and returns, stores nothing"
  },
  "explainRentalPrice": {
   "contract": "rental",
@@ -45918,7 +46033,8 @@
   "stores": [
    "postgres"
   ],
-  "lineageNote": "ordered trace of the same rules quoteRentalPrice applies; creates nothing"
+  "lineageNote": "ordered trace of the same rules quoteRentalPrice applies; creates nothing",
+  "pure": "an explanation: computes and returns, stores nothing"
  },
  "extendRental": {
   "contract": "rental",
@@ -47539,7 +47655,9 @@
   "reads": [
    "tenancy.device_credential"
   ],
-  "writes": [],
+  "writes": [
+   "tenancy.device_credential"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "DEVICE_MANAGE",
@@ -47553,7 +47671,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "linkWalletCredential": {
   "contract": "wallet",
@@ -49239,7 +49358,9 @@
   "reads": [
    "rental.product"
   ],
-  "writes": [],
+  "writes": [
+   "rental.product"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "RENTAL_APPROVE",
@@ -49252,7 +49373,8 @@
   "service": "VenueOpsService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "publishWalletConfiguration": {
   "contract": "wallet",
@@ -49308,7 +49430,8 @@
    "rental.quote"
   ],
   "writes": [
-   "cache:idempotency"
+   "cache:idempotency",
+   "rental.quote"
   ],
   "routing": null,
   "scope": "venue",
@@ -49324,7 +49447,8 @@
   "stores": [
    "postgres"
   ],
-  "lineageNote": "rental amount from pricing profile, deposit from deposit policy; returns quoteId+expiresAt but no quote table exists (see _missingTables); promotions via their own operation"
+  "lineageNote": "rental amount from pricing profile, deposit from deposit policy; returns quoteId+expiresAt but no quote table exists (see _missingTables); promotions via their own operation",
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "raiseWalletDispute": {
   "contract": "wallet",
@@ -49357,7 +49481,9 @@
   "reads": [
    "seating.reassignment"
   ],
-  "writes": [],
+  "writes": [
+   "seating.reassignment"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "ORDER_MODIFY",
@@ -49371,7 +49497,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "recordDeviceTamperEvent": {
   "contract": "tenancy",
@@ -49485,7 +49612,9 @@
   "reads": [
    "seating.hold_pool"
   ],
-  "writes": [],
+  "writes": [
+   "seating.hold_pool"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "CAPACITY_CONFIGURE",
@@ -49499,7 +49628,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "replaceAccreditationCredential": {
   "contract": "accreditation",
@@ -49536,7 +49666,9 @@
   "reads": [
    "resources.booking"
   ],
-  "writes": [],
+  "writes": [
+   "resources.booking"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "RESOURCE_BOOK",
@@ -49550,7 +49682,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "reportRentalIncident": {
   "contract": "rental",
@@ -49707,7 +49840,9 @@
   "reads": [
    "wallet.adjustment"
   ],
-  "writes": [],
+  "writes": [
+   "wallet.adjustment"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "WALLET_OPERATE",
@@ -49720,7 +49855,8 @@
   "service": "WalletService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "revokeDeviceCredential": {
   "contract": "tenancy",
@@ -49820,7 +49956,9 @@
   "reads": [
    "subscription.go_live_readiness"
   ],
-  "writes": [],
+  "writes": [
+   "subscription.go_live_readiness"
+  ],
   "routing": null,
   "scope": "platform",
   "perm": "PLATFORM_TENANT_MANAGE",
@@ -49835,7 +49973,8 @@
    "postgres",
    "postgres-analytical",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "scoreVsiAssessment": {
   "contract": "subscription",
@@ -49869,7 +50008,9 @@
   "reads": [
    "identity.authorisation_policy"
   ],
-  "writes": [],
+  "writes": [
+   "identity.authorisation_policy"
+  ],
   "routing": null,
   "scope": "tenant",
   "perm": "PERMISSION_MANAGE",
@@ -49883,7 +50024,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "setAccessProfile": {
   "contract": "accreditation",
@@ -50532,7 +50674,9 @@
   "reads": [
    "games.card"
   ],
-  "writes": [],
+  "writes": [
+   "games.card"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "PRODUCT_CONFIGURE",
@@ -50546,7 +50690,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "setGameKioskConfiguration": {
   "contract": "games",
@@ -50916,7 +51061,9 @@
   "reads": [
    "assets.approval"
   ],
-  "writes": [],
+  "writes": [
+   "assets.approval"
+  ],
   "routing": null,
   "scope": "tenant",
   "perm": "ASSET_LIBRARY_APPROVE",
@@ -50930,7 +51077,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "setMediaAssetRights": {
   "contract": "assets",
@@ -51708,7 +51856,9 @@
   "reads": [
    "resources.resource"
   ],
-  "writes": [],
+  "writes": [
+   "resources.resource"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "RESOURCE_MANAGE",
@@ -51722,7 +51872,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "setResourceSchedule": {
   "contract": "resources",
@@ -52236,7 +52387,9 @@
   "reads": [
    "approvals.signature"
   ],
-  "writes": [],
+  "writes": [
+   "approvals.signature"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "APPROVAL_DECIDE",
@@ -52250,7 +52403,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "signRentalAgreement": {
   "contract": "rental",
@@ -52336,7 +52490,8 @@
    "postgres-analytical",
    "redis"
   ],
-  "lineageNote": "Idempotent POST with no persisted result (schemas carry no persistence); composes tier, licensing model (billable unit, minimum guarantee), module_listing (dependencies, prices), add-ons and capacity packs into one number."
+  "lineageNote": "Idempotent POST with no persisted result (schemas carry no persistence); composes tier, licensing model (billable unit, minimum guarantee), module_listing (dependencies, prices), add-ons and capacity packs into one number.",
+  "pure": "a simulation: computes what would happen and stores nothing"
  },
  "simulateCreditConsumption": {
   "contract": "wallet",
@@ -52366,7 +52521,8 @@
   "stores": [
    "postgres"
   ],
-  "lineageNote": "Allocation lot by lot per consumption_policy and credit_eligibility over the wallet credit lots; simulation, nothing stored; IdempotencyKey parameter"
+  "lineageNote": "Allocation lot by lot per consumption_policy and credit_eligibility over the wallet credit lots; simulation, nothing stored; IdempotencyKey parameter",
+  "pure": "a simulation: computes what would happen and stores nothing"
  },
  "simulateGameplayAuthorisation": {
   "contract": "games",
@@ -52389,7 +52545,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "pure": "a simulation: computes what would happen and stores nothing"
  },
  "simulatePaymentConfiguration": {
   "contract": "payments",
@@ -52423,7 +52580,8 @@
   "stores": [
    "postgres"
   ],
-  "lineageNote": "composes method/eligibility/currency/fee/routing configuration for a basket; stores nothing"
+  "lineageNote": "composes method/eligibility/currency/fee/routing configuration for a basket; stores nothing",
+  "pure": "a simulation: computes what would happen and stores nothing"
  },
  "simulatePaymentRouting": {
   "contract": "payments",
@@ -52454,7 +52612,8 @@
   "stores": [
    "postgres"
   ],
-  "lineageNote": "decision trace over routing_rule (conditions, priority, fallback), connections, fees and failover; stores nothing"
+  "lineageNote": "decision trace over routing_rule (conditions, priority, fallback), connections, fees and failover; stores nothing",
+  "pure": "a simulation: computes what would happen and stores nothing"
  },
  "simulateRecommendationStrategy": {
   "contract": "promotions",
@@ -52509,7 +52668,8 @@
   "stores": [
    "postgres"
   ],
-  "lineageNote": "simulates the pricing stack before publishing; validates profiles, effective dates, deposit policies, dynamic guardrails; creates nothing"
+  "lineageNote": "simulates the pricing stack before publishing; validates profiles, effective dates, deposit policies, dynamic guardrails; creates nothing",
+  "pure": "a simulation: computes what would happen and stores nothing"
  },
  "startDeviceFirmwareRollout": {
   "contract": "tenancy",
@@ -52621,7 +52781,9 @@
    "rental.booking",
    "rental.participant"
   ],
-  "writes": [],
+  "writes": [
+   "rental.booking"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "RENTAL_OPERATE",
@@ -52634,7 +52796,8 @@
   "service": "VenueOpsService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "testPaymentProviderConnection": {
   "contract": "payments",
@@ -52692,7 +52855,8 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "Tests tap/balance/display/IO on a configured reader: reads reader, its deployment and profile, and the test card balance; result returned, not stored (description names no record); IdempotencyKey parameter"
+  "lineageNote": "Tests tap/balance/display/IO on a configured reader: reads reader, its deployment and profile, and the test card balance; result returned, not stored (description names no record); IdempotencyKey parameter",
+  "pure": "sends a test to the reader and returns its answer; the reader's own heartbeat records health"
  },
  "updateAuthorisationPolicy": {
   "contract": "identity",
@@ -52828,7 +52992,9 @@
    "rental.booking",
    "rental.participant"
   ],
-  "writes": [],
+  "writes": [
+   "rental.booking"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "RENTAL_BOOK",
@@ -52841,7 +53007,8 @@
   "service": "VenueOpsService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "updateRentalPricingProfile": {
   "contract": "rental",
@@ -52923,7 +53090,9 @@
   "reads": [
    "resources.booking"
   ],
-  "writes": [],
+  "writes": [
+   "resources.booking"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "RESOURCE_BOOK",
@@ -52937,7 +53106,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "updateResourceCategory": {
   "contract": "resources",
@@ -53074,7 +53244,8 @@
   "stores": [
    "postgres"
   ],
-  "lineageNote": "returns findings only (checklist: category, location, inventory, duration, rules, agreement, pricing, deposit, availability); POST with Idempotency-Key"
+  "lineageNote": "returns findings only (checklist: category, location, inventory, duration, rules, agreement, pricing, deposit, availability); POST with Idempotency-Key",
+  "pure": "a validation: reports what it finds, stores nothing"
  },
  "validateSeatCompliance": {
   "contract": "seating",
@@ -53140,7 +53311,9 @@
   "reads": [
    "accreditation.document"
   ],
-  "writes": [],
+  "writes": [
+   "accreditation.document"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "ACCREDITATION_APPROVE",
@@ -53153,7 +53326,8 @@
   "service": "TenancyService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "getEmployee": {
   "contract": "workforce",
@@ -53396,7 +53570,9 @@
   "reads": [
    "workforce.sync_conflict"
   ],
-  "writes": [],
+  "writes": [
+   "workforce.sync_conflict"
+  ],
   "routing": null,
   "scope": "tenant",
   "perm": "WORKFORCE_MANAGE",
@@ -53410,7 +53586,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "setFieldOwnership": {
   "contract": "workforce",
@@ -53544,7 +53721,9 @@
   "reads": [
    "workforce.sync_run"
   ],
-  "writes": [],
+  "writes": [
+   "workforce.sync_run"
+  ],
   "routing": null,
   "scope": "tenant",
   "perm": "WORKFORCE_MANAGE",
@@ -53558,7 +53737,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "awardBadge": {
   "contract": "marketing-crm",
@@ -55181,7 +55361,9 @@
   "reads": [
    "marketing.loyalty_position"
   ],
-  "writes": [],
+  "writes": [
+   "marketing.loyalty_position"
+  ],
   "routing": null,
   "scope": "tenant",
   "perm": null,
@@ -55195,7 +55377,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "enrolFaceTag": {
   "contract": "access",
@@ -55381,7 +55564,9 @@
   "reads": [
    "payments.dunning_case"
   ],
-  "writes": [],
+  "writes": [
+   "payments.dunning_case"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "PAYMENT_CONFIGURE",
@@ -55394,7 +55579,8 @@
   "service": "OrderService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "setDunningPolicy": {
   "contract": "payments",
@@ -56129,7 +56315,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "pure": "computed per request; nothing is held"
  },
  "checkGuestCheckoutMatch": {
   "contract": "marketing-crm",
@@ -56154,7 +56341,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "pure": "a lookup: resolves and returns, nothing is created or merged"
  },
  "decideGuestCheckoutMatch": {
   "contract": "marketing-crm",
@@ -56621,7 +56809,11 @@
    "orders.pos_shift_approval",
    "orders.pos_shift_incident"
   ],
-  "writes": [],
+  "writes": [
+   "orders.pos_shift",
+   "orders.pos_shift_approval",
+   "platform.outbox"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "SHIFT_APPROVE_CLOSE",
@@ -56635,7 +56827,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "getCatalogueImportJob": {
   "contract": "catalogue",
@@ -57091,7 +57284,9 @@
   "reads": [
    "sync.rejection"
   ],
-  "writes": [],
+  "writes": [
+   "sync.rejection"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "ORDER_MODIFY",
@@ -57105,7 +57300,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "revokeEntitlementShare": {
   "contract": "orders",
@@ -57304,7 +57500,9 @@
   "reads": [
    "fnb.waitlist_entry"
   ],
-  "writes": [],
+  "writes": [
+   "fnb.waitlist_entry"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "ORDER_MODIFY",
@@ -57321,7 +57519,8 @@
    "postgres",
    "postgres-analytical",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "listOwnPlatformStaffGrants": {
   "contract": "identity",
@@ -57399,7 +57598,9 @@
   "reads": [
    "identity.platform_staff_grant"
   ],
-  "writes": [],
+  "writes": [
+   "identity.platform_staff_grant"
+  ],
   "routing": null,
   "scope": "tenant",
   "perm": "PLATFORM_TENANT_ACCESS",
@@ -57413,7 +57614,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "setPerformanceTemplate": {
   "contract": "catalogue",
@@ -57592,7 +57794,9 @@
   "reads": [
    "orders.payment"
   ],
-  "writes": [],
+  "writes": [
+   "orders.payment"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "ORDER_VOID",
@@ -57606,7 +57810,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "cloneGame": {
   "contract": "games",
@@ -57615,7 +57820,9 @@
   "reads": [
    "games.game"
   ],
-  "writes": [],
+  "writes": [
+   "games.game"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "PRODUCT_CONFIGURE",
@@ -57629,7 +57836,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "cloneReaderConfiguration": {
   "contract": "games",
@@ -57638,7 +57846,9 @@
   "reads": [
    "games.reader"
   ],
-  "writes": [],
+  "writes": [
+   "games.reader"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "DEVICE_CONFIGURE",
@@ -57652,7 +57862,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "cloneTicketTemplate": {
   "contract": "orders",
@@ -57662,7 +57873,10 @@
    "orders.ticket_template",
    "orders.ticket_template_channel"
   ],
-  "writes": [],
+  "writes": [
+   "orders.ticket_template",
+   "orders.ticket_template_channel"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "PRODUCT_CONFIGURE",
@@ -57676,7 +57890,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "createConsentQuestion": {
   "contract": "marketing-crm",
@@ -57712,7 +57927,9 @@
   "reads": [
    "orders.group_enquiry"
   ],
-  "writes": [],
+  "writes": [
+   "orders.group_enquiry"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "ORDER_CREATE",
@@ -57726,7 +57943,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "createGuidedChoice": {
   "contract": "white-label",
@@ -57764,7 +57982,9 @@
   "reads": [
    "orders.member_exception"
   ],
-  "writes": [],
+  "writes": [
+   "orders.member_exception"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "ORDER_MODIFY",
@@ -57778,7 +57998,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "createResourceHold": {
   "contract": "resources",
@@ -57787,7 +58008,9 @@
   "reads": [
    "resources.resource_hold"
   ],
-  "writes": [],
+  "writes": [
+   "resources.resource_hold"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "ORDER_CREATE",
@@ -57802,7 +58025,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "createTransportPassType": {
   "contract": "transport",
@@ -58135,7 +58359,9 @@
   "reads": [
    "resources.resource_hold"
   ],
-  "writes": [],
+  "writes": [
+   "resources.resource_hold"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "ORDER_CREATE",
@@ -58150,7 +58376,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "getCaseInvestigationResolution": {
   "contract": "marketing-crm",
@@ -58281,6 +58508,7 @@
   "verb": "GET",
   "path": "/transport/departures/next",
   "reads": [
+   "catalogue.channel_capacity",
    "transport.departure",
    "transport.fare_matrix_cell",
    "transport.fare_passenger_type",
@@ -58544,7 +58772,10 @@
    "orders.ticket_template",
    "orders.ticket_template_channel"
   ],
-  "writes": [],
+  "writes": [
+   "orders.ticket_template",
+   "orders.ticket_template_channel"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "PRODUCT_CONFIGURE",
@@ -58558,7 +58789,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "importTransportNetwork": {
   "contract": "transport",
@@ -59141,7 +59373,9 @@
   "reads": [
    "orders.membership_migration"
   ],
-  "writes": [],
+  "writes": [
+   "orders.membership_migration"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "ORDER_MODIFY",
@@ -59155,7 +59389,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "proposeGuidedChoice": {
   "contract": "white-label",
@@ -59223,7 +59458,9 @@
   "reads": [
    "access.hardware_deployment"
   ],
-  "writes": [],
+  "writes": [
+   "access.hardware_deployment"
+  ],
   "routing": "primary",
   "scope": "venue",
   "perm": "ACCESS_POINT_CONFIGURE",
@@ -59237,7 +59474,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "publishTransportTimetable": {
   "contract": "transport",
@@ -59295,7 +59533,8 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "persistence: computed; baseFare+perStopFare x stops or matrix pair, x passenger multiplier; pass via pass_type.fare_multiplier/reference_trips; creates nothing"
+  "lineageNote": "persistence: computed; baseFare+perStopFare x stops or matrix pair, x passenger multiplier; pass via pass_type.fare_multiplier/reference_trips; creates nothing",
+  "pure": "a quote: priced on request and returned, not stored"
  },
  "raiseResourceRequest": {
   "contract": "resources",
@@ -59304,7 +59543,9 @@
   "reads": [
    "resources.resource_request"
   ],
-  "writes": [],
+  "writes": [
+   "resources.resource_request"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "RESOURCE_VIEW",
@@ -59318,7 +59559,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "recordConsentAnswers": {
   "contract": "marketing-crm",
@@ -59327,7 +59569,9 @@
   "reads": [
    "marketing.booking_consent_record"
   ],
-  "writes": [],
+  "writes": [
+   "marketing.booking_consent_record"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "ORDER_CREATE",
@@ -59342,7 +59586,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "relinquishResourceHold": {
   "contract": "resources",
@@ -59415,7 +59660,9 @@
   "reads": [
    "approvals.approved_action_execution"
   ],
-  "writes": [],
+  "writes": [
+   "approvals.approved_action_execution"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "APPROVAL_ACT",
@@ -59429,7 +59676,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "resolveCredentialException": {
   "contract": "access",
@@ -59475,7 +59723,9 @@
   "reads": [
    "orders.membership_activation_action"
   ],
-  "writes": [],
+  "writes": [
+   "orders.membership_activation_action"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "ORDER_MODIFY",
@@ -59489,7 +59739,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "resolveWalletDispute": {
   "contract": "wallet",
@@ -59498,7 +59749,9 @@
   "reads": [
    "wallet.dispute"
   ],
-  "writes": [],
+  "writes": [
+   "wallet.dispute"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "WALLET_OPERATE",
@@ -59512,7 +59765,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "restoreWalletConfigurationVersion": {
   "contract": "wallet",
@@ -59646,6 +59900,7 @@
   "verb": "GET",
   "path": "/transport/departures",
   "reads": [
+   "catalogue.channel_capacity",
    "transport.departure",
    "transport.fare_matrix_cell",
    "transport.fare_passenger_type",
@@ -59735,7 +59990,9 @@
   "reads": [
    "control.api_client"
   ],
-  "writes": [],
+  "writes": [
+   "control.api_client"
+  ],
   "routing": null,
   "scope": "tenant",
   "perm": "DEVELOPER_MANAGE",
@@ -59750,7 +60007,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "setBiometricLifecycleRetention": {
   "contract": "access",
@@ -59759,7 +60017,9 @@
   "reads": [
    "tenancy.data_retention_setting"
   ],
-  "writes": [],
+  "writes": [
+   "tenancy.data_retention_setting"
+  ],
   "routing": "primary",
   "scope": "venue",
   "perm": "ACCESS_POINT_CONFIGURE",
@@ -59774,7 +60034,8 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "reads the tenant's faceTagBiometric/facePassBiometric period to refuse a longer rule (422); the rule itself has no table (BiometricLifecycleRetentionDeletionInput is request-only), unchanged"
+  "lineageNote": "reads the tenant's faceTagBiometric/facePassBiometric period to refuse a longer rule (422); the rule itself has no table (BiometricLifecycleRetentionDeletionInput is request-only), unchanged",
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "setBrandingLocalizationTemplate": {
   "contract": "access",
@@ -60272,7 +60533,9 @@
   "reads": [
    "orders.group_ticket_fulfillment"
   ],
-  "writes": [],
+  "writes": [
+   "orders.group_ticket_fulfillment"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "ORDER_MODIFY",
@@ -60286,7 +60549,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "setGuestCompanionEligibility": {
   "contract": "access",
@@ -60467,7 +60731,9 @@
   "reads": [
    "fnb.outlet_template"
   ],
-  "writes": [],
+  "writes": [
+   "fnb.outlet_template"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "PRODUCT_CONFIGURE",
@@ -60483,7 +60749,8 @@
    "postgres",
    "postgres-analytical",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "setParticipantGuestList": {
   "contract": "orders",
@@ -60675,7 +60942,9 @@
   "reads": [
    "orders.refund_calculation_policy"
   ],
-  "writes": [],
+  "writes": [
+   "orders.refund_calculation_policy"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "PRODUCT_CONFIGURE",
@@ -60689,7 +60958,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "setResourceBookingProgress": {
   "contract": "resources",
@@ -60698,7 +60968,9 @@
   "reads": [
    "resources.booking"
   ],
-  "writes": [],
+  "writes": [
+   "resources.booking"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "RESOURCE_BOOK",
@@ -60712,7 +60984,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "setRulePriorityConflict": {
   "contract": "catalogue",
@@ -60814,7 +61087,9 @@
    "transport.route_stop",
    "transport.station"
   ],
-  "writes": [],
+  "writes": [
+   "transport.route"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "TRANSPORT_MANAGE",
@@ -60828,7 +61103,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "setWaiverAssociation": {
   "contract": "marketing-crm",
@@ -61015,7 +61291,9 @@
   "reads": [
    "wallet.risk_rules"
   ],
-  "writes": [],
+  "writes": [
+   "wallet.risk_rules"
+  ],
   "routing": null,
   "scope": "tenant",
   "perm": "WALLET_CONFIGURE",
@@ -61029,7 +61307,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "simulateBiometricConfiguration": {
   "contract": "access",
@@ -61088,7 +61367,8 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "Reads the journey profile named by journeyProfileId; writes nothing"
+  "lineageNote": "Reads the journey profile named by journeyProfileId; writes nothing",
+  "pure": "a simulation: computes what would happen and stores nothing"
  },
  "submitPricingChangeRequest": {
   "contract": "catalogue",
@@ -61155,7 +61435,8 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "DM3: on-demand test; stores nothing | L2: dry run stores nothing (PricingRuleTestResult response only): evaluates the rule and live rules against base price in price/price_list"
+  "lineageNote": "DM3: on-demand test; stores nothing | L2: dry run stores nothing (PricingRuleTestResult response only): evaluates the rule and live rules against base price in price/price_list",
+  "pure": "a dry run: the request says it stores nothing"
  },
  "testWebhookSubscription": {
   "contract": "public-api",
@@ -61164,7 +61445,9 @@
   "reads": [
    "control.webhook_delivery"
   ],
-  "writes": [],
+  "writes": [
+   "control.webhook_delivery"
+  ],
   "routing": null,
   "scope": "tenant",
   "perm": "DEVELOPER_MANAGE",
@@ -61179,7 +61462,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "unpublishGuidedChoice": {
   "contract": "white-label",
@@ -61190,7 +61474,9 @@
    "whitelabel.guided_choice_answer",
    "whitelabel.guided_choice_question"
   ],
-  "writes": [],
+  "writes": [
+   "whitelabel.guided_choice"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "TENANT_PUBLISH",
@@ -61204,7 +61490,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "updateConsentQuestion": {
   "contract": "marketing-crm",
@@ -61238,11 +61525,15 @@
   "verb": "PATCH",
   "path": "/guided-choices/{guidedChoiceId}",
   "reads": [
+   "cache:idempotency",
    "whitelabel.guided_choice",
    "whitelabel.guided_choice_answer",
    "whitelabel.guided_choice_question"
   ],
   "writes": [
+   "cache:idempotency",
+   "whitelabel.guided_choice",
+   "whitelabel.guided_choice_answer",
    "whitelabel.guided_choice_question"
   ],
   "routing": null,
@@ -61267,7 +61558,9 @@
   "reads": [
    "catalogue.variant"
   ],
-  "writes": [],
+  "writes": [
+   "catalogue.variant"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "PRODUCT_CONFIGURE",
@@ -61281,7 +61574,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "updateTransportDeparture": {
   "contract": "transport",
@@ -61290,7 +61584,9 @@
   "reads": [
    "transport.departure"
   ],
-  "writes": [],
+  "writes": [
+   "transport.departure"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "TRANSPORT_MANAGE",
@@ -61304,7 +61600,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "updateTransportPassType": {
   "contract": "transport",
@@ -61313,7 +61610,9 @@
   "reads": [
    "transport.pass_type"
   ],
-  "writes": [],
+  "writes": [
+   "transport.pass_type"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "TRANSPORT_PRICE",
@@ -61327,7 +61626,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "updateTransportRoute": {
   "contract": "transport",
@@ -61364,7 +61664,9 @@
   "reads": [
    "transport.station"
   ],
-  "writes": [],
+  "writes": [
+   "transport.station"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "TRANSPORT_MANAGE",
@@ -61378,7 +61680,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "updateTransportTimetable": {
   "contract": "transport",
@@ -61436,7 +61739,8 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "Health checks per game: price, mapped/deployed reader, edge package expiry, entitlements, redemption rule; nothing changed; asset in-service is asset service by operation; IdempotencyKey parameter"
+  "lineageNote": "Health checks per game: price, mapped/deployed reader, edge package expiry, entitlements, redemption rule; nothing changed; asset in-service is asset service by operation; IdempotencyKey parameter",
+  "pure": "a validation: reports what it finds, stores nothing"
  },
  "verifyTaxExemption": {
   "contract": "finance",
@@ -61445,7 +61749,9 @@
   "reads": [
    "ledger.tax_exemption"
   ],
-  "writes": [],
+  "writes": [
+   "ledger.tax_exemption"
+  ],
   "routing": null,
   "scope": "region",
   "perm": "TAX_CONFIGURE",
@@ -61459,7 +61765,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "voidEntitlement": {
   "contract": "orders",
@@ -61468,7 +61775,9 @@
   "reads": [
    "access.entitlement"
   ],
-  "writes": [],
+  "writes": [
+   "access.entitlement"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "ORDER_VOID",
@@ -61482,7 +61791,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "withdrawTransportTimetable": {
   "contract": "transport",
@@ -61492,7 +61802,9 @@
    "transport.timetable",
    "transport.timetable_run"
   ],
-  "writes": [],
+  "writes": [
+   "transport.timetable"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "TRANSPORT_MANAGE",
@@ -61506,7 +61818,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "withdrawWalletDispute": {
   "contract": "wallet",
@@ -61515,7 +61828,9 @@
   "reads": [
    "wallet.dispute"
   ],
-  "writes": [],
+  "writes": [
+   "wallet.dispute"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "WALLET_OPERATE",
@@ -61530,7 +61845,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "actOnPartnerApplicationReview": {
   "contract": "subscription",
@@ -65131,7 +65447,8 @@
    "qdrant",
    "redis"
   ],
-  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged.",
+  "pure": "compares stored scenarios; nothing is written"
  },
  "configureAiCapability": {
   "contract": "ai",
@@ -69576,7 +69893,8 @@
    "postgres-analytical",
    "redis"
   ],
-  "lineageNote": "new; routing analytical; plus whatever analytical-replica datasets the spec compiles to"
+  "lineageNote": "new; routing analytical; plus whatever analytical-replica datasets the spec compiles to",
+  "pure": "runs a query on the analytical replica and returns the result"
  },
  "scoreApprovalRequest": {
   "contract": "ai",
@@ -70333,7 +70651,8 @@
    "qdrant",
    "redis"
   ],
-  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged. Service audience (serviceAuth), no screen."
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged. Service audience (serviceAuth), no screen.",
+  "pure": "a simulation: computes what would happen and stores nothing"
  },
  "startConfigurationSession": {
   "contract": "ai",
@@ -70779,7 +71098,10 @@
    "cache:idempotency",
    "catalogue.channel_allocation",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold"
+   "catalogue.inventory_hold",
+   "platform.outbox",
+   "seating.seat_hold",
+   "seating.seat_hold_item"
   ],
   "routing": null,
   "scope": "venue",
@@ -72289,7 +72611,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "pure": "a transient place held in the waiting room's Redis counters, never a table (ADR-0066)"
  },
  "getWaitingRoomPosition": {
   "contract": "catalogue",
@@ -72380,7 +72703,8 @@
    "cache:idempotency",
    "ledger.journal_entry",
    "orders.cash_count_line",
-   "orders.pos_shift"
+   "orders.pos_shift",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "workstation",
@@ -72528,7 +72852,9 @@
   "reads": [
    "marketing.challenge"
   ],
-  "writes": [],
+  "writes": [
+   "marketing.challenge"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "MARKETING_SEND",
@@ -72542,7 +72868,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "applyConfigPackage": {
   "contract": "platform-ops",
@@ -72551,7 +72878,9 @@
   "reads": [
    "control.config_package_application"
   ],
-  "writes": [],
+  "writes": [
+   "control.config_package_application"
+  ],
   "routing": null,
   "scope": "tenant",
   "perm": "PLATFORM_MIGRATION_APPLY",
@@ -72565,7 +72894,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "approveDevice": {
   "contract": "tenancy",
@@ -72574,7 +72904,9 @@
   "reads": [
    "platform.device"
   ],
-  "writes": [],
+  "writes": [
+   "platform.device"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "DEVICE_MANAGE",
@@ -72588,7 +72920,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "assignApprovalRequest": {
   "contract": "approvals",
@@ -72598,7 +72931,9 @@
    "approvals.decision",
    "approvals.request"
   ],
-  "writes": [],
+  "writes": [
+   "approvals.request"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "APPROVAL_DECIDE",
@@ -72612,7 +72947,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "buildDeepLink": {
   "contract": "white-label",
@@ -72633,14 +72969,17 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "pure": "builds and signs a URL; nothing is stored"
  },
  "bulkUpdateCatalogueProducts": {
   "contract": "catalogue",
   "verb": "POST",
   "path": "/products/bulk-update",
   "reads": [],
-  "writes": [],
+  "writes": [
+   "catalogue.product"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "PRODUCT_CONFIGURE",
@@ -72654,7 +72993,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "cancelApprovalRequest": {
   "contract": "approvals",
@@ -72664,7 +73004,9 @@
    "approvals.decision",
    "approvals.request"
   ],
-  "writes": [],
+  "writes": [
+   "approvals.request"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "APPROVAL_CONFIGURE",
@@ -72678,7 +73020,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "createTableReservationForGuest": {
   "contract": "fnb",
@@ -72716,7 +73059,9 @@
   "reads": [
    "control.config_package_diff"
   ],
-  "writes": [],
+  "writes": [
+   "control.config_package_diff"
+  ],
   "routing": null,
   "scope": "tenant",
   "perm": "PLATFORM_RELEASE_VIEW",
@@ -72730,14 +73075,19 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "endOwnSession": {
   "contract": "identity",
   "verb": "POST",
   "path": "/auth/sessions/mine/{sessionId}/end",
-  "reads": [],
-  "writes": [],
+  "reads": [
+   "identity.session"
+  ],
+  "writes": [
+   "identity.session"
+  ],
   "routing": null,
   "scope": "tenant",
   "perm": null,
@@ -72752,7 +73102,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "exportConfigPackage": {
   "contract": "platform-ops",
@@ -72761,7 +73112,9 @@
   "reads": [
    "control.config_package"
   ],
-  "writes": [],
+  "writes": [
+   "control.config_package"
+  ],
   "routing": null,
   "scope": "tenant",
   "perm": "PLATFORM_RELEASE_MANAGE",
@@ -72775,7 +73128,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "exportSitePackage": {
   "contract": "white-label",
@@ -72784,7 +73138,9 @@
   "reads": [
    "whitelabel.site_package"
   ],
-  "writes": [],
+  "writes": [
+   "whitelabel.site_package"
+  ],
   "routing": null,
   "scope": "tenant",
   "perm": "TENANT_PUBLISH",
@@ -72798,7 +73154,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "getAiSpendCeiling": {
   "contract": "ai",
@@ -73061,7 +73418,9 @@
   "contract": "fnb",
   "verb": "GET",
   "path": "/outlets/{outletId}/kitchen-sla",
-  "reads": [],
+  "reads": [
+   "fnb.kitchen_sla"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "venue",
@@ -73451,7 +73810,9 @@
   "contract": "identity",
   "verb": "GET",
   "path": "/auth/sessions/mine",
-  "reads": [],
+  "reads": [
+   "identity.session"
+  ],
   "writes": [],
   "routing": "primary",
   "scope": "tenant",
@@ -73601,7 +73962,8 @@
    "postgres",
    "postgres-analytical",
    "redis"
-  ]
+  ],
+  "pure": "renders a document from data already stored; nothing is written"
  },
  "regenerateDomainToken": {
   "contract": "white-label",
@@ -73610,7 +73972,9 @@
   "reads": [
    "whitelabel.custom_domain"
   ],
-  "writes": [],
+  "writes": [
+   "whitelabel.custom_domain"
+  ],
   "routing": null,
   "scope": "tenant",
   "perm": "TENANT_CONFIGURE",
@@ -73624,7 +73988,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "rejectShiftVariance": {
   "contract": "shift",
@@ -73635,7 +74000,10 @@
    "orders.pos_shift_approval",
    "orders.pos_shift_incident"
   ],
-  "writes": [],
+  "writes": [
+   "orders.pos_shift",
+   "orders.pos_shift_incident"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "OVERSHORT_ACCEPT",
@@ -73649,7 +74017,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "reopenApprovalRequest": {
   "contract": "approvals",
@@ -73659,7 +74028,9 @@
    "approvals.decision",
    "approvals.request"
   ],
-  "writes": [],
+  "writes": [
+   "approvals.request"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "APPROVAL_REQUEST",
@@ -73673,7 +74044,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "setAccessPointDirection": {
   "contract": "access",
@@ -73683,7 +74055,9 @@
    "access.access_point",
    "access.gate_mode_change"
   ],
-  "writes": [],
+  "writes": [
+   "access.access_point"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "ACCESS_DIRECTION_SET",
@@ -73697,7 +74071,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "setAiSpendCeiling": {
   "contract": "ai",
@@ -73786,7 +74161,9 @@
   "reads": [
    "catalogue.entitlement_template"
   ],
-  "writes": [],
+  "writes": [
+   "catalogue.entitlement_template"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "PRODUCT_CONFIGURE",
@@ -73800,7 +74177,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "setEventChangeTreatmentPolicy": {
   "contract": "catalogue",
@@ -73886,7 +74264,9 @@
   "reads": [
    "fnb.menu_item"
   ],
-  "writes": [],
+  "writes": [
+   "fnb.menu_item"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "PRODUCT_CONFIGURE",
@@ -73902,7 +74282,8 @@
    "postgres",
    "postgres-analytical",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "setPrepSheetTemplate": {
   "contract": "fnb",
@@ -73938,7 +74319,9 @@
   "reads": [
    "whitelabel.custom_domain"
   ],
-  "writes": [],
+  "writes": [
+   "whitelabel.custom_domain"
+  ],
   "routing": null,
   "scope": "tenant",
   "perm": "TENANT_CONFIGURE",
@@ -73952,7 +74335,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "setPublishReviewPolicy": {
   "contract": "white-label",
@@ -74100,7 +74484,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "pure": "a simulation: computes what would happen and stores nothing"
  },
  "startProspectSignup": {
   "contract": "identity",
@@ -74122,7 +74507,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "pure": "the one-time challenge is held in Identity's challenge store (Redis), not a table"
  },
  "updateRole": {
   "contract": "identity",
@@ -74131,7 +74517,9 @@
   "reads": [
    "identity.role"
   ],
-  "writes": [],
+  "writes": [
+   "identity.role"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "ROLE_MANAGE",
@@ -74145,7 +74533,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "verifyProspectSignupCode": {
   "contract": "identity",
@@ -74167,7 +74556,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "pure": "returns a prospect session token held in Redis, not a table"
  },
  "addIncidentPerson": {
   "contract": "maintenance",
@@ -74176,7 +74566,9 @@
   "reads": [
    "maintenance.incident_involved_party"
   ],
-  "writes": [],
+  "writes": [
+   "maintenance.incident_involved_party"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "INCIDENT_REPORT",
@@ -74190,7 +74582,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "cancelPaymentLink": {
   "contract": "orders",
@@ -74199,7 +74592,9 @@
   "reads": [
    "orders.payment_link"
   ],
-  "writes": [],
+  "writes": [
+   "orders.payment_link"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "ORDER_CREATE",
@@ -74213,7 +74608,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "getGuestConversation": {
   "contract": "marketing-crm",
@@ -74291,7 +74687,9 @@
   "verb": "POST",
   "path": "/my/conversations/{conversationId}/messages",
   "reads": [],
-  "writes": [],
+  "writes": [
+   "marketing.conversation_message"
+  ],
   "routing": null,
   "scope": "tenant",
   "perm": null,
@@ -74305,7 +74703,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "uploadIncidentMedia": {
   "contract": "maintenance",
@@ -74314,7 +74713,9 @@
   "reads": [
    "maintenance.incident_media"
   ],
-  "writes": [],
+  "writes": [
+   "maintenance.incident_media"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "INCIDENT_REPORT",
@@ -74327,6 +74728,424 @@
   "service": "VenueOpsService",
   "stores": [
    "postgres",
+   "redis"
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
+ },
+ "getBiometricVerificationProfile": {
+  "contract": "access",
+  "verb": "GET",
+  "path": "/biometric-verification-profile",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ACCESS_POINT_CONFIGURE",
+  "offline": false,
+  "summary": "The biometric verification profile as saved",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getBleBeaconGeofence": {
+  "contract": "access",
+  "verb": "GET",
+  "path": "/ble-beacon-geofence",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ACCESS_POINT_CONFIGURE",
+  "offline": false,
+  "summary": "The BLE beacon and geofence configuration as saved",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getCustomerServiceCopilot": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/customer-service-copilot",
+  "reads": [
+   "marketing.service_copilot_config"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "AI_CONFIGURE",
+  "offline": false,
+  "summary": "The customer-service copilot configuration as saved",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getDeveloperAccount": {
+  "contract": "public-api",
+  "verb": "GET",
+  "path": "/developers/{developerId}",
+  "reads": [
+   "control.developer_account"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "DEVELOPER_VIEW",
+  "offline": false,
+  "summary": "A registered developer organisation",
+  "source": "derived",
+  "audience": [
+   "partner",
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getDeviceAssignment": {
+  "contract": "tenancy",
+  "verb": "GET",
+  "path": "/devices/{deviceId}/assignment",
+  "reads": [
+   "tenancy.device_assignment"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "DEVICE_VIEW",
+  "offline": false,
+  "summary": "Where a device is assigned",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getFacePassEnrollmentConfiguration": {
+  "contract": "access",
+  "verb": "GET",
+  "path": "/face-pass-enrollment",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ACCESS_POINT_CONFIGURE",
+  "offline": false,
+  "summary": "The FacePass enrolment configuration as saved",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getPackagePricingDefinition": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/package-pricing",
+  "reads": [
+   "catalogue.package_pricing"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRICE_VIEW",
+  "offline": false,
+  "summary": "The package pricing definition as saved",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getParkingEntitlement": {
+  "contract": "access",
+  "verb": "GET",
+  "path": "/parking-entitlements/{entitlementId}",
+  "reads": [
+   "access.parking_entitlement"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "One of the guest's parking entitlements",
+  "source": "derived",
+  "audience": [
+   "guest"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getPdfPrintablePos": {
+  "contract": "access",
+  "verb": "GET",
+  "path": "/pdf-printable-pos",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ACCESS_POINT_CONFIGURE",
+  "offline": false,
+  "summary": "The printable ticket design as saved",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getProductAttributes": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/products/{productId}/attributes",
+  "reads": [
+   "catalogue.variant_dimension"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "A product's attribute axes",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getTaxProfileJurisdiction": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/tax-profile-jurisdiction",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "The tax profile and jurisdiction configuration as saved",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getTransportDeparture": {
+  "contract": "transport",
+  "verb": "GET",
+  "path": "/transport/departures/{departureId}",
+  "reads": [
+   "catalogue.channel_capacity",
+   "transport.departure",
+   "transport.fare_matrix_cell",
+   "transport.fare_passenger_type",
+   "transport.fare_table",
+   "transport.route",
+   "transport.route_stop",
+   "transport.station",
+   "transport.timetable"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "One departure, as a guest books it",
+  "source": "derived",
+  "audience": [
+   "guest",
+   "public"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getVirtualTicketIdentity": {
+  "contract": "access",
+  "verb": "GET",
+  "path": "/virtual-ticket-identity",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ACCESS_POINT_CONFIGURE",
+  "offline": false,
+  "summary": "The virtual ticket identity configuration as saved",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listApiAnomalyRules": {
+  "contract": "public-api",
+  "verb": "GET",
+  "path": "/api-anomaly-rules",
+  "reads": [
+   "control.api_anomaly_rule"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "DEVELOPER_ADMIN",
+  "offline": false,
+  "summary": "The rules that flag abnormal API traffic",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listApiLicences": {
+  "contract": "public-api",
+  "verb": "GET",
+  "path": "/api-licensing",
+  "reads": [
+   "control.api_licence"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "DEVELOPER_ADMIN",
+  "offline": false,
+  "summary": "The API licences granted, per client",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listApiQuotas": {
+  "contract": "public-api",
+  "verb": "GET",
+  "path": "/api-quotas",
+  "reads": [
+   "control.api_limit"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "DEVELOPER_ADMIN",
+  "offline": false,
+  "summary": "The rate limits and quotas set per client",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listCombos": {
+  "contract": "fnb",
+  "verb": "GET",
+  "path": "/combos",
+  "reads": [
+   "fnb.combo",
+   "fnb.combo_slot"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "The combos defined at the venue, with their slots",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "listSubstitutionRules": {
+  "contract": "fnb",
+  "verb": "GET",
+  "path": "/substitution-rules",
+  "reads": [
+   "fnb.substitution_rule"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "What may replace what, as saved",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
    "redis"
   ]
  }
