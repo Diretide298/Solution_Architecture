@@ -76,6 +76,11 @@ CHECKS = [
     # 2 October (Chinmay, pre-apply round, CHG-SBO-001): every TICVAI Console screen acting in a tenant carries
     # the R098 tenant picker and platform-staff grant, and every Console screen is core.
     "check-console-grant",
+    # 3 October (the Block A audit's screen patterns, CHG-SPF-001..013): no form asks for a readOnly field,
+    # no list dumps a schema, the no-access state names the read's and the actions' permissions, every
+    # required entry parameter is carried, no screen wears another's route, a Block A screen is wave 1 and
+    # says so, and Chinmay's 3 October screen decisions stay made.
+    "check-screen-patterns",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.
