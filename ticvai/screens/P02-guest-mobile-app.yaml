@@ -2734,7 +2734,7 @@ screens:
   name: Wallet Overview
   module: Membership, Loyalty & Value
   requiresModule: retail
-  wave: 2
+  wave: 1
   capability: C37
   implementation:
     app: guest-app
@@ -3330,7 +3330,7 @@ screens:
   name: Ticket Transfer
   module: Ticketing
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   capability: C02
   implementation:
     app: guest-app
@@ -3482,7 +3482,7 @@ screens:
   name: Memberships
   module: Membership, Loyalty & Value
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   capability: C03
   implementation:
     app: guest-app
@@ -3798,7 +3798,7 @@ screens:
   name: My Reservations
   module: Ticketing
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   capability: C02
   implementation:
     app: guest-app
@@ -3949,7 +3949,7 @@ screens:
   name: Reservation Details
   module: Ticketing
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   capability: C02
   implementation:
     app: guest-app
@@ -4065,7 +4065,7 @@ screens:
   name: Add to Calendar / Reminders
   module: Account & Self-Service
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   capability: C02
   implementation:
     app: guest-app
@@ -4239,7 +4239,7 @@ screens:
   name: Order History
   module: Account & Self-Service
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   capability: C21
   implementation:
     app: guest-app
@@ -4477,7 +4477,7 @@ screens:
   name: Saved Items / Wishlist
   module: Account & Self-Service
   requiresModule: marketing
-  wave: 3
+  wave: 1
   capability: C58
   implementation:
     app: guest-app
@@ -4598,7 +4598,7 @@ screens:
   name: Interactive Map
   module: In-venue Services
   requiresModule: seating
-  wave: 2
+  wave: 1
   capability: C39
   implementation:
     app: guest-app
@@ -4795,7 +4795,7 @@ screens:
   name: Attraction Wait Times
   module: In-venue Services
   requiresModule: queue
-  wave: 2
+  wave: 1
   capability: C82
   implementation:
     app: guest-app
@@ -4834,8 +4834,8 @@ screens:
         of them. The edge carries nothing: itemId only pre-selects (deep link or optional); GST-059 opens
         on getWaitTimes, and planId has no source on GST-059 yet (a gap in GST-059, not in this edge)'
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement. Pulled to Wave 2 (CF-101)
-    with the queue platform F21 runs on.
+    from the screen name and its operations on 17 August, not from a requirement. Pulled forward (CF-101)
+    with the queue platform F21 runs on; in Block A since the 1 October plan.
 
 
     **Mobile v4 (decided 29 September, MOB-1).** The **Waits** view of GST-038 At the Venue: **one implementation
@@ -4896,7 +4896,7 @@ screens:
   name: Virtual Queue
   module: In-venue Services
   requiresModule: queue
-  wave: 3
+  wave: 1
   capability: C82
   implementation:
     app: guest-app
@@ -5075,7 +5075,7 @@ screens:
   name: F&B – Browse & Order
   module: In-venue Services
   requiresModule: fnb
-  wave: 2
+  wave: 1
   capability: C05
   implementation:
     app: guest-app
@@ -5313,7 +5313,7 @@ screens:
   name: F&B – Order Tracking
   module: In-venue Services
   requiresModule: fnb
-  wave: 2
+  wave: 1
   capability: C05
   implementation:
     app: guest-app
@@ -5440,7 +5440,7 @@ screens:
   name: Retail / Merchandise
   module: Retail
   requiresModule: retail
-  wave: 2
+  wave: 1
   capability: C08
   implementation:
     app: guest-app
@@ -5659,7 +5659,7 @@ screens:
   name: Parking – Reserve & Pay
   module: In-venue Services
   requiresModule: access
-  wave: 3
+  wave: 1
   capability: C23
   implementation:
     app: guest-app
@@ -5861,7 +5861,7 @@ screens:
   name: Parking – Reservation Confirmed
   module: In-venue Services
   requiresModule: access
-  wave: 3
+  wave: 1
   capability: C23
   implementation:
     app: guest-app
@@ -5987,7 +5987,7 @@ screens:
   name: Venue Info & Services
   module: In-venue Services
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C17
   implementation:
     app: guest-app
@@ -6119,7 +6119,7 @@ screens:
   name: In-Venue Notifications
   module: Engagement & Support
   requiresModule: fnb
-  wave: 2
+  wave: 1
   capability: C61
   implementation:
     app: guest-app
@@ -6231,7 +6231,7 @@ screens:
   name: AI Concierge – Home
   module: Engagement & Support
   requiresModule: ai
-  wave: 2
+  wave: 1
   capability: AI-02
   implementation:
     app: guest-app
@@ -6425,7 +6425,7 @@ screens:
   name: AI Concierge – Chat
   module: Engagement & Support
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   capability: AI-02
   implementation:
     app: guest-app
@@ -6696,7 +6696,7 @@ screens:
   name: AI Concierge – Contextual Help
   module: Engagement & Support
   requiresModule: ai
-  wave: 2
+  wave: 1
   capability: AI-02
   implementation:
     app: guest-app
@@ -6822,7 +6822,7 @@ screens:
   name: Lost & Found
   module: Support
   requiresModule: fnb
-  wave: 2
+  wave: 1
   capability: C18
   implementation:
     app: guest-app
@@ -7020,7 +7020,7 @@ screens:
   name: Feedback & Ratings
   module: Engagement & Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   capability: C62
   implementation:
     app: guest-app
@@ -7174,7 +7174,7 @@ screens:
   name: Loyalty & Rewards
   module: Membership, Loyalty & Value
   requiresModule: marketing
-  wave: 2
+  wave: 1
   capability: C64
   implementation:
     app: guest-app
@@ -7412,7 +7412,7 @@ screens:
   name: Offers & Promotions
   module: Promotions
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   capability: C86
   implementation:
     app: guest-app
@@ -7562,7 +7562,7 @@ screens:
   name: At the Venue
   module: In-venue Services
   requiresModule: queue
-  wave: 3
+  wave: 1
   capability: C105
   implementation:
     app: guest-app
@@ -7924,7 +7924,7 @@ screens:
   name: Help & Support
   module: Engagement & Support
   requiresModule: marketing
-  wave: 2
+  wave: 1
   capability: C17
   implementation:
     app: guest-app
@@ -8890,7 +8890,7 @@ screens:
   name: Multi-Currency & Pricing
   module: Ticketing
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   capability: C107
   implementation:
     app: guest-app
@@ -9050,7 +9050,7 @@ screens:
   name: Ticket Delivery & Sharing
   module: Account & Self-Service
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   capability: C02
   implementation:
     app: guest-app
@@ -9378,7 +9378,7 @@ screens:
   name: Upsell / Cross-Sell
   module: Booking & Selection
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   capability: C88
   implementation:
     app: guest-app
@@ -9512,7 +9512,7 @@ screens:
   name: Interactive Seat Selection
   module: Booking & Selection
   requiresModule: seating
-  wave: 2
+  wave: 1
   capability: C53
   implementation:
     app: guest-app
@@ -9733,7 +9733,7 @@ screens:
   name: Resource Booking – Cabana
   module: Booking & Selection
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   capability: C78
   implementation:
     app: guest-app
@@ -9934,12 +9934,12 @@ screens:
       trigger: Home tab
       provenance: decided 29 September 2026, MOB-1
   notes: 'Minuted 10 Aug §4.9. Benchmarked against Skidata. Tied to a ticket purchase and saved as a personal
-    visit profile. **Out of the first release** (decided 28 September, audit R187): the itinerary planner
-    is deferred and this screen is `wave: 4` with a `deferred` block. Kept, not deleted, for the release
-    that builds it.
+    visit profile. **Deferred on 28 September (audit R187), and brought back the next day**: the itinerary
+    planner was put in `wave: 4` with a `deferred` block and kept rather than deleted; the 29 September
+    re-plan below superseded that, and the screen is in Block A, wave 1 (3 October 2026, CHG-SPF-006).
 
 
-    **Rev 3 (decided 29 September).** Had stayed in wave 4 (GAP-C3); superseded the same day by the re-plan
+    **Rev 3 (decided 29 September).** Had stayed deferred (GAP-C3); superseded the same day by the re-plan
     below.
 
 
@@ -9962,9 +9962,8 @@ screens:
     `retailTags`, `VisitPlan.unmatchedPreferences`.
 
 
-    **In the first release (Block A, wave 1), stated plainly (CHG-SGU-021).** The R187 note that put the
-    planner out of the first release (wave 4) was superseded by rev 3 (29 September); the Plan tab is
-    in the Block A slice.'
+    **In the first release (Block A, wave 1), stated plainly (CHG-SGU-021).** The R187 note that deferred
+    the planner was superseded by rev 3 (29 September); the Plan tab is in the Block A slice.'
   density: comfortable
   pattern: multiStepForm
   patternReason: The v4 prototype asks six questions one at a time (who, heights, days, pace, likes, food)
@@ -10142,14 +10141,15 @@ screens:
     surface.** `check-screens` refused it and was right: **a guest does not record an outcome — the platform
     observes what they did.** A guest app that self-reports whether it took the advice is a training label
     the guest could forge, and the observation belongs server-side where the plan and the visit can be
-    compared. **Out of the first release** (decided 28 September, audit R187): the itinerary planner is
-    deferred and this screen is `wave: 4` with a `deferred` block. Kept, not deleted, for the release
-    that builds it. **Itinerary suggestion removed 28 September** (decided 28 September, audit R209):
-    the planner is deferred (R187) and `requestSuggestion` refuses a guest anything but prepPlan, upsell
-    and waitTime, so this screen no longer asks for a day plan.
+    compared. **Deferred on 28 September (audit R187), and brought back the next day**: the itinerary
+    planner was put in `wave: 4` with a `deferred` block and kept rather than deleted; the 29 September
+    re-plan below superseded that, and the screen is in Block A, wave 1 (3 October 2026, CHG-SPF-006).
+    **Itinerary suggestion removed 28 September** (decided 28 September, audit R209): the planner was
+    deferred (R187) and `requestSuggestion` refuses a guest anything but prepPlan, upsell and waitTime,
+    so this screen no longer asks for a day plan.
 
 
-    **Rev 3 (decided 29 September).** Had stayed in wave 4 (GAP-C3); superseded the same day by the re-plan
+    **Rev 3 (decided 29 September).** Had stayed deferred (GAP-C3); superseded the same day by the re-plan
     below.
 
 
@@ -10302,12 +10302,13 @@ screens:
       trigger: Home tab
       provenance: decided 29 September 2026, MOB-1
   notes: 'Minuted 10 Aug §4.9. **Group sharing agreed** — an in-app QR a friend scans to join the itinerary
-    (Chinmay raised, Qossai confirmed). **Out of the first release** (decided 28 September, audit R187):
-    the itinerary planner is deferred and this screen is `wave: 4` with a `deferred` block. Kept, not
-    deleted, for the release that builds it.
+    (Chinmay raised, Qossai confirmed). **Deferred on 28 September (audit R187), and brought back the
+    next day**: the itinerary planner was put in `wave: 4` with a `deferred` block and kept rather than
+    deleted; the 29 September re-plan below superseded that, and the screen is in Block A, wave 1 (3 October
+    2026, CHG-SPF-006).
 
 
-    **Rev 3 (decided 29 September).** Had stayed in wave 4 (GAP-C3); superseded the same day by the re-plan
+    **Rev 3 (decided 29 September).** Had stayed deferred (GAP-C3); superseded the same day by the re-plan
     below.
 
 
@@ -10539,22 +10540,24 @@ screens:
     - to: GST-001
       trigger: Home tab
       provenance: decided 29 September 2026, MOB-1
-  notes: 'Minuted 10 Aug §4.9. **The AI half is Wave 2** — the manual planner must work without it (CF-41).
-    **Guest concierge confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.**
+  notes: 'Minuted 10 Aug §4.9. **The AI half came second in the 10 August minutes** — the manual planner
+    must work without it (CF-41); since the 29 September re-plan (MOB-6) both are in Block A. **Guest
+    concierge confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.**
     Still degrades to the manual planner rather than to an error. ** wired 24 August.** The board drew
     four bespoke AI endpoints for itinerary planning; **one operation with a kind answers all of them**
     (ADR-0028), and recording the outcome is what lets a model replace the heuristic later. **`recordSuggestionOutcome`
     removed from the guest surface.** `check-screens` refused it and was right: **a guest does not record
     an outcome — the platform observes what they did.** A guest app that self-reports whether it took
     the advice is a training label the guest could forge, and the observation belongs server-side where
-    the plan and the visit can be compared. **Out of the first release** (decided 28 September, audit
-    R187): the itinerary planner is deferred and this screen is `wave: 4` with a `deferred` block. Kept,
-    not deleted, for the release that builds it. **Itinerary suggestion removed 28 September** (decided
-    28 September, audit R209): the planner is deferred (R187) and `requestSuggestion` refuses a guest
-    anything but prepPlan, upsell and waitTime, so this screen no longer asks for a day plan.
+    the plan and the visit can be compared. **Deferred on 28 September (audit R187), and brought back
+    the next day**: the itinerary planner was put in `wave: 4` with a `deferred` block and kept rather
+    than deleted; the 29 September re-plan below superseded that, and the screen is in Block A, wave 1
+    (3 October 2026, CHG-SPF-006). **Itinerary suggestion removed 28 September** (decided 28 September,
+    audit R209): the planner was deferred (R187) and `requestSuggestion` refuses a guest anything but
+    prepPlan, upsell and waitTime, so this screen no longer asks for a day plan.
 
 
-    **Rev 3 (decided 29 September).** Had stayed in wave 4 (GAP-C3); superseded the same day by the re-plan
+    **Rev 3 (decided 29 September).** Had stayed deferred (GAP-C3); superseded the same day by the re-plan
     below.
 
 
@@ -10907,7 +10910,7 @@ screens:
   name: Bundle Package
   module: Booking & Selection
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   capability: C87
   implementation:
     app: guest-app
@@ -11061,7 +11064,7 @@ screens:
   name: Accessibility Information
   module: Discovery & Browse
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C17
   implementation:
     app: guest-app
@@ -11173,7 +11176,7 @@ screens:
   name: Resource Availability (Cabana)
   module: Booking & Selection
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   capability: C78
   implementation:
     app: guest-app
@@ -11343,15 +11346,16 @@ screens:
     heuristic later. **`recordSuggestionOutcome` removed from the guest surface.** `check-screens` refused
     it and was right: **a guest does not record an outcome — the platform observes what they did.** A
     guest app that self-reports whether it took the advice is a training label the guest could forge,
-    and the observation belongs server-side where the plan and the visit can be compared. **Out of the
-    first release** (decided 28 September, audit R187): the itinerary planner is deferred and this screen
-    is `wave: 4` with a `deferred` block. Kept, not deleted, for the release that builds it. **Itinerary
-    suggestion removed 28 September** (decided 28 September, audit R209): the planner is deferred (R187)
-    and `requestSuggestion` refuses a guest anything but prepPlan, upsell and waitTime, so this screen
-    no longer asks for a day plan.
+    and the observation belongs server-side where the plan and the visit can be compared. **Deferred on
+    28 September (audit R187), and brought back the next day**: the itinerary planner was put in `wave:
+    4` with a `deferred` block and kept rather than deleted; the 29 September re-plan below superseded
+    that, and the screen is in Block A, wave 1 (3 October 2026, CHG-SPF-006). **Itinerary suggestion removed
+    28 September** (decided 28 September, audit R209): the planner was deferred (R187) and `requestSuggestion`
+    refuses a guest anything but prepPlan, upsell and waitTime, so this screen no longer asks for a day
+    plan.
 
 
-    **Rev 3 (decided 29 September).** Had stayed in wave 4 (GAP-C3); superseded the same day by the re-plan
+    **Rev 3 (decided 29 September).** Had stayed deferred (GAP-C3); superseded the same day by the re-plan
     below.
 
 
@@ -11467,7 +11471,7 @@ screens:
   name: Menu Item Detail
   module: In-Venue Experience
   requiresModule: fnb
-  wave: 2
+  wave: 1
   capability: C05
   implementation:
     app: guest-app
@@ -11607,7 +11611,7 @@ screens:
   name: Shop & Drop Collection
   module: In-Venue Experience
   requiresModule: retail
-  wave: 2
+  wave: 1
   capability: C21
   implementation:
     app: guest-app
@@ -11802,7 +11806,7 @@ screens:
   name: Newsletter & Preferences
   module: Marketing
   requiresModule: marketing
-  wave: 3
+  wave: 1
   capability: C00
   implementation:
     app: guest-app
@@ -11948,7 +11952,7 @@ screens:
   name: Privacy & My Data
   module: Account & Self-Service
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: read-write
   implementation:
     app: guest-app
@@ -12128,7 +12132,7 @@ screens:
   name: Refunds & Resale
   module: Account & Self-Service
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: read-write
   implementation:
     app: guest-app
@@ -12256,7 +12260,7 @@ screens:
   name: Help & My Cases
   module: Engagement & Support
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: read-write
   implementation:
     app: guest-app
@@ -12420,7 +12424,7 @@ screens:
   name: Face Pass
   module: Account & Self-Service
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: read-write
   implementation:
     app: guest-app
@@ -12604,7 +12608,7 @@ screens:
   name: Reserve a Table
   module: In-venue Services
   requiresModule: fnb
-  wave: 2
+  wave: 1
   capability: read-write
   implementation:
     app: guest-app
@@ -12850,7 +12854,7 @@ screens:
   name: Payment Methods
   module: Account & Self-Service
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: read-write
   implementation:
     app: guest-app
@@ -13060,7 +13064,7 @@ screens:
   name: Share & Group Booking
   module: Booking & Selection
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: read-write
   implementation:
     app: guest-app
@@ -13290,7 +13294,7 @@ screens:
   name: Security & Sign-in
   module: Account & Self-Service
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: read-write
   implementation:
     app: guest-app
@@ -13534,7 +13538,7 @@ screens:
   name: Map Booking — Cabanas & Spots
   module: Booking & Selection
   requiresModule: resources
-  wave: 3
+  wave: 1
   implementation:
     app: guest-app
     route: /general/map-booking
@@ -13785,7 +13789,7 @@ screens:
   name: Book a Space by the Hour
   module: Booking & Selection
   requiresModule: resources
-  wave: 3
+  wave: 1
   implementation:
     app: guest-app
     route: /general/space-by-the-hour
@@ -13946,7 +13950,7 @@ screens:
   name: Intercity Trip — Route & Schedule
   module: Transport
   requiresModule: transport
-  wave: 3
+  wave: 1
   implementation:
     app: guest-app
     route: /transport/route-and-schedule
@@ -14134,7 +14138,7 @@ screens:
   name: Intercity Trip — Route & Passengers
   module: Transport
   requiresModule: transport
-  wave: 3
+  wave: 1
   implementation:
     app: guest-app
     route: /transport/route-and-passengers
@@ -14314,7 +14318,7 @@ screens:
   name: Intercity Trip — Multi-trip Passes
   module: Transport
   requiresModule: transport
-  wave: 3
+  wave: 1
   implementation:
     app: guest-app
     route: /transport/multi-trip-passes
@@ -14446,7 +14450,7 @@ screens:
   name: Intercity Trip — Favourite Routes
   module: Transport
   requiresModule: transport
-  wave: 3
+  wave: 1
   implementation:
     app: guest-app
     route: /transport/favourite-routes

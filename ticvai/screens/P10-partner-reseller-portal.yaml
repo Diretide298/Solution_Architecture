@@ -58,7 +58,7 @@ screens:
   name: Partner Login / MFA
   module: Access & Account
   requiresModule: partner
-  wave: 2
+  wave: 1
   capability: C35
   implementation:
     app: partner-web

@@ -65,7 +65,7 @@ screens:
   name: Venue Management Sign In
   module: Access & Availability
   requiresModule: core
-  wave: 3
+  wave: 1
   capability: C35
   implementation:
     app: venue-support-web
@@ -381,7 +381,7 @@ screens:
   name: Agent Dashboard
   module: Overview
   requiresModule: marketing
-  wave: 3
+  wave: 1
   capability: C32
   implementation:
     app: venue-support-web
@@ -806,7 +806,7 @@ screens:
   name: Conversation Queue
   module: Conversations
   requiresModule: marketing
-  wave: 2
+  wave: 1
   capability: C32
   implementation:
     app: venue-support-web
@@ -840,11 +840,11 @@ screens:
       carries:
       - caseId
       - conversationId
-  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+  notes: 'States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement. Pulled to Wave 2 (CF-101).
-    **The guest concierge is Phase 1 and a handover needs somewhere to land** — the queue and the workspace
-    move; the rest of the console stays Wave 3.
+    from the screen name and its operations on 17 August, not from a requirement. Pulled forward (CF-101),
+    and in Block A since the 1 October plan: **the guest concierge is Phase 1 and a handover needs somewhere
+    to land** — the queue and the workspace move; the rest of the console comes later.'
   density: compact
   pattern: listDetail
   patternReason: '`listCases` reads the population and `getCase` reads one of them — list, select, act'
@@ -988,7 +988,7 @@ screens:
   name: Live Chat Workspace
   module: Conversations
   requiresModule: marketing
-  wave: 2
+  wave: 1
   capability: C32
   implementation:
     app: venue-support-web
@@ -1020,9 +1020,9 @@ screens:
         edge into it carries them
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement. Pulled to Wave 2 (CF-101)
-    with SUP-004. An agent needs a queue and a place to answer from; canned responses and SLA reporting
-    can wait.
+    from the screen name and its operations on 17 August, not from a requirement. Pulled forward (CF-101)
+    with SUP-004, into Block A. An agent needs a queue and a place to answer from; canned responses and
+    SLA reporting can wait.
   density: compact
   pattern: listDetail
   patternReason: '`listCases` reads the population and `getCase` reads one of them — list, select, act'

@@ -71,7 +71,7 @@ screens:
   name: Kitchen Operations Command Center
   module: Kitchen
   requiresModule: fnb
-  wave: 2
+  wave: 1
   permission: ORDER_VIEW
   implementation:
     app: kitchen-display
@@ -250,7 +250,7 @@ screens:
   name: Kitchen Display System (KDS)
   module: Kitchen
   requiresModule: fnb
-  wave: 2
+  wave: 1
   permission: ORDER_VIEW
   implementation:
     app: kitchen-display
@@ -561,7 +561,7 @@ screens:
   name: Order Firing & Course Management
   module: Kitchen
   requiresModule: fnb
-  wave: 2
+  wave: 1
   permission: ORDER_MODIFY
   implementation:
     app: kitchen-display
@@ -804,7 +804,7 @@ screens:
   name: Active Order Management & Fulfilment Journey
   module: Kitchen
   requiresModule: fnb
-  wave: 2
+  wave: 1
   permission: ORDER_VIEW
   implementation:
     app: kitchen-display
@@ -963,7 +963,7 @@ screens:
   name: Kitchen Station Workload & Dynamic Routing
   module: Kitchen
   requiresModule: fnb
-  wave: 2
+  wave: 1
   permission: PRODUCT_VIEW
   implementation:
     app: kitchen-display
@@ -1141,7 +1141,7 @@ screens:
   name: Expeditor & Order Assembly
   module: Kitchen
   requiresModule: fnb
-  wave: 2
+  wave: 1
   permission: ORDER_VIEW
   implementation:
     app: kitchen-display
@@ -1417,7 +1417,7 @@ screens:
   name: Guest Collection, Buzzer & Digital Notification
   module: Kitchen
   requiresModule: fnb
-  wave: 2
+  wave: 1
   permission: ORDER_VIEW
   implementation:
     app: kitchen-display
@@ -1577,7 +1577,7 @@ screens:
   name: Exceptions, Re-Fire & Unavailable Items
   module: Kitchen
   requiresModule: fnb
-  wave: 2
+  wave: 1
   permission: PRODUCT_VIEW
   implementation:
     app: kitchen-display
@@ -1826,7 +1826,7 @@ screens:
   name: SLA, Priority & Service Rules
   module: Kitchen
   requiresModule: fnb
-  wave: 2
+  wave: 1
   permission: ORDER_MODIFY
   implementation:
     app: kitchen-display
@@ -1979,7 +1979,7 @@ screens:
   name: Kitchen Performance, AI & Operational Optimization
   module: Kitchen
   requiresModule: fnb
-  wave: 2
+  wave: 1
   permission: REPORT_VIEW_VENUE
   implementation:
     app: kitchen-display

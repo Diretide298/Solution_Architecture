@@ -4108,7 +4108,7 @@ screens:
   name: Drag-and-Drop Dashboard Canvas
   module: Analytics
   requiresModule: analytics
-  wave: 3
+  wave: 1
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '2'
@@ -4466,7 +4466,7 @@ screens:
   name: KPI Builder
   module: Analytics
   requiresModule: analytics
-  wave: 3
+  wave: 1
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '2'
@@ -9659,7 +9659,7 @@ screens:
   name: Semantic Model & Business Data Catalogue
   module: Analytics
   requiresModule: analytics
-  wave: 3
+  wave: 1
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '10'

@@ -1413,8 +1413,8 @@ screens:
       back: false
       carries:
       - queueId
-  notes: 'Pulled to Wave 1 on 17 August (CF-101): F09 closes a cancelled event’s queue, and a Wave 1
-    flow cannot step through a Wave 2 screen. **Cross-platform navigation removed 24 August**: EMP-032.
+  notes: 'Pulled to Wave 1 on 17 August (CF-101): F09 closes a cancelled event’s queue, and a flow cannot
+    step through a screen that is built after it. **Cross-platform navigation removed 24 August**: EMP-032.
     **A till does not navigate to a back office and a guest app does not navigate to either** — those
     are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending
     there is a link.'
@@ -1808,7 +1808,7 @@ screens:
   name: Parking Configuration
   module: Access & Venue
   requiresModule: access
-  wave: 2
+  wave: 1
   capability: C39
   implementation:
     app: venue-management-web
@@ -3124,7 +3124,7 @@ screens:
   name: Promotions & Coupons
   module: Sell
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -3805,7 +3805,7 @@ screens:
   name: Packages & Bundles
   module: Sell
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -4198,7 +4198,7 @@ screens:
   name: Membership Products
   module: Sell
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -4575,7 +4575,7 @@ screens:
   name: Channel & Distribution
   module: Sell
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -9475,7 +9475,7 @@ screens:
   name: Report Builder
   module: Orders & Money
   requiresModule: analytics
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -12926,7 +12926,7 @@ screens:
   name: F&B Outlets
   module: Venue Operations
   requiresModule: fnb
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -14552,7 +14552,7 @@ screens:
   name: Retail Products
   module: Orders & Money
   requiresModule: retail
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -16217,7 +16217,7 @@ screens:
   name: Rota & Scheduling
   module: People & Access Rights
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -19617,7 +19617,7 @@ screens:
   name: Asset Register
   module: Access & Venue
   requiresModule: maintenance
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -20978,7 +20978,7 @@ screens:
     - BO-043
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing. Pulled to Wave 1 (CF-101). **F16 says it itself** — no chart of accounts
-    blocks the first sale, so it cannot be Wave 2 while venue provisioning is Wave 1.
+    blocks the first sale, so it cannot be built after venue provisioning.
   density: compact
   pattern: listDetail
   patternReason: '`listAccounts` reads the population and `getAccount` reads one of them — list, select,
@@ -22902,7 +22902,7 @@ screens:
   name: Inventory Items
   module: Stock & Supply
   requiresModule: inventory
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -25189,7 +25189,7 @@ screens:
   name: Venue Maps
   module: Access & Venue
   requiresModule: seating
-  wave: 2
+  wave: 1
   implementation:
     app: venue-management-web
     route: /venue-mapping/venue-maps
@@ -25331,7 +25331,7 @@ screens:
   name: Map Import & Labelling
   module: Access & Venue
   requiresModule: seating
-  wave: 2
+  wave: 1
   implementation:
     app: venue-management-web
     route: /venue-mapping/map-import
@@ -25558,7 +25558,7 @@ screens:
   name: Map Editor & Publish
   module: Access & Venue
   requiresModule: seating
-  wave: 2
+  wave: 1
   implementation:
     app: venue-management-web
     route: /venue-mapping/map-editor
@@ -26088,7 +26088,7 @@ screens:
   name: Resource Calendar
   module: Access & Venue
   requiresModule: resources
-  wave: 2
+  wave: 1
   implementation:
     app: venue-management-web
     route: /resources/calendar
@@ -26213,7 +26213,7 @@ screens:
   name: Check Out & Check In
   module: Access & Venue
   requiresModule: resources
-  wave: 2
+  wave: 1
   implementation:
     app: venue-management-web
     route: /resources/check-out
@@ -29605,7 +29605,7 @@ screens:
   name: Menu Builder & POS Layout Designer
   module: Sell
   requiresModule: fnb
-  wave: 2
+  wave: 1
   implementation:
     app: venue-management-web
     route: /sell/menu-builder-pos-layout-designer
@@ -29893,7 +29893,7 @@ screens:
   name: Ingredient Substitution, Allergen & Nutrition
   module: Sell
   requiresModule: fnb
-  wave: 2
+  wave: 1
   implementation:
     app: venue-management-web
     route: /sell/ingredient-substitution-allergen-nutrition
@@ -30134,7 +30134,7 @@ screens:
   name: Production Planning & Production Sheets
   module: Sell
   requiresModule: fnb
-  wave: 2
+  wave: 1
   implementation:
     app: venue-management-web
     route: /sell/production-planning-production-sheets
@@ -31044,7 +31044,7 @@ screens:
   name: Product Import, Governance & AI Configuration Assistant
   module: Sell
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   implementation:
     app: venue-management-web
     route: /sell/product-import-governance-ai-configuration-assistant
@@ -34342,7 +34342,7 @@ screens:
   name: F&B Global Settings & Controls
   module: Food & Beverage
   requiresModule: fnb
-  wave: 2
+  wave: 1
   implementation:
     app: venue-management-web
     route: /food-beverage/f-b-global-settings-controls
@@ -36481,7 +36481,7 @@ screens:
   name: Access Location Grouping
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   source:
     pack: Access Control Module_Reference.pdf
     board: '1'
@@ -37121,7 +37121,7 @@ screens:
   name: Visual Access Rule Builder
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   source:
     pack: Access Control Module_Reference.pdf
     board: '2'
@@ -37843,7 +37843,7 @@ screens:
   name: Guest, Companion & Eligibility Rules
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   source:
     pack: Access Control Module_Reference.pdf
     board: '2'
@@ -38516,7 +38516,7 @@ screens:
   name: Credential Activation & Display Rules
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   source:
     pack: Access Control Module_Reference.pdf
     board: '3'
@@ -38639,7 +38639,7 @@ screens:
   name: Device Binding & Session Security
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   source:
     pack: Access Control Module_Reference.pdf
     board: '3'
@@ -38814,7 +38814,7 @@ screens:
   name: BLE Beacon & Geofence Configuration
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   source:
     pack: Access Control Module_Reference.pdf
     board: '3'
@@ -40771,7 +40771,7 @@ screens:
   name: Biometric Verification Profile Builder
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   source:
     pack: Access Control Module_Reference.pdf
     board: '5'
@@ -40870,7 +40870,7 @@ screens:
   name: Face Pass Enrollment Configuration
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   source:
     pack: Access Control Module_Reference.pdf
     board: '5'
@@ -41136,7 +41136,7 @@ screens:
   name: Face Tag Temporary Enrollment
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   source:
     pack: Access Control Module_Reference.pdf
     board: '5'
@@ -41264,7 +41264,7 @@ screens:
   name: Face Matching & Verification Thresholds
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   source:
     pack: Access Control Module_Reference.pdf
     board: '5'
@@ -42949,7 +42949,7 @@ screens:
   name: Gate Modes, Free Spin & Emergency Controls
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   source:
     pack: Access Control Module_Reference.pdf
     board: '6'
@@ -46508,7 +46508,7 @@ screens:
   name: Live Gate Mode & Lane Control
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   source:
     pack: Access Control Module_Reference.pdf
     board: '9'
@@ -60619,7 +60619,7 @@ screens:
   name: Virtual Ticket Identity & Master Record Configuration
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   source:
     pack: Ticket_Media___Credential_Management_Reference.pdf
     board: '1'
@@ -62072,7 +62072,7 @@ screens:
   name: PDF, Printable & POS Ticket Designer
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   source:
     pack: Ticket_Media___Credential_Management_Reference.pdf
     board: '2'
@@ -67991,7 +67991,7 @@ screens:
   name: Game & Ride Directory
   module: Games & Rides
   requiresModule: games
-  wave: 3
+  wave: 1
   source:
     pack: Game_and_Ride_Module.pdf
     board: '1'
@@ -91763,7 +91763,7 @@ screens:
   name: Accreditation Form Builder
   module: Access & Venue
   requiresModule: accreditation
-  wave: 3
+  wave: 1
   source:
     pack: ACCREDITATION.pdf
     board: '1'
@@ -99539,7 +99539,7 @@ screens:
   name: Event Duplication & Clone Configuration
   module: Sell
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   source:
     pack: Event_Management_Configuration_Backend_Structure_v1.0.pdf
     board: '1'
@@ -101674,7 +101674,7 @@ screens:
   name: Event Lifecycle & Change Command Center
   module: Sell
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   source:
     pack: Event_Management_Configuration_Backend_Structure_v1.0.pdf
     board: '7'
@@ -101774,7 +101774,7 @@ screens:
     purpose: Lifecycle at a glance
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id027
+    invalidates:
     - listEvents
   - operationId: getEvent
     contract: catalogue
@@ -101877,7 +101877,8 @@ screens:
     purpose: Move through the lifecycle
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id027
+    invalidates:
+    - listEvents
   - operationId: getEvent
     contract: catalogue
     purpose: Read an event
@@ -106079,7 +106080,7 @@ screens:
   name: Dynamic Segment Builder
   module: Engagement & Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '3'
@@ -107285,7 +107286,7 @@ screens:
   name: Campaign Builder
   module: Engagement & Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '4'
@@ -107943,7 +107944,7 @@ screens:
   name: A/B & AI Optimization
   module: Engagement & Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '4'
@@ -109278,7 +109279,7 @@ screens:
   name: Template Library
   module: Engagement & Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '6'
@@ -110561,7 +110562,7 @@ screens:
   name: Intent & Knowledge Management
   module: Engagement & Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '7'
@@ -113406,7 +113407,7 @@ screens:
   name: Challenge Builder
   module: Engagement & Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '10'
@@ -113576,7 +113577,7 @@ screens:
   name: Achievement & Badge Engine
   module: Engagement & Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '10'
@@ -113694,7 +113695,7 @@ screens:
   name: Points & Activity Rules
   module: Engagement & Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '10'
@@ -113807,7 +113808,7 @@ screens:
   name: Milestones & Reward Rules
   module: Engagement & Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '10'
@@ -116982,7 +116983,7 @@ screens:
   name: Resource Creation & Profile
   module: Rentals
   requiresModule: resources
-  wave: 3
+  wave: 1
   source:
     pack: Resource_Management_Configuration_Reference.pdf
     board: '1'
@@ -117496,7 +117497,7 @@ screens:
   name: Resource Package & Bundle Configuration
   module: Rentals
   requiresModule: resources
-  wave: 3
+  wave: 1
   source:
     pack: Resource_Management_Configuration_Reference.pdf
     board: '1'
@@ -118244,7 +118245,7 @@ screens:
   name: Resource Availability Schedule Configuration
   module: Rentals
   requiresModule: resources
-  wave: 3
+  wave: 1
   source:
     pack: Resource_Management_Configuration_Reference.pdf
     board: '2'
@@ -118372,7 +118373,7 @@ screens:
     purpose: Operating hours and working pattern
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id032
+    invalidates:
     - getResourceSchedule
     - getResourceAvailability
   wireframe:
@@ -118515,7 +118516,9 @@ screens:
     purpose: Slot length and booking limits
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id032
+    invalidates:
+    - getResourceSchedule
+    - getResourceAvailability
   - operationId: getResourceSchedule
     contract: resources
     purpose: The current slots
@@ -118826,7 +118829,7 @@ screens:
   name: Operational Time & Resource Blocking
   module: Rentals
   requiresModule: resources
-  wave: 3
+  wave: 1
   source:
     pack: Resource_Management_Configuration_Reference.pdf
     board: '2'
@@ -119688,7 +119691,7 @@ screens:
   name: Qualification & Assignment Rule Engine
   module: Rentals
   requiresModule: resources
-  wave: 3
+  wave: 1
   source:
     pack: Resource_Management_Configuration_Reference.pdf
     board: '3'
@@ -124139,7 +124142,7 @@ screens:
   name: Inspection, Condition & Compliance Management
   module: Rentals
   requiresModule: resources
-  wave: 3
+  wave: 1
   source:
     pack: Resource_Management_Configuration_Reference.pdf
     board: '6'
@@ -125301,7 +125304,7 @@ screens:
   name: AI Event Resource Forecasting
   module: Rentals
   requiresModule: resources
-  wave: 3
+  wave: 1
   source:
     pack: Resource_Management_Configuration_Reference.pdf
     board: '7'
@@ -126248,7 +126251,7 @@ screens:
   name: AI Staffing Requirement Forecast
   module: Rentals
   requiresModule: resources
-  wave: 3
+  wave: 1
   source:
     pack: Resource_Management_Configuration_Reference.pdf
     board: '8'
@@ -162251,7 +162254,7 @@ screens:
   name: Tax Profile & Jurisdiction Configuration
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   source:
     pack: Pricing___Revenue_Management_Reference.pdf
     board: '3'
@@ -163436,7 +163439,7 @@ screens:
   name: Calculation Validation, Reconciliation & Service Interface
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   source:
     pack: Pricing___Revenue_Management_Reference.pdf
     board: '3'
@@ -175755,7 +175758,7 @@ screens:
   name: Code Distribution & Assignment Manager
   module: Commercial
   requiresModule: marketing
-  wave: 3
+  wave: 1
   source:
     pack: Promotions___Bundles_Management_Reference.pdf
     board: '3'
@@ -185197,7 +185200,7 @@ screens:
   name: Roles, Authority, Delegation & Approval Limits
   module: Platform
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Rules__Workflow__Approval___Automation_Engine_Reference.pdf
     board: '1'
@@ -197005,7 +197008,7 @@ screens:
   name: Gateway, PSP & Acquirer Directory
   module: Commercial
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Payment_Payment_Orchestration.pdf
     board: '2'
@@ -201005,7 +201008,7 @@ screens:
   name: B2B Invoice, On-Account & Payment Terms Configuration
   module: Commercial
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Payment_Payment_Orchestration.pdf
     board: '5'
@@ -215756,7 +215759,7 @@ screens:
   name: Authentication & MFA Policy Manager
   module: Platform
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Approval_Workflows_and_Governance_Reference.pdf
     board: '6'
@@ -217059,7 +217062,7 @@ screens:
   name: External Workflow System Integration
   module: Platform
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Approval_Workflows_and_Governance_Reference.pdf
     board: '7'

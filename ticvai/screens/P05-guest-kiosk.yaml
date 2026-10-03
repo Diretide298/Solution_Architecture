@@ -1415,7 +1415,7 @@ screens:
   name: Assistant
   module: AI
   requiresModule: ai
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: guest-app
@@ -1444,12 +1444,12 @@ screens:
   notes: 'Added 17 August for 2.1.28, which names the kiosk explicitly and was the only surface with
     no AI screen. **Scoped to `guestCapabilityScope`** — ticket selection, promotions, FAQs, recommendations
     and checkout, and nothing else. **No keyboard**: voice or a constrained touch interface, which is
-    why the app chat pattern does not transfer. Depends on CF-14. **Not on the wireframe board.** **Wave
-    2 with the rest of the kiosk.** Set to Wave 1 in error on 17 August — an assistant that guides a
-    guest through ticket selection and checkout cannot ship before the screens that do the selecting
-    and the checking out. **Cross-platform navigation removed 24 August**: SUP-004. **A till does not
-    navigate to a back office and a guest app does not navigate to either** — those are device handovers,
-    and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.'
+    why the app chat pattern does not transfer. Depends on CF-14. **Not on the wireframe board.** **Built
+    with the kiosk''s selection and checkout screens** (17 August): an assistant that guides a guest
+    through ticket selection and checkout cannot ship before the screens that do the selecting and the
+    checking out. **Cross-platform navigation removed 24 August**: SUP-004. **A till does not navigate
+    to a back office and a guest app does not navigate to either** — those are device handovers, and
+    a flow declares them with `crossesDevice` rather than a screen pretending there is a link.'
   density: touchLarge
   boardFrames:
   - Kiosk Board 2.dc.html#KSK-015

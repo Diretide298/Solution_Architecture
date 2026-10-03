@@ -869,7 +869,7 @@ screens:
   name: Cross-Tenant Health Dashboard
   module: Overview & Health
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C95
   implementation:
     app: ticvai-web
@@ -4865,7 +4865,7 @@ screens:
   name: White-Label Branding Management
   module: Branding & Localisation
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C57
   implementation:
     app: ticvai-web
@@ -5334,7 +5334,7 @@ screens:
   name: Domain & Certificate Management
   module: Branding & Localisation
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C96
   implementation:
     app: ticvai-web
@@ -5627,7 +5627,7 @@ screens:
   name: Interface Languages
   module: Branding & Localisation
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C57
   implementation:
     app: ticvai-web
@@ -9082,7 +9082,7 @@ screens:
   name: Security & Compliance Dashboard
   module: Security & Compliance
   requiresModule: core
-  wave: 3
+  wave: 1
   capability: C97
   implementation:
     app: ticvai-web
@@ -15923,7 +15923,7 @@ screens:
   name: Payment Method & Settlement Setup
   module: Tenants & Licensing
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '5'
@@ -17515,7 +17515,7 @@ screens:
   name: Module Activation & Dependency Validation
   module: Tenants & Licensing
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '6'
@@ -26652,7 +26652,7 @@ screens:
   name: Forecast Configuration & Forecasting Strategy
   module: Analytics
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf
     board: '1'
@@ -27885,7 +27885,7 @@ screens:
   name: Forecast Drivers, Confidence & Explainability
   module: Analytics
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf
     board: '1'
@@ -28300,7 +28300,7 @@ screens:
   name: Forecast Accuracy, Review & Publication Center
   module: AI
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf
     board: '1'
@@ -31354,7 +31354,7 @@ screens:
   name: AI Action & Permission Policy Builder
   module: Platform
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: AI_Governance_Reference.pdf
     board: '1'
@@ -32207,7 +32207,7 @@ screens:
   name: AI Policy Testing & Governance Simulation
   module: Platform
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: AI_Governance_Reference.pdf
     board: '1'
@@ -32412,7 +32412,7 @@ screens:
   name: AI Governance Policy Publication & Effective Policy Map
   module: Platform
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: AI_Governance_Reference.pdf
     board: '1'
@@ -37990,7 +37990,7 @@ screens:
   name: AI Quality, Behavior & Governance Drift Monitoring
   module: Platform
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: AI_Governance_Reference.pdf
     board: '4'
@@ -38473,7 +38473,7 @@ screens:
   name: AI Incident & Remediation Management
   module: Platform
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: AI_Governance_Reference.pdf
     board: '4'

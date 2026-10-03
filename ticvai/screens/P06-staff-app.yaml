@@ -4859,7 +4859,7 @@ screens:
   name: Manual wait entry
   module: Operations
   requiresModule: queue
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-staff-app
@@ -11440,7 +11440,7 @@ screens:
   name: Live Table & Service Management
   module: Floor Service
   requiresModule: fnb
-  wave: 2
+  wave: 1
   implementation:
     app: venue-staff-app
     route: /operations/live-table-service-management
@@ -11854,7 +11854,7 @@ screens:
   name: Table Order, Bill & Payment Management
   module: Floor Service
   requiresModule: fnb
-  wave: 2
+  wave: 1
   implementation:
     app: venue-staff-app
     route: /operations/table-order-bill-payment-management
@@ -13001,7 +13001,7 @@ screens:
   name: Receiving
   module: Stock on the Floor
   requiresModule: inventory
-  wave: 2
+  wave: 1
   implementation:
     app: venue-staff-app
     route: /operations/receiving-store-put-away
@@ -13443,7 +13443,7 @@ screens:
   name: Damage, Loss, Shrinkage & Stock Adjustment
   module: Stock on the Floor
   requiresModule: fnb
-  wave: 2
+  wave: 1
   implementation:
     app: venue-staff-app
     route: /operations/damage-loss-shrinkage-stock-adjustment

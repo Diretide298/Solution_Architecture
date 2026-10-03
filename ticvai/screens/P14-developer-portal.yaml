@@ -223,7 +223,7 @@ screens:
   name: Register & Organisation
   module: Developer & API
   requiresModule: developerApi
-  wave: 2
+  wave: 1
   implementation:
     app: developer-portal-web
     route: /developer/organisation
@@ -353,7 +353,7 @@ screens:
   name: Clients & Credentials
   module: Developer & API
   requiresModule: developerApi
-  wave: 2
+  wave: 1
   implementation:
     app: developer-portal-web
     route: /developer/clients
@@ -1294,7 +1294,7 @@ screens:
   name: Programme Administration
   module: Developer & API
   requiresModule: developerApi
-  wave: 2
+  wave: 1
   implementation:
     app: developer-portal-web
     route: /developer/admin

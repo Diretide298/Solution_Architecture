@@ -66,7 +66,7 @@ screens:
   name: Tenant Workspace
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -362,7 +362,7 @@ screens:
   name: Brand Kit
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -509,7 +509,7 @@ screens:
   name: Typography
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -642,7 +642,7 @@ screens:
   name: Logo & Assets
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -811,7 +811,7 @@ screens:
   name: Theme Editor
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -963,7 +963,7 @@ screens:
   name: Component Preview
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -1182,7 +1182,7 @@ screens:
   name: Page Builder
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -1498,7 +1498,7 @@ screens:
   name: Content Blocks
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -1829,7 +1829,7 @@ screens:
   name: Navigation & Menus
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -2082,7 +2082,7 @@ screens:
   name: Media Library
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -2526,7 +2526,7 @@ screens:
   name: SEO & Metadata
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -2677,7 +2677,7 @@ screens:
   name: Translations
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -2798,7 +2798,7 @@ screens:
   name: RTL Preview
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -2885,7 +2885,7 @@ screens:
   name: Publishing Workflow
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -3152,7 +3152,7 @@ screens:
   name: Version History
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -3326,7 +3326,7 @@ screens:
   name: Site Settings
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -3560,7 +3560,7 @@ screens:
   name: Domain & Certificate
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -3782,7 +3782,7 @@ screens:
   name: Consent & Legal
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -4123,7 +4123,7 @@ screens:
   name: User Access
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-management-web
@@ -4875,7 +4875,7 @@ screens:
   name: Cookie, Tracking & Digital Technology Registry
   module: Policy
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '1'
@@ -5120,7 +5120,7 @@ screens:
   name: Cookie Banner & Preference Center Designer
   module: Policy
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '1'
@@ -14518,7 +14518,7 @@ screens:
   name: Help Me Choose
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   implementation:
     app: venue-management-web
     route: /white-label/help-me-choose

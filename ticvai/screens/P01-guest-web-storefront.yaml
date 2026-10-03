@@ -1684,7 +1684,7 @@ screens:
   name: Interactive Seat Selection
   module: Booking & Selection
   requiresModule: seating
-  wave: 2
+  wave: 1
   capability: C51
   implementation:
     app: guest-web
@@ -1958,7 +1958,7 @@ screens:
   name: Add-ons & Upsell
   module: Booking & Selection
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   capability: C86
   implementation:
     app: guest-web
@@ -2179,7 +2179,7 @@ screens:
   name: Wishlist
   module: Booking & Selection
   requiresModule: marketing
-  wave: 3
+  wave: 1
   capability: C79
   implementation:
     app: guest-web
@@ -3459,7 +3459,7 @@ screens:
   name: Branded Queue / Waiting Room
   module: High-Demand Access
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   implementation:
     app: guest-web
     route: /high-demand-access/virtual-waiting-room
@@ -5007,7 +5007,7 @@ screens:
   name: Wallet & Gift Cards
   module: Membership, Loyalty & Value
   requiresModule: retail
-  wave: 2
+  wave: 1
   capability: C21
   implementation:
     app: guest-web
@@ -5276,7 +5276,7 @@ screens:
   name: Membership Plans
   module: Membership, Loyalty & Value
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   capability: C31
   implementation:
     app: guest-web
@@ -5433,7 +5433,7 @@ screens:
   name: Membership Management
   module: Membership, Loyalty & Value
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   capability: C31
   implementation:
     app: guest-web
@@ -5676,7 +5676,7 @@ screens:
   name: Devices, Wishlist & Consent
   module: Membership, Loyalty & Value
   requiresModule: marketing
-  wave: 3
+  wave: 1
   capability: C93
   implementation:
     app: guest-web
@@ -6259,7 +6259,7 @@ screens:
   name: Survey & Feedback
   module: Engagement & Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   capability: C33
   implementation:
     app: guest-web
@@ -6411,7 +6411,7 @@ screens:
   name: Newsletter Subscription
   module: Engagement & Support
   requiresModule: marketing
-  wave: 2
+  wave: 1
   capability: C59
   implementation:
     app: guest-web
@@ -6935,7 +6935,7 @@ screens:
   name: My Reservations
   module: Ticketing
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: guest-web
@@ -7254,7 +7254,7 @@ screens:
   name: Offers & Promotions
   module: Promotions
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: guest-web
@@ -7377,7 +7377,7 @@ screens:
   name: Shop
   module: Retail
   requiresModule: retail
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: guest-web
@@ -7550,7 +7550,7 @@ screens:
   name: Lost & Found
   module: Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   capability: C00
   implementation:
     app: guest-web
@@ -7775,8 +7775,8 @@ screens:
       provenance: derived — WEB-031 declares entryState.params groupBookingId, productId, reservationId,
         resourceId and WEB-035 holds productId, so an edge into it carries them
   notes: 'Added 17 August. **The surface the matrix names** — 2.6.33 *"website should be able to display
-    multi currency"* and 2.9.1 *"in the B2C portal for guests comparison"*. Wave 1 against the app''s
-    Wave 2, because **the website is where an overseas guest compares before booking** and the app is
+    multi currency"* and 2.9.1 *"in the B2C portal for guests comparison"*. First on the website, before
+    the app, because **the website is where an overseas guest compares before booking** and the app is
     where they check after. **Display only — the sale settles in base currency** (CF-37). Not on the wireframe
     board; needs drawing. **`getRegionSettings` deliberately not called** — a guest does not need the
     venue''s scope configuration to pick a currency. `listFxRates` is the currency list: a rate exists
@@ -7920,7 +7920,7 @@ screens:
   name: F&B – Browse & Order
   module: In-venue Services
   requiresModule: fnb
-  wave: 2
+  wave: 1
   implementation:
     app: guest-web
     route: /fandb--browse-and-order
@@ -8254,7 +8254,7 @@ screens:
   name: Menu Item Detail
   module: In-venue Services
   requiresModule: fnb
-  wave: 2
+  wave: 1
   implementation:
     app: guest-web
     route: /menu-item-detail
@@ -8366,7 +8366,7 @@ screens:
   name: F&B – Order Tracking
   module: In-venue Services
   requiresModule: fnb
-  wave: 2
+  wave: 1
   implementation:
     app: guest-web
     route: /fandb--order-tracking
@@ -8483,7 +8483,7 @@ screens:
   name: Venue Map & Wait Times
   module: In-venue Services
   requiresModule: queue
-  wave: 2
+  wave: 1
   implementation:
     app: guest-web
     route: /venue-map-and-wait-times
@@ -8642,7 +8642,7 @@ screens:
   name: Virtual Queue
   module: In-venue Services
   requiresModule: queue
-  wave: 2
+  wave: 1
   implementation:
     app: guest-web
     route: /virtual-queue
@@ -8798,7 +8798,7 @@ screens:
   name: Parking – Reserve & Pay
   module: In-venue Services
   requiresModule: access
-  wave: 2
+  wave: 1
   implementation:
     app: guest-web
     route: /parking--reserve-and-pay
@@ -8990,7 +8990,7 @@ screens:
   name: Retail & Shop and Drop
   module: Retail
   requiresModule: retail
-  wave: 2
+  wave: 1
   implementation:
     app: guest-web
     route: /retail-and-shop-and-drop
@@ -9160,7 +9160,7 @@ screens:
   name: Loyalty & Rewards
   module: Membership, Loyalty & Value
   requiresModule: marketing
-  wave: 2
+  wave: 1
   implementation:
     app: guest-web
     route: /loyalty-and-rewards
@@ -9386,7 +9386,7 @@ screens:
   name: AI Concierge – Home
   module: Engagement & Support
   requiresModule: ai
-  wave: 2
+  wave: 1
   implementation:
     app: guest-web
     route: /ai-concierge
@@ -9558,7 +9558,7 @@ screens:
   name: Help Centre & Accessibility
   module: Support
   requiresModule: core
-  wave: 2
+  wave: 1
   implementation:
     app: guest-web
     route: /help-centre-and-accessibility
@@ -9704,7 +9704,7 @@ screens:
   name: In-Venue Notifications
   module: Engagement & Support
   requiresModule: marketing
-  wave: 2
+  wave: 1
   implementation:
     app: guest-web
     route: /in-venue-notifications
@@ -9813,7 +9813,7 @@ screens:
   name: Map Booking — Cabanas & Spots
   module: Booking & Selection
   requiresModule: resources
-  wave: 3
+  wave: 1
   implementation:
     app: guest-web
     route: /booking-and-selection/map-booking
@@ -10057,7 +10057,7 @@ screens:
   name: Book a Space by the Hour
   module: Booking & Selection
   requiresModule: resources
-  wave: 3
+  wave: 1
   implementation:
     app: guest-web
     route: /booking-and-selection/space-by-the-hour
@@ -10210,7 +10210,7 @@ screens:
   name: Transport — Route & Schedule
   module: Transport
   requiresModule: transport
-  wave: 3
+  wave: 1
   implementation:
     app: guest-web
     route: /transport/route-and-schedule
