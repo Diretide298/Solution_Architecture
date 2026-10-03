@@ -50,7 +50,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-screen-patterns.py
-status: open
+status: closed
+closed_by_commit: 61d9e08d
 notes: 'Batch SPF (spec-screens), 3 October 2026, commit cf7cb692. Open until the operations exist: sendGuestConversationMessage
   comes from the guest-contracts branch, listMyTableReservations, listBookableOutlets, uploadIncidentMedia and
   addIncidentPerson from the rules branch (or their equivalents, renamed here when they land). Until those merge,

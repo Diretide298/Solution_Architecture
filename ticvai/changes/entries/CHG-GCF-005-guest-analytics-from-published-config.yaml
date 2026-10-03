@@ -37,7 +37,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-audience-match.py
-status: open
+status: closed
+closed_by_commit: 61d9e08d
 notes: Batch GCF (spec-guest). The screens branch (CHG-SPF-007) takes listAnalyticsProviders off GST-001 and WEB-001; until
   it merges, AM-GUEST-PERMISSION reports those two bindings. Close on the merge. The guest audience and the optional credential
   stay on listAnalyticsProviders so a client built against r1 is not broken.

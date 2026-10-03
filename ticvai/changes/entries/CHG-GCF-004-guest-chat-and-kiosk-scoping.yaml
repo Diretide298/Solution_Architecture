@@ -51,7 +51,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-audience-match.py
-status: open
+status: closed
+closed_by_commit: 61d9e08d
 notes: Batch GCF (spec-guest). The screens branch (CHG-SPF-013, cf7cb692) binds sendGuestConversationMessage on GST-031, GST-032
   and WEB-044. Until it merges, check-audience-match AM-GUEST-PERMISSION reports those three screens still binding sendConversationMessage;
   close this entry on the merge, when the rule reaches zero. The guest audience and guestAuth stay on sendConversationMessage
