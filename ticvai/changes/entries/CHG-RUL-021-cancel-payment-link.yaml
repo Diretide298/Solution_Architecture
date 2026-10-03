@@ -32,7 +32,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-business-rules.py
-status: open
+status: closed
+closed_by_commit: 7f6e5b08
 notes: 'New-operation gates: ORDER_CREATE is in the vocabulary; no config noun (an action on one link); not a list, so no
   paging. No screen binds it yet (ADM-592 or ADM-593, screens agent). Prevention: tools/check-business-rules.py rule BR-PAY-LINK,
   which fails on the parent commit and passes here. Batch RUL (spec-rules), 3 October 2026.'

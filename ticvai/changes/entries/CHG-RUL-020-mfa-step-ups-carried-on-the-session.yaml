@@ -59,7 +59,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-step-up.py
-status: open
+status: closed
+closed_by_commit: 7f6e5b08
 notes: 'A vendor extension and description only: no request or response field changes, so additive. The stepUpToken verifyMfaChallenge
   returns stays for r1 clients. Prevention: tools/check-step-up.py rule SU-CARRIER, which fails on the parent commit and
   passes here. Batch RUL (spec-rules), 3 October 2026.'

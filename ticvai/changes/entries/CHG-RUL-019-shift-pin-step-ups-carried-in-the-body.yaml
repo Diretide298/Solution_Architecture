@@ -38,7 +38,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-step-up.py
-status: open
+status: closed
+closed_by_commit: 7f6e5b08
 notes: 'withdrawFromDepositBox''s field is witnessStepUp rather than supervisorStepUp because the step-up there is the witnessing
   cashier''s (DEC-178), not a supervisor''s; the shape is the same SupervisorStepUp. Prevention: tools/check-step-up.py
   rule SU-CARRIER, which fails on the parent commit and passes here. Batch RUL (spec-rules), 3 October 2026.'
