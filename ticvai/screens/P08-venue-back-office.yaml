@@ -1705,7 +1705,9 @@ screens:
     - listQueueEntries
   - operationId: requestSuggestion
     contract: ai
-    purpose: 'Queue-balancing suggestion (kind queueBalancing): return-slot allocation and redirection'
+    purpose: 'Queue-balancing suggestion (kind queueBalancing): return-slot allocation and redirection.
+      Later (CHG-RONEP-010): the queue-balancing suggestion of the day-one suggestions (AI-ENGINE-SUGGESTIONS)
+      ships in Block A2 (Chinmay, 3 October); until then the control shows ''Later''.'
     trigger: onAction
     provenance: build, 29 September 2026
   entryState:
@@ -26984,6 +26986,10 @@ screens:
     - PTR-039
     - PTR-047
     - PTR-048
+    - ADM-243
+    - ADM-342
+    - ADM-354
+    - BO-1065
     entryFrom:
     - BO-108
     - BO-594
@@ -27592,6 +27598,22 @@ screens:
       trigger: Commission Calculation & Settlement Management
       provenance: moved to Venue Management 2 October 2026 (CHG-CLN-004); its board's hub PTR-042 stays
         on the partner portal
+    - to: ADM-243
+      trigger: Opens Roles, Authority, Delegation & Approval Limits
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: ADM-342
+      trigger: Opens Authentication & MFA Policy Manager
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: ADM-354
+      trigger: Opens External Workflow System Integration
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-1065
+      trigger: Opens Currency, Timezone & Channels
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
   notes: '**Built 20 August because P08 had none.** `BO-001 Queue Directory` was the declared entry point
     to a 99-screen back office — it exits to four queue screens, and **93 screens hung off nothing.**
     A back office entered through a queue list. **The module was also one bucket holding 72 of 99 screens**,
@@ -27803,6 +27825,10 @@ screens:
     - BO-077
     - BO-089
     - BO-090
+    - BO-1094
+    - BO-1111
+    - BO-1146
+    - BO-1162
     transitions:
     - to: BO-008
       trigger: Product Detail & Variants
@@ -27928,6 +27954,22 @@ screens:
       provenance: 'derived — BO-028 declares entryState.params refundId and BO-101 holds none of them.
         The edge carries nothing: refundId only pre-selects (deep link or optional), and BO-028 opens
         on its own'
+    - to: BO-1094
+      trigger: Opens Funding Method Configuration
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-1111
+      trigger: Opens Credit Expiry, Extension & Forfeiture Operations
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-1146
+      trigger: Opens Refund-to-Wallet Policy Configuration
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-1162
+      trigger: Opens Security Governance, Audit & Rule Publication
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
   notes: Section landing. **28 screens reach the entry point through here** — before 20 August they reached
     it through nothing. **Given its section's own operations on 4 September.** It sat on `getVenueSettings`
     alone, which made it identical to every other section landing page — a hub that shows nothing of its
@@ -28115,6 +28157,10 @@ screens:
     - BO-142
     - BO-143
     - BO-1190
+    - ADM-164
+    - ADM-570
+    - ADM-603
+    - BO-696
     transitions:
     - to: BO-007
       trigger: Product Directory
@@ -28283,6 +28329,22 @@ screens:
     - to: BO-1190
       trigger: Donation Campaigns
       provenance: decided 29 September, VM close-out (venue management and configuration)
+    - to: ADM-164
+      trigger: Opens Code Distribution & Assignment Manager
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: ADM-570
+      trigger: Opens Gateway, PSP & Acquirer Directory
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: ADM-603
+      trigger: Opens B2B Invoice, On-Account & Payment Terms Configuration
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-696
+      trigger: Opens Event Duplication & Clone Configuration
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
   notes: Section landing. **14 screens reach the entry point through here** — before 20 August they reached
     it through nothing.
   density: compact
@@ -28448,6 +28510,23 @@ screens:
     - BO-097
     - BO-098
     - BO-099
+    - BO-1045
+    - BO-1062
+    - BO-151
+    - BO-155
+    - BO-161
+    - BO-166
+    - BO-167
+    - BO-168
+    - BO-185
+    - BO-186
+    - BO-188
+    - BO-189
+    - BO-201
+    - BO-230
+    - BO-335
+    - BO-346
+    - BO-618
     transitions:
     - to: BO-001
       trigger: Queue Directory
@@ -28542,6 +28621,74 @@ screens:
       provenance: 'derived — BO-099 declares entryState.params performanceId and BO-103 holds none of
         them. The edge carries nothing: BO-103 is the Access & Venue hub and this is its menu entry; BO-099
         has no source yet for performanceId'
+    - to: BO-1045
+      trigger: Opens Price Bands & Categories
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-1062
+      trigger: Opens Tenant & Brand Context
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-151
+      trigger: Opens Access Location Grouping
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-155
+      trigger: Opens Visual Access Rule Builder
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-161
+      trigger: Opens Guest, Companion & Eligibility Rules
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-166
+      trigger: Opens Credential Activation & Display Rules
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-167
+      trigger: Opens Device Binding & Session Security
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-168
+      trigger: Opens BLE Beacon & Geofence Configuration
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-185
+      trigger: Opens Biometric Verification Profile Builder
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-186
+      trigger: Opens Face Pass Enrollment Configuration
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-188
+      trigger: Opens Face Tag Temporary Enrollment
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-189
+      trigger: Opens Face Matching & Verification Thresholds
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-201
+      trigger: Opens Gate Modes, Free Spin & Emergency Controls
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-230
+      trigger: Opens Live Gate Mode & Lane Control
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-335
+      trigger: Opens Virtual Ticket Identity & Master Record Configuration
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-346
+      trigger: Opens PDF, Printable & POS Ticket Designer
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-618
+      trigger: Opens Accreditation Form Builder
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
   notes: Section landing. **24 screens reach the entry point through here** — before 20 August they reached
     it through nothing. **Given its section's own operations on 4 September.** It sat on `getVenueSettings`
     alone, which made it identical to every other section landing page — a hub that shows nothing of its
@@ -29275,6 +29422,16 @@ screens:
     - BO-068
     - BO-073
     - BO-091
+    - BO-755
+    - BO-766
+    - BO-772
+    - BO-785
+    - BO-798
+    - BO-799
+    - BO-825
+    - BO-826
+    - BO-827
+    - BO-828
     transitions:
     - to: BO-073
       trigger: Lost & Found Register
@@ -29287,6 +29444,46 @@ screens:
         of them. The edge carries nothing: profileKey only pre-selects (deep link or optional); BO-091
         opens on listIndexFailures, and tenantId has no source on BO-091 yet (a gap in BO-091, not in
         this edge)'
+    - to: BO-755
+      trigger: Opens Dynamic Segment Builder
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-766
+      trigger: Opens Campaign Builder
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-772
+      trigger: Opens A/B & AI Optimization
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-785
+      trigger: Opens Template Library
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-798
+      trigger: Opens Intent & Knowledge Management
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-799
+      trigger: Opens Agent Workspace
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-825
+      trigger: Opens Challenge Builder
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-826
+      trigger: Opens Achievement & Badge Engine
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-827
+      trigger: Opens Points & Activity Rules
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-828
+      trigger: Opens Milestones & Reward Rules
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
   notes: Section landing. **3 screens reach the entry point through here** — before 20 August they reached
     it through nothing.
   density: compact
@@ -29480,6 +29677,15 @@ screens:
     - BO-1184
     - BO-1183
     - BO-070
+    - BO-395
+    - BO-857
+    - BO-861
+    - BO-866
+    - BO-870
+    - BO-877
+    - BO-911
+    - BO-919
+    - BO-927
     transitions:
     - to: BO-036
       trigger: Device Registry
@@ -29557,6 +29763,42 @@ screens:
         an id'
       carries:
       - workOrderId
+    - to: BO-395
+      trigger: Opens Game & Ride Directory
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-857
+      trigger: Opens Resource Creation & Profile
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-861
+      trigger: Opens Resource Package & Bundle Configuration
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-866
+      trigger: Opens Resource Availability Schedule Configuration
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-870
+      trigger: Opens Operational Time & Resource Blocking
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-877
+      trigger: Opens Qualification & Assignment Rule Engine
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-911
+      trigger: Opens Inspection, Condition & Compliance Management
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-919
+      trigger: Opens AI Event Resource Forecasting
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: BO-927
+      trigger: Opens AI Staffing Requirement Forecast
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
   notes: Section landing. **6 screens reach the entry point through here** — before 20 August they reached
     it through nothing. **Given its section's own operations on 4 September.** It sat on `getVenueSettings`
     alone, which made it identical to every other section landing page — a hub that shows nothing of its
@@ -36662,6 +36904,7 @@ screens:
   navigation:
     entryFrom:
     - BO-144
+    - BO-103
     exitTo:
     - BO-144
     inferred: false
@@ -37299,6 +37542,7 @@ screens:
   navigation:
     entryFrom:
     - BO-154
+    - BO-103
     exitTo:
     - BO-154
     inferred: false
@@ -38014,6 +38258,7 @@ screens:
   navigation:
     entryFrom:
     - BO-154
+    - BO-103
     exitTo:
     - BO-154
     inferred: false
@@ -38686,6 +38931,7 @@ screens:
   navigation:
     entryFrom:
     - BO-164
+    - BO-103
     exitTo:
     - BO-164
     inferred: false
@@ -38809,6 +39055,7 @@ screens:
   navigation:
     entryFrom:
     - BO-164
+    - BO-103
     exitTo:
     - BO-164
     inferred: false
@@ -38982,6 +39229,7 @@ screens:
   navigation:
     entryFrom:
     - BO-164
+    - BO-103
     exitTo:
     - BO-164
     inferred: false
@@ -40953,6 +41201,7 @@ screens:
   navigation:
     entryFrom:
     - BO-184
+    - BO-103
     exitTo:
     - BO-184
     inferred: false
@@ -41067,6 +41316,7 @@ screens:
   navigation:
     entryFrom:
     - BO-184
+    - BO-103
     exitTo:
     - BO-184
     inferred: false
@@ -41351,6 +41601,7 @@ screens:
   navigation:
     entryFrom:
     - BO-184
+    - BO-103
     exitTo:
     - BO-184
     inferred: false
@@ -41479,6 +41730,7 @@ screens:
   navigation:
     entryFrom:
     - BO-184
+    - BO-103
     exitTo:
     - BO-184
     inferred: false
@@ -43161,6 +43413,7 @@ screens:
   navigation:
     entryFrom:
     - BO-194
+    - BO-103
     exitTo:
     - BO-194
     inferred: false
@@ -46712,6 +46965,7 @@ screens:
   navigation:
     entryFrom:
     - BO-224
+    - BO-103
     exitTo:
     - BO-224
     inferred: false
@@ -60787,6 +61041,7 @@ screens:
   navigation:
     entryFrom:
     - BO-334
+    - BO-103
     exitTo:
     - BO-334
     inferred: false
@@ -62252,6 +62507,7 @@ screens:
   navigation:
     entryFrom:
     - BO-344
+    - BO-103
     exitTo:
     - BO-344
     inferred: false
@@ -68193,6 +68449,7 @@ screens:
   navigation:
     entryFrom:
     - BO-394
+    - BO-108
     exitTo:
     - BO-394
     transitions:
@@ -91957,6 +92214,7 @@ screens:
   navigation:
     entryFrom:
     - BO-615
+    - BO-103
     exitTo:
     - BO-615
     transitions:
@@ -99757,6 +100015,7 @@ screens:
   navigation:
     entryFrom:
     - BO-694
+    - BO-102
     exitTo:
     - BO-694
     transitions:
@@ -106295,6 +106554,7 @@ screens:
   navigation:
     entryFrom:
     - BO-754
+    - BO-107
     exitTo:
     - BO-754
     transitions:
@@ -107502,6 +107762,7 @@ screens:
   navigation:
     entryFrom:
     - BO-764
+    - BO-107
     exitTo:
     - BO-764
     transitions:
@@ -108157,6 +108418,7 @@ screens:
   navigation:
     entryFrom:
     - BO-764
+    - BO-107
     exitTo:
     - BO-764
     transitions:
@@ -109503,6 +109765,7 @@ screens:
   navigation:
     entryFrom:
     - BO-784
+    - BO-107
     exitTo:
     - BO-784
     transitions:
@@ -110785,6 +111048,7 @@ screens:
   navigation:
     entryFrom:
     - BO-794
+    - BO-107
     exitTo:
     - BO-794
     transitions:
@@ -110917,7 +111181,7 @@ screens:
   name: Agent Workspace
   module: Engagement & Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '7'
@@ -110931,6 +111195,7 @@ screens:
   navigation:
     entryFrom:
     - BO-794
+    - BO-107
     exitTo:
     - BO-794
     transitions:
@@ -113636,6 +113901,7 @@ screens:
   navigation:
     entryFrom:
     - BO-824
+    - BO-107
     exitTo:
     - BO-824
     transitions:
@@ -113804,6 +114070,7 @@ screens:
   navigation:
     entryFrom:
     - BO-824
+    - BO-107
     exitTo:
     - BO-824
     transitions:
@@ -113920,6 +114187,7 @@ screens:
   navigation:
     entryFrom:
     - BO-824
+    - BO-107
     exitTo:
     - BO-824
     transitions:
@@ -114050,6 +114318,7 @@ screens:
   navigation:
     entryFrom:
     - BO-824
+    - BO-107
     exitTo:
     - BO-824
     transitions:
@@ -117247,6 +117516,7 @@ screens:
   navigation:
     entryFrom:
     - BO-854
+    - BO-108
     exitTo:
     - BO-854
     transitions:
@@ -117759,6 +118029,7 @@ screens:
   navigation:
     entryFrom:
     - BO-854
+    - BO-108
     exitTo:
     - BO-854
     transitions:
@@ -118505,6 +118776,7 @@ screens:
   navigation:
     entryFrom:
     - BO-864
+    - BO-108
     exitTo:
     - BO-864
     transitions:
@@ -119088,6 +119360,7 @@ screens:
   navigation:
     entryFrom:
     - BO-864
+    - BO-108
     exitTo:
     - BO-864
     transitions:
@@ -119942,6 +120215,7 @@ screens:
   navigation:
     entryFrom:
     - BO-873
+    - BO-108
     exitTo:
     - BO-873
     transitions:
@@ -124402,6 +124676,7 @@ screens:
   navigation:
     entryFrom:
     - BO-903
+    - BO-108
     exitTo:
     - BO-903
     transitions:
@@ -125563,6 +125838,7 @@ screens:
   navigation:
     entryFrom:
     - BO-913
+    - BO-108
     exitTo:
     - BO-913
     transitions:
@@ -126510,6 +126786,7 @@ screens:
   navigation:
     entryFrom:
     - BO-923
+    - BO-108
     exitTo:
     - BO-923
     transitions:
@@ -139813,7 +140090,7 @@ screens:
   name: Price Bands & Categories
   module: Access & Venue
   requiresModule: seating
-  wave: 3
+  wave: 1
   source:
     pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf
     board: '10'
@@ -139827,6 +140104,7 @@ screens:
   navigation:
     entryFrom:
     - BO-1043
+    - BO-103
     exitTo:
     - BO-1043
     transitions:
@@ -141625,7 +141903,7 @@ screens:
   name: Tenant & Brand Context
   module: Access & Venue
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf
     board: '12'
@@ -141639,6 +141917,7 @@ screens:
   navigation:
     entryFrom:
     - BO-1061
+    - BO-103
     exitTo:
     - BO-1061
     transitions:
@@ -141998,7 +142277,7 @@ screens:
   name: Currency, Timezone & Channels
   module: Setup
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf
     board: '12'
@@ -142012,6 +142291,7 @@ screens:
   navigation:
     entryFrom:
     - BO-1061
+    - BO-100
     exitTo:
     - BO-1061
     transitions:
@@ -145713,7 +145993,7 @@ screens:
   name: Funding Method Configuration
   module: Orders & Money
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Wallet_Configuration_Backend_Structure_v1.0.pdf
     board: '2'
@@ -145727,6 +146007,7 @@ screens:
   navigation:
     entryFrom:
     - BO-1093
+    - BO-101
     exitTo:
     - BO-1093
     transitions:
@@ -145823,7 +146104,7 @@ screens:
     purpose: Which methods may fund a wallet
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id029
+    invalidates:
     - getWalletFundingRules
   - operationId: getWalletFundingRules
     contract: wallet
@@ -145965,7 +146246,8 @@ screens:
     purpose: Amounts, presets and bonus rules
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id029
+    invalidates:
+    - getWalletFundingRules
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -146108,7 +146390,8 @@ screens:
     purpose: Channel and funding-source mapping
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id029
+    invalidates:
+    - getWalletFundingRules
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -146237,7 +146520,8 @@ screens:
     purpose: Auto-reload on a threshold
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id029
+    invalidates:
+    - getWalletFundingRules
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -146369,7 +146653,8 @@ screens:
     purpose: Recurring funding on a date
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id029
+    invalidates:
+    - getWalletFundingRules
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -146516,7 +146801,8 @@ screens:
     purpose: Approval above a threshold
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id029
+    invalidates:
+    - getWalletFundingRules
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -146826,7 +147112,8 @@ screens:
     purpose: Limits and velocity controls
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id029
+    invalidates:
+    - getWalletFundingRules
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -147990,7 +148277,7 @@ screens:
   name: Credit Expiry, Extension & Forfeiture Operations
   module: Orders & Money
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Wallet_Configuration_Backend_Structure_v1.0.pdf
     board: '3'
@@ -148004,6 +148291,7 @@ screens:
   navigation:
     entryFrom:
     - BO-1103
+    - BO-101
     exitTo:
     - BO-1103
     transitions:
@@ -148079,7 +148367,7 @@ screens:
     purpose: Expire, extend or forfeit
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id033
+    invalidates:
     - listCreditLots
     - getWalletLiability
   - operationId: listCreditLots
@@ -150791,7 +151079,9 @@ screens:
     purpose: Gift card and voucher expiry
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id033
+    invalidates:
+    - listCreditLots
+    - getWalletLiability
   - operationId: listCreditLots
     contract: wallet
     purpose: The tranches behind a balance, with their expiry
@@ -152847,7 +153137,7 @@ screens:
   name: Refund-to-Wallet Policy Configuration
   module: Orders & Money
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Wallet_Configuration_Backend_Structure_v1.0.pdf
     board: '7'
@@ -152861,6 +153151,7 @@ screens:
   navigation:
     entryFrom:
     - BO-1143
+    - BO-101
     exitTo:
     - BO-1143
     transitions:
@@ -155040,7 +155331,7 @@ screens:
   name: Security Governance, Audit & Rule Publication
   module: Orders & Money
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Wallet_Configuration_Backend_Structure_v1.0.pdf
     board: '8'
@@ -155054,6 +155345,7 @@ screens:
   navigation:
     entryFrom:
     - BO-1153
+    - BO-101
     exitTo:
     - BO-1153
     transitions:
@@ -158212,7 +158504,7 @@ screens:
   name: Transport Stations
   module: Transport
   requiresModule: transport
-  wave: 2
+  wave: 1
   implementation:
     app: venue-management-web
     route: /transport/stations
@@ -158388,7 +158680,7 @@ screens:
   name: Transport Routes & Stops
   module: Transport
   requiresModule: transport
-  wave: 2
+  wave: 1
   implementation:
     app: venue-management-web
     route: /transport/routes
@@ -158644,7 +158936,7 @@ screens:
   name: Transport Fares & Passenger Types
   module: Transport
   requiresModule: transport
-  wave: 2
+  wave: 1
   implementation:
     app: venue-management-web
     route: /transport/fares
@@ -158807,7 +159099,7 @@ screens:
   name: Transport Timetables
   module: Transport
   requiresModule: transport
-  wave: 2
+  wave: 1
   implementation:
     app: venue-management-web
     route: /transport/timetables
@@ -159228,7 +159520,7 @@ screens:
   name: Transport Pass Types
   module: Transport
   requiresModule: transport
-  wave: 2
+  wave: 1
   implementation:
     app: venue-management-web
     route: /transport/pass-types
@@ -159397,7 +159689,7 @@ screens:
   name: Transport Network Import
   module: Transport
   requiresModule: transport
-  wave: 2
+  wave: 1
   implementation:
     app: venue-management-web
     route: /transport/import
@@ -175928,6 +176220,7 @@ screens:
   navigation:
     entryFrom:
     - ADM-158
+    - BO-102
     exitTo:
     - ADM-158
     inferred: false
@@ -185343,6 +185636,7 @@ screens:
   navigation:
     entryFrom:
     - ADM-238
+    - BO-100
     exitTo:
     - ADM-238
     - BO-087
@@ -197145,6 +197439,7 @@ screens:
   navigation:
     entryFrom:
     - ADM-569
+    - BO-102
     exitTo:
     - ADM-569
     transitions:
@@ -201166,6 +201461,7 @@ screens:
   navigation:
     entryFrom:
     - ADM-599
+    - BO-102
     exitTo:
     - ADM-599
     transitions:
@@ -215842,6 +216138,7 @@ screens:
   navigation:
     entryFrom:
     - ADM-339
+    - BO-100
     exitTo:
     - ADM-339
     transitions:
@@ -217151,6 +217448,7 @@ screens:
   navigation:
     entryFrom:
     - ADM-349
+    - BO-100
     exitTo:
     - ADM-349
     transitions:

@@ -1,0 +1,62 @@
+id: CHG-RONEP-007
+date: '2026-10-03'
+source: plan
+kind: plan
+summary: Block A ships in two drops, A1 by 27 November and A2 right after it, with app homes only pulled in (section homes
+  link to their setup screens) and no writer pulled forward just because a read of its service is in Block A.
+decision:
+  what: 'tools/build-service-docs.py splits Block A''s closure into its core (the Block A apps and their flows, the slice''s
+    screens, their doors and the homes they are reached through, and blockA1Operations: the payment configuration) and
+    completion work (the rest of the setup screens, the decided screens and operations), planned in app-modules of its
+    own ("(setup, the rest of the screens)", "(Block A completion)"). Completion work goes into A1 app by app (guest
+    apps first, Venue Management and the console last) only while A1 ends by its window with no more developer overtime
+    than its core already needs or the 43 h accepted (team.json acceptedOvertimeHours); the rest is Block A2
+    (tools/sprint_plan.py BLOCKS A, A2, B, C, D; epic BLOCK-A2, its own block test in the last three days of Sprint 5,
+    ticketed like A; keys unchanged). Lever A: the navigation closure pulls in only an app''s entry and the homes in
+    block-a-extra-tasks.json navHomes (BO-101 to BO-108, EMP-003); 65 Block A screens behind a command centre get a link
+    from their section home (tools/applied/nav-homes-r1-plan-3-october.py), and the 47 command centres and hubs left out
+    go back to their wave. Lever B: a read-only task no longer pulls (or waits for) its own service''s writers in a later
+    block. Result: A1 3,966 points (1,004 tasks): Venue Management 1,101, Guest Web 693, Guest App 507, platform and
+    foundation 393, POS 329, CMS 270, TICVAI Console 215, Staff App 203, and Support Console, Kitchen Display, Developer
+    Portal, Scanner, Analytics, Kiosk, Partner Portal 11 to 55 each; the completion work of the Staff App, Support Console,
+    Developer Portal and Analytics fits in it. A2 655 points (232 tasks): the rest of the Venue Management setup screens
+    (536), of the TICVAI Console''s (80) and CMS''s (23), and 16 points of decided report and finance operations; it ends
+    with Sprint 5 on 11 December. B 2,828, C 2,950, D 3,183 points (before: 3,347, 3,125, 3,184); D still ends on 19
+    February 2027 with Sprints 11 to 13 as buffer, so the programme ends where it did.'
+  by: Chinmay
+  date: '2026-10-03'
+proposed: '2026-10-03'
+why: 'Chinmay, 3 October evening, "Block A size and embeddings" (docs/active/decisions/answers-3-october-r1-plan.md): Block A
+  in two drops, A1 by 27 November with the completion work that fits and A2 right after, ahead of Block B; apply levers A
+  and B to keep A2 small; the programme end should stay about where it was. CHG-RONEP-001 and CHG-RONEP-006 had taken Block
+  A to 5,561 points.'
+keys_touched:
+  screens: [BO-100, BO-101, BO-102, BO-103, BO-104, BO-105, BO-106, BO-107, BO-108, ADM-002, CMS-001, ANL-001, EMP-003,
+    KSK-001]
+  files: [tools/build-service-docs.py, tools/sprint_plan.py, tools/check-plan-closure.py, tools/build-plan-deck.py,
+    tools/screen_patterns.py, tools/applied/nav-homes-r1-plan-3-october.py, tools/applied/block-a-wave-r1-plan-3-october.py,
+    tools/applied/README.md, docs/active/team.json, docs/active/block-a-extra-tasks.json, checks/baseline.json,
+    screens/P05-guest-kiosk.yaml, screens/P06-staff-app.yaml, screens/P08-venue-back-office.yaml,
+    screens/P09-platform-admin-console.yaml, screens/P13-white-label-cms.yaml, screens/P16-venue-analytics.yaml]
+root_class: 'new: block-scope-incomplete'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py
+status: closed
+closed_by_commit: 92bb83fa
+notes: 'Does not fit, for Chinmay: A1 alone still runs past 24 November. Its developers'' work after the window opens is
+  about 125 h (15.6 person-days; the AI engineers 13.8 more), against 58 h in the plan of 3044d8b0 and the 43 h accepted:
+  the homes the A1 screens are reached through, the flow operations and the payment configuration are A1 core and added to
+  it; the generator''s own measure (module tests included) is 172 h. No completion app whose work raised that went into
+  A1. A2 at normal hours runs to 15 December (its test to 18 December) and Block B''s last work is 23 December, its test to
+  28 December: both a few days past their sprint. C-UNTICKETED: 246 departures against old-r2 carry their reasons (most
+  are writers lever B no longer pulls forward, and Block B is smaller). checks/baseline.json re-recorded: counts moved
+  between blocks only, every app total unchanged. Before the section-home links C-REACH found 124 Block A screens
+  reached only through a command centre; with them, none. C-BOUND checks a setup screen per wiring task (its slice in
+  A1, its rest in its own drop).'

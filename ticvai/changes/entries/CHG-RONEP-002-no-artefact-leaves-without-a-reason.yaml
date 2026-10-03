@@ -1,0 +1,49 @@
+id: CHG-RONEP-002
+date: '2026-10-03'
+source: audit
+kind: plan
+summary: An artefact the last released plan built in a ticketed block stays ticketed or carries its reason, the payment
+  configuration and the flow operations Block A needs are built in Block A, and a flow branch resolved by an operation joins
+  Block A's closure.
+decision:
+  what: 'tools/check-plan-closure.py compares the plan with the one at the newest release tag (rN, else old-rN) and fails on an
+    operation, table or screen that is built by no task now (C-GONE) or only outside the ticketed blocks (C-UNTICKETED)
+    without a reason in docs/active/block-a-extra-tasks.json `departures`; C-FLOW fails on an operation a step or branch of a
+    Block A app''s flow needs that Block A does not build. Of the ten artefacts the lead found: the five payment operations
+    are decided Block A (blockAOperations: "payment configuration is needed before guests can pay"); ADM-031 stays with
+    Reporting on the TICVAI Console (Block D), as it was a setup host only and ANL-023 now hosts createDashboard and
+    updateDashboard; the four marketing tables are created in Block A again by its marketing migration. The generator takes
+    a flow branch resolved by an operation into the closure (F02 extendSeatHold, F26 proposeWalkways, F29 quoteWaitTime, F58
+    relinquishInventoryHold). 24 departures against old-r2 carry their reasons (ADM-031, six operations and seventeen tables
+    reached only by Block C or D work now).'
+  by: Chinmay
+  date: '2026-10-03'
+proposed: '2026-10-03'
+why: 'The lead''s r1 gate finding, 3 October (docs/active/decisions/answers-3-october-r1-plan.md): comparing the plan before the
+  fresh map (4e2c56c1) with 3044d8b0, ten artefacts built in Block A before were built by no ticket. They had ridden into
+  Block A inside a four-operation task or a migration with something Block A needed (r2: SVC-ORDER-PAYMENTS-8 and -9,
+  MIG-MARKETING-7) and fell out when new operations re-cut those tasks; nothing compared one plan with the last. Same root:
+  flows/F02-guest-buys-seated-tickets.yaml resolves its hold-expiry branches with extendSeatHold, which the closure never
+  read (it took only branches resolved by a screen).'
+keys_touched:
+  operations: [listPaymentMethods, listPaymentProviderConnections, setPaymentRules, simulatePaymentConfiguration,
+    testPaymentProviderConnection, extendSeatHold, proposeWalkways, quoteWaitTime, relinquishInventoryHold]
+  screens: [ADM-031]
+  tables: [marketing.duplicate_candidate, marketing.identity_rules, marketing.privacy_exception, marketing.privacy_request]
+  flows: [F02, F26, F29, F58]
+  files: [tools/check-plan-closure.py, tools/build-service-docs.py, docs/active/block-a-extra-tasks.json]
+root_class: 'new: plan-departure-unrecorded'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py
+status: closed
+closed_by_commit: 155f591a
+notes: C-UNTICKETED fails on the plan of 3044d8b0 against old-r2 (41 artefacts, the lead's ten among them; 29 even with
+  today's departures) and C-FLOW on five flow operations; both pass after it. A `departures` entry no longer needed against the reference is printed, to be
+  removed once r1 is the last release.

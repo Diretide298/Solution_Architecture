@@ -1,0 +1,34 @@
+id: CHG-RONEP-008
+date: '2026-10-03'
+source: plan
+kind: plan
+summary: The concierge embeds through the provider on the UAE route and hosts no embedding or reranking model; Qdrant keeps
+  the vectors in our cell.
+decision:
+  what: 'AI-ENGINE-CONCIERGE: embeddings from OpenAI UAE text-embedding-3-large or Core42 Compass instead of BGE-M3 and a
+    cross-encoder on CPU in the cell; the dense vectors are combined with Qdrant''s BM25 by rank, a provider reranker only if
+    the evaluation falls short. check-ticket-builds B-HOSTED-MODEL also fails on an embedding or reranking model we host.'
+  by: Chinmay
+  date: '2026-10-03'
+proposed: '2026-10-03'
+why: 'Chinmay, 3 October evening, "Block A size and embeddings" (docs/active/decisions/answers-3-october-r1-plan.md): "provider
+  embeddings on the UAE route (OpenAI UAE text-embedding-3-large / Core42), no embedding model hosted by us; Qdrant stays in
+  our cell for the vectors (ADR-0049)". Answers the question CHG-RONEP-004 left open.'
+keys_touched:
+  tickets: [AI-ENGINE-CONCIERGE]
+  files: [docs/active/block-a-extra-tasks.json, tools/check-ticket-builds.py]
+root_class: 'new: hosting-decision'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-ticket-builds.py
+status: closed
+closed_by_commit: 92bb83fa
+notes: B-HOSTED-MODEL fails on the plan derived before this change (AI-ENGINE-CONCIERGE, "embeddings and reranking
+  self-hosted") and passes after it. ADR-0049 and docs/architecture/ai-system-design.md still name the CPU models; the docs
+  batch owns them.

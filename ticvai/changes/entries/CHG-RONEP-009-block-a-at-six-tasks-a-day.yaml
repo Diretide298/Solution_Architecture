@@ -1,0 +1,38 @@
+id: CHG-RONEP-009
+date: '2026-10-03'
+source: plan
+kind: plan
+summary: Block A is planned at 6 tasks a day per developer in Sprints 1 to 4 instead of overtime; the ramp after it is
+  unchanged.
+decision:
+  what: 'team.json sprintPlan.pace.tasksPerDevDayBlockA 6, read by tools/sprint_plan.py pace_model for the sprints before the
+    ramp (1 to 4); from Sprint 5 the ramp still starts from tasksPerDevDay 5 and rises to 2x by Sprint 11. A task a day is
+    per developer: 6 average non-AI tasks (3.25 points each), 19.5 points a working day, times each person''s pace; AI
+    engine work is sized in engineer-days and unaffected. With it every app''s completion work fits in A1 (the generator''s
+    A1 overtime 17 h, under the 43 h accepted), so A1 holds all of Block A: 4,621 points, 1,234 tasks. Developers'' A1
+    work after the window opens (24 November) is 20 h (Hrushikant 8, Chitrangi 3, Chinmay Patkar 3, Pranay 2); the AI
+    engineers'' is 109 h (Kalpita 58, the second AI engineer 50), which CHG-RONEP-010 takes out. Every developer is booked
+    36 to 37 of the 37 working days before 24 November; Deep, the helper, 32.5 (his share scales with his rating). Block B
+    last work 16 December (ends 25 December), C 31 December (22 January), D 9 February (19 February 2027): the programme
+    ends where it did.'
+  by: Chinmay
+  date: '2026-10-03'
+proposed: '2026-10-03'
+why: 'Chinmay, 3 October (docs/active/decisions/answers-3-october-r1-plan.md, "Block A pace and AI scope"): Block A at 6
+  tasks a day per developer, the ramp after it unchanged, instead of the overtime of CHG-RONEP-007. The pace of 1 October
+  was 5 tasks a day ramping to 2x by Block D.'
+keys_touched:
+  files: [docs/active/team.json, tools/sprint_plan.py]
+root_class: 'new: block-scope-incomplete'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/sprint_plan.py::tasksPerDevDayBlockA
+status: closed
+closed_by_commit: 68326467
+notes: At 7 tasks a day the scenario run gave the same result as 6 (the remaining overtime is AI engine work sized in days).

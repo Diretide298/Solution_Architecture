@@ -55,7 +55,7 @@ screens:
   name: Attract Loop
   module: Sell
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: guest-app
@@ -68,6 +68,7 @@ screens:
     - KSK-003
     - KSK-004
     - KSK-014
+    - KSK-015
     inferred: true
     isEntryPoint: true
     transitions:
@@ -83,6 +84,10 @@ screens:
     - to: KSK-014
       trigger: Out of service
       provenance: structural — KSK-001 is P05's home screen and its exits are its launcher
+    - to: KSK-015
+      trigger: Opens Assistant
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. **The attract loop is the entry.** A kiosk has no login and nobody navigates to it
     — it is what the screen shows when nobody is standing there. **Declared 20 August** — `isEntryPoint`
@@ -1447,6 +1452,7 @@ screens:
     fromFlows: true
     entryFrom:
     - KSK-004
+    - KSK-001
     notes: '**Reached from KSK-004** — help is asked for at the point of confusion. Stated on 4 September:
       this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
     transitions:

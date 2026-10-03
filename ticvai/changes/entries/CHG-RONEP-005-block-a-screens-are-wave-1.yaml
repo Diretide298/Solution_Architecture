@@ -1,0 +1,37 @@
+id: CHG-RONEP-005
+date: '2026-10-03'
+source: audit
+kind: spec
+summary: The 64 Block A screens left at wave 2 or 3 (BO-1065 and the hubs CHG-RONEP-006 pulls in among them) are wave 1, and the design handoff reads
+  a screen's block from every task that builds it, so their Block A design is asked for.
+decision:
+  what: 'tools/applied/block-a-wave-r1-plan-3-october.py sets wave 1 on BO-799, BO-1045, BO-1062, BO-1065, BO-1094, BO-1111,
+    BO-1146, BO-1162, BO-1183, BO-1184, BO-1185, BO-1186, BO-1188 and BO-1189, then on the 50 navigation hubs
+    CHG-RONEP-006 brings into Block A (KSK-001, KSK-004, EMP-031, DEV-001, CMS-021, ANL-001, ANL-021, ANL-061 and 42 command
+    centres and hubs of P08 and P09); only the wave line moves. tools/design_spec.py
+    reads a screen''s block from every task that builds it, four-digit ids, Venue Management tasks and the rest of a setup
+    screen included, the earliest block winning; it showed BO-1065 and every VM screen of Block A as "B-D".'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Chinmay''s r1 additions, 3 October (docs/active/decisions/answers-3-october-r1-plan.md): "The residency section on BO-1065
+  is drawn and built in Block A." CHG-SPF-006 made every Block A screen wave 1 but read Block A from op-release.json, where a
+  four-digit id built no screen until CHG-GTR-002; the design handoff matched three digits only.'
+keys_touched:
+  screens: [BO-799, BO-1045, BO-1062, BO-1065, BO-1094, BO-1111, BO-1146, BO-1162, BO-1183, BO-1184, BO-1185, BO-1186,
+    BO-1188, BO-1189, KSK-001, KSK-004, EMP-031, DEV-001, CMS-021, ANL-001, ANL-021, ANL-061]
+  files: [screens/P08-venue-back-office.yaml, tools/applied/block-a-wave-r1-plan-3-october.py, tools/applied/README.md,
+    tools/design_spec.py]
+root_class: A10 TICKET-DRIFT
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-screen-patterns.py
+status: closed
+closed_by_commit: 155f591a
+notes: check-screen-patterns P8 reads Block A from op-release.json, which still holds the r2 bundle; it sees these screens once
+  the r1 bundle is built with the four-digit pattern.

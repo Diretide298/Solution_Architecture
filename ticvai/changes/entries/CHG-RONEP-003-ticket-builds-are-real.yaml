@@ -1,0 +1,42 @@
+id: CHG-RONEP-003
+date: '2026-10-03'
+source: audit
+kind: process
+summary: A ticket builds only real ids, a module test names the screens, operations and tables of its app-module, and a
+  setup ticket links only its slice's operations (the rest-of-the-screen ticket the others).
+decision:
+  what: 'tools/ticket_done.py builds_of: a task whose text leads with "Builds: `kind id`, ..." builds what it lists; only a
+    generated operations task (SVC-, VM-) reads its title as operations, so a hand-written task builds no fragment of its
+    title. build-service-docs.py writes that lead for the hand-written tasks of block-a-extra-tasks.json (their
+    `operations` and new `builds`: PLATFORM-OUTBOX the outbox, inbox and dead-letter tables and ADR-0033, ADR-0057 and
+    ADR-0058; AI-ENGINE-EVAL runAiEvaluation and the evaluation tables; AI-ENGINE-GUIDED proposeGuidedChoice and
+    publishGuidedChoice; and so on) and for every module test (its app-module''s screens, operations and tables, named in
+    its done-when too). op-release.py keeps the text of a ticket that lists its own builds. tools/adam-links.py links
+    through the same builds_of, reads four-digit screen ids, and links a setup ticket''s slice operations only and the
+    rest-of-the-screen ticket the others. tools/check-ticket-builds.py: B-UNRESOLVED, B-AI-EMPTY, B-MODULE-TEST,
+    B-SETUP-LINKS.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'The r1 gate, an AI judge of 119 tickets on the fixed package, 3 October (docs/active/decisions/answers-3-october-r1-plan.md,
+  G1, G2, G4): TEST-AM-* tickets named nothing to test; PLATFORM-SAGA-PAID built "operation the saga proven end to end",
+  OFFLINE-JOURNAL "operation record" and the AI engine tasks nothing; APP-SETUP-BO-1162 said "2 of its 6 operations" and
+  linked all 6. Same family as A14 TICKET-LINKS (the 26 September pull audit, R044).'
+keys_touched:
+  files: [tools/ticket_done.py, tools/build-service-docs.py, tools/op-release.py, tools/adam-links.py,
+    tools/check-ticket-builds.py, tools/run-checks.py, docs/active/block-a-extra-tasks.json]
+  tickets: [PLATFORM-OUTBOX, PLATFORM-SAGA-PAID, OFFLINE-JOURNAL, AI-ENGINE-EVAL, AI-ENGINE-GUIDED, AI-ENGINE-BASELINE,
+    APP-SETUP-BO-1162]
+root_class: A14 TICKET-LINKS
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-ticket-builds.py
+status: closed
+closed_by_commit: 155f591a
+notes: On the plan and code of 3044d8b0 check-ticket-builds finds 7 unresolved build ids, 10 Block A AI engine tasks building
+  nothing and 279 module tests naming nothing; after it, none. tools/tests/test_op_release.py passes (22).

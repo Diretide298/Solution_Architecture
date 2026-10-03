@@ -1,0 +1,61 @@
+id: CHG-RONEP-001
+date: '2026-10-03'
+source: plan
+kind: plan
+summary: Every operation a Block A screen binds is built by a Block A task, so the setup screens, the decided operations and
+  the AI engine's own operations are built in Block A whole, and the plan derivation keeps it so.
+decision:
+  what: 'A generator rule in tools/build-service-docs.py (the "Every operation a Block A screen binds" closure): every screen a
+    Block A task builds joins Block A''s closure with its whole binding set (apis, onLoad and onAction alike), so the rest of
+    each setup screen (APP-SETUP-*-REST) is built in Block A, in its setup app-module, and the operations no earlier task
+    builds are planned with a Block A app-module (their four-operation tasks hold only Block A work). The rest of a setup
+    screen is now every operation beyond its setup ones, also those another task builds (BO-1065 had nobody wiring
+    listDenominations and getRegionSettings). Decided scope no binding in this tree derives is recorded in
+    docs/active/block-a-extra-tasks.json: blockAOperations (getUnifiedReconciliation, createPrincipal, requestProductionAccess,
+    closeFiscalPeriod, listFiscalPeriods, the four report-schedule operations, the BO-074/BO-075 writes, the payment
+    configuration operations), the AI engine tasks'' operations (getGuestConversation and sendGuestConversationMessage on
+    AI-ENGINE-CONCIERGE, 9 days; setAiProvider and setAiCredential on AI-ENGINE-GATEWAY, 13 days; no back-end task builds
+    them), blockAScreens (BO-1065 whole) and screenNotes (BO-1065''s AI residency section). This rule alone takes Block A from 3,806
+    to 4,740 points (945 to 1,228 tasks; with CHG-RONEP-006, 5,561): +8 points starting in Sprint 1, +305 in Sprint 2, +241 in Sprint 3, +163 in Sprint 4 and
+    217 that start in Sprint 5. It does not fit by Friday 27 November at normal hours, as it did not before: Block A work
+    after the block-test window opens (24 November) rises from 19.9 to 55.3 person-days (developers 7.3 to 41.5, the two AI
+    engineers 12.6 to 13.8), and at normal hours Block A would end in Sprint 6 (25 December) instead of Sprint 5 (11
+    December). Block A stays fixed at Sprint 4; the overtime is Chinmay''s call. People and load rules unchanged (owners of
+    pushed tickets kept, helpers within their caps).'
+  by: Chinmay
+  date: '2026-10-03'
+proposed: '2026-10-03'
+why: 'Chinmay''s r1 additions, 3 October (docs/active/decisions/answers-3-october-r1-plan.md): "Block A completes its apps:
+  every operation a Block A screen binds is built in Block A or earlier (a new rule)". The r1 gate and the design batches''
+  cross-checks found Block A screens binding operations built in Blocks B to D or by no ticket: 74 and 99 on Venue
+  Management, 8 on CMS-025/026, 22 on the TICVAI Console, 2 on Analytics (186 distinct bindings; all built in Block A now).
+  The cause was the closure of 1 October (extended to doors by CHG-DOOR-004): it took the screens of the Block A apps and of
+  their flows, never the setup screens a Block A task builds, so their other buttons were planned later.'
+keys_touched:
+  operations: [getUnifiedReconciliation, createPrincipal, requestProductionAccess, closeFiscalPeriod, listFiscalPeriods,
+    createReportSchedule, listReportSchedules, updateReportSchedule, deleteReportSchedule, createAccount, updateAccount,
+    createCostCenter, setAccountMappings, createTaxExemption, verifyTaxExemption, getGuestConversation,
+    sendGuestConversationMessage, setAiProvider, setAiCredential]
+  screens: [BO-1065, BO-074, BO-075, DEV-003, ADM-037, ADM-005, ADM-008, BO-010, BO-013, BO-054, CMS-025, CMS-026, ANL-025,
+    ANL-066]
+  files: [tools/build-service-docs.py, docs/active/block-a-extra-tasks.json, tools/check-plan-closure.py, tools/run-checks.py,
+    checks/baseline.json, docs/active/decisions/answers-3-october-r1-plan.md]
+root_class: 'new: block-scope-incomplete'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py
+status: closed
+closed_by_commit: 155f591a
+notes: 'check-plan-closure C-BOUND fails on the plan of 3044d8b0 (215 bindings on 77 setup screens built later) and passes
+  after it. checks/baseline.json re-recorded: the plan moved staff-app screens between Blocks C and D and design_spec now
+  attributes VM, four-digit and rest-of-the-screen tasks to their blocks (CHG-RONEP-005); every app and kind total is
+  unchanged (venue-management unbound-control 4,824, unknown-field 1; venue-staff-mobile 42). Levers for Chinmay, not
+  applied: a read that does not pull its own service''s writers into Block A (as across services) would take about 370
+  points out of Block A but move about 120 artefacts r2 built in Block A to later blocks; leaving the rest of the setup
+  screens in their later blocks would take 254 front-end points out but leave Block A screens with buttons nobody wires.'
