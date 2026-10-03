@@ -10,6 +10,10 @@ Retired 10 September 2026.
 
 Gave guest mobile the twenty-three operations only guest web could call — including the whole cart-editing surface and `createOrder`, without which the app could start a checkout and never produce an order. Applied 10 September.
 
+## `guest-scoping-3-october.py`
+
+Declared how a guest calls the staff-permission operations the guest screens bind, decided 3 October (Chinmay's answers to the Block A audit, "Pattern 4", all as recommended; CHG-GCF-001 to -005). The audit found 184 guest-screen bindings of 49 operations carrying a staff permission with neither `x-ticvai-guest-callable` nor `x-ticvai-self-scoped`. Writes the flag and one description paragraph per operation at its own lines: twenty catalogue reads guest-callable with published data only, fifteen of the guest's own records and the three assistant-conversation operations self-scoped, seven purchase actions guest-callable within the guest's own session, `reprintOrder` self-scoped and kiosk-callable as a device, and a note on `sendConversationMessage` and `listAnalyticsProviders`, which stay staff operations. The new `sendGuestConversationMessage`, `getGuestConversation` and `PublishedTenantConfig.analyticsProviders` were written by hand. `check-audience-match` (AM-GUEST-PERMISSION) fails a guest screen that binds such an operation again. Applied 3 October; a second run says there is nothing to do.
+
 ## `apply-naming-and-navsets.py`
 
 Collapsed ADM-321 into ADM-241, renamed BO-047 to Order Corrections & Exceptions, and defined the two P04 navigation sets — recording `posPrimaryRail` as unrealised rather than inventing a membership for it. Applied 9 September.

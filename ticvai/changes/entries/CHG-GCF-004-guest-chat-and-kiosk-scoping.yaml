@@ -1,0 +1,58 @@
+id: CHG-GCF-004
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: The guest's assistant conversations are self-scoped; new sendGuestConversationMessage and getGuestConversation give
+  the guest their side of a handed-over chat (send, read the replies and the queue position); reprintOrder is the guest's
+  own and kiosk-callable as a device.
+decision:
+  what: 'createAiConversation, listAiConversations and sendAiMessage get x-ticvai-self-scoped: subject (sendAiMessage''s responses
+    untouched). New in marketing-crm, both self-scoped with no permission, audience guest: sendGuestConversationMessage (POST
+    /my/conversations/{conversationId}/messages: body and attachments, sender resolved as guest, 409 conversation-not-with-agent)
+    replaces sendConversationMessage (CASE_MANAGE) on the guest screens; getGuestConversation (GET /my/conversations/{conversationId}:
+    state, queuePosition, estimatedWaitSeconds and the guest-visible messages, afterMessageId for polling) because no guest
+    read of the agent''s replies existed. sendConversationMessage stays the agent''s send and its description says guests
+    use the new operation. reprintOrder gets x-ticvai-self-scoped: subject (a guest resends their own order on WEB-013 and
+    GST-010), the device audience and the kiosk''s apiKeyAuth credential (additive). endKioskAssist is already device-only
+    (audience device, apiKeyAuth) and needs no change.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Chinmay''s answers of 3 October 2026 to the Block A audit on live r2 (CHG-AUD-001, pattern 3: guest screens bind staff-only
+  operations), section ''Pattern 4'', all as recommended. The zero-AI scan found 184 guest-screen bindings (P01, P02, P05)
+  of 49 operations that carry a staff permission and declare neither x-ticvai-guest-callable nor x-ticvai-self-scoped, so
+  nothing said what a guest, who holds no permission, may do (ADR-0025: audience and permission are orthogonal).'
+keys_touched:
+  operations:
+  - createAiConversation
+  - listAiConversations
+  - sendAiMessage
+  - sendGuestConversationMessage
+  - getGuestConversation
+  - sendConversationMessage
+  - reprintOrder
+  - endKioskAssist
+  schemas:
+  - GuestConversation
+  - GuestConversationMessage
+  files:
+  - tools/applied/guest-scoping-3-october.py
+  - tools/check-audience-match.py
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - SVC-AI-ASSIST-1
+  - SVC-MARKETING-MARKETING-3
+  - SVC-MARKETING-MARKETING-5
+  - SVC-ORDER-ORDER-4
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-audience-match.py
+status: open
+notes: Batch GCF (spec-guest). The screens branch (CHG-SPF-013, cf7cb692) binds sendGuestConversationMessage on GST-031, GST-032
+  and WEB-044. Until it merges, check-audience-match AM-GUEST-PERMISSION reports those three screens still binding sendConversationMessage;
+  close this entry on the merge, when the rule reaches zero. The guest audience and guestAuth stay on sendConversationMessage
+  so a client built against r1 is not broken; they go at the next major.

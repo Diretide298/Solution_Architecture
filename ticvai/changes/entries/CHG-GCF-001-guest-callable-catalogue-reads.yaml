@@ -1,0 +1,73 @@
+id: CHG-GCF-001
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: Twenty public catalogue reads the guest screens bind are guest-callable and serve a guest published data only; staff
+  keep their permission and also see drafts.
+decision:
+  what: 'Mark the public catalogue reads x-ticvai-guest-callable: true and state in each description that a guest or visitor
+    sees published data only (drafts, unpublished and withdrawn rows never; such a record by id answers as not found), while
+    the staff permission stays for staff, who also see drafts.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Chinmay''s answers of 3 October 2026 to the Block A audit on live r2 (CHG-AUD-001, pattern 3: guest screens bind staff-only
+  operations), section ''Pattern 4'', all as recommended. The zero-AI scan found 184 guest-screen bindings (P01, P02, P05)
+  of 49 operations that carry a staff permission and declare neither x-ticvai-guest-callable nor x-ticvai-self-scoped, so
+  nothing said what a guest, who holds no permission, may do (ADR-0025: audience and permission are orthogonal).'
+keys_touched:
+  operations:
+  - listProducts
+  - getProduct
+  - listProductVariants
+  - listPerformances
+  - getPerformance
+  - getAvailability
+  - listCatalogueBundles
+  - getBundle
+  - listPromotions
+  - getPromotion
+  - getCouponCode
+  - getSeatAvailability
+  - listMerchandise
+  - lookupMerchandise
+  - listQueues
+  - listParkingFacilities
+  - listFxRates
+  - listLoyaltyProgrammes
+  - listRewards
+  - listConsentPurposes
+  files:
+  - tools/applied/guest-scoping-3-october.py
+  - tools/check-audience-match.py
+root_class: A23 AUTH-SCOPE
+tickets:
+  started: []
+  unstarted:
+  - SVC-ACCESS-ACCESS-3
+  - SVC-CATALOGUE-AVAILABILITY-1
+  - SVC-CATALOGUE-BUNDLE-1
+  - SVC-CATALOGUE-CAPACITY-1
+  - SVC-CATALOGUE-COUPON-1
+  - SVC-CATALOGUE-EVENT-1
+  - SVC-CATALOGUE-EVENT-3
+  - SVC-CATALOGUE-PRODUCT-1
+  - SVC-CATALOGUE-PRODUCT-2
+  - SVC-CATALOGUE-PROMOTION-2
+  - SVC-CATALOGUE-PROMOTION-3
+  - SVC-LEDGER-LEDGER-1
+  - SVC-MARKETING-CONSENT-2
+  - SVC-MARKETING-LOYALTY-2
+  - SVC-RETAIL-FLOOR-1
+  - SVC-RETAIL-MERCHANDISE-1
+  - SVC-VENUEOPS-QUEUE-1
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-audience-match.py
+status: open
+notes: 'Batch GCF (spec-guest). Applied by tools/applied/guest-scoping-3-october.py (one flag and one appended description
+  paragraph per operation). ''Badges'' in the answer''s group 1 is read as the programme catalogue: listCustomerBadges returns
+  one customer''s badges, so it is self-scoped under CHG-GCF-002 instead (a guest-callable read by customerId would show anyone''s
+  badges).'

@@ -1,0 +1,46 @@
+id: CHG-GCF-003
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: Seven purchase actions are guest-callable within the guest's own session; staff keep the permission to act for a
+  guest.
+decision:
+  what: 'Mark createOrder, createPayment, inquirePaymentStatus, createSeatHold, recommendSeats, reserveMerchandise and evaluatePromotions
+    x-ticvai-guest-callable: true; each description says a guest acts only for themselves in their own session and the permission
+    is what staff hold to do it for a guest.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Chinmay''s answers of 3 October 2026 to the Block A audit on live r2 (CHG-AUD-001, pattern 3: guest screens bind staff-only
+  operations), section ''Pattern 4'', all as recommended. The zero-AI scan found 184 guest-screen bindings (P01, P02, P05)
+  of 49 operations that carry a staff permission and declare neither x-ticvai-guest-callable nor x-ticvai-self-scoped, so
+  nothing said what a guest, who holds no permission, may do (ADR-0025: audience and permission are orthogonal).'
+keys_touched:
+  operations:
+  - createOrder
+  - createPayment
+  - inquirePaymentStatus
+  - createSeatHold
+  - recommendSeats
+  - reserveMerchandise
+  - evaluatePromotions
+  files:
+  - tools/applied/guest-scoping-3-october.py
+  - tools/check-audience-match.py
+root_class: A23 AUTH-SCOPE
+tickets:
+  started: []
+  unstarted:
+  - SVC-CATALOGUE-EVALUATION-1
+  - SVC-CATALOGUE-HOLD-1
+  - SVC-CATALOGUE-RECOMMENDATION-1
+  - SVC-ORDER-ORDER-1
+  - SVC-ORDER-PAYMENT-1
+  - SVC-RETAIL-FLOOR-2
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-audience-match.py
+status: open
+notes: Batch GCF (spec-guest). Applied by tools/applied/guest-scoping-3-october.py.

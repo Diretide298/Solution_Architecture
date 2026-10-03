@@ -1308,10 +1308,16 @@ paths:
       description: '8.4.30. Retained because an assistant with no memory of yesterday is a search box,
         and because the governance requirements need the history to exist (8.3.59).
 
+        **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-004;
+        `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own
+        assistant conversations; another guest''s conversation is refused exactly as one that does not exist,
+        never returned. `AI_USE` is what a staff caller must hold to act for any guest (ADR-0025).
+
         '
       tags:
       - assist
       x-ticvai-permission: AI_USE
+      x-ticvai-self-scoped: subject
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1370,10 +1376,16 @@ paths:
         conversation carries its `module` and `scopePath` and no role of its own — a role copied onto
         the thread would go on answering as a finance controller after the grant was withdrawn.
 
+        **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-004;
+        `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own
+        assistant conversations; another guest''s conversation is refused exactly as one that does not exist,
+        never returned. `AI_USE` is what a staff caller must hold to act for any guest (ADR-0025).
+
         '
       tags:
       - assist
       x-ticvai-permission: AI_USE
+      x-ticvai-self-scoped: subject
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1460,10 +1472,16 @@ paths:
         `503 scrubber-unavailable`, never sent raw; a message or reply the guard blocks is refused
         `422 guard-refused`.
 
+        **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-004;
+        `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own
+        assistant conversations; another guest''s conversation is refused exactly as one that does not exist,
+        never returned. `AI_USE` is what a staff caller must hold to act for any guest (ADR-0025).
+
         '
       tags:
       - assist
       x-ticvai-permission: AI_USE
+      x-ticvai-self-scoped: subject
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append

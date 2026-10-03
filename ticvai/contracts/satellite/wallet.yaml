@@ -1982,8 +1982,14 @@ paths:
       description: >
         Stored value belonging to a guest, distinct from a bearer gift card. Where the guest
         is linked across cells, the authoritative balance lives in their home cell.
+
+        **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002;
+        `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own
+        wallet (`subjectId` is the caller's); another guest's wallet is refused exactly as one that does not
+        exist, never returned. `WALLET_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
       tags: [wallet]
       x-ticvai-permission: WALLET_VIEW
+      x-ticvai-self-scoped: subject
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -2098,8 +2104,14 @@ paths:
         **An unknown subject is 404; a wallet with no movements is an empty page.** A subject
         with no wallet in the caller's scope is the shared 404 — the same answer `getWallet`
         gives — so an empty page always means a wallet that exists and has not moved yet.
+
+        **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002;
+        `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own
+        wallet (`subjectId` is the caller's); another guest's wallet is refused exactly as one that does not
+        exist, never returned. `WALLET_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
       tags: [wallet]
       x-ticvai-permission: WALLET_VIEW
+      x-ticvai-self-scoped: subject
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -2247,8 +2259,14 @@ paths:
       x-ticvai-audience: [staff, guest]
       x-ticvai-read-routing: primary   # bearer instrument. Stale balance is double-spend
       summary: Check a gift card balance
+      description: >
+        **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002;
+        `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for a gift card
+        held in their own wallet; any other card code is refused exactly as one that does not exist, never
+        returned. `WALLET_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
       tags: [giftCard]
       x-ticvai-permission: WALLET_VIEW
+      x-ticvai-self-scoped: subject
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins

@@ -2011,10 +2011,16 @@ paths:
         a till (DI-282). `chargeable=true` with `venueId` narrows the list to the currencies the venue
         lets a guest pay in (`tenancy.VenueSettings.chargeCurrencies`); each rate says `chargeable`.
 
+        **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026,
+        Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets the published rates in
+        force, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not
+        found. `LEDGER_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
         '
       tags:
       - ledger
       x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-guest-callable: true
       x-ticvai-scope-level: region
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
