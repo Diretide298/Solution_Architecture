@@ -1455,7 +1455,11 @@ screens:
     **The guest board is an unattended customer display** (POSV2-7; design-notes correction fnb-retail
     KIT-007; CHG-SPO-017): order numbers only, under Preparing and Ready for pickup, never a name and
     no staff control. Handover is recorded at the pass (KIT-006). The buzzer number is on the ticket,
-    but nothing writes it from the till or dispatches to a pager yet (open entry CHG-SPO-019).'
+    but nothing writes it from the till or dispatches to a pager yet (open entry CHG-SPO-019).
+
+
+    **An unattended guest display, read-only** (decided by Chinmay, 3 October 2026 (CHG-SPF-008)): `recordOrderHandover`,
+    its button and form left this screen; a handover is recorded on KIT-006 Expo / Pass.'
   density: touchLarge
   densityReason: '**Bumped by somebody with flour on their hands, read from two metres, in a room where
     nobody is sitting down.** A kitchen display is not a back office at a different width.'
@@ -1472,34 +1476,23 @@ screens:
       slot: collection
       components:
       - kind: cardList
-        bindsTo: KitchenTicket[]
-        notes: '**One ticket per card, ordered by promise time not arrival.** A ticket due in two minutes
-          sits above one that arrived first, because a kitchen works to when food is wanted.'
-        provenance: carried from the previous definition
-      - kind: cardList
         label: Guest status board — Preparing and Ready for pickup
         bindsTo: KitchenTicket
         operation: listKitchenTickets
         notes: '**Order numbers only, never a name**, in two columns, Preparing and Ready for pickup,
           readable from across the room. **Owned here** (decided 1 October 2026, POSV2-7); the till''s
-          Order Queue (POS-029) mirrors it. The look is the v2 build''s queue status board.'
+          Order Queue (POS-029) mirrors it. The look is the v2 build''s queue status board.
+
+
+          **Read-only, in the order the server returns** (decided by Chinmay, 3 October 2026 (CHG-SPF-008)):
+          order numbers, Preparing and Ready for pickup, no buttons and no re-sorting on the display.
+          The handover is recorded on KIT-006.'
         provenance: v2 build, Queue (the guest status board, wireframes/incoming/P04-pos-v2/img/pos-029.png)
       - kind: metricTile
         notes: Depth and oldest ticket age. **Two numbers, glanceable** — anything a chef has to read
           is a number they will not read. The station-load tile is not in the first release (decided 28
           September, audit R277).
         provenance: carried from the previous definition
-    - name: contextPanel
-      slot: selection
-      components: []
-    - name: actionBar
-      slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Record order handover
-        operation: recordOrderHandover
-        permission: ORDER_MODIFY
-        provenance: contract fnb.yaml POST /guest-orders/{orderId}/delivery
   states:
     loading: Order numbers under Preparing and Ready for pickup.
     error: Could not reach the platform. **The rail is still live from cache** and every bump is queued.
@@ -1515,20 +1508,12 @@ screens:
     contract: fnb
     purpose: Kitchen ticket queue
     trigger: onLoad
-  - operationId: recordOrderHandover
-    contract: fnb
-    purpose: Record that an order reached the guest
-    trigger: onAction
-    invalidates:
-    - listKitchenTickets
   entryState:
     params:
     - name: venueId
       from: session
     - name: stationId
       from: session
-    - name: orderId
-      from: KIT-002
     coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the kitchen
       is open, and it resolves its station from the device assignment rather than from a person.'
     preloaded:
@@ -1551,28 +1536,7 @@ screens:
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
-  overlays:
-  - id: formRecordOrderHandover
-    component: modal
-    trigger: Record order handover
-    body: '**Collects what `recordOrderHandover` sends before it is called.** Required: `outcome`, `recordedAt`.
-      Optional: `deliveredToLocationId`, `runnerPrincipalId`, `note`. **Only the outcome that fits the
-      order''s service mode is offered**: tableService `served`; quickService or collection `collected`;
-      delivery or roomService `delivered`, with `deliveredToLocationId` required. `guestNotFound` and
-      `refused` are offered for every mode. Any other pairing is refused 422 `outcomeNotForServiceMode`
-      (decided 28 September, audit R125 (1)). Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Record order handover
-      operation: recordOrderHandover
-    dismiss:
-      label: Cancel
-      discards:
-      - outcome
-      - recordedAt
-      - deliveredToLocationId
-      - runnerPrincipalId
-      - note
-    provenance: contract fnb.yaml POST /guest-orders/{orderId}/delivery
+  overlays: []
 - id: KIT-008
   name: Exceptions, Re-Fire & Unavailable Items
   module: Kitchen

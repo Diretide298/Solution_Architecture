@@ -659,8 +659,13 @@ screens:
     trigger: onAction
   - operationId: getPublishedTenantConfig
     contract: white-label
-    purpose: The published brand, theme, fonts, header, footer, navigation, homepage, booking-flow display
+    purpose: 'The published brand, theme, fonts, header, footer, navigation, homepage, booking-flow display
       settings and languages, read before anyone signs in (GFIX-1)
+
+
+      Also the analytics providers to start once their consent category is granted, from the published
+      config (listAnalyticsProviders needs TENANT_CONFIGURE and left the guest screens: decided by Chinmay,
+      3 October 2026 (CHG-SPF-007)).'
     trigger: onLoad
     provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-1)
   - operationId: getCookieConsentRuntime
@@ -672,11 +677,6 @@ screens:
     contract: marketing-crm
     purpose: Accept, reject or customise tracking on first launch
     trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: listAnalyticsProviders
-    contract: white-label
-    purpose: Analytics SDKs to start once their consent category is granted
-    trigger: onLoad
     provenance: build, 29 September 2026
   - operationId: decideRecommendations
     contract: ai
@@ -10323,7 +10323,12 @@ screens:
 
     **Multi-venue intelligence (client meeting 30 September, MoM 4.7, Allam).** Each day tab is one park,
     and every item on it (rides, dining, and now retail: shops and kiosks) is at that park; a preference
-    the park cannot meet shows as *Not at this park* rather than being filled from another park.'
+    the park cannot meet shows as *Not at this park* rather than being filled from another park.
+
+
+    **A signed-out guest builds and changes a plan** (decided by Chinmay, 3 October 2026 (CHG-SPF-012)):
+    the plan lives in an anonymous session; signing in is asked only to save, share or book, and the plan
+    moves to the account on sign-in.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listProducts` reads the population and `getCart` reads one of them — list, select,
@@ -10397,8 +10402,12 @@ screens:
       - kind: toggle
         label: Add Fast Track
         operation: updateVisitPlan
-        notes: An add-on from the plan's `addOnSuggestions` (the product GST-048 sells), priced per guest,
-          with the queuing time it saves.
+        notes: 'An add-on from the plan''s `addOnSuggestions` (the product GST-048 sells), priced per
+          guest, with the queuing time it saves.
+
+
+          Sends `updateVisitPlan` with the change kind `addAddOn` (on) or `removeAddOn` (off); the add-on
+          is priced at booking (decided by Chinmay, 3 October 2026 (CHG-SPF-012)).'
         provenance: decided 29 September 2026, MOB-6
       - kind: detailPanel
         label: Estimated total
@@ -10575,7 +10584,12 @@ screens:
 
     **Grounding (client meeting 30 September, MoM 4.7, Allam).** The agent''s candidates are only the
     rides, dining and retail (shops and kiosks) of each day''s own park, as the plan operations return
-    them; `updateVisitPlan` refuses a point from another park (`point-not-at-day-venue`) as the backstop.'
+    them; `updateVisitPlan` refuses a point from another park (`point-not-at-day-venue`) as the backstop.
+
+
+    **A signed-out guest builds and changes a plan** (decided by Chinmay, 3 October 2026 (CHG-SPF-012)):
+    the plan lives in an anonymous session; signing in is asked only to save, share or book, and the plan
+    moves to the account on sign-in.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listProducts` reads the population and `getWaitTimes` reads one of them — list, select,
@@ -10812,7 +10826,12 @@ screens:
         notes: '**The code rotates every 30 seconds by default, the venue''s setting** (decided by Chinmay,
           2 October 2026; DEC-136; `DynamicQrSecurityProfile.refreshIntervalSeconds`: 15, 30, 45, 60 or
           a custom value of at least 5 seconds, matching BO-165). A countdown shows the seconds to the
-          next code; the seed''s time step is that one setting, never a value of its own (CHG-SGU-003).'
+          next code; the seed''s time step is that one setting, never a value of its own (CHG-SGU-003).
+
+
+          **Every 30 seconds** (decided by Chinmay, 3 October 2026 (CHG-SPF-012): GST-055''s admission
+          QR rotates every 30 seconds; the answer named GST-069 and meant this screen): the default above,
+          which the venue may change.'
         provenance: corrected 2 October 2026 (CHG-SGU-003, decided by Chinmay 2 October 2026, DEC-136)
       - kind: detailPanel
         label: The entitlement

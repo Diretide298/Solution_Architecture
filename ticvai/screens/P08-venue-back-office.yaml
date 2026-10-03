@@ -16483,9 +16483,15 @@ screens:
     inferred: true
     entryFrom:
     - BO-055
-  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+  notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound
     for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+
+
+    **Attendance is self clock-in only** (decided by Chinmay, 3 October 2026 (CHG-SPF-009), not the
+    recommendation): staff clock in and out themselves on the staff app (`recordAttendance`, EMP-024
+    and EMP-025); a supervisor corrects a record afterwards here with Amend attendance (`amendAttendance`).
+    Record attendance left this screen.'
   density: compact
   pattern: listDetail
   patternReason: '`listAttendance` reads a population and nothing reads one of them; the detail is the
@@ -16561,10 +16567,6 @@ screens:
         label: Amend attendance
         operation: amendAttendance
         provenance: contract workforce.yaml POST /attendance/{recordId}/amend
-      - kind: secondaryButton
-        label: Record attendance
-        operation: recordAttendance
-        provenance: contract workforce.yaml POST /attendance/clock
   states:
     loading: The time attendance list.
     error: Could not load. Names which read failed and leaves the time attendance untouched.
@@ -16575,8 +16577,8 @@ screens:
     emptyNoAccess: 'Shown when the caller lacks `WORKFORCE_VIEW`, which `listAttendance` requires to
       show this screen, and names that permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question. A caller who can see the screen
-      but lacks what an action needs sees that action disabled, naming its permission: `ATTENDANCE_RECORD`
-      for `recordAttendance`; `WORKFORCE_MANAGE` for `amendAttendance`.'
+      but lacks what an action needs sees that action disabled, naming its permission: `WORKFORCE_MANAGE`
+      for `amendAttendance`.'
   apis:
   - operationId: listAttendance
     contract: workforce
@@ -16585,12 +16587,6 @@ screens:
   - operationId: amendAttendance
     contract: workforce
     purpose: A supervisor corrects a record
-    trigger: onAction
-    invalidates:
-    - listAttendance
-  - operationId: recordAttendance
-    contract: workforce
-    purpose: Clock in, clock out, or take a break
     trigger: onAction
     invalidates:
     - listAttendance
@@ -16635,25 +16631,6 @@ screens:
       - correctedAt
       - reason
     provenance: contract workforce.yaml POST /attendance/{recordId}/amend
-  - id: formRecordAttendance
-    component: modal
-    trigger: Record attendance
-    body: '**Collects what `recordAttendance` sends before it is called.** Required: `kind`, `occurredAt`.
-      Optional: `assignmentId`, `accessPointId`, `latitude`, `longitude`. Dismissing sends nothing;
-      the screen behind is unchanged.'
-    confirm:
-      label: Record attendance
-      operation: recordAttendance
-    dismiss:
-      label: Cancel
-      discards:
-      - kind
-      - occurredAt
-      - assignmentId
-      - accessPointId
-      - latitude
-      - longitude
-    provenance: contract workforce.yaml POST /attendance/clock
 - id: BO-057
   name: Training & Certification
   module: People & Access Rights
@@ -22095,20 +22072,12 @@ screens:
         permission: PROCUREMENT_REQUEST
         provenance: contract inventory.yaml POST /requisitions
       - kind: secondaryButton
-        label: Approve requisition
+        label: Decide requisition
         operation: approveRequisition
         permission: APPROVAL_ACT
         provenance: contract inventory.yaml POST /requisitions/{requisitionId}/approve
-      - kind: destructiveButton
-        label: Reject requisition
-        operation: rejectRequisition
-        permission: APPROVAL_ACT
-        provenance: contract inventory.yaml POST /requisitions/{requisitionId}/reject
-      - kind: secondaryButton
-        label: Return requisition
-        operation: returnRequisition
-        permission: APPROVAL_ACT
-        provenance: contract inventory.yaml POST /requisitions/{requisitionId}/return
+        notes: '**One decision call** (decided by Chinmay, 3 October 2026 (CHG-SPF-010)): approve, reject
+          or return, with the reason a reject or a return needs.'
       - kind: destructiveButton
         label: Cancel requisition
         operation: cancelRequisition
@@ -22125,13 +22094,6 @@ screens:
         permission: PROCUREMENT_REQUEST
         provenance: contract inventory.yaml PUT /requisitions/{requisitionId}/lines
   overlays:
-  - id: confirmRejectRequisition
-    component: confirmDialog
-    trigger: Reject requisition
-    body: '**Names what `rejectRequisition` changes and what it leaves alone**, in the consequence rather
-      than the verb. A requisitions this affects should be identified in the dialog, not just counted.
-      **Collects what `rejectRequisition` sends before it is called.** Required: `reason`.'
-    provenance: contract inventory.yaml POST /requisitions/{requisitionId}/reject
   - id: confirmCancelRequisition
     component: confirmDialog
     trigger: Cancel requisition
@@ -22162,11 +22124,13 @@ screens:
     provenance: contract inventory.yaml POST /requisitions
   - id: formApproveRequisition
     component: modal
-    trigger: Approve requisition
-    body: '**Collects what `approveRequisition` sends before it is called.** Required: `decision`. Optional:
-      `note`, `amendedLines`. Dismissing sends nothing; the screen behind is unchanged.'
+    trigger: Decide requisition
+    body: '**Collects the decision `approveRequisition` sends** (decided by Chinmay, 3 October 2026
+      (CHG-SPF-010)): `decision` is approve, reject or return; a reject or a return names its reason
+      in `note`, which the form will not send empty. Optional: `amendedLines` (approve only). Dismissing
+      sends nothing; the screen behind is unchanged.'
     confirm:
-      label: Approve requisition
+      label: Send decision
       operation: approveRequisition
     dismiss:
       label: Cancel
@@ -22175,19 +22139,6 @@ screens:
       - note
       - amendedLines
     provenance: contract inventory.yaml POST /requisitions/{requisitionId}/approve
-  - id: formReturnRequisition
-    component: modal
-    trigger: Return requisition
-    body: '**Collects what `returnRequisition` sends before it is called.** Required: `question`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Return requisition
-      operation: returnRequisition
-    dismiss:
-      label: Cancel
-      discards:
-      - question
-    provenance: contract inventory.yaml POST /requisitions/{requisitionId}/return
   - id: formUpdateRequisitionLines
     component: modal
     trigger: Save requisition lines
@@ -22229,18 +22180,6 @@ screens:
   - operationId: approveRequisition
     contract: inventory
     purpose: Approve or reject a requisition
-    trigger: onAction
-    invalidates:
-    - listRequisitions
-  - operationId: rejectRequisition
-    contract: inventory
-    purpose: Reject a requisition
-    trigger: onAction
-    invalidates:
-    - listRequisitions
-  - operationId: returnRequisition
-    contract: inventory
-    purpose: Return a requisition for more information
     trigger: onAction
     invalidates:
     - listRequisitions

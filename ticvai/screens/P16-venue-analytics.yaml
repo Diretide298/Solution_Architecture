@@ -4154,9 +4154,11 @@ screens:
       - kind: primaryButton
         label: Save dashboard
         operation: updateDashboard
-        notes: Saves the whole dashboard (tiles replace tiles); the confirmation names tiles that will
-          be removed. Refused 422 `tile-encoding-missing` for a tile whose report lacks a well its mark
-          requires, naming the tile and the well.
+        notes: '**The first Save creates the dashboard (`createDashboard`), every later Save updates it
+          (`updateDashboard`)** (decided by Chinmay, 3 October 2026 (CHG-SPF-011)); the refresh budget
+          is checked on both. Saves the whole dashboard (tiles replace tiles); the confirmation names
+          tiles that will be removed. Refused 422 `tile-encoding-missing` for a tile whose report lacks
+          a well its mark requires, naming the tile and the well.'
         provenance: contract reporting.yaml PUT /dashboards/{dashboardId}
       - kind: iconButton
         label: Undo
@@ -4271,9 +4273,10 @@ screens:
     emptyFirstRun: A new dashboard with no tiles yet. The gallery is open and says "Drag a visual onto
       the grid"; nothing is created until Save dashboard.
     emptyNoResults: The report search matched nothing. Names the search and offers to clear it.
-    emptyNoAccess: Without `REPORT_VIEW_VENUE`, which `listReports` requires, the screen does not load
-      and this state names that permission. Shown when the caller lacks `REPORT_MANAGE`, which saving
-      requires; the dashboard opens read-only and names that permission.
+    emptyNoAccess: 'Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listReports` requires to show
+      this screen, and names that permission. A caller without `REPORT_MANAGE` sees the dashboard read-only:
+      Save (`createDashboard`, `updateDashboard`) and Archive (`deleteDashboard`) are disabled and name
+      that permission (decided by Chinmay, 3 October 2026 (CHG-SPF-011)).'
   apis:
   - operationId: updateDashboard
     contract: reporting
@@ -4308,6 +4311,13 @@ screens:
     purpose: A report's columns and their encodings, for the field wells
     trigger: onAction
     provenance: '2 October 2026 (CHG-SOT-010): the wells come from ReportColumn (CHG-FIN-007)'
+  - operationId: createDashboard
+    contract: reporting
+    purpose: The first Save of a new dashboard; later saves update it
+    trigger: onAction
+    invalidates:
+    - getDashboard
+    provenance: decided by Chinmay, 3 October 2026 (CHG-SPF-011)
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-023
@@ -4320,6 +4330,9 @@ screens:
     params:
     - name: dashboardId
       from: navigation
+      optional: true
+      notes: 'Optional (decided by Chinmay, 3 October 2026 (CHG-SPF-011)): opened without one, the canvas
+        is a new dashboard and its first Save creates it.'
     - name: reportId
       from: navigation
       optional: true

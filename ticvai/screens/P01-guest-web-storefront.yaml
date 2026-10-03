@@ -388,8 +388,13 @@ screens:
     contract: white-label
   - operationId: getPublishedTenantConfig
     contract: white-label
-    purpose: The published brand, theme, fonts, header, footer, navigation, homepage, booking-flow display
+    purpose: 'The published brand, theme, fonts, header, footer, navigation, homepage, booking-flow display
       settings and languages, read before anyone signs in (GFIX-1)
+
+
+      Also the analytics providers to start once their consent category is granted, from the published
+      config (listAnalyticsProviders needs TENANT_CONFIGURE and left the guest screens: decided by Chinmay,
+      3 October 2026 (CHG-SPF-007)).'
     trigger: onLoad
     provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-1)
   - operationId: listProducts
@@ -410,11 +415,6 @@ screens:
     contract: marketing-crm
     purpose: Accept all, reject non-essential or save preferences from the banner
     trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: listAnalyticsProviders
-    contract: white-label
-    purpose: Analytics tags to inject once their consent category is granted
-    trigger: onLoad
     provenance: build, 29 September 2026
   - operationId: decideRecommendations
     contract: ai

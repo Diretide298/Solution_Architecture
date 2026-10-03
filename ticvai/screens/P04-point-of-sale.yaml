@@ -209,6 +209,13 @@ screens:
     - name: contextPanel
       slot: selection
       components:
+      - kind: numberField
+        label: Supervisor PIN
+        notes: '**A supervisor''s PIN step-up opens session management on the door** (decided by Chinmay,
+          3 October 2026 (CHG-SPF-012), not the recommendation; reverses CHG-DOOR-003 for this screen).
+          Nobody is signed in at a till''s door, so the supervisor''s PIN authorises `listActiveSessions`
+          and `forceLogout` here; BO-053 keeps them too. Masked, never stored on the till.'
+        provenance: decided by Chinmay, 3 October 2026 (CHG-SPF-012)
       - kind: detailPanel
         label: Signed in on this till now
         bindsTo: ActiveSession
@@ -247,8 +254,9 @@ screens:
     trigger: onAction
   - operationId: listActiveSessions
     contract: identity
-    purpose: Who holds this till now
-    trigger: onLoad
+    purpose: 'Who holds this till now, read only after a supervisor''s PIN step-up: nobody is signed in
+      at the door (decided by Chinmay, 3 October 2026 (CHG-SPF-012))'
+    trigger: onAction
   - operationId: forceLogout
     contract: identity
     purpose: A supervisor ends the session of the operator holding the till, after login was refused 409
