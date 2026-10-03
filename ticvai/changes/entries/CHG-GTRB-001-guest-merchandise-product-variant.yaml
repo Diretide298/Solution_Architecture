@@ -30,5 +30,6 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-glossary-terms.py
-status: open
+status: closed
+closed_by_commit: a7a41452
 notes: Additive against the last release - the field did not exist before CHG-R1S-004 and no screen binds it.

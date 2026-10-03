@@ -27,4 +27,5 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/derive-lineage.py
-status: open
+status: closed
+closed_by_commit: a7a41452

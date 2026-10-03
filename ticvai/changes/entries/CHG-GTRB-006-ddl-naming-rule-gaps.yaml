@@ -29,4 +29,5 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-ddl-conventions.py
-status: open
+status: closed
+closed_by_commit: a7a41452
