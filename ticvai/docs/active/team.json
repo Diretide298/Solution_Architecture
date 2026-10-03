@@ -217,7 +217,14 @@
    {
     "block": "A",
     "endSprint": 4,
-    "fixed": true
+    "fixed": true,
+    "acceptedOvertimeHours": 43,
+    "note": "A1, the first drop (Chinmay, 3 October, CHG-RONEP-007): the 43 h of developer overtime to end by 27 November are accepted; completion work goes into A1 app by app only while that holds"
+   },
+   {
+    "block": "A2",
+    "endSprint": 5,
+    "note": "A2, the second drop of Block A: the completion work that does not fit in A1, right after it and ahead of Block B (Chinmay, 3 October, CHG-RONEP-007)"
    },
    {
     "block": "B",
@@ -234,6 +241,7 @@
   ],
   "ticketBlocks": [
    "A",
+   "A2",
    "B"
   ],
   "fePointsPerAppModule": 45,

@@ -214,7 +214,17 @@ POOL_OF_PLATFORM = {"P02": "mob", "P05": "mob", "P06": "mob", "P07": "mob", "P04
 SCHEMA_CONTRACT = {"pii": "identity", "ledger": "finance", "control": "tenancy", "venuemap": "venue-map",
                    "whitelabel": "white-label", "marketing": "marketing-crm", "subscription": "subscription",
                    "platform": "platform-ops", "baseline": None, "seating": "seating"}
-BLOCKS = ["A", "B", "C", "D"]
+# **Block A ships in two drops** (Chinmay, 3 October 2026, CHG-RONEP-007): A (A1, the first release by 27 November)
+# and A2 (the completion work that does not fit in it, right after and ahead of Block B). A2 sorts after A and before
+# B everywhere a block is ranked; its tickets keep their keys.
+BLOCKS = ["A", "A2", "B", "C", "D"]
+BLOCK_A_FAMILY = ("A", "A2")
+LATER_BLOCKS = ["B", "C", "D"]
+
+
+def block_label(b):
+    """'A1' for Block A (its first drop, key BLOCK-A), else the block's own code."""
+    return "A1" if b == "A" else b
 
 
 def am_name(module, platform, part=None, parts=1, variant=""):
@@ -264,7 +274,7 @@ def load_team(team=None):
 def sprint_settings(team):
     sp = team.get("sprintPlan") or {}
     targets = {b["block"]: int(b["endSprint"]) for b in sp.get("blocks") or []}
-    for b, n in zip(BLOCKS, (4, 7, 10, 13)):
+    for b, n in {"A": 4, "A2": 5, "B": 7, "C": 10, "D": 13}.items():
         targets.setdefault(b, n)
     return {"targets": targets, "ticketBlocks": list(sp.get("ticketBlocks") or ["A", "B"]),
             "fePointsPerAppModule": int(sp.get("fePointsPerAppModule") or 45),
@@ -367,6 +377,12 @@ def test_settings(team):
             "minPoints": int(bt.get("moduleTestMinPoints") or TEST_MIN_POINTS)}
 
 
+def test_pair(b, tests):
+    """The block-test pair of a block, rotating over A, B, C and D as before A2 existed; A2 keeps Block A's pair."""
+    order = ["A", "B", "C", "D"]
+    return tests["pairs"][order.index("A" if b == "A2" else b) % len(tests["pairs"])]
+
+
 def window_of(n, days=BLOCK_TEST_DAYS):
     """The block-test window of sprint n: its last `days` working days, as (start index, end index)."""
     end = sprint_end_index(n)
@@ -425,6 +441,12 @@ def flow_claims(flows, screen_block, op_block):
 DOOR_OPS = {"login", "verifyGuestOtp", "guestSocialLogin", "guestUaePassLogin"}
 
 
+def is_entry(s):
+    """Where an app starts: `navigation.isEntryPoint`, or a door (a screen calling an operation that opens a session)."""
+    return bool((s.get("navigation") or {}).get("isEntryPoint")
+                or {a.get("operationId") for a in s.get("apis") or [] if isinstance(a, dict)} & DOOR_OPS)
+
+
 def nav_exits(s):
     """The screens a screen leads to: `navigation.exitTo` and `navigation.transitions[].to`."""
     nav = s.get("navigation") or {}
@@ -440,8 +462,7 @@ def nav_paths(app_screens, a_set, targets):
     a target with none is left out. Shared by build-service-docs.py (which pulls the screens on these paths into Block A)
     and check-plan-closure.py (C-REACH)."""
     import heapq
-    entries = sorted(sid for sid, s in app_screens.items() if (s.get("navigation") or {}).get("isEntryPoint")
-                     or {a.get("operationId") for a in s.get("apis") or [] if isinstance(a, dict)} & DOOR_OPS)
+    entries = sorted(sid for sid, s in app_screens.items() if is_entry(s))
     dist, prev, pq = {}, {}, []
     for e in entries:
         c = 0 if e in a_set else 1

@@ -16,11 +16,15 @@ ticketed block must still be built in one, or carry its reason in `docs/active/b
 
 **What fails** (handoff/service-docs/plan-tasks.csv, screens/P*.yaml, contracts/, block-a-extra-tasks.json):
 
-  C-BOUND        an operation a Block A screen binds (`apis`: onLoad, onAction and the rest) is built by no Block A task
+  C-BOUND        an operation a Block A screen binds (`apis`: onLoad, onAction and the rest) is built by no task of the
+                 drop that wires it or an earlier one: Block A ships as A1 then A2 (CHG-RONEP-007), and a setup screen
+                 is wired twice, its slice by the setup task and the rest by the rest-of-the-screen task
   C-FLOW         an operation a step of a flow through a Block A app (team.json sprintPlan.blockAApps) names, or a
                  branch of it is resolved by, is built by no Block A task (F02's extendSeatHold, CHG-RONEP-002)
   C-REACH        a Block A screen is reached from its app's entry (`navigation.isEntryPoint`) only through a screen
-                 outside Block A (EMP-003, the staff home, was in no block; CHG-RONEP-006)
+                 outside its drop or an earlier one (EMP-003, the staff home, was in no block; CHG-RONEP-006). The plan
+                 pulls in app homes only (`navHomes`, lever A, CHG-RONEP-007); a screen behind a command centre gets a
+                 link from its section home (tools/applied/nav-homes-r1-plan-3-october.py)
   C-NO-PATH      no navigation from its app's entry reaches a Block A screen at all: a navigation gap in the screens,
                  which the plan cannot close (an exception is written in NO_PATH_EXEMPT with its reason)
   C-DECIDED      a decided piece of Block A is not built in Block A: a `blockAOperations` operation, a `blockAScreens`
@@ -63,7 +67,8 @@ RULES = {
     "C-UNTICKETED": "an artefact the last released plan built in a ticketed block left them, with no reason (CHG-RONEP-002)",
 }
 PLAN = Path("handoff") / "service-docs" / "plan-tasks.csv"
-RANK = {b: i for i, b in enumerate("ABCD")}
+RANK = {b: i for i, b in enumerate(sp.BLOCKS)}                # A (A1), A2, B, C, D (CHG-RONEP-007)
+FAMILY = set(sp.BLOCK_A_FAMILY)
 # screen -> why no navigation from its app's entry reaching it is not a plan finding. Empty: every gap is reported.
 NO_PATH_EXEMPT: dict = {}
 
@@ -131,8 +136,24 @@ def main() -> int:
     screens = {s["id"]: s for _, s in g.screens()}
     now = built(rows)
 
-    # C-BOUND: every operation a Block A screen binds is built by a Block A task
-    a_screens = sorted(b.split(" ", 1)[1] for b, bl in now.items() if b.startswith("screen ") and "A" in bl)
+    def rank_of(where):
+        return min((RANK.get(b, 9) for b in where), default=99)
+
+    # C-BOUND: every operation a Block A screen binds is built in the screen's drop or an earlier one (A1, then A2)
+    screen_block = {b.split(" ", 1)[1]: first_block(bl) for b, bl in now.items() if b.startswith("screen ")}
+    a_screens = sorted(sid for sid, b in screen_block.items() if b in FAMILY)
+    # a setup screen is wired in two tickets: its setup task wires the slice's operations, the rest-of-the-screen task
+    # the others; each must find its operations built by its own drop or an earlier one (A1 then A2, CHG-RONEP-007)
+    by_key = {r["key"]: r for r in rows if r.get("type") == "Task"}
+
+    def wired_in(sid, o):
+        setup = by_key.get(f"APP-SETUP-{sid}")
+        if not setup:
+            return screen_block[sid]
+        m = re.search(r"In the slice: ([A-Za-z0-9, ]+?)(?:\)|\.|;|$)", setup.get("description") or "")
+        sl = {x.strip() for x in m.group(1).split(",")} if m else set()
+        rest = by_key.get(f"APP-SETUP-{sid}-REST")
+        return (setup.get("block") or "A") if (o in sl or not rest) else (rest.get("block") or "A")
     excused = set()
     n_bound = 0
     for sid in a_screens:
@@ -142,13 +163,13 @@ def main() -> int:
         for o in sorted({a["operationId"] for a in s.get("apis") or [] if isinstance(a, dict) and a.get("operationId")}):
             n_bound += 1
             where = now.get(f"operation {o}") or {}
-            if "A" in where:
+            if rank_of(where) <= RANK[wired_in(sid, o)]:
                 continue
             if o in provisional:
                 excused.add(o)
                 continue
             later = first_block(where)
-            guard.add("C-BOUND", f"{sid}:{o}", f"{sid} (built in Block A) binds {o}, which "
+            guard.add("C-BOUND", f"{sid}:{o}", f"{sid} (wired in Block {sp.block_label(wired_in(sid, o))}) binds {o}, which "
                       + (f"Block {later} builds ({', '.join(where[later][:2])})" if later else "no task builds"))
     # C-FLOW: the operations of the flows through Block A's apps (the closure build-service-docs.py takes)
     a_apps = set(((team.get("sprintPlan") or {}).get("blockAApps")) or ["P01", "P02", "P04", "P15"])
@@ -160,7 +181,7 @@ def main() -> int:
         need |= {str(b.get("resolvedBy") or "").split(" ")[0] for b in fd.get("branches") or [] if isinstance(b, dict)}
         for o in sorted(x for x in need if x in ops):
             where = now.get(f"operation {o}") or {}
-            if "A" in where:
+            if "A" in where:                 # a Block A app's flow runs in A1
                 continue
             if o in provisional:
                 excused.add(o)
@@ -174,36 +195,44 @@ def main() -> int:
     for sid in a_screens:
         if sid in screens:
             by_plat[plat[sid]].add(sid)
-    a_set = set(a_screens)
-    for pf, theirs in sorted(by_plat.items()):
+    for pf, theirs_all in sorted(by_plat.items()):
         app = {sid: s for sid, s in screens.items() if plat[sid] == pf}
-        paths = sp.nav_paths(app, a_set, theirs)
-        for sid in sorted(theirs):
-            if sid not in paths:
-                if sid in NO_PATH_EXEMPT:
-                    guard.note(f"exempt C-NO-PATH {sid}: {NO_PATH_EXEMPT[sid]}")
+        for drop in sp.BLOCK_A_FAMILY:               # an A1 screen is reached through A1, an A2 one through A1 or A2
+            a_set = {sid for sid in a_screens if RANK[screen_block[sid]] <= RANK[drop]}
+            theirs = {sid for sid in theirs_all if screen_block[sid] == drop}
+            paths = sp.nav_paths(app, a_set, theirs)
+            for sid in sorted(theirs):
+                if sid not in paths:
+                    if sid in NO_PATH_EXEMPT:
+                        guard.note(f"exempt C-NO-PATH {sid}: {NO_PATH_EXEMPT[sid]}")
+                        continue
+                    guard.add("C-NO-PATH", sid, f"{sid} ({pf}, Block {sp.block_label(drop)}): no navigation from the app's "
+                              "entry reaches it")
                     continue
-                guard.add("C-NO-PATH", sid, f"{sid} ({pf}, Block A): no navigation from the app's entry reaches it")
-                continue
-            outside = [x for x in paths[sid] if x not in a_set]
-            if outside:
-                guard.add("C-REACH", sid, f"{sid} ({pf}, Block A) is reached only through {', '.join(outside)}, outside "
-                          f"Block A: {' > '.join(paths[sid])}")
+                outside = [x for x in paths[sid] if x not in a_set]
+                if outside:
+                    guard.add("C-REACH", sid, f"{sid} ({pf}, Block {sp.block_label(drop)}) is reached only through "
+                              f"{', '.join(outside)}, outside it: {' > '.join(paths[sid])}")
 
     for o in sorted(excused):
         guard.note(f"excused: {o} is provisional (x-ticvai-provisional), held off build tickets until agreed (CHG-GTR-007)")
 
     # C-DECIDED: the decided parts of Block A
-    for o, why in sorted((extra.get("blockAOperations") or {}).items()):
+    for o, why in sorted((extra.get("blockA1Operations") or {}).items()):
         where = now.get(f"operation {o}") or {}
         if o in ops and "A" not in where:
+            guard.add("C-DECIDED", f"op:{o}", f"{o} is decided A1 ({why[:80]}) but is built in "
+                      + (f"Block {first_block(where)}" if where else "no task"))
+    for o, why in sorted((extra.get("blockAOperations") or {}).items()):
+        where = now.get(f"operation {o}") or {}
+        if o in ops and not FAMILY & set(where):
             guard.add("C-DECIDED", f"op:{o}", f"{o} is decided Block A ({why[:80]}) but is built in "
                       + (f"Block {first_block(where)}" if where else "no task"))
     for sid, why in sorted((extra.get("blockAScreens") or {}).items()):
-        if sid in screens and "A" not in (now.get(f"screen {sid}") or {}):
+        if sid in screens and not FAMILY & set(now.get(f"screen {sid}") or {}):
             guard.add("C-DECIDED", f"screen:{sid}", f"{sid} is decided Block A ({why[:80]}) but no Block A task builds it")
         rest = [r["key"] for r in rows if r.get("type") == "Task" and r["key"].endswith(f"{sid}-REST")
-                and (r.get("block") or "A") != "A"]
+                and (r.get("block") or "A") not in FAMILY]
         if rest:
             guard.add("C-DECIDED", f"screen-rest:{sid}", f"{sid} is decided Block A whole, but {rest[0]} is in a later block")
     for t in extra.get("tasks") or []:

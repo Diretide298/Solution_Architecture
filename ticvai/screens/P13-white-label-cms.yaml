@@ -94,6 +94,8 @@ screens:
     - CMS-081
     - CMS-091
     - CMS-102
+    - CMS-025
+    - CMS-026
     inferred: true
     isEntryPoint: true
     transitions:
@@ -161,6 +163,14 @@ screens:
     - to: CMS-003
       trigger: Typography
       provenance: flow F102 step 1→2
+    - to: CMS-025
+      trigger: Opens Cookie, Tracking & Digital Technology Registry
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: CMS-026
+      trigger: Opens Cookie Banner & Preference Center Designer
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **The
@@ -4288,7 +4298,7 @@ screens:
   name: Privacy & Consent Configuration Command Center
   module: Policy
   requiresModule: core
-  wave: 1
+  wave: 3
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '1'
@@ -4888,6 +4898,7 @@ screens:
   navigation:
     entryFrom:
     - CMS-021
+    - CMS-001
     exitTo:
     - CMS-021
     inferred: false
@@ -5133,6 +5144,7 @@ screens:
   navigation:
     entryFrom:
     - CMS-021
+    - CMS-001
     exitTo:
     - CMS-021
     inferred: false

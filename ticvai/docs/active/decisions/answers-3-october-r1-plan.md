@@ -4,7 +4,7 @@
 > batch 1 onward): the first bullet of the section "r1 additions", the hosting bullet of "Gate and hosting", and the
 > lead's findings from the r1 gate handed to the plan batch the same day. Copied into git so the CHG-RONEP entries,
 > `tools/check-plan-closure.py` and `tools/check-ticket-builds.py` can cite them (`ticvai/CLAUDE.md` rule 12). The two
-> answers are verbatim; the findings are as the lead sent them. Applied by CHG-RONEP-001 to CHG-RONEP-005.
+> answers are verbatim; the findings are as the lead sent them. Applied by CHG-RONEP-001 to CHG-RONEP-008.
 
 ## r1 additions (Chinmay, 3 Oct afternoon, all as recommended)
 - Block A completes its apps: every operation a Block A screen binds is built in Block A or earlier (a new rule); getUnifiedReconciliation, createPrincipal, requestProductionAccess, closeFiscalPeriod / listFiscalPeriods, report scheduling and the BO-074/BO-075 writes move into Block A; so do getGuestConversation and sendGuestConversationMessage (AI-ENGINE-CONCIERGE) and setAiProvider / setAiCredential (AI-ENGINE-GATEWAY). The residency section on BO-1065 is drawn and built in Block A.
@@ -19,3 +19,8 @@
 - **G1** Module-test tickets (TEST-AM-*) name nothing to test. Their builds and links must list their app-module's artefacts, and their done-when must name them.
 - **G2** Tickets whose builds do not resolve: PLATFORM-OUTBOX, PLATFORM-SAGA-PAID (builds "operation" with no id), OFFLINE-JOURNAL, the AI-ENGINE tasks (they must name their real operations, e.g. runAiEvaluation, setAiProvider, proposeGuidedChoice, and tables and ADRs). Add a check: every id in a ticket's builds resolves to a real operation, screen, table, service or ADR.
 - **G4** Ticket title scope against links: APP-SETUP-BO-1162 says "2 of its 6 operations" but links all 6. A setup ticket links only its slice's operations; the rest-of-the-screen ticket links the rest.
+
+## Block A size and embeddings (Chinmay, 3 Oct evening)
+- Block A ships in two drops: A1 by 27 Nov (the original Block A core plus the completeness work that fits, incl. the accepted 43 h overtime, prioritised so every A1 app works end to end); A2 = the rest of the pulled-in work, right after, ahead of Block B. Chinmay: "before we were completing in Feb, so work is definitely getting pulled into A from others" - the program end should stay about where it was.
+- Keep A2 small: apply lever A (pull in app homes only, not the 42 command centres; section homes link to their setup screens) and lever B (don't pull a service's writers into Block A just because its reads are there).
+- Embeddings: provider embeddings on the UAE route (OpenAI UAE text-embedding-3-large / Core42), no embedding model hosted by us; Qdrant stays in our cell for the vectors (ADR-0049). "We have a GPU server" noted, not used for tenant data.

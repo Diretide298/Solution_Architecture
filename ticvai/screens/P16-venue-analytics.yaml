@@ -100,6 +100,9 @@ screens:
     - ANL-041
     - ANL-051
     - ANL-061
+    - ANL-023
+    - ANL-025
+    - ANL-066
     transitions:
     - to: ANL-020
       trigger: Multi-Site & Performance Comparison
@@ -201,6 +204,18 @@ screens:
       provenance: structural — ANL-001 is P16's home screen and its exits are its launcher
       carries:
       - insightId
+    - to: ANL-023
+      trigger: Opens Drag-and-Drop Dashboard Canvas
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: ANL-025
+      trigger: Opens KPI Builder
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
+    - to: ANL-066
+      trigger: Opens Semantic Model & Business Data Catalogue
+      provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
+        3 October 2026); its command centre is not in Block A'
   notes: '**Built 20 August. Answers 3 board screens**: F&B Executive Command Center; Retail Executive
     Command Center; Enterprise Frontline Operations Dashboard. **Three board screens, one screen with
     a domain selector.** F&B, Retail and POS each drew an executive command centre and they differ only
@@ -3757,7 +3772,7 @@ screens:
   name: Dashboard Library
   module: Analytics
   requiresModule: analytics
-  wave: 1
+  wave: 3
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '2'
@@ -4124,6 +4139,7 @@ screens:
   navigation:
     entryFrom:
     - ANL-021
+    - ANL-001
     exitTo:
     - ANL-021
     transitions:
@@ -4508,6 +4524,7 @@ screens:
   navigation:
     entryFrom:
     - ANL-021
+    - ANL-001
     exitTo:
     - ANL-021
     transitions:
@@ -9024,7 +9041,7 @@ screens:
   name: BI & Analytics Administration Command Center
   module: Analytics
   requiresModule: analytics
-  wave: 1
+  wave: 3
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '10'
@@ -9701,6 +9718,7 @@ screens:
   navigation:
     entryFrom:
     - ANL-061
+    - ANL-001
     exitTo:
     - ANL-061
     transitions:

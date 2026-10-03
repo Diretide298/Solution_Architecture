@@ -17,7 +17,7 @@ handoff/service-decomposition.json and docs/adr/):
   B-AI-EMPTY      a Block A AI engine task (AI-ENGINE-*, docs/active/block-a-extra-tasks.json) builds nothing: the
                   operations it serves or implements, its tables and ADRs go in the task's `operations` and `builds`
   B-HOSTED-MODEL  a task's text plans a model we host or a GPU pool (gpt-oss in the cell, a Qwen3Guard host, vLLM, a GPU
-                  node pool): "We are not hosting anything unless the client asks" (Chinmay, 3 October, CHG-RONEP-004)
+                  node pool, an embedding or reranking model of our own: CHG-RONEP-008): "We are not hosting anything unless the client asks" (Chinmay, 3 October, CHG-RONEP-004)
   B-MODULE-TEST   a module test builds nothing although its app-module's tasks build something, or its done-when
                   names none of what it builds
   B-SETUP-LINKS   a setup ticket links an operation outside its slice, or a rest-of-the-screen ticket links one of
@@ -88,7 +88,7 @@ def main() -> int:
             guard.add("B-AI-EMPTY", t["key"], f"{t['key']} builds nothing: name its operations, tables and ADRs in "
                                               "block-a-extra-tasks.json `operations` / `builds`")
 
-    hosted = re.compile(r"gpt-oss|Qwen3Guard|vLLM|GPU (?:node )?pool|in-cell (?:open )?model|self-hosted (?:guard|LLM|model)", re.I)
+    hosted = re.compile(r"gpt-oss|Qwen3Guard|vLLM|GPU (?:node )?pool|in-cell (?:open )?model|self-hosted (?:guard|LLM|model)|BGE-M3|Qwen3-(?:Embedding|Reranker)|(?:embeddings?|reranking)[^.;]{0,30}self-hosted", re.I)
     for k, r in sorted(rows.items()):
         m = hosted.search(r.get("description") or "") if r["type"] == "Task" else None
         if m:

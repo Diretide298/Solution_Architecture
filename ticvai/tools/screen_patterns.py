@@ -227,7 +227,7 @@ def block_a_screens(root: str = ROOT) -> set | None:
         return k
     out = set()
     for t in rel["tickets"]:
-        if t.get("type") == "Task" and root_of(t["key"]) == "BLOCK-A":
+        if t.get("type") == "Task" and root_of(t["key"]) in ("BLOCK-A", "BLOCK-A2"):    # both drops (CHG-RONEP-007)
             for b in t.get("builds") or []:
                 kind, _, val = b.partition(" ")
                 if kind == "screen":
