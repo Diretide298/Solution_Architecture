@@ -69,7 +69,8 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/build-service-docs.py::ai_unit_text
-status: open
+status: closed
+closed_by_commit: 1caa2544
 notes: 'Branch r1-ai-phase from main 857986c1. Scoped derive only (build-service-docs, derive-block-a-schedule,
   op-descriptions, build-ticket-links, derive-mirrors, build-changelog-index); the full refresh happens on main. Kept for
   Chinmay: whether to drop AI-BE-SHARED-BASELINE-THEN-LEARN-1..9 (a Block A change through the pace model), and whether
