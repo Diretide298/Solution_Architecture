@@ -1,0 +1,49 @@
+id: CHG-RUL-002
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: sendAiMessage streams its answer as server-sent events (tokens, then sources and any proposed action, then the
+  stored message); the stored message and the JSON answer are unchanged.
+decision:
+  what: 'ai.yaml sendAiMessage: x-ticvai-streaming: sse, x-ticvai-sse-events (token, sources, proposedAction, done, error)
+    and a text/event-stream content on 200 beside application/json. Text is released in checked runs after the placeholder
+    re-fill and the guard; a guard block part-way ends the stream with an error event and nothing is stored as the answer.
+    The full AiMessage is stored once, when complete. Clients that do not ask for the stream get the JSON answer as at r1.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Block A audit on live r2, pattern 4 of CHG-AUD-001 (contract rules that disagree with their screens). Chinmay answered
+  on 3 October 2026 (docs/active/decisions/answers-3-october-business-rules.md, section ''Block A audit business rules''
+  and the list ''Asked as questions instead of defaults''): ''AI concierge / chat: stream answers (server-sent events for
+  sendAiMessage: tokens, then sources and any proposed action); the full message is stored.'' CHG-AUD-001 pattern 4 named
+  streaming answers.'
+keys_touched:
+  operations:
+  - sendAiMessage
+  schemas:
+  - AiMessage
+  screens:
+  - GST-031
+  - GST-032
+  - WEB-044
+  - EMP-019
+  - EMP-020
+  - KSK-015
+  files:
+  - contracts/satellite/ai.yaml
+root_class: 'new: contract-rule-vs-screen'
+tickets:
+  started: []
+  unstarted:
+  - APP-MOB-GST-031
+  - APP-MOB-GST-032
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'sendAiMessage is a Pattern 4 operation (guest-contracts agent, group 4 self-scoped); only its response content and
+  the streaming extensions are touched here, not its audience, security or permission. BR-STREAM also fails any operation
+  answering text/event-stream without declaring x-ticvai-streaming. Prevention: tools/check-business-rules.py rule BR-STREAM,
+  which fails on the parent commit 4e2c56c1 and passes here. Batch RUL (spec-rules), 3 October 2026.'

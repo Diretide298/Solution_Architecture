@@ -4101,6 +4101,132 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /venues/{venueId}/bookable-outlets:
+    parameters:
+    - name: venueId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: listBookableOutlets
+      x-ticvai-consumed-by: []
+      x-ticvai-agreed: '3 October: Chinmay, Block A business rules, GST-070 ("a published list of bookable restaurants");
+        CHG-RUL-013; shape follows listDiningOutlets (public, paged)'
+      x-ticvai-audience:
+      - guest
+      summary: The restaurants a guest can book a table at
+      description: '**The published list GST-070 Reserve a Table picks from** (Chinmay, 3 October 2026, Block A
+        business rules; CHG-RUL-013). Different from `listDiningOutlets`, which answers *where can I eat right
+        now* and drops an outlet that is closed: a booking is for another time, so an outlet is listed whether
+        or not it is open now. **Published data only**: an outlet is listed when it is active, takes table
+        reservations (it has tables, `setTableLayout`, and its reservation policy, `getFnbReservationPolicy`,
+        is active) and is on the venue''s published guest app. A draft outlet, or one with no tables, is never
+        listed. Ordered by the outlet''s display order, then `name`. Readable before sign-in: a guest chooses a
+        restaurant and signs in to book (`createTableReservation`).
+
+        '
+      tags:
+      - guestOrdering
+      parameters:
+      - name: date
+        in: query
+        description: Only outlets open on this calendar day (the region's time zone). Absent, every bookable
+          outlet.
+        schema:
+          type: string
+          format: date
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      # Public, with an optional token (GFIX-5): a visitor browses before signing in; `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Bookable outlets
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/BookableOutlet'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /me/table-reservations:
+    get:
+      operationId: listMyTableReservations
+      x-ticvai-consumed-by: []
+      x-ticvai-agreed: '3 October: Chinmay, Block A business rules, GST-070 ("bind the guest''s own reservations/waitlist
+        list, self-scoped"); CHG-RUL-013; shape follows listTableReservations (paged)'
+      security:
+      - guestAuth: []
+      x-ticvai-self-scoped: subject
+      x-ticvai-audience:
+      - guest
+      summary: The guest's own table bookings and waitlist places
+      description: '**What GST-070 lists under "Your reservations"** (Chinmay, 3 October 2026, Block A business
+        rules; CHG-RUL-013). The caller''s own table reservations (`createTableReservation`) and restaurant
+        waitlist entries (`joinRestaurantWaitlist`), across the venues of the tenant. **Ordered by** the
+        booking''s time, soonest first (a waitlist entry by when it was joined), the row''s id as the tiebreak. **Self-scoped**: the subject is the session''s, never a
+        parameter, so the list cannot be asked for anybody else; `listTableReservations` stays the host''s
+        list under `ORDER_MODIFY`. A signed-out guest has no list (401).
+
+        '
+      tags:
+      - fnb
+      parameters:
+      - name: include
+        in: query
+        description: Which kinds to list. Absent, both.
+        schema:
+          type: string
+          enum:
+          - reservations
+          - waitlist
+      - name: upcomingOnly
+        in: query
+        description: Only bookings from today and live waitlist places (`waiting`, `notified`). Default true.
+        schema:
+          type: boolean
+          default: true
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      responses:
+        '200':
+          description: The guest's reservations and waitlist places
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/MyTableBooking'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /outlets/{outletId}/guest-menu:
     parameters:
     - name: outletId
@@ -6223,6 +6349,21 @@ paths:
         Remainders are distributed to the minor unit. A split that does not sum to the total is rejected
         rather than rounded away.
 
+
+        **Five methods, one request** (Chinmay, 3 October 2026, Block A business rules; CHG-RUL-001): `method`
+        is `byAmount` (`amounts`), `byCovers` (`parts`, default the visit''s covers), `byCategory`
+        (`categoryAssignments`), `byLine`, the item split (`lineAssignments`), or `bySeat` (`lineAssignments`,
+        each line going to the part of its `seatNumber`). POS-028 and EMP-059 send this one request with the
+        method the server picked; there is no operation per method. **A bill that is never split closes as
+        one sub-bill**: `closeTableVisit` takes its payments without a `subBillId`.
+
+
+        **Payment timing follows the outlet, as on POS-021** (`tenancy.Outlet.paymentTiming`, CHG-CSA-010;
+        both configurations): at a `sendFirst` outlet, the default, the party orders, the kitchen cooks, and
+        the bill is split and paid at close. At a `payFirst` outlet each round is charged before it reaches
+        the kitchen (`createFnbOrder`), so the split divides only what is still unpaid at close (the bill''s
+        lines with no payment against them) and `amounts` sum to that outstanding total.
+
         '
       tags:
       - bill
@@ -6294,6 +6435,18 @@ paths:
       description: 'Converts the visit into one or more sales orders and posts to the ledger. The table
         moves to `needsClearing`, not `free` — clearing is a separate act by a separate person.
 
+
+        **An unsplit bill closes as one sub-bill** (Chinmay, 3 October 2026, Block A business rules;
+        CHG-RUL-001). Where `splitBill` was never called, payments carry no `subBillId`: the server makes the
+        one sub-bill for the whole bill and the payments settle it. Where the bill was split, every payment
+        names its sub-bill, and a payment without one is refused 400.
+
+
+        **Payment timing follows the outlet** (`tenancy.Outlet.paymentTiming`, as POS-021; CHG-CSA-010). At a
+        `sendFirst` outlet, the default, the payments here settle the bill. At a `payFirst` outlet each round
+        was charged before it reached the kitchen, so the payments here settle only what is still unpaid, and
+        a visit with nothing outstanding closes with `payments` empty.
+
         '
       tags:
       - bill
@@ -6314,16 +6467,19 @@ paths:
               properties:
                 payments:
                   type: array
-                  minItems: 1
+                  minItems: 0
+                  description: Empty only at a `payFirst` outlet with nothing left to pay (CHG-RUL-001).
                   items:
                     type: object
                     required:
-                    - subBillId
                     - tender
                     - amount
                     properties:
                       subBillId:
                         type: string
+                        nullable: true
+                        description: The sub-bill this payment settles. Omitted on a bill that was never
+                          split, which closes as one sub-bill (CHG-RUL-001); required once the bill is split.
                       tender:
                         type: string
                       amount:
@@ -9371,6 +9527,70 @@ components:
           - cancelled
         varianceReason:
           type: string
+          nullable: true
+    BookableOutlet:
+      type: object
+      x-ticvai-persistence: none — projection over the published outlet, its tables and its reservation policy
+      description: 'One restaurant a guest can book (`listBookableOutlets`; CHG-RUL-013). Published data only.'
+      required:
+      - outletId
+      - venueId
+      - name
+      properties:
+        outletId:
+          type: string
+          format: uuid
+        venueId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        kind:
+          type: string
+          nullable: true
+        cuisine:
+          type: array
+          items:
+            type: string
+        zone:
+          type: string
+          nullable: true
+        imageAssetRef:
+          type: string
+          nullable: true
+        depositMayApply:
+          type: boolean
+          description: The venue's `orders.DepositPolicy.dining` is on, so a booking from its party size takes a
+            deposit (rev 3 REV3-8b). Shown before the guest picks a time; the amount comes with the booking.
+        waitlistOpen:
+          type: boolean
+          description: The outlet takes walk-in waitlist places today (`joinRestaurantWaitlist`).
+    MyTableBooking:
+      type: object
+      x-ticvai-persistence: none — projection over fnb.table_reservation and fnb.waitlist_entry
+      description: 'One row of the guest''s own list (`listMyTableReservations`; CHG-RUL-013): a reservation or a
+        waitlist place, as `kind` says; exactly one of `reservation` and `waitlistEntry` is set.'
+      required:
+      - kind
+      - outletId
+      properties:
+        kind:
+          type: string
+          enum:
+          - reservation
+          - waitlist
+        outletId:
+          type: string
+          format: uuid
+        outletName:
+          type: string
+        reservation:
+          allOf:
+          - $ref: '#/components/schemas/TableReservation'
+          nullable: true
+        waitlistEntry:
+          allOf:
+          - $ref: '#/components/schemas/RestaurantWaitlist'
           nullable: true
     RestaurantWaitlist:
       type: object

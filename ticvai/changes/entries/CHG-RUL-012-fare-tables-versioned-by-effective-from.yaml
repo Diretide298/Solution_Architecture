@@ -1,0 +1,45 @@
+id: CHG-RUL-012
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: 'Transport fare tables are versioned by effectiveFrom: a future table sits beside the current one, and quotes use
+  the table in force at travel time.'
+decision:
+  what: 'transport.yaml setTransportFareTable: a PUT sets the version from its effectiveFrom; a version in force is never
+    edited (422 fare-version-in-force). getTransportFareTable takes at and returns effectiveTo and upcoming. quoteTransportFare
+    prices at travelAt (new); at is deprecated (it meant the sale instant) and read as travelAt when travelAt is absent.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Block A audit on live r2, pattern 4 of CHG-AUD-001 (contract rules that disagree with their screens). Chinmay answered
+  on 3 October 2026 (docs/active/decisions/answers-3-october-business-rules.md, section ''Block A audit business rules''
+  and the list ''Asked as questions instead of defaults''): ''Fare tables: versioned by effectiveFrom; a future table sits
+  beside the current one; quotes use the one in force at travel time.'''
+keys_touched:
+  operations:
+  - setTransportFareTable
+  - getTransportFareTable
+  - quoteTransportFare
+  schemas:
+  - FareTable
+  - FareQuoteRequest
+  screens:
+  - BO-1185
+  - GST-077
+  - WEB-049
+  files:
+  - contracts/satellite/transport.yaml
+root_class: 'new: contract-rule-vs-screen'
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-BO-1185
+  - APP-MOB-GST-077
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'Prevention: tools/check-business-rules.py rule BR-FARE, which fails on the parent commit 4e2c56c1 and passes here.
+  Batch RUL (spec-rules), 3 October 2026.'

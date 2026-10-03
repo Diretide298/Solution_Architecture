@@ -1,0 +1,40 @@
+id: CHG-RUL-007
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: setTheme checks the WCAG AA pairs and ratios, listed on Theme.x-ticvai-contrast-pairs (text 4.5:1, large text and
+  non-text 3:1).
+decision:
+  what: 'white-label.yaml: Theme.x-ticvai-contrast-pairs lists text on background 4.5:1, large text 3:1, primary, secondary
+    and accent against the background 3:1 (WCAG 1.4.11), each component colour''s text on its background 4.5:1 and its background
+    against the page 3:1. setTheme states the pairs and ratios; ContrastProblem.failures names them.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Block A audit on live r2, pattern 4 of CHG-AUD-001 (contract rules that disagree with their screens). Chinmay answered
+  on 3 October 2026 (docs/active/decisions/answers-3-october-business-rules.md, section ''Block A audit business rules''
+  and the list ''Asked as questions instead of defaults''): ''Theme contrast: WCAG AA (text 4.5:1, large text 3:1; primary/accent
+  and component colours 3:1).'''
+keys_touched:
+  operations:
+  - setTheme
+  schemas:
+  - Theme
+  screens:
+  - CMS-005
+  - ADM-016
+  files:
+  - contracts/satellite/white-label.yaml
+root_class: 'new: contract-rule-vs-screen'
+tickets:
+  started: []
+  unstarted:
+  - APP-WL-CMS-005
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'Prevention: tools/check-business-rules.py rule BR-CONTRAST, which fails on the parent commit 4e2c56c1 and passes
+  here. Batch RUL (spec-rules), 3 October 2026.'

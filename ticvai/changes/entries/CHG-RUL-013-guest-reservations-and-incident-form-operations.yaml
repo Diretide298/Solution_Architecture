@@ -1,0 +1,61 @@
+id: CHG-RUL-013
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: 'Four new operations: listMyTableReservations (self-scoped), listBookableOutlets (published), uploadIncidentMedia
+  and addIncidentPerson (a PII subject, consent rules apply).'
+decision:
+  what: 'fnb.yaml: listMyTableReservations (GET /me/table-reservations, guestAuth, self-scoped subject, paged, ordered;
+    MyTableBooking) and listBookableOutlets (GET /venues/{venueId}/bookable-outlets, public with an optional token, published
+    outlets that take reservations, paged; BookableOutlet). maintenance.yaml: uploadIncidentMedia (POST /incidents/{incidentId}/media,
+    INCIDENT_REPORT, a signed upload issued through assets.createUpload; IncidentMedia, maintenance.incident_media) and
+    addIncidentPerson (POST /incidents/{incidentId}/people, INCIDENT_REPORT; the person goes to pii.subject, the incident
+    keeps the opaque id; the contact is stored only with consent to be contacted). IncidentInvolvedParty gains role and
+    contactStored.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Block A audit on live r2, pattern 4 of CHG-AUD-001 (contract rules that disagree with their screens). Chinmay answered
+  on 3 October 2026 (docs/active/decisions/answers-3-october-business-rules.md, section ''Block A audit business rules''
+  and the list ''Asked as questions instead of defaults''): ''GST-070 reservations: bind the guest''s own reservations/waitlist
+  list (self-scoped) and a published list of bookable restaurants.'' and ''EMP-026 incident form: bind media upload for
+  photos and a person involved entry (name, role, contact, optional guest lookup) stored as PII subjects; consent rules
+  apply.'' No equivalent existed: listTableReservations is the host''s (ORDER_MODIFY), listDiningOutlets lists only outlets
+  open now, assets.createUpload needs ASSET_LIBRARY_MANAGE, and reportIncident takes only opaque subject ids.'
+keys_touched:
+  operations:
+  - listMyTableReservations
+  - listBookableOutlets
+  - uploadIncidentMedia
+  - addIncidentPerson
+  schemas:
+  - MyTableBooking
+  - BookableOutlet
+  - IncidentMedia
+  - UploadIncidentMediaRequest
+  - AddIncidentPersonRequest
+  - IncidentInvolvedParty
+  tables:
+  - maintenance.incident_media
+  screens:
+  - GST-070
+  - EMP-026
+  files:
+  - contracts/satellite/fnb.yaml
+  - contracts/satellite/maintenance.yaml
+root_class: 'new: contract-rule-vs-screen'
+tickets:
+  started: []
+  unstarted:
+  - APP-MOB-GST-070
+  - APP-STAFF-EMP-026
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'New-operation gates: permission vocabulary (null with self-scope or public; INCIDENT_REPORT exists), no config noun,
+  paging on both lists (BR-NEW-OPS checks it; C-PAGED-ORDER passes). The screens bind them (GST-070, EMP-026: screens agent).
+  maintenance.incident_media is a new table: the refresh derives it. Prevention: tools/check-business-rules.py rule BR-NEW-OPS,
+  which fails on the parent commit 4e2c56c1 and passes here. Batch RUL (spec-rules), 3 October 2026.'

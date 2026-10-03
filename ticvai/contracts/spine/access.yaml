@@ -449,6 +449,9 @@ paths:
                         minimum: 10
                         maximum: 60
                         default: 30
+                        description: '**30 seconds for an admission QR** (Chinmay, 3 October 2026, Block A business
+                          rules: GST-055''s admission QR rotates every 30 seconds; CHG-RUL-018). The bounds stay
+                          for other credential kinds.'
                       digits:
                         type: integer
                         minimum: 6

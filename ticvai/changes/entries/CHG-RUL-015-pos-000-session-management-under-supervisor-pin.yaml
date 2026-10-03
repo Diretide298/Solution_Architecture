@@ -1,0 +1,47 @@
+id: CHG-RUL-015
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: listActiveSessions and forceLogout are callable on the POS-000 door with no session, under a supervisor's PIN step-up;
+  BO-053 keeps them under its session.
+decision:
+  what: 'identity.yaml listActiveSessions and forceLogout: security gains {} (no session) beside bearerAuth (an alternative
+    added: additive), x-ticvai-step-up pin with x-ticvai-step-up-when sessionless; forceLogout carries supervisorStepUp
+    and workstationId in its body, listActiveSessions the X-Supervisor-Principal-Id and X-Supervisor-Pin headers (a GET
+    has no body). Without a session the supervisor must hold SESSION_FORCE_LOGOUT at the till''s venue and reaches only
+    that till''s sessions (list) or a session of that venue (forceLogout); 403 supervisor-step-up-refused otherwise. No
+    session is opened by the step-up. With a session (BO-053) nothing changes.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Block A audit on live r2, pattern 4 of CHG-AUD-001 (contract rules that disagree with their screens). Chinmay answered
+  on 3 October 2026 (docs/active/decisions/answers-3-october-business-rules.md, section ''Block A audit business rules''
+  and the list ''Asked as questions instead of defaults''): ''POS-000: session management STAYS on the door (NOT the recommendation;
+  reverses CHG-DOOR-003 for this): a supervisor PIN step-up authorises listActiveSessions / forceLogout there, since no
+  one is signed in; BO-053 keeps it too.'''
+keys_touched:
+  operations:
+  - listActiveSessions
+  - forceLogout
+  screens:
+  - POS-000
+  - BO-053
+  files:
+  - contracts/spine/identity.yaml
+root_class: 'new: contract-rule-vs-screen'
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-000
+  - APP-SETUP-BO-053
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+reverses: CHG-DOOR-003
+notes: 'check-doors already allows the two operations on a device door (DEVICE_TAKEOVER, R184); it passes. A PIN in a header
+  is never logged, stored or echoed (stated on the parameter). SU-CARRIER (check-step-up) also holds both carriers. Prevention:
+  tools/check-business-rules.py rule BR-SESSIONS-DOOR, which fails on the parent commit 4e2c56c1 and passes here. Batch
+  RUL (spec-rules), 3 October 2026.'

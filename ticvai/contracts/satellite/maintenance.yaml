@@ -764,9 +764,12 @@ paths:
       description: >
         Raised in error, duplicated, or superseded by a larger job.
 
-        **Refused once work has started** — a job with recorded time and parts is completed or
-        abandoned, not cancelled, and the distinction matters when the asset's history is read
-        after an incident.
+        **Cancellable until any labour time or part is recorded** (Chinmay, 3 October 2026, Block A
+        business rules; CHG-RUL-010). Accepting, starting or pausing a job does not stop a cancel;
+        the first `recordWorkOrderTime` or `recordWorkOrderParts` does. From then the job is
+        completed (`completeWorkOrder`) or closed with a reason (`closeWorkOrder`), never
+        cancelled, because a job with recorded time and parts is part of the asset's history and
+        the distinction matters when that history is read after an incident.
       tags: [work]
       x-ticvai-permission: WORK_ORDER_MANAGE
       x-ticvai-scope-level: venue
@@ -797,7 +800,9 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrder' }
         '409':
-          description: Work has started. Complete or abandon it instead
+          description: Labour time or a part is already recorded against it (`work-recorded`;
+            CHG-RUL-010). Complete it, or close it with a reason, instead.
+          x-ticvai-problem-types: [work-recorded]
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -2008,10 +2013,23 @@ paths:
         - "P06 EMP-050 Post-incident restore"
         - "P08 BO-072 Incident Log"
       x-ticvai-audience: [staff]
-      summary: Investigate, escalate or close an incident
+      summary: Investigate, escalate, close or reopen an incident
       description: >
         Closure requires findings and, where a corrective action was identified, a linked
         work order. An incident closed without either is a lesson nobody learned.
+
+        **The incident flow** (Chinmay, 3 October 2026, Block A business rules; CHG-RUL-011;
+        `states/incident.yaml`): **Reported, Investigating, Escalated (optional), Closed**, and
+        **reopen** from Closed back to Investigating with a reason. In the contract, Investigating
+        is `underInvestigation`; **Escalated is an investigation with `escalation` set** (who it
+        went to, why, when), sent here as `escalate`, so the status values clients built at r1
+        switch on are unchanged. A reported incident may also be closed straight away as a
+        duplicate or a report in error (with `reason`). Reopening a closed incident needs
+        `reason`. `actionRequired` is no longer entered: it stays in `IncidentStatus` so a client
+        built at r1 still parses an old row, and a request to move to it is refused. Any move
+        outside this flow is `422 incident-transition-not-allowed`. **Every change is logged**:
+        each status change and each escalation appends a row to `IncidentDetail.investigationNotes`
+        with the status before and after, the reason, who and when; nothing is overwritten.
 
         **The original report is never edited.** Investigation adds to the record.
 
@@ -2054,6 +2072,23 @@ paths:
                 attachmentRefs:
                   type: array
                   items: { type: string }
+                escalate:
+                  type: object
+                  description: >
+                    Escalate an incident under investigation (the optional Escalated step;
+                    CHG-RUL-011). Sets `Incident.escalation`; logged as a note row.
+                  required: [toPrincipalId, reason]
+                  properties:
+                    toPrincipalId: { type: string, format: uuid }
+                    reason: { type: string, minLength: 3, maxLength: 1000 }
+                reason:
+                  type: string
+                  minLength: 3
+                  maxLength: 1000
+                  description: >
+                    Why the status changes. Required to reopen a closed incident (back to
+                    `underInvestigation`) and to close a `reported` one straight away (CHG-RUL-011).
+                    Kept on the logged row.
       responses:
         '200':
           headers:
@@ -2063,6 +2098,15 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Incident' }
+        '422':
+          description: >
+            A move outside the incident flow (`incident-transition-not-allowed`; CHG-RUL-011):
+            to `actionRequired`, from `closed` to anything but `underInvestigation`, a reopen
+            without `reason`, or `escalate` on an incident that is not under investigation.
+          x-ticvai-problem-types: [incident-transition-not-allowed]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '400':
           description: Closure attempted without findings or a corrective action
           content:
@@ -2073,6 +2117,139 @@ paths:
             (`closer-completed-action`; workbook Q530; CHG-CSA-033). Another supervisor must close it.
           x-ticvai-problem-types:
           - closer-completed-action
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /incidents/{incidentId}/media:
+    parameters:
+      - name: incidentId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: uploadIncidentMedia
+      x-ticvai-consumed-by: []
+      x-ticvai-agreed: '3 October: Chinmay, Block A business rules, EMP-026 ("bind media upload for photos"); CHG-RUL-013; shape follows attachWorkOrderEvidence, with the signed upload of assets.createUpload'
+      x-ticvai-audience: [staff]
+      summary: Add a photo, video or document to an incident
+      description: >
+        **The incident form's photos** (Chinmay, 3 October 2026, Block A business rules, EMP-026;
+        CHG-RUL-013). Reporting is photo-first, and the reporter holds `INCIDENT_REPORT`, not
+        the media library's `ASSET_LIBRARY_MANAGE`, so the upload is asked for here, under the
+        incident's own permission. The call returns a signed upload (`upload`, as
+        `assets.createUpload` issues it: the file goes direct to object storage, never through
+        this API) and the media row; when the transfer completes the media store links the file
+        (`assetRef`, `status: stored`) and its id is added to the incident's `attachmentRefs`.
+        Allowed on any incident the caller may report on that is not `closed`. The file is
+        personal data where it shows a person: it is read only under `INCIDENT_VIEW` and is
+        erased with the incident's subjects (ADR-0023). Content types and the size limit are the
+        media store's (400 otherwise). Captured offline, the app keeps the photo and calls this
+        when the device is back online; `capturedAt` is the device time it was taken.
+      tags: [incident]
+      x-ticvai-calls:
+      - assets.createUpload
+      x-ticvai-permission: INCIDENT_REPORT
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UploadIncidentMediaRequest' }
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The media row, with the signed upload to send the file to
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/IncidentMedia' }
+        '400':
+          description: Content type not permitted, or size beyond the media store's limit for that kind.
+          x-ticvai-problem-types: [media-type-not-permitted, media-too-large]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '409':
+          description: The incident is closed (`incident-closed`); reopen it first (CHG-RUL-011).
+          x-ticvai-problem-types: [incident-closed]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /incidents/{incidentId}/people:
+    parameters:
+      - name: incidentId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: addIncidentPerson
+      x-ticvai-consumed-by: []
+      x-ticvai-agreed: '3 October: Chinmay, Block A business rules, EMP-026 ("a person involved entry: name, role, contact, optional guest lookup, stored as PII subjects; consent rules apply"); CHG-RUL-013; shape follows reportIncident involved parties'
+      x-ticvai-audience: [staff]
+      summary: Add a person involved in an incident
+      description: >
+        **The "Person involved" entry on the incident form** (Chinmay, 3 October 2026, Block A
+        business rules, EMP-026; CHG-RUL-013). The reporter types a name, a role in the incident
+        and a contact, or picks a known guest (`guestSubjectId`, found with
+        `marketing-crm.searchGuests` where the reporter may search) or a member of staff
+        (`principalId`). **The person is a PII subject** (ADR-0023): the name and contact are
+        written to the erasable store (`pii.subject`) and the incident keeps only the opaque id
+        on a `maintenance.incident_involved_party` row, so an erasure removes the person and
+        leaves the incident intact. A known guest is linked to their existing subject, never
+        copied. A member of staff is a principal, not a PII subject.
+
+        **Consent rules apply.** The name, the role and what happened are recorded under the
+        venue's incident-reporting purpose (a legal obligation where the incident is reportable,
+        a legitimate interest otherwise), and need no consent. **The contact is kept only with
+        the person's consent to be contacted about the incident** (`contactConsent: true`,
+        recorded as a consent of that purpose with who took it and when); without it the
+        contact fields are not stored and the response says so (`contactStored: false`). The
+        subject's retention follows the incident's, and a DSAR export includes it.
+      tags: [incident]
+      x-ticvai-permission: INCIDENT_REPORT
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AddIncidentPersonRequest' }
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Added; the person is a PII subject (or a staff principal) on the incident
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/IncidentInvolvedParty' }
+        '400':
+          description: >
+            Neither a name, a guest nor a member of staff given, or more than one of
+            `guestSubjectId` and `principalId`.
+          x-ticvai-problem-types: [person-not-identified]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '409':
+          description: The incident is closed (`incident-closed`); reopen it first (CHG-RUL-011).
+          x-ticvai-problem-types: [incident-closed]
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -3216,6 +3393,24 @@ components:
         assignedToPrincipalId: { type: string, format: uuid, nullable: true }
         reportedByPrincipalId: { type: string, format: uuid }
         correctiveWorkOrderId: { type: string, format: uuid, nullable: true }
+        escalation:
+          type: object
+          nullable: true
+          readOnly: true
+          description: >
+            **Set while the incident is escalated** (the optional Escalated step of the 3 October
+            flow; CHG-RUL-011). Screens show "Escalated" when `status` is `underInvestigation` and
+            this is set. Cleared when the incident closes.
+          properties:
+            toPrincipalId: { type: string, format: uuid }
+            byPrincipalId: { type: string, format: uuid }
+            reason: { type: string }
+            escalatedAt: { type: string, format: date-time }
+        reopenCount:
+          type: integer
+          minimum: 0
+          readOnly: true
+          description: How many times the incident was reopened (CHG-RUL-011). Each reopen is a logged row.
         occurredAt: { type: string, format: date-time }
         recordedAt: { type: string, format: date-time }
         closedAt: { type: string, format: date-time, nullable: true }
@@ -3284,6 +3479,115 @@ components:
           format: uuid
           nullable: true
           description: The staff principal where `kind` is `staff`.
+        role:
+          type: string
+          nullable: true
+          enum: [injured, involved, witness, reporter, null]
+          description: The person's part in the incident, from `addIncidentPerson` (CHG-RUL-013).
+        contactStored:
+          type: boolean
+          readOnly: true
+          description: >
+            Whether a contact is held for the person: only with their consent to be contacted
+            (`AddIncidentPersonRequest.contactConsent`; CHG-RUL-013).
+
+    UploadIncidentMediaRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [kind, filename, contentType, sizeBytes]
+      properties:
+        kind: { type: string, enum: [photo, video, document] }
+        filename: { type: string, maxLength: 256 }
+        contentType: { type: string }
+        sizeBytes: { type: integer, minimum: 1 }
+        capturedAt: { type: string, format: date-time, description: Device time the photo or video was taken. }
+        caption: { type: string, maxLength: 500 }
+
+    IncidentMedia:
+      x-ticvai-persistence: maintenance.incident_media
+      type: object
+      description: >
+        **One photo, video or document on an incident** (`uploadIncidentMedia`; CHG-RUL-013).
+        The file is in the media store; this row links it to the incident.
+      required: [id, incidentId, kind, status]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        incidentId: { type: string, format: uuid }
+        kind: { type: string, enum: [photo, video, document] }
+        status:
+          type: string
+          enum: [awaitingUpload, stored]
+          readOnly: true
+          description: '`stored` once the media store confirmed the transfer and `assetRef` is set.'
+        assetRef:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: assets.media_asset
+        caption: { type: string, nullable: true }
+        capturedAt: { type: string, format: date-time, nullable: true }
+        uploadedByPrincipalId: { type: string, format: uuid, readOnly: true }
+        createdAt: { type: string, format: date-time, readOnly: true }
+        upload:
+          type: object
+          readOnly: true
+          x-ticvai-persisted: false
+          description: The signed upload, as `assets.createUpload` returns it; only on the 201.
+          properties:
+            uploadUrl: { type: string }
+            method: { type: string, enum: [PUT, POST] }
+            headers:
+              type: object
+              additionalProperties: { type: string }
+            expiresAt: { type: string, format: date-time }
+
+    AddIncidentPersonRequest:
+      x-ticvai-persistence: "none — request only; the person goes to pii.subject, the link to maintenance.incident_involved_party"
+      type: object
+      required: [role]
+      properties:
+        role:
+          type: string
+          enum: [injured, involved, witness, reporter]
+          description: The person's part in the incident.
+        partyType:
+          type: string
+          enum: [guest, publicMember, staff, contractor]
+          default: guest
+        name:
+          type: string
+          maxLength: 200
+          writeOnly: true
+          description: Written to the erasable store (`pii.subject`), never to the incident (ADR-0023).
+        phone:
+          type: string
+          maxLength: 32
+          writeOnly: true
+          description: Stored only with `contactConsent` true.
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          writeOnly: true
+          description: Stored only with `contactConsent` true.
+        contactConsent:
+          type: boolean
+          default: false
+          description: >
+            The person agreed to be contacted about this incident (consent rules apply; CHG-RUL-013).
+            Recorded as a consent with who took it and when.
+        guestSubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          description: A known guest, from the optional guest lookup; links their existing subject.
+        principalId:
+          type: string
+          format: uuid
+          nullable: true
+          description: A member of staff; a principal, not a PII subject.
+        note: { type: string, maxLength: 2000 }
 
     IncidentInvestigationNote:
       x-ticvai-persistence: maintenance.incident_investigation_note
@@ -3297,6 +3601,19 @@ components:
         id: { type: string, format: uuid }
         incidentId: { type: string, format: uuid }
         note: { type: string, maxLength: 10000 }
+        kind:
+          type: string
+          enum: [note, statusChange, escalation, reopen]
+          default: note
+          description: >
+            **Every change is logged here** (CHG-RUL-011): an investigator's note, or a row the server
+            writes for a status change, an escalation or a reopen, with `note` as its reason.
+        fromStatus:
+          allOf: [{ $ref: '#/components/schemas/IncidentStatus' }]
+          nullable: true
+        toStatus:
+          allOf: [{ $ref: '#/components/schemas/IncidentStatus' }]
+          nullable: true
         writtenByPrincipalId: { type: string, format: uuid }
         recordedAt: { type: string, format: date-time }
 

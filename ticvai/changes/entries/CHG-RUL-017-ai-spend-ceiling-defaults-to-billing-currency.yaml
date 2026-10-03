@@ -1,0 +1,42 @@
+id: CHG-RUL-017
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: The AI spend ceiling defaults to the tenant's billing currency (AED for a UAE tenant), not USD; the tenant may
+  change it.
+decision:
+  what: 'ai.yaml getAiSpendCeiling, setAiSpendCeiling, getAiUsage, AiSpendCeiling and AiUsageReport: every ''USD by default''
+    becomes the tenant''s billing currency (the currency TICVAI invoices the tenant in, SubscriptionInvoice), changeable
+    on BO-091.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Block A audit on live r2, pattern 4 of CHG-AUD-001 (contract rules that disagree with their screens). Chinmay answered
+  on 3 October 2026 (docs/active/decisions/answers-3-october-business-rules.md, section ''Block A audit business rules''
+  and the list ''Asked as questions instead of defaults''): ''AI spend ceiling (BO-091): default currency is the tenant''s
+  billing currency (AED for UAE tenants), not USD; tenants can change it.'' This refines CHG-CSA-004 (workbook Q8).'
+keys_touched:
+  operations:
+  - getAiSpendCeiling
+  - setAiSpendCeiling
+  - getAiUsage
+  schemas:
+  - AiSpendCeiling
+  - AiUsageReport
+  screens:
+  - BO-091
+  files:
+  - contracts/satellite/ai.yaml
+root_class: 'new: contract-rule-vs-screen'
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-BO-091
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'Prevention: tools/check-business-rules.py rule BR-AI-CURRENCY, which fails on the parent commit 4e2c56c1 and passes
+  here. Batch RUL (spec-rules), 3 October 2026.'

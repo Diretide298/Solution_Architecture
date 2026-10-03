@@ -1,0 +1,35 @@
+id: CHG-RUL-005
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: createPaymentLink returns the order's live link instead of making a second one, refuses a paid order 409, and makes
+  a new link only after the old one expired or was cancelled.
+decision:
+  what: 'orders.yaml createPaymentLink: one live link per order; a create for an order with a live link (issued or viewed,
+    not expired) answers 200 with it and sends nothing (resendPaymentLink re-sends); a paid order is 409 order-already-paid.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Block A audit on live r2, pattern 4 of CHG-AUD-001 (contract rules that disagree with their screens). Chinmay answered
+  on 3 October 2026 (docs/active/decisions/answers-3-october-business-rules.md, section ''Block A audit business rules''
+  and the list ''Asked as questions instead of defaults''): ''Payment links: a second create returns the existing live link
+  (idempotent); a paid order is refused with 409; a new link only after the old one expires or is cancelled.'''
+keys_touched:
+  operations:
+  - createPaymentLink
+  screens:
+  - ADM-592
+  files:
+  - contracts/spine/orders.yaml
+root_class: 'new: contract-rule-vs-screen'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'No operation cancels a link on its own; the contract says so and it is a question for the lead. Prevention: tools/check-business-rules.py
+  rule BR-PAY-LINK, which fails on the parent commit 4e2c56c1 and passes here. Batch RUL (spec-rules), 3 October 2026.'

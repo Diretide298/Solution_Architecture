@@ -1170,13 +1170,32 @@ paths:
       tags:
       - identity
       x-ticvai-permission: SESSION_FORCE_LOGOUT
+      x-ticvai-step-up: pin
+      x-ticvai-step-up-reason: On the POS-000 door nobody at the till has a session, so a supervisor's own PIN on the device proves who ended the other one (CHG-RUL-015; audit R184).
+      x-ticvai-step-up-carrier: body:supervisorStepUp
+      x-ticvai-step-up-when: sessionless
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append
+      # No session on the POS-000 door (CHG-RUL-015): `{}` admits the call without a token, under the step-up.
+      security:
+      - bearerAuth: []
+      - {}
       summary: Supervisor termination of an abandoned session
       description: 'Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than displaces
         a second login — an operator who went home still logged in would otherwise be locked out until
         token expiry.
+
+        **Callable on the POS-000 door with no session, under a supervisor''s PIN step-up** (Chinmay, 3 October
+        2026, Block A business rules: "POS-000: session management stays on the door"; CHG-RUL-015, which
+        reverses CHG-DOOR-003 for this). Somebody else is signed in to the till, so nobody at it has a
+        session: the till calls this with no token (`security` admits `{}`), names itself (`workstationId`),
+        and carries the supervisor''s own principal and PIN (`supervisorStepUp` in the body). The PIN is verified against the
+        principal as `common.yaml` `SupervisorStepUp` says; that principal must hold `SESSION_FORCE_LOGOUT`
+        at the till''s venue, and the call reaches only a session at a workstation of that venue. Anything else is `403
+        supervisor-step-up-refused` and nothing is read or written. **No session is opened** by the step-up:
+        it authorises this one call. With a session (BO-053 Staff Directory) the caller''s own
+        `SESSION_FORCE_LOGOUT` applies as before and no step-up is asked.
 
         '
       parameters:
@@ -1200,6 +1219,16 @@ paths:
                   type: string
                   minLength: 3
                   maxLength: 500
+                workstationId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: The till making the call. Required with no session (the POS-000 door; CHG-RUL-015).
+                supervisorStepUp:
+                  allOf:
+                  - $ref: ../shared/common.yaml#/components/schemas/SupervisorStepUp
+                  description: The supervisor ending the session, signing on this device. Required with no
+                    session (POS-000), ignored with one (CHG-RUL-015).
       responses:
         '204':
           headers:
@@ -1207,7 +1236,15 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Session terminated and audited
         '403':
-          $ref: ../shared/common.yaml#/components/responses/Forbidden
+          description: The caller lacks SESSION_FORCE_LOGOUT, or, with no session, the supervisor step-up is
+            missing or failed or the session is not at the till's venue (`supervisor-step-up-refused`;
+            CHG-RUL-015).
+          x-ticvai-problem-types:
+          - supervisor-step-up-refused
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/session:
@@ -3325,14 +3362,49 @@ paths:
       description: 'Who is logged in, on which workstation, since when. There was previously no way to
         see this — only to terminate a session someone already knew about.
 
+        **Callable on the POS-000 door with no session, under a supervisor''s PIN step-up** (Chinmay, 3 October
+        2026, Block A business rules: "POS-000: session management stays on the door"; CHG-RUL-015, which
+        reverses CHG-DOOR-003 for this). Somebody else is signed in to the till, so nobody at it has a
+        session: the till calls this with no token (`security` admits `{}`), names itself (`workstationId`),
+        and carries the supervisor''s own principal and PIN (the `X-Supervisor-Principal-Id` and `X-Supervisor-Pin` headers, since a GET has no body). The PIN is verified against the
+        principal as `common.yaml` `SupervisorStepUp` says; that principal must hold `SESSION_FORCE_LOGOUT`
+        at the till''s venue, and the call reaches only the sessions at that one till (`workstationId` is required then). Anything else is `403
+        supervisor-step-up-refused` and nothing is read or written. **No session is opened** by the step-up:
+        it authorises this one call. With a session (BO-053 Staff Directory) the caller''s own
+        `SESSION_FORCE_LOGOUT` applies as before and no step-up is asked.
+
         '
       tags:
       - session
       x-ticvai-permission: SESSION_FORCE_LOGOUT
+      x-ticvai-step-up: pin
+      x-ticvai-step-up-reason: On the POS-000 door nobody at the till has a session, so a supervisor's own PIN on the device authorises seeing who holds it (CHG-RUL-015; audit R184).
+      x-ticvai-step-up-carrier: header:X-Supervisor-Principal-Id,X-Supervisor-Pin
+      x-ticvai-step-up-when: sessionless
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      # No session on the POS-000 door (CHG-RUL-015): `{}` admits the call without a token, under the step-up.
+      security:
+      - bearerAuth: []
+      - {}
       parameters:
+      - name: X-Supervisor-Principal-Id
+        in: header
+        required: false
+        description: With no session (POS-000), the supervisor signing the step-up (CHG-RUL-015). Ignored with a session.
+        schema:
+          type: string
+          format: uuid
+      - name: X-Supervisor-Pin
+        in: header
+        required: false
+        description: With no session (POS-000), the supervisor's staff PIN, as `SupervisorStepUp.credential`
+          (CHG-RUL-015). Never logged, stored or echoed. Ignored with a session.
+        schema:
+          type: string
+          maxLength: 512
+          format: password
       - name: venueId
         in: query
         description: Exact match on `ActiveSession.venueId`.
@@ -3371,6 +3443,15 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/ActiveSession'
+        '403':
+          description: The caller lacks SESSION_FORCE_LOGOUT, or, with no session, the supervisor step-up is
+            missing or failed, or `workstationId` is missing (`supervisor-step-up-refused`; CHG-RUL-015).
+          x-ticvai-problem-types:
+          - supervisor-step-up-refused
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/sessions/mine:

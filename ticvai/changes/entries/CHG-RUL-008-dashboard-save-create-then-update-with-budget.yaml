@@ -1,0 +1,40 @@
+id: CHG-RUL-008
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: 'Dashboards: the first Save creates (createDashboard), later saves update (updateDashboard), and the refresh budget
+  is checked on both.'
+decision:
+  what: 'reporting.yaml updateDashboard: the save rule and the refresh budget in its description, and a 400 refresh-budget-exceeded
+    like createDashboard''s.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Block A audit on live r2, pattern 4 of CHG-AUD-001 (contract rules that disagree with their screens). Chinmay answered
+  on 3 October 2026 (docs/active/decisions/answers-3-october-business-rules.md, section ''Block A audit business rules''
+  and the list ''Asked as questions instead of defaults''): ''Dashboards: first Save calls createDashboard, later saves
+  updateDashboard; the refresh budget is checked on both.'' CHG-AUD-001 named updateDashboard against ANL-023 Save.'
+keys_touched:
+  operations:
+  - updateDashboard
+  - createDashboard
+  screens:
+  - ANL-023
+  files:
+  - contracts/satellite/reporting.yaml
+root_class: 'new: contract-rule-vs-screen'
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ANL-023
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'BR-PAIR-REFUSAL is general: an update taking a create''s body declares the create''s refusals. Five older pairs
+  no rule named are exempt in the check, each with its reason (createTableReservation, createTableReservationForGuest, createReport,
+  createRotaAssignment, createTicketTemplate). ANL-023 binds createDashboard for the first Save (screens agent). Prevention:
+  tools/check-business-rules.py rule BR-PAIR-REFUSAL, which fails on the parent commit 4e2c56c1 and passes here. Batch RUL
+  (spec-rules), 3 October 2026.'

@@ -1975,12 +1975,20 @@ paths:
         format: uuid
     post:
       operationId: rejectRequisition
+      deprecated: true
+      x-ticvai-superseded-by: 'approveRequisition'
       x-ticvai-consumed-by:
         - "P08 BO-078 Requisitions"
       x-ticvai-audience:
       - staff
       summary: Reject a requisition
-      description: 'Refused with a reason. The requester may copy it into a new draft rather than losing
+      description: '**Deprecated on 3 October; retired at the next major version** (Chinmay, 3 October 2026, Block A
+        business rules: "one approveRequisition call with its decision; separate reject/return operations dropped from
+        BO-078"; CHG-RUL-004). New screens send `approveRequisition` with `decision: rejected`. Kept, with its path and
+        id, for clients built at r1; it records the same decision.
+
+
+        Refused with a reason. The requester may copy it into a new draft rather than losing
         the detail.
 
         '
@@ -2032,12 +2040,18 @@ paths:
         format: uuid
     post:
       operationId: returnRequisition
+      deprecated: true
+      x-ticvai-superseded-by: 'approveRequisition'
       x-ticvai-consumed-by:
         - "P08 BO-078 Requisitions"
       x-ticvai-audience:
       - staff
       summary: Return a requisition for more information
-      description: '**Not a rejection.** Sent back so the requester can amend rather than start again
+      description: '**Deprecated on 3 October; retired at the next major version** (CHG-RUL-004): new screens send
+        `approveRequisition` with `decision: returnedForInfo`. Kept, with its path and id, for clients built at r1.
+
+
+        **Not a rejection.** Sent back so the requester can amend rather than start again
         — without this state every incomplete request is a refusal and the requisition queue stops moving.
 
         '
@@ -2149,9 +2163,14 @@ paths:
         - "P08 BO-078 Requisitions"
       x-ticvai-audience:
       - staff
-      summary: Approve or reject a requisition
+      summary: Approve, reject or return a requisition
       description: 'Departmental approval. The approver may amend quantities downward but not upward —
         raising a quantity at approval bypasses the request that justified it.
+
+
+        **One call with its decision** (Chinmay, 3 October 2026, Block A business rules; CHG-RUL-004): `approved`,
+        `rejected` or `returnedForInfo`, with `note` as the reason the requester reads (required for the last
+        two). BO-078 binds this one operation; `rejectRequisition` and `returnRequisition` are deprecated.
 
         '
       tags:
@@ -2437,8 +2456,23 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Raise a purchase order
-      description: 'Requires an approved requisition and a selected quotation. Raising one without either
-        is refused — that is the control the chain exists to enforce.
+      description: 'A `standard` order requires an approved requisition and a selected quotation. Raising one
+        without either is refused (409 `requisition-required`) — that is the control the chain exists to enforce.
+
+
+        **Blanket and RFQ-award orders are raised without a requisition, and every order goes through the PO
+        approval matrix** (Chinmay, 3 October 2026, Block A business rules; CHG-RUL-004). `kind` says which:
+        `standard` (the default) needs `requisitionId` and `quotationId` as before; `blanket` (a price and a
+        commitment for a period, `contractPriceValidUntil`) and `rfqAward` (the winner of a quotation round,
+        `rfqId` and the winning `quotationId`) need no requisition; `release` draws against a blanket order
+        (`blanketParentId`) and needs neither. **The approval matrix stands in for the requisition''s approval**:
+        the call asks `approvals.evaluateApprovalRequirement` with kind `requisition` narrowed by subject type
+        `purchaseOrder` (no new `ApprovalKind`, which would break r1 clients), and where the venue''s or tenant''s
+        matrix requires an approval for that kind and value it raises `approvals.createApprovalRequest`, sets
+        `approvalRequestId` and the order stays `raised`: `sendPurchaseOrder` refuses it (409
+        `po-approval-pending`) until the request is approved. Where the matrix requires none the order is sendable
+        at once. A standard order whose requisition was approved follows the same matrix, so one rule decides
+        every order''s approval.
 
         **The line price comes from the selected quotation and is editable with a reason** (decided 28
         September, audit R171). A line that omits `unitPrice` takes the quotation line''s price; a line
@@ -2484,7 +2518,13 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
-          description: Requisition is not approved, or the quotation does not match it
+          description: A `standard` order with no approved requisition or no quotation (`requisition-required`),
+            a quotation that does not match the requisition or the RFQ (`quotation-mismatch`), or a `release`
+            whose blanket order is not open or has expired (`blanket-not-open`) (CHG-RUL-004).
+          x-ticvai-problem-types:
+          - requisition-required
+          - quotation-mismatch
+          - blanket-not-open
           content:
             application/problem+json:
               schema:
@@ -2563,7 +2603,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/PurchaseOrder'
         '409':
-          description: Not in a state that permits this
+          description: Not in a state that permits this, or the order waits for its approval under the PO approval
+            matrix (`po-approval-pending`; CHG-RUL-004). It is sent once the request is approved.
+          x-ticvai-problem-types:
+          - po-approval-pending
           content:
             application/problem+json:
               schema:
@@ -4888,24 +4931,52 @@ components:
       type: object
       required:
       - id
-      - requisitionId
       - supplierId
-      - quotationId
       - lines
       - expectedDelivery
       properties:
         id:
           type: string
           format: uuid
+        kind:
+          type: string
+          enum:
+          - standard
+          - blanket
+          - release
+          - rfqAward
+          default: standard
+          description: '**Which order this is** (CHG-RUL-004). `standard` needs `requisitionId` and `quotationId`
+            (409 `requisition-required` without them); `blanket` and `rfqAward` are raised without a requisition;
+            `release` names `blanketParentId`. Every kind goes through the PO approval matrix.'
         requisitionId:
           type: string
           format: uuid
+          nullable: true
+          description: Required for a `standard` order; omitted for a blanket order, an RFQ award or a release.
         supplierId:
           type: string
           format: uuid
         quotationId:
           type: string
           format: uuid
+          nullable: true
+          description: Required for a `standard` order and an `rfqAward` (the winning quotation).
+        rfqId:
+          type: string
+          format: uuid
+          nullable: true
+          description: For an `rfqAward`, the quotation round it awards.
+        blanketParentId:
+          type: string
+          format: uuid
+          nullable: true
+          description: For a `release`, the open blanket order it draws against.
+        contractPriceValidUntil:
+          type: string
+          format: date
+          nullable: true
+          description: For a `blanket` order, the last day its prices hold.
         deliverToLocationId:
           type: string
           format: uuid

@@ -76,6 +76,12 @@ CHECKS = [
     # 2 October (Chinmay, pre-apply round, CHG-SBO-001): every TICVAI Console screen acting in a tenant carries
     # the R098 tenant picker and platform-staff grant, and every Console screen is core.
     "check-console-grant",
+    # 3 October (Chinmay, Block A business rules, CHG-RUL-001..018): the contract side of the business rules
+    # (bill split, streamed answers, visit plan, purchase orders, payment links, report runs, theme contrast,
+    # dashboards, work orders, incidents, fares, door sessions, attendance, AI currency, admission QR, new guest
+    # and incident operations), and two general rules: a streaming answer declares its events, and an update
+    # declares the refusals of the create whose body it takes.
+    "check-business-rules",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.

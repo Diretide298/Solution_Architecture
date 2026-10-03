@@ -1,0 +1,49 @@
+id: CHG-RUL-001
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: 'F&B bill split: five methods in one SplitBill request, an unsplit bill closes as one sub-bill, and payment timing
+  follows the outlet (send first or pay first).'
+decision:
+  what: 'fnb.yaml splitBill states the five methods of SplitMethod (byAmount, byCovers, byCategory, byLine for items, bySeat)
+    sent as one SplitBillRequest with its method field, and that at a payFirst outlet a split divides only what is unpaid.
+    closeTableVisit: payments[].subBillId is optional (an unsplit bill closes as one sub-bill; required once split), payments
+    may be empty at a payFirst outlet with nothing outstanding, and the description states both payment timings (tenancy.Outlet.paymentTiming,
+    as POS-021). The cited copy of the answers is added as docs/active/decisions/answers-3-october-business-rules.md.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Block A audit on live r2, pattern 4 of CHG-AUD-001 (contract rules that disagree with their screens). Chinmay answered
+  on 3 October 2026 (docs/active/decisions/answers-3-october-business-rules.md, section ''Block A audit business rules''
+  and the list ''Asked as questions instead of defaults''): ''F&B bill split: all five methods (amount, covers, category,
+  item, seat), one SplitBill request with a method field; an unsplit bill closes as one sub-bill (subBillId optional). Payment
+  timing follows POS-021: pay first or send first, both configurations.'' CHG-AUD-001 named closeTableVisit payments and
+  subBillId against POS-028 and EMP-059.'
+keys_touched:
+  operations:
+  - splitBill
+  - closeTableVisit
+  schemas:
+  - SplitBillRequest
+  screens:
+  - POS-028
+  - EMP-059
+  - POS-021
+  files:
+  - contracts/satellite/fnb.yaml
+  - docs/active/decisions/answers-3-october-business-rules.md
+root_class: 'new: contract-rule-vs-screen'
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-028
+  - APP-STAFF-EMP-059
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'Relaxing a required request field and minItems is additive (check-contract-compat passes against r1). Prevention:
+  tools/check-business-rules.py rule BR-SPLIT, which fails on the parent commit 4e2c56c1 and passes here. Batch RUL (spec-rules),
+  3 October 2026.'

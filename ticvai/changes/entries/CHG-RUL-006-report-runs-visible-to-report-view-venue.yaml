@@ -1,0 +1,37 @@
+id: CHG-RUL-006
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: 'Report runs: REPORT_VIEW_VENUE sees every run in the venue scope; mineOnly is a filter; REPORT_MANAGE adds editing
+  and scheduling, not visibility.'
+decision:
+  what: 'reporting.yaml listReportExecutions: a description, and mineOnly rewritten as a filter (true: own runs; false:
+    every run in the venue scope), replacing the 28 September rule (audit R158) that gated other people''s runs on REPORT_MANAGE.
+    The default stays true, so a client built at r1 sees the same list unless it asks.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Block A audit on live r2, pattern 4 of CHG-AUD-001 (contract rules that disagree with their screens). Chinmay answered
+  on 3 October 2026 (docs/active/decisions/answers-3-october-business-rules.md, section ''Block A audit business rules''
+  and the list ''Asked as questions instead of defaults''): ''Report runs: REPORT_VIEW_VENUE sees every run in the venue
+  scope; mine only is a filter; REPORT_MANAGE adds editing and scheduling.'''
+keys_touched:
+  operations:
+  - listReportExecutions
+  screens:
+  - BO-058
+  - BO-061
+  files:
+  - contracts/satellite/reporting.yaml
+root_class: 'new: contract-rule-vs-screen'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'Prevention: tools/check-business-rules.py rule BR-REPORT-RUNS, which fails on the parent commit 4e2c56c1 and passes
+  here. Batch RUL (spec-rules), 3 October 2026.'

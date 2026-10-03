@@ -4736,6 +4736,9 @@ components:
         value here would be a breaking change against r1) and each is off until the venue saves an active matrix
         for it:
 
+        - **A purchase order** (`requisition`, subject `purchaseOrder`; Chinmay, 3 October 2026, Block A business
+          rules; CHG-RUL-004): the PO approval matrix. Blanket and RFQ-award orders are raised without a requisition
+          and are approved here instead; `inventory.createPurchaseOrder` asks for every order, by kind and value.
         - **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a
           single publish by a holder of the permission; a review step only where the venue sets one up (batch 1,
           CMS-014; DEC-156).

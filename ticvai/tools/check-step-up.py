@@ -18,6 +18,17 @@ approving a journal entry need a second factor?* has to be one answer and not th
   *raise only* a checkable rule rather than an intention.
 - **A policy operation whose `x-ticvai-config-scope` sits below the level of an operation it
   governs.** A venue that can configure away a platform-level control is not a control.
+- **SU-CARRIER: a step-up with nowhere to travel** (Chinmay, 3 October 2026, Block A business rules;
+  CHG-RUL-014). `rejectShiftVariance` demanded a supervisor's PIN and its body had no field for it,
+  so the till had no way to send one. Every step-up operation now says where the step-up travels,
+  `x-ticvai-step-up-carrier`: `body:<property>` (a `SupervisorStepUp` or a step-up token in the
+  request body), `header:<Name>[,<Name>]` (a GET, which has no body) or `session` (an MFA factor
+  verified on the caller's own session). The named property or header must exist. An undeclared
+  operation whose body has `supervisorStepUp` or `stepUpToken` counts as carrying it there. An
+  operation whose `security` admits `{}` (no session) can only carry it in the body or a header,
+  and says so with `x-ticvai-step-up-when: sessionless`. Operations found without a carrier on
+  3 October that no rule named are listed in `CARRIER_EXEMPT`, each with its reason; a new one
+  is not exempt.
 
 **And what it reports without refusing:** a screen calling a step-up operation that declares no way
 to present the challenge. That is authoring work on real screens rather than a defect in the
@@ -46,6 +57,78 @@ CHALLENGE = {"createMfaChallenge", "verifyMfaChallenge"}
 # Where a level sits, so "below" is comparable. Widest first.
 LEVELS = ["platform", "tenant", "region", "venue", "outlet"]
 
+# **SU-CARRIER exemptions** (CHG-RUL-014). Step-up operations that, on 3 October 2026, declared no carrier and
+# had none in their body. None was named by the 3 October rules; each is a question for the lead, not a silent skip.
+_MFA = ("MFA step-up: how the token from createMfaChallenge/verifyMfaChallenge reaches the call (a header or the "
+        "session) is not contracted; question for Chinmay (CHG-RUL-014)")
+_PIN = ("supervisor PIN on the device with no field to carry it, the gap rejectShiftVariance had; not named by "
+        "the 3 October rule; question for Chinmay, default: supervisorStepUp in the body (CHG-RUL-014)")
+CARRIER_EXEMPT = {
+    **{o: _MFA for o in (
+        "approveMembershipProductValidation", "approvePartnerStatuLifecycle", "approveBookingLimitCommercial",
+        "setPartnerCapabilityGrants", "setPartnerCommissionRules", "setPartnerCreditProfile",
+        "actOnPartnerSettlementBatch", "setBiometricLifecycleRetention", "approveManualOverrideSupervisor",
+        "replaceCredential", "getFaceReenrolmentImages", "approveMatrixMultiLevel", "approveRoleAuthorityDelegation",
+        "approveVersioningGovernance", "approveUnifiedDecision", "approveJournalEntry", "resetPrincipalCredential",
+        "endOwnSession", "openPlatformStaffGrant", "approveRefund")},
+    **{o: _PIN for o in ("closeShift", "acceptShiftVariance", "withdrawFromDepositBox")},
+}
+INFERRED_BODY = ("supervisorStepUp", "stepUpToken")
+
+
+def _body_props(op: dict, doc: dict) -> set:
+    schema = (((op.get("requestBody") or {}).get("content") or {}).get("application/json") or {}).get("schema") or {}
+
+    def walk(node, depth=0):
+        if not isinstance(node, dict) or depth > 4:
+            return set()
+        ref = node.get("$ref")
+        if isinstance(ref, str) and ref.startswith("#/components/schemas/"):
+            node = ((doc.get("components") or {}).get("schemas") or {}).get(ref.rsplit("/", 1)[1]) or {}
+        out = set((node.get("properties") or {}).keys())
+        for part in node.get("allOf") or []:
+            out |= walk(part, depth + 1)
+        return out
+    return walk(schema)
+
+
+def carrier_problems(oid: str, op: dict, doc: dict, path_params: list) -> list:
+    """SU-CARRIER: where the step-up travels, and that it exists (CHG-RUL-014)."""
+    carrier = op.get("x-ticvai-step-up-carrier")
+    body = _body_props(op, doc)
+    sessionless = {} in (op.get("security") or [])
+    if not carrier:
+        inferred = [b for b in INFERRED_BODY if b in body]
+        if inferred and not sessionless:
+            return []
+        if oid in CARRIER_EXEMPT:
+            return []
+        return [f"{oid}: demands a step-up and says nowhere it travels (x-ticvai-step-up-carrier) -- "
+                "a till cannot send a PIN the request has no field for (CHG-RUL-014)"]
+    out = []
+    kind, _, rest = str(carrier).partition(":")
+    if kind == "body":
+        if rest not in body:
+            out.append(f"{oid}: step-up carrier body:{rest} is not a property of its request body")
+    elif kind == "header":
+        names = {p.get("name") for p in (op.get("parameters") or []) + path_params
+                 if isinstance(p, dict) and p.get("in") == "header"}
+        for h in [h for h in rest.split(",") if h]:
+            if h not in names:
+                out.append(f"{oid}: step-up carrier header {h} is not a header parameter of the operation")
+    elif kind == "session":
+        if sessionless:
+            out.append(f"{oid}: admits a call with no session ({{}}) and carries its step-up in the session")
+    else:
+        out.append(f"{oid}: step-up carrier {carrier!r} is not body:<property>, header:<Name> or session")
+    when = op.get("x-ticvai-step-up-when", "always")
+    if when not in ("always", "sessionless"):
+        out.append(f"{oid}: x-ticvai-step-up-when {when!r} is not always or sessionless")
+    if sessionless and when != "sessionless":
+        out.append(f"{oid}: admits a call with no session and does not say the step-up is what authorises it "
+                   "(x-ticvai-step-up-when: sessionless)")
+    return out
+
 
 def _utf8() -> None:
     try:
@@ -60,6 +143,7 @@ def main() -> int:
 
     guarded: dict = {}          # operationId -> (strength, reason, scopeLevel, file)
     policy_ops: dict = {}       # operationId -> config-scope
+    carrier_errors: list = []   # SU-CARRIER (CHG-RUL-014)
     for f in sorted((ROOT / "contracts").rglob("*.yaml")):
         try:
             doc = yaml.safe_load(f.read_text(encoding="utf-8")) or {}
@@ -76,10 +160,12 @@ def main() -> int:
                     guarded[oid] = (op["x-ticvai-step-up"],
                                     op.get("x-ticvai-step-up-reason"),
                                     op.get("x-ticvai-scope-level"), f.name)
+                    carrier_errors += carrier_problems(oid, op, doc, item.get("parameters") or [])
                 if oid in ("listStepUpPolicies", "setStepUpPolicy"):
                     policy_ops[oid] = op.get("x-ticvai-config-scope")
 
     errors, warnings = [], []
+    errors += carrier_errors
 
     for oid, (strength, reason, level, fname) in sorted(guarded.items()):
         if strength not in STRENGTH:
@@ -139,6 +225,8 @@ def main() -> int:
         warnings.append(f"{len(unable)} screen(s) reach a step-up action with no challenge "
                         "declared")
 
+    print(f"\n  SU-CARRIER: {len(guarded) - len([o for o in guarded if o in CARRIER_EXEMPT])} carry their "
+          f"step-up; {len([o for o in guarded if o in CARRIER_EXEMPT])} exempt with a reason (CHG-RUL-014)")
     for e in errors:
         print(f"\n  ERROR  {e}")
     print(f"\n{'FAIL' if errors else 'PASS'} - {len(errors)} error(s), {len(warnings)} warning(s)")

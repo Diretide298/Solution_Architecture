@@ -2191,6 +2191,15 @@ paths:
         Expires, because an unpaid link holding inventory is inventory nobody can sell — **the expiry
         releases the hold, not just the link.**
 
+
+        **One live link per order, and a create is idempotent on the order** (Chinmay, 3 October 2026, Block A
+        business rules; CHG-RUL-005). Where the order already has a live link (`issued` or `viewed`, not past
+        `expiresAt`), a second create makes no new link and sends nothing: it answers `200` with that link, so
+        ADM-592 shows the link the guest already holds (re-sending it is `resendPaymentLink`). **A paid order is
+        refused `409 order-already-paid`.** A new link is created only once the old one has expired or been
+        cancelled (no operation cancels a link on its own yet; open, CHG-RUL-005). The `Idempotency-Key` still guards a retried call; this
+        rule also covers two different calls for the same order.
+
         '
       tags:
       - orders
@@ -2238,6 +2247,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentLink'
+        '200':
+          description: The order already has a live link; that link is returned and nothing is sent (CHG-RUL-005).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentLink'
+        '409':
+          description: The order is already paid (`order-already-paid`; CHG-RUL-005). No link is created.
+          x-ticvai-problem-types:
+          - order-already-paid
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /invitations:
