@@ -215770,6 +215770,16 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: setStepUpPolicy
+      - kind: multiSelect
+        label: Permissions that require MFA
+        bindsTo: PasswordPolicy.mfaRequiredForPermissions
+        operation: setPasswordPolicy
+        notes: '**MFA is required by permission (decided 28 September, audit R135).** A principal holding
+          any permission listed here must present a second factor at sign-in and keep an active method.
+          The floor — `ROLE_MANAGE`, `LEDGER_APPROVE` and every `PLATFORM_*` permission — is shown locked:
+          the tenant may add permissions and never drop a floor entry (`setPasswordPolicy` refuses such
+          a body with 400).'
+        provenance: contract identity.yaml PUT /password-policy
       - kind: primaryButton
         label: Save MFA requirement
         operation: setPasswordPolicy
