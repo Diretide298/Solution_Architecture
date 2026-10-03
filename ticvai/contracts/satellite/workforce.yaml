@@ -431,7 +431,15 @@ paths:
 
         A missing clock-out is not corrected automatically. It is flagged, because guessing when
         someone left is how a payroll dispute starts.
+
+        **Self clock-in only** (Chinmay, 3 October 2026, Block A business rules: "self clock-in
+        only"; CHG-RUL-016). The record is always the caller's own: the principal comes from the
+        session and the body names nobody, so a supervisor cannot clock a member of staff in or out
+        here, from a till, the staff app or the back office. A supervisor corrects a record
+        afterwards with `amendAttendance` (`WORKFORCE_MANAGE`), which keeps the original. BO-056's
+        "Record attendance" becomes "Amend attendance".
       tags: [attendance]
+      x-ticvai-self-scoped: principal
       x-ticvai-permission: ATTENDANCE_RECORD
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
@@ -491,6 +499,10 @@ paths:
         Forgotten clock-outs and phones that died. **The original is kept and the amendment is
         recorded against it** — attendance feeds pay, and a record that can be quietly rewritten
         is not evidence of anything.
+
+        **The supervisor's tool for attendance** (Chinmay, 3 October 2026; CHG-RUL-016): staff clock
+        themselves in and out with `recordAttendance`; a supervisor never records for them and
+        corrects here instead.
 
         **Every correction is kept as its own row** (decided 28 September, audit R129 (7)): each
         call appends one `AttendanceAmendment` (who, when, the time before, the time after, the

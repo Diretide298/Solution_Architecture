@@ -1,0 +1,53 @@
+id: CHG-RUL-004
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: Blanket and RFQ-award purchase orders are raised without a requisition and go through the PO approval matrix; a
+  standard order still needs an approved requisition; a requisition is decided in one approveRequisition call.
+decision:
+  what: 'inventory.yaml createPurchaseOrder: CreatePurchaseOrderRequest gains kind (standard, blanket, release, rfqAward),
+    rfqId, blanketParentId, contractPriceValidUntil; requisitionId and quotationId are no longer required in the schema
+    (a standard order without them is 409 requisition-required). Every order asks approvals.evaluateApprovalRequirement
+    (kind requisition, subject purchaseOrder: no new ApprovalKind, which would break r1); an order awaiting approval cannot
+    be sent (sendPurchaseOrder 409 po-approval-pending). approvals.yaml ApprovalKind documents the subject. approveRequisition
+    is the one decision call (approved, rejected, returnedForInfo); rejectRequisition and returnRequisition are deprecated,
+    superseded by it, and kept for r1 clients.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Block A audit on live r2, pattern 4 of CHG-AUD-001 (contract rules that disagree with their screens). Chinmay answered
+  on 3 October 2026 (docs/active/decisions/answers-3-october-business-rules.md, section ''Block A audit business rules''
+  and the list ''Asked as questions instead of defaults''): ''Purchase orders: blanket and RFQ-award orders may be raised
+  without a requisition but go through the PO approval matrix; normal orders still need an approved requisition.'' and ''Requisitions:
+  one approveRequisition call with its decision (approve / reject / return); separate reject/return operations dropped from
+  BO-078.'''
+keys_touched:
+  operations:
+  - createPurchaseOrder
+  - sendPurchaseOrder
+  - approveRequisition
+  - rejectRequisition
+  - returnRequisition
+  schemas:
+  - CreatePurchaseOrderRequest
+  - ApprovalKind
+  screens:
+  - BO-051
+  - BO-078
+  files:
+  - contracts/satellite/inventory.yaml
+  - contracts/spine/approvals.yaml
+root_class: 'new: contract-rule-vs-screen'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: closed
+closed_by_commit: 112ef275
+notes: 'BO-078 still binds rejectRequisition and returnRequisition (screens are another agent''s); it rebinds to approveRequisition.
+  sendPurchaseOrder is touched only for the approval gate the rule needs. Prevention: tools/check-business-rules.py rule
+  BR-PO, which fails on the parent commit 4e2c56c1 and passes here. Batch RUL (spec-rules), 3 October 2026.'

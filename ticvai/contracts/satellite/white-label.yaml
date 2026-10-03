@@ -1421,6 +1421,15 @@ paths:
         at configuration time rather than at audit. **Refused, not warned (confirmed 28 September,
         audit R139)**: flow F22 is corrected to match.
 
+        **The pairs and ratios** (Chinmay, 3 October 2026, Block A business rules: "WCAG AA"; CHG-RUL-007), listed
+        on `Theme.x-ticvai-contrast-pairs` so the server, CMS-005 and the check read one list: text on the
+        background at **4.5:1**; large text (24 px, or 18.66 px bold, and up) at **3:1**; the primary, secondary
+        and accent colours against the background at **3:1** (a button, a link, a focus ring is a user-interface
+        component, WCAG 1.4.11); and for each component colour, its text on its own background at **4.5:1** and
+        its background against the page background at **3:1**. The ratio is the WCAG 2.2 relative-luminance
+        contrast ratio. Each failing pair is named in `ContrastProblem.failures` with its ratio and the one it
+        needed.
+
         **One theme, no dark mode** (Chinmay, 2 October, workbook Q150; CHG-CSA-035): `darkMode` is deprecated
         and ignored; a body that carries it is accepted and the field is not applied.
 
@@ -7617,6 +7626,17 @@ components:
     Theme:
       x-ticvai-persistence: none — embedded in tenant_config
       type: object
+      # The WCAG AA pairs `setTheme` checks (Chinmay, 3 October 2026; CHG-RUL-007). `use` is text (4.5:1),
+      # largeText (3:1) or nonText (3:1, WCAG 1.4.11). `componentColours.*` means every component colour;
+      # an unset optional colour is not checked. Read by tools/check-business-rules.py (BR-CONTRAST).
+      x-ticvai-contrast-pairs:
+      - { foreground: textColour, background: backgroundColour, use: text, ratio: 4.5 }
+      - { foreground: textColour, background: backgroundColour, use: largeText, ratio: 3.0 }
+      - { foreground: primaryColour, background: backgroundColour, use: nonText, ratio: 3.0 }
+      - { foreground: secondaryColour, background: backgroundColour, use: nonText, ratio: 3.0 }
+      - { foreground: accentColour, background: backgroundColour, use: nonText, ratio: 3.0 }
+      - { foreground: componentColours.*.text, background: componentColours.*.background, use: text, ratio: 4.5 }
+      - { foreground: componentColours.*.background, background: backgroundColour, use: nonText, ratio: 3.0 }
       required:
       - primaryColour
       - secondaryColour

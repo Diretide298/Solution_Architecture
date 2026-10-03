@@ -1,0 +1,40 @@
+id: CHG-RUL-009
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: updateVisitPlan gains the addAddOn and removeAddOn change kinds; add-ons are priced at booking.
+decision:
+  what: venue-map.yaml VisitPlanUpdate.changes[].op gains addAddOn and removeAddOn with addOnProductId; updateVisitPlan
+    states the rule and refuses an add-on not sold for the stop (422 add-on-not-offered); VisitPlanItem.addOnProductIds
+    holds them; the plan carries no price (bookVisitPlan prices them by addCartLine).
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Block A audit on live r2, pattern 4 of CHG-AUD-001 (contract rules that disagree with their screens). Chinmay answered
+  on 3 October 2026 (docs/active/decisions/answers-3-october-business-rules.md, section ''Block A audit business rules''
+  and the list ''Asked as questions instead of defaults''): ''Visit plan add-ons: updateVisitPlan gains addAddOn / removeAddOn
+  change kinds; priced at booking.'' CHG-AUD-001 named updateVisitPlan change kinds against the GST-053 add-on.'
+keys_touched:
+  operations:
+  - updateVisitPlan
+  schemas:
+  - VisitPlanUpdate
+  - VisitPlanItem
+  screens:
+  - GST-053
+  files:
+  - contracts/satellite/venue-map.yaml
+root_class: 'new: contract-rule-vs-screen'
+tickets:
+  started: []
+  unstarted:
+  - APP-MOB-GST-053
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: closed
+closed_by_commit: 112ef275
+notes: 'Prevention: tools/check-business-rules.py rule BR-VISIT-PLAN, which fails on the parent commit 4e2c56c1 and passes
+  here. Batch RUL (spec-rules), 3 October 2026.'

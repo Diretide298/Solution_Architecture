@@ -1,0 +1,45 @@
+id: CHG-RUL-019
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: closeShift, acceptShiftVariance and withdrawFromDepositBox carry their PIN step-up in the body, as rejectShiftVariance
+  does; their SU-CARRIER exemptions are dropped.
+decision:
+  what: 'shift.yaml: closeShift (body allOf CloseShiftRequest plus supervisorStepUp, so submitShiftCount, which shares the
+    count schema, asks none) and acceptShiftVariance take supervisorStepUp; withdrawFromDepositBox takes witnessStepUp (the
+    countersigning cashier''s PIN: its principal must be witnessPrincipalId, so the field is named for the witness, not
+    a supervisor). Each declares x-ticvai-step-up-carrier, is refused 403 supervisor-step-up-refused without it, and keeps
+    the field optional in the schema so r1 clients validate. check-step-up.py drops the three exemptions.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Chinmay, 3 October 2026, took the defaults on the questions the spec-rules report (CHG-RUL-001..018) left open, relayed
+  by the coordinator: ''(2) add supervisorStepUp to closeShift, acceptShiftVariance and withdrawFromDepositBox the same
+  way as rejectShiftVariance, and drop their SU-CARRIER exemptions''. Same gap as CHG-RUL-014.'
+keys_touched:
+  operations:
+  - closeShift
+  - acceptShiftVariance
+  - withdrawFromDepositBox
+  screens:
+  - POS-007
+  - BO-040
+  - BO-043
+  files:
+  - contracts/spine/shift.yaml
+  - tools/check-step-up.py
+root_class: 'new: contract-rule-vs-screen'
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-007
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-step-up.py
+status: closed
+closed_by_commit: 7f6e5b08
+notes: 'withdrawFromDepositBox''s field is witnessStepUp rather than supervisorStepUp because the step-up there is the witnessing
+  cashier''s (DEC-178), not a supervisor''s; the shape is the same SupervisorStepUp. Prevention: tools/check-step-up.py
+  rule SU-CARRIER, which fails on the parent commit and passes here. Batch RUL (spec-rules), 3 October 2026.'

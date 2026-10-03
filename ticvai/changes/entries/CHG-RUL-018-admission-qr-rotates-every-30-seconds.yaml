@@ -1,0 +1,37 @@
+id: CHG-RUL-018
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: 'GST-055''s admission QR rotates every 30 seconds: the rotation step of getEntitlementCredential is 30 seconds
+  by decision.'
+decision:
+  what: access.yaml getEntitlementCredential rotation.timeStepSeconds (already default 30) states the decision; the 10 to
+    60 second bounds stay for other credential kinds.
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Block A audit on live r2, pattern 4 of CHG-AUD-001 (contract rules that disagree with their screens). Chinmay answered
+  on 3 October 2026 (docs/active/decisions/answers-3-october-business-rules.md, section ''Block A audit business rules''
+  and the list ''Asked as questions instead of defaults''): ''QR: GST-055''s admission QR rotates every 30 seconds (Chinmay''s
+  GST-069 meant GST-055); GST-069 FacePass unchanged.'''
+keys_touched:
+  operations:
+  - getEntitlementCredential
+  screens:
+  - GST-055
+  files:
+  - contracts/spine/access.yaml
+root_class: 'new: contract-rule-vs-screen'
+tickets:
+  started: []
+  unstarted:
+  - APP-MOB-GST-055
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: closed
+closed_by_commit: 112ef275
+notes: 'Prevention: tools/check-business-rules.py rule BR-QR, which fails on the parent commit 4e2c56c1 and passes here.
+  Batch RUL (spec-rules), 3 October 2026.'

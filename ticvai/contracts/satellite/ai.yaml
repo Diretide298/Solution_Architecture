@@ -1460,6 +1460,21 @@ paths:
         `503 scrubber-unavailable`, never sent raw; a message or reply the guard blocks is refused
         `422 guard-refused`.
 
+
+        **The answer streams** (Chinmay, 3 October 2026, Block A business rules: "stream answers"; CHG-RUL-002).
+        A client that sends `Accept: text/event-stream` gets server-sent events in this order: `token` events
+        carrying the answer text as it is produced (`{delta}`), then one `sources` event (`AiSourceList`), then
+        a `proposedAction` event only where the answer proposes one (`ProposedAction`, still a draft), then
+        `done` carrying the stored `AiMessage`, the same body the JSON answer returns. **What is stored does not
+        change**: the full message is written once, when the answer is complete, and `done` and the JSON
+        answer are that row. Text reaches the client only after the cell has re-filled the scrubber''s
+        placeholders and the guard has passed it, so the stream is released in short checked runs rather
+        than raw tokens; where the guard blocks the reply part-way, an `error` event (`Problem`,
+        `guard-refused`) ends the stream, the client discards the partial text, and nothing is stored as the
+        answer. Refusals found before the first token (429, 503, 422) are ordinary HTTP answers, never a
+        stream. A client that sends `Accept: application/json` (or no `Accept`) gets the whole `AiMessage`
+        as before; clients built at r1 are unchanged.
+
         '
       tags:
       - assist
@@ -1467,6 +1482,18 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append
+      x-ticvai-streaming: sse
+      x-ticvai-sse-events:
+      - name: token
+        data: '{delta: string} — the next run of answer text, already re-filled and passed by the guard'
+      - name: sources
+        data: AiSourceList — once, after the last token
+      - name: proposedAction
+        data: ProposedAction — only where the answer proposes one; a draft, never applied here
+      - name: done
+        data: AiMessage — the stored message, identical to the JSON answer; ends the stream
+      - name: error
+        data: Problem — `guard-refused` or `provider-unavailable` part-way; ends the stream, nothing stored
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -1496,11 +1523,16 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Answered
+          description: 'Answered. JSON by default; server-sent events when the client sends `Accept: text/event-stream` (CHG-RUL-002).'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiMessage'
+            text/event-stream:
+              schema:
+                type: string
+                description: 'Server-sent events `token`*, `sources`, `proposedAction`?, then `done` (or `error`), as
+                  `x-ticvai-sse-events` says. Each `data:` line is JSON of the shape named there.'
         '429':
           description: 'Usage limit reached (8.3.76). The limit is a cost control, and the response says
             which limit rather than failing opaquely.
@@ -2178,8 +2210,8 @@ paths:
         `subscription.settleAiUsage` (decision 2); on a tenant''s own key they are metered for visibility.
 
         **Money in the tenant''s selected currency, tokens alongside** (Chinmay, 2 October, workbook Q8;
-        CHG-CSA-004). Every cost and the spend ceiling are reported in the tenant''s selected currency (USD by
-        default), with the token counts beside them, never instead of them.
+        CHG-CSA-004). Every cost and the spend ceiling are reported in the tenant''s selected currency (by
+        default its billing currency, AED for a UAE tenant, not USD; CHG-RUL-017), with the token counts beside them, never instead of them.
 
         '
       tags:
@@ -2529,7 +2561,7 @@ paths:
       - staff
       x-ticvai-read-routing: replica
       x-ticvai-agreed: '2 October: Chinmay, workbook Q8 (BO-091): the ceiling in the tenant''s selected currency,
-        default USD, with tokens; shape follows getAiPolicy'
+        with tokens (default currency the tenant''s billing currency since 3 October, CHG-RUL-017); shape follows getAiPolicy'
       summary: The AI spend ceiling, in money
       description: 'The ceiling in force at the caller''s scope, resolved nearest ancestor first as `getAiPolicy`
         is (CHG-CSA-004), with its token equivalent.
@@ -2558,8 +2590,11 @@ paths:
       - staff
       x-ticvai-agreed: '2 October: Chinmay, workbook Q8 (BO-091); shape follows setAiPolicy'
       summary: Set the AI spend ceiling, in money
-      description: '**The AI spend ceiling is shown and set in the tenant''s selected currency (USD by default), with
-        tokens shown alongside** (Chinmay, 2 October, workbook Q8; CHG-CSA-004). `spend.currency` must be the
+      description: '**The AI spend ceiling is shown and set in the tenant''s selected currency, with tokens shown
+        alongside** (Chinmay, 2 October, workbook Q8; CHG-CSA-004). **Until the tenant changes it, that currency is
+        the tenant''s billing currency**, the currency TICVAI invoices the tenant in (`SubscriptionInvoice`; AED for
+        a UAE tenant), **not USD** (Chinmay, 3 October 2026, Block A business rules, BO-091; CHG-RUL-017). The tenant
+        may pick another currency on BO-091. `spend.currency` must be the
         tenant''s selected currency, or 400. The token equivalent at the current blended rate is returned beside it,
         and `AiPolicy.monthlyTokenCeiling` stays the token limit. Where both are set, the first reached applies the
         policy''s `ceilingBehaviour` (warn by default). A venue may narrow the tenant''s ceiling and never raise it,
@@ -18200,7 +18235,8 @@ components:
         spend:
           allOf:
           - $ref: ../shared/common.yaml#/components/schemas/Money
-          description: Per month, in the tenant's selected currency (USD by default).
+          description: Per month, in the tenant's selected currency; until the tenant changes it, the tenant's
+            billing currency (AED for a UAE tenant), not USD (CHG-RUL-017).
         tokenEquivalent:
           type: integer
           readOnly: true
@@ -18219,7 +18255,8 @@ components:
           minLength: 3
           maxLength: 3
           readOnly: true
-          description: '**The tenant''s selected currency, USD by default** (Chinmay, 2 October, workbook Q8;
+          description: '**The tenant''s selected currency, by default its billing currency (AED for a UAE tenant),
+            not USD** (CHG-RUL-017; Chinmay, 2 October, workbook Q8;
             CHG-CSA-004). Every `cost` here is in it; token counts sit beside each cost.'
         ceiling:
           type: object

@@ -449,6 +449,9 @@ paths:
                         minimum: 10
                         maximum: 60
                         default: 30
+                        description: '**30 seconds for an admission QR** (Chinmay, 3 October 2026, Block A business
+                          rules: GST-055''s admission QR rotates every 30 seconds; CHG-RUL-018). The bounds stay
+                          for other credential kinds.'
                       digits:
                         type: integer
                         minimum: 6
@@ -8096,6 +8099,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
+      x-ticvai-step-up-carrier: session   # the MFA step-up verified on the caller's session (CHG-RUL-020)
       x-ticvai-step-up-reason: Sets how long biometric data is kept; a wrong value is a data protection breach.
   /biometric:
     get:
@@ -10052,6 +10056,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
+      x-ticvai-step-up-carrier: session   # the MFA step-up verified on the caller's session (CHG-RUL-020)
       x-ticvai-step-up-reason: Opens a gate by hand, against the admission rules, for a person standing at
         it.
   /credential-disable-blacklist:
@@ -12995,6 +13000,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
+      x-ticvai-step-up-carrier: session   # the MFA step-up verified on the caller's session (CHG-RUL-020)
       x-ticvai-step-up-reason: Moves a paid ticket onto new media; the old one stops working.
   /access-point-groups:
     put:
@@ -15521,6 +15527,7 @@ paths:
       - access
       x-ticvai-permission: BIOMETRIC_IMAGE_VIEW
       x-ticvai-step-up: mfa
+      x-ticvai-step-up-carrier: session   # the MFA step-up verified on the caller's session (CHG-RUL-020)
       x-ticvai-step-up-reason: Opens a guest's face images, special-category data under PDPL; every look is logged (DEC-239).
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false

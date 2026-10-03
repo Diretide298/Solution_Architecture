@@ -1,0 +1,41 @@
+id: CHG-RUL-016
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: recordAttendance acts on the caller only (self clock-in); supervisors correct afterwards with amendAttendance.
+decision:
+  what: 'workforce.yaml recordAttendance: x-ticvai-self-scoped principal and the rule (the principal comes from the session;
+    no person in the body; nobody clocks anybody else in). amendAttendance states it is the supervisor''s correction.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Block A audit on live r2, pattern 4 of CHG-AUD-001 (contract rules that disagree with their screens). Chinmay answered
+  on 3 October 2026 (docs/active/decisions/answers-3-october-business-rules.md, section ''Block A audit business rules''
+  and the list ''Asked as questions instead of defaults''): ''Attendance: self clock-in only (NOT the recommendation); supervisors
+  correct afterwards with amendAttendance. BO-056''s Record attendance is removed or becomes Amend attendance.'''
+keys_touched:
+  operations:
+  - recordAttendance
+  - amendAttendance
+  screens:
+  - EMP-024
+  - BO-056
+  - BO-889
+  - POS-009
+  files:
+  - contracts/satellite/workforce.yaml
+root_class: 'new: contract-rule-vs-screen'
+tickets:
+  started: []
+  unstarted:
+  - APP-STAFF-EMP-024
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: closed
+closed_by_commit: 112ef275
+notes: 'BO-056 and BO-889 still offer recordAttendance as a supervisor''s act (screens agent): BO-056 becomes Amend attendance.
+  Prevention: tools/check-business-rules.py rule BR-ATTENDANCE, which fails on the parent commit 4e2c56c1 and passes here.
+  Batch RUL (spec-rules), 3 October 2026.'

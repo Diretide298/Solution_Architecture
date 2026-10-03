@@ -1,0 +1,47 @@
+id: CHG-RUL-011
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: 'Incidents: Reported, Investigating, Escalated (optional), Closed; reopen to Investigating with a reason; every
+  change logged.'
+decision:
+  what: 'maintenance.yaml updateIncident: the flow, an escalate object and a reason, 422 incident-transition-not-allowed.
+    Incident.escalation and reopenCount; IncidentInvestigationNote gains kind, fromStatus and toStatus so every status change,
+    escalation and reopen is a logged row. Escalated is underInvestigation with escalation set, and actionRequired is no
+    longer entered but stays in IncidentStatus: no response enum value is added or removed (lead''s rule: no breaking enum
+    additions). states/incident.yaml rewritten: no terminal state (reopen), actionRequired a legacy start.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Block A audit on live r2, pattern 4 of CHG-AUD-001 (contract rules that disagree with their screens). Chinmay answered
+  on 3 October 2026 (docs/active/decisions/answers-3-october-business-rules.md, section ''Block A audit business rules''
+  and the list ''Asked as questions instead of defaults''): ''Incidents: Reported > Investigating > Escalated (optional)
+  > Closed; reopen to Investigating with a reason; every change logged.'''
+keys_touched:
+  operations:
+  - updateIncident
+  schemas:
+  - Incident
+  - IncidentInvestigationNote
+  - IncidentStatus
+  screens:
+  - EMP-027
+  - BO-072
+  files:
+  - contracts/satellite/maintenance.yaml
+  - states/incident.yaml
+root_class: 'new: contract-rule-vs-screen'
+tickets:
+  started: []
+  unstarted:
+  - APP-STAFF-EMP-027
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: closed
+closed_by_commit: 112ef275
+notes: 'states/incident.yaml is outside contracts/ and edited with the rule (flagged in the report). The old note ''No reopen''
+  is replaced by the decision. Prevention: tools/check-business-rules.py rule BR-INCIDENT, which fails on the parent commit
+  4e2c56c1 and passes here. Batch RUL (spec-rules), 3 October 2026.'

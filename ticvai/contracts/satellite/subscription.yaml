@@ -4074,6 +4074,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
+      x-ticvai-step-up-carrier: session   # the MFA step-up verified on the caller's session (CHG-RUL-020)
       x-ticvai-step-up-reason: Platform-level product state, across tenants.
   /member:
     get:
@@ -5776,6 +5777,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
+      x-ticvai-step-up-carrier: session   # the MFA step-up verified on the caller's session (CHG-RUL-020)
       x-ticvai-step-up-reason: Makes a partner able to trade, or stops them.
   /partner-profile-readiness:
     get:
@@ -6538,6 +6540,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
+      x-ticvai-step-up-carrier: session   # the MFA step-up verified on the caller's session (CHG-RUL-020)
       x-ticvai-step-up-reason: Sets what a partner may commit the venue to.
   /commercial-agreement-health:
     get:
@@ -8746,6 +8749,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       x-ticvai-step-up: mfa
+      x-ticvai-step-up-carrier: session   # the MFA step-up verified on the caller's session (CHG-RUL-020)
       x-ticvai-step-up-reason: Sets what a partner organisation may do, including refunds and price overrides.
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -8836,6 +8840,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       x-ticvai-step-up: mfa
+      x-ticvai-step-up-carrier: session   # the MFA step-up verified on the caller's session (CHG-RUL-020)
       x-ticvai-step-up-reason: Sets what the venue pays a partner.
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -8917,6 +8922,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       x-ticvai-step-up: mfa
+      x-ticvai-step-up-carrier: session   # the MFA step-up verified on the caller's session (CHG-RUL-020)
       x-ticvai-step-up-reason: Sets how much a partner may owe the venue.
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -9408,6 +9414,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       x-ticvai-step-up: mfa
+      x-ticvai-step-up-carrier: session   # the MFA step-up verified on the caller's session (CHG-RUL-020)
       x-ticvai-step-up-reason: Approves paying commission to a partner.
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey

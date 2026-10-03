@@ -1,0 +1,45 @@
+id: CHG-RUL-014
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: rejectShiftVariance carries the supervisor's PIN step-up in its body (supervisorStepUp), as reopenShift does; every
+  step-up operation now says where its step-up travels.
+decision:
+  what: 'shift.yaml rejectShiftVariance: supervisorStepUp (common SupervisorStepUp) in the body, refused 403 supervisor-step-up-refused
+    without it or when it fails; x-ticvai-step-up-carrier on it and on reopenShift. check-step-up.py rule SU-CARRIER: a
+    step-up operation declares x-ticvai-step-up-carrier (body:<property>, header:<Name>, session) or carries supervisorStepUp
+    or stepUpToken in its body; the named carrier exists; a sessionless operation cannot carry it in the session.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Block A audit on live r2, pattern 4 of CHG-AUD-001 (contract rules that disagree with their screens). Chinmay answered
+  on 3 October 2026 (docs/active/decisions/answers-3-october-business-rules.md, section ''Block A audit business rules''
+  and the list ''Asked as questions instead of defaults''): ''rejectShiftVariance carries the supervisor step-up in its
+  body, as reopenShift does.'''
+keys_touched:
+  operations:
+  - rejectShiftVariance
+  - reopenShift
+  screens:
+  - POS-007
+  - BO-040
+  - BO-043
+  files:
+  - contracts/spine/shift.yaml
+  - tools/check-step-up.py
+root_class: 'new: contract-rule-vs-screen'
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-007
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-step-up.py
+status: closed
+closed_by_commit: 112ef275
+notes: 'supervisorStepUp is optional in the schema so a client built at r1 still validates, and refused without it (a newly
+  required request field is breaking against r1; kept so in the defaults round). The 23 step-up operations first exempted
+  from SU-CARRIER now carry theirs (CHG-RUL-019, CHG-RUL-020); none is exempt. Prevention: tools/check-step-up.py rule SU-CARRIER,
+  which fails on the parent commit 4e2c56c1 and passes here. Batch RUL (spec-rules), 3 October 2026.'

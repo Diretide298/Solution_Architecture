@@ -1,0 +1,48 @@
+id: CHG-RUL-003
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: 'Visit plan: a signed-out guest builds and changes a plan in the anonymous device session; signing in saves it
+  to the account (it moves on sign-in); booking needs a signed-in guest.'
+decision:
+  what: 'venue-map.yaml: generateVisitPlan states that it, getVisitPlan, updateVisitPlan and listVisitPlanAlternatives take
+    the anonymous guest session, that the plan lapses with the session until sign-in, and that on sign-in every draft plan
+    of the session moves to the account (subjectId set, sessionRef cleared) with the cart claim and no client call. VisitPlan.ownership
+    (anonymous, account). bookVisitPlan refuses an anonymous session 403 sign-in-required.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Block A audit on live r2, pattern 4 of CHG-AUD-001 (contract rules that disagree with their screens). Chinmay answered
+  on 3 October 2026 (docs/active/decisions/answers-3-october-business-rules.md, section ''Block A audit business rules''
+  and the list ''Asked as questions instead of defaults''): ''Visit planner: a signed-out guest can build and change a plan
+  in an anonymous session; sign in to save, share or book; the plan moves to the account on sign-in.'''
+keys_touched:
+  operations:
+  - generateVisitPlan
+  - bookVisitPlan
+  - getVisitPlan
+  - updateVisitPlan
+  schemas:
+  - VisitPlan
+  screens:
+  - GST-051
+  - GST-053
+  - WEB-050
+  files:
+  - contracts/satellite/venue-map.yaml
+root_class: 'new: contract-rule-vs-screen'
+tickets:
+  started: []
+  unstarted:
+  - APP-MOB-GST-051
+  - APP-MOB-GST-053
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: closed
+closed_by_commit: 112ef275
+notes: 'Sharing a plan has no operation; the rule is stated (a signed-in act). shareVisitPlan is left for later (Chinmay,
+  3 October, defaults round: not now). Prevention: tools/check-business-rules.py rule BR-VISIT-PLAN, which fails on the
+  parent commit 4e2c56c1 and passes here. Batch RUL (spec-rules), 3 October 2026.'

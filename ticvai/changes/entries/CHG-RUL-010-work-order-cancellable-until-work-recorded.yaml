@@ -1,0 +1,40 @@
+id: CHG-RUL-010
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: A work order is cancellable until any labour time or part is recorded; then it is completed or closed with a reason.
+decision:
+  what: 'maintenance.yaml cancelWorkOrder: the rule and a 409 work-recorded. states/work-order.yaml: cancel from inProgress,
+    paused and awaitingParts while nothing is recorded, and close (with a reason) from paused and awaitingParts.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Block A audit on live r2, pattern 4 of CHG-AUD-001 (contract rules that disagree with their screens). Chinmay answered
+  on 3 October 2026 (docs/active/decisions/answers-3-october-business-rules.md, section ''Block A audit business rules''
+  and the list ''Asked as questions instead of defaults''): ''Work orders: cancellable until any labour time or part is
+  recorded; then complete or close with a reason.'''
+keys_touched:
+  operations:
+  - cancelWorkOrder
+  - closeWorkOrder
+  screens:
+  - BO-070
+  - EMP-006
+  files:
+  - contracts/satellite/maintenance.yaml
+  - states/work-order.yaml
+root_class: 'new: contract-rule-vs-screen'
+tickets:
+  started: []
+  unstarted:
+  - APP-STAFF-EMP-006
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: closed
+closed_by_commit: 112ef275
+notes: 'states/work-order.yaml is the state model of this contract enum; edited with the rule (outside contracts/, flagged
+  in the report). Prevention: tools/check-business-rules.py rule BR-WO-CANCEL, which fails on the parent commit 4e2c56c1
+  and passes here. Batch RUL (spec-rules), 3 October 2026.'
