@@ -25,7 +25,8 @@ The rule for agent edits:
 - No agent commits on the release branch directly. No agent runs a full refresh in the main tree.
 
 ## 3. Refresh: safe, then scoped
-- `bash tools/refresh-safe.sh`: refreshes in a throwaway worktree. It merges into the main tree **only if every check passes** (no new failures against the baseline). An interrupted run is deleted.
+- `bash tools/refresh-safe.sh`: refreshes in a throwaway worktree. It merges into the main tree **only if every check passes** (no new failures against the baseline). A failed or interrupted run keeps its worktree for `--resume` (which never merges); any other run removes it. One run at a time (a release lock), and nothing merges if HEAD moved during the run (STALE BASE). How to run it, read a failure and resume: `docs/active/refresh-runbook.md`.
+- **Policy (council of 3 October, CHG-RSPD-001):** scoped runs and single checkers while iterating; the full gate only at the Tuesday and Friday releases with the CRs batched; never a gate with more than two agents running.
 - `bash tools/refresh-safe.sh --changed <paths>`: runs only the steps downstream of the changed files (from `handoff/refresh-manifest.json`). Use it between releases. **A full `refresh-safe.sh` run is required before tagging.**
 
 ## 4. Gates (in the checks)

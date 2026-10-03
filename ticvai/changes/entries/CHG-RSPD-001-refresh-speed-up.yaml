@@ -1,0 +1,87 @@
+id: CHG-RSPD-001
+date: '2026-10-04'
+source: developer
+kind: process
+summary: The refresh gate fails loudly, times every step, resumes a failed run, holds a release lock, refuses a
+  stale base, runs the checks four at a time, and check-screens parses each file once.
+decision:
+  what: 'Implement the refresh speed-up the council of 3 October 23:30 decided (TODO "Refresh speed-up"):
+    loud failure with a completion marker the judge requires, per-step timings, --resume, a release lock and a
+    STALE BASE check, the checks in parallel (4 jobs, proven equal to sequential), a profile of the slow checks
+    with only clear and safe fixes, a Defender runbook for Chinmay, and the refresh policy. No content-hash
+    cache before Sprint 2.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'The council of 3 October 23:30 (audit/ticvai/council/council-transcript-20261003-refresh.md, chairman
+  verdict) found that reruns, not run length, were the cost: about 80 minutes paid six times on 3 October, and
+  one run died silently at step 37 (build-service-docs) with nothing after the step banner. The gate is the
+  safety net, so speed may not weaken it; every part below either makes a failure cheaper or is proven to give
+  the same result.'
+keys_touched:
+  files:
+  - tools/refresh-safe.sh
+  - tools/refresh-manifest.py
+  - tools/run-checks.py
+  - tools/check-screens.py
+  - docs/active/refresh-runbook.md
+  - docs/active/release-runbook.md
+root_class: A00 TOOLING
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/refresh-manifest.py::__finish
+status: open
+notes: 'Decisions, each with its reason (4 October 2026, branch refresh-speedup):
+  (1) The step wrapper lives in the script refresh-manifest.py emits, not in refresh.sh itself: refresh-safe
+  runs the emitted copy, refresh.sh keeps its 65 commands readable, and a plain refresh.sh run (forbidden in
+  the main tree by ticvai/CLAUDE.md rule 10) is unchanged.
+  (2) Loud failure is set -e plus an EXIT trap that names the step ("FAILED at step N <name> -- exit rc after
+  Xs"); a step that exits 0 but leaves an expected output missing, empty or unparseable also fails. Expected
+  outputs are the manifest''s concrete writes for the step''s command that exist before the run (266 files over
+  64 steps): matched by command, so the manifest traced on 2 October (64 steps) still covers 64 of today''s 65;
+  a file that did not exist before is a conditional write and is not expected. JSON outputs must parse,
+  .xlsx/.docx/.pptx must be readable zips; other files must be non-empty.
+  (3) The marker "== refresh completed: all N selected steps of T" is printed last, only when every selected
+  step completed, and the judge itself fails a run whose log lacks it -- so even a refresh killed with no trap
+  (proved: run.sh SIGKILLed mid-step, rc 137) can never end in PASS.
+  (4) Per-step timings go to <run>/steps.tsv (step, name, start, seconds, exit, status) with bash''s
+  EPOCHREALTIME, no extra processes; the ten slowest steps and every phase (setup, derive, checks, merge,
+  total; also <run>/phases.tsv) are printed at the end of every run, failed or not.
+  (5) --resume reuses the failed run''s worktree and skips the steps its state.tsv lists. It is valid only if
+  HEAD is the commit the failed run started on and the fingerprint of every step (its text, its tool, the
+  local modules the tool imports, refresh.sh and the emitter) is unchanged; otherwise it is refused, the kept
+  worktree is removed and a fresh run starts. A resumed run never merges: the release gate is always a
+  fresh run. Only a failed or interrupted run (exit 1 or 130) keeps its worktree; a pass, a merge refusal or
+  a stale base does not, and any non-resume run removes what was kept. Traced runs are not resumable.
+  (6) The release lock is a directory (mkdir is atomic on Windows too) in the repository''s common git
+  directory, so the main checkout and every worktree share one lock; it records pid, Windows pid, start,
+  HEAD, tree and run. A lock whose holder is not running (kill -0, then tasklist for the Windows pid) is
+  stale and removed. A second run while one holds it exits 6.
+  (7) Before merging, HEAD must still be the commit the run started from: otherwise "STALE BASE", nothing
+  merged, exit 5. With --no-merge it is reported and the verdict names the commit it is for.
+  (8) run-checks.py --jobs N (refresh-safe passes 4, its --jobs flag changes it) runs N checkers at once and
+  prints each row only when every row above it has printed; --jobs 1 is the original loop, kept. Each
+  checker''s full output is kept in <run>/checks/<name>.txt (before, only its last line survived for 66 of
+  the 68). check-package and check-authored-inputs still run alongside, as before.
+  (9) Serial-only checkers: none. All 68 were read: every write is behind a flag run-checks never passes
+  (--write, --csv, --json, --fix, --bless, --freeze, --update-baseline); check-contract-compat''s one
+  unflagged write is a fresh mkdtemp per process; the git calls only read. SERIAL stays as a barrier for the
+  first checker that ever needs it, with the rule written beside it.
+  (10) check-screens: 99.7% of its time was PyYAML re-parsing the 16 screens files and 35 contracts about
+  twenty times (490 safe_load calls). Each text is now parsed once and every caller gets a fresh pickle copy:
+  same parser, same result (output byte-identical on 857986c1), 676 s to about 36 s. The libyaml loader would
+  be faster still and was not taken: it is a different parser, and the gate''s results must not move.
+  (11) Defender: no system setting was changed; the exclusion commands are in docs/active/refresh-runbook.md
+  for Chinmay to run as administrator.
+  (12) Policy (docs/active/refresh-runbook.md): scoped runs and single checkers while iterating, the full gate
+  only at the Tuesday and Friday releases with CRs batched, never a gate with more than two agents running. No
+  content-hash cache before Sprint 2, and only after the manifest rebuilds itself and three cold runs match
+  cached runs byte for byte.
+  (13) The task named the file CHG-RSPD-001.yaml; it is CHG-RSPD-001-refresh-speed-up.yaml because
+  check-changelog requires <id>-<slug>.yaml.
+  Closes when the branch is merged and a full gate has passed on it: closed_by_commit is that merge.'
