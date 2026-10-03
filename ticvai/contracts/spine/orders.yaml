@@ -3992,10 +3992,16 @@ paths:
         evaluated, which applied and why the others did not, so a disputed discount can be explained
         later (decided 29 September, writers pass).
 
+        **A guest does this within their own session** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-003;
+        `x-ticvai-guest-callable`): a guest needs no permission and acts only for themselves, on their own
+        cart, hold, order or payment in their own session. `ORDER_CREATE` is what a staff caller must hold to
+        do it for a guest at a till or in the back office (ADR-0025).
+
         '
       tags:
       - order
       x-ticvai-permission: ORDER_CREATE
+      x-ticvai-guest-callable: true
       x-ticvai-scope-level: workstation
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: append
@@ -4093,9 +4099,15 @@ paths:
       - partner
       x-ticvai-read-routing: primary
       summary: Read an order
+      description: >
+        **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002;
+        `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for an order they
+        placed; another guest's order is refused exactly as one that does not exist, never returned.
+        `ORDER_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
       tags:
       - order
       x-ticvai-permission: ORDER_VIEW
+      x-ticvai-self-scoped: subject
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
@@ -5287,10 +5299,16 @@ paths:
         pays cash at a till, where a drawer and a person reconcile it. So a server''s End shift (EMP-009) has no cash
         count; the till holder''s shift does.
 
+        **A guest does this within their own session** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-003;
+        `x-ticvai-guest-callable`): a guest needs no permission and acts only for themselves, on their own
+        cart, hold, order or payment in their own session. `ORDER_CREATE` is what a staff caller must hold to
+        do it for a guest at a till or in the back office (ADR-0025).
+
         '
       tags:
       - payment
       x-ticvai-permission: ORDER_CREATE
+      x-ticvai-guest-callable: true
       x-ticvai-scope-level: workstation
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: append
@@ -5369,10 +5387,16 @@ paths:
         Network International each publish one), held per provider in the adapter configuration and
         never shorter than that interval. Proposed, client to correct (decided 28 September, audit R065).
 
+        **A guest does this within their own session** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-003;
+        `x-ticvai-guest-callable`): a guest needs no permission and acts only for themselves, on their own
+        cart, hold, order or payment in their own session. `ORDER_CREATE` is what a staff caller must hold to
+        do it for a guest at a till or in the back office (ADR-0025).
+
         '
       tags:
       - payment
       x-ticvai-permission: ORDER_CREATE
+      x-ticvai-guest-callable: true
       x-ticvai-scope-level: workstation
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -6250,10 +6274,12 @@ paths:
       security:
       - guestAuth: []
       - bearerAuth: []
+      - apiKeyAuth: []
       x-ticvai-audience:
       - staff
       - guest
       - partner
+      - device
       summary: Reprint or resend tickets
       description: 'Reprint count is recorded per line (`OrderLine.reprintCount`). Repeated reprints on
         one order is a signal worth surfacing — usually a printer fault, occasionally something else.
@@ -6261,10 +6287,21 @@ paths:
         Offline-capable, so it carries `recordedAt`: the moment the till reprinted, kept apart from when
         the server heard about it.
 
+        **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-004;
+        `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for an order they
+        placed (resend or reprint); another guest''s order is refused exactly as one that does not exist,
+        never returned. `ORDER_REPRINT` is what a staff caller must hold to act for any guest (ADR-0025).
+
+        **A kiosk reprints as a registered device** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-004): the
+        kiosk (P05) calls this with its device credential (`apiKeyAuth`, audience `device`) and holds no
+        permission; it reprints only an order the guest at it has identified (KSK-012 booking found, KSK-009
+        ticket issued, KSK-010 print failure), and each reprint is recorded against the device.
+
         '
       tags:
       - order
       x-ticvai-permission: ORDER_REPRINT
+      x-ticvai-self-scoped: subject
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: append
@@ -6638,10 +6675,16 @@ paths:
         guest token never widens to another subject (`guestAuth`), so the venue scope narrows further to
         the caller for a guest session, and no parameter can widen it.
 
+        **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002;
+        `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own
+        reservations; another guest''s reservation is refused exactly as one that does not exist, never
+        returned. `ORDER_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
+
         '
       tags:
       - reservation
       x-ticvai-permission: ORDER_VIEW
+      x-ticvai-self-scoped: subject
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -6754,10 +6797,17 @@ paths:
       - guest
       x-ticvai-read-routing: primary
       summary: Read a reservation
-      description: A guest reads only a reservation held for them; another guest's is the shared 404.
+      description: >
+        A guest reads only a reservation held for them; another guest's is the shared 404.
+
+        **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002;
+        `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own
+        reservations; another guest's reservation is refused exactly as one that does not exist, never
+        returned. `ORDER_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
       tags:
       - reservation
       x-ticvai-permission: ORDER_VIEW
+      x-ticvai-self-scoped: subject
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -6791,10 +6841,16 @@ paths:
 
         **Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state
         change it makes, with the previous and new state, the actor and the correlation id (decided 29
-        September, writers pass).'
+        September, writers pass).
+
+        **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002;
+        `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own
+        reservations; another guest''s reservation is refused exactly as one that does not exist, never
+        returned. `ORDER_CANCEL` is what a staff caller must hold to act for any guest (ADR-0025).'
       tags:
       - reservation
       x-ticvai-permission: ORDER_CANCEL
+      x-ticvai-self-scoped: subject
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins

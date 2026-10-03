@@ -1,0 +1,43 @@
+id: CHG-GCF-005
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: listAnalyticsProviders stays a staff read; a guest reads the analytics providers from getPublishedTenantConfig, whose
+  PublishedTenantConfig gains analyticsProviders (provider, public measurement id, surfaces, consent category).
+decision:
+  what: 'listAnalyticsProviders (TENANT_CONFIGURE) gets no guest flag and its description says the guest screens no longer
+    call it. PublishedTenantConfig gains an optional analyticsProviders array of the new PublishedAnalyticsProvider (provider,
+    otherProviderName, measurementId, surfaces, consentCategory; no reporting property, credential or venue): the enabled
+    rows in force for the venue browsed, each loaded only once getCookieConsentRuntime grants its consent category. Additive:
+    a new response field.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Chinmay''s answers of 3 October 2026 to the Block A audit on live r2 (CHG-AUD-001, pattern 3: guest screens bind staff-only
+  operations), section ''Pattern 4'', all as recommended. The zero-AI scan found 184 guest-screen bindings (P01, P02, P05)
+  of 49 operations that carry a staff permission and declare neither x-ticvai-guest-callable nor x-ticvai-self-scoped, so
+  nothing said what a guest, who holds no permission, may do (ADR-0025: audience and permission are orthogonal).'
+keys_touched:
+  operations:
+  - listAnalyticsProviders
+  - getPublishedTenantConfig
+  schemas:
+  - PublishedTenantConfig
+  - PublishedAnalyticsProvider
+  files:
+  - tools/applied/guest-scoping-3-october.py
+  - tools/check-audience-match.py
+root_class: A23 AUTH-SCOPE
+tickets:
+  started: []
+  unstarted:
+  - SVC-WHITELABEL-OVERVIEW-1
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-audience-match.py
+status: open
+notes: Batch GCF (spec-guest). The screens branch (CHG-SPF-007) takes listAnalyticsProviders off GST-001 and WEB-001; until
+  it merges, AM-GUEST-PERMISSION reports those two bindings. Close on the merge. The guest audience and the optional credential
+  stay on listAnalyticsProviders so a client built against r1 is not broken.
