@@ -32,6 +32,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-flow-briefs.py
-status: open
+status: closed
+closed_by_commit: 97baa1aa
 notes: 'The tool-coverage block in refresh.sh finds both names in run-checks.py, so neither needs an exemption. The step
   rule finds the five prose steps on the parent briefs and none after.'

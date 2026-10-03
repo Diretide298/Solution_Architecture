@@ -28,7 +28,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-r1-additions.py
-status: open
+status: closed
+closed_by_commit: 97baa1aa
 notes: 'R1-CONCIERGE fails on the parent (3 findings) and passes after. pollSeconds and pollSecondsHidden are new optional
   keys on a screen api entry (screens/_schema.yaml leaves api items open); the rule also holds that a hidden interval is
   never faster than the visible one. Moving getGuestConversation and sendGuestConversationMessage into Block A with

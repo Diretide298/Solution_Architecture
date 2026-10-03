@@ -29,7 +29,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-r1-additions.py
-status: open
+status: closed
+closed_by_commit: 97baa1aa
 notes: 'R1-RESIDENCY fails on the parent (3 findings) and passes after. BO-1065 is still wave 3 in screens/; moving it (or
   its residency section) into Block A is the plan side of the same r1 additions, and once it is a Block A build
   check-screen-patterns P8 asks for wave 1.'

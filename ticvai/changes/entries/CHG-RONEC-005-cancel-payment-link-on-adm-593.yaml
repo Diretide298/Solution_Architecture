@@ -27,5 +27,6 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-r1-additions.py
-status: open
+status: closed
+closed_by_commit: 97baa1aa
 notes: R1-PAY-LINK fails on the parent (3 findings) and passes after. ADM-593 is wave 3.

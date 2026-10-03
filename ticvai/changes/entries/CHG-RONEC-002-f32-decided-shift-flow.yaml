@@ -49,7 +49,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-r1-additions.py
-status: open
+status: closed
+closed_by_commit: 97baa1aa
 notes: 'R1-BLIND-CLOSE is general: across every flow, a step that submits a count says it is blind, a step that accepts,
   rejects, closes or reopens a shift names the supervisor, and no step or branch shows a cashier or a steward the expected
   figure. On the parent commit it finds 3 findings in F32 and R1-F32 finds 7; after, both pass. The witness PIN on a

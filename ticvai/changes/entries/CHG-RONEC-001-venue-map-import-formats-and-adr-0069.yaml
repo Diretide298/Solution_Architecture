@@ -57,7 +57,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-r1-additions.py
-status: open
+status: closed
+closed_by_commit: 97baa1aa
 notes: 'Additive against HEAD for venue-map (159 additive changes) and ai (2); assets.MediaKind gaining model3d is a response
   enum value, so BC-029 to BC-033 in docs/active/breaking-changes.yaml approve it for every operation returning a MediaAsset
   (tag r1: nothing is built before the fresh r1). check-r1-additions (R1-VENUE-IMPORT, R1-ADR-0069) fails on the parent
