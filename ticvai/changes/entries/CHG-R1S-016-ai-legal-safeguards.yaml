@@ -1,0 +1,43 @@
+id: CHG-R1S-016
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: 'The AI contracts carry the 3 October legal safeguards: a tenant-category lock on globalAllowed, a deterministic
+  pattern pass after Presidio, a global-endpoint exclusion list, stateless global calls, a count-only scrub audit
+  per call, no residency-widening failover, a pinned Presidio version, and OpenAI''s UAE-region project as a uaeOnly
+  provider.'
+decision:
+  what: tenancy RegionSettings.tenantCategory (private, semiGovernment, government, banking, payments, health, difc,
+    adgm; only private may take globalAllowed; 409 residency-category-refused); ai AiPolicy.scrubbing.residualPatternCheck
+    and scrubberVersion; AiPolicy.globalEndpointExclusions; AiProvider.statelessOnly; AiInteraction.scrubAudit (entity
+    counts by type, never values); common AiResidencyClass names ae.api.openai.com and the no-widening rule; the
+    AI design section 8a. All additive.
+  by: Chinmay
+  date: '2026-10-03'
+why: 'The legal research of 3 October (docs/active/research/openai-key-uae-3-october.md, ''What this means for TICVAI'',
+  items 1-12) and Chinmay''s decisions: the residency class per tenant (DEC-539) and the gate and hosting decision
+  (docs/active/decisions/answers-3-october-gate-and-hosting.md); ADR-0009 section 3 (the transfer register).'
+keys_touched:
+  schemas:
+  - RegionSettings
+  - AiPolicy
+  - AiProvider
+  - AiInteraction
+  - AiResidencyClass
+  - AiProviderKind
+  operations:
+  - updateRegionSettings
+  - setAiProvider
+  files:
+  - docs/active/research/openai-key-uae-3-october.md
+root_class: 'new: ai-residency-safeguards'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-ai-residency.py
+status: open

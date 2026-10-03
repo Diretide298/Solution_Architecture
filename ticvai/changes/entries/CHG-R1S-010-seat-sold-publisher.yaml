@@ -1,0 +1,34 @@
+id: CHG-R1S-010
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: seat.sold is written by catalogue.convertInventoryHold (CatalogueService, which owns seating) inside the
+  order transaction, not by createPayment.
+decision:
+  what: events/seat-sold.yaml emittedBy catalogue.convertInventoryHold; states/seat.yaml held to sold by convertInventoryHold
+    (cascade from createPayment); convertInventoryHold converts the order's seat holds and declares x-ticvai-emits
+    seat.sold; its lineage writes seating.seat_hold, seat_hold_item and the outbox.
+  by: Chinmay
+  date: '2026-10-03'
+why: 'the HLD/LLD cross-check of 3 October 2026 (handoff-out/r1/HLD-LLD/CROSSCHECK.md, a PKG finding): seat.sold
+  named publisher seating but was emitted by createPayment, an OrderService operation.'
+keys_touched:
+  operations:
+  - convertInventoryHold
+  - createPayment
+  files:
+  - events/seat-sold.yaml
+  - states/seat.yaml
+  other:
+  - seat.sold
+root_class: 'new: write-lineage-gaps'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-write-lineage.py
+status: open

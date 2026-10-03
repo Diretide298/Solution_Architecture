@@ -1161,7 +1161,6 @@ paths:
         - "P01 WEB-042 Retail & Shop and Drop"
         - "P02 GST-062 Shop & Drop Collection"
         - "P04 POS-012 Omnichannel Order & Fulfilment Center"
-        - "P05 KSK-011 Collect a booking"
         - "P08 BO-143 Retail Global Settings & Controls"
       security:
       - guestAuth: []
@@ -1692,6 +1691,13 @@ components:
         isReturnable: { type: boolean }
         returnWindowDays: { type: integer, nullable: true }
         imageAssetRef: { type: string, nullable: true }
+        variantId:
+          type: string
+          format: uuid
+          description: >
+            The catalogue variant the item sells, which `addCartLine` takes (added 3 October
+            2026, CHG-R1S-004: the r1 gate found WEB-033 could not add to the cart from the guest
+            projection). An id, not the variant record: price and tax still come from the server.
 
     MerchandiseConflictProblem:
       x-ticvai-persistence: "none — error shape"

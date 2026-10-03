@@ -1,0 +1,39 @@
+id: CHG-R1S-026
+date: '2026-10-03'
+source: audit
+kind: spec
+summary: Embeddings are the provider's on the UAE route (OpenAI UAE text-embedding-3-large or Core42), scrubbed
+  and routed by residency class like any AI call; no embedding model and no CPU embeddings in our cell; Qdrant keeps
+  the vectors in the cell.
+decision:
+  what: docs/architecture/ai-system-design.md (diagram, 3.3, 4.5, 5.8, phasing, 8a), ADR-0009 and ADR-0020 (the
+    3 October amendments), ai.yaml (the uaeOnly routing text), the concierge task text in docs/active/block-a-extra-tasks.json;
+    hybrid retrieval is the provider's dense vector fused with Qdrant's BM25 sparse index, no hosted reranker; check-ai-residency
+    R-EMBED refuses a self-hosted embedding or reranking model in the contracts.
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Chinmay, 3 October evening (docs/active/decisions/answers-3-october-gate-and-hosting.md, section ''Block A
+  size and embeddings''): "provider embeddings on the UAE route ..., no embedding model hosted by us; Qdrant stays
+  in our cell for the vectors" (ADR-0049). Supersedes the in-cell BGE-M3 of the AI design (29 September) and ADR-0009
+  item 4.'
+keys_touched:
+  files:
+  - docs/architecture/ai-system-design.md
+  - docs/adr/0009-ai-data-residency.md
+  - docs/adr/0020-ai-isolation-boundary.md
+  - contracts/satellite/ai.yaml
+  - docs/active/block-a-extra-tasks.json
+  - docs/active/decisions/answers-3-october-gate-and-hosting.md
+  other:
+  - HOST-1
+root_class: 'new: design-doc-behind-decisions'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-ai-residency.py
+status: open

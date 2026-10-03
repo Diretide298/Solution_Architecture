@@ -1,13 +1,13 @@
 # TICVAI AI subsystem: system design
 
-> **Status:** Decided 29 September 2026; updated 1 October 2026 (vectors in Qdrant, ADR-0049)
+> **Status:** Decided 29 September 2026; updated 1 October 2026 (vectors in Qdrant, ADR-0049); updated 3 October 2026 to the decisions of 2 October (residency class, curated models, BYOK, mandatory scrubbing: DEC-001, DEC-002, DEC-539 to DEC-544) and Chinmay's hosting decision of 3 October (we host no model unless a client asks; the guard is the provider's safety service), section 8a, CHG-R1S-001
 > **Owner:** Chinmay
 > **Inputs:** `audit/ticvai/steps/AI/req-core.md` (AIC-001..271), `req-predict.md` (AIP-001..219), `req-personal.md` (AIR-001..211); ADR-0009, 0020, 0021, 0033, 0034, 0038, 0041, 0046; `contracts/satellite/ai.yaml` (31 operations); `ai-platform.md`, `ai-credentials.md`; `registers/ai-applications.md`; `active/ai-scope-for-confirmation.md`, `active/ai-suggestion-rules-proposal.md`.
 > **Precedence used throughout:** a decided (Accepted) ADR beats the minutes and the books unless the client overruled it in the minutes; the minutes (M18, M21) beat the books; among the books, the governance books (GOV, CORE) beat the capability books (CFG, BI, R&P, UCS) on governance questions, because CORE says its modes "should align" to governance. Where this document departs from an ADR, section 8 lists the ADR change.
 
 The client's books describe AI screen by screen. This document does not. It designs one AI platform with a small number of engines, and the ninety-odd P09 screens (ADM-469..558), the P16 analytics screens and the recommendation boards bind to the operations named in section 2.3.
 
-**The design in eight sentences.** One Python service, `ticvai-ai`, deployed in three process groups (real-time, interactive, batch), owns every AI table and every model call. Every AI capability passes one governance decision point, one gateway to models, and writes one standard decision record. Large language models never sit on a path that takes money: recommendations and fraud scoring are rules plus classical ML with hard time budgets, and checkout continues without them. Forecasting, anomaly detection, fraud and recommendations ship rules-first and statistical, and each moves to a trained model per tenant only when a shadow run proves it beats the rule. Anything that changes configuration goes plan, validate, simulate, approve (through the shared approvals service), execute through the owning module's API, with rollback. Vectors live in Qdrant from day one, self-hosted in UAE North, in one collection per tenant that only that tenant's collection-scoped token can read (ADR-0049). The default model provider is TICVAI-managed Azure OpenAI in UAE North, re-billed to the tenant per token, with bring-your-own-key as an override. One autonomy scale (GOV's 0 to 4) applies to every capability.
+**The design in eight sentences.** One Python service, `ticvai-ai`, deployed in three process groups (real-time, interactive, batch), owns every AI table and every model call. Every AI capability passes one governance decision point, one gateway to models, and writes one standard decision record. Large language models never sit on a path that takes money: recommendations and fraud scoring are rules plus classical ML with hard time budgets, and checkout continues without them. Forecasting, anomaly detection, fraud and recommendations ship rules-first and statistical, and each moves to a trained model per tenant only when a shadow run proves it beats the rule. Anything that changes configuration goes plan, validate, simulate, approve (through the shared approvals service), execute through the owning module's API, with rollback. Vectors live in Qdrant from day one, self-hosted in UAE North, in one collection per tenant that only that tenant's collection-scoped token can read (ADR-0049). The model provider follows the tenant's AI residency class: Core42 Compass by default (UAE-only), OpenAI UAE as the fallback, re-billed to the tenant per token, with bring-your-own-key where TICVAI enables it; **we host no model unless a client asks**, every prompt is scrubbed of personal data by an offline Presidio scrubber in our own worker, and the provider's content-safety service checks input and output (section 8a). One autonomy scale (GOV's 0 to 4) applies to every capability.
 
 ---
 
@@ -93,15 +93,17 @@ No source agrees a number for any of these (req-predict "left to us"; AIR-203 gi
   │                  Plan executor · Governance/admin API                                   │
   │  ai-batch        Ingestion · Forecasting · Anomaly · Accuracy · Training · Evaluation   │
   │  ─────────────── shared libraries, imported by all three ───────────────────────────── │
-  │  Governance decision point (PDP) · AI gateway (router, masking, budgets, caches,        │
-  │  breaker, telemetry) · Retrieval client (no scope parameter) · Feature library ·        │
+  │  Governance decision point (PDP) · AI gateway (router, masking, Presidio scrubber on    │
+  │  CPU, budgets, caches, breaker, telemetry) · Retrieval client (no scope parameter) ·    │
+  │  Feature library ·                                                                      │
   │  Decision-record writer · Prompt registry client                                        │
   └─────┬────────────┬────────────┬────────────┬────────────┬────────────┬──────────────────┘
         ▼            ▼            ▼            ▼            ▼            ▼
    Tenant DB    Qdrant       AI log DB    Redis        Blob         Key Vault ──► Model endpoints
-   `ai` schema: collection   per tenant,  features,    model files, credentialRef Azure OpenAI UAE North
-   config,      per tenant,  append-only, counters,    Parquet      only; Qdrant  (TICVAI-managed or BYOK)
-   state, point scoped JWT,  partitioned  caches       snapshots,   API key for   In-cell CPU: BGE-M3,
+   `ai` schema: collection   per tenant,  features,    model files, credentialRef Core42 Compass (uaeOnly),
+   config,      per tenant,  append-only, counters,    Parquet      only; Qdrant  fallback OpenAI UAE, or BYOK;
+                                                                                  provider content safety
+   state, point scoped JWT,  partitioned  caches       snapshots,   API key for   Embeddings: provider, UAE route,
    refs, RLS    3 nodes      by month                  evidence     the issuer    reranker
                                                        (WORM)                     Customer endpoint
 ```
@@ -302,20 +304,20 @@ Consumers are idempotent and dead-letter after five attempts (ADR-0033). Velocit
 **Routing, in order:**
 
 1. **Allowed set.** The intersection of the platform catalogue (production status in this environment), the region's `allowedAiResidencies`, tenant policy (a tenant may restrict itself to private models, AIC-038), the task's data classification and the governance data policy (AIC-018).
-2. **Pre-selection.** Each task has a default model chosen by us (AIC-010). The tenant may override it per task with its own key; every override is logged, and the fitness check warns when the new model lacks a required feature or is far outside the task's evaluated class (AIC-011, AIC-012).
+2. **Pre-selection.** Each task has a default model chosen by us (AIC-010) from TICVAI's curated range for that task (DEC-544: the best-suited model plus 3-4 alternatives; `AiModel.curatedRange`). **A client cannot change the model per task** (DEC-002, amending AI-D18): a model outside the curated range is refused `422 model-not-curated`. With BYOK the engine maps each task to the client provider's equivalent model from the curated range (DEC-001); every change is logged, and the fitness check still reports a model outside the task's evaluated band (AIC-011, AIC-012).
 3. **Cascade** (ADR-0034): the small model answers; the gateway escalates only where the task defines a checkable signal. Examples: schema validation failed twice, retrieval reliability "partial", or the classifier's margin below threshold. We do not route on a model's self-reported confidence, because none of the sources accept it as meaningful.
 4. **Fallback:** a circuit breaker per endpoint (opens at 50% errors over 20 calls, or 95th-percentile above twice the task budget for 60 s; half-open after 30 s). The next model in the chain must support every required feature (AIC-020). `residencyRefused` is returned, never failed over.
 5. **Controlled degraded mode** when nothing answers: search-only, rules-only, or "a person will help" (AIC-243).
 
-**Before the call** the gateway checks the per-request budget and ceiling behaviour, applies `maskedFields` (fail closed), blocks a payload carrying a customer identifier the data policy does not allow (AIC-214), orders the prompt stable-first, and short-circuits refusals a rule can decide. **After it**, it validates structured output, writes `ai.activity` and emits telemetry (AIC-244).
+**Before the call** the gateway checks the per-request budget and ceiling behaviour, applies `maskedFields` (fail closed), runs the offline Presidio scrubber (reversible placeholders, DEC-542) and the provider's content-safety check on the input (section 8a), blocks a payload carrying a customer identifier the data policy does not allow (AIC-214), orders the prompt stable-first, and short-circuits refusals a rule can decide. **After it**, it runs the content-safety check on the output, re-fills the placeholders in the cell, validates structured output, writes `ai.activity` and emits telemetry (AIC-244).
 
 **Endpoints:**
 
-- **Default LLM:** Azure OpenAI in UAE North under TICVAI's subscription, with per-tenant keys for attribution: a small model for guest answers, extraction and classification, a stronger one for staff analysis and configuration planning. Which models UAE North offers at go-live is ours to confirm against the task list (section 8).
+- **Default LLM, by residency class** (DEC-539 as amended on 3 October, section 8a): for `uaeOnly` (the default) Core42 Compass under TICVAI's account, a Small tier (GPT-4.1 mini, or Seraj) for guest answers, extraction and classification and a Strong tier (GPT-5) for staff analysis and configuration planning, with OpenAI UAE as the fallback; for `globalAllowed` Azure Global deployments or the tenant's BYOK provider, falling back to the UAE-only chain. Per-tenant keys give attribution. **No model runs in our cell**: there is no in-cell open-weights fallback and no GPU pool. Until Compass is signed (DEC-541), dev and staging use Azure Global Standard with synthetic data only (TBF-1).
 
 **"Multiple providers", read against AI-D02 (21 September minutes, M21-03).** The minute asks for several providers with each agent on the model that fits its task. AI-D02 is the later decision and stands: **one managed provider by default**, and the choice per agent is a choice of model inside it. More providers and bring-your-own models are added only when TICVAI enables them for a tenant (AI-D14). `AiProvider.taskKeys` binds a provider to named agent tasks, so a second provider can serve one agent without touching the others. The default model per agent:
 
-| Agent | Tasks | Default model (Azure OpenAI, UAE North) |
+| Agent | Tasks | Default tier (provider by residency class, 3.3) |
 |---|---|---|
 | Guest (concierge, Help me choose wording, visit planner) | `assistant.guest.answer`, `planner.guest.refine` | Small |
 | Operations (staff assistant, configuration assistant, seat-map labels) | `assistant.staff.answer`, `config.extract`, `config.plan` | Stronger for planning, small for extraction |
@@ -323,10 +325,11 @@ Consumers are idempotent and dead-letter after five attempts (ADR-0033). Velocit
 | Marketing (content drafts, translations) | `content.draft`, `content.translate` | Small |
 | Security and risk (case summaries) | `case.summarise` | Stronger |
 
-**Model fitness (M21-09, our proposal).** Each task has a golden set; `runAiEvaluation` scores a model on it and the score lands in `AiModel.taskFitness` with the task's band. Binding a model outside the band returns `fitnessWarnings` on `setAiProvider` (underpowered, overpowered or never scored). A warning is recorded and shown on ADM-037; it never blocks.
-- **Embeddings and reranking:** BGE-M3 (dense plus sparse in one pass) and a multilingual cross-encoder, **self-hosted on CPU in the cell**, so search and retrieval call no external API (AIC-042). BGE-M3 is the default pending ADR-0021's two-stage evaluation (AIC-067).
+**Model fitness (M21-09, our proposal).** Each task has a golden set; `runAiEvaluation` scores a model on it and the score lands in `AiModel.taskFitness` with the task's band. Binding a model outside the band returns `fitnessWarnings` on `setAiProvider` (underpowered, overpowered or never scored), recorded and shown on ADM-037. **Amended 2 October (DEC-002):** a model outside the task's curated range is refused (`model-not-curated`); the warning stays for a curated model scored outside its band.
+- **Embeddings: the provider's, on the UAE route** (Chinmay, 3 October evening, CHG-R1S-026; supersedes the in-cell BGE-M3 of 29 September): OpenAI UAE `text-embedding-3-large` or Core42's embeddings, chosen by the tenant's residency class like any other call, **through the scrubber like any other call**. We host no embedding model and run no CPU embeddings. The vectors still live only in our cell, in Qdrant (ADR-0049); the provider sees the scrubbed chunk text, never the store. **Reranking**: no hosted cross-encoder; retrieval fuses the dense vectors with Qdrant's BM25 sparse index by reciprocal rank (no model), and the evaluation (ADR-0021) says whether a provider reranker is needed (a question for the lead).
 - **Customer endpoint:** any OpenAI-compatible or Azure OpenAI endpoint plus key, with no custom development (AIC-009). Any other protocol needs an adapter, and we say so.
-- **Self-hosted open LLM** (vLLM on GPU) for private-only tenants and `onPremiseIsolated` sites with a client GPU (ADR-0046), through the same gateway.
+- **Self-hosted open LLM: only when a client asks** (Chinmay, 3 October: "We are not hosting anything unless client asks it"). Then it runs on the client's estate (`onPrem`, ADR-0046), through the same gateway. We run no GPU pool and no in-cell model.
+- **Scrubber and guard.** The Presidio scrubber is a CPU library inside our own worker (not a hosted model) and is mandatory in every residency class (DEC-542). The guard on input and output is the provider's content-safety service (Azure AI Content Safety in UAE North for `uaeOnly`; the provider's own moderation for BYOK and `globalAllowed`), replacing the self-hosted Qwen3Guard of DEC-543. Both fail closed: with either down the call is refused `503 scrubber-unavailable`.
 - **Classical models** (LightGBM, statistical forecasters) load in-process from Blob and score in under 5 ms. They are registered in the same catalogue, so lifecycle, release and audit are uniform (AIC-013, AIC-015).
 
 ### 3.4 Feature computation
@@ -343,7 +346,7 @@ We do not buy a feature store; with one AI engineer it costs more to run than it
 
 ### 3.5 Evaluation and release
 
-**Golden sets per capability**, in the repository for platform behaviour and in Blob for tenant-specific sets. They include permission and tenant-isolation cases ("show revenue for another tenant" must be refused), Arabic, English and code-mixed queries. **Isolation and permission cases must pass 100%**; a single failure blocks release (AIC-255).
+**Golden sets per capability**, in the repository for platform behaviour and in Blob for tenant-specific sets. The guard's golden set includes Arabic and English harmful prompts, run against the provider's content-safety service before each release (DEC-543 as amended, section 8a), and the scrubber's corpus carries Emirates IDs, UAE phones, IBANs and card numbers that must never reach an outbound prompt (DEC-542). They include permission and tenant-isolation cases ("show revenue for another tenant" must be refused), Arabic, English and code-mixed queries. **Isolation and permission cases must pass 100%**; a single failure blocks release (AIC-255).
 
 **Release stages for any model, prompt, routing, embedding or retrieval change** (AIC-260):
 
@@ -529,7 +532,7 @@ The tenant database is the configuration and state boundary; RLS carries venue s
 
 ### 4.3 Failover
 
-- **Model endpoints:** breaker and fallback as in 3.3. The secondary is a second Azure OpenAI deployment with its own quota, then the in-cell open model for the tasks it passes evaluation on. Cross-border fallback exists only for a tenant with a recorded transfer mechanism (ADR-0009 §3).
+- **Model endpoints:** breaker and fallback as in 3.3. For `uaeOnly` the secondary is OpenAI UAE; there is no in-cell open model (section 8a). Cross-border fallback exists only for a tenant with a recorded transfer mechanism (ADR-0009 §3). A scrubber or content-safety outage is never failed over: the call is refused.
 - **Service:** `ai-realtime` runs across three availability zones. Callers own the budget, so a zone loss shows up as fallbacks, not errors.
 - **Region:** AI follows the platform's regional disaster recovery; the AI log database is geo-backed-up. AI is Engagement tier: RTO 4 h, RPO 15 min for configuration and state, 24 h for logs.
 - **Data:** a rebuildable cache is never the only copy of anything (ADR-0020's cache exemption).
@@ -556,7 +559,7 @@ Every capability has SLOs (availability, latency, error rate, freshness) and an 
 
 ### 4.5 Cost per tenant
 
-Illustrative token prices, to be confirmed against the Azure UAE North price sheet before anything is quoted: small-model class about $0.15 / $0.60 per million input/output tokens; large-model class about $2.50 / $10. Average call: 3,500 input and 350 output tokens, 80% on the small model, before prefix-cache discount.
+Illustrative token prices, to be confirmed against Core42 Compass's and OpenAI UAE's price sheets before anything is quoted (DEC-541). **Scale step (DEC-540):** when steady Small-tier traffic in a region nears about 100,000 calls a day, the UAE-only Small tier moves to Azure UAE North provisioned throughput (PTU) with spillover off; an alert on Small-tier calls per day names the step. Prices: small-model class about $0.15 / $0.60 per million input/output tokens; large-model class about $2.50 / $10. Average call: 3,500 input and 350 output tokens, 80% on the small model, before prefix-cache discount.
 
 | Tenant | LLM tokens / month | Infra share / month | Notes |
 |---|---:|---:|---|
@@ -564,7 +567,7 @@ Illustrative token prices, to be confirmed against the Azure UAE North price she
 | Medium (3 venues, 15,000/day) | $90–150 | $200–350 | |
 | Large (6 venues, 40,000/day) | $250–400 | $600–900 | Tokens driven by guest questions; cache hit rate is the lever |
 
-Embeddings and reranking are self-hosted, so their marginal cost is CPU, not tokens: a 20,000-chunk corpus embeds in minutes. The regional AI tier (pods, embedding nodes, Redis, AI log server) is about $2,500–3,500 a month, shared by usage. The Qdrant cluster adds about $800 a month per cell (3 × E4s v5 and P15 disks, already in the cost workbook; open-source Qdrant has no licence fee). **ML and rules cost almost nothing per decision**, which is part of why they, not LLMs, sit on the high-volume paths.
+Embeddings are the provider's (CHG-R1S-026), metered and re-billed with the tokens: a 20,000-chunk corpus of about 300 tokens a chunk is about 6 million embedding tokens, under a dollar at `text-embedding-3-large` list price, and only changed chunks re-embed. The regional AI tier (pods, embedding nodes, Redis, AI log server) is about $2,500–3,500 a month, shared by usage. The Qdrant cluster adds about $800 a month per cell (3 × E4s v5 and P15 disks, already in the cost workbook; open-source Qdrant has no licence fee). **ML and rules cost almost nothing per decision**, which is part of why they, not LLMs, sit on the high-volume paths.
 
 ---
 
@@ -628,7 +631,7 @@ The minutes win on "these capabilities exist". CH05 and the 14 August principle 
 
 **Choice: every tenant's vectors live in Qdrant, in collections of its own.** Retrieval is a first-release feature (the guest concierge is in Block A), so it runs on the store it will grow on rather than moving later.
 
-- **One collection per tenant per embedding model**, for example `t_<tenantId>_bge-m3-v1`, provisioned at onboarding with the tenant database (ADR-0039). The retrieval client never names it; it reads the **alias `tenant_<tenantId>`**. A model change is a shadow collection, an evaluation, then an alias swap.
+- **One collection per tenant per embedding model**, for example `t_<tenantId>_te3l-v1` (`text-embedding-3-large`, CHG-R1S-026), provisioned at onboarding with the tenant database (ADR-0039). The retrieval client never names it; it reads the **alias `tenant_<tenantId>`**. A model change is a shadow collection, an evaluation, then an alias swap.
 - **The store enforces the tenant boundary.** Each tenant has a JWT scoped to its own collections and alias (Qdrant's granular JWT RBAC, open source since 1.9, `service.jwt_rbac: true`); the retrieval client for a tenant holds only that token, so a bug that forgets the tenant is refused by Qdrant. A shared collection with a tenant filter was rejected: payload-filter RBAC was removed in Qdrant 1.16, so no token can be limited to one tenant's points, and isolation would rest on the application never forgetting a filter (ADR-0021's own worry).
 - **The token is HS256, signed with Qdrant's admin API key**, which Key Vault holds as a secret (Key Vault keys cannot do HMAC). Only the token issuer reads it; `ticvai-ai` never does. Tenant tokens expire and are reissued on their own schedule. **Rotating the API key breaks every token at once**, so it is a planned procedure: a window with retrieval in its degraded mode, a new secret version, a rolling restart of the Qdrant pods, every token reissued, one read verified per tenant. Whether a collection-scoped token works through the alias is tested on day one; the token can name both if needed.
 - **Venue scope is a payload filter the client always adds.** Points carry `venue_id` and `scope_path`, indexed. The single retrieval client still has no scope parameter: it reads the caller's scope from the request context, so a caller cannot widen it.
@@ -636,7 +639,7 @@ The minutes win on "these capabilities exist". CH05 and the 14 August principle 
 - **Backups:** each collection is snapshotted to local disk, and a Kubernetes CronJob copies the snapshot to the UAE North storage account with azcopy under workload identity (Qdrant snapshots support only local and S3 targets, not Blob). Azure Disk snapshots are a second line. Restore is tested per tenant.
 - **Erasure and offboarding** (AIC-266, AIC-268): erasure deletes points by the guest's or document's payload key. The tenant database keeps the point references in `ai.chunk_embedding` (point id, collection alias, model, source document), so the delete is checked against what existed. Offboarding deletes the tenant's collections and alias and revokes its token, with the tenant database (ADR-0047).
 
-The sizes are small: about 20,000 chunks per tenant, 1024 dimensions, roughly 0.2 GB per tenant with the sparse vectors and the HNSW index. Hybrid retrieval stores BGE-M3's dense and learned sparse vectors as named vectors and fuses them by reciprocal rank. Learned sparse weights need no corpus IDF, which also dissolves ADR-0021's IDF-scope problem.
+The sizes are small: about 20,000 chunks per tenant at the provider model's dimension (3072 for `text-embedding-3-large`, or the reduced size the evaluation picks), well under a gigabyte per tenant with the sparse index and HNSW. Hybrid retrieval stores the provider's dense vector and a BM25 sparse vector (Qdrant's own, no model) as named vectors and fuses them by reciprocal rank (CHG-R1S-026; BGE-M3's learned sparse vectors went with the in-cell model, so the BM25 IDF is per collection, which is per tenant).
 
 **What survives from ADR-0021** (amended by ADR-0049): one collection per embedding model; the single retrieval client with no scope parameter; shadow re-embed on model change; and the two-stage model evaluation. What changes is that the tenant gets a collection of its own instead of a shard in a shared one.
 
@@ -648,7 +651,7 @@ The sizes are small: about 20,000 chunks per tenant, 1024 dimensions, roughly 0.
 
 **Positions.** ADR-0034 (Accepted 31 August): "tokens are billed to the tenant … BYOK is settled". M21 §5 (21 September): the system selects the model by default, and the client *may override* with its own key.
 
-**Choice.** The minutes are later and the client decided them, so the default follows M21. **TICVAI-managed provider accounts (Azure OpenAI, UAE North), metered per tenant and re-billed per token through Subscription & Licensing** (AIC-232). BYOK is an override per task or per tenant; the tenant then pays the provider directly and we meter for visibility only.
+**Choice.** The minutes are later and the client decided them, so the default follows M21. **TICVAI-managed provider accounts (by residency class: Core42 Compass for `uaeOnly`, section 8a), metered per tenant and re-billed per token through Subscription & Licensing** (AIC-232). BYOK is an override per task or per tenant; the tenant then pays the provider directly and we meter for visibility only. **With BYOK the engine maps each task to the client provider's equivalent model from TICVAI's curated range, and usage is billed to the client's own key** (DEC-001, which closed AI-D20).
 
 ADR-0034's substance survives: the tenant bears token cost, per-tenant keys give independent reconciliation, and ceilings and `quotaExceeded` stay. Only "BYOK is the default" is corrected. Ceiling behaviour becomes per capability, so a budget never silently disables fraud scoring (which has no tokens) or a critical capability (AIC-227). The guest concierge defaults to warn (decided 17 August).
 
@@ -667,12 +670,12 @@ ADR-0034's substance survives: the tenant bears token cost, per-tenant keys give
 | A tenant passes ~2 million chunks, or retrieval 95th-percentile exceeds 150 ms | Shard that tenant's collection, behind the same alias and retrieval client (ADR-0049) |
 | About 500 tenants in one region (the cluster's default cap is 1,000 collections) | Custom sharding, or a second Qdrant cluster in the region (ADR-0049) |
 | More than 3 people building ML | A managed feature store and experiment tracking instead of features-as-code |
-| More than 60 tenants in a region, or LLM calls above 500,000 a day | Split `ai-interactive` into assistant and configuration deployments; dedicated Azure OpenAI capacity (provisioned throughput) |
+| More than 60 tenants in a region, or LLM calls above 500,000 a day | Split `ai-interactive` into assistant and configuration deployments; dedicated provisioned throughput (the PTU step of DEC-540 comes earlier, near 100,000 Small-tier calls a day) |
 | Fraud labels above ~5,000 confirmed cases in a tenant | Graph neural or sequence models on the relationship graph; a streaming engine instead of Redis counters |
 | Recommendation traffic above 5,000 decisions/s in a region | Precomputed per-customer candidate lists; an online ranking service separate from `ai-realtime` |
 | Six months of clean L3 operation with low override rates | Enable L4 governed optimisation for named low-risk parameters (AIR-090) |
 | A client asks for pooled cross-tenant models | Contract, consent and federated or anonymised training; not before |
-| Azure UAE North lacks a model a tenant needs | Self-hosted open model on GPU in-region before any cross-border route |
+| The UAE-only chain lacks a model a tenant needs | Another in-UAE provider from the curated range; a self-hosted model only if the client asks for it and hosts it (section 8a) |
 
 ---
 
@@ -687,7 +690,7 @@ Effort is in developer-weeks at the AI-assisted pace assumed in the six-month pl
 | Gateway: routing, catalogue, masking, budgets, breaker, caches, telemetry | C1, C13 | 4 |
 | Governance decision point, capability registry, autonomy, policy versions | C2 | 4 |
 | Action pipeline, executor, Approvals integration, tool registry, `validate-only` on the first 15 tools | C3 | 5 |
-| Qdrant tenancy (a collection, alias and scoped token per tenant, the venue filter, erasure, snapshots), BGE-M3 and reranker in-cell, hybrid retrieval | C4 | 3 |
+| Qdrant tenancy (a collection, alias and scoped token per tenant, the venue filter, erasure, snapshots), provider embeddings on the UAE route (CHG-R1S-026), hybrid retrieval | C4 | 3 |
 | Assistant profiles: staff, guest concierge, support | C5 | 3 |
 | Configuration assistant: discovery, blueprint, plan (seating and ticketing first, then general; the ai-scope paper's Reading B) | C7 | 5 |
 | Analytics assistant via semantic spec | C6 | 3 |
@@ -745,7 +748,7 @@ Chinmay answered every question in this section on 29 September, following the r
 | # | Question | Decision (29 September) | Effect on the design |
 |---|---|---|---|
 | 1 | Rules-first, evidence-gated ML | **Yes.** The models are our own, trained per tenant on that tenant's data; no bought scoring service | 5.1, 3.5 stand. ADR-0051 |
-| 2 | Default provider and billing | **Yes: managed Azure OpenAI, re-billed per token.** Billing is per module the tenant selects: three packages exist, and a custom package is allowed. TICVAI configures each module's price on the platform, with the subscription and billing settings | AI tokens are one metered line in the tenant's bill (`settleAiUsage`, `recordUsage`). Packages, module listings and simulation are already in `subscription.yaml` (`listPlans`, `setModuleListing`, `simulateCommercialPackage`); the markup is a module-listing setting, not a code constant |
+| 2 | Default provider and billing | **Yes: managed provider, re-billed per token** (the provider amended 2 October by DEC-539 and 3 October: Core42 Compass for `uaeOnly`, OpenAI UAE fallback, no self-hosted model; section 8a). Billing is per module the tenant selects: three packages exist, and a custom package is allowed. TICVAI configures each module's price on the platform, with the subscription and billing settings | AI tokens are one metered line in the tenant's bill (`settleAiUsage`, `recordUsage`). Packages, module listings and simulation are already in `subscription.yaml` (`listPlans`, `setModuleListing`, `simulateCommercialPackage`); the markup is a module-listing setting, not a code constant |
 | 3 | Models in UAE North; cross-border | **UAE North for now.** Another region is configured tenant by tenant when it is needed | The region's `allowedAiResidencies` stays the gate; no cross-border route is built for the first release |
 | 4 | One autonomy scale, access-security at advisory | **Yes** | 3.8, 5.5 stand. ADR-0050 |
 | 5 | Retention | **90 days by default; the tenant may set it longer or shorter.** All AI data retention is one tenant configuration: prompts, responses and conversations, and decision records and approvals too, each with its own period. The audit period (ADR-0047) is the default for decision records, not a fixed rule. AI keeps metadata (summaries, embeddings, indexes) so a question is answered from the index, not by reading the whole history | Retention moves to tenant configuration, beside the other tenant data-retention settings, with a period per data class. Only where law sets a floor (the biometric retention question, kept make-or-break) does the platform refuse a shorter value. 3.9 gains a memory rule (below) |
@@ -758,7 +761,7 @@ Chinmay answered every question in this section on 29 September, following the r
 | 12 | Which AI ships in six months (30 September, AI-D17) | **Every AI function inside the six months, baseline first, then it learns per tenant.** Rules and starting patterns answer on day one; the tenant's own data takes over as it accumulates | Every suggestion carries its maturity stage (`Suggestion.maturity`); the minimums per kind are where own data takes over, not a refusal |
 | 13 | Model fitness scoring (30 September, AI-D18, our proposal) | **A task-fitness band per model and agent task; warn, never block** | `AiModel.taskFitness`; `setAiProvider` returns `fitnessWarnings` (underpowered, overpowered, unscored); ADM-037 shows them |
 | 14 | Second AI engineer (30 September, AI-D19) | **From 5 October; no third** | As decision 11: trained model producers slip first |
-| 15 | Billing for a client-chosen provider or model (30 September client meeting, MoM 4.1, AI-D20) | **Deferred, not decided: to the dedicated AI workshop** (Allam). Position stated on the call, for the workshop to confirm: the agents behave the same whichever model a client selects (minor performance variation only); we propose a recommended model per function; any extra cost of a provider or model the client chooses (for example ChatGPT) is borne by the client | None yet. Decision 2 (managed Azure OpenAI, re-billed per token) stays the default until the workshop; the per-function recommendation fits decision 13's fitness bands, and BYOK (5.9) is the existing route for a client's own provider |
+| 15 | Billing for a client-chosen provider or model (30 September client meeting, MoM 4.1, AI-D20) | **Closed 2 October by DEC-001** (CHG-CSA-001): with BYOK the AI engine maps each task to the client provider's equivalent model from TICVAI's curated range, and usage is billed to the client's own key; the client cannot pick a model outside the curated range (DEC-002) | `AiModel.curatedRange`; `setAiProvider` refuses `model-not-curated`; BYOK enabled per tenant by TICVAI (`setAiByokEnablement`). Section 8a |
 
 **The trade-offs in section 5 were reviewed at the same time.** All were accepted, with these additions:
 
@@ -769,7 +772,7 @@ Chinmay answered every question in this section on 29 September, following the r
 
 **Memory rule (added to 3.9).** Conversations, decision records and activity older than the retention window are not read at question time. As they age, AI writes compact metadata (a summary, the entities and outcomes, an embedding) that stays under the audit period, so a later question is answered from the index. This keeps answers accurate without keeping prompt text, and it is what makes a longer retention affordable and a shorter one safe: the index outlives the raw text either way. The index itself follows the decision-record period.
 
-**Remaining, ours:** confirm the models on offer in UAE North against the task list in 3.3 (an Azure fact, not a client question); set the markup figure in the module listing; price the weather API.
+**Remaining, ours:** confirm the models on offer from Core42 Compass and OpenAI UAE against the task list in 3.3 (DEC-541: their terms in writing before signing) (an Azure fact, not a client question); set the markup figure in the module listing; price the weather API.
 
 **ADR changes this implies:**
 
@@ -786,6 +789,26 @@ Chinmay answered every question in this section on 29 September, following the r
 | New **ADR-0052** | One recommendation engine; runtime in AI, configuration in Promotions (accepted 1 October) |
 | New **ADR-0053** | Risk layer ownership: owners keep deterministic rules, AI owns cross-entity risk, alerts and cases (accepted 1 October) |
 | New **ADR-0054** | Natural-language analytics goes through the semantic layer (accepted 1 October) |
+
+---
+
+## 8a. The decisions of 2 and 3 October
+
+> **Added 3 October 2026 (CHG-R1S-001).** Chinmay's AI decisions of 2 October (`docs/registers/decisions-2-october.md`) and his hosting decision of 3 October (`docs/active/decisions/answers-3-october-gate-and-hosting.md`). Where this section and an earlier one differ, this section stands; sections 2, 3.3, 3.5, 4.3, 4.5, 5.9 and 6 were brought in line the same day.
+
+| Ref | Decision | Effect on the design |
+|---|---|---|
+| DEC-539, amended 3 October | **A residency class per tenant.** `uaeOnly` (the default; mandatory for government, bank and health tenants): Core42 Compass, Small GPT-4.1 mini (or Seraj), Strong GPT-5, reached through `openaiCompatible`; **fallback OpenAI UAE**. `globalAllowed` (PDPL Art. 23 opt-in): Azure Global or the tenant's BYOK provider, falling back to the UAE-only chain. `onPrem`: models on the client's own estate. **The in-cell gpt-oss-120b fallback is dropped** (3 October) | 3.3 routing resolves a provider from the class (`AiResidencyClass`, common.yaml); a residency refusal is never failed over (ADR-0009) |
+| Hosting, 3 October | **"We are not hosting anything unless client asks it."** No in-cell open model, **no GPU node pool**; the AI goes through providers: Compass by default, OpenAI UAE as fallback, BYOK. On-prem or self-hosted models only when a client asks | The cell runs CPU only for AI: the scrubber (3.3); embeddings are the provider's since the same evening (row below). The infrastructure modules carry no GPU pool |
+| Embeddings, 3 October evening (CHG-R1S-026) | **Provider embeddings on the UAE route** (OpenAI UAE `text-embedding-3-large` or Core42), no embedding model hosted by us and no CPU embeddings; **Qdrant stays in our cell for the vectors** (ADR-0049). Embedding calls go through the scrubber and the residency class like any other AI call. "We have a GPU server" was noted and is not used for tenant data | 3.3, 4.5, 5.8; the reranker question is the lead's |
+| DEC-542 | **Mandatory offline PII scrubbing** on every LLM call, every class: Microsoft Presidio with UAE recognisers (Emirates ID, UAE phone, passport, IBAN, Luhn-checked card, email) and an Arabic NER model; reversible placeholders whose map stays in the cell; replies re-filled in the cell. **The scrubber is a CPU library inside our own worker, not a hosted model** | AI gateway, 3.3 "before the call"; `AiPolicy.scrubbing`; ADR-0020 |
+| DEC-543, amended 3 October | **The guard on input and output is the provider's content-safety service** (Azure AI Content Safety in UAE North for `uaeOnly`; the provider's own moderation for BYOK and `globalAllowed`), not a self-hosted Qwen3Guard: a guard model is itself an LLM and we host none unless a client asks (Chinmay may drop the guard) | Fails closed with the scrubber: either down refuses the call `503 scrubber-unavailable`; a blocked message is `422 guard-refused`. 3.5's golden set carries Arabic harmful prompts |
+| DEC-544 | **A curated range per AI and ML task**: the best-suited model plus 3-4 alternatives (generative tiers Small/Strong/Reasoning); embeddings, reranking, moderation, PII, OCR and speech are platform-owned and never BYOK; money paths stay classical ML | `AiModel.curatedRange`, seeded in the model catalogue |
+| DEC-002 | **The client cannot change the model per task**; TICVAI curates it. Amends AI-D18 ("warn, never block") | `setAiProvider` refuses `model-not-curated` (3.3 step 2) |
+| DEC-001 | **BYOK maps each task to the client provider's equivalent model from the curated range; usage is billed to the client's key.** Closes AI-D20 | 5.9; section 8 row 15 |
+| DEC-540 | **PTU step**: the UAE-only Small tier moves to Azure UAE North provisioned throughput (spillover off) near 100,000 calls a day | 4.5, 6 |
+| Legal safeguards, 3 October (CHG-R1S-016; `docs/active/research/openai-key-uae-3-october.md`, "What this means for TICVAI") | **Only a `private` tenant may take `globalAllowed`**: government and semi-government (DESC, ADISS, TDRA scope), banking and payments, health, DIFC and ADGM tenants stay `uaeOnly` (tenancy `RegionSettings.tenantCategory`, `409 residency-category-refused`). **A second, deterministic pattern pass after Presidio** (Emirates ID, +971, card PAN, IBAN, email) blocks the call on any survivor (`503 scrubber-unavailable`, no fallback). **Sensitive fields never go to a global endpoint** (allergy, accessibility, family and children, health, biometric, religion, payment; images, audio and files blocked: `AiPolicy.globalEndpointExclusions`). **Global endpoints are stateless** (no Assistants, Threads or Conversations, `store=false`, no uploads or fine-tuning: `AiProvider.statelessOnly`). **One audit record per call** with entity counts by type, never values (`AiInteraction.scrubAudit`). **Failover never widens residency.** **OpenAI's UAE-region API project (`ae.api.openai.com`)** is a `uaeOnly` provider beside Core42 Compass and Azure OpenAI UAE North. **The Presidio version is pinned** (`AiPolicy.scrubbing.scrubberVersion`): it is community-maintained now, so each release is taken on purpose after the golden corpus passes | AI gateway (3.3), prompt builders, the OpenAI adapter, the audit store |
+| DEC-541 (open, needs vendors) | Compass terms, OpenAI UAE approval, PTU figures and the legal opinion, in writing before signing. Until then dev and staging use Azure Global Standard with synthetic data only (TBF-1) | `docs/registers/external-dependencies.md` |
 
 ---
 

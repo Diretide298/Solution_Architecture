@@ -1,0 +1,53 @@
+id: CHG-R1S-005
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: 'Every write operation writes a table or says why not, and every event emitter writes platform.outbox:
+  10 emitters and 163 table-less writes answered, derive-lineage adds the outbox for emitters, and check-write-lineage
+  holds it.'
+decision:
+  what: 'tools/applied/lineage-writes-3-october.py: platform.outbox on the 10 emitters (createOrder, publishTenantConfig
+    and 8 more); 108 writes given their table (exportSitePackage whitelabel.site_package, rejectShiftVariance orders.pos_shift,
+    resolveSyncRejection sync.rejection, sendGuestConversationMessage marketing.conversation_message ...); 48 marked
+    pure with a reason (validateVenueMapGraph, enterWaitingRoom: Redis counters, simulations, quotes, prints); 7
+    generated workspace writes exempt as storage undecided. KitchenSla persists to fnb.kitchen_sla. 46 writes that
+    now write a table declare X-Consistency-Token on their 2xx (api-conventions 3). tools/derive-lineage.py adds
+    platform.outbox for every emitter outside the AI contract; the four AI emitters (closeRiskCase, containAiIncident,
+    pauseAiCapability, publishForecastVersion) are exempt with a reason, AI writing only AI stores (ADR-0020), and
+    their publish path is a question for the lead.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'the HLD/LLD cross-check of 3 October 2026 (handoff-out/r1/HLD-LLD/CROSSCHECK.md, a PKG finding): createOrder
+  and publishTenantConfig emit without the outbox in their writes; exportSitePackage, sendGuestConversationMessage,
+  rejectShiftVariance, enterWaitingRoom, validateVenueMapGraph and resolveSyncRejection wrote no table.'
+keys_touched:
+  operations:
+  - createOrder
+  - publishTenantConfig
+  - exportSitePackage
+  - sendGuestConversationMessage
+  - rejectShiftVariance
+  - enterWaitingRoom
+  - validateVenueMapGraph
+  - resolveSyncRejection
+  - setKitchenSla
+  tables:
+  - platform.outbox
+  - fnb.kitchen_sla
+  files:
+  - handoff/api-data-lineage.json
+  - tools/derive-lineage.py
+  - tools/applied/lineage-writes-3-october.py
+  - tools/check-write-lineage.py
+root_class: 'new: write-lineage-gaps'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-write-lineage.py
+status: open
+notes: check-write-lineage fails on the parent commit (10 W-OUTBOX, 163 W-NOTABLE, W-EMITS, W-OWNER kernel).

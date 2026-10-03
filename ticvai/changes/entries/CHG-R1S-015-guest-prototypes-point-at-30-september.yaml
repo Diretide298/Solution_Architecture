@@ -1,0 +1,35 @@
+id: CHG-R1S-015
+date: '2026-10-03'
+source: client-review
+kind: spec
+summary: The 58 guest screens that pointed at the 28 or 29 September prototype copies point at the 30 September
+  copies (22 on 29 September as the lead found, 36 more on 28 September that the new rule found); check-wireframes
+  refuses a pointer to a dated copy when a later copy of the same file exists.
+decision:
+  what: 'screens P01 and P02: wireframe.prototype.file to sources/designs/guest-rev3-30-september/... where the
+    30 September copy holds the same file; rev notes the pointer moved and where the view was verified.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'The lead''s guest/kiosk design cross-check finding of 3 October: designers opened the older build; the client''s
+  30 September build (CLIENT-RESPONSE-30SEP.md, REV3- items) is filed beside it.'
+keys_touched:
+  screens:
+  - WEB-001
+  - WEB-002
+  - WEB-005
+  - GST-001
+  files:
+  - tools/check-wireframes.py
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+root_class: 'new: stale-prototype-pointer'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-wireframes.py
+status: open

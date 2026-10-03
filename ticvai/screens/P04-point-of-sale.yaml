@@ -6153,6 +6153,20 @@ screens:
     - name: contentBody
       slot: carried
       components:
+      - kind: detailPanel
+        label: Load the order the exception applies to
+        operation: getOrder
+        bindsTo: Order
+        columns:
+        - Order.orderNumber
+        - Order.status
+        - Order.grossAmount
+        - Order.taxAmount
+        - Order.netAmount
+        - Order.refundedAmount
+        - Order.chargeFxRate
+        - Order.holdLabel
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: primaryButton
         label: Confirm
         provenance: carried from the previous definition
@@ -6213,9 +6227,11 @@ screens:
     error: Could not load. Names which read failed and leaves the sales exceptions controls untouched.
     emptyFirstRun: No sales exceptions controls configured. The form opens empty and `recordNoSale` saves
       the first one; it says what the platform does in the meantime.
-    emptyNoAccess: Shown when the caller lacks `CASH_NO_SALE`, which `recordNoSale` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires to show this screen,
+      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question. A caller who can see the screen but lacks what an action
+      needs sees that action disabled, naming its permission: `CASH_NO_SALE` for `recordNoSale`; `ORDER_DISCOUNT`
+      for `applyManualDiscount`; `ORDER_VOID` for `voidOrder`.'
     offline: '**Working from the local journal.** The till keeps taking money; this reconciles on sync.'
     approvalRejected: The supervisor declined the no-sale or void; the drawer stays shut and the reason
       is shown.
@@ -6232,6 +6248,11 @@ screens:
     contract: orders
     purpose: Apply a discount a cashier chose
     trigger: onAction
+  - operationId: getOrder
+    contract: orders
+    purpose: Load the order the exception applies to
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: workstationId
@@ -6472,6 +6493,18 @@ screens:
     - name: contentBody
       slot: fields
       components:
+      - kind: cardList
+        label: Show where the selected device is assigned
+        operation: getDeviceAssignment
+        bindsTo: DeviceAssignment
+        columns:
+        - DeviceAssignment.locationScopePath
+        - DeviceAssignment.lastSeenLocation
+        - DeviceAssignment.assetTag
+        - DeviceAssignment.acquiredAt
+        - DeviceAssignment.warrantyExpiresAt
+        - DeviceAssignment.assignedAt
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: selectField
         label: Cashier
         operation: allocateDepositBox
@@ -6564,6 +6597,11 @@ screens:
     provenance: decided 29 September, readiness close-out (QA wiring note)
     invalidates:
     - listDevices
+  - operationId: getDeviceAssignment
+    contract: tenancy
+    purpose: Show where the selected device is assigned
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: workstationId
@@ -6694,6 +6732,18 @@ screens:
     - name: contentBody
       slot: fields
       components:
+      - kind: dataTable
+        label: Show the shift's cash in and cash out so far
+        operation: listCashMovements
+        bindsTo: CashMovement
+        columns:
+        - CashMovement.kind
+        - CashMovement.amount
+        - CashMovement.reference
+        - CashMovement.reason
+        - CashMovement.recordedAt
+        - CashMovement.syncedAt
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: selectField
         label: Cash in or cash out
         bindsTo: CreateCashMovementRequest.kind
@@ -6732,15 +6782,22 @@ screens:
     error: Could not load. Names which read failed and leaves the cash cash out untouched.
     emptyFirstRun: No cash cash out configured. The form opens empty and `createCashMovement` saves the
       first one; it says what the platform does in the meantime.
-    emptyNoAccess: Shown when the caller lacks `CASH_LIFT`, which `createCashMovement` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listCashMovements` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `CASH_LIFT` for
+      `createCashMovement`.'
     offline: '**Working from the local journal.** The till keeps taking money; this reconciles on sync.'
   apis:
   - operationId: createCashMovement
     contract: shift
     purpose: Record a cash lift or add
     trigger: onAction
+  - operationId: listCashMovements
+    contract: shift
+    purpose: Show the shift's cash in and cash out so far
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: workstationId
@@ -8352,6 +8409,9 @@ screens:
       - kind: multiSelect
         label: 86 an item
         provenance: carried from the previous definition
+        operation: getGuestMenu
+        bindsTo: GuestMenu.sections
+        notes: Lists the outlet's menu items; ticking one sends `setItemAvailability` (r1 gate, CHG-R1S-004).
       - kind: primaryButton
         label: Apply
         provenance: carried from the previous definition
@@ -8409,6 +8469,11 @@ screens:
     purpose: The outlet's floor as it is laid out
     trigger: onLoad
     provenance: wiring fix, 2 October 2026 (CHG-WIR-008)
+  - operationId: getGuestMenu
+    contract: fnb
+    purpose: List the outlet's menu items for the '86 an item' picker
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: workstationId

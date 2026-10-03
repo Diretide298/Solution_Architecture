@@ -539,17 +539,25 @@ def main() -> int:
     # child rows, which is why it was skipped as a column in the first place.
     child_of: dict[str, tuple[str, str]] = {}
     declared_children: set[str] = set()     # children a `+` persistence tag names outright
+    # **A third table in a `+` tag may be a grandchild** (3 October 2026, CHG-R1S-006). `GuidedChoice`
+    # persists to `guided_choice + guided_choice_question + guided_choice_answer`, and the answers are
+    # `questions[].answers[]`, not a top-level array: with no top-level match the answer table took the
+    # question array by letter overlap, so the r1 gate found `guided_choice_answer` a copy of the question
+    # table with no link to its question. The children named before it are where a nested array is looked for.
+    chain_before: dict[str, list] = {}
     for name, (_, doc) in contracts.items():
         for sname, body in ((doc.get("components") or {}).get("schemas") or {}).items():
             raw = persistence_of(body)
             if not isinstance(raw, str) or "+" not in raw or "—" in raw:
                 continue
             parts = [x.strip() for x in raw.split("+")]
-            for child in parts[1:]:
+            for i, child in enumerate(parts[1:], start=1):
                 if "." in child:
                     child_of[child] = (sname, parts[0])
                     owner[child] = name
                     declared_children.add(child)
+                    if i > 1:
+                        chain_before[child] = parts[1:i]
 
     # A child table may also be implied rather than declared. `identity.role_permission` is named
     # by the lineage, described in prose and used by an operation, and **no schema declares it** —
@@ -614,7 +622,25 @@ def main() -> int:
         tail = child.split(".")[-1].replace(parent_table.split(".")[-1] + "_", "")
         _exact = [kv for kv in arrays if snake(kv[0]).rstrip("s") in (tail, tail.split("_")[-1])]
         _prefix = [kv for kv in arrays if snake(kv[0]).startswith(tail)]
-        key, spec = (_exact or _prefix or [max(arrays, key=lambda kv: len(set(snake(kv[0])) & set(tail)))])[0]
+        _nested = None
+        if not (_exact or _prefix) and chain_before.get(child):
+            for _k, _v in arrays:
+                _it = _v["items"]
+                if "$ref" in _it:
+                    _it = all_schemas.get(_it["$ref"].split("/")[-1]) or {}
+                for _k2, _v2 in (_it.get("properties") or {}).items():
+                    if isinstance(_v2, dict) and _v2.get("type") == "array" and isinstance(_v2.get("items"), dict)                             and snake(_k2).rstrip("s") in (tail, tail.split("_")[-1]):
+                        _mid = next((m for m in chain_before[child]
+                                     if m.split(".")[-1].endswith("_" + snake(_k).rstrip("s"))), None)
+                        if _mid:
+                            _nested = (_k + "[]." + _k2, _v2, _mid)
+                            break
+                if _nested:
+                    break
+        if _nested:
+            key, spec, parent_table = _nested
+        else:
+            key, spec = (_exact or _prefix or [max(arrays, key=lambda kv: len(set(snake(kv[0])) & set(tail)))])[0]
         items = spec["items"]
         if "$ref" in items:
             resolved = all_schemas.get(items["$ref"].split("/")[-1])
@@ -1313,6 +1339,16 @@ def main() -> int:
                 _c["required"] = "yes"
                 _req_fixed += 1
     print(f"  key columns marked required: {_req_fixed}")
+    # **A table a contract persists to is a Postgres table** (3 October 2026, CHG-R1S-008). `identity.session`
+    # was held as `redis` here while `ActiveSession` said "none — Redis session registry"; the HLD/LLD
+    # cross-check and the r1 gate found 11 operations writing a session nothing created in SQL, with no
+    # structure to page, filter by workstation or venue, or put under RLS. `ActiveSession` now persists to
+    # `identity.session` (Redis stays the token cache in front of it), and a contract's declaration beats
+    # a `redis` store remembered from before.
+    _now_pg = sorted(t for t in set(persisted.values()) if (S.get("store") or {}).get(t) == "redis")
+    for _t in _now_pg:
+        S["store"].pop(_t, None)
+        print(f"  {_t}: a contract persists to it, so it is a Postgres table (was redis)")
     S["cols"] = existing
     ref_path.write_text(json.dumps(S), encoding="utf-8")
 

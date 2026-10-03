@@ -277,6 +277,7 @@ paths:
             Status change refused: archiving an asset that is still referenced (`inUse`, with
             every reference listed), or a transition `states/media.yaml` does not allow from the
             asset's current status (`transitionNotAllowed`)
+          x-ticvai-problem-types: [in-use, transition-not-allowed]
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/MediaStatusRefusedProblem' }
@@ -374,6 +375,7 @@ paths:
             document (`kindMismatch`) — or the transfer never finished (`transferIncomplete`),
             the upload ticket expired (`uploadExpired`), or the stored file is larger than the
             ticket allowed (`sizeExceeded`)
+          x-ticvai-problem-types: [kind-mismatch, transfer-incomplete, upload-expired, size-exceeded]
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/UploadRefusedProblem' }
@@ -506,6 +508,7 @@ paths:
             The transfer never finished (`transferIncomplete`), the upload ticket expired
             (`uploadExpired`), or the stored file is larger than the ticket allowed
             (`sizeExceeded`). A file that fails scanning is not refused here — see above
+          x-ticvai-problem-types: [transfer-incomplete, upload-expired, size-exceeded]
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/UploadRefusedProblem' }
@@ -1044,6 +1047,9 @@ paths:
                   nullable: true
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Moved
           content:
             application/json:

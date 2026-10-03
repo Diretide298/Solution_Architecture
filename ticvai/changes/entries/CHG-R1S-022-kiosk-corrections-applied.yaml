@@ -1,0 +1,44 @@
+id: CHG-R1S-022
+date: '2026-10-03'
+source: design-input
+kind: contract
+summary: 'The eleven open process-notes corrections on kiosk screens are applied and marked fixed: KSK-001 loop,
+  KSK-006 review, KSK-008 status, KSK-011 collection, KSK-012, KSK-013 call staff, KSK-014 out of service, KSK-016
+  payment, allergens and modal.'
+decision:
+  what: KSK-001 reads listProducts; KSK-006 drops addCartLine and evaluatePromotions (offers apply on their own;
+    F07 and F75 follow); KSK-008 is a status tracker; KSK-011 is core, scans the booking QR (getOrder) and shows
+    three columns; KSK-013 hands over to an agent (handoverToAgent, createAiConversation); KSK-014 reads getTenantAppStatus;
+    KSK-016 goes to payment (KSK-007) and its modal asks nothing; GuestMenu items carry allergenDetail (contains
+    and mayContain). KSK-012's transfer form had gone with GFIX-3 (CHG-GST-003).
+  by: Chinmay
+  date: '2026-10-03'
+why: 'The process notes'' corrections (handoff/design-notes/ticketing-guest.yaml, fnb-retail.yaml, customer-marketing.yaml)
+  and the lead''s guest/kiosk design cross-check finding of 3 October: the kiosk is drawn in full now.'
+keys_touched:
+  screens:
+  - KSK-001
+  - KSK-006
+  - KSK-008
+  - KSK-011
+  - KSK-012
+  - KSK-013
+  - KSK-014
+  - KSK-016
+  flows:
+  - F07
+  - F57
+  - F75
+  schemas:
+  - GuestMenu
+root_class: 'new: screen-without-read'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-screen-patterns.py
+status: open

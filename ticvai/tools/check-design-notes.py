@@ -77,7 +77,7 @@ NOTES = ROOT / "handoff" / "design-notes"
 LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
 RULE_LISTS = ("inputs", "outputs", "actions", "edgeCases", "corrections", "openQuestions")
 CORRECTION_STATUS = ("fixed", "logged", "withdrawn")
-CHG_ID = re.compile(r"\bCHG-[A-Z]{2,6}-\d{3}\b")
+CHG_ID = re.compile(r"\bCHG-[A-Z][A-Z0-9]{1,5}-\d{3}\b")
 _ENTRIES: set | None = None
 
 

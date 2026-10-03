@@ -13,7 +13,8 @@
   "to-apply": "decided; applied by the change entries that cite the id",
   "already-applied": "decided earlier and already in the package (applied_by)",
   "needs-research": "decided to research first; nothing applied until the research lands",
-  "needs-client": "needs the client or a vendor; nothing applied until it arrives"
+  "needs-client": "needs the client or a vendor; nothing applied until it arrives",
+  "applied": "decided and applied: applied_by names the closed change entries that applied it"
  },
  "amends": [
   {
@@ -238,7 +239,7 @@
    "screen": "ADM-037",
    "process": "AI",
    "block": "A",
-   "status": "to-apply",
+   "status": "applied",
    "kind": "contract",
    "decision": "With BYOK, the AI engine maps each AI task to the client provider's equivalent model from TICVAI's curated range (tiers, not model names: research section 2.3); usage is billed to the client's own key. Closes AI-D20 (deferred to the AI workshop).",
    "by": "Chinmay",
@@ -290,6 +291,12 @@
       "3.3 Model serving and the provider abstraction"
      ]
     }
+   ],
+   "applied_by": [
+    "CHG-CSA-001",
+    "CHG-FUP-008",
+    "CHG-NOTE-001",
+    "CHG-SBO-025"
    ]
   },
   {
@@ -933,7 +940,7 @@
    "screen": "CMS-025",
    "process": "Customer & marketing",
    "block": "A",
-   "status": "to-apply",
+   "status": "applied",
    "kind": "contract",
    "decision": "Cookie scanner: buy a scanner API (hybrid). Our banner, runtime, registry and consent logs stay; a bought scanner API feeds recordCookieScan; the manual 'Upload scan report' path stays.",
    "by": "Chinmay",
@@ -981,6 +988,15 @@
       "cookie scanner vendor (new)"
      ]
     }
+   ],
+   "applied_by": [
+    "CHG-CSA-023",
+    "CHG-CSA-024",
+    "CHG-DOC-021",
+    "CHG-FUP-009",
+    "CHG-GTB-005",
+    "CHG-NOTE-002",
+    "CHG-SGU-013"
    ]
   },
   {
@@ -5181,7 +5197,7 @@
    "screen": "ADM-016",
    "process": "White label & CMS",
    "block": "A",
-   "status": "to-apply",
+   "status": "applied",
    "kind": "contract",
    "decision": "Hosted with TICVAI: platform staff may publish a tenant's site under a grant. Self-hosted: the venue uses 'Generate site package' (export).",
    "by": "Chinmay",
@@ -5231,6 +5247,13 @@
       "R098"
      ]
     }
+   ],
+   "applied_by": [
+    "CHG-CSA-038",
+    "CHG-DOC-014",
+    "CHG-NOTE-009",
+    "CHG-SBO-025",
+    "CHG-SGU-010"
    ]
   },
   {
@@ -6084,7 +6107,7 @@
    "screen": "ADM-122",
    "process": "Ticketing (back office)",
    "block": "B",
-   "status": "to-apply",
+   "status": "applied",
    "kind": "adr",
    "decision": "Industry standard for production change: never merge or reverse-migrate production databases. Schema goes forward-only through versioned migrations (expand then contract). Configuration moves as a versioned package exported with stable keys, diffed against production, approved, applied as an idempotent upsert by key, and audited; rollback re-applies the previous package. Secrets and environment settings never travel in it.",
    "by": "Chinmay",
@@ -6128,6 +6151,14 @@
       "configuration promotion"
      ]
     }
+   ],
+   "applied_by": [
+    "CHG-CSA-034",
+    "CHG-GTB-011",
+    "CHG-MOV-010",
+    "CHG-NOTE-006",
+    "CHG-SBO-024",
+    "CHG-SBO-025"
    ]
   },
   {
@@ -19195,7 +19226,7 @@
   {
    "id": "DEC-539",
    "source": "AI residency (Chinmay, 2 Oct)",
-   "status": "to-apply",
+   "status": "applied",
    "kind": "adr",
    "decision": "Per-tenant AI residency class. UAE-only (default; mandatory for government, bank and health tenants): Small = Core42 Compass GPT-4.1 mini (or Seraj if it wins the Arabic golden set), Strong = Compass GPT-5, fallback OpenAI UAE then in-cell gpt-oss-120b. Global allowed (private venue opts in under PDPL Art. 23 with vendor contract, DPIA and notice): Azure gpt-5-mini / gpt-6-sol Global or the tenant's BYOK provider, fallback the UAE-only chain. On-prem: Qwen3.5 or gpt-oss; Strong Qwen3.5-122B, Falcon-H1 Arabic or Jais 2. Compass is reached through AiProviderKind openaiCompatible. Amends AI-D02.",
    "by": "Chinmay",
@@ -19272,12 +19303,20 @@
       "AI-ENGINE-GATEWAY"
      ]
     }
+   ],
+   "applied_by": [
+    "CHG-CSA-002",
+    "CHG-CSA-008",
+    "CHG-DOC-021"
+   ],
+   "overridden_by": [
+    "HOST-1"
    ]
   },
   {
    "id": "DEC-540",
    "source": "AI residency (Chinmay, 2 Oct): scale step",
-   "status": "to-apply",
+   "status": "applied",
    "kind": "docs-hld-lld",
    "decision": "Move the UAE-only Small tier to Azure UAE North PTU (spillover off) when steady traffic nears about 100,000 calls a day.",
    "by": "Chinmay",
@@ -19301,6 +19340,9 @@
       "Region and residency"
      ]
     }
+   ],
+   "applied_by": [
+    "CHG-CSA-002"
    ]
   },
   {
@@ -19326,7 +19368,7 @@
   {
    "id": "DEC-542",
    "source": "PII scrubbing (Chinmay, 2 Oct)",
-   "status": "to-apply",
+   "status": "applied",
    "kind": "adr",
    "decision": "Every LLM call, whatever the tenant's residency class, first passes an offline scrubber inside our cell: Microsoft Presidio with custom recognisers (Emirates ID, UAE phone, passport, IBAN, Luhn-checked card, email) plus an Arabic NER model (e.g. CAMeL Tools); detected PII becomes reversible placeholders ([GUEST_1]) whose map stays in-cell, and replies are re-filled before reaching the user. Scrubbing is mandatory, not tied to residency.",
    "by": "Chinmay",
@@ -19382,12 +19424,15 @@
       "AI-ENGINE-GATEWAY"
      ]
     }
+   ],
+   "applied_by": [
+    "CHG-CSA-003"
    ]
   },
   {
    "id": "DEC-543",
    "source": "PII scrubbing (Chinmay, 2 Oct): moderation",
-   "status": "to-apply",
+   "status": "applied",
    "kind": "adr",
    "decision": "An offline guard model (Qwen3Guard, covers Arabic) runs on both input and output of every LLM call.",
    "by": "Chinmay",
@@ -19423,12 +19468,18 @@
       "AI-ENGINE-GATEWAY"
      ]
     }
+   ],
+   "applied_by": [
+    "CHG-CSA-003"
+   ],
+   "overridden_by": [
+    "HOST-1"
    ]
   },
   {
    "id": "DEC-544",
    "source": "Batch 2 #7 / batch 3 (AI/ML model selection)",
-   "status": "to-apply",
+   "status": "applied",
    "kind": "docs-hld-lld",
    "decision": "TICVAI keeps a curated range per AI and ML task: the best-suited model plus 3-4 alternatives where they exist (generative tiers Small/Strong/Reasoning; platform-owned embeddings, reranking, moderation, PII, OCR, speech never BYOK; money paths stay classical ML). Record the range in the AI design and seed it in the AI model catalogue.",
    "by": "Chinmay",
@@ -19466,12 +19517,16 @@
       "new AI-D entry: curated range"
      ]
     }
+   ],
+   "applied_by": [
+    "CHG-CSA-001",
+    "CHG-CSA-008"
    ]
   },
   {
    "id": "DEC-545",
    "source": "Batch 5 set 2 (cookie scanner) + sequence",
-   "status": "to-apply",
+   "status": "applied",
    "kind": "docs-hld-lld",
    "decision": "Update the HLD/LLD with the third-party cookie-scanner integration (egress to the vendor API, data sent, where consent logs stay).",
    "by": "Chinmay",
@@ -19499,12 +19554,15 @@
       "Security"
      ]
     }
+   ],
+   "applied_by": [
+    "CHG-CSA-023"
    ]
   },
   {
    "id": "DEC-546",
    "source": "Batch 5 set 2 (domains)",
-   "status": "to-apply",
+   "status": "applied",
    "kind": "docs-hld-lld",
    "decision": "Every tenant gets a platform subdomain at provisioning, one stem per cell (venue.<cell>.ticvai.app, e.g. *.ae.ticvai.app) with a wildcard certificate; host-only cookies; start the Public Suffix List submission.",
    "by": "Chinmay",
@@ -19543,12 +19601,17 @@
       "Network"
      ]
     }
+   ],
+   "applied_by": [
+    "CHG-CSA-043",
+    "CHG-DOC-021",
+    "CHG-SOT-006"
    ]
   },
   {
    "id": "DEC-547",
    "source": "Batch 5 set 2 (domains)",
-   "status": "to-apply",
+   "status": "applied",
    "kind": "contract",
    "decision": "Custom domains: a CNAME (e.g. tickets.venue.com) straight to our Front Door endpoint, validated by TXT _dnsauth, with a Front Door managed certificate. A delegated subdomain as an option; the apex only on request; no path proxy. CMS-017 gains the DNS records list (TXT, CNAME, CAA/NS with observed value and status), the pending-revalidation and timeout states, the takeover warning on release, a primary domain with redirects, and per-domain readiness (UAE Pass redirect, Apple Pay domain, app links).",
    "by": "Chinmay",
@@ -19611,6 +19674,13 @@
       "Network"
      ]
     }
+   ],
+   "applied_by": [
+    "CHG-CSA-043",
+    "CHG-DOC-021",
+    "CHG-SBO-025",
+    "CHG-SGU-012",
+    "CHG-SOT-006"
    ]
   },
   {
@@ -20224,6 +20294,25 @@
    "date": "2026-10-02",
    "why": "The lead's call in the pre-apply round.",
    "overrides": []
+  },
+  {
+   "id": "HOST-1",
+   "source": "Gate and hosting (3 Oct)",
+   "topic": "No self-hosted model; the guard is the provider's safety service",
+   "status": "applied",
+   "kind": "adr",
+   "decision": "We host no model unless a client asks: no in-cell open model (gpt-oss-120b) and no GPU node pool. The AI goes through providers: Core42 Compass by default, OpenAI UAE as fallback, BYOK. The guard (Qwen3Guard) becomes the provider-side safety service (e.g. Azure AI Content Safety, UAE North; the provider's own moderation for BYOK and globalAllowed), still fail-closed. The Presidio scrubber stays as a CPU library in our own worker; scrubbing stays mandatory. On-prem or self-hosted models only when a client asks.",
+   "by": "Chinmay",
+   "date": "2026-10-03",
+   "why": "Chinmay, 3 October evening: \"We are not hosting anything unless client asks it\"; a guard model is itself an LLM (docs/active/decisions/answers-3-october-gate-and-hosting.md).",
+   "overrides": [
+    "DEC-539",
+    "DEC-543"
+   ],
+   "applied_by": [
+    "CHG-R1S-001",
+    "CHG-R1S-002"
+   ]
   }
  ]
 }

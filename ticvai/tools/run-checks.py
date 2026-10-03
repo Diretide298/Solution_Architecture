@@ -88,6 +88,12 @@ CHECKS = [
     # required entry parameter is carried, no screen wears another's route, a Block A screen is wave 1 and
     # says so, and Chinmay's 3 October screen decisions stay made.
     "check-screen-patterns",
+    # 3 October (the r1 gate and the HLD/LLD cross-check, CHG-R1S-002..021): every write writes a table or
+    # says why not and every emitter writes the outbox; the AI residency and scrubbing safeguards stay in the
+    # contracts; an operation-specific error names its problem types (a falling ceiling).
+    "check-write-lineage",
+    "check-ai-residency",
+    "check-problem-types",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.

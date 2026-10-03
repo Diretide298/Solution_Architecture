@@ -1,0 +1,31 @@
+id: CHG-R1S-018
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: transferOrderItems moves F&B service order lines (fnb.service_order_line) to an open service order on the
+  target visit, returns the target visit, and names its refusals.
+decision:
+  what: 'Description: lineIds are FnbOrder.lines[].id; nothing in orders changes; 409 target-visit-not-open, 422
+    line-not-transferable; offline replay is a no-op. Lineage writes fnb.service_order, fnb.service_order_line,
+    fnb.table_visit (not orders.order_line).'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'the r1 gate of 3 October 2026 (a judge finding on the Sprint 1 and baseline tickets), SVC-FNB-FNB-13 (blocker):
+  lineIds named two tables and the lineage wrote OrderService''s table.'
+keys_touched:
+  operations:
+  - transferOrderItems
+  tables:
+  - fnb.service_order_line
+  - orders.order_line
+root_class: 'new: write-lineage-gaps'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-problem-types.py
+status: open

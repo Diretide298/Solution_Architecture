@@ -776,6 +776,9 @@ paths:
                   - goodwill
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Reversed
           content:
             application/json:

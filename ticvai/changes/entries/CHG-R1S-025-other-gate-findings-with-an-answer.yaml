@@ -1,0 +1,38 @@
+id: CHG-R1S-025
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: 'Four more gate findings with a clear answer: verifyMfaChallenge names its wrong-code (422 mfa-code-invalid)
+  and expired-challenge (410) errors; createPaymentLink writes orders.payment_link; splitBill writes fnb.sub_bill;
+  the departure reads take seats left from catalogue.channel_capacity.'
+decision:
+  what: 'identity.yaml verifyMfaChallenge 410 and 422; lineage: createPaymentLink + orders.payment_link, splitBill
+    + fnb.sub_bill, getTransportDeparture, getNextTransportDeparture and searchTransportDepartures + catalogue.channel_capacity.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'the r1 gate of 3 October 2026 (a judge finding on the Sprint 1 and baseline tickets): SVC-IDENTITY-MFA-2 (no
+  error for attempts one to four), SVC-ORDER-ORDERS-17 (createPaymentLink never wrote the link), SVC-FNB-BILL-1
+  (no operation wrote fnb.sub_bill; check-states warned the same), SVC-VENUEOPS-DEPARTURE-1 (seatsLeft had no source).'
+keys_touched:
+  operations:
+  - verifyMfaChallenge
+  - createPaymentLink
+  - splitBill
+  - getTransportDeparture
+  - getNextTransportDeparture
+  - searchTransportDepartures
+  tables:
+  - orders.payment_link
+  - fnb.sub_bill
+  - catalogue.channel_capacity
+root_class: 'new: write-lineage-gaps'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-problem-types.py
+status: open

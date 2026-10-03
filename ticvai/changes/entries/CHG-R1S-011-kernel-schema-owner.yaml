@@ -1,0 +1,27 @@
+id: CHG-R1S-011
+date: '2026-10-03'
+source: audit
+kind: spec
+summary: The kernel schema (kernel.inbox) is owned by TenancyService, beside platform.outbox.
+decision:
+  what: 'handoff/service-decomposition.json: TenancyService.schemas gains kernel, with the reason in kernelNote.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'the HLD/LLD cross-check of 3 October 2026 (handoff-out/r1/HLD-LLD/CROSSCHECK.md, a PKG finding): the kernel
+  schema''s tables were owned by no service.'
+keys_touched:
+  tables:
+  - kernel.inbox
+  files:
+  - handoff/service-decomposition.json
+root_class: 'new: write-lineage-gaps'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-write-lineage.py
+status: open

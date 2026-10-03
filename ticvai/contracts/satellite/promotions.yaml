@@ -1645,6 +1645,7 @@ paths:
         - "P08 ADM-180 Bundle Component Builder"
         - "P08 ADM-181 Guest Choice & Build-Your-Own Bundle Designer"
         - "P08 ADM-187 Bundle Preview, Simulation & AI Recommendation"
+        - "P08 BO-011 Packages & Bundles"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -2054,7 +2055,6 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-021 Sell — Food & Drink"
         - "P04 POS-023 Sell — Merchandise"
-        - "P05 KSK-006 Review"
         - "P08 ADM-157 Rule Test, Simulation & AI Recommendation Workspace"
         - "P08 ADM-177 Offer Simulation, Basket Trace & AI Optimization"
         - "P08 BO-010 Promotions & Coupons"

@@ -426,6 +426,18 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: cardList
+        label: Show the agents' availability as saved
+        operation: listAgentWorkloadAvailability
+        bindsTo: AgentWorkloadAvailabilityWorkforceControlView
+        columns:
+        - AgentWorkloadAvailabilityWorkforceControlView.agentName
+        - AgentWorkloadAvailabilityWorkforceControlView.team
+        - AgentWorkloadAvailabilityWorkforceControlView.status
+        - AgentWorkloadAvailabilityWorkforceControlView.averageHandleSeconds
+        - AgentWorkloadAvailabilityWorkforceControlView.resolutionRate
+        - AgentWorkloadAvailabilityWorkforceControlView.availabilityExpiresAt
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: selectField
         label: Status
         operation: listCases
@@ -589,6 +601,11 @@ screens:
     trigger: onAction
     invalidates:
     - listCases
+  - operationId: listAgentWorkloadAvailability
+    contract: marketing-crm
+    purpose: Show the agents' availability as saved
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: caseId

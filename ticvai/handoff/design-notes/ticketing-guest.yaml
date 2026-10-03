@@ -3749,6 +3749,8 @@ screens:
       - what: The screen declares no operation; nothing fills the loop.
         why: The loop needs the venue's products and media (listProducts with Product.media) or a configured playlist.
         source: screens/P05-guest-kiosk.yaml#KSK-001 gaps
+        status: fixed
+        by: CHG-R1S-022
 
   KSK-003:
     summary: >-
@@ -3846,6 +3848,8 @@ screens:
       - what: '"Add cart line" and "Evaluate promotions" buttons on the review.'
         why: Lines are added before; promotions apply automatically.
         source: screens/P05-guest-kiosk.yaml#KSK-006 layout
+        status: fixed
+        by: CHG-R1S-022
 
   KSK-007:
     summary: >-
@@ -3882,6 +3886,8 @@ screens:
       - what: inquirePaymentStatus declares no request body, so the screen's editor has nothing to edit.
         why: Recorded gap; the screen is a status, not an editor.
         source: screens/P05-guest-kiosk.yaml#KSK-008 gaps
+        status: fixed
+        by: CHG-R1S-022
 
   KSK-009:
     summary: >-
@@ -3934,6 +3940,8 @@ screens:
       - what: Modelled as a ticket transfer form.
         why: Collecting is printing or a media swap, not a transfer.
         source: screens/P05-guest-kiosk.yaml#KSK-012 layout; DI-637
+        status: fixed
+        by: CHG-R1S-022
 
   KSK-014:
     summary: >-
@@ -3949,6 +3957,8 @@ screens:
       - what: The screen declares no operation.
         why: It needs the device status that puts it out of service.
         source: screens/P05-guest-kiosk.yaml#KSK-014 gaps
+        status: fixed
+        by: CHG-R1S-022
 
   EMP-014:
     summary: >-

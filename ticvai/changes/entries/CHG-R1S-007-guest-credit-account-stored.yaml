@@ -1,0 +1,31 @@
+id: CHG-R1S-007
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: 'openGuestCreditAccount stores its account in orders.guest_credit_account and states its rules: one live
+  account per guest, the 25,000 AED ceiling, the escalated permission and the approval path.'
+decision:
+  what: GuestCreditAccount persists to orders.guest_credit_account; 409 guest-credit-account-exists, 422 credit-limit-exceeded;
+    requiresApproval false needs ORDER_DISCOUNT; a pending account is released through the approvals inbox.
+  by: Chinmay
+  date: '2026-10-03'
+why: 'the r1 gate of 3 October 2026 (a judge finding on the Sprint 1 and baseline tickets), SVC-ORDER-ORDERS-12:
+  the operation returned an id nothing stored.'
+keys_touched:
+  operations:
+  - openGuestCreditAccount
+  schemas:
+  - GuestCreditAccount
+  tables:
+  - orders.guest_credit_account
+root_class: 'new: write-lineage-gaps'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-write-lineage.py
+status: open

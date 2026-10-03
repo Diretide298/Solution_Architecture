@@ -24,7 +24,7 @@ changes/
 - **One file per entry**, so parallel branches never conflict. The file name is the id, a dash and
   a short lowercase slug: `CHG-FIN-003-guest-selects-currency.yaml`.
 - **Ids are allocated per batch.** A batch is one branch or one agent run, with its own code of 2 to
-  6 capital letters: `CHG-SEED-` (the seed of 2 October), `CHG-FIN-` (finance decisions), `CHG-WIR-`
+  6 capital letters or digits, starting with a letter (`R1S`, since CHG-R1S-024): `CHG-SEED-` (the seed of 2 October), `CHG-FIN-` (finance decisions), `CHG-WIR-`
   (wiring fixes), `CHG-GST-` (guest fixes). Number from `001` with no gaps inside the batch. Ask the
   lead for a new code; never reuse another branch's.
 - **Do not commit `CHANGELOG.md` from a branch.** It is regenerated at the refresh; editing it on
@@ -34,7 +34,7 @@ changes/
 
 | Field | Required | What it holds |
 |---|---|---|
-| `id` | yes | `CHG-<BATCH>-<nnn>`, pattern `^CHG-[A-Z]{2,6}-\d{3}$`; matches the file name |
+| `id` | yes | `CHG-<BATCH>-<nnn>`, pattern `^CHG-[A-Z][A-Z0-9]{1,5}-\d{3}$`; matches the file name |
 | `date` | yes | the day the change was made, `YYYY-MM-DD` |
 | `source` | yes | `mom` · `cr` · `audit` · `client-review` · `plan` · `design-input` · `developer` |
 | `kind` | yes | `spec` · `contract` · `plan` · `design-input` · `process` |

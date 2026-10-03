@@ -1,0 +1,44 @@
+id: CHG-R1S-002
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: The AI contracts say the guard is the provider's content-safety service and that no model is hosted in
+  the cell; scrubbing stays mandatory and fail-closed.
+decision:
+  what: 'contracts/satellite/ai.yaml (sendAiMessage description, the 503 and 422 responses, AiProviderKind, AiPolicy.scrubbing
+    and guardModel), shared/common.yaml AiResidencyClass and tenancy RegionSettings.aiResidencyClass: the guard
+    is Azure AI Content Safety in UAE North for uaeOnly and the provider''s own moderation for BYOK and globalAllowed;
+    with the scrubber or the safety service down the call is refused 503 scrubber-unavailable; the in-cell gpt-oss-120b
+    fallback is dropped; onPrem only where the client asks. Description text only: no field removed.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Chinmay, 3 October evening (docs/active/decisions/answers-3-october-gate-and-hosting.md, decision HOST-1,
+  overriding DEC-539 and DEC-543 in part), and the lead''s clarification the same evening: a guard model is itself
+  an LLM, and we never host one unless a client asks. Amends ADR-0020 and ADR-0009 (CHG-R1S-001).'
+keys_touched:
+  operations:
+  - sendAiMessage
+  schemas:
+  - AiPolicy
+  - AiProviderKind
+  - AiResidencyClass
+  - RegionSettings
+  files:
+  - contracts/satellite/ai.yaml
+  - contracts/shared/common.yaml
+  - contracts/spine/tenancy.yaml
+  other:
+  - HOST-1
+root_class: 'new: design-doc-behind-decisions'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-ai-residency.py
+status: open
+notes: 'Additive: descriptions and enum descriptions only, no field removed (the lead''s instruction). check-ai-residency
+  R-NOHOST fails on the parent commit (it names Qwen3Guard as ours).'

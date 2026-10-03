@@ -1,0 +1,33 @@
+id: CHG-R1S-019
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: calculateTax reads the taxable base from the catalogue.tax_profile row whose taxCodeId is the line's tax
+  code, and the account's ledger.tax_exemption rows; both are in its lineage.
+decision:
+  what: CalculateTaxRequest.discountsAreTaxInclusive description says how the profile is found; lineage reads add
+    catalogue.tax_profile and ledger.tax_exemption.
+  by: Chinmay
+  date: '2026-10-03'
+why: 'the r1 gate of 3 October 2026 (a judge finding on the Sprint 1 and baseline tickets), SVC-LEDGER-TAX-4 (blocker):
+  the base came from catalogue.TaxProfile.taxBase but nothing listed the catalogue table, and ledger.tax_code has
+  no profile column.'
+keys_touched:
+  operations:
+  - calculateTax
+  tables:
+  - catalogue.tax_profile
+  - ledger.tax_exemption
+  - ledger.tax_code
+root_class: 'new: write-lineage-gaps'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: none
+  reason: A read the description names and the lineage omits is found by reading prose; no rule reads it. Open for
+    the lead to accept none.
+status: open

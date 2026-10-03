@@ -2021,6 +2021,15 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: cardList
+        label: Load the product's attribute axes before they are replaced
+        operation: getProductAttributes
+        bindsTo: VariantDimension
+        columns:
+        - VariantDimension.code
+        - VariantDimension.name
+        - VariantDimension.values
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: multiSelect
         label: Kind
         operation: listProducts
@@ -2250,6 +2259,11 @@ screens:
     purpose: Change many products at once, with a preview
     trigger: onAction
     provenance: design-note correction, 2 October 2026 (BO-007)
+  - operationId: getProductAttributes
+    contract: catalogue
+    purpose: Load the product's attribute axes before they are replaced
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: productId
@@ -2473,6 +2487,15 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: cardList
+        label: Load the product's attribute axes before they are replaced
+        operation: getProductAttributes
+        bindsTo: VariantDimension
+        columns:
+        - VariantDimension.code
+        - VariantDimension.name
+        - VariantDimension.values
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: dataTable
         label: Every product variant
         bindsTo: ProductVariant
@@ -2699,6 +2722,11 @@ screens:
     purpose: The PDF ticket and the Apple and Google Wallet pass proofs of this product (DEC-151, CHG-CSP-038)
     trigger: onLoad
     provenance: design-note correction, 2 October 2026 (BO-008)
+  - operationId: getProductAttributes
+    contract: catalogue
+    purpose: Load the product's attribute axes before they are replaced
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: venueId
@@ -3860,6 +3888,44 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: cardList
+        label: Load the package pricing as saved
+        operation: getPackagePricingDefinition
+        bindsTo: PackagePricing
+        columns:
+        - PackagePricing.recordKind
+        - PackagePricing.name
+        - PackagePricing.pricingModel
+        - PackagePricing.addOnType
+        - PackagePricing.packagePrice
+        - PackagePricing.components
+        - PackagePricing.componentPriceVisibility
+        - PackagePricing.status
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
+      - kind: cardList
+        label: Load the bundle being edited
+        operation: getBundle
+        bindsTo: Bundle
+        columns:
+        - Bundle.code
+        - Bundle.name
+        - Bundle.description
+        - Bundle.kind
+        - Bundle.price
+        - Bundle.savingsAmount
+        - Bundle.savingsPercentage
+        - Bundle.hasBeenSold
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
+      - kind: cardList
+        label: List the combos and their slots
+        operation: listCombos
+        bindsTo: Combo
+        columns:
+        - Combo.name
+        - Combo.price
+        - Combo.availability
+        - Combo.isActive
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: dataTable
         label: Every bundle
         bindsTo: BundleSummary
@@ -4057,6 +4123,21 @@ screens:
     - listCatalogueBundles
     - getLatestBundle
     - listCommercialCampaigns
+  - operationId: listCombos
+    contract: fnb
+    purpose: List the combos and their slots
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
+  - operationId: getBundle
+    contract: promotions
+    purpose: Load the bundle being edited
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
+  - operationId: getPackagePricingDefinition
+    contract: catalogue
+    purpose: Load the package pricing as saved
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: version
@@ -4238,6 +4319,15 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: cardList
+        label: Load the product's attribute axes before they are replaced
+        operation: getProductAttributes
+        bindsTo: VariantDimension
+        columns:
+        - VariantDimension.code
+        - VariantDimension.name
+        - VariantDimension.values
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: textField
         label: Venue id
         operation: listProducts
@@ -4423,6 +4513,11 @@ screens:
     trigger: onAction
     invalidates:
     - listProducts
+  - operationId: getProductAttributes
+    contract: catalogue
+    purpose: Load the product's attribute axes before they are replaced
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: productId
@@ -10086,6 +10181,14 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: cardList
+        label: Show the rule's entry points before they are replaced
+        operation: listEntryRulePoints
+        bindsTo: AccessEntryRulePoint
+        columns:
+        - AccessEntryRulePoint.isActive
+        - AccessEntryRulePoint.createdAt
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: dataTable
         label: Admission profiles
         bindsTo: AdmissionRules
@@ -10161,6 +10264,11 @@ screens:
     provenance: decided 29 September, VM close-out (venue management and configuration)
     invalidates:
     - listAdmissionRules
+  - operationId: listEntryRulePoints
+    contract: access
+    purpose: Show the rule's entry points before they are replaced
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: profileId
@@ -12963,6 +13071,18 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: cardList
+        label: Show the delivery locations and the outlets mapped to them
+        operation: listDeliveryLocations
+        bindsTo: DeliveryLocation
+        columns:
+        - DeliveryLocation.kind
+        - DeliveryLocation.label
+        - DeliveryLocation.zone
+        - DeliveryLocation.isServiceable
+        - DeliveryLocation.unserviceableReason
+        - DeliveryLocation.walkTimeMinutes
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: multiSelect
         label: Kind
         operation: listOutlets
@@ -13169,6 +13289,11 @@ screens:
     purpose: Assign serving outlets to delivery locations
     trigger: onAction
     provenance: build, 29 September 2026
+  - operationId: listDeliveryLocations
+    contract: fnb
+    purpose: Show the delivery locations and the outlets mapped to them
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: outletId
@@ -18763,7 +18888,19 @@ screens:
     regions:
     - name: contentBody
       slot: collection
-      components: []
+      components:
+      - kind: cardList
+        label: Show the delivery locations and the outlets mapped to them
+        operation: listDeliveryLocations
+        bindsTo: DeliveryLocation
+        columns:
+        - DeliveryLocation.kind
+        - DeliveryLocation.label
+        - DeliveryLocation.zone
+        - DeliveryLocation.isServiceable
+        - DeliveryLocation.unserviceableReason
+        - DeliveryLocation.walkTimeMinutes
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
     - name: contextPanel
       slot: selection
       components:
@@ -18879,6 +19016,11 @@ screens:
     purpose: Set the rules every till in the venue opens and closes to
     trigger: onAction
     provenance: design-note correction, 2 October 2026 (BO-065)
+  - operationId: listDeliveryLocations
+    contract: fnb
+    purpose: Show the delivery locations and the outlets mapped to them
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: venueId
@@ -29758,6 +29900,27 @@ screens:
     - name: contentBody
       slot: fields
       components:
+      - kind: cardList
+        label: Show the substitution rules before they are replaced
+        operation: listSubstitutionRules
+        bindsTo: SubstitutionRule
+        columns:
+        - SubstitutionRule.ratio
+        - SubstitutionRule.requiresApproval
+        - SubstitutionRule.isActive
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
+      - kind: cardList
+        label: Show the recipe's approved substitutions
+        operation: listIngredientSubstitutes
+        bindsTo: FnbIngredientSubstitute
+        columns:
+        - FnbIngredientSubstitute.substitutionRatio
+        - FnbIngredientSubstitute.conditionsJson
+        - FnbIngredientSubstitute.allergensAddedJson
+        - FnbIngredientSubstitute.allergensRemovedJson
+        - FnbIngredientSubstitute.requiresApproval
+        - FnbIngredientSubstitute.isActive
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: searchField
         label: Search ingredient substitution, allergen
         provenance: carried from the previous definition
@@ -29875,6 +30038,16 @@ screens:
     purpose: List recipes
     trigger: onLoad
     provenance: merged from BO-110, 2 October 2026
+  - operationId: listIngredientSubstitutes
+    contract: fnb
+    purpose: Show the recipe's approved substitutions
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
+  - operationId: listSubstitutionRules
+    contract: fnb
+    purpose: Show the substitution rules before they are replaced
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: venueId
@@ -30890,6 +31063,20 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: detailPanel
+        label: Show the import's progress and its findings
+        operation: getCatalogueImportJob
+        bindsTo: CatalogueImportJob
+        columns:
+        - CatalogueImportJob.status
+        - CatalogueImportJob.outcome
+        - CatalogueImportJob.parsedCount
+        - CatalogueImportJob.createCount
+        - CatalogueImportJob.updateCount
+        - CatalogueImportJob.jobKind
+        - CatalogueImportJob.warningCount
+        - CatalogueImportJob.errorCount
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: searchField
         label: Search product import, governance
         provenance: carried from the previous definition
@@ -30914,9 +31101,11 @@ screens:
       distinct from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on venueId, kind and the product import governance are
       still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_CONFIGURE`, which `importProductCatalogue` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: 'Shown when the caller lacks `PRODUCT_VIEW`, which `getCatalogueImportJob` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `generateConfiguration`;
+      `PRODUCT_CONFIGURE` for `importProductCatalogue`, `commitCatalogueImport`.'
   apis:
   - operationId: importProductCatalogue
     contract: catalogue
@@ -30931,6 +31120,11 @@ screens:
     purpose: Apply a parsed catalogue import
     trigger: onAction
     provenance: decided 29 September, VM close-out (venue management and configuration)
+  - operationId: getCatalogueImportJob
+    contract: catalogue
+    purpose: Show the import's progress and its findings
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: venueId
@@ -33065,6 +33259,18 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: cardList
+        label: Load the offline policy saved at this scope
+        operation: getOfflinePolicy
+        bindsTo: OfflinePolicy
+        columns:
+        - OfflinePolicy.maxOfflineHours
+        - OfflinePolicy.allowedOffline
+        - OfflinePolicy.offlineValueCeiling
+        - OfflinePolicy.offlineTransactionCeiling
+        - OfflinePolicy.onCeilingBreach
+        - OfflinePolicy.requiresManagerToExtend
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: textField
         label: Workstation id
         operation: listSyncRejections
@@ -33151,6 +33357,11 @@ screens:
     purpose: Record what was done about each refused entry
     trigger: onAction
     provenance: wiring fix, 2 October 2026 (CHG-WIR-025)
+  - operationId: getOfflinePolicy
+    contract: tenancy
+    purpose: Load the offline policy saved at this scope
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: venueId
@@ -34165,6 +34376,16 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: cardList
+        label: Load the outlet's course rules as saved
+        operation: getCourseRules
+        bindsTo: CourseRules
+        columns:
+        - CourseRules.defaultCoursing
+        - CourseRules.courseNames
+        - CourseRules.autoFireMinutes
+        - CourseRules.serviceModeOverrides
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: searchField
         label: Search f
         provenance: carried from the previous definition
@@ -34215,6 +34436,11 @@ screens:
     purpose: How each outlet courses by default
     trigger: onAction
     provenance: wiring fix, 2 October 2026 (CHG-WIR-008)
+  - operationId: getCourseRules
+    contract: fnb
+    purpose: Load the outlet's course rules as saved
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: venueId
@@ -38614,6 +38840,20 @@ screens:
     - name: contentBody
       slot: fields
       components:
+      - kind: detailPanel
+        label: Load the configuration as saved
+        operation: getBleBeaconGeofence
+        bindsTo: BleBeaconGeofenceConfigurationView
+        columns:
+        - BleBeaconGeofenceConfigurationView.beaconName
+        - BleBeaconGeofenceConfigurationView.venue
+        - BleBeaconGeofenceConfigurationView.zone
+        - BleBeaconGeofenceConfigurationView.gate
+        - BleBeaconGeofenceConfigurationView.proximityThreshold
+        - BleBeaconGeofenceConfigurationView.activeInactive
+        - BleBeaconGeofenceConfigurationView.health
+        - BleBeaconGeofenceConfigurationView.lastDetected
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: textField
         label: Beacon name
         provenance: pack Access Control Module_Reference.pdf, page 34 §Configure
@@ -38680,6 +38920,11 @@ screens:
     contract: access
     purpose: BLE Beacon & Geofence Configuration
     trigger: onAction
+  - operationId: getBleBeaconGeofence
+    contract: access
+    purpose: Load the configuration as saved
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   wireframe:
     status: notStarted
     provenance: generated
@@ -40566,6 +40811,16 @@ screens:
     - name: contentBody
       slot: fields
       components:
+      - kind: detailPanel
+        label: Load the profile as saved
+        operation: getBiometricVerificationProfile
+        bindsTo: BiometricVerificationProfileBuilderView
+        columns:
+        - BiometricVerificationProfileBuilderView.faceRequirement
+        - BiometricVerificationProfileBuilderView.biometricType
+        - BiometricVerificationProfileBuilderView.selectType
+        - BiometricVerificationProfileBuilderView.name
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: selectField
         label: Ticket Product
         provenance: pack Access Control Module_Reference.pdf, page 58 §Select
@@ -40608,6 +40863,11 @@ screens:
     contract: access
     purpose: Biometric Verification Profile Builder
     trigger: onAction
+  - operationId: getBiometricVerificationProfile
+    contract: access
+    purpose: Load the profile as saved
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   wireframe:
     status: notStarted
     provenance: generated
@@ -40663,6 +40923,20 @@ screens:
     - name: contentBody
       slot: fields
       components:
+      - kind: detailPanel
+        label: Load the configuration as saved
+        operation: getFacePassEnrollmentConfiguration
+        bindsTo: FacePassEnrollmentConfigurationView
+        columns:
+        - FacePassEnrollmentConfigurationView.enrollmentChannels
+        - FacePassEnrollmentConfigurationView.accountLoginRequired
+        - FacePassEnrollmentConfigurationView.validTicketPassRequired
+        - FacePassEnrollmentConfigurationView.identityCheckRequired
+        - FacePassEnrollmentConfigurationView.numberOfCaptureAttempts
+        - FacePassEnrollmentConfigurationView.minimumImageQuality
+        - FacePassEnrollmentConfigurationView.operatorVerification
+        - FacePassEnrollmentConfigurationView.enrollmentExpiry
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: multiSelect
         label: Enrolment channels
         provenance: pack Access Control Module_Reference.pdf, page 59 §Capture Required Consent
@@ -40725,6 +40999,11 @@ screens:
     contract: access
     purpose: Face Pass Enrollment Configuration
     trigger: onAction
+  - operationId: getFacePassEnrollmentConfiguration
+    contract: access
+    purpose: Load the configuration as saved
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   wireframe:
     status: notStarted
     provenance: generated
@@ -60365,6 +60644,20 @@ screens:
     - name: contentBody
       slot: fields
       components:
+      - kind: detailPanel
+        label: Load the configuration as saved
+        operation: getVirtualTicketIdentity
+        bindsTo: VirtualTicketIdentityMasterRecordConfigurationView
+        columns:
+        - VirtualTicketIdentityMasterRecordConfigurationView.idGenerationPattern
+        - VirtualTicketIdentityMasterRecordConfigurationView.ticketClassification
+        - VirtualTicketIdentityMasterRecordConfigurationView.ticketOwnershipModel
+        - VirtualTicketIdentityMasterRecordConfigurationView.holderAssignmentRequirements
+        - VirtualTicketIdentityMasterRecordConfigurationView.transferabilityReference
+        - VirtualTicketIdentityMasterRecordConfigurationView.validityModel
+        - VirtualTicketIdentityMasterRecordConfigurationView.consumptionModel
+        - VirtualTicketIdentityMasterRecordConfigurationView.entitlementModel
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: selectField
         label: ID generation pattern
         provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 6 §Configure
@@ -60410,6 +60703,11 @@ screens:
     contract: access
     purpose: Virtual Ticket Identity & Master Record Configuration
     trigger: onAction
+  - operationId: getVirtualTicketIdentity
+    contract: access
+    purpose: Load the configuration as saved
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   wireframe:
     status: notStarted
     provenance: generated
@@ -61812,6 +62110,20 @@ screens:
     - name: contentBody
       slot: fields
       components:
+      - kind: detailPanel
+        label: Load the design as saved
+        operation: getPdfPrintablePos
+        bindsTo: PdfPrintablePosTicketDesignerView
+        columns:
+        - PdfPrintablePosTicketDesignerView.outputFormat
+        - PdfPrintablePosTicketDesignerView.pageSize
+        - PdfPrintablePosTicketDesignerView.orientation
+        - PdfPrintablePosTicketDesignerView.margins
+        - PdfPrintablePosTicketDesignerView.header
+        - PdfPrintablePosTicketDesignerView.footer
+        - PdfPrintablePosTicketDesignerView.qrBarcode
+        - PdfPrintablePosTicketDesignerView.paperStockType
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: selectField
         label: Orientation
         provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure
@@ -61913,6 +62225,11 @@ screens:
     contract: access
     purpose: PDF, Printable & POS Ticket Designer
     trigger: onAction
+  - operationId: getPdfPrintablePos
+    contract: access
+    purpose: Load the design as saved
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   wireframe:
     status: notStarted
     provenance: generated
@@ -91497,6 +91814,18 @@ screens:
     - name: contentBody
       slot: fields
       components:
+      - kind: cardList
+        label: Show the programmes, the one being changed among them
+        operation: listAccreditationProgrammes
+        bindsTo: AccreditationProgramme
+        columns:
+        - AccreditationProgramme.code
+        - AccreditationProgramme.name
+        - AccreditationProgramme.applicationsOpenAt
+        - AccreditationProgramme.applicationsCloseAt
+        - AccreditationProgramme.isTemplate
+        - AccreditationProgramme.status
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: selectField
         label: Field requirement
         provenance: pack ACCREDITATION.pdf, page 5 §Fields may be configured as
@@ -91541,6 +91870,11 @@ screens:
     purpose: Open one form at a version
     trigger: onAction
     provenance: wiring fix, 2 October 2026 (CHG-WIR-005)
+  - operationId: listAccreditationProgrammes
+    contract: accreditation
+    purpose: Show the programmes, the one being changed among them
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-618
@@ -110319,6 +110653,15 @@ screens:
     regions:
     - name: contentBody
       components:
+      - kind: cardList
+        label: Load the copilot configuration as saved
+        operation: getCustomerServiceCopilot
+        bindsTo: AiCustomerServiceCopilotKnowledgeWorkspaceView
+        columns:
+        - AiCustomerServiceCopilotKnowledgeWorkspaceView.configuration
+        - AiCustomerServiceCopilotKnowledgeWorkspaceView.effective
+        - AiCustomerServiceCopilotKnowledgeWorkspaceView.knowledgeCollections
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: primaryButton
         derived: true
         impliedBy: setCustomerServiceCopilot
@@ -110371,6 +110714,11 @@ screens:
     purpose: Add a document to a collection
     trigger: onAction
     provenance: wiring fix, 2 October 2026 (CHG-WIR-005)
+  - operationId: getCustomerServiceCopilot
+    contract: marketing-crm
+    purpose: Load the copilot configuration as saved
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-798
@@ -113447,6 +113795,18 @@ screens:
     regions:
     - name: contentBody
       components:
+      - kind: cardList
+        label: Show the loyalty campaigns
+        operation: listLoyaltyCampaigns
+        bindsTo: MarketingLoyaltyCampaign
+        columns:
+        - MarketingLoyaltyCampaign.code
+        - MarketingLoyaltyCampaign.name
+        - MarketingLoyaltyCampaign.startAt
+        - MarketingLoyaltyCampaign.endAt
+        - MarketingLoyaltyCampaign.isActive
+        - MarketingLoyaltyCampaign.createdAt
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: detailPanel
         label: Rules in force
         bindsTo: LoyaltyRuleSet
@@ -113488,6 +113848,11 @@ screens:
     purpose: Every rule the programme runs on
     trigger: onLoad
     provenance: wiring fix, 2 October 2026 (CHG-WIR-005)
+  - operationId: listLoyaltyCampaigns
+    contract: marketing-crm
+    purpose: Show the loyalty campaigns
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-827
@@ -113552,7 +113917,29 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: cardList
+        label: Show the rewards a milestone can give
+        operation: listRewards
+        bindsTo: MarketingReward
+        columns:
+        - MarketingReward.code
+        - MarketingReward.name
+        - MarketingReward.type
+        - MarketingReward.pointsCost
+        - MarketingReward.discountValue
+        - MarketingReward.validityDays
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
+      - kind: dataTable
+        label: Show the programmes and their milestones
+        operation: listLoyaltyProgrammes
+        bindsTo: LoyaltyProgramme
+        columns:
+        - LoyaltyProgramme.code
+        - LoyaltyProgramme.name
+        - LoyaltyProgramme.pointsExpireAfterMonths
+        - LoyaltyProgramme.isActive
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
     - name: actionBar
       slot: rowActions
       components:
@@ -113586,6 +113973,16 @@ screens:
     purpose: Define a reward and its points cost
     trigger: onAction
     provenance: decided 29 September, VM close-out (venue management and configuration)
+  - operationId: listLoyaltyProgrammes
+    contract: marketing-crm
+    purpose: Show the programmes and their milestones
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
+  - operationId: listRewards
+    contract: marketing-crm
+    purpose: Show the rewards a milestone can give
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-828
@@ -119422,6 +119819,28 @@ screens:
         provenance: contract resources.yaml PUT /experiences/{experienceId}/resource-requirements
     - name: contentBody
       components:
+      - kind: cardList
+        label: List the resources the assignment rules choose from
+        operation: listResources
+        bindsTo: Resource
+        columns:
+        - Resource.code
+        - Resource.name
+        - Resource.setupMinutes
+        - Resource.teardownMinutes
+        - Resource.depositAmount
+        - Resource.status
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
+      - kind: cardList
+        label: Load the experience's resource requirements
+        operation: getExperienceResourceRequirements
+        bindsTo: ResourceRequirement
+        columns:
+        - ResourceRequirement.quantity
+        - ResourceRequirement.mandatory
+        - ResourceRequirement.requiredQualifications
+        - ResourceRequirement.requiredAttributes
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: dataTable
         label: Requirement rules
         operation: setExperienceResourceRequirements
@@ -119456,6 +119875,16 @@ screens:
       action(s) Minimum requirement, Preferred requirement, Mandatory requirement'
     invalidates:
     - suggestResources
+  - operationId: getExperienceResourceRequirements
+    contract: resources
+    purpose: Load the experience's resource requirements
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
+  - operationId: listResources
+    contract: resources
+    purpose: List the resources the assignment rules choose from
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-877
@@ -161833,6 +162262,20 @@ screens:
     - name: contentBody
       slot: fields
       components:
+      - kind: detailPanel
+        label: Load the tax profile and jurisdiction as saved
+        operation: getTaxProfileJurisdiction
+        bindsTo: TaxProfileJurisdictionConfigurationView
+        columns:
+        - TaxProfileJurisdictionConfigurationView.taxProfileName
+        - TaxProfileJurisdictionConfigurationView.taxProfileCode
+        - TaxProfileJurisdictionConfigurationView.country
+        - TaxProfileJurisdictionConfigurationView.taxRegistrationNumber
+        - TaxProfileJurisdictionConfigurationView.status
+        - TaxProfileJurisdictionConfigurationView.ratePercent
+        - TaxProfileJurisdictionConfigurationView.consumingProductCount
+        - TaxProfileJurisdictionConfigurationView.consumingVenueCount
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: selectField
         label: Tax Profile Name
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 40 §Configure
@@ -161942,6 +162385,11 @@ screens:
     purpose: Configure the e-invoicing provider
     trigger: onAction
     provenance: build, 29 September 2026
+  - operationId: getTaxProfileJurisdiction
+    contract: catalogue
+    purpose: Load the tax profile and jurisdiction as saved
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   wireframe:
     status: notStarted
     provenance: generated
@@ -184710,6 +185158,15 @@ screens:
     - name: contentBody
       slot: fields
       components:
+      - kind: dataTable
+        label: Show the approval matrices, the one being changed among them
+        operation: listApprovalMatrices
+        bindsTo: ApprovalMatrix
+        columns:
+        - ApprovalMatrix.kind
+        - ApprovalMatrix.scopeLevel
+        - ApprovalMatrix.isActive
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: selectField
         label: User
         provenance: pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 13 §Define
@@ -184792,6 +185249,11 @@ screens:
     purpose: Set role authority and approval limits
     trigger: onAction
     provenance: decided 29 September, readiness close-out (QA wiring note)
+  - operationId: listApprovalMatrices
+    contract: approvals
+    purpose: Show the approval matrices, the one being changed among them
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   wireframe:
     status: notStarted
     provenance: generated

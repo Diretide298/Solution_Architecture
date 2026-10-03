@@ -1,0 +1,45 @@
+id: CHG-R1S-003
+date: '2026-10-03'
+source: audit
+kind: spec
+summary: DEC-001, 019, 144, 168, 539, 540, 542 to 547 are marked applied with the closed entries that applied them,
+  and the 3 October hosting decision is a later round (HOST-1) overriding DEC-539 and DEC-543 in part.
+decision:
+  what: handoff/decisions-2-october.json gains the status `applied` (status_values), the twelve rows take it with
+    applied_by naming their closed change entries, and HOST-1 joins later_rounds; tools/build-audit-decisions.py
+    renders `applied`, reads HOST-n references, and fails when an applied row names no entry or one that is not
+    closed. docs/registers/decisions-2-october.md is regenerated.
+  by: Chinmay
+  date: '2026-10-03'
+why: 'the HLD/LLD cross-check of 3 October 2026 (handoff-out/r1/HLD-LLD/CROSSCHECK.md, a PKG finding): twelve decisions
+  were still `to-apply` with an empty applied_by while closed entries (CHG-CSA-001 and others) had applied them.'
+keys_touched:
+  files:
+  - handoff/decisions-2-october.json
+  - docs/registers/decisions-2-october.md
+  - tools/build-audit-decisions.py
+  other:
+  - DEC-001
+  - DEC-019
+  - DEC-144
+  - DEC-168
+  - DEC-539
+  - DEC-540
+  - DEC-542
+  - DEC-543
+  - DEC-544
+  - DEC-545
+  - DEC-546
+  - DEC-547
+  - HOST-1
+root_class: 'new: register-status-drift'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/build-audit-decisions.py::closed_ids
+status: open

@@ -1,0 +1,33 @@
+id: CHG-R1S-024
+date: '2026-10-03'
+source: audit
+kind: process
+summary: 'A batch code may carry digits after its first letter (R1S): the id pattern is ^CHG-[A-Z][A-Z0-9]{1,5}-\d{3}$
+  in the schema, the README and every tool that reads ids.'
+decision:
+  what: changes/schema.yaml id_pattern and why_cites, changes/README.md, and the id regexes in check-changelog,
+    check-design-notes, check-candidate-decisions, build-audit-decisions and build-design-inputs.
+  by: Chinmay
+  date: '2026-10-03'
+why: The lead's brief for this batch (SPEC-FIX-BRIEF, batch code R1S for the r1 gate fixes) named a code the old
+  pattern [A-Z]{2,6} refused; check-changelog failed every R1S entry (finding).
+keys_touched:
+  files:
+  - changes/schema.yaml
+  - changes/README.md
+  - tools/check-changelog.py
+  - tools/check-design-notes.py
+  - tools/check-candidate-decisions.py
+  - tools/build-audit-decisions.py
+  - tools/build-design-inputs.py
+root_class: 'new: id-pattern'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-changelog.py
+status: open

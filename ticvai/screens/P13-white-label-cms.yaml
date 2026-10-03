@@ -422,8 +422,11 @@ screens:
         - BrandIdentity.splashBackgroundColour
         - BrandIdentity.showLoadingIndicator
         - BrandIdentity.splashChangeScope
+        - BrandIdentity.showPoweredBy
         operation: getBrandIdentity
         provenance: contract white-label.yaml GET /tenant-config/brand
+        notes: '**The Powered-by credit is shown here read-only** and edited on CMS-104 (Chinmay, 3 October
+          2026, flow-brief defaults: "Powered-by toggle on CMS-104, shown read-only on CMS-002"; CHG-R1S-012).'
       - kind: fileUpload
         label: Upload a logo
         operation: createUpload
@@ -487,6 +490,7 @@ screens:
       `logoVariant` (light, dark or duotone: which lockup sits in the nav bar and which colour reading
       of it drives the theme, decided 29 September, rev 3 CFG-4), `logoDarkAssetRef`, `faviconAssetRef`,
       `splashImageAssetRefs`, `splashDurationSeconds`, `splashBackgroundColour`, `showLoadingIndicator`.
+      **`showPoweredBy` is not asked here**: it is sent as read, and changed only on CMS-104 (CHG-R1S-012).
       Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: BrandIdentity
     confirm:
@@ -1874,7 +1878,21 @@ screens:
     regions:
     - name: contentBody
       slot: collection
-      components: []
+      components:
+      - kind: cardList
+        label: Load the working header and footer
+        operation: getTenantConfig
+        bindsTo: TenantConfig
+        columns:
+        - TenantConfig.brand
+        - TenantConfig.appIcons
+        - TenantConfig.bookingFlow
+        - TenantConfig.bookingFlows
+        - TenantConfig.theme
+        - TenantConfig.fonts
+        - TenantConfig.footer
+        - TenantConfig.expectedBackAt
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
     - name: contextPanel
       slot: selection
       components: []
@@ -1973,6 +1991,11 @@ screens:
     contract: white-label
     purpose: Build a deep link to a target for a tenant's own site (DEC-548)
     trigger: onAction
+  - operationId: getTenantConfig
+    contract: white-label
+    purpose: Load the working header and footer
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed

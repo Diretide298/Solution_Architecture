@@ -1,0 +1,32 @@
+id: CHG-R1S-013
+date: '2026-10-03'
+source: design-input
+kind: spec
+summary: Flow F89 step 5 no longer calls syncOrders, the till's own replay; the back office reads the refusals there
+  (listSyncRejections) and resolves them on BO-130.
+decision:
+  what: flows/F89 step 5 keeps BO-037 and listSyncRejections and drops syncOrders, with a note.
+  by: Chinmay
+  date: '2026-10-03'
+why: 'The lead''s design-batch cross-check finding of 3 October: the step called syncOrders (workstation scope,
+  ORDER_CREATE, bound on POS-013), which a back-office screen does not perform.'
+keys_touched:
+  flows:
+  - F89
+  operations:
+  - syncOrders
+  - listSyncRejections
+  - resolveSyncRejection
+root_class: 'new: flow-step-actor'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: none
+  reason: 'Which actor performs a step is a judgement: a rule ''no back-office step calls a workstation-scoped operation''
+    flags five legitimate steps (getWorkstation on BO-036, capturePayment on BO-024). Left open for the lead to
+    accept none or ask for a narrower rule.'
+status: open

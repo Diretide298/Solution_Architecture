@@ -7,7 +7,7 @@ version: 1
 # One file per change: changes/entries/<id>-<slug>.yaml. Ids are allocated per batch (one batch per
 # branch or agent run): CHG-SEED-001, CHG-FIN-001, CHG-WIR-001, CHG-GST-001 ... and run 001, 002, ...
 # with no gap inside a batch. Two branches never share a batch code, so they never collide on merge.
-id_pattern: '^CHG-[A-Z]{2,6}-\d{3}$'
+id_pattern: '^CHG-[A-Z][A-Z0-9]{1,5}-\d{3}$'
 slug_pattern: '^[a-z0-9]+(-[a-z0-9]+)*$'
 
 required: [id, date, source, kind, summary, decision, why, keys_touched, root_class, tickets,
@@ -36,7 +36,7 @@ why_cites:
   - '\bCR[- ]?\d+\b|\bCF-\d+\b|\bQ\d+\b'              # an ADAM CR, a conflict, a client question
   - '\bfinding\b|\bcorrection\b'                      # a process-agent or audit finding
   - '\b[0-9a-f]{8,40}\b'                              # a commit
-  - '\bCHG-[A-Z]{2,6}-\d{3}\b'                        # an earlier change
+  - '\bCHG-[A-Z][A-Z0-9]{1,5}-\d{3}\b'                        # an earlier change
 
 # When `source` is mom, client_signoff is required: {by: <name>, date: YYYY-MM-DD} or "pending".
 # Sign-offs are batched weekly; silence for 5 working days after the batch is sent is acceptance
