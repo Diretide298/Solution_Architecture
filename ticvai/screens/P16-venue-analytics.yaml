@@ -266,15 +266,9 @@ screens:
         label: Every alert
         bindsTo: Alert
         columns:
-        - Alert.id
-        - Alert.ruleId
         - Alert.raisedAt
         - Alert.severity
         - Alert.status
-        - Alert.observedValue
-        - Alert.threshold
-        - Alert.scopePath
-        - Alert.acknowledgedByPrincipalId
         - Alert.acknowledgedAt
         - Alert.resolvedAt
         - Alert.escalatedAt
@@ -297,8 +291,6 @@ screens:
         label: The selected alert
         bindsTo: Alert
         columns:
-        - Alert.id
-        - Alert.ruleId
         - Alert.ruleName
         - Alert.metric
         - Alert.raisedAt
@@ -306,13 +298,7 @@ screens:
         - Alert.status
         - Alert.observedValue
         - Alert.threshold
-        - Alert.scopePath
-        - Alert.workstationId
-        - Alert.shiftId
-        - Alert.itemId
-        - Alert.acknowledgedByPrincipalId
         - Alert.acknowledgedAt
-        - Alert.acknowledgementNote
         operation: listAlerts
         provenance: contract reporting.yaml GET /alerts
       - kind: detailPanel
@@ -416,9 +402,9 @@ screens:
       operations, states, entry params and exits, and it is better specified than anything derived from
       the screen file.'
     derivedFrom: wireframes/POS Board 6.dc.html#pos-6a
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   purposeNote: Provide senior management with an immediate consolidated view of overall organizational
     performance.
   gaps:
@@ -582,9 +568,9 @@ screens:
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-6L in the client Retail pack.**'
     derivedFrom: wireframes/Retail Board 6.dc.html#ret-6l
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRunReport
     component: modal
@@ -691,15 +677,9 @@ screens:
         label: Every alert
         bindsTo: Alert
         columns:
-        - Alert.id
-        - Alert.ruleId
         - Alert.raisedAt
         - Alert.severity
         - Alert.status
-        - Alert.observedValue
-        - Alert.threshold
-        - Alert.scopePath
-        - Alert.acknowledgedByPrincipalId
         - Alert.acknowledgedAt
         - Alert.resolvedAt
         - Alert.escalatedAt
@@ -709,32 +689,23 @@ screens:
         label: Every registered device
         bindsTo: RegisteredDevice
         columns:
-        - RegisteredDevice.id
         - RegisteredDevice.kind
         - RegisteredDevice.driver
         - RegisteredDevice.identifier
-        - RegisteredDevice.workstationId
         - RegisteredDevice.model
         - RegisteredDevice.pushToken
-        - RegisteredDevice.pushPlatform
         - RegisteredDevice.pushFailureCount
-        - RegisteredDevice.offlineScope
-        - RegisteredDevice.firmwareVersion
-        - RegisteredDevice.isRequired
         operation: listDevices
         provenance: contract tenancy.yaml GET /devices
       - kind: dataTable
         label: Every principal
         bindsTo: Principal
         columns:
-        - Principal.id
         - Principal.username
         - Principal.displayName
         - Principal.isActive
         - Principal.validFrom
         - Principal.validTo
-        - Principal.primaryRoleId
-        - Principal.roles
         - Principal.lastLoginAt
         operation: listPrincipals
         provenance: contract identity.yaml GET /principals
@@ -755,8 +726,6 @@ screens:
         label: The selected alert
         bindsTo: Alert
         columns:
-        - Alert.id
-        - Alert.ruleId
         - Alert.ruleName
         - Alert.metric
         - Alert.raisedAt
@@ -764,13 +733,7 @@ screens:
         - Alert.status
         - Alert.observedValue
         - Alert.threshold
-        - Alert.scopePath
-        - Alert.workstationId
-        - Alert.shiftId
-        - Alert.itemId
-        - Alert.acknowledgedByPrincipalId
         - Alert.acknowledgedAt
-        - Alert.acknowledgementNote
         operation: listAlerts
         provenance: contract reporting.yaml GET /alerts
       - kind: detailPanel
@@ -854,9 +817,9 @@ screens:
       — it carries operations, states, entry params and exits, and it is better specified than anything
       derived from the screen file.'
     derivedFrom: wireframes/POS Board 6.dc.html#pos-6b
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRunReport
     component: modal
@@ -961,16 +924,10 @@ screens:
         label: Every product
         bindsTo: Product
         columns:
-        - Product.id
         - Product.code
         - Product.name
         - Product.description
         - Product.kind
-        - Product.venueId
-        - Product.scopePath
-        - Product.createdByPrincipalId
-        - Product.approvedByPrincipalId
-        - Product.responsibleDepartmentId
         - Product.onSaleFrom
         - Product.onSaleTo
         operation: listProducts
@@ -992,22 +949,14 @@ screens:
         label: The selected product
         bindsTo: Product
         columns:
-        - Product.id
         - Product.code
         - Product.name
         - Product.description
         - Product.kind
-        - Product.venueId
-        - Product.scopePath
-        - Product.createdByPrincipalId
-        - Product.approvedByPrincipalId
-        - Product.responsibleDepartmentId
         - Product.onSaleFrom
         - Product.onSaleTo
-        - Product.categoryId
         - Product.lifecycleState
         - Product.isSellable
-        - Product.isStockTracked
         operation: listProducts
         provenance: contract catalogue.yaml GET /products
       - kind: detailPanel
@@ -1081,9 +1030,9 @@ screens:
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-6C in the client Retail pack.**'
     derivedFrom: wireframes/Retail Board 6.dc.html#ret-6c
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRunReport
     component: modal
@@ -1251,9 +1200,9 @@ screens:
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-6F in the client Retail pack.**'
     derivedFrom: wireframes/Retail Board 6.dc.html#ret-6f
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRunReport
     component: modal
@@ -1345,15 +1294,11 @@ screens:
         label: Every stock batch
         bindsTo: StockBatch
         columns:
-        - StockBatch.id
-        - StockBatch.itemId
-        - StockBatch.locationId
         - StockBatch.batchCode
         - StockBatch.lotNumber
         - StockBatch.quantity
         - StockBatch.receivedAt
         - StockBatch.expiresAt
-        - StockBatch.supplierId
         - StockBatch.status
         operation: listExpiringBatches
         provenance: contract inventory.yaml GET /stock-batches/expiring
@@ -1374,15 +1319,11 @@ screens:
         label: The selected stock batch
         bindsTo: StockBatch
         columns:
-        - StockBatch.id
-        - StockBatch.itemId
-        - StockBatch.locationId
         - StockBatch.batchCode
         - StockBatch.lotNumber
         - StockBatch.quantity
         - StockBatch.receivedAt
         - StockBatch.expiresAt
-        - StockBatch.supplierId
         - StockBatch.status
         operation: listExpiringBatches
         provenance: contract inventory.yaml GET /stock-batches/expiring
@@ -1480,9 +1421,9 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
     derivedFrom: wireframes/Retail Board 6.dc.html#ret-6d
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRunReport
     component: modal
@@ -1571,11 +1512,7 @@ screens:
         columns:
         - Segment.name
         - Segment.description
-        - Segment.venueId
         - Segment.match
-        - Segment.criteria
-        - Segment.excludeSegmentIds
-        - Segment.id
         - Segment.lastEvaluatedSize
         - Segment.lastEvaluatedAt
         operation: listSegments
@@ -1701,9 +1638,9 @@ screens:
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-6E in the client Retail pack.**'
     derivedFrom: wireframes/Retail Board 6.dc.html#ret-6e
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRunReport
     component: modal
@@ -1865,9 +1802,9 @@ screens:
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-6G in the client Retail pack.**'
     derivedFrom: wireframes/Retail Board 6.dc.html#ret-6g
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formAskReportingQuestion
     component: modal
@@ -1976,15 +1913,9 @@ screens:
         label: Waiting for a decision
         bindsTo: Alert
         columns:
-        - Alert.id
-        - Alert.ruleId
         - Alert.raisedAt
         - Alert.severity
         - Alert.status
-        - Alert.observedValue
-        - Alert.threshold
-        - Alert.scopePath
-        - Alert.acknowledgedByPrincipalId
         - Alert.acknowledgedAt
         - Alert.resolvedAt
         - Alert.escalatedAt
@@ -1994,14 +1925,10 @@ screens:
         label: Every order
         bindsTo: OrderSummary
         columns:
-        - OrderSummary.id
         - OrderSummary.orderNumber
         - OrderSummary.status
-        - OrderSummary.grossAmount
-        - OrderSummary.refundedAmount
         - OrderSummary.channel
         - OrderSummary.lineCount
-        - OrderSummary.principalId
         - OrderSummary.holdLabel
         - OrderSummary.heldUntil
         operation: listOrders
@@ -2010,17 +1937,11 @@ screens:
         label: Every proposed action
         bindsTo: ProposedAction
         columns:
-        - ProposedAction.id
-        - ProposedAction.interactionId
         - ProposedAction.kind
         - ProposedAction.targetContract
         - ProposedAction.targetOperation
-        - ProposedAction.payload
-        - ProposedAction.summary
         - ProposedAction.status
         - ProposedAction.approvalLevel
-        - ProposedAction.decidedByPrincipalId
-        - ProposedAction.decisionReason
         - ProposedAction.proposedAt
         operation: listProposedActions
         notes: '**What a caller sees follows who may decide** (decided 28 September, audit R213 (3)):
@@ -2178,9 +2099,9 @@ screens:
       operations, states, entry params and exits, and it is better specified than anything derived from
       the screen file.'
     derivedFrom: wireframes/POS Board 6.dc.html#pos-6e
-  apisNote: Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formAskReportingQuestion
     component: modal
@@ -2421,9 +2342,9 @@ screens:
       operations, states, entry params and exits, and it is better specified than anything derived from
       the screen file.'
     derivedFrom: wireframes/POS Board 6.dc.html#pos-6f
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRecordSuggestionOutcome
     component: modal
@@ -3482,8 +3403,6 @@ screens:
         - AiInsight.title
         - AiInsight.kind
         - AiInsight.priority
-        - AiInsight.metricKey
-        - AiInsight.magnitude
         - AiInsight.status
         - AiInsight.detectedAt
         operation: listAiInsights
@@ -3525,7 +3444,6 @@ screens:
         - AiMetricChangeExplanation.drivers
         - AiMetricChangeExplanation.narrative
         - AiMetricChangeExplanation.reliability
-        - AiMetricChangeExplanation.dataAsOf
         operation: explainMetricChange
         notes: The drivers in order of contribution and how reliable the explanation is (grounded, partial,
           conflicting sources, insufficient evidence).
@@ -3772,8 +3690,6 @@ screens:
         label: Every site normalisation basis
         bindsTo: SiteNormalisationBasis
         columns:
-        - SiteNormalisationBasis.id
-        - SiteNormalisationBasis.scopePath
         - SiteNormalisationBasis.periodStart
         - SiteNormalisationBasis.periodEnd
         - SiteNormalisationBasis.visitors
@@ -7272,15 +7188,9 @@ screens:
         - AuthorisationPolicy.description
         - AuthorisationPolicy.effect
         - AuthorisationPolicy.permissions
-        - AuthorisationPolicy.conditions
-        - AuthorisationPolicy.combining
         - AuthorisationPolicy.priority
-        - AuthorisationPolicy.appliesToRoleIds
-        - AuthorisationPolicy.scopePath
         - AuthorisationPolicy.status
-        - AuthorisationPolicy.version
         - AuthorisationPolicy.effectiveFrom
-        - AuthorisationPolicy.effectiveTo
         operation: listAuthorisationPolicies
         provenance: contract identity.yaml GET /authorisation-policies
       - kind: detailPanel
@@ -9465,8 +9375,6 @@ screens:
         label: Every site normalisation basis
         bindsTo: SiteNormalisationBasis
         columns:
-        - SiteNormalisationBasis.id
-        - SiteNormalisationBasis.scopePath
         - SiteNormalisationBasis.periodStart
         - SiteNormalisationBasis.periodEnd
         - SiteNormalisationBasis.visitors

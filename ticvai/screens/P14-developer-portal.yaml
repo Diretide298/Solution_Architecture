@@ -216,9 +216,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P14 Developer.dc.html#dev-001
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: DEV-002
   name: Register & Organisation
   module: Developer & API
@@ -329,9 +329,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P14 Developer.dc.html#dev-002
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSetDeveloperMembers
     component: modal
@@ -595,9 +595,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P14 Developer.dc.html#dev-003
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: DEV-004
   name: Sandbox
   module: Developer & API
@@ -810,9 +810,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P14 Developer.dc.html#dev-004
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: DEV-005
   name: Webhooks
   module: Developer & API
@@ -991,9 +991,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P14 Developer.dc.html#dev-005
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formCreateWebhookSubscription
     component: modal
@@ -1078,7 +1078,6 @@ screens:
         - ApiUsageSummary.p95LatencyMs
         - ApiUsageSummary.p99LatencyMs
         - ApiUsageSummary.quotaBreaches
-        - ApiUsageSummary.byOperation
         operation: getApiUsage
         provenance: contract public-api.yaml GET /api-usage
       - kind: metricTile
@@ -1132,9 +1131,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P14 Developer.dc.html#dev-006
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: DEV-007
   name: Marketplace Listing
   module: Developer & API
@@ -1182,11 +1181,8 @@ screens:
         - IntegrationListing.name
         - IntegrationListing.category
         - IntegrationListing.description
-        - IntegrationListing.integrationUrl
-        - IntegrationListing.requiredScopes
         - IntegrationListing.status
         - IntegrationListing.certifiedUntil
-        - IntegrationListing.certifiedAgainstVersion
         - IntegrationListing.listingFeeModel
         operation: listIntegrationListings
         provenance: contract public-api.yaml GET /listings
@@ -1255,9 +1251,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P14 Developer.dc.html#dev-007
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSubmitIntegrationListing
     component: modal
@@ -1476,9 +1472,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P14 Developer.dc.html#dev-008
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formCertifyIntegration
     component: modal

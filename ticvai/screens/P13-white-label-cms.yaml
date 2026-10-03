@@ -231,9 +231,9 @@ screens:
     note: '**Drawn by Claude Design on `Marketing Board 7.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   layout:
     template: detail
     regions:
@@ -477,9 +477,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-002
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSetBrandIdentity
     component: modal
@@ -600,9 +600,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-003
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSetFonts
     component: modal
@@ -715,9 +715,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-004
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   layout:
     template: detail
     regions:
@@ -929,9 +929,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-005
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSetTheme
     component: modal
@@ -1127,9 +1127,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-006
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formCreatePreview
     component: modal
@@ -1276,17 +1276,12 @@ screens:
         label: Every content page
         bindsTo: ContentPage
         columns:
-        - ContentPage.id
         - ContentPage.slug
         - ContentPage.title
-        - ContentPage.body
-        - ContentPage.isEnabled
         - ContentPage.status
         - ContentPage.iconAssetRef
         - ContentPage.categoryCode
         - ContentPage.sortOrder
-        - ContentPage.isReferenced
-        - ContentPage.scopePath
         operation: listContentPages
         provenance: contract white-label.yaml GET /tenant-config/pages
     - name: actionBar
@@ -1393,9 +1388,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-007
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   entryState:
     params:
     - name: pageId
@@ -1542,34 +1537,24 @@ screens:
         label: Every promo block
         bindsTo: PromoBlock
         columns:
-        - PromoBlock.id
         - PromoBlock.title
         - PromoBlock.description
         - PromoBlock.iconAssetRef
-        - PromoBlock.promotionId
-        - PromoBlock.linkTarget
         - PromoBlock.startsAt
         - PromoBlock.endsAt
         - PromoBlock.state
-        - PromoBlock.sortOrder
-        - PromoBlock.scopePath
         operation: listPromoBlocks
         provenance: contract white-label.yaml GET /tenant-config/promo-blocks
       - kind: dataTable
         label: Every banner
         bindsTo: Banner
         columns:
-        - Banner.id
         - Banner.title
         - Banner.subtitle
         - Banner.imageAssetRef
-        - Banner.placement
-        - Banner.linkTarget
         - Banner.startsAt
         - Banner.endsAt
         - Banner.state
-        - Banner.sortOrder
-        - Banner.isActive
         operation: listBanners
         provenance: contract white-label.yaml GET /tenant-config/banners
     - name: contextPanel
@@ -1579,17 +1564,14 @@ screens:
         label: The selected promo block
         bindsTo: PromoBlock
         columns:
-        - PromoBlock.id
         - PromoBlock.title
         - PromoBlock.description
         - PromoBlock.iconAssetRef
-        - PromoBlock.promotionId
         - PromoBlock.linkTarget
         - PromoBlock.startsAt
         - PromoBlock.endsAt
         - PromoBlock.state
         - PromoBlock.sortOrder
-        - PromoBlock.scopePath
         operation: listPromoBlocks
         provenance: contract white-label.yaml GET /tenant-config/promo-blocks
       - kind: detailPanel
@@ -1710,9 +1692,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-008
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formCreateBanner
     component: modal
@@ -1983,9 +1965,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-009
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSetNavigation
     component: modal
@@ -2212,7 +2194,6 @@ screens:
         label: The selected media asset
         bindsTo: MediaAsset
         columns:
-        - MediaAsset.id
         - MediaAsset.kind
         - MediaAsset.status
         - MediaAsset.filename
@@ -2220,21 +2201,13 @@ screens:
         - MediaAsset.sizeBytes
         - MediaAsset.title
         - MediaAsset.description
-        - MediaAsset.altText
-        - MediaAsset.width
-        - MediaAsset.height
         - MediaAsset.durationSeconds
-        - MediaAsset.customMetadata
-        - MediaAsset.sharedWithTenantIds
-        - MediaAsset.tags
-        - MediaAsset.venueId
         operation: searchMedia
         provenance: contract assets.yaml GET /media
       - kind: detailPanel
         label: The expiring media
         bindsTo: ExpiringMedia
         columns:
-        - ExpiringMedia.assetId
         - ExpiringMedia.filename
         - ExpiringMedia.thumbnailUrl
         - ExpiringMedia.licensor
@@ -2249,7 +2222,6 @@ screens:
         label: The media asset
         bindsTo: MediaAssetDetail
         columns:
-        - MediaAssetDetail.id
         - MediaAssetDetail.kind
         - MediaAssetDetail.status
         - MediaAssetDetail.filename
@@ -2257,14 +2229,7 @@ screens:
         - MediaAssetDetail.sizeBytes
         - MediaAssetDetail.title
         - MediaAssetDetail.description
-        - MediaAssetDetail.altText
-        - MediaAssetDetail.width
-        - MediaAssetDetail.height
         - MediaAssetDetail.durationSeconds
-        - MediaAssetDetail.customMetadata
-        - MediaAssetDetail.sharedWithTenantIds
-        - MediaAssetDetail.tags
-        - MediaAssetDetail.venueId
         operation: getMediaAsset
         provenance: contract assets.yaml GET /media/{mediaId}
     - name: actionBar
@@ -2507,9 +2472,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-010
-  apisNote: Rebuilt 9 September 2026 from the 12 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 12 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: appendEntitlementToMedia
     removed: true
@@ -2656,9 +2621,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-013
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formCreateUrlRedirect
     component: modal
@@ -2783,9 +2748,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-011
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: proposeTranslations
     removed: true
@@ -2877,9 +2842,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-012
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: CMS-014
   name: Publishing Workflow
   module: White Label
@@ -3095,9 +3060,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-014
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formPublishTenantConfig
     component: modal
@@ -3217,14 +3182,10 @@ screens:
         bindsTo: ConfigVersion
         columns:
         - ConfigVersion.publishedAt
-        - ConfigVersion.publishedByPrincipalId
         - ConfigVersion.publishedByName
         - ConfigVersion.note
         - ConfigVersion.isCurrent
         - ConfigVersion.scheduledFor
-        - ConfigVersion.contentHash
-        - ConfigVersion.pendingBuildTimeChanges
-        - ConfigVersion.scopePath
         operation: listConfigVersions
         provenance: contract white-label.yaml GET /tenant-config/versions
     - name: contextPanel
@@ -3303,9 +3264,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-015
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: confirmRestoreConfigVersion
     component: confirmDialog
@@ -3397,35 +3358,14 @@ screens:
         label: The booking flow config
         bindsTo: BookingFlowConfig
         columns:
-        - BookingFlowConfig.preset
-        - BookingFlowConfig.stepIndicator
         - BookingFlowConfig.cartLayout
         - BookingFlowConfig.cardLayout
-        - BookingFlowConfig.cardSize
-        - BookingFlowConfig.seatPicker
-        - BookingFlowConfig.mapView
         - BookingFlowConfig.density
-        - BookingFlowConfig.embedMode
-        - BookingFlowConfig.heroBanner
-        - BookingFlowConfig.searchInBanner
-        - BookingFlowConfig.singleEventPage
-        - BookingFlowConfig.quantitiesOnAddOns
         - BookingFlowConfig.cartSideInRtl
         - BookingFlowConfig.eventBannerDates
         - BookingFlowConfig.timesPerPage
-        - BookingFlowConfig.dayPartFilter
-        - BookingFlowConfig.dayPartBoundaries
         - BookingFlowConfig.seatViewPosition
         - BookingFlowConfig.seatTimeBar
-        - BookingFlowConfig.ticketCategories
-        - BookingFlowConfig.ticketTags
-        - BookingFlowConfig.cardInfo
-        - BookingFlowConfig.conciergeMascot
-        - BookingFlowConfig.showInfoOnly
-        - BookingFlowConfig.locationSwitcher
-        - BookingFlowConfig.guestContactFields
-        - BookingFlowConfig.dateStripDays
-        - BookingFlowConfig.venueOverrides
         operation: getBookingFlowConfig
         notes: '**Venue-wide booking settings only (decided 29 September, W12).** The settings that belong
           to one flow (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`,
@@ -3513,9 +3453,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-016
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSetBookingFlowConfig
     component: modal
@@ -3752,9 +3692,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-017
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formClaimCustomDomain
     component: modal
@@ -3904,9 +3844,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-018
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   layout:
     template: split
     regions:
@@ -3935,7 +3875,6 @@ screens:
         - ConsentPurposeConfig.purpose
         - ConsentPurposeConfig.displayName
         - ConsentPurposeConfig.description
-        - ConsentPurposeConfig.channels
         - ConsentPurposeConfig.noticeVersion
         - ConsentPurposeConfig.isRequiredForService
         - ConsentPurposeConfig.expiresAfterMonths
@@ -3967,16 +3906,10 @@ screens:
         bindsTo: BookingConsentRecord
         columns:
         - BookingConsentRecord.answeredAt
-        - BookingConsentRecord.questionId
         - BookingConsentRecord.questionVersion
         - BookingConsentRecord.answer
         - BookingConsentRecord.scope
         - BookingConsentRecord.personName
-        - BookingConsentRecord.orderId
-        - BookingConsentRecord.answeredBySubjectId
-        - BookingConsentRecord.answeredByPrincipalId
-        - BookingConsentRecord.source
-        - BookingConsentRecord.blocksBooking
         - BookingConsentRecord.supersededAt
         operation: listConsentAnswers
         notes: '**What was asked, at which version, what was answered, for whom, by whom and when** (rev
@@ -4230,13 +4163,11 @@ screens:
         label: The selected principal
         bindsTo: Principal
         columns:
-        - Principal.id
         - Principal.username
         - Principal.displayName
         - Principal.isActive
         - Principal.validFrom
         - Principal.validTo
-        - Principal.primaryRoleId
         - Principal.roles
         - Principal.lastLoginAt
         operation: listPrincipals
@@ -4286,9 +4217,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-019
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formUpdatePrincipal
     component: modal
@@ -8889,16 +8820,10 @@ screens:
         label: Every participant waiver status
         columns:
         - ParticipantWaiverStatusTrackingView.participant
-        - ParticipantWaiverStatusTrackingView.participantId
-        - ParticipantWaiverStatusTrackingView.customerPurchaser
         - ParticipantWaiverStatusTrackingView.booking
         - ParticipantWaiverStatusTrackingView.ticket
-        - ParticipantWaiverStatusTrackingView.product
-        - ParticipantWaiverStatusTrackingView.event
         - ParticipantWaiverStatusTrackingView.visitDate
         - ParticipantWaiverStatusTrackingView.ageCategory
-        - ParticipantWaiverStatusTrackingView.group
-        - ParticipantWaiverStatusTrackingView.waiverRequirements
         - ParticipantWaiverStatusTrackingView.completionStatus
         bindsTo: ParticipantWaiverStatusTrackingView
         operation: listParticipantWaiverStatus
@@ -8911,16 +8836,12 @@ screens:
         bindsTo: ParticipantWaiverStatusTrackingView
         columns:
         - ParticipantWaiverStatusTrackingView.participant
-        - ParticipantWaiverStatusTrackingView.participantId
         - ParticipantWaiverStatusTrackingView.customerPurchaser
         - ParticipantWaiverStatusTrackingView.booking
         - ParticipantWaiverStatusTrackingView.ticket
         - ParticipantWaiverStatusTrackingView.product
-        - ParticipantWaiverStatusTrackingView.event
         - ParticipantWaiverStatusTrackingView.visitDate
         - ParticipantWaiverStatusTrackingView.ageCategory
-        - ParticipantWaiverStatusTrackingView.group
-        - ParticipantWaiverStatusTrackingView.waiverRequirements
         - ParticipantWaiverStatusTrackingView.completionStatus
         notes: null
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 28 §Display

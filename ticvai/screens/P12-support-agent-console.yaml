@@ -451,17 +451,11 @@ screens:
         label: Every case
         bindsTo: Case
         columns:
-        - Case.id
         - Case.caseNumber
-        - Case.subjectId
         - Case.guestName
         - Case.subject
-        - Case.categoryId
         - Case.status
         - Case.priority
-        - Case.assignedToPrincipalId
-        - Case.venueId
-        - Case.relatedOrderId
         - Case.slaDueAt
         operation: listCases
         provenance: contract marketing-crm.yaml GET /cases
@@ -469,15 +463,8 @@ screens:
         label: Every conversation
         bindsTo: Conversation
         columns:
-        - Conversation.id
-        - Conversation.telephony
-        - Conversation.assistSessionId
         - Conversation.channel
         - Conversation.state
-        - Conversation.subjectId
-        - Conversation.venueId
-        - Conversation.assignedPrincipalId
-        - Conversation.queueId
         - Conversation.queuePosition
         - Conversation.estimatedWaitSeconds
         - Conversation.handoverReason
@@ -490,44 +477,28 @@ screens:
         label: The selected case
         bindsTo: Case
         columns:
-        - Case.id
         - Case.caseNumber
-        - Case.subjectId
         - Case.guestName
         - Case.subject
         - Case.kind
         - Case.channel
         - Case.recordedAt
-        - Case.syncedAt
-        - Case.categoryId
         - Case.status
         - Case.priority
-        - Case.assignedToPrincipalId
-        - Case.venueId
-        - Case.relatedOrderId
-        - Case.slaDueAt
         operation: listCases
         provenance: contract marketing-crm.yaml GET /cases
       - kind: detailPanel
         label: The case
         bindsTo: CaseDetail
         columns:
-        - CaseDetail.id
         - CaseDetail.caseNumber
-        - CaseDetail.subjectId
         - CaseDetail.guestName
         - CaseDetail.subject
         - CaseDetail.kind
         - CaseDetail.channel
         - CaseDetail.recordedAt
-        - CaseDetail.syncedAt
-        - CaseDetail.categoryId
         - CaseDetail.status
         - CaseDetail.priority
-        - CaseDetail.assignedToPrincipalId
-        - CaseDetail.venueId
-        - CaseDetail.relatedOrderId
-        - CaseDetail.slaDueAt
         operation: getCase
         provenance: contract marketing-crm.yaml GET /cases/{caseId}
     - name: actionBar
@@ -639,9 +610,9 @@ screens:
     note: '**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formAddCaseMessage
     component: modal
@@ -823,9 +794,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-003
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-006): The purpose was the configuration-screen
     template ("Change how availability behaves here, and see which level the current value came from");
     the screen sets the agent''s own availability (design-notes correction customer-marketing SUP-003).'
@@ -886,15 +857,8 @@ screens:
         label: Every conversation
         bindsTo: Conversation
         columns:
-        - Conversation.id
-        - Conversation.telephony
-        - Conversation.assistSessionId
         - Conversation.channel
         - Conversation.state
-        - Conversation.subjectId
-        - Conversation.venueId
-        - Conversation.assignedPrincipalId
-        - Conversation.queueId
         - Conversation.queuePosition
         - Conversation.estimatedWaitSeconds
         - Conversation.handoverReason
@@ -953,9 +917,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-004
-  apisNote: Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formTransferConversation
     component: modal
@@ -1089,17 +1053,11 @@ screens:
         label: Every case
         bindsTo: Case
         columns:
-        - Case.id
         - Case.caseNumber
-        - Case.subjectId
         - Case.guestName
         - Case.subject
-        - Case.categoryId
         - Case.status
         - Case.priority
-        - Case.assignedToPrincipalId
-        - Case.venueId
-        - Case.relatedOrderId
         - Case.slaDueAt
         operation: listCases
         provenance: contract marketing-crm.yaml GET /cases
@@ -1110,66 +1068,42 @@ screens:
         label: The selected case
         bindsTo: Case
         columns:
-        - Case.id
         - Case.caseNumber
-        - Case.subjectId
         - Case.guestName
         - Case.subject
         - Case.kind
         - Case.channel
         - Case.recordedAt
-        - Case.syncedAt
-        - Case.categoryId
         - Case.status
         - Case.priority
-        - Case.assignedToPrincipalId
-        - Case.venueId
-        - Case.relatedOrderId
-        - Case.slaDueAt
         operation: listCases
         provenance: contract marketing-crm.yaml GET /cases
       - kind: detailPanel
         label: The conversation
         bindsTo: Conversation
         columns:
-        - Conversation.id
         - Conversation.telephony
-        - Conversation.assistSessionId
         - Conversation.channel
         - Conversation.state
-        - Conversation.subjectId
-        - Conversation.venueId
-        - Conversation.assignedPrincipalId
-        - Conversation.queueId
         - Conversation.queuePosition
         - Conversation.estimatedWaitSeconds
         - Conversation.handoverReason
         - Conversation.handoverSummary
         - Conversation.sentiment
-        - Conversation.intent
-        - Conversation.locale
         operation: getConversation
         provenance: contract marketing-crm.yaml GET /conversations/{conversationId}
       - kind: detailPanel
         label: The case
         bindsTo: CaseDetail
         columns:
-        - CaseDetail.id
         - CaseDetail.caseNumber
-        - CaseDetail.subjectId
         - CaseDetail.guestName
         - CaseDetail.subject
         - CaseDetail.kind
         - CaseDetail.channel
         - CaseDetail.recordedAt
-        - CaseDetail.syncedAt
-        - CaseDetail.categoryId
         - CaseDetail.status
         - CaseDetail.priority
-        - CaseDetail.assignedToPrincipalId
-        - CaseDetail.venueId
-        - CaseDetail.relatedOrderId
-        - CaseDetail.slaDueAt
         operation: getCase
         provenance: contract marketing-crm.yaml GET /cases/{caseId}
     - name: actionBar
@@ -1418,9 +1352,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-005
-  apisNote: Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-006): The purpose was the generic template ("Work
     with live chat workspace for this venue"); the workspace serves one conversation (design-notes correction
     customer-marketing SUP-005).'
@@ -1526,9 +1460,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-006
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSemanticSearch
     component: modal
@@ -1596,15 +1530,9 @@ screens:
         label: Every message template
         bindsTo: MessageTemplate
         columns:
-        - MessageTemplate.id
         - MessageTemplate.code
         - MessageTemplate.name
         - MessageTemplate.channel
-        - MessageTemplate.subjects
-        - MessageTemplate.bodies
-        - MessageTemplate.mergeFields
-        - MessageTemplate.missingLanguages
-        - MessageTemplate.providerTemplateId
         operation: listMessageTemplates
         provenance: contract marketing-crm.yaml GET /message-templates
     - name: contextPanel
@@ -1664,9 +1592,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-007
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formCreateMessageTemplate
     component: modal
@@ -1752,14 +1680,7 @@ screens:
         - ReportDefinition.name
         - ReportDefinition.description
         - ReportDefinition.category
-        - ReportDefinition.dataSource
-        - ReportDefinition.columns
-        - ReportDefinition.filters
-        - ReportDefinition.groupBy
-        - ReportDefinition.parameters
-        - ReportDefinition.requiredPermission
         - ReportDefinition.maxDateRangeDays
-        - ReportDefinition.id
         - ReportDefinition.isSystem
         operation: listReports
         provenance: contract reporting.yaml GET /reports
@@ -1767,15 +1688,8 @@ screens:
         label: Every conversation
         bindsTo: Conversation
         columns:
-        - Conversation.id
-        - Conversation.telephony
-        - Conversation.assistSessionId
         - Conversation.channel
         - Conversation.state
-        - Conversation.subjectId
-        - Conversation.venueId
-        - Conversation.assignedPrincipalId
-        - Conversation.queueId
         - Conversation.queuePosition
         - Conversation.estimatedWaitSeconds
         - Conversation.handoverReason
@@ -1794,15 +1708,7 @@ screens:
         - ReportDefinition.dataSource
         - ReportDefinition.columns
         - ReportDefinition.filters
-        - ReportDefinition.groupBy
-        - ReportDefinition.parameters
-        - ReportDefinition.requiredPermission
-        - ReportDefinition.maxDateRangeDays
-        - ReportDefinition.id
-        - ReportDefinition.isSystem
-        - ReportDefinition.isRetired
         - ReportDefinition.estimatedCost
-        - ReportDefinition.createdByPrincipalId
         - ReportDefinition.lastRunAt
         operation: getReport
         provenance: contract reporting.yaml GET /reports/{reportId}
@@ -2028,9 +1934,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-008
-  apisNote: Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: SUP-009
   name: Customer Service Command Center
   module: Support

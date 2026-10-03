@@ -178,18 +178,12 @@ screens:
         label: Every station, at a glance
         bindsTo: KitchenTicket
         columns:
-        - KitchenTicket.id
-        - KitchenTicket.orderId
         - KitchenTicket.orderNumber
-        - KitchenTicket.outletId
         - KitchenTicket.tableLabel
         - KitchenTicket.serviceMode
-        - KitchenTicket.coursing
         - KitchenTicket.buzzerCode
         - KitchenTicket.status
         - KitchenTicket.priority
-        - KitchenTicket.prioritisedByPrincipalId
-        - KitchenTicket.prioritiseReason
         operation: listKitchenTickets
         permission: ORDER_VIEW
         provenance: contract fnb.yaml GET /kitchen/tickets
@@ -249,9 +243,9 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
     derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3a
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: KIT-002
   name: Kitchen Display System (KDS)
   module: Kitchen
@@ -357,18 +351,12 @@ screens:
         label: Every kitchen ticket
         bindsTo: KitchenTicket
         columns:
-        - KitchenTicket.id
-        - KitchenTicket.orderId
         - KitchenTicket.orderNumber
-        - KitchenTicket.outletId
         - KitchenTicket.tableLabel
         - KitchenTicket.serviceMode
-        - KitchenTicket.coursing
         - KitchenTicket.buzzerCode
         - KitchenTicket.status
         - KitchenTicket.priority
-        - KitchenTicket.prioritisedByPrincipalId
-        - KitchenTicket.prioritiseReason
         operation: listKitchenTickets
         permission: ORDER_VIEW
         provenance: contract fnb.yaml GET /kitchen/tickets
@@ -395,19 +383,12 @@ screens:
         label: The selected kitchen ticket
         bindsTo: KitchenTicket
         columns:
-        - KitchenTicket.id
-        - KitchenTicket.orderId
         - KitchenTicket.orderNumber
-        - KitchenTicket.outletId
         - KitchenTicket.tableLabel
         - KitchenTicket.serviceMode
-        - KitchenTicket.coursing
         - KitchenTicket.buzzerCode
         - KitchenTicket.status
         - KitchenTicket.priority
-        - KitchenTicket.prioritisedByPrincipalId
-        - KitchenTicket.prioritiseReason
-        - KitchenTicket.lines
         - KitchenTicket.targetReadyAt
         - KitchenTicket.elapsedSeconds
         operation: listKitchenTickets
@@ -511,9 +492,9 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
     derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3b
-  apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSetKitchenTicketStatus
     component: modal
@@ -757,9 +738,9 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
     derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3c
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formPrioritiseKitchenTicket
     component: modal
@@ -869,18 +850,12 @@ screens:
         label: This order's tickets, station by station
         bindsTo: KitchenTicket
         columns:
-        - KitchenTicket.id
-        - KitchenTicket.orderId
         - KitchenTicket.orderNumber
-        - KitchenTicket.outletId
         - KitchenTicket.tableLabel
         - KitchenTicket.serviceMode
-        - KitchenTicket.coursing
         - KitchenTicket.buzzerCode
         - KitchenTicket.status
         - KitchenTicket.priority
-        - KitchenTicket.prioritisedByPrincipalId
-        - KitchenTicket.prioritiseReason
         operation: listKitchenTickets
         permission: ORDER_VIEW
         provenance: contract fnb.yaml GET /kitchen/tickets
@@ -903,19 +878,12 @@ screens:
         label: The selected kitchen ticket
         bindsTo: KitchenTicket
         columns:
-        - KitchenTicket.id
-        - KitchenTicket.orderId
         - KitchenTicket.orderNumber
-        - KitchenTicket.outletId
         - KitchenTicket.tableLabel
         - KitchenTicket.serviceMode
-        - KitchenTicket.coursing
         - KitchenTicket.buzzerCode
         - KitchenTicket.status
         - KitchenTicket.priority
-        - KitchenTicket.prioritisedByPrincipalId
-        - KitchenTicket.prioritiseReason
-        - KitchenTicket.lines
         - KitchenTicket.targetReadyAt
         - KitchenTicket.elapsedSeconds
         operation: listKitchenTickets
@@ -925,17 +893,11 @@ screens:
         label: The F&B order
         bindsTo: FnbOrder
         columns:
-        - FnbOrder.id
         - FnbOrder.orderNumber
-        - FnbOrder.outletId
         - FnbOrder.serviceMode
-        - FnbOrder.tableVisitId
         - FnbOrder.status
-        - FnbOrder.lines
-        - FnbOrder.salesOrderId
         - FnbOrder.grossAmount
         - FnbOrder.taxAmount
-        - FnbOrder.kitchenTicketId
         - FnbOrder.estimatedReadyAt
         - FnbOrder.recordedAt
         - FnbOrder.syncedAt
@@ -987,9 +949,9 @@ screens:
       — it carries operations, states, entry params and exits, and it is better specified than anything
       derived from the screen file.'
     derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3d
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-010): The purpose was the board title ("Active
     Order Management & Fulfilment Journey — board 3 of the client F&B design set") (design-notes correction
     fnb-retail KIT-004).'
@@ -1160,9 +1122,9 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
     derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3e
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: setKitchenStations
     removed: true
@@ -1235,18 +1197,12 @@ screens:
         label: Whole orders, ready to assemble
         bindsTo: KitchenTicket
         columns:
-        - KitchenTicket.id
-        - KitchenTicket.orderId
         - KitchenTicket.orderNumber
-        - KitchenTicket.outletId
         - KitchenTicket.tableLabel
         - KitchenTicket.serviceMode
-        - KitchenTicket.coursing
         - KitchenTicket.buzzerCode
         - KitchenTicket.status
         - KitchenTicket.priority
-        - KitchenTicket.prioritisedByPrincipalId
-        - KitchenTicket.prioritiseReason
         operation: listKitchenTickets
         permission: ORDER_VIEW
         provenance: contract fnb.yaml GET /kitchen/tickets
@@ -1271,19 +1227,12 @@ screens:
         label: The selected kitchen ticket
         bindsTo: KitchenTicket
         columns:
-        - KitchenTicket.id
-        - KitchenTicket.orderId
         - KitchenTicket.orderNumber
-        - KitchenTicket.outletId
         - KitchenTicket.tableLabel
         - KitchenTicket.serviceMode
-        - KitchenTicket.coursing
         - KitchenTicket.buzzerCode
         - KitchenTicket.status
         - KitchenTicket.priority
-        - KitchenTicket.prioritisedByPrincipalId
-        - KitchenTicket.prioritiseReason
-        - KitchenTicket.lines
         - KitchenTicket.targetReadyAt
         - KitchenTicket.elapsedSeconds
         operation: listKitchenTickets
@@ -1393,9 +1342,9 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
     derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3f
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSetKitchenTicketStatus
     component: modal
@@ -1588,9 +1537,9 @@ screens:
       its look** (decided 1 October 2026, POSV2-7): wireframes/incoming/P04-pos-v2/img/pos-029.png, the
       board above the lanes.'
     derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3g
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRecordOrderHandover
     component: modal
@@ -1809,9 +1758,9 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
     derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3h
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSetItemAvailability
     component: modal
@@ -1985,9 +1934,9 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
     derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3j
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: prioritiseKitchenTicket
     removed: true
@@ -2127,9 +2076,9 @@ screens:
       — it carries operations, states, entry params and exits, and it is better specified than anything
       derived from the screen file.'
     derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3k
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formAskReportingQuestion
     component: modal

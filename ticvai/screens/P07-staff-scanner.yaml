@@ -302,18 +302,10 @@ screens:
         label: Every access point
         bindsTo: AccessPoint
         columns:
-        - AccessPoint.id
         - AccessPoint.code
         - AccessPoint.name
-        - AccessPoint.venueId
-        - AccessPoint.scopePath
-        - AccessPoint.externalCredentialSources
-        - AccessPoint.scanAnomalyRules
-        - AccessPoint.operatingMode
-        - AccessPoint.vehicleLocationCapture
         - AccessPoint.mode
         - AccessPoint.direction
-        - AccessPoint.antiPassbackEnabled
         operation: listAccessPoints
         provenance: contract access.yaml GET /access-points
     - name: contextPanel
@@ -323,20 +315,11 @@ screens:
         label: The selected access point
         bindsTo: AccessPoint
         columns:
-        - AccessPoint.id
         - AccessPoint.code
         - AccessPoint.name
-        - AccessPoint.venueId
-        - AccessPoint.scopePath
-        - AccessPoint.externalCredentialSources
-        - AccessPoint.scanAnomalyRules
         - AccessPoint.operatingMode
-        - AccessPoint.vehicleLocationCapture
         - AccessPoint.mode
         - AccessPoint.direction
-        - AccessPoint.antiPassbackEnabled
-        - AccessPoint.isActive
-        - AccessPoint.lastHeartbeatAt
         operation: getAccessPoint
         provenance: contract access.yaml GET /access-points/{accessPointId}
     - name: actionBar
@@ -410,9 +393,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P07 Venue Scanner.dc.html#scn-002
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formStartPodiumShift
     component: modal
@@ -696,9 +679,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P07 Venue Scanner.dc.html#scn-003
-  apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: getOfflinePackage
     removed: true
@@ -800,11 +783,8 @@ screens:
         - OfflinePackage.generatedAt
         - OfflinePackage.validFrom
         - OfflinePackage.validTo
-        - OfflinePackage.accessPointId
         - OfflinePackage.entitlements
         - OfflinePackage.delegatedRights
-        - OfflinePackage.blacklist
-        - OfflinePackage.admissionRules
         operation: getOfflinePackage
         provenance: contract access.yaml GET /access/offline-package
     - name: actionBar
@@ -872,9 +852,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P07 Venue Scanner.dc.html#scn-007
-  apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: listScans
     removed: true
@@ -974,11 +954,8 @@ screens:
         - OfflinePackage.generatedAt
         - OfflinePackage.validFrom
         - OfflinePackage.validTo
-        - OfflinePackage.accessPointId
         - OfflinePackage.entitlements
         - OfflinePackage.delegatedRights
-        - OfflinePackage.blacklist
-        - OfflinePackage.admissionRules
         operation: getOfflinePackage
         provenance: contract access.yaml GET /access/offline-package
     - name: actionBar
@@ -1050,9 +1027,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P07 Venue Scanner.dc.html#scn-008
-  apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: listScans
     removed: true
@@ -1163,18 +1140,8 @@ screens:
         label: Every scan event
         bindsTo: ScanEvent
         columns:
-        - ScanEvent.id
-        - ScanEvent.accessPointId
-        - ScanEvent.venueId
-        - ScanEvent.scopePath
-        - ScanEvent.ticketId
         - ScanEvent.mediaCode
         - ScanEvent.outcome
-        - ScanEvent.denyReason
-        - ScanEvent.direction
-        - ScanEvent.operatorPrincipalId
-        - ScanEvent.deviceId
-        - ScanEvent.overridesScanId
         operation: listScans
         provenance: contract access.yaml GET /access/scans
       - kind: searchField
@@ -1197,19 +1164,9 @@ screens:
         label: The selected scan event
         bindsTo: ScanEvent
         columns:
-        - ScanEvent.id
-        - ScanEvent.accessPointId
-        - ScanEvent.venueId
-        - ScanEvent.scopePath
-        - ScanEvent.ticketId
         - ScanEvent.mediaCode
         - ScanEvent.outcome
         - ScanEvent.denyReason
-        - ScanEvent.direction
-        - ScanEvent.operatorPrincipalId
-        - ScanEvent.deviceId
-        - ScanEvent.overridesScanId
-        - ScanEvent.overrideReason
         - ScanEvent.recordedAt
         - ScanEvent.syncedAt
         operation: listScans
@@ -1221,11 +1178,8 @@ screens:
         - OfflinePackage.generatedAt
         - OfflinePackage.validFrom
         - OfflinePackage.validTo
-        - OfflinePackage.accessPointId
         - OfflinePackage.entitlements
         - OfflinePackage.delegatedRights
-        - OfflinePackage.blacklist
-        - OfflinePackage.admissionRules
         operation: getOfflinePackage
         provenance: contract access.yaml GET /access/offline-package
     - name: actionBar
@@ -1270,9 +1224,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P07 Venue Scanner.dc.html#scn-009
-  apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: overrideAccess
     removed: true
@@ -1354,22 +1308,11 @@ screens:
         label: The cross region entitlement
         bindsTo: CrossRegionEntitlement
         columns:
-        - CrossRegionEntitlement.id
-        - CrossRegionEntitlement.rightId
-        - CrossRegionEntitlement.ticketId
-        - CrossRegionEntitlement.guestLinkId
         - CrossRegionEntitlement.issuingCellName
         - CrossRegionEntitlement.consumingCellName
-        - CrossRegionEntitlement.mediaCodes
         - CrossRegionEntitlement.validFrom
-        - CrossRegionEntitlement.validTo
-        - CrossRegionEntitlement.admissionRulesId
-        - CrossRegionEntitlement.venueId
-        - CrossRegionEntitlement.entriesAllowed
-        - CrossRegionEntitlement.entriesConsumed
         - CrossRegionEntitlement.status
         - CrossRegionEntitlement.lastConsumedAt
-        - CrossRegionEntitlement.lastReconciledAt
         operation: getCrossRegionEntitlement
         provenance: contract cross-region.yaml GET /cross-region-entitlements/{rightId}
     - name: actionBar
@@ -1411,9 +1354,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P07 Venue Scanner.dc.html#scn-011
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formConsumeCrossRegionEntitlement
     component: modal
@@ -1505,11 +1448,8 @@ screens:
         - OfflinePackage.generatedAt
         - OfflinePackage.validFrom
         - OfflinePackage.validTo
-        - OfflinePackage.accessPointId
         - OfflinePackage.entitlements
         - OfflinePackage.delegatedRights
-        - OfflinePackage.blacklist
-        - OfflinePackage.admissionRules
         operation: getOfflinePackage
         provenance: contract access.yaml GET /access/offline-package
     - name: actionBar
@@ -1644,9 +1584,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P07 Venue Scanner.dc.html#scn-013
-  apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: listScans
     removed: true
@@ -1737,33 +1677,18 @@ screens:
         label: Every sync rejection
         bindsTo: SyncRejection
         columns:
-        - SyncRejection.id
-        - SyncRejection.workstationId
         - SyncRejection.kind
         - SyncRejection.recordedAt
         - SyncRejection.rejectedAt
-        - SyncRejection.problem
-        - SyncRejection.payload
         - SyncRejection.resolvedAt
-        - SyncRejection.resolvedByPrincipalId
         operation: listSyncRejections
         provenance: contract orders.yaml GET /sync/rejections
       - kind: dataTable
         label: Every scan event
         bindsTo: ScanEvent
         columns:
-        - ScanEvent.id
-        - ScanEvent.accessPointId
-        - ScanEvent.venueId
-        - ScanEvent.scopePath
-        - ScanEvent.ticketId
         - ScanEvent.mediaCode
         - ScanEvent.outcome
-        - ScanEvent.denyReason
-        - ScanEvent.direction
-        - ScanEvent.operatorPrincipalId
-        - ScanEvent.deviceId
-        - ScanEvent.overridesScanId
         operation: listScans
         provenance: contract access.yaml GET /access/scans
       - kind: scanTarget
@@ -1786,17 +1711,11 @@ screens:
         label: The selected sync rejection
         bindsTo: SyncRejection
         columns:
-        - SyncRejection.id
-        - SyncRejection.workstationId
         - SyncRejection.kind
         - SyncRejection.recordedAt
         - SyncRejection.rejectedAt
         - SyncRejection.problem
-        - SyncRejection.payload
         - SyncRejection.resolvedAt
-        - SyncRejection.resolvedByPrincipalId
-        - SyncRejection.resolution
-        - SyncRejection.resolvedRecordId
         operation: listSyncRejections
         provenance: contract orders.yaml GET /sync/rejections
       - kind: detailPanel
@@ -1806,11 +1725,8 @@ screens:
         - OfflinePackage.generatedAt
         - OfflinePackage.validFrom
         - OfflinePackage.validTo
-        - OfflinePackage.accessPointId
         - OfflinePackage.entitlements
         - OfflinePackage.delegatedRights
-        - OfflinePackage.blacklist
-        - OfflinePackage.admissionRules
         operation: getOfflinePackage
         provenance: contract access.yaml GET /access/offline-package
     - name: actionBar
@@ -1959,9 +1875,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P07 Venue Scanner.dc.html#scn-014
-  apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: syncOrders
     removed: true
@@ -2039,11 +1955,8 @@ screens:
         - OfflinePackage.generatedAt
         - OfflinePackage.validFrom
         - OfflinePackage.validTo
-        - OfflinePackage.accessPointId
         - OfflinePackage.entitlements
         - OfflinePackage.delegatedRights
-        - OfflinePackage.blacklist
-        - OfflinePackage.admissionRules
         operation: getOfflinePackage
         provenance: contract access.yaml GET /access/offline-package
     - name: actionBar
@@ -2084,9 +1997,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P07 Venue Scanner.dc.html#scn-015
-  apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: listScans
     removed: true
@@ -2185,18 +2098,10 @@ screens:
         label: Every access point
         bindsTo: AccessPoint
         columns:
-        - AccessPoint.id
         - AccessPoint.code
         - AccessPoint.name
-        - AccessPoint.venueId
-        - AccessPoint.scopePath
-        - AccessPoint.externalCredentialSources
-        - AccessPoint.scanAnomalyRules
         - AccessPoint.operatingMode
-        - AccessPoint.vehicleLocationCapture
         - AccessPoint.mode
-        - AccessPoint.direction
-        - AccessPoint.antiPassbackEnabled
         operation: listAccessPoints
         provenance: contract access.yaml GET /access-points
     - name: contextPanel
@@ -2206,19 +2111,10 @@ screens:
         label: The selected access point
         bindsTo: AccessPoint
         columns:
-        - AccessPoint.id
         - AccessPoint.code
         - AccessPoint.name
-        - AccessPoint.venueId
-        - AccessPoint.scopePath
-        - AccessPoint.externalCredentialSources
-        - AccessPoint.scanAnomalyRules
         - AccessPoint.operatingMode
-        - AccessPoint.vehicleLocationCapture
         - AccessPoint.mode
-        - AccessPoint.direction
-        - AccessPoint.antiPassbackEnabled
-        - AccessPoint.isActive
         - AccessPoint.lastHeartbeatAt
         operation: getAccessPoint
         provenance: contract access.yaml GET /access-points/{accessPointId}
@@ -2306,9 +2202,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P07 Venue Scanner.dc.html#scn-016
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSetTurnstileMode
     component: modal

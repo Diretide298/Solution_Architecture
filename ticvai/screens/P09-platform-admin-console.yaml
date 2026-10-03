@@ -740,12 +740,9 @@ screens:
         - Tenant.code
         - Tenant.name
         - Tenant.status
-        - Tenant.suspensionMode
-        - Tenant.suspensionReason
         - Tenant.planName
         - Tenant.cellCount
         - Tenant.venueCount
-        - Tenant.billingEmail
         operation: listTenants
         provenance: contract subscription.yaml GET /tenants
       - kind: dataTable
@@ -754,13 +751,10 @@ screens:
         columns:
         - Cell.name
         - Cell.kind
-        - Cell.isReachable
         - Cell.lastContactAt
         - Cell.licenceExpiresAt
-        - Cell.participatesInCrossCell
         - Cell.regionName
         - Cell.countryCode
-        - Cell.tier
         operation: listTenantCells
         provenance: contract subscription.yaml GET /tenants/{tenantId}/cells
     - name: contextPanel
@@ -770,19 +764,11 @@ screens:
         label: The selected tenant
         bindsTo: Tenant
         columns:
-        - Tenant.id
         - Tenant.code
         - Tenant.name
         - Tenant.status
         - Tenant.suspensionMode
-        - Tenant.suspensionReason
         - Tenant.suspensionEffectiveAt
-        - Tenant.suspensionNoticeMessage
-        - Tenant.terminationScheduledAt
-        - Tenant.terminationRetentionUntil
-        - Tenant.terminationReason
-        - Tenant.terminationRequestedByPrincipalId
-        - Tenant.planId
         - Tenant.planName
         - Tenant.cellCount
         - Tenant.venueCount
@@ -792,19 +778,11 @@ screens:
         label: The tenant
         bindsTo: TenantDetail
         columns:
-        - TenantDetail.id
         - TenantDetail.code
         - TenantDetail.name
         - TenantDetail.status
         - TenantDetail.suspensionMode
-        - TenantDetail.suspensionReason
         - TenantDetail.suspensionEffectiveAt
-        - TenantDetail.suspensionNoticeMessage
-        - TenantDetail.terminationScheduledAt
-        - TenantDetail.terminationRetentionUntil
-        - TenantDetail.terminationReason
-        - TenantDetail.terminationRequestedByPrincipalId
-        - TenantDetail.planId
         - TenantDetail.planName
         - TenantDetail.cellCount
         - TenantDetail.venueCount
@@ -877,9 +855,9 @@ screens:
     note: '**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not
       starting from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: getSsoConfig
     removed: true
@@ -983,22 +961,14 @@ screens:
         label: The cell
         bindsTo: CellDetail
         columns:
-        - CellDetail.id
         - CellDetail.name
         - CellDetail.kind
-        - CellDetail.clusterId
-        - CellDetail.isReachable
         - CellDetail.lastContactAt
         - CellDetail.licenceExpiresAt
-        - CellDetail.participatesInCrossCell
-        - CellDetail.regionId
         - CellDetail.regionName
         - CellDetail.countryCode
         - CellDetail.tier
         - CellDetail.status
-        - CellDetail.cloudProvider
-        - CellDetail.cloudRegion
-        - CellDetail.apiEndpoint
         operation: getCell
         provenance: contract subscription.yaml GET /cells/{cellId}
       - kind: detailPanel
@@ -1144,9 +1114,9 @@ screens:
     note: '**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not
       starting from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: getCrossRegionEntitlement
     removed: true
@@ -1304,17 +1274,10 @@ screens:
         label: Every AI interaction
         bindsTo: AiInteraction
         columns:
-        - AiInteraction.id
-        - AiInteraction.conversationId
-        - AiInteraction.principalId
         - AiInteraction.audience
-        - AiInteraction.subjectId
-        - AiInteraction.billableToTenantId
-        - AiInteraction.scopePath
         - AiInteraction.capability
         - AiInteraction.prompt
         - AiInteraction.response
-        - AiInteraction.sources
         - AiInteraction.outcome
         operation: listAiInteractions
         provenance: contract ai.yaml GET /interactions
@@ -1329,13 +1292,7 @@ screens:
         label: The selected AI interaction
         bindsTo: AiInteraction
         columns:
-        - AiInteraction.id
-        - AiInteraction.conversationId
-        - AiInteraction.principalId
         - AiInteraction.audience
-        - AiInteraction.subjectId
-        - AiInteraction.billableToTenantId
-        - AiInteraction.scopePath
         - AiInteraction.capability
         - AiInteraction.prompt
         - AiInteraction.response
@@ -1343,8 +1300,6 @@ screens:
         - AiInteraction.outcome
         - AiInteraction.refusalReason
         - AiInteraction.provider
-        - AiInteraction.model
-        - AiInteraction.promptTokens
         operation: listAiInteractions
         provenance: contract ai.yaml GET /interactions
   states:
@@ -1409,9 +1364,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-004
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formOpenPlatformStaffGrant
     component: modal
@@ -1554,12 +1509,9 @@ screens:
         - Tenant.code
         - Tenant.name
         - Tenant.status
-        - Tenant.suspensionMode
-        - Tenant.suspensionReason
         - Tenant.planName
         - Tenant.cellCount
         - Tenant.venueCount
-        - Tenant.billingEmail
         operation: listTenants
         provenance: contract subscription.yaml GET /tenants
       - kind: dataTable
@@ -1568,13 +1520,10 @@ screens:
         columns:
         - Cell.name
         - Cell.kind
-        - Cell.isReachable
         - Cell.lastContactAt
         - Cell.licenceExpiresAt
-        - Cell.participatesInCrossCell
         - Cell.regionName
         - Cell.countryCode
-        - Cell.tier
         operation: listTenantCells
         provenance: contract subscription.yaml GET /tenants/{tenantId}/cells
     - name: contextPanel
@@ -1584,19 +1533,11 @@ screens:
         label: The selected tenant
         bindsTo: Tenant
         columns:
-        - Tenant.id
         - Tenant.code
         - Tenant.name
         - Tenant.status
         - Tenant.suspensionMode
-        - Tenant.suspensionReason
         - Tenant.suspensionEffectiveAt
-        - Tenant.suspensionNoticeMessage
-        - Tenant.terminationScheduledAt
-        - Tenant.terminationRetentionUntil
-        - Tenant.terminationReason
-        - Tenant.terminationRequestedByPrincipalId
-        - Tenant.planId
         - Tenant.planName
         - Tenant.cellCount
         - Tenant.venueCount
@@ -1606,36 +1547,25 @@ screens:
         label: The SSO provider config
         bindsTo: SsoProviderConfig
         columns:
-        - SsoProviderConfig.id
         - SsoProviderConfig.displayName
         - SsoProviderConfig.protocol
         - SsoProviderConfig.metadataUrl
         - SsoProviderConfig.issuer
-        - SsoProviderConfig.clientId
         - SsoProviderConfig.clientSecretRef
         - SsoProviderConfig.groupMappings
         - SsoProviderConfig.autoProvisionPrincipals
         - SsoProviderConfig.isEnforced
-        - SsoProviderConfig.isActive
         operation: getSsoConfig
         provenance: contract identity.yaml GET /tenants/sso-config
       - kind: detailPanel
         label: The tenant
         bindsTo: TenantDetail
         columns:
-        - TenantDetail.id
         - TenantDetail.code
         - TenantDetail.name
         - TenantDetail.status
         - TenantDetail.suspensionMode
-        - TenantDetail.suspensionReason
         - TenantDetail.suspensionEffectiveAt
-        - TenantDetail.suspensionNoticeMessage
-        - TenantDetail.terminationScheduledAt
-        - TenantDetail.terminationRetentionUntil
-        - TenantDetail.terminationReason
-        - TenantDetail.terminationRequestedByPrincipalId
-        - TenantDetail.planId
         - TenantDetail.planName
         - TenantDetail.cellCount
         - TenantDetail.venueCount
@@ -1958,9 +1888,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-005
-  apisNote: Rebuilt 9 September 2026 from the 15 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 15 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the generic list template
     ("Find the right one quickly, and act on it without opening it").'
 - id: ADM-006
@@ -2086,12 +2016,9 @@ screens:
         - Tenant.code
         - Tenant.name
         - Tenant.status
-        - Tenant.suspensionMode
-        - Tenant.suspensionReason
         - Tenant.planName
         - Tenant.cellCount
         - Tenant.venueCount
-        - Tenant.billingEmail
         operation: listTenants
         provenance: contract subscription.yaml GET /tenants
       - kind: dataTable
@@ -2100,13 +2027,10 @@ screens:
         columns:
         - Cell.name
         - Cell.kind
-        - Cell.isReachable
         - Cell.lastContactAt
         - Cell.licenceExpiresAt
-        - Cell.participatesInCrossCell
         - Cell.regionName
         - Cell.countryCode
-        - Cell.tier
         operation: listTenantCells
         provenance: contract subscription.yaml GET /tenants/{tenantId}/cells
       - kind: dataTable
@@ -2128,19 +2052,11 @@ screens:
         label: The selected tenant
         bindsTo: Tenant
         columns:
-        - Tenant.id
         - Tenant.code
         - Tenant.name
         - Tenant.status
         - Tenant.suspensionMode
-        - Tenant.suspensionReason
         - Tenant.suspensionEffectiveAt
-        - Tenant.suspensionNoticeMessage
-        - Tenant.terminationScheduledAt
-        - Tenant.terminationRetentionUntil
-        - Tenant.terminationReason
-        - Tenant.terminationRequestedByPrincipalId
-        - Tenant.planId
         - Tenant.planName
         - Tenant.cellCount
         - Tenant.venueCount
@@ -2158,19 +2074,11 @@ screens:
         label: The tenant
         bindsTo: TenantDetail
         columns:
-        - TenantDetail.id
         - TenantDetail.code
         - TenantDetail.name
         - TenantDetail.status
         - TenantDetail.suspensionMode
-        - TenantDetail.suspensionReason
         - TenantDetail.suspensionEffectiveAt
-        - TenantDetail.suspensionNoticeMessage
-        - TenantDetail.terminationScheduledAt
-        - TenantDetail.terminationRetentionUntil
-        - TenantDetail.terminationReason
-        - TenantDetail.terminationRequestedByPrincipalId
-        - TenantDetail.planId
         - TenantDetail.planName
         - TenantDetail.cellCount
         - TenantDetail.venueCount
@@ -2273,9 +2181,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-006
-  apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formUpdateTenant
     component: modal
@@ -2421,13 +2329,10 @@ screens:
         columns:
         - Cell.name
         - Cell.kind
-        - Cell.isReachable
         - Cell.lastContactAt
         - Cell.licenceExpiresAt
-        - Cell.participatesInCrossCell
         - Cell.regionName
         - Cell.countryCode
-        - Cell.tier
         operation: listTenantCells
         provenance: contract subscription.yaml GET /tenants/{tenantId}/cells
       - kind: dataTable
@@ -2437,13 +2342,9 @@ screens:
         - Tenant.code
         - Tenant.name
         - Tenant.status
-        - Tenant.suspensionMode
-        - Tenant.suspensionReason
         - Tenant.suspensionEffectiveAt
-        - Tenant.suspensionNoticeMessage
         - Tenant.terminationScheduledAt
         - Tenant.terminationRetentionUntil
-        - Tenant.terminationReason
         operation: listTenants
         provenance: contract subscription.yaml GET /tenants
       - kind: confirmDialog
@@ -2465,22 +2366,14 @@ screens:
         label: The selected cell
         bindsTo: Cell
         columns:
-        - Cell.id
         - Cell.name
         - Cell.kind
-        - Cell.clusterId
-        - Cell.isReachable
         - Cell.lastContactAt
         - Cell.licenceExpiresAt
-        - Cell.participatesInCrossCell
-        - Cell.regionId
         - Cell.regionName
         - Cell.countryCode
         - Cell.tier
         - Cell.status
-        - Cell.cloudProvider
-        - Cell.cloudRegion
-        - Cell.apiEndpoint
         operation: listTenantCells
         provenance: contract subscription.yaml GET /tenants/{tenantId}/cells
       - kind: detailPanel
@@ -2510,19 +2403,11 @@ screens:
         label: The tenant
         bindsTo: TenantDetail
         columns:
-        - TenantDetail.id
         - TenantDetail.code
         - TenantDetail.name
         - TenantDetail.status
         - TenantDetail.suspensionMode
-        - TenantDetail.suspensionReason
         - TenantDetail.suspensionEffectiveAt
-        - TenantDetail.suspensionNoticeMessage
-        - TenantDetail.terminationScheduledAt
-        - TenantDetail.terminationRetentionUntil
-        - TenantDetail.terminationReason
-        - TenantDetail.terminationRequestedByPrincipalId
-        - TenantDetail.planId
         - TenantDetail.planName
         - TenantDetail.cellCount
         - TenantDetail.venueCount
@@ -2638,9 +2523,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-007
-  apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: getSsoConfig
     removed: true
@@ -2719,13 +2604,8 @@ screens:
         - Plan.name
         - Plan.description
         - Plan.cellTier
-        - Plan.licensedModules
-        - Plan.limits
         - Plan.basePrice
         - Plan.billingPeriod
-        - Plan.includesBrandedApp
-        - Plan.includedAiTokens
-        - Plan.isActive
         operation: listPlans
         provenance: contract subscription.yaml GET /plans
       - kind: dataTable
@@ -2733,12 +2613,9 @@ screens:
         bindsTo: SubscriptionInvoice
         columns:
         - SubscriptionInvoice.invoiceNumber
-        - SubscriptionInvoice.periodStart
-        - SubscriptionInvoice.periodEnd
         - SubscriptionInvoice.status
         - SubscriptionInvoice.subtotal
         - SubscriptionInvoice.taxAmount
-        - SubscriptionInvoice.total
         - SubscriptionInvoice.issuedAt
         - SubscriptionInvoice.dueAt
         operation: listSubscriptionInvoices
@@ -2749,13 +2626,10 @@ screens:
         columns:
         - Cell.name
         - Cell.kind
-        - Cell.isReachable
         - Cell.lastContactAt
         - Cell.licenceExpiresAt
-        - Cell.participatesInCrossCell
         - Cell.regionName
         - Cell.countryCode
-        - Cell.tier
         operation: listTenantCells
         provenance: contract subscription.yaml GET /tenants/{tenantId}/cells
       - kind: dataTable
@@ -2765,13 +2639,9 @@ screens:
         - Tenant.code
         - Tenant.name
         - Tenant.status
-        - Tenant.suspensionMode
-        - Tenant.suspensionReason
         - Tenant.suspensionEffectiveAt
-        - Tenant.suspensionNoticeMessage
         - Tenant.terminationScheduledAt
         - Tenant.terminationRetentionUntil
-        - Tenant.terminationReason
         operation: listTenants
         provenance: contract subscription.yaml GET /tenants
     - name: contextPanel
@@ -2786,13 +2656,7 @@ screens:
         - Plan.description
         - Plan.cellTier
         - Plan.licensedModules
-        - Plan.limits
         - Plan.basePrice
-        - Plan.billingPeriod
-        - Plan.includesBrandedApp
-        - Plan.includedAiTokens
-        - Plan.id
-        - Plan.isActive
         - Plan.subscriberCount
         - Plan.publishedAt
         operation: getPlan
@@ -2816,19 +2680,11 @@ screens:
         label: The tenant
         bindsTo: TenantDetail
         columns:
-        - TenantDetail.id
         - TenantDetail.code
         - TenantDetail.name
         - TenantDetail.status
         - TenantDetail.suspensionMode
-        - TenantDetail.suspensionReason
         - TenantDetail.suspensionEffectiveAt
-        - TenantDetail.suspensionNoticeMessage
-        - TenantDetail.terminationScheduledAt
-        - TenantDetail.terminationRetentionUntil
-        - TenantDetail.terminationReason
-        - TenantDetail.terminationRequestedByPrincipalId
-        - TenantDetail.planId
         - TenantDetail.planName
         - TenantDetail.cellCount
         - TenantDetail.venueCount
@@ -2981,9 +2837,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-008
-  apisNote: Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSetSubscription
     component: modal
@@ -3180,16 +3036,10 @@ screens:
         label: Every subscription invoice
         bindsTo: SubscriptionInvoice
         columns:
-        - SubscriptionInvoice.id
         - SubscriptionInvoice.invoiceNumber
-        - SubscriptionInvoice.periodStart
-        - SubscriptionInvoice.periodEnd
         - SubscriptionInvoice.status
-        - SubscriptionInvoice.lines
         - SubscriptionInvoice.subtotal
         - SubscriptionInvoice.taxAmount
-        - SubscriptionInvoice.total
-        - SubscriptionInvoice.planVersionUsed
         - SubscriptionInvoice.issuedAt
         - SubscriptionInvoice.dueAt
         operation: listSubscriptionInvoices
@@ -3198,18 +3048,12 @@ screens:
         label: Every tenant
         bindsTo: Tenant
         columns:
-        - Tenant.id
         - Tenant.code
         - Tenant.name
         - Tenant.status
-        - Tenant.suspensionMode
-        - Tenant.suspensionReason
         - Tenant.suspensionEffectiveAt
-        - Tenant.suspensionNoticeMessage
         - Tenant.terminationScheduledAt
         - Tenant.terminationRetentionUntil
-        - Tenant.terminationReason
-        - Tenant.terminationRequestedByPrincipalId
         operation: listTenants
         provenance: contract subscription.yaml GET /tenants
     - name: contextPanel
@@ -3219,16 +3063,11 @@ screens:
         label: The selected subscription invoice
         bindsTo: SubscriptionInvoice
         columns:
-        - SubscriptionInvoice.id
         - SubscriptionInvoice.invoiceNumber
-        - SubscriptionInvoice.periodStart
-        - SubscriptionInvoice.periodEnd
         - SubscriptionInvoice.status
-        - SubscriptionInvoice.lines
         - SubscriptionInvoice.subtotal
         - SubscriptionInvoice.taxAmount
         - SubscriptionInvoice.total
-        - SubscriptionInvoice.planVersionUsed
         - SubscriptionInvoice.issuedAt
         - SubscriptionInvoice.dueAt
         - SubscriptionInvoice.paidAt
@@ -3253,19 +3092,11 @@ screens:
         label: The tenant
         bindsTo: TenantDetail
         columns:
-        - TenantDetail.id
         - TenantDetail.code
         - TenantDetail.name
         - TenantDetail.status
         - TenantDetail.suspensionMode
-        - TenantDetail.suspensionReason
         - TenantDetail.suspensionEffectiveAt
-        - TenantDetail.suspensionNoticeMessage
-        - TenantDetail.terminationScheduledAt
-        - TenantDetail.terminationRetentionUntil
-        - TenantDetail.terminationReason
-        - TenantDetail.terminationRequestedByPrincipalId
-        - TenantDetail.planId
         - TenantDetail.planName
         - TenantDetail.cellCount
         - TenantDetail.venueCount
@@ -3356,9 +3187,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-009
-  apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formGenerateInvoice
     component: modal
@@ -3454,13 +3285,10 @@ screens:
         columns:
         - Cell.name
         - Cell.kind
-        - Cell.isReachable
         - Cell.lastContactAt
         - Cell.licenceExpiresAt
-        - Cell.participatesInCrossCell
         - Cell.regionName
         - Cell.countryCode
-        - Cell.tier
         operation: listTenantCells
         provenance: contract subscription.yaml GET /tenants/{tenantId}/cells
       - kind: dataTable
@@ -3470,13 +3298,9 @@ screens:
         - Tenant.code
         - Tenant.name
         - Tenant.status
-        - Tenant.suspensionMode
-        - Tenant.suspensionReason
         - Tenant.suspensionEffectiveAt
-        - Tenant.suspensionNoticeMessage
         - Tenant.terminationScheduledAt
         - Tenant.terminationRetentionUntil
-        - Tenant.terminationReason
         operation: listTenants
         provenance: contract subscription.yaml GET /tenants
     - name: contextPanel
@@ -3486,22 +3310,14 @@ screens:
         label: The selected cell
         bindsTo: Cell
         columns:
-        - Cell.id
         - Cell.name
         - Cell.kind
-        - Cell.clusterId
-        - Cell.isReachable
         - Cell.lastContactAt
         - Cell.licenceExpiresAt
-        - Cell.participatesInCrossCell
-        - Cell.regionId
         - Cell.regionName
         - Cell.countryCode
         - Cell.tier
         - Cell.status
-        - Cell.cloudProvider
-        - Cell.cloudRegion
-        - Cell.apiEndpoint
         operation: listTenantCells
         provenance: contract subscription.yaml GET /tenants/{tenantId}/cells
       - kind: detailPanel
@@ -3516,19 +3332,11 @@ screens:
         label: The tenant
         bindsTo: TenantDetail
         columns:
-        - TenantDetail.id
         - TenantDetail.code
         - TenantDetail.name
         - TenantDetail.status
         - TenantDetail.suspensionMode
-        - TenantDetail.suspensionReason
         - TenantDetail.suspensionEffectiveAt
-        - TenantDetail.suspensionNoticeMessage
-        - TenantDetail.terminationScheduledAt
-        - TenantDetail.terminationRetentionUntil
-        - TenantDetail.terminationReason
-        - TenantDetail.terminationRequestedByPrincipalId
-        - TenantDetail.planId
         - TenantDetail.planName
         - TenantDetail.cellCount
         - TenantDetail.venueCount
@@ -3602,9 +3410,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-010
-  apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: getSsoConfig
     removed: true
@@ -3696,13 +3504,10 @@ screens:
         columns:
         - Cell.name
         - Cell.kind
-        - Cell.isReachable
         - Cell.lastContactAt
         - Cell.licenceExpiresAt
-        - Cell.participatesInCrossCell
         - Cell.regionName
         - Cell.countryCode
-        - Cell.tier
         operation: listTenantCells
         provenance: contract subscription.yaml GET /tenants/{tenantId}/cells
       - kind: dataTable
@@ -3712,13 +3517,9 @@ screens:
         - Tenant.code
         - Tenant.name
         - Tenant.status
-        - Tenant.suspensionMode
-        - Tenant.suspensionReason
         - Tenant.suspensionEffectiveAt
-        - Tenant.suspensionNoticeMessage
         - Tenant.terminationScheduledAt
         - Tenant.terminationRetentionUntil
-        - Tenant.terminationReason
         operation: listTenants
         provenance: contract subscription.yaml GET /tenants
     - name: contextPanel
@@ -3728,22 +3529,14 @@ screens:
         label: The selected cell
         bindsTo: Cell
         columns:
-        - Cell.id
         - Cell.name
         - Cell.kind
-        - Cell.clusterId
-        - Cell.isReachable
         - Cell.lastContactAt
         - Cell.licenceExpiresAt
-        - Cell.participatesInCrossCell
-        - Cell.regionId
         - Cell.regionName
         - Cell.countryCode
         - Cell.tier
         - Cell.status
-        - Cell.cloudProvider
-        - Cell.cloudRegion
-        - Cell.apiEndpoint
         operation: listTenantCells
         provenance: contract subscription.yaml GET /tenants/{tenantId}/cells
       - kind: detailPanel
@@ -3765,19 +3558,11 @@ screens:
         label: The tenant
         bindsTo: TenantDetail
         columns:
-        - TenantDetail.id
         - TenantDetail.code
         - TenantDetail.name
         - TenantDetail.status
         - TenantDetail.suspensionMode
-        - TenantDetail.suspensionReason
         - TenantDetail.suspensionEffectiveAt
-        - TenantDetail.suspensionNoticeMessage
-        - TenantDetail.terminationScheduledAt
-        - TenantDetail.terminationRetentionUntil
-        - TenantDetail.terminationReason
-        - TenantDetail.terminationRequestedByPrincipalId
-        - TenantDetail.planId
         - TenantDetail.planName
         - TenantDetail.cellCount
         - TenantDetail.venueCount
@@ -3930,9 +3715,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-011
-  apisNote: Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: getSsoConfig
     removed: true
@@ -4024,13 +3809,10 @@ screens:
         columns:
         - Cell.name
         - Cell.kind
-        - Cell.isReachable
         - Cell.lastContactAt
         - Cell.licenceExpiresAt
-        - Cell.participatesInCrossCell
         - Cell.regionName
         - Cell.countryCode
-        - Cell.tier
         operation: listTenantCells
         provenance: contract subscription.yaml GET /tenants/{tenantId}/cells
       - kind: dataTable
@@ -4040,13 +3822,9 @@ screens:
         - Tenant.code
         - Tenant.name
         - Tenant.status
-        - Tenant.suspensionMode
-        - Tenant.suspensionReason
         - Tenant.suspensionEffectiveAt
-        - Tenant.suspensionNoticeMessage
         - Tenant.terminationScheduledAt
         - Tenant.terminationRetentionUntil
-        - Tenant.terminationReason
         operation: listTenants
         provenance: contract subscription.yaml GET /tenants
     - name: contextPanel
@@ -4056,41 +3834,25 @@ screens:
         label: The selected cell
         bindsTo: Cell
         columns:
-        - Cell.id
         - Cell.name
         - Cell.kind
-        - Cell.clusterId
-        - Cell.isReachable
         - Cell.lastContactAt
         - Cell.licenceExpiresAt
-        - Cell.participatesInCrossCell
-        - Cell.regionId
         - Cell.regionName
         - Cell.countryCode
         - Cell.tier
         - Cell.status
-        - Cell.cloudProvider
-        - Cell.cloudRegion
-        - Cell.apiEndpoint
         operation: listTenantCells
         provenance: contract subscription.yaml GET /tenants/{tenantId}/cells
       - kind: detailPanel
         label: The tenant
         bindsTo: TenantDetail
         columns:
-        - TenantDetail.id
         - TenantDetail.code
         - TenantDetail.name
         - TenantDetail.status
         - TenantDetail.suspensionMode
-        - TenantDetail.suspensionReason
         - TenantDetail.suspensionEffectiveAt
-        - TenantDetail.suspensionNoticeMessage
-        - TenantDetail.terminationScheduledAt
-        - TenantDetail.terminationRetentionUntil
-        - TenantDetail.terminationReason
-        - TenantDetail.terminationRequestedByPrincipalId
-        - TenantDetail.planId
         - TenantDetail.planName
         - TenantDetail.cellCount
         - TenantDetail.venueCount
@@ -4192,9 +3954,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-012
-  apisNote: Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formProvisionCell
     component: modal
@@ -4316,22 +4078,14 @@ screens:
         label: The cell
         bindsTo: CellDetail
         columns:
-        - CellDetail.id
         - CellDetail.name
         - CellDetail.kind
-        - CellDetail.clusterId
-        - CellDetail.isReachable
         - CellDetail.lastContactAt
         - CellDetail.licenceExpiresAt
-        - CellDetail.participatesInCrossCell
-        - CellDetail.regionId
         - CellDetail.regionName
         - CellDetail.countryCode
         - CellDetail.tier
         - CellDetail.status
-        - CellDetail.cloudProvider
-        - CellDetail.cloudRegion
-        - CellDetail.apiEndpoint
         operation: getCell
         provenance: contract subscription.yaml GET /cells/{cellId}
       - kind: detailPanel
@@ -4408,9 +4162,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-013
-  apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: cancelDecommission
     removed: true
@@ -4518,22 +4272,14 @@ screens:
         label: The cell
         bindsTo: CellDetail
         columns:
-        - CellDetail.id
         - CellDetail.name
         - CellDetail.kind
-        - CellDetail.clusterId
-        - CellDetail.isReachable
         - CellDetail.lastContactAt
         - CellDetail.licenceExpiresAt
-        - CellDetail.participatesInCrossCell
-        - CellDetail.regionId
         - CellDetail.regionName
         - CellDetail.countryCode
         - CellDetail.tier
         - CellDetail.status
-        - CellDetail.cloudProvider
-        - CellDetail.cloudRegion
-        - CellDetail.apiEndpoint
         operation: getCell
         provenance: contract subscription.yaml GET /cells/{cellId}
       - kind: detailPanel
@@ -4626,9 +4372,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-014
-  apisNote: Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: cancelDecommission
     removed: true
@@ -4770,13 +4516,9 @@ screens:
         - Tenant.code
         - Tenant.name
         - Tenant.status
-        - Tenant.suspensionMode
-        - Tenant.suspensionReason
         - Tenant.suspensionEffectiveAt
-        - Tenant.suspensionNoticeMessage
         - Tenant.terminationScheduledAt
         - Tenant.terminationRetentionUntil
-        - Tenant.terminationReason
         operation: listTenants
         provenance: contract subscription.yaml GET /tenants
       - kind: dataTable
@@ -4835,19 +4577,11 @@ screens:
         label: The tenant
         bindsTo: TenantDetail
         columns:
-        - TenantDetail.id
         - TenantDetail.code
         - TenantDetail.name
         - TenantDetail.status
         - TenantDetail.suspensionMode
-        - TenantDetail.suspensionReason
         - TenantDetail.suspensionEffectiveAt
-        - TenantDetail.suspensionNoticeMessage
-        - TenantDetail.terminationScheduledAt
-        - TenantDetail.terminationRetentionUntil
-        - TenantDetail.terminationReason
-        - TenantDetail.terminationRequestedByPrincipalId
-        - TenantDetail.planId
         - TenantDetail.planName
         - TenantDetail.cellCount
         - TenantDetail.venueCount
@@ -4865,7 +4599,6 @@ screens:
         - ApiUsageSummary.p95LatencyMs
         - ApiUsageSummary.p99LatencyMs
         - ApiUsageSummary.quotaBreaches
-        - ApiUsageSummary.byOperation
         operation: getApiUsage
         provenance: contract public-api.yaml GET /api-usage
       - kind: detailPanel
@@ -4988,9 +4721,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-015
-  apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSetApiQuota
     component: modal
@@ -5180,14 +4913,10 @@ screens:
         bindsTo: ConfigVersion
         columns:
         - ConfigVersion.publishedAt
-        - ConfigVersion.publishedByPrincipalId
         - ConfigVersion.publishedByName
         - ConfigVersion.note
         - ConfigVersion.isCurrent
         - ConfigVersion.scheduledFor
-        - ConfigVersion.contentHash
-        - ConfigVersion.pendingBuildTimeChanges
-        - ConfigVersion.scopePath
         operation: listConfigVersions
         provenance: contract white-label.yaml GET /tenant-config/versions
       - kind: publishGate
@@ -5415,9 +5144,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-016
-  apisNote: Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formOpenPlatformStaffGrant
     component: modal
@@ -5680,16 +5409,10 @@ screens:
         - CustomDomain.kind
         - CustomDomain.status
         - CustomDomain.verificationMethod
-        - CustomDomain.verificationRecord
-        - CustomDomain.dnsRecords
-        - CustomDomain.routing
         - CustomDomain.revalidation
-        - CustomDomain.cnameLost
-        - CustomDomain.isPrimary
         - CustomDomain.readiness
         - CustomDomain.certificateExpiresAt
         - CustomDomain.lastCheckedAt
-        - CustomDomain.failureReason
         operation: listCustomDomains
         provenance: contract white-label.yaml GET /tenant-domains
     - name: actionBar
@@ -5805,9 +5528,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-017
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formOpenPlatformStaffGrant
     component: modal
@@ -6010,9 +5733,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-018
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formOpenPlatformStaffGrant
     component: modal
@@ -6240,9 +5963,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-019
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formOpenPlatformStaffGrant
     component: modal
@@ -6432,13 +6155,11 @@ screens:
         label: The selected principal
         bindsTo: Principal
         columns:
-        - Principal.id
         - Principal.username
         - Principal.displayName
         - Principal.isActive
         - Principal.validFrom
         - Principal.validTo
-        - Principal.primaryRoleId
         - Principal.roles
         - Principal.lastLoginAt
         operation: getPrincipal
@@ -6523,9 +6244,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-020
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formCreatePrincipal
     component: modal
@@ -6766,9 +6487,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-021
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formOpenPlatformStaffGrant
     component: modal
@@ -7325,9 +7046,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-022
-  apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the generator template
     ("Find release & version management for this venue"); releases are platform-wide (design-notes correction
     platform-foundation ADM-022).'
@@ -7543,9 +7264,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-023
-  apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: createRelease
     removed: true
@@ -7712,9 +7433,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-024
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formPublishSupportNotice
     component: modal
@@ -7849,9 +7570,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-025
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formScheduleTenantUpgrade
     component: modal
@@ -8078,9 +7799,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-026
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formPublishSupportNotice
     component: modal
@@ -8205,11 +7926,8 @@ screens:
         columns:
         - Migration.module
         - Migration.description
-        - Migration.isReversible
         - Migration.rollbackTestedAt
         - Migration.checksum
-        - Migration.estimatedLockMs
-        - Migration.touchesPartitionedTable
         - Migration.appliedCellCount
         - Migration.pendingCellCount
         operation: listMigrations
@@ -8236,22 +7954,14 @@ screens:
         label: The migration run
         bindsTo: MigrationRun
         columns:
-        - MigrationRun.id
-        - MigrationRun.planId
         - MigrationRun.status
-        - MigrationRun.canaryCellId
-        - MigrationRun.canaryTenantId
         - MigrationRun.tenantsTotal
         - MigrationRun.tenantsComplete
         - MigrationRun.tenantsFailed
         - MigrationRun.cellsTotal
-        - MigrationRun.cellsComplete
-        - MigrationRun.cellsFailed
-        - MigrationRun.startedByPrincipalId
         - MigrationRun.startedAt
         - MigrationRun.completedAt
         - MigrationRun.cells
-        - MigrationRun.tenants
         operation: getMigrationRun
         provenance: contract platform-ops.yaml GET /migrations/runs/{runId}
       - kind: detailPanel
@@ -8333,9 +8043,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-027
-  apisNote: Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formPlanMigration
     component: modal
@@ -8500,9 +8210,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-028
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRegisterEnvironment
     component: modal
@@ -8850,22 +8560,14 @@ screens:
         label: The cell
         bindsTo: CellDetail
         columns:
-        - CellDetail.id
         - CellDetail.name
         - CellDetail.kind
-        - CellDetail.clusterId
-        - CellDetail.isReachable
         - CellDetail.lastContactAt
         - CellDetail.licenceExpiresAt
-        - CellDetail.participatesInCrossCell
-        - CellDetail.regionId
         - CellDetail.regionName
         - CellDetail.countryCode
         - CellDetail.tier
         - CellDetail.status
-        - CellDetail.cloudProvider
-        - CellDetail.cloudRegion
-        - CellDetail.apiEndpoint
         operation: getCell
         provenance: contract subscription.yaml GET /cells/{cellId}
       - kind: detailPanel
@@ -8898,19 +8600,14 @@ screens:
         label: The rollout
         bindsTo: RolloutDetail
         columns:
-        - RolloutDetail.id
-        - RolloutDetail.releaseId
         - RolloutDetail.environment
         - RolloutDetail.status
         - RolloutDetail.cellsTotal
         - RolloutDetail.cellsComplete
         - RolloutDetail.cellsFailed
-        - RolloutDetail.startedByPrincipalId
-        - RolloutDetail.approvedByPrincipalId
         - RolloutDetail.pausedReason
         - RolloutDetail.startedAt
         - RolloutDetail.completedAt
-        - RolloutDetail.cells
         operation: getRollout
         provenance: contract platform-ops.yaml GET /rollouts/{rolloutId}
     - name: actionBar
@@ -9050,9 +8747,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-029
-  apisNote: Rebuilt 9 September 2026 from the 12 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 12 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: cancelDecommission
     removed: true
@@ -9222,9 +8919,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-030
-  apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: cancelDecommission
     removed: true
@@ -9482,9 +9179,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-031
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formOpenPlatformStaffGrant
     component: modal
@@ -9681,9 +9378,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-032
-  apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: cancelDecommission
     removed: true
@@ -9794,22 +9491,14 @@ screens:
         label: The cell
         bindsTo: CellDetail
         columns:
-        - CellDetail.id
         - CellDetail.name
         - CellDetail.kind
-        - CellDetail.clusterId
-        - CellDetail.isReachable
         - CellDetail.lastContactAt
         - CellDetail.licenceExpiresAt
-        - CellDetail.participatesInCrossCell
-        - CellDetail.regionId
         - CellDetail.regionName
         - CellDetail.countryCode
         - CellDetail.tier
         - CellDetail.status
-        - CellDetail.cloudProvider
-        - CellDetail.cloudRegion
-        - CellDetail.apiEndpoint
         operation: getCell
         provenance: contract subscription.yaml GET /cells/{cellId}
       - kind: detailPanel
@@ -9869,9 +9558,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-033
-  apisNote: Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: cancelDecommission
     removed: true
@@ -10006,9 +9695,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-034
-  apisNote: Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: cancelDecommission
     removed: true
@@ -10166,9 +9855,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-035
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formPublishSupportNotice
     component: modal
@@ -10322,9 +10011,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-036
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formPublishSupportNotice
     component: modal
@@ -10477,17 +10166,11 @@ screens:
         bindsTo: AiProvider
         columns:
         - AiProvider.kind
-        - AiProvider.capability
         - AiProvider.model
-        - AiProvider.failoverProviderId
-        - AiProvider.degradeGracefully
         - AiProvider.priority
         - AiProvider.scopeLevel
         - AiProvider.credentialRotatedAt
         - AiProvider.credentialExpiresAt
-        - AiProvider.vendor
-        - AiProvider.credentialHint
-        - AiProvider.compatibility
         operation: listAiProviders
         provenance: contract ai.yaml GET /providers
       - kind: dataTable
@@ -10513,24 +10196,14 @@ screens:
         label: The selected AI provider
         bindsTo: AiProvider
         columns:
-        - AiProvider.id
         - AiProvider.kind
-        - AiProvider.capability
         - AiProvider.model
-        - AiProvider.failoverProviderId
-        - AiProvider.degradeGracefully
         - AiProvider.priority
         - AiProvider.scopeLevel
         - AiProvider.credentialRotatedAt
         - AiProvider.credentialExpiresAt
         - AiProvider.lastVerifiedAt
-        - AiProvider.endpoint
         - AiProvider.residency
-        - AiProvider.maxTokens
-        - AiProvider.vendor
-        - AiProvider.residencyClasses
-        - AiProvider.credentialHint
-        - AiProvider.compatibility
         operation: listAiProviders
         provenance: contract ai.yaml GET /providers
       - kind: detailPanel
@@ -10725,9 +10398,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-037
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formOpenPlatformStaffGrant
     component: modal
@@ -11330,17 +11003,11 @@ screens:
         label: The selected republish and its progress
         bindsTo: OutboxRepublish
         columns:
-        - OutboxRepublish.id
-        - OutboxRepublish.tenantId
         - OutboxRepublish.from
         - OutboxRepublish.to
-        - OutboxRepublish.eventNames
-        - OutboxRepublish.reason
         - OutboxRepublish.status
         - OutboxRepublish.cursorAt
         - OutboxRepublish.rowsPublished
-        - OutboxRepublish.lastError
-        - OutboxRepublish.requestedBy
         - OutboxRepublish.requestedAt
         - OutboxRepublish.startedAt
         - OutboxRepublish.finishedAt
@@ -11458,11 +11125,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-318
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen. The four outbox republish
-    operations (ADR-0058, amended 1 October) were added on 1 October 2026 and sit here until republish
-    has a screen of its own.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself. The four
+    outbox republish operations (ADR-0058, amended 1 October) were added on 1 October 2026 and sit here
+    until republish has a screen of its own.'
 - id: ADM-369
   name: Commercial Command Center
   module: Tenants & Licensing
@@ -28503,13 +28170,9 @@ screens:
         columns:
         - AiForecastVersion.versionNumber
         - AiForecastVersion.status
-        - AiForecastVersion.basis
-        - AiForecastVersion.maturity
         - AiForecastVersion.modelVersion
         - AiForecastVersion.dataCutoffAt
         - AiForecastVersion.horizonStart
-        - AiForecastVersion.horizonEnd
-        - AiForecastVersion.qualityChecks
         - AiForecastVersion.publishedAt
         operation: listForecastVersions
         notes: The versions of the picked definition, newest first. The board's example values ("Saturday

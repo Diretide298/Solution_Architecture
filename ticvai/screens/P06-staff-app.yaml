@@ -326,15 +326,9 @@ screens:
         label: The session
         bindsTo: Session
         columns:
-        - Session.sessionId
-        - Session.principalId
-        - Session.roleId
         - Session.displayName
         - Session.scope
         - Session.effectivePermissions
-        - Session.permissionsByScope
-        - Session.saleBoardId
-        - Session.workstation
         - Session.openedAt
         - Session.expiresAt
         operation: getCurrentSession
@@ -381,9 +375,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-002
-  apisNote: Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSelectRole
     component: modal
@@ -743,18 +737,10 @@ screens:
         label: Waiting for a decision
         bindsTo: Incident
         columns:
-        - Incident.id
         - Incident.incidentNumber
-        - Incident.kind
         - Incident.severity
         - Incident.status
-        - Incident.venueId
-        - Incident.assetId
         - Incident.locationDescription
-        - Incident.isReportable
-        - Incident.notificationDueAt
-        - Incident.notifiedAt
-        - Incident.assignedToPrincipalId
         operation: listIncidents
         provenance: contract maintenance.yaml GET /incidents
     - name: contextPanel
@@ -764,82 +750,44 @@ screens:
         label: The selected incident
         bindsTo: Incident
         columns:
-        - Incident.id
         - Incident.incidentNumber
         - Incident.kind
         - Incident.severity
         - Incident.status
-        - Incident.venueId
-        - Incident.assetId
         - Incident.locationDescription
-        - Incident.isReportable
-        - Incident.notificationDueAt
-        - Incident.notifiedAt
-        - Incident.assignedToPrincipalId
-        - Incident.reportedByPrincipalId
-        - Incident.correctiveWorkOrderId
-        - Incident.occurredAt
-        - Incident.recordedAt
         operation: listIncidents
         provenance: contract maintenance.yaml GET /incidents
       - kind: detailPanel
         label: The incident
         bindsTo: IncidentDetail
         columns:
-        - IncidentDetail.id
         - IncidentDetail.incidentNumber
         - IncidentDetail.kind
         - IncidentDetail.severity
         - IncidentDetail.status
-        - IncidentDetail.venueId
-        - IncidentDetail.assetId
         - IncidentDetail.locationDescription
-        - IncidentDetail.isReportable
-        - IncidentDetail.notificationDueAt
-        - IncidentDetail.notifiedAt
-        - IncidentDetail.assignedToPrincipalId
-        - IncidentDetail.reportedByPrincipalId
-        - IncidentDetail.correctiveWorkOrderId
-        - IncidentDetail.occurredAt
-        - IncidentDetail.recordedAt
         operation: getIncident
         provenance: contract maintenance.yaml GET /incidents/{incidentId}
       - kind: detailPanel
         label: The shift
         bindsTo: Shift
         columns:
-        - Shift.id
-        - Shift.workstationId
-        - Shift.venueId
-        - Shift.scopePath
-        - Shift.principalId
         - Shift.principalDisplayName
         - Shift.incidents
         - Shift.status
-        - Shift.currency
-        - Shift.currencyScale
         - Shift.depositBoxCode
         - Shift.bagNumber
-        - Shift.openingFloat
         operation: getShift
         provenance: contract shift.yaml GET /shifts/{shiftId}
       - kind: detailPanel
         label: The shift
         bindsTo: Shift
         columns:
-        - Shift.id
-        - Shift.workstationId
-        - Shift.venueId
-        - Shift.scopePath
-        - Shift.principalId
         - Shift.principalDisplayName
         - Shift.incidents
         - Shift.status
-        - Shift.currency
-        - Shift.currencyScale
         - Shift.depositBoxCode
         - Shift.bagNumber
-        - Shift.openingFloat
         operation: getWorkstationShift
         provenance: contract shift.yaml GET /shifts/current/overview
     - name: actionBar
@@ -997,9 +945,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-003
-  apisNote: Rebuilt 9 September 2026 from the 17 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 17 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: acceptShiftVariance
     removed: true
@@ -1119,33 +1067,20 @@ screens:
         label: Every inspection template
         bindsTo: InspectionTemplate
         columns:
-        - InspectionTemplate.id
         - InspectionTemplate.code
         - InspectionTemplate.name
-        - InspectionTemplate.venueId
-        - InspectionTemplate.appliesToAssetCategoryId
         - InspectionTemplate.frequency
-        - InspectionTemplate.items
         - InspectionTemplate.retentionYears
-        - InspectionTemplate.isActive
         operation: listInspectionTemplates
         provenance: contract maintenance.yaml GET /inspection-templates
       - kind: dataTable
         label: Every inspection
         bindsTo: Inspection
         columns:
-        - Inspection.id
-        - Inspection.templateId
         - Inspection.templateName
-        - Inspection.venueId
-        - Inspection.assetId
         - Inspection.outcome
         - Inspection.failedItemCount
         - Inspection.failedSafetyCriticalCount
-        - Inspection.performedByPrincipalId
-        - Inspection.performedAt
-        - Inspection.recordedAt
-        - Inspection.syncedAt
         operation: listInspections
         provenance: contract maintenance.yaml GET /inspections
     - name: contextPanel
@@ -1155,15 +1090,11 @@ screens:
         label: The selected inspection template
         bindsTo: InspectionTemplate
         columns:
-        - InspectionTemplate.id
         - InspectionTemplate.code
         - InspectionTemplate.name
-        - InspectionTemplate.venueId
-        - InspectionTemplate.appliesToAssetCategoryId
         - InspectionTemplate.frequency
         - InspectionTemplate.items
         - InspectionTemplate.retentionYears
-        - InspectionTemplate.isActive
         operation: listInspectionTemplates
         provenance: contract maintenance.yaml GET /inspection-templates
     - name: actionBar
@@ -1209,9 +1140,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-048
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSubmitInspection
     component: modal
@@ -1309,16 +1240,9 @@ screens:
         label: Waiting for a decision
         bindsTo: CashMovement
         columns:
-        - CashMovement.id
-        - CashMovement.kind
-        - CashMovement.amount
-        - CashMovement.denominations
         - CashMovement.reference
         - CashMovement.reason
         - CashMovement.recordedAt
-        - CashMovement.shiftId
-        - CashMovement.authorisedByPrincipalId
-        - CashMovement.sequence
         - CashMovement.syncedAt
         operation: listCashMovements
         provenance: contract shift.yaml GET /shifts/{shiftId}/cash-movements
@@ -1326,16 +1250,8 @@ screens:
         label: Every shift
         bindsTo: Shift
         columns:
-        - Shift.id
-        - Shift.workstationId
-        - Shift.venueId
-        - Shift.scopePath
-        - Shift.principalId
         - Shift.principalDisplayName
-        - Shift.incidents
         - Shift.status
-        - Shift.currency
-        - Shift.currencyScale
         - Shift.depositBoxCode
         - Shift.bagNumber
         operation: listShifts
@@ -1347,58 +1263,33 @@ screens:
         label: The selected cash movement
         bindsTo: CashMovement
         columns:
-        - CashMovement.id
         - CashMovement.kind
         - CashMovement.amount
-        - CashMovement.denominations
         - CashMovement.reference
         - CashMovement.reason
         - CashMovement.recordedAt
-        - CashMovement.shiftId
-        - CashMovement.depositBoxId
-        - CashMovement.witnessPrincipalId
-        - CashMovement.withdrawalReason
-        - CashMovement.authorisedByPrincipalId
-        - CashMovement.sequence
-        - CashMovement.syncedAt
         operation: listCashMovements
         provenance: contract shift.yaml GET /shifts/{shiftId}/cash-movements
       - kind: detailPanel
         label: The shift
         bindsTo: Shift
         columns:
-        - Shift.id
-        - Shift.workstationId
-        - Shift.venueId
-        - Shift.scopePath
-        - Shift.principalId
         - Shift.principalDisplayName
         - Shift.incidents
         - Shift.status
-        - Shift.currency
-        - Shift.currencyScale
         - Shift.depositBoxCode
         - Shift.bagNumber
-        - Shift.openingFloat
         operation: getShift
         provenance: contract shift.yaml GET /shifts/{shiftId}
       - kind: detailPanel
         label: The shift
         bindsTo: Shift
         columns:
-        - Shift.id
-        - Shift.workstationId
-        - Shift.venueId
-        - Shift.scopePath
-        - Shift.principalId
         - Shift.principalDisplayName
         - Shift.incidents
         - Shift.status
-        - Shift.currency
-        - Shift.currencyScale
         - Shift.depositBoxCode
         - Shift.bagNumber
-        - Shift.openingFloat
         operation: getCurrentShift
         provenance: contract shift.yaml GET /shifts/current
     - name: actionBar
@@ -1516,9 +1407,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-009
-  apisNote: Rebuilt 9 September 2026 from the 13 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 13 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: approveShiftOpen
     removed: true
@@ -1729,9 +1620,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-010
-  apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: getOfflinePackage
     removed: true
@@ -1834,11 +1725,8 @@ screens:
         label: Every order
         bindsTo: OrderSummary
         columns:
-        - OrderSummary.id
         - OrderSummary.orderNumber
         - OrderSummary.status
-        - OrderSummary.grossAmount
-        - OrderSummary.refundedAmount
         - OrderSummary.channel
         - OrderSummary.lineCount
         operation: listOrders
@@ -1847,18 +1735,10 @@ screens:
         label: Every refund
         bindsTo: Refund
         columns:
-        - Refund.id
-        - Refund.orderId
-        - Refund.batchId
         - Refund.fxRate
-        - Refund.taxReversalEntryId
-        - Refund.settleTo
-        - Refund.fxVariance
         - Refund.amount
         - Refund.appliedPercentage
         - Refund.status
-        - Refund.reason
-        - Refund.requestedByPrincipalId
         operation: listOrderRefunds
         provenance: contract orders.yaml GET /orders/{orderId}/refunds
       - kind: confirmDialog
@@ -1880,27 +1760,19 @@ screens:
         label: The selected order
         bindsTo: OrderSummary
         columns:
-        - OrderSummary.id
         - OrderSummary.orderNumber
         - OrderSummary.status
         - OrderSummary.grossAmount
         - OrderSummary.refundedAmount
-        - OrderSummary.channel
-        - OrderSummary.lineCount
-        - OrderSummary.principalId
         - OrderSummary.holdLabel
-        - OrderSummary.heldUntil
         operation: listOrders
         provenance: contract orders.yaml GET /orders
       - kind: detailPanel
         label: The order statement
         bindsTo: OrderStatement
         columns:
-        - OrderStatement.orderId
         - OrderStatement.orderNumber
         - OrderStatement.currency
-        - OrderStatement.currencyScale
-        - OrderStatement.entries
         - OrderStatement.totalPaid
         - OrderStatement.totalRefunded
         - OrderStatement.currentBalance
@@ -1910,22 +1782,11 @@ screens:
         label: The order
         bindsTo: Order
         columns:
-        - Order.id
         - Order.orderNumber
-        - Order.channel
-        - Order.venueId
-        - Order.scopePath
         - Order.status
-        - Order.currency
-        - Order.currencyScale
         - Order.grossAmount
         - Order.taxAmount
         - Order.netAmount
-        - Order.refundedAmount
-        - Order.totalPriceVariance
-        - Order.lines
-        - Order.payments
-        - Order.principalId
         operation: getOrder
         provenance: contract orders.yaml GET /orders/{orderId}
     - name: actionBar
@@ -2004,9 +1865,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-014
-  apisNote: Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: applyManualDiscount
     removed: true
@@ -2141,18 +2002,8 @@ screens:
         label: Every scan event
         bindsTo: ScanEvent
         columns:
-        - ScanEvent.id
-        - ScanEvent.accessPointId
-        - ScanEvent.venueId
-        - ScanEvent.scopePath
-        - ScanEvent.ticketId
         - ScanEvent.mediaCode
         - ScanEvent.outcome
-        - ScanEvent.denyReason
-        - ScanEvent.direction
-        - ScanEvent.operatorPrincipalId
-        - ScanEvent.deviceId
-        - ScanEvent.overridesScanId
         operation: listScans
         provenance: contract access.yaml GET /access/scans
       - kind: scanTarget
@@ -2175,19 +2026,9 @@ screens:
         label: The selected scan event
         bindsTo: ScanEvent
         columns:
-        - ScanEvent.id
-        - ScanEvent.accessPointId
-        - ScanEvent.venueId
-        - ScanEvent.scopePath
-        - ScanEvent.ticketId
         - ScanEvent.mediaCode
         - ScanEvent.outcome
         - ScanEvent.denyReason
-        - ScanEvent.direction
-        - ScanEvent.operatorPrincipalId
-        - ScanEvent.deviceId
-        - ScanEvent.overridesScanId
-        - ScanEvent.overrideReason
         - ScanEvent.recordedAt
         - ScanEvent.syncedAt
         operation: listScans
@@ -2199,11 +2040,8 @@ screens:
         - OfflinePackage.generatedAt
         - OfflinePackage.validFrom
         - OfflinePackage.validTo
-        - OfflinePackage.accessPointId
         - OfflinePackage.entitlements
         - OfflinePackage.delegatedRights
-        - OfflinePackage.blacklist
-        - OfflinePackage.admissionRules
         operation: getOfflinePackage
         provenance: contract access.yaml GET /access/offline-package
     - name: actionBar
@@ -2349,9 +2187,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-015
-  apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: EMP-017
   name: Sync & reconciliation
   module: Operations
@@ -2432,33 +2270,18 @@ screens:
         label: Every sync rejection
         bindsTo: SyncRejection
         columns:
-        - SyncRejection.id
-        - SyncRejection.workstationId
         - SyncRejection.kind
         - SyncRejection.recordedAt
         - SyncRejection.rejectedAt
-        - SyncRejection.problem
-        - SyncRejection.payload
         - SyncRejection.resolvedAt
-        - SyncRejection.resolvedByPrincipalId
         operation: listSyncRejections
         provenance: contract orders.yaml GET /sync/rejections
       - kind: dataTable
         label: Every scan event
         bindsTo: ScanEvent
         columns:
-        - ScanEvent.id
-        - ScanEvent.accessPointId
-        - ScanEvent.venueId
-        - ScanEvent.scopePath
-        - ScanEvent.ticketId
         - ScanEvent.mediaCode
         - ScanEvent.outcome
-        - ScanEvent.denyReason
-        - ScanEvent.direction
-        - ScanEvent.operatorPrincipalId
-        - ScanEvent.deviceId
-        - ScanEvent.overridesScanId
         operation: listScans
         provenance: contract access.yaml GET /access/scans
       - kind: scanTarget
@@ -2481,17 +2304,11 @@ screens:
         label: The selected sync rejection
         bindsTo: SyncRejection
         columns:
-        - SyncRejection.id
-        - SyncRejection.workstationId
         - SyncRejection.kind
         - SyncRejection.recordedAt
         - SyncRejection.rejectedAt
         - SyncRejection.problem
-        - SyncRejection.payload
         - SyncRejection.resolvedAt
-        - SyncRejection.resolvedByPrincipalId
-        - SyncRejection.resolution
-        - SyncRejection.resolvedRecordId
         operation: listSyncRejections
         provenance: contract orders.yaml GET /sync/rejections
       - kind: detailPanel
@@ -2501,11 +2318,8 @@ screens:
         - OfflinePackage.generatedAt
         - OfflinePackage.validFrom
         - OfflinePackage.validTo
-        - OfflinePackage.accessPointId
         - OfflinePackage.entitlements
         - OfflinePackage.delegatedRights
-        - OfflinePackage.blacklist
-        - OfflinePackage.admissionRules
         operation: getOfflinePackage
         provenance: contract access.yaml GET /access/offline-package
     - name: actionBar
@@ -2656,9 +2470,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-017
-  apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: syncOrders
     removed: true
@@ -2726,15 +2540,10 @@ screens:
         label: Every bundle
         bindsTo: BundleSummary
         columns:
-        - BundleSummary.venueId
         - BundleSummary.publishedAt
         - BundleSummary.publishedBy
-        - BundleSummary.contentHash
-        - BundleSummary.signatureKeyId
         - BundleSummary.staleAfter
         - BundleSummary.sizeBytes
-        - BundleSummary.note
-        - BundleSummary.appliedByWorkstations
         operation: listCatalogueBundles
         provenance: contract catalogue.yaml GET /catalogue/bundles
     - name: contextPanel
@@ -2744,27 +2553,20 @@ screens:
         label: The selected bundle
         bindsTo: BundleSummary
         columns:
-        - BundleSummary.venueId
         - BundleSummary.publishedAt
         - BundleSummary.publishedBy
-        - BundleSummary.contentHash
-        - BundleSummary.signatureKeyId
         - BundleSummary.staleAfter
         - BundleSummary.sizeBytes
         - BundleSummary.note
-        - BundleSummary.appliedByWorkstations
         operation: listCatalogueBundles
         provenance: contract catalogue.yaml GET /catalogue/bundles
       - kind: detailPanel
         label: The catalogue bundle
         bindsTo: CatalogueBundle
         columns:
-        - CatalogueBundle.venueId
         - CatalogueBundle.isDelta
         - CatalogueBundle.baseVersion
         - CatalogueBundle.signature
-        - CatalogueBundle.signatureKeyId
-        - CatalogueBundle.contentHash
         - CatalogueBundle.staleAfter
         - CatalogueBundle.payload
         operation: getLatestBundle
@@ -2819,9 +2621,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-018
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formReportBundleApplied
     component: modal
@@ -2900,17 +2702,9 @@ screens:
         bindsTo: WorkOrder
         columns:
         - WorkOrder.downtimeMinutes
-        - WorkOrder.rootCause
-        - WorkOrder.rootCauseNote
-        - WorkOrder.escalatedAt
-        - WorkOrder.escalationLevel
-        - WorkOrder.id
         - WorkOrder.workOrderNumber
         - WorkOrder.title
-        - WorkOrder.venueId
-        - WorkOrder.assetId
         - WorkOrder.assetName
-        - WorkOrder.status
         operation: listWorkOrders
         provenance: contract maintenance.yaml GET /work-orders
       - kind: confirmDialog
@@ -2932,44 +2726,22 @@ screens:
         label: The selected work order
         bindsTo: WorkOrder
         columns:
-        - WorkOrder.downtimeMinutes
-        - WorkOrder.rootCause
-        - WorkOrder.rootCauseNote
-        - WorkOrder.escalatedAt
-        - WorkOrder.escalationLevel
-        - WorkOrder.id
         - WorkOrder.workOrderNumber
         - WorkOrder.title
-        - WorkOrder.venueId
-        - WorkOrder.assetId
         - WorkOrder.assetName
         - WorkOrder.status
         - WorkOrder.priority
-        - WorkOrder.kind
-        - WorkOrder.assignedToPrincipalId
-        - WorkOrder.raisedByPrincipalId
         operation: listWorkOrders
         provenance: contract maintenance.yaml GET /work-orders
       - kind: detailPanel
         label: The work order
         bindsTo: WorkOrderDetail
         columns:
-        - WorkOrderDetail.downtimeMinutes
-        - WorkOrderDetail.rootCause
-        - WorkOrderDetail.rootCauseNote
-        - WorkOrderDetail.escalatedAt
-        - WorkOrderDetail.escalationLevel
-        - WorkOrderDetail.id
         - WorkOrderDetail.workOrderNumber
         - WorkOrderDetail.title
-        - WorkOrderDetail.venueId
-        - WorkOrderDetail.assetId
         - WorkOrderDetail.assetName
         - WorkOrderDetail.status
         - WorkOrderDetail.priority
-        - WorkOrderDetail.kind
-        - WorkOrderDetail.assignedToPrincipalId
-        - WorkOrderDetail.raisedByPrincipalId
         operation: getWorkOrder
         provenance: contract maintenance.yaml GET /work-orders/{workOrderId}
     - name: actionBar
@@ -3044,9 +2816,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-004
-  apisNote: Rebuilt 9 September 2026 from the 15 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 15 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: attachWorkOrderEvidence
     removed: true
@@ -3224,17 +2996,9 @@ screens:
         bindsTo: WorkOrder
         columns:
         - WorkOrder.downtimeMinutes
-        - WorkOrder.rootCause
-        - WorkOrder.rootCauseNote
-        - WorkOrder.escalatedAt
-        - WorkOrder.escalationLevel
-        - WorkOrder.id
         - WorkOrder.workOrderNumber
         - WorkOrder.title
-        - WorkOrder.venueId
-        - WorkOrder.assetId
         - WorkOrder.assetName
-        - WorkOrder.status
         operation: listWorkOrders
         provenance: contract maintenance.yaml GET /work-orders
       - kind: confirmDialog
@@ -3256,44 +3020,22 @@ screens:
         label: The selected work order
         bindsTo: WorkOrder
         columns:
-        - WorkOrder.downtimeMinutes
-        - WorkOrder.rootCause
-        - WorkOrder.rootCauseNote
-        - WorkOrder.escalatedAt
-        - WorkOrder.escalationLevel
-        - WorkOrder.id
         - WorkOrder.workOrderNumber
         - WorkOrder.title
-        - WorkOrder.venueId
-        - WorkOrder.assetId
         - WorkOrder.assetName
         - WorkOrder.status
         - WorkOrder.priority
-        - WorkOrder.kind
-        - WorkOrder.assignedToPrincipalId
-        - WorkOrder.raisedByPrincipalId
         operation: listWorkOrders
         provenance: contract maintenance.yaml GET /work-orders
       - kind: detailPanel
         label: The work order
         bindsTo: WorkOrderDetail
         columns:
-        - WorkOrderDetail.downtimeMinutes
-        - WorkOrderDetail.rootCause
-        - WorkOrderDetail.rootCauseNote
-        - WorkOrderDetail.escalatedAt
-        - WorkOrderDetail.escalationLevel
-        - WorkOrderDetail.id
         - WorkOrderDetail.workOrderNumber
         - WorkOrderDetail.title
-        - WorkOrderDetail.venueId
-        - WorkOrderDetail.assetId
         - WorkOrderDetail.assetName
         - WorkOrderDetail.status
         - WorkOrderDetail.priority
-        - WorkOrderDetail.kind
-        - WorkOrderDetail.assignedToPrincipalId
-        - WorkOrderDetail.raisedByPrincipalId
         operation: getWorkOrder
         provenance: contract maintenance.yaml GET /work-orders/{workOrderId}
     - name: actionBar
@@ -3580,9 +3322,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-005
-  apisNote: Rebuilt 9 September 2026 from the 15 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 15 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: cancelWorkOrder
     removed: true
@@ -3695,17 +3437,9 @@ screens:
         bindsTo: WorkOrder
         columns:
         - WorkOrder.downtimeMinutes
-        - WorkOrder.rootCause
-        - WorkOrder.rootCauseNote
-        - WorkOrder.escalatedAt
-        - WorkOrder.escalationLevel
-        - WorkOrder.id
         - WorkOrder.workOrderNumber
         - WorkOrder.title
-        - WorkOrder.venueId
-        - WorkOrder.assetId
         - WorkOrder.assetName
-        - WorkOrder.status
         operation: listWorkOrders
         provenance: contract maintenance.yaml GET /work-orders
       - kind: confirmDialog
@@ -3727,44 +3461,22 @@ screens:
         label: The selected work order
         bindsTo: WorkOrder
         columns:
-        - WorkOrder.downtimeMinutes
-        - WorkOrder.rootCause
-        - WorkOrder.rootCauseNote
-        - WorkOrder.escalatedAt
-        - WorkOrder.escalationLevel
-        - WorkOrder.id
         - WorkOrder.workOrderNumber
         - WorkOrder.title
-        - WorkOrder.venueId
-        - WorkOrder.assetId
         - WorkOrder.assetName
         - WorkOrder.status
         - WorkOrder.priority
-        - WorkOrder.kind
-        - WorkOrder.assignedToPrincipalId
-        - WorkOrder.raisedByPrincipalId
         operation: listWorkOrders
         provenance: contract maintenance.yaml GET /work-orders
       - kind: detailPanel
         label: The work order
         bindsTo: WorkOrderDetail
         columns:
-        - WorkOrderDetail.downtimeMinutes
-        - WorkOrderDetail.rootCause
-        - WorkOrderDetail.rootCauseNote
-        - WorkOrderDetail.escalatedAt
-        - WorkOrderDetail.escalationLevel
-        - WorkOrderDetail.id
         - WorkOrderDetail.workOrderNumber
         - WorkOrderDetail.title
-        - WorkOrderDetail.venueId
-        - WorkOrderDetail.assetId
         - WorkOrderDetail.assetName
         - WorkOrderDetail.status
         - WorkOrderDetail.priority
-        - WorkOrderDetail.kind
-        - WorkOrderDetail.assignedToPrincipalId
-        - WorkOrderDetail.raisedByPrincipalId
         operation: getWorkOrder
         provenance: contract maintenance.yaml GET /work-orders/{workOrderId}
     - name: actionBar
@@ -4132,9 +3844,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-006
-  apisNote: Rebuilt 9 September 2026 from the 16 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 16 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: EMP-007
   name: Handover notes
   module: Operations
@@ -4223,9 +3935,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-007
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: acknowledgeAnnouncement
     removed: true
@@ -4361,16 +4073,8 @@ screens:
         label: Every shift
         bindsTo: Shift
         columns:
-        - Shift.id
-        - Shift.workstationId
-        - Shift.venueId
-        - Shift.scopePath
-        - Shift.principalId
         - Shift.principalDisplayName
-        - Shift.incidents
         - Shift.status
-        - Shift.currency
-        - Shift.currencyScale
         - Shift.depositBoxCode
         - Shift.bagNumber
         operation: listShifts
@@ -4379,18 +4083,10 @@ screens:
         label: Every cash movement
         bindsTo: CashMovement
         columns:
-        - CashMovement.id
         - CashMovement.kind
         - CashMovement.amount
-        - CashMovement.denominations
         - CashMovement.reference
-        - CashMovement.reason
         - CashMovement.recordedAt
-        - CashMovement.shiftId
-        - CashMovement.depositBoxId
-        - CashMovement.witnessPrincipalId
-        - CashMovement.withdrawalReason
-        - CashMovement.authorisedByPrincipalId
         operation: listCashMovements
         provenance: contract shift.yaml GET /shifts/{shiftId}/cash-movements
     - name: contextPanel
@@ -4400,38 +4096,22 @@ screens:
         label: The selected shift
         bindsTo: Shift
         columns:
-        - Shift.id
-        - Shift.workstationId
-        - Shift.venueId
-        - Shift.scopePath
-        - Shift.principalId
         - Shift.principalDisplayName
         - Shift.incidents
         - Shift.status
-        - Shift.currency
-        - Shift.currencyScale
         - Shift.depositBoxCode
         - Shift.bagNumber
-        - Shift.openingFloat
         operation: getCurrentShift
         provenance: contract shift.yaml GET /shifts/current
       - kind: detailPanel
         label: The shift
         bindsTo: Shift
         columns:
-        - Shift.id
-        - Shift.workstationId
-        - Shift.venueId
-        - Shift.scopePath
-        - Shift.principalId
         - Shift.principalDisplayName
         - Shift.incidents
         - Shift.status
-        - Shift.currency
-        - Shift.currencyScale
         - Shift.depositBoxCode
         - Shift.bagNumber
-        - Shift.openingFloat
         operation: getShift
         provenance: contract shift.yaml GET /shifts/{shiftId}
     - name: actionBar
@@ -4484,9 +4164,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-008
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: suspendShift
     removed: true
@@ -4555,10 +4235,6 @@ screens:
         label: Every AI conversation
         bindsTo: AiConversation
         columns:
-        - AiConversation.id
-        - AiConversation.principalId
-        - AiConversation.scopePath
-        - AiConversation.module
         - AiConversation.locale
         - AiConversation.messageCount
         - AiConversation.startedAt
@@ -4572,9 +4248,6 @@ screens:
         label: The selected AI conversation
         bindsTo: AiConversation
         columns:
-        - AiConversation.id
-        - AiConversation.principalId
-        - AiConversation.scopePath
         - AiConversation.module
         - AiConversation.locale
         - AiConversation.messageCount
@@ -4636,9 +4309,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-019
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formCreateAiConversation
     component: modal
@@ -4741,10 +4414,6 @@ screens:
         label: Every AI conversation
         bindsTo: AiConversation
         columns:
-        - AiConversation.id
-        - AiConversation.principalId
-        - AiConversation.scopePath
-        - AiConversation.module
         - AiConversation.locale
         - AiConversation.messageCount
         - AiConversation.startedAt
@@ -4758,9 +4427,6 @@ screens:
         label: The selected AI conversation
         bindsTo: AiConversation
         columns:
-        - AiConversation.id
-        - AiConversation.principalId
-        - AiConversation.scopePath
         - AiConversation.module
         - AiConversation.locale
         - AiConversation.messageCount
@@ -4838,9 +4504,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-020
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSendAiMessage
     component: modal
@@ -4954,15 +4620,7 @@ screens:
         columns:
         - Queue.code
         - Queue.name
-        - Queue.venueId
-        - Queue.attractionProductId
-        - Queue.assetId
-        - Queue.accessPointId
         - Queue.kind
-        - Queue.operatingWindows
-        - Queue.parentQueueId
-        - Queue.loadBalanceWithQueueIds
-        - Queue.inQueueOfferEnabled
         - Queue.notifyBeforeCallMinutes
         operation: listQueues
         provenance: contract queue.yaml GET /queues
@@ -4970,18 +4628,10 @@ screens:
         label: Every waiting guest
         bindsTo: WaitingGuest
         columns:
-        - WaitingGuest.id
-        - WaitingGuest.queueId
         - WaitingGuest.queueName
-        - WaitingGuest.subjectId
         - WaitingGuest.partyNumber
-        - WaitingGuest.partySize
         - WaitingGuest.status
-        - WaitingGuest.positionInQueue
-        - WaitingGuest.partiesAhead
         - WaitingGuest.estimatedCallAt
-        - WaitingGuest.isFastPass
-        - WaitingGuest.entitlementId
         operation: listQueueEntries
         provenance: contract queue.yaml GET /queues/{queueId}/entries
     - name: contextPanel
@@ -4993,37 +4643,20 @@ screens:
         columns:
         - Queue.code
         - Queue.name
-        - Queue.venueId
-        - Queue.attractionProductId
-        - Queue.assetId
-        - Queue.accessPointId
-        - Queue.kind
-        - Queue.operatingWindows
-        - Queue.parentQueueId
-        - Queue.loadBalanceWithQueueIds
-        - Queue.inQueueOfferEnabled
         - Queue.notifyBeforeCallMinutes
         - Queue.capacityPerCycle
         - Queue.cycleMinutes
-        - Queue.maxPartySize
-        - Queue.returnWindowMinutes
         operation: listQueues
         provenance: contract queue.yaml GET /queues
       - kind: detailPanel
         label: The wait time
         bindsTo: WaitTime
         columns:
-        - WaitTime.queueId
         - WaitTime.queueName
-        - WaitTime.attractionProductId
-        - WaitTime.attractionCategoryId
         - WaitTime.status
         - WaitTime.waitMinutes
         - WaitTime.source
-        - WaitTime.isStale
         - WaitTime.heightRequirementCm
-        - WaitTime.zone
-        - WaitTime.asOf
         operation: getWaitTimes
         provenance: contract queue.yaml GET /queues/wait-times
       - kind: detailPanel
@@ -5122,9 +4755,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-031
-  apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formCallNextParties
     component: modal
@@ -5256,17 +4889,11 @@ screens:
         label: The wait time
         bindsTo: WaitTime
         columns:
-        - WaitTime.queueId
         - WaitTime.queueName
-        - WaitTime.attractionProductId
-        - WaitTime.attractionCategoryId
         - WaitTime.status
         - WaitTime.waitMinutes
         - WaitTime.source
-        - WaitTime.isStale
         - WaitTime.heightRequirementCm
-        - WaitTime.zone
-        - WaitTime.asOf
         operation: getWaitTimes
         provenance: contract queue.yaml GET /queues/wait-times
     - name: actionBar
@@ -5320,9 +4947,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-032
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSetWaitTime
     component: modal
@@ -5412,18 +5039,10 @@ screens:
         label: Every channel capacity
         bindsTo: ChannelCapacity
         columns:
-        - ChannelCapacity.id
-        - ChannelCapacity.performanceId
         - ChannelCapacity.name
-        - ChannelCapacity.seatCategoryId
-        - ChannelCapacity.oversellAllowance
-        - ChannelCapacity.oversellBasis
         - ChannelCapacity.capacity
         - ChannelCapacity.sold
-        - ChannelCapacity.leased
         - ChannelCapacity.remaining
-        - ChannelCapacity.hasChannelAllocations
-        - ChannelCapacity.isSeated
         operation: listChannelCapacities
         provenance: contract catalogue.yaml GET /channel-capacities
     - name: contextPanel
@@ -5433,25 +5052,17 @@ screens:
         label: The selected channel capacity
         bindsTo: ChannelCapacity
         columns:
-        - ChannelCapacity.id
-        - ChannelCapacity.performanceId
         - ChannelCapacity.name
-        - ChannelCapacity.seatCategoryId
         - ChannelCapacity.oversellAllowance
-        - ChannelCapacity.oversellBasis
         - ChannelCapacity.capacity
         - ChannelCapacity.sold
-        - ChannelCapacity.leased
         - ChannelCapacity.remaining
-        - ChannelCapacity.hasChannelAllocations
-        - ChannelCapacity.isSeated
         operation: listChannelCapacities
         provenance: contract catalogue.yaml GET /channel-capacities
       - kind: detailPanel
         label: The channel allocation set
         bindsTo: ChannelAllocationSet
         columns:
-        - ChannelAllocationSet.channelCapacityId
         - ChannelAllocationSet.capacity
         - ChannelAllocationSet.allocations
         - ChannelAllocationSet.generalPoolUnits
@@ -5511,9 +5122,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-033
-  apisNote: Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRelinquishChannelAllocation
     component: modal
@@ -5632,18 +5243,10 @@ screens:
         label: Every product
         bindsTo: Product
         columns:
-        - Product.id
         - Product.code
         - Product.name
         - Product.description
-        - Product.kind
-        - Product.venueId
-        - Product.scopePath
-        - Product.createdByPrincipalId
-        - Product.approvedByPrincipalId
-        - Product.responsibleDepartmentId
         - Product.onSaleFrom
-        - Product.onSaleTo
         operation: listProducts
         provenance: contract catalogue.yaml GET /products
       - kind: dataTable
@@ -5651,9 +5254,7 @@ screens:
         bindsTo: AlternativeCode
         columns:
         - AlternativeCode.code
-        - AlternativeCode.partnerId
         - AlternativeCode.partnerName
-        - AlternativeCode.variantId
         - AlternativeCode.note
         operation: listAlternativeCodes
         provenance: contract catalogue.yaml GET /products/{productId}/alternative-codes
@@ -5661,48 +5262,30 @@ screens:
         label: Every refund
         bindsTo: Refund
         columns:
-        - Refund.id
-        - Refund.orderId
-        - Refund.batchId
         - Refund.fxRate
-        - Refund.taxReversalEntryId
-        - Refund.settleTo
-        - Refund.fxVariance
         - Refund.amount
         - Refund.appliedPercentage
         - Refund.status
-        - Refund.reason
-        - Refund.requestedByPrincipalId
         operation: listOrderRefunds
         provenance: contract orders.yaml GET /orders/{orderId}/refunds
       - kind: dataTable
         label: Every order
         bindsTo: OrderSummary
         columns:
-        - OrderSummary.id
         - OrderSummary.orderNumber
         - OrderSummary.status
-        - OrderSummary.grossAmount
-        - OrderSummary.refundedAmount
-        - OrderSummary.channel
         - OrderSummary.lineCount
-        - OrderSummary.principalId
         - OrderSummary.holdLabel
-        - OrderSummary.heldUntil
         operation: listOrders
         provenance: contract orders.yaml GET /orders
       - kind: dataTable
         label: Every product variant
         bindsTo: ProductVariant
         columns:
-        - ProductVariant.id
-        - ProductVariant.productId
         - ProductVariant.sku
         - ProductVariant.axisValues
         - ProductVariant.name
         - ProductVariant.barcode
-        - ProductVariant.isDefault
-        - ProductVariant.isActive
         operation: listProductVariants
         provenance: contract catalogue.yaml GET /products/{productId}/variants
       - kind: confirmDialog
@@ -5724,33 +5307,19 @@ screens:
         label: The selected product
         bindsTo: Product
         columns:
-        - Product.id
         - Product.code
         - Product.name
         - Product.description
         - Product.kind
-        - Product.venueId
-        - Product.scopePath
-        - Product.createdByPrincipalId
-        - Product.approvedByPrincipalId
-        - Product.responsibleDepartmentId
-        - Product.onSaleFrom
-        - Product.onSaleTo
-        - Product.categoryId
         - Product.lifecycleState
-        - Product.isSellable
-        - Product.isStockTracked
         operation: getProduct
         provenance: contract catalogue.yaml GET /products/{productId}
       - kind: detailPanel
         label: The order statement
         bindsTo: OrderStatement
         columns:
-        - OrderStatement.orderId
         - OrderStatement.orderNumber
         - OrderStatement.currency
-        - OrderStatement.currencyScale
-        - OrderStatement.entries
         - OrderStatement.totalPaid
         - OrderStatement.totalRefunded
         - OrderStatement.currentBalance
@@ -5760,22 +5329,11 @@ screens:
         label: The order
         bindsTo: Order
         columns:
-        - Order.id
         - Order.orderNumber
-        - Order.channel
-        - Order.venueId
-        - Order.scopePath
         - Order.status
-        - Order.currency
-        - Order.currencyScale
         - Order.grossAmount
         - Order.taxAmount
         - Order.netAmount
-        - Order.refundedAmount
-        - Order.totalPriceVariance
-        - Order.lines
-        - Order.payments
-        - Order.principalId
         operation: getOrder
         provenance: contract orders.yaml GET /orders/{orderId}
     - name: actionBar
@@ -6143,9 +5701,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-034
-  apisNote: Rebuilt 9 September 2026 from the 22 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 22 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: setAlternativeCodes
     removed: true
@@ -6310,9 +5868,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-035
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formAddTip
     component: modal
@@ -6403,10 +5961,8 @@ screens:
         columns:
         - MediaEntitlements.mediaCode
         - MediaEntitlements.mediaKind
-        - MediaEntitlements.subjectId
         - MediaEntitlements.isValid
         - MediaEntitlements.invalidReason
-        - MediaEntitlements.canAcceptMore
         - MediaEntitlements.entitlements
         operation: getMediaEntitlements
         provenance: contract orders.yaml GET /media/{mediaCode}/entitlements
@@ -6414,22 +5970,11 @@ screens:
         label: The media asset
         bindsTo: MediaAssetDetail
         columns:
-        - MediaAssetDetail.id
-        - MediaAssetDetail.kind
         - MediaAssetDetail.status
         - MediaAssetDetail.filename
-        - MediaAssetDetail.contentType
-        - MediaAssetDetail.sizeBytes
         - MediaAssetDetail.title
         - MediaAssetDetail.description
-        - MediaAssetDetail.altText
-        - MediaAssetDetail.width
-        - MediaAssetDetail.height
         - MediaAssetDetail.durationSeconds
-        - MediaAssetDetail.customMetadata
-        - MediaAssetDetail.sharedWithTenantIds
-        - MediaAssetDetail.tags
-        - MediaAssetDetail.venueId
         operation: getMediaAsset
         provenance: contract assets.yaml GET /media/{mediaId}
     - name: actionBar
@@ -6476,9 +6021,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-036
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formAppendEntitlementToMedia
     component: modal
@@ -6558,18 +6103,10 @@ screens:
         label: Every announcement
         bindsTo: Announcement
         columns:
-        - Announcement.id
         - Announcement.title
         - Announcement.body
-        - Announcement.kind
-        - Announcement.venueIds
-        - Announcement.departmentIds
-        - Announcement.roleIds
-        - Announcement.requiresAcknowledgement
         - Announcement.expiresAt
-        - Announcement.publishedByPrincipalId
         - Announcement.publishedAt
-        - Announcement.locale
         operation: listAnnouncements
         provenance: contract workforce.yaml GET /announcements
       - kind: dataTable
@@ -6583,18 +6120,11 @@ screens:
         label: The selected announcement
         bindsTo: Announcement
         columns:
-        - Announcement.id
         - Announcement.title
         - Announcement.body
         - Announcement.kind
-        - Announcement.venueIds
-        - Announcement.departmentIds
-        - Announcement.roleIds
-        - Announcement.requiresAcknowledgement
         - Announcement.expiresAt
-        - Announcement.publishedByPrincipalId
         - Announcement.publishedAt
-        - Announcement.locale
         operation: listAnnouncements
         provenance: contract workforce.yaml GET /announcements
       - kind: detailPanel
@@ -6692,9 +6222,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-037
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: publishAnnouncement
     removed: true
@@ -6763,18 +6293,10 @@ screens:
         label: Every announcement
         bindsTo: Announcement
         columns:
-        - Announcement.id
         - Announcement.title
         - Announcement.body
-        - Announcement.kind
-        - Announcement.venueIds
-        - Announcement.departmentIds
-        - Announcement.roleIds
-        - Announcement.requiresAcknowledgement
         - Announcement.expiresAt
-        - Announcement.publishedByPrincipalId
         - Announcement.publishedAt
-        - Announcement.locale
         operation: listAnnouncements
         provenance: contract workforce.yaml GET /announcements
     - name: contextPanel
@@ -6784,18 +6306,11 @@ screens:
         label: The selected announcement
         bindsTo: Announcement
         columns:
-        - Announcement.id
         - Announcement.title
         - Announcement.body
         - Announcement.kind
-        - Announcement.venueIds
-        - Announcement.departmentIds
-        - Announcement.roleIds
-        - Announcement.requiresAcknowledgement
         - Announcement.expiresAt
-        - Announcement.publishedByPrincipalId
         - Announcement.publishedAt
-        - Announcement.locale
         operation: listAnnouncements
         provenance: contract workforce.yaml GET /announcements
     - name: actionBar
@@ -6852,9 +6367,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-039
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: getAnnouncementReach
     removed: true
@@ -6934,18 +6449,10 @@ screens:
         label: Every announcement
         bindsTo: Announcement
         columns:
-        - Announcement.id
         - Announcement.title
         - Announcement.body
-        - Announcement.kind
-        - Announcement.venueIds
-        - Announcement.departmentIds
-        - Announcement.roleIds
-        - Announcement.requiresAcknowledgement
         - Announcement.expiresAt
-        - Announcement.publishedByPrincipalId
         - Announcement.publishedAt
-        - Announcement.locale
         operation: listAnnouncements
         provenance: contract workforce.yaml GET /announcements
     - name: contextPanel
@@ -6955,18 +6462,11 @@ screens:
         label: The selected announcement
         bindsTo: Announcement
         columns:
-        - Announcement.id
         - Announcement.title
         - Announcement.body
         - Announcement.kind
-        - Announcement.venueIds
-        - Announcement.departmentIds
-        - Announcement.roleIds
-        - Announcement.requiresAcknowledgement
         - Announcement.expiresAt
-        - Announcement.publishedByPrincipalId
         - Announcement.publishedAt
-        - Announcement.locale
         operation: listAnnouncements
         provenance: contract workforce.yaml GET /announcements
     - name: actionBar
@@ -7022,9 +6522,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-047
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: getAnnouncementReach
     removed: true
@@ -7121,18 +6621,10 @@ screens:
         label: Every incident
         bindsTo: Incident
         columns:
-        - Incident.id
         - Incident.incidentNumber
-        - Incident.kind
         - Incident.severity
         - Incident.status
-        - Incident.venueId
-        - Incident.assetId
         - Incident.locationDescription
-        - Incident.isReportable
-        - Incident.notificationDueAt
-        - Incident.notifiedAt
-        - Incident.assignedToPrincipalId
         operation: listIncidents
         provenance: contract maintenance.yaml GET /incidents
     - name: contextPanel
@@ -7142,44 +6634,22 @@ screens:
         label: The selected incident
         bindsTo: Incident
         columns:
-        - Incident.id
         - Incident.incidentNumber
         - Incident.kind
         - Incident.severity
         - Incident.status
-        - Incident.venueId
-        - Incident.assetId
         - Incident.locationDescription
-        - Incident.isReportable
-        - Incident.notificationDueAt
-        - Incident.notifiedAt
-        - Incident.assignedToPrincipalId
-        - Incident.reportedByPrincipalId
-        - Incident.correctiveWorkOrderId
-        - Incident.occurredAt
-        - Incident.recordedAt
         operation: listIncidents
         provenance: contract maintenance.yaml GET /incidents
       - kind: detailPanel
         label: The incident
         bindsTo: IncidentDetail
         columns:
-        - IncidentDetail.id
         - IncidentDetail.incidentNumber
         - IncidentDetail.kind
         - IncidentDetail.severity
         - IncidentDetail.status
-        - IncidentDetail.venueId
-        - IncidentDetail.assetId
         - IncidentDetail.locationDescription
-        - IncidentDetail.isReportable
-        - IncidentDetail.notificationDueAt
-        - IncidentDetail.notifiedAt
-        - IncidentDetail.assignedToPrincipalId
-        - IncidentDetail.reportedByPrincipalId
-        - IncidentDetail.correctiveWorkOrderId
-        - IncidentDetail.occurredAt
-        - IncidentDetail.recordedAt
         operation: getIncident
         provenance: contract maintenance.yaml GET /incidents/{incidentId}
     - name: actionBar
@@ -7234,9 +6704,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-050
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formUpdateIncident
     component: modal
@@ -7353,16 +6823,8 @@ screens:
         columns:
         - RotaAssignment.overtimeMinutes
         - RotaAssignment.restPeriodBefore
-        - RotaAssignment.breachesWorkingHourLimit
         - RotaAssignment.labourCost
-        - RotaAssignment.id
-        - RotaAssignment.principalId
         - RotaAssignment.displayName
-        - RotaAssignment.venueId
-        - RotaAssignment.departmentId
-        - RotaAssignment.position
-        - RotaAssignment.requiredRoleId
-        - RotaAssignment.workstationId
         operation: listRotaAssignments
         provenance: contract workforce.yaml GET /rota-assignments
     - name: contextPanel
@@ -7373,19 +6835,8 @@ screens:
         bindsTo: RotaAssignment
         columns:
         - RotaAssignment.overtimeMinutes
-        - RotaAssignment.restPeriodBefore
-        - RotaAssignment.breachesWorkingHourLimit
         - RotaAssignment.labourCost
-        - RotaAssignment.id
-        - RotaAssignment.principalId
         - RotaAssignment.displayName
-        - RotaAssignment.venueId
-        - RotaAssignment.departmentId
-        - RotaAssignment.position
-        - RotaAssignment.requiredRoleId
-        - RotaAssignment.workstationId
-        - RotaAssignment.startsAt
-        - RotaAssignment.endsAt
         - RotaAssignment.status
         - RotaAssignment.breakMinutes
         operation: listRotaAssignments
@@ -7438,9 +6889,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-021
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRequestShiftSwap
     component: modal
@@ -7543,16 +6994,8 @@ screens:
         columns:
         - RotaAssignment.overtimeMinutes
         - RotaAssignment.restPeriodBefore
-        - RotaAssignment.breachesWorkingHourLimit
         - RotaAssignment.labourCost
-        - RotaAssignment.id
-        - RotaAssignment.principalId
         - RotaAssignment.displayName
-        - RotaAssignment.venueId
-        - RotaAssignment.departmentId
-        - RotaAssignment.position
-        - RotaAssignment.requiredRoleId
-        - RotaAssignment.workstationId
         operation: listRotaAssignments
         provenance: contract workforce.yaml GET /rota-assignments
     - name: contextPanel
@@ -7563,19 +7006,8 @@ screens:
         bindsTo: RotaAssignment
         columns:
         - RotaAssignment.overtimeMinutes
-        - RotaAssignment.restPeriodBefore
-        - RotaAssignment.breachesWorkingHourLimit
         - RotaAssignment.labourCost
-        - RotaAssignment.id
-        - RotaAssignment.principalId
         - RotaAssignment.displayName
-        - RotaAssignment.venueId
-        - RotaAssignment.departmentId
-        - RotaAssignment.position
-        - RotaAssignment.requiredRoleId
-        - RotaAssignment.workstationId
-        - RotaAssignment.startsAt
-        - RotaAssignment.endsAt
         - RotaAssignment.status
         - RotaAssignment.breakMinutes
         operation: listRotaAssignments
@@ -7628,9 +7060,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-022
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRequestShiftSwap
     component: modal
@@ -7737,28 +7169,15 @@ screens:
         columns:
         - RotaAssignment.overtimeMinutes
         - RotaAssignment.restPeriodBefore
-        - RotaAssignment.breachesWorkingHourLimit
         - RotaAssignment.labourCost
-        - RotaAssignment.id
-        - RotaAssignment.principalId
         - RotaAssignment.displayName
-        - RotaAssignment.venueId
-        - RotaAssignment.departmentId
-        - RotaAssignment.position
-        - RotaAssignment.requiredRoleId
-        - RotaAssignment.workstationId
         operation: listRotaAssignments
         provenance: contract workforce.yaml GET /rota-assignments
       - kind: dataTable
         label: Every shift swap
         bindsTo: ShiftSwap
         columns:
-        - ShiftSwap.id
-        - ShiftSwap.assignmentId
-        - ShiftSwap.fromPrincipalId
-        - ShiftSwap.toPrincipalId
         - ShiftSwap.status
-        - ShiftSwap.approvalRequestId
         - ShiftSwap.reason
         - ShiftSwap.requestedAt
         operation: listShiftSwapRequests
@@ -7771,19 +7190,8 @@ screens:
         bindsTo: RotaAssignment
         columns:
         - RotaAssignment.overtimeMinutes
-        - RotaAssignment.restPeriodBefore
-        - RotaAssignment.breachesWorkingHourLimit
         - RotaAssignment.labourCost
-        - RotaAssignment.id
-        - RotaAssignment.principalId
         - RotaAssignment.displayName
-        - RotaAssignment.venueId
-        - RotaAssignment.departmentId
-        - RotaAssignment.position
-        - RotaAssignment.requiredRoleId
-        - RotaAssignment.workstationId
-        - RotaAssignment.startsAt
-        - RotaAssignment.endsAt
         - RotaAssignment.status
         - RotaAssignment.breakMinutes
         operation: listRotaAssignments
@@ -7840,9 +7248,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-023
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRequestShiftSwap
     component: modal
@@ -7937,18 +7345,10 @@ screens:
         label: Every attendance
         bindsTo: AttendanceRecord
         columns:
-        - AttendanceRecord.id
-        - AttendanceRecord.principalId
-        - AttendanceRecord.assignmentId
-        - AttendanceRecord.venueId
         - AttendanceRecord.kind
         - AttendanceRecord.occurredAt
         - AttendanceRecord.recordedAt
-        - AttendanceRecord.accessPointId
         - AttendanceRecord.latitude
-        - AttendanceRecord.longitude
-        - AttendanceRecord.isAmended
-        - AttendanceRecord.amendedByPrincipalId
         operation: listAttendance
         provenance: contract workforce.yaml GET /attendance
     - name: contextPanel
@@ -7958,20 +7358,11 @@ screens:
         label: The selected attendance
         bindsTo: AttendanceRecord
         columns:
-        - AttendanceRecord.id
-        - AttendanceRecord.principalId
-        - AttendanceRecord.assignmentId
-        - AttendanceRecord.venueId
         - AttendanceRecord.kind
         - AttendanceRecord.occurredAt
         - AttendanceRecord.recordedAt
-        - AttendanceRecord.accessPointId
-        - AttendanceRecord.latitude
-        - AttendanceRecord.longitude
-        - AttendanceRecord.isAmended
         - AttendanceRecord.originalOccurredAt
         - AttendanceRecord.originalOccurredAt
-        - AttendanceRecord.exception
         operation: listAttendance
         provenance: contract workforce.yaml GET /attendance
       - kind: timeline
@@ -8036,9 +7427,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-024
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRecordAttendance
     component: modal
@@ -8142,18 +7533,10 @@ screens:
         label: Every attendance
         bindsTo: AttendanceRecord
         columns:
-        - AttendanceRecord.id
-        - AttendanceRecord.principalId
-        - AttendanceRecord.assignmentId
-        - AttendanceRecord.venueId
         - AttendanceRecord.kind
         - AttendanceRecord.occurredAt
         - AttendanceRecord.recordedAt
-        - AttendanceRecord.accessPointId
         - AttendanceRecord.latitude
-        - AttendanceRecord.longitude
-        - AttendanceRecord.isAmended
-        - AttendanceRecord.amendedByPrincipalId
         operation: listAttendance
         provenance: contract workforce.yaml GET /attendance
     - name: contextPanel
@@ -8163,21 +7546,11 @@ screens:
         label: The selected attendance
         bindsTo: AttendanceRecord
         columns:
-        - AttendanceRecord.id
-        - AttendanceRecord.principalId
-        - AttendanceRecord.assignmentId
-        - AttendanceRecord.venueId
         - AttendanceRecord.kind
         - AttendanceRecord.occurredAt
         - AttendanceRecord.recordedAt
-        - AttendanceRecord.accessPointId
         - AttendanceRecord.latitude
-        - AttendanceRecord.longitude
-        - AttendanceRecord.isAmended
-        - AttendanceRecord.amendedByPrincipalId
-        - AttendanceRecord.amendmentReason
         - AttendanceRecord.originalOccurredAt
-        - AttendanceRecord.exception
         operation: listAttendance
         provenance: contract workforce.yaml GET /attendance
     - name: actionBar
@@ -8228,9 +7601,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-025
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRecordAttendance
     component: modal
@@ -8334,18 +7707,10 @@ screens:
         label: Every incident
         bindsTo: Incident
         columns:
-        - Incident.id
         - Incident.incidentNumber
-        - Incident.kind
         - Incident.severity
         - Incident.status
-        - Incident.venueId
-        - Incident.assetId
         - Incident.locationDescription
-        - Incident.isReportable
-        - Incident.notificationDueAt
-        - Incident.notifiedAt
-        - Incident.assignedToPrincipalId
         operation: listIncidents
         provenance: contract maintenance.yaml GET /incidents
     - name: contextPanel
@@ -8355,44 +7720,22 @@ screens:
         label: The selected incident
         bindsTo: Incident
         columns:
-        - Incident.id
         - Incident.incidentNumber
         - Incident.kind
         - Incident.severity
         - Incident.status
-        - Incident.venueId
-        - Incident.assetId
         - Incident.locationDescription
-        - Incident.isReportable
-        - Incident.notificationDueAt
-        - Incident.notifiedAt
-        - Incident.assignedToPrincipalId
-        - Incident.reportedByPrincipalId
-        - Incident.correctiveWorkOrderId
-        - Incident.occurredAt
-        - Incident.recordedAt
         operation: listIncidents
         provenance: contract maintenance.yaml GET /incidents
       - kind: detailPanel
         label: The incident
         bindsTo: IncidentDetail
         columns:
-        - IncidentDetail.id
         - IncidentDetail.incidentNumber
         - IncidentDetail.kind
         - IncidentDetail.severity
         - IncidentDetail.status
-        - IncidentDetail.venueId
-        - IncidentDetail.assetId
         - IncidentDetail.locationDescription
-        - IncidentDetail.isReportable
-        - IncidentDetail.notificationDueAt
-        - IncidentDetail.notifiedAt
-        - IncidentDetail.assignedToPrincipalId
-        - IncidentDetail.reportedByPrincipalId
-        - IncidentDetail.correctiveWorkOrderId
-        - IncidentDetail.occurredAt
-        - IncidentDetail.recordedAt
         operation: getIncident
         provenance: contract maintenance.yaml GET /incidents/{incidentId}
     - name: actionBar
@@ -8444,9 +7787,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-026
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formReportIncident
     component: modal
@@ -8575,18 +7918,10 @@ screens:
         label: Every incident
         bindsTo: Incident
         columns:
-        - Incident.id
         - Incident.incidentNumber
-        - Incident.kind
         - Incident.severity
         - Incident.status
-        - Incident.venueId
-        - Incident.assetId
         - Incident.locationDescription
-        - Incident.isReportable
-        - Incident.notificationDueAt
-        - Incident.notifiedAt
-        - Incident.assignedToPrincipalId
         operation: listIncidents
         provenance: contract maintenance.yaml GET /incidents
     - name: contextPanel
@@ -8596,44 +7931,22 @@ screens:
         label: The selected incident
         bindsTo: Incident
         columns:
-        - Incident.id
         - Incident.incidentNumber
         - Incident.kind
         - Incident.severity
         - Incident.status
-        - Incident.venueId
-        - Incident.assetId
         - Incident.locationDescription
-        - Incident.isReportable
-        - Incident.notificationDueAt
-        - Incident.notifiedAt
-        - Incident.assignedToPrincipalId
-        - Incident.reportedByPrincipalId
-        - Incident.correctiveWorkOrderId
-        - Incident.occurredAt
-        - Incident.recordedAt
         operation: listIncidents
         provenance: contract maintenance.yaml GET /incidents
       - kind: detailPanel
         label: The incident
         bindsTo: IncidentDetail
         columns:
-        - IncidentDetail.id
         - IncidentDetail.incidentNumber
         - IncidentDetail.kind
         - IncidentDetail.severity
         - IncidentDetail.status
-        - IncidentDetail.venueId
-        - IncidentDetail.assetId
         - IncidentDetail.locationDescription
-        - IncidentDetail.isReportable
-        - IncidentDetail.notificationDueAt
-        - IncidentDetail.notifiedAt
-        - IncidentDetail.assignedToPrincipalId
-        - IncidentDetail.reportedByPrincipalId
-        - IncidentDetail.correctiveWorkOrderId
-        - IncidentDetail.occurredAt
-        - IncidentDetail.recordedAt
         operation: getIncident
         provenance: contract maintenance.yaml GET /incidents/{incidentId}
     - name: actionBar
@@ -8702,9 +8015,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-027
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formUpdateIncident
     component: modal
@@ -8813,18 +8126,10 @@ screens:
         label: Every case
         bindsTo: Case
         columns:
-        - Case.id
         - Case.caseNumber
-        - Case.subjectId
         - Case.guestName
         - Case.subject
-        - Case.categoryId
         - Case.status
-        - Case.priority
-        - Case.assignedToPrincipalId
-        - Case.venueId
-        - Case.relatedOrderId
-        - Case.slaDueAt
         operation: listCases
         provenance: contract marketing-crm.yaml GET /cases
     - name: contextPanel
@@ -8834,44 +8139,22 @@ screens:
         label: The selected case
         bindsTo: Case
         columns:
-        - Case.id
         - Case.caseNumber
-        - Case.subjectId
         - Case.guestName
         - Case.subject
-        - Case.kind
-        - Case.channel
-        - Case.recordedAt
-        - Case.syncedAt
-        - Case.categoryId
         - Case.status
         - Case.priority
-        - Case.assignedToPrincipalId
-        - Case.venueId
-        - Case.relatedOrderId
-        - Case.slaDueAt
         operation: listCases
         provenance: contract marketing-crm.yaml GET /cases
       - kind: detailPanel
         label: The case
         bindsTo: CaseDetail
         columns:
-        - CaseDetail.id
         - CaseDetail.caseNumber
-        - CaseDetail.subjectId
         - CaseDetail.guestName
         - CaseDetail.subject
-        - CaseDetail.kind
-        - CaseDetail.channel
-        - CaseDetail.recordedAt
-        - CaseDetail.syncedAt
-        - CaseDetail.categoryId
         - CaseDetail.status
         - CaseDetail.priority
-        - CaseDetail.assignedToPrincipalId
-        - CaseDetail.venueId
-        - CaseDetail.relatedOrderId
-        - CaseDetail.slaDueAt
         operation: getCase
         provenance: contract marketing-crm.yaml GET /cases/{caseId}
     - name: actionBar
@@ -8967,9 +8250,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-028
-  apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formCreateCase
     component: modal
@@ -9140,36 +8423,20 @@ screens:
         label: Every case
         bindsTo: Case
         columns:
-        - Case.id
         - Case.caseNumber
-        - Case.subjectId
         - Case.guestName
         - Case.subject
-        - Case.categoryId
         - Case.status
-        - Case.priority
-        - Case.assignedToPrincipalId
-        - Case.venueId
-        - Case.relatedOrderId
-        - Case.slaDueAt
         operation: listCases
         provenance: contract marketing-crm.yaml GET /cases
       - kind: dataTable
         label: Every incident
         bindsTo: Incident
         columns:
-        - Incident.id
         - Incident.incidentNumber
-        - Incident.kind
         - Incident.severity
         - Incident.status
-        - Incident.venueId
-        - Incident.assetId
         - Incident.locationDescription
-        - Incident.isReportable
-        - Incident.notificationDueAt
-        - Incident.notifiedAt
-        - Incident.assignedToPrincipalId
         operation: listIncidents
         provenance: contract maintenance.yaml GET /incidents
     - name: contextPanel
@@ -9179,66 +8446,33 @@ screens:
         label: The selected case
         bindsTo: Case
         columns:
-        - Case.id
         - Case.caseNumber
-        - Case.subjectId
         - Case.guestName
         - Case.subject
-        - Case.kind
-        - Case.channel
-        - Case.recordedAt
-        - Case.syncedAt
-        - Case.categoryId
         - Case.status
         - Case.priority
-        - Case.assignedToPrincipalId
-        - Case.venueId
-        - Case.relatedOrderId
-        - Case.slaDueAt
         operation: listCases
         provenance: contract marketing-crm.yaml GET /cases
       - kind: detailPanel
         label: The incident
         bindsTo: IncidentDetail
         columns:
-        - IncidentDetail.id
         - IncidentDetail.incidentNumber
         - IncidentDetail.kind
         - IncidentDetail.severity
         - IncidentDetail.status
-        - IncidentDetail.venueId
-        - IncidentDetail.assetId
         - IncidentDetail.locationDescription
-        - IncidentDetail.isReportable
-        - IncidentDetail.notificationDueAt
-        - IncidentDetail.notifiedAt
-        - IncidentDetail.assignedToPrincipalId
-        - IncidentDetail.reportedByPrincipalId
-        - IncidentDetail.correctiveWorkOrderId
-        - IncidentDetail.occurredAt
-        - IncidentDetail.recordedAt
         operation: getIncident
         provenance: contract maintenance.yaml GET /incidents/{incidentId}
       - kind: detailPanel
         label: The case
         bindsTo: CaseDetail
         columns:
-        - CaseDetail.id
         - CaseDetail.caseNumber
-        - CaseDetail.subjectId
         - CaseDetail.guestName
         - CaseDetail.subject
-        - CaseDetail.kind
-        - CaseDetail.channel
-        - CaseDetail.recordedAt
-        - CaseDetail.syncedAt
-        - CaseDetail.categoryId
         - CaseDetail.status
         - CaseDetail.priority
-        - CaseDetail.assignedToPrincipalId
-        - CaseDetail.venueId
-        - CaseDetail.relatedOrderId
-        - CaseDetail.slaDueAt
         operation: getCase
         provenance: contract marketing-crm.yaml GET /cases/{caseId}
     - name: actionBar
@@ -9374,9 +8608,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-029
-  apisNote: Rebuilt 9 September 2026 from the 12 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 12 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formReportIncident
     component: modal
@@ -9682,9 +8916,9 @@ screens:
     note: '**Drawn by Claude Design on `Seat Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: EMP-038
   name: Broadcast to team
   module: Operations
@@ -9745,18 +8979,10 @@ screens:
         label: Every announcement
         bindsTo: Announcement
         columns:
-        - Announcement.id
         - Announcement.title
         - Announcement.body
-        - Announcement.kind
-        - Announcement.venueIds
-        - Announcement.departmentIds
-        - Announcement.roleIds
-        - Announcement.requiresAcknowledgement
         - Announcement.expiresAt
-        - Announcement.publishedByPrincipalId
         - Announcement.publishedAt
-        - Announcement.locale
         operation: listAnnouncements
         provenance: contract workforce.yaml GET /announcements
       - kind: publishGate
@@ -9773,18 +8999,11 @@ screens:
         label: The selected announcement
         bindsTo: Announcement
         columns:
-        - Announcement.id
         - Announcement.title
         - Announcement.body
         - Announcement.kind
-        - Announcement.venueIds
-        - Announcement.departmentIds
-        - Announcement.roleIds
-        - Announcement.requiresAcknowledgement
         - Announcement.expiresAt
-        - Announcement.publishedByPrincipalId
         - Announcement.publishedAt
-        - Announcement.locale
         operation: listAnnouncements
         provenance: contract workforce.yaml GET /announcements
       - kind: detailPanel
@@ -9859,9 +9078,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-038
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formPublishAnnouncement
     component: modal
@@ -9985,9 +9204,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-040
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: EMP-041
   name: Training
   module: Operations
@@ -10042,14 +9261,10 @@ screens:
         label: Every training
         bindsTo: TrainingRecord
         columns:
-        - TrainingRecord.id
-        - TrainingRecord.principalId
         - TrainingRecord.courseName
-        - TrainingRecord.required
         - TrainingRecord.completedAt
         - TrainingRecord.expiresAt
         - TrainingRecord.state
-        - TrainingRecord.evidenceRef
         operation: listTrainingRecords
         provenance: contract workforce.yaml GET /training-records
     - name: contextPanel
@@ -10059,14 +9274,11 @@ screens:
         label: The selected training
         bindsTo: TrainingRecord
         columns:
-        - TrainingRecord.id
-        - TrainingRecord.principalId
         - TrainingRecord.courseName
         - TrainingRecord.required
         - TrainingRecord.completedAt
         - TrainingRecord.expiresAt
         - TrainingRecord.state
-        - TrainingRecord.evidenceRef
         operation: listTrainingRecords
         provenance: contract workforce.yaml GET /training-records
     - name: actionBar
@@ -10109,9 +9321,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-041
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSemanticSearch
     component: modal
@@ -10191,9 +9403,6 @@ screens:
         columns:
         - MfaMethod.kind
         - MfaMethod.label
-        - MfaMethod.maskedTarget
-        - MfaMethod.isActive
-        - MfaMethod.isPrimary
         - MfaMethod.enrolledAt
         - MfaMethod.lastUsedAt
         operation: listMfaMethods
@@ -10215,12 +9424,9 @@ screens:
         label: The selected MFA method
         bindsTo: MfaMethod
         columns:
-        - MfaMethod.id
         - MfaMethod.kind
         - MfaMethod.label
         - MfaMethod.maskedTarget
-        - MfaMethod.isActive
-        - MfaMethod.isPrimary
         - MfaMethod.enrolledAt
         - MfaMethod.lastUsedAt
         operation: listMfaMethods
@@ -10229,15 +9435,9 @@ screens:
         label: The session
         bindsTo: Session
         columns:
-        - Session.sessionId
-        - Session.principalId
-        - Session.roleId
         - Session.displayName
         - Session.scope
         - Session.effectivePermissions
-        - Session.permissionsByScope
-        - Session.saleBoardId
-        - Session.workstation
         - Session.openedAt
         - Session.expiresAt
         operation: getCurrentSession
@@ -10320,9 +9520,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-042
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formEnrolMfaMethod
     component: modal
@@ -10439,8 +9639,6 @@ screens:
         - RegisteredDevice.identifier
         - RegisteredDevice.model
         - RegisteredDevice.offlineScope
-        - RegisteredDevice.firmwareVersion
-        - RegisteredDevice.isRequired
         operation: listDevices
         provenance: contract tenancy.yaml GET /devices
     - name: contextPanel
@@ -10450,21 +9648,10 @@ screens:
         label: The selected registered device
         bindsTo: RegisteredDevice
         columns:
-        - RegisteredDevice.id
         - RegisteredDevice.kind
-        - RegisteredDevice.driver
-        - RegisteredDevice.identifier
-        - RegisteredDevice.workstationId
-        - RegisteredDevice.model
-        - RegisteredDevice.pushToken
-        - RegisteredDevice.pushPlatform
         - RegisteredDevice.pushFailureCount
-        - RegisteredDevice.offlineScope
-        - RegisteredDevice.firmwareVersion
-        - RegisteredDevice.isRequired
         - RegisteredDevice.status
         - RegisteredDevice.batteryPercent
-        - RegisteredDevice.lastCheckedAt
         - RegisteredDevice.health
         operation: listDevices
         provenance: contract tenancy.yaml GET /devices
@@ -10512,9 +9699,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-043
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRegisterDevice
     component: modal
@@ -10602,9 +9789,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-044
-  apisNote: Rebuilt 9 September 2026 from the 0 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 0 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: EMP-045
   name: Arabic / RTL
   module: Operations
@@ -10668,9 +9855,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-045
-  apisNote: Rebuilt 9 September 2026 from the 0 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 0 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: EMP-046
   name: Sign out
   module: Operations
@@ -10752,9 +9939,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-046
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: EMP-049
   name: Hand over the journal
   module: Operations
@@ -10835,18 +10022,8 @@ screens:
         label: Every scan event
         bindsTo: ScanEvent
         columns:
-        - ScanEvent.id
-        - ScanEvent.accessPointId
-        - ScanEvent.venueId
-        - ScanEvent.scopePath
-        - ScanEvent.ticketId
         - ScanEvent.mediaCode
         - ScanEvent.outcome
-        - ScanEvent.denyReason
-        - ScanEvent.direction
-        - ScanEvent.operatorPrincipalId
-        - ScanEvent.deviceId
-        - ScanEvent.overridesScanId
         operation: listScans
         provenance: contract access.yaml GET /access/scans
       - kind: scanTarget
@@ -10863,19 +10040,9 @@ screens:
         label: The selected scan event
         bindsTo: ScanEvent
         columns:
-        - ScanEvent.id
-        - ScanEvent.accessPointId
-        - ScanEvent.venueId
-        - ScanEvent.scopePath
-        - ScanEvent.ticketId
         - ScanEvent.mediaCode
         - ScanEvent.outcome
         - ScanEvent.denyReason
-        - ScanEvent.direction
-        - ScanEvent.operatorPrincipalId
-        - ScanEvent.deviceId
-        - ScanEvent.overridesScanId
-        - ScanEvent.overrideReason
         - ScanEvent.recordedAt
         - ScanEvent.syncedAt
         operation: listScans
@@ -10920,9 +10087,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-049
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSyncScans
     component: modal
@@ -10995,35 +10162,19 @@ screens:
         label: Every table reservation
         bindsTo: TableReservation
         columns:
-        - TableReservation.id
-        - TableReservation.outletId
-        - TableReservation.subjectId
         - TableReservation.guestName
-        - TableReservation.contactPoint
-        - TableReservation.partySize
         - TableReservation.startsAt
         - TableReservation.durationMinutes
-        - TableReservation.tables[].tableId
         - TableReservation.status
-        - TableReservation.groupId
-        - TableReservation.notes
         operation: listTableReservations
         provenance: contract fnb.yaml GET /table-reservations
       - kind: dataTable
         label: Every F&B order
         bindsTo: FnbOrder
         columns:
-        - FnbOrder.id
         - FnbOrder.orderNumber
-        - FnbOrder.outletId
-        - FnbOrder.serviceMode
-        - FnbOrder.tableVisitId
         - FnbOrder.status
-        - FnbOrder.lines
-        - FnbOrder.salesOrderId
         - FnbOrder.grossAmount
-        - FnbOrder.taxAmount
-        - FnbOrder.kitchenTicketId
         - FnbOrder.estimatedReadyAt
         operation: listFnbOrders
         provenance: contract fnb.yaml GET /fnb-orders
@@ -11043,20 +10194,11 @@ screens:
         label: The selected table reservation
         bindsTo: TableReservation
         columns:
-        - TableReservation.id
-        - TableReservation.outletId
-        - TableReservation.subjectId
         - TableReservation.guestName
         - TableReservation.contactPoint
-        - TableReservation.partySize
         - TableReservation.startsAt
         - TableReservation.durationMinutes
-        - TableReservation.tables
         - TableReservation.status
-        - TableReservation.groupId
-        - TableReservation.notes
-        - TableReservation.actualPartySize
-        - TableReservation.tableVisitId
         operation: listTableReservations
         provenance: contract fnb.yaml GET /table-reservations
       - kind: detailPanel
@@ -11116,9 +10258,9 @@ screens:
     note: '**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: EMP-052
   name: Floor Plan & Table Map
   module: Floor Service
@@ -11213,9 +10355,9 @@ screens:
     note: '**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: setTableLayout
     removed: true
@@ -11348,9 +10490,9 @@ screens:
     note: '**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSetTableCombinations
     component: modal
@@ -11439,18 +10581,10 @@ screens:
         label: Every table reservation
         bindsTo: TableReservation
         columns:
-        - TableReservation.id
-        - TableReservation.outletId
-        - TableReservation.subjectId
         - TableReservation.guestName
-        - TableReservation.contactPoint
-        - TableReservation.partySize
         - TableReservation.startsAt
         - TableReservation.durationMinutes
-        - TableReservation.tables[].tableId
         - TableReservation.status
-        - TableReservation.groupId
-        - TableReservation.notes
         operation: listTableReservations
         provenance: contract fnb.yaml GET /table-reservations
       - kind: searchField
@@ -11473,20 +10607,11 @@ screens:
         label: The selected table reservation
         bindsTo: TableReservation
         columns:
-        - TableReservation.id
-        - TableReservation.outletId
-        - TableReservation.subjectId
         - TableReservation.guestName
         - TableReservation.contactPoint
-        - TableReservation.partySize
         - TableReservation.startsAt
         - TableReservation.durationMinutes
-        - TableReservation.tables[].tableId
         - TableReservation.status
-        - TableReservation.groupId
-        - TableReservation.notes
-        - TableReservation.actualPartySize
-        - TableReservation.tableVisitId
         operation: listTableReservations
         provenance: contract fnb.yaml GET /table-reservations
   states:
@@ -11532,9 +10657,9 @@ screens:
     note: '**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: EMP-055
   name: Create / Edit Reservation
   module: Floor Service
@@ -11714,9 +10839,9 @@ screens:
     note: '**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formMatchGuest
     component: modal
@@ -11902,9 +11027,9 @@ screens:
     note: '**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: confirmLeaveRestaurantWaitlist
     component: confirmDialog
@@ -11999,11 +11124,8 @@ screens:
         label: Every order
         bindsTo: OrderSummary
         columns:
-        - OrderSummary.id
         - OrderSummary.orderNumber
         - OrderSummary.status
-        - OrderSummary.grossAmount
-        - OrderSummary.refundedAmount
         - OrderSummary.channel
         - OrderSummary.lineCount
         operation: listOrders
@@ -12050,16 +11172,11 @@ screens:
         label: The selected order
         bindsTo: OrderSummary
         columns:
-        - OrderSummary.id
         - OrderSummary.orderNumber
         - OrderSummary.status
         - OrderSummary.grossAmount
         - OrderSummary.refundedAmount
-        - OrderSummary.channel
-        - OrderSummary.lineCount
-        - OrderSummary.principalId
         - OrderSummary.holdLabel
-        - OrderSummary.heldUntil
         operation: listOrders
         provenance: contract orders.yaml GET /orders
       - kind: duplicateMatch
@@ -12079,22 +11196,11 @@ screens:
         label: The guest profile
         bindsTo: GuestProfileDetail
         columns:
-        - GuestProfileDetail.id
-        - GuestProfileDetail.subjectId
         - GuestProfileDetail.displayName
-        - GuestProfileDetail.email
-        - GuestProfileDetail.phone
-        - GuestProfileDetail.preferredLanguage
         - GuestProfileDetail.preferredChannel
-        - GuestProfileDetail.guestLinkId
-        - GuestProfileDetail.tags
         - GuestProfileDetail.engagementScore
-        - GuestProfileDetail.engagementTier
         - GuestProfileDetail.lifetimeValue
         - GuestProfileDetail.visitCount
-        - GuestProfileDetail.lastVisitAt
-        - GuestProfileDetail.isActive
-        - GuestProfileDetail.mergedIntoSubjectId
         operation: getGuestProfile
         provenance: contract marketing-crm.yaml GET /guests/{subjectId}
     - name: actionBar
@@ -12166,9 +11272,9 @@ screens:
     note: '**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formMatchGuest
     component: modal
@@ -12254,19 +11360,9 @@ screens:
         label: The table visit
         bindsTo: TableVisit
         columns:
-        - TableVisit.id
-        - TableVisit.tableId
         - TableVisit.tableLabel
-        - TableVisit.outletId
-        - TableVisit.covers
         - TableVisit.status
-        - TableVisit.serverPrincipalId
-        - TableVisit.subjectId
-        - TableVisit.orders
-        - TableVisit.mergedIntoVisitId
-        - TableVisit.mergedFromVisitIds
         - TableVisit.runningTotal
-        - TableVisit.gratuity
         - TableVisit.openedAt
         - TableVisit.closedAt
         operation: getTableVisit
@@ -12579,9 +11675,9 @@ screens:
     note: '**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 16 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 16 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: joinRestaurantWaitlist
     removed: true
@@ -12665,11 +11761,8 @@ screens:
         label: The bill
         bindsTo: Bill
         columns:
-        - Bill.visitId
         - Bill.covers
-        - Bill.lines
         - Bill.subtotal
-        - Bill.serviceCharge
         - Bill.taxAmount
         - Bill.discountAmount
         - Bill.total
@@ -12899,9 +11992,9 @@ screens:
     note: '**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: EMP-060
   name: Reservation & Table Performance
   module: Floor Service
@@ -12964,18 +12057,10 @@ screens:
         label: Every table reservation
         bindsTo: TableReservation
         columns:
-        - TableReservation.id
-        - TableReservation.outletId
-        - TableReservation.subjectId
         - TableReservation.guestName
-        - TableReservation.contactPoint
-        - TableReservation.partySize
         - TableReservation.startsAt
         - TableReservation.durationMinutes
-        - TableReservation.tables[].tableId
         - TableReservation.status
-        - TableReservation.groupId
-        - TableReservation.notes
         operation: listTableReservations
         provenance: contract fnb.yaml GET /table-reservations
       - kind: searchField
@@ -12994,20 +12079,11 @@ screens:
         label: The selected table reservation
         bindsTo: TableReservation
         columns:
-        - TableReservation.id
-        - TableReservation.outletId
-        - TableReservation.subjectId
         - TableReservation.guestName
         - TableReservation.contactPoint
-        - TableReservation.partySize
         - TableReservation.startsAt
         - TableReservation.durationMinutes
-        - TableReservation.tables
         - TableReservation.status
-        - TableReservation.groupId
-        - TableReservation.notes
-        - TableReservation.actualPartySize
-        - TableReservation.tableVisitId
         operation: listTableReservations
         provenance: contract fnb.yaml GET /table-reservations
       - kind: detailPanel
@@ -13069,9 +12145,9 @@ screens:
     note: '**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: EMP-061
   name: Retail Inventory Command Center
   module: Stock on the Floor
@@ -13136,18 +12212,10 @@ screens:
         label: Every stock movement
         bindsTo: StockMovement
         columns:
-        - StockMovement.id
-        - StockMovement.itemId
-        - StockMovement.locationId
-        - StockMovement.kind
         - StockMovement.quantity
-        - StockMovement.unit
-        - StockMovement.reason
-        - StockMovement.costCenterId
         - StockMovement.recordedAt
         - StockMovement.balanceAfter
         - StockMovement.unitCost
-        - StockMovement.totalCost
         operation: listStockMovements
         provenance: contract inventory.yaml GET /stock-movements
       - kind: searchField
@@ -13166,37 +12234,19 @@ screens:
         label: The selected stock movement
         bindsTo: StockMovement
         columns:
-        - StockMovement.id
-        - StockMovement.itemId
-        - StockMovement.locationId
         - StockMovement.kind
         - StockMovement.quantity
-        - StockMovement.unit
-        - StockMovement.reason
-        - StockMovement.costCenterId
-        - StockMovement.recordedAt
         - StockMovement.balanceAfter
         - StockMovement.unitCost
         - StockMovement.totalCost
-        - StockMovement.principalId
-        - StockMovement.sourceType
-        - StockMovement.sourceId
-        - StockMovement.journalEntryId
         operation: listStockMovements
         provenance: contract inventory.yaml GET /stock-movements
       - kind: detailPanel
         label: The stock position
         bindsTo: StockPosition
         columns:
-        - StockPosition.itemId
         - StockPosition.itemName
-        - StockPosition.sku
-        - StockPosition.locationId
         - StockPosition.locationName
-        - StockPosition.onHand
-        - StockPosition.allocated
-        - StockPosition.available
-        - StockPosition.unit
         - StockPosition.value
         - StockPosition.lastCountedAt
         - StockPosition.lastMovementAt
@@ -13269,9 +12319,9 @@ screens:
     note: '**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: EMP-062
   name: Store Stock & SKU Availability
   module: Stock on the Floor
@@ -13345,15 +12395,8 @@ screens:
         label: The stock position
         bindsTo: StockPosition
         columns:
-        - StockPosition.itemId
         - StockPosition.itemName
-        - StockPosition.sku
-        - StockPosition.locationId
         - StockPosition.locationName
-        - StockPosition.onHand
-        - StockPosition.allocated
-        - StockPosition.available
-        - StockPosition.unit
         - StockPosition.value
         - StockPosition.lastCountedAt
         - StockPosition.lastMovementAt
@@ -13423,9 +12466,9 @@ screens:
     note: '**Drawn by Claude Design on `FnB Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: EMP-063
   name: Requisition & Smart Store Replenishment
   module: Stock on the Floor
@@ -13473,17 +12516,9 @@ screens:
         label: Every requisition
         bindsTo: Requisition
         columns:
-        - Requisition.id
         - Requisition.requisitionNumber
-        - Requisition.venueId
-        - Requisition.departmentId
         - Requisition.status
-        - Requisition.lines
         - Requisition.estimatedTotal
-        - Requisition.raisedByPrincipalId
-        - Requisition.approvedByPrincipalId
-        - Requisition.approvalNote
-        - Requisition.requiredBy
         - Requisition.approvedAt
         operation: listRequisitions
         provenance: contract inventory.yaml GET /requisitions
@@ -13508,17 +12543,10 @@ screens:
         label: The selected requisition
         bindsTo: Requisition
         columns:
-        - Requisition.id
         - Requisition.requisitionNumber
-        - Requisition.venueId
-        - Requisition.departmentId
         - Requisition.status
         - Requisition.lines
         - Requisition.estimatedTotal
-        - Requisition.raisedByPrincipalId
-        - Requisition.approvedByPrincipalId
-        - Requisition.approvalNote
-        - Requisition.requiredBy
         - Requisition.approvedAt
         operation: listRequisitions
         provenance: contract inventory.yaml GET /requisitions
@@ -13591,9 +12619,9 @@ screens:
     note: '**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formCreateRequisition
     component: modal
@@ -13665,12 +12693,9 @@ screens:
         label: Every stock location
         bindsTo: StockLocation
         columns:
-        - StockLocation.id
         - StockLocation.code
         - StockLocation.name
-        - StockLocation.venueId
         - StockLocation.kind
-        - StockLocation.parentLocationId
         - StockLocation.isActive
         operation: listStockLocations
         provenance: contract inventory.yaml GET /stock-locations
@@ -13699,12 +12724,9 @@ screens:
         label: The selected stock location
         bindsTo: StockLocation
         columns:
-        - StockLocation.id
         - StockLocation.code
         - StockLocation.name
-        - StockLocation.venueId
         - StockLocation.kind
-        - StockLocation.parentLocationId
         - StockLocation.isActive
         operation: listStockLocations
         provenance: contract inventory.yaml GET /stock-locations
@@ -13781,9 +12803,9 @@ screens:
     note: '**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formCreateStockTransfer
     component: modal
@@ -13907,18 +12929,11 @@ screens:
         label: The stock transfer
         bindsTo: StockTransfer
         columns:
-        - StockTransfer.id
         - StockTransfer.transferNumber
-        - StockTransfer.fromLocationId
-        - StockTransfer.toLocationId
         - StockTransfer.status
         - StockTransfer.lines
-        - StockTransfer.dispatchedByPrincipalId
-        - StockTransfer.receivedByPrincipalId
         - StockTransfer.dispatchedAt
         - StockTransfer.receivedAt
-        - StockTransfer.closeShortReason
-        - StockTransfer.scopePath
         operation: getStockTransfer
         provenance: contract inventory.yaml GET /stock-transfers/{transferId}
       - kind: dataTable
@@ -14048,9 +13063,9 @@ screens:
     note: '**Drawn by Claude Design on `FnB Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: EMP-066
   name: Stock Count & Cycle Count Management
   module: Stock on the Floor
@@ -14174,9 +13189,9 @@ screens:
     note: '**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formStartStockCount
     component: modal
@@ -14413,9 +13428,9 @@ screens:
     note: '**Drawn by Claude Design on `FnB Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formCreateStockMovement
     component: modal
@@ -14526,15 +13541,8 @@ screens:
         label: The stock position
         bindsTo: StockPosition
         columns:
-        - StockPosition.itemId
         - StockPosition.itemName
-        - StockPosition.sku
-        - StockPosition.locationId
         - StockPosition.locationName
-        - StockPosition.onHand
-        - StockPosition.allocated
-        - StockPosition.available
-        - StockPosition.unit
         - StockPosition.value
         - StockPosition.lastCountedAt
         - StockPosition.lastMovementAt
@@ -14614,9 +13622,9 @@ screens:
     note: '**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formReserveMerchandise
     component: modal
@@ -14692,13 +13700,8 @@ screens:
         label: Every serialised
         bindsTo: SerialisedItem
         columns:
-        - SerialisedItem.id
-        - SerialisedItem.itemId
-        - SerialisedItem.batchId
         - SerialisedItem.serial
-        - SerialisedItem.locationId
         - SerialisedItem.status
-        - SerialisedItem.soldOnOrderLineId
         - SerialisedItem.warrantyUntil
         - SerialisedItem.receivedAt
         operation: listSerialisedItems
@@ -14719,13 +13722,8 @@ screens:
         label: The selected serialised
         bindsTo: SerialisedItem
         columns:
-        - SerialisedItem.id
-        - SerialisedItem.itemId
-        - SerialisedItem.batchId
         - SerialisedItem.serial
-        - SerialisedItem.locationId
         - SerialisedItem.status
-        - SerialisedItem.soldOnOrderLineId
         - SerialisedItem.warrantyUntil
         - SerialisedItem.receivedAt
         operation: listSerialisedItems
@@ -14779,9 +13777,9 @@ screens:
     note: '**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: EMP-070
   name: Inventory Exceptions, AI Replenishment & Action Center
   module: Stock on the Floor
@@ -14848,18 +13846,10 @@ screens:
         label: Every alert
         bindsTo: Alert
         columns:
-        - Alert.id
-        - Alert.ruleId
         - Alert.raisedAt
         - Alert.severity
         - Alert.status
-        - Alert.observedValue
-        - Alert.threshold
-        - Alert.scopePath
-        - Alert.acknowledgedByPrincipalId
         - Alert.acknowledgedAt
-        - Alert.resolvedAt
-        - Alert.escalatedAt
         operation: listAlerts
         provenance: contract reporting.yaml GET /alerts
       - kind: searchField
@@ -14878,18 +13868,11 @@ screens:
         label: The selected alert
         bindsTo: Alert
         columns:
-        - Alert.id
-        - Alert.ruleId
         - Alert.raisedAt
         - Alert.severity
         - Alert.status
         - Alert.observedValue
-        - Alert.threshold
-        - Alert.scopePath
-        - Alert.acknowledgedByPrincipalId
         - Alert.acknowledgedAt
-        - Alert.resolvedAt
-        - Alert.escalatedAt
         operation: listAlerts
         provenance: contract reporting.yaml GET /alerts
     - name: actionBar
@@ -14956,9 +13939,9 @@ screens:
     note: '**Drawn by Claude Design on `Inventory Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formAcknowledgeAlert
     component: modal
@@ -16920,9 +15903,6 @@ screens:
         - Predicted late returns
         - Future reservation conflicts
         - Extension demand
-        - Equipment incident trends
-        - Location return pressure
-        - Expected inventory shortage
         kind: dataTable
         label: Every active rental intelligence
         operation: null
@@ -16937,8 +15917,6 @@ screens:
         - Future reservation conflicts
         - Extension demand
         - Equipment incident trends
-        - Location return pressure
-        - Expected inventory shortage
         kind: detailPanel
         label: The selected active rental intelligence
         notes: 'The pack groups this record''s detail under its own headings: “RNT-10482”, “Confirmed”,

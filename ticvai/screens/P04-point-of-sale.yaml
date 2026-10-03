@@ -566,7 +566,6 @@ screens:
         label: Every denomination
         bindsTo: Denomination
         columns:
-        - Denomination.id
         - Denomination.currencyCode
         - Denomination.displayName
         - Denomination.kind
@@ -604,11 +603,6 @@ screens:
         label: The shift
         bindsTo: Shift
         columns:
-        - Shift.id
-        - Shift.workstationId
-        - Shift.venueId
-        - Shift.scopePath
-        - Shift.principalId
         - Shift.principalDisplayName
         - Shift.incidents
         - Shift.status
@@ -799,9 +793,9 @@ screens:
     note: '**Drawn by Claude Design on `TICVAI Boards v2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 17 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 17 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: POS-002
   name: Sell — Ticket Catalogue
   module: Sell
@@ -1150,16 +1144,10 @@ screens:
         label: Every product
         bindsTo: Product
         columns:
-        - Product.id
         - Product.code
         - Product.name
         - Product.description
         - Product.kind
-        - Product.venueId
-        - Product.scopePath
-        - Product.createdByPrincipalId
-        - Product.approvedByPrincipalId
-        - Product.responsibleDepartmentId
         - Product.onSaleFrom
         - Product.onSaleTo
         operation: listProducts
@@ -1179,14 +1167,10 @@ screens:
         label: Every order
         bindsTo: OrderSummary
         columns:
-        - OrderSummary.id
         - OrderSummary.orderNumber
         - OrderSummary.status
-        - OrderSummary.grossAmount
-        - OrderSummary.refundedAmount
         - OrderSummary.channel
         - OrderSummary.lineCount
-        - OrderSummary.principalId
         - OrderSummary.holdLabel
         - OrderSummary.heldUntil
         operation: listOrders
@@ -1212,15 +1196,9 @@ screens:
         - Promotion.code
         - Promotion.name
         - Promotion.description
-        - Promotion.venueId
         - Promotion.discount
-        - Promotion.conditions
         - Promotion.stackingMode
-        - Promotion.stackingGroup
-        - Promotion.precedence
         - Promotion.validFrom
-        - Promotion.validTo
-        - Promotion.maxRedemptions
         operation: listPromotions
         provenance: contract promotions.yaml GET /promotions
       - kind: dataTable
@@ -1228,31 +1206,17 @@ screens:
         bindsTo: MerchandiseItem
         columns:
         - MerchandiseItem.description
-        - MerchandiseItem.id
         - MerchandiseItem.sku
         - MerchandiseItem.barcode
         - MerchandiseItem.name
-        - MerchandiseItem.outletId
-        - MerchandiseItem.categoryId
-        - MerchandiseItem.variantId
-        - MerchandiseItem.inventoryItemId
         - MerchandiseItem.price
         - MerchandiseItem.onHand
-        - MerchandiseItem.isReturnable
         operation: listMerchandise
         provenance: contract retail.yaml GET /merchandise
       - kind: dataTable
         label: Every entitlement
         bindsTo: Entitlement
         columns:
-        - Entitlement.id
-        - Entitlement.templateId
-        - Entitlement.productId
-        - Entitlement.orderId
-        - Entitlement.orderLineId
-        - Entitlement.subjectId
-        - Entitlement.venueId
-        - Entitlement.scopePath
         - Entitlement.mediaCode
         - Entitlement.status
         - Entitlement.statusNote
@@ -1263,12 +1227,9 @@ screens:
         label: Every sale board
         bindsTo: SaleBoard
         columns:
-        - SaleBoard.id
         - SaleBoard.code
         - SaleBoard.name
-        - SaleBoard.venueId
         - SaleBoard.kind
-        - SaleBoard.pages
         - SaleBoard.isActive
         operation: listSaleBoards
         provenance: contract tenancy.yaml GET /sale-boards
@@ -1311,22 +1272,14 @@ screens:
         label: The selected product
         bindsTo: Product
         columns:
-        - Product.id
         - Product.code
         - Product.name
         - Product.description
         - Product.kind
-        - Product.venueId
-        - Product.scopePath
-        - Product.createdByPrincipalId
-        - Product.approvedByPrincipalId
-        - Product.responsibleDepartmentId
         - Product.onSaleFrom
         - Product.onSaleTo
-        - Product.categoryId
         - Product.lifecycleState
         - Product.isSellable
-        - Product.isStockTracked
         operation: getProduct
         provenance: contract catalogue.yaml GET /products/{productId}
       - kind: detailPanel
@@ -1336,18 +1289,10 @@ screens:
         - Promotion.code
         - Promotion.name
         - Promotion.description
-        - Promotion.venueId
         - Promotion.discount
         - Promotion.conditions
         - Promotion.stackingMode
-        - Promotion.stackingGroup
-        - Promotion.precedence
         - Promotion.validFrom
-        - Promotion.validTo
-        - Promotion.maxRedemptions
-        - Promotion.maxRedemptionsPerGuest
-        - Promotion.budgetCap
-        - Promotion.id
         - Promotion.status
         operation: getPromotion
         provenance: contract promotions.yaml GET /promotions/{promotionId}
@@ -1402,22 +1347,14 @@ screens:
         label: The order
         bindsTo: Order
         columns:
-        - Order.id
         - Order.orderNumber
-        - Order.channel
-        - Order.venueId
-        - Order.scopePath
         - Order.status
         - Order.currency
-        - Order.currencyScale
         - Order.grossAmount
         - Order.taxAmount
         - Order.netAmount
         - Order.refundedAmount
         - Order.totalPriceVariance
-        - Order.lines
-        - Order.payments
-        - Order.principalId
         operation: getOrder
         provenance: contract orders.yaml GET /orders/{orderId}
       - kind: cartPanel
@@ -2115,9 +2052,9 @@ screens:
     note: '**Drawn by Claude Design on `Retail Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 41 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 41 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: POS-003
   name: Sell — Timed Entry
   module: Sell
@@ -2247,14 +2184,8 @@ screens:
         label: Every inventory hold
         bindsTo: InventoryHold
         columns:
-        - InventoryHold.id
-        - InventoryHold.channelCapacityId
-        - InventoryHold.holderWorkstationId
-        - InventoryHold.parentLeaseId
         - InventoryHold.requestedUnits
         - InventoryHold.channel
-        - InventoryHold.grantedUnits
-        - InventoryHold.consumedUnits
         - InventoryHold.status
         - InventoryHold.acquiredAt
         - InventoryHold.expiresAt
@@ -2265,16 +2196,10 @@ screens:
         label: Every product
         bindsTo: Product
         columns:
-        - Product.id
         - Product.code
         - Product.name
         - Product.description
         - Product.kind
-        - Product.venueId
-        - Product.scopePath
-        - Product.createdByPrincipalId
-        - Product.approvedByPrincipalId
-        - Product.responsibleDepartmentId
         - Product.onSaleFrom
         - Product.onSaleTo
         operation: listProducts
@@ -2318,22 +2243,14 @@ screens:
         label: The product
         bindsTo: Product
         columns:
-        - Product.id
         - Product.code
         - Product.name
         - Product.description
         - Product.kind
-        - Product.venueId
-        - Product.scopePath
-        - Product.createdByPrincipalId
-        - Product.approvedByPrincipalId
-        - Product.responsibleDepartmentId
         - Product.onSaleFrom
         - Product.onSaleTo
-        - Product.categoryId
         - Product.lifecycleState
         - Product.isSellable
-        - Product.isStockTracked
         operation: getProduct
         provenance: contract catalogue.yaml GET /products/{productId}
   states:
@@ -2427,9 +2344,9 @@ screens:
         (decided 2 October 2026, Chinmay, batch 5; POSV2-10, DEC-551; CHG-SPO-001): the business-date
         card with Change, the entry-slot card with what is left and Change, guests by ticket type and
         the group and family bundles are the specification; the hold the cashier sees is the cart''s countdown.'
-  apisNote: Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formAcquireInventoryHold
     component: modal
@@ -2723,9 +2640,9 @@ screens:
     note: '**Drawn by Claude Design on `Seat Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formCreateSeatHold
     component: modal
@@ -2965,13 +2882,7 @@ screens:
         label: Every retail sale
         bindsTo: RetailSale
         columns:
-        - RetailSale.id
         - RetailSale.receiptNumber
-        - RetailSale.orderId
-        - RetailSale.outletId
-        - RetailSale.shiftId
-        - RetailSale.subjectId
-        - RetailSale.lines
         - RetailSale.subtotal
         - RetailSale.discountAmount
         - RetailSale.taxAmount
@@ -3017,12 +2928,7 @@ screens:
         label: The selected retail sale
         bindsTo: RetailSale
         columns:
-        - RetailSale.id
         - RetailSale.receiptNumber
-        - RetailSale.orderId
-        - RetailSale.outletId
-        - RetailSale.shiftId
-        - RetailSale.subjectId
         - RetailSale.lines
         - RetailSale.subtotal
         - RetailSale.discountAmount
@@ -3266,9 +3172,9 @@ screens:
     note: '**Drawn by Claude Design on `Retail Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formCreatePayment
     component: modal
@@ -3506,18 +3412,12 @@ screens:
         label: Every refund
         bindsTo: Refund
         columns:
-        - Refund.id
-        - Refund.orderId
-        - Refund.batchId
         - Refund.fxRate
-        - Refund.taxReversalEntryId
         - Refund.settleTo
         - Refund.fxVariance
         - Refund.amount
         - Refund.appliedPercentage
         - Refund.status
-        - Refund.reason
-        - Refund.requestedByPrincipalId
         operation: listOrderRefunds
         provenance: contract orders.yaml GET /orders/{orderId}/refunds
       - kind: dataTable
@@ -3564,22 +3464,14 @@ screens:
         label: The order
         bindsTo: Order
         columns:
-        - Order.id
         - Order.orderNumber
         - Order.channel
-        - Order.venueId
-        - Order.scopePath
         - Order.status
-        - Order.currency
-        - Order.currencyScale
         - Order.grossAmount
         - Order.taxAmount
         - Order.netAmount
         - Order.refundedAmount
         - Order.totalPriceVariance
-        - Order.lines
-        - Order.payments
-        - Order.principalId
         operation: getOrder
         provenance: contract orders.yaml GET /orders/{orderId}
     - name: actionBar
@@ -3642,12 +3534,12 @@ screens:
     confirm:
       label: Void
       operation: voidOrder
-      carries: &id001
+      carries:
       - orderId
       - reason
     dismiss:
       label: Keep the sale
-      discards: &id002
+      discards:
       - reason
   - id: formApplyManualDiscount
     component: modal
@@ -3939,9 +3831,9 @@ screens:
     note: '**Drawn by Claude Design on `Retail Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: POS-007
   name: Close Shift
   module: Shift
@@ -4080,16 +3972,11 @@ screens:
         label: Waiting for a decision
         bindsTo: CashMovement
         columns:
-        - CashMovement.id
         - CashMovement.kind
         - CashMovement.amount
-        - CashMovement.denominations
         - CashMovement.reference
         - CashMovement.reason
         - CashMovement.recordedAt
-        - CashMovement.shiftId
-        - CashMovement.authorisedByPrincipalId
-        - CashMovement.sequence
         - CashMovement.syncedAt
         operation: listCashMovements
         provenance: contract shift.yaml GET /shifts/{shiftId}/cash-movements
@@ -4097,7 +3984,6 @@ screens:
         label: Every denomination
         bindsTo: Denomination
         columns:
-        - Denomination.id
         - Denomination.currencyCode
         - Denomination.displayName
         - Denomination.kind
@@ -4128,19 +4014,13 @@ screens:
         label: The selected cash movement
         bindsTo: CashMovement
         columns:
-        - CashMovement.id
         - CashMovement.kind
         - CashMovement.amount
         - CashMovement.denominations
         - CashMovement.reference
         - CashMovement.reason
         - CashMovement.recordedAt
-        - CashMovement.shiftId
-        - CashMovement.depositBoxId
-        - CashMovement.witnessPrincipalId
         - CashMovement.withdrawalReason
-        - CashMovement.authorisedByPrincipalId
-        - CashMovement.sequence
         - CashMovement.syncedAt
         operation: listCashMovements
         provenance: contract shift.yaml GET /shifts/{shiftId}/cash-movements
@@ -4148,11 +4028,6 @@ screens:
         label: The shift
         bindsTo: Shift
         columns:
-        - Shift.id
-        - Shift.workstationId
-        - Shift.venueId
-        - Shift.scopePath
-        - Shift.principalId
         - Shift.principalDisplayName
         - Shift.incidents
         - Shift.status
@@ -4376,9 +4251,9 @@ screens:
     note: '**Drawn by Claude Design on `TICVAI Boards v2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 17 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 17 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: adjustDepositBoxFloat
     removed: true
@@ -4534,14 +4409,7 @@ screens:
         - ReportDefinition.name
         - ReportDefinition.description
         - ReportDefinition.category
-        - ReportDefinition.dataSource
-        - ReportDefinition.columns
-        - ReportDefinition.filters
-        - ReportDefinition.groupBy
-        - ReportDefinition.parameters
-        - ReportDefinition.requiredPermission
         - ReportDefinition.maxDateRangeDays
-        - ReportDefinition.id
         - ReportDefinition.isSystem
         operation: listReports
         provenance: contract reporting.yaml GET /reports
@@ -4570,15 +4438,7 @@ screens:
         - ReportDefinition.dataSource
         - ReportDefinition.columns
         - ReportDefinition.filters
-        - ReportDefinition.groupBy
-        - ReportDefinition.parameters
-        - ReportDefinition.requiredPermission
-        - ReportDefinition.maxDateRangeDays
-        - ReportDefinition.id
-        - ReportDefinition.isSystem
-        - ReportDefinition.isRetired
         - ReportDefinition.estimatedCost
-        - ReportDefinition.createdByPrincipalId
         - ReportDefinition.lastRunAt
         operation: getReport
         provenance: contract reporting.yaml GET /reports/{reportId}
@@ -4689,9 +4549,9 @@ screens:
       differences: The prototype is a fixed cross-venue command dashboard. There is no report list, run-report
         action, natural-language question or saved query (all declared in the YAML). It also shows terminal
         health and cross-outlet data, which is broader than 'from the terminal'.
-  apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: deleteReport
     removed: true
@@ -4793,13 +4653,7 @@ screens:
         label: Waiting for a decision
         bindsTo: Shift
         columns:
-        - Shift.id
-        - Shift.workstationId
-        - Shift.venueId
-        - Shift.scopePath
-        - Shift.principalId
         - Shift.principalDisplayName
-        - Shift.incidents
         - Shift.status
         - Shift.currency
         - Shift.currencyScale
@@ -4815,14 +4669,8 @@ screens:
         - RotaAssignment.restPeriodBefore
         - RotaAssignment.breachesWorkingHourLimit
         - RotaAssignment.labourCost
-        - RotaAssignment.id
-        - RotaAssignment.principalId
         - RotaAssignment.displayName
-        - RotaAssignment.venueId
-        - RotaAssignment.departmentId
         - RotaAssignment.position
-        - RotaAssignment.requiredRoleId
-        - RotaAssignment.workstationId
         operation: listRotaAssignments
         provenance: contract workforce.yaml GET /rota-assignments
       - kind: dataTable
@@ -4916,9 +4764,9 @@ screens:
     note: '**Drawn by Claude Design on `POS Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 16 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 16 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: acceptShiftVariance
     removed: true
@@ -5093,7 +4941,6 @@ screens:
         label: The media asset
         bindsTo: MediaAssetDetail
         columns:
-        - MediaAssetDetail.id
         - MediaAssetDetail.kind
         - MediaAssetDetail.status
         - MediaAssetDetail.filename
@@ -5101,36 +4948,21 @@ screens:
         - MediaAssetDetail.sizeBytes
         - MediaAssetDetail.title
         - MediaAssetDetail.description
-        - MediaAssetDetail.altText
-        - MediaAssetDetail.width
-        - MediaAssetDetail.height
         - MediaAssetDetail.durationSeconds
-        - MediaAssetDetail.customMetadata
-        - MediaAssetDetail.sharedWithTenantIds
-        - MediaAssetDetail.tags
-        - MediaAssetDetail.venueId
         operation: getMediaAsset
         provenance: contract assets.yaml GET /media/{mediaId}
       - kind: detailPanel
         label: The cart
         bindsTo: Cart
         columns:
-        - Cart.id
         - Cart.token
-        - Cart.venueId
         - Cart.channel
-        - Cart.subjectId
         - Cart.status
-        - Cart.lines
-        - Cart.conflicts
         - Cart.subtotal
         - Cart.discountTotal
         - Cart.taxTotal
         - Cart.total
-        - Cart.appliedPromotionIds
         - Cart.expiresAt
-        - Cart.extensionsUsed
-        - Cart.maxExtensions
         operation: getCart
         provenance: contract orders.yaml GET /carts/{cartId}
       - kind: scanTarget
@@ -5218,9 +5050,9 @@ screens:
       note: 'The prototype has no view for this screen. It was drawn in Claude Design on 29 September
         in the prototype''s style and accepted as its design the same day (the frame on this screen''s
         board): build the layout from that frame.'
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formAppendEntitlementToMedia
     component: modal
@@ -5355,13 +5187,8 @@ screens:
         label: Every serialised
         bindsTo: SerialisedItem
         columns:
-        - SerialisedItem.id
-        - SerialisedItem.itemId
-        - SerialisedItem.batchId
         - SerialisedItem.serial
-        - SerialisedItem.locationId
         - SerialisedItem.status
-        - SerialisedItem.soldOnOrderLineId
         - SerialisedItem.warrantyUntil
         - SerialisedItem.receivedAt
         operation: listSerialisedItems
@@ -5376,8 +5203,6 @@ screens:
         label: The return policy
         bindsTo: ReturnPolicy
         columns:
-        - ReturnPolicy.id
-        - ReturnPolicy.outletId
         - ReturnPolicy.defaultWindowDays
         - ReturnPolicy.requiresReceipt
         - ReturnPolicy.allowCashRefundOnCardSale
@@ -5385,7 +5210,6 @@ screens:
         - ReturnPolicy.requiresSecondUserAbove
         - ReturnPolicy.requiresApprovalAbove
         - ReturnPolicy.restockableConditions
-        - ReturnPolicy.nonReturnableCategoryIds
         operation: getReturnPolicy
         provenance: contract retail.yaml GET /outlets/{outletId}/return-policy
     - name: actionBar
@@ -5509,9 +5333,9 @@ screens:
     note: '**Drawn by Claude Design on `POS Frontline Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formCreateRefund
     component: modal
@@ -5744,19 +5568,11 @@ screens:
         label: The shift
         bindsTo: Shift
         columns:
-        - Shift.id
-        - Shift.workstationId
-        - Shift.venueId
-        - Shift.scopePath
-        - Shift.principalId
         - Shift.principalDisplayName
         - Shift.incidents
         - Shift.status
-        - Shift.currency
-        - Shift.currencyScale
         - Shift.depositBoxCode
         - Shift.bagNumber
-        - Shift.openingFloat
         - Shift.salesTotal
         - Shift.refundsTotal
         - Shift.liftsTotal
@@ -5878,9 +5694,9 @@ screens:
     note: '**Drawn by Claude Design on `POS Frontline Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRecordOrderHandover
     component: modal
@@ -6160,9 +5976,9 @@ screens:
     note: '**Drawn by Claude Design on `POS Frontline Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: adjustDepositBoxFloat
     removed: true
@@ -6294,10 +6110,13 @@ screens:
     confirm:
       label: Void
       operation: voidOrder
-      carries: *id001
+      carries:
+      - orderId
+      - reason
     dismiss:
       label: Keep the sale
-      discards: *id002
+      discards:
+      - reason
   - id: formApplyManualDiscount
     component: modal
     trigger: Apply manual discount
@@ -6369,9 +6188,9 @@ screens:
         drawer'' (the no-sale) takes no reason, checks no permission and writes no audit entry; it only
         shows a toast. This is the POS-020 gap C-4/C-5, still present. The approval modal has a reject
         path that the YAML does not model.'
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: POS-015
   name: Cash Operations Dashboard
   module: Sell
@@ -6424,16 +6243,11 @@ screens:
         label: Every cash movement
         bindsTo: CashMovement
         columns:
-        - CashMovement.id
         - CashMovement.kind
         - CashMovement.amount
-        - CashMovement.denominations
         - CashMovement.reference
         - CashMovement.reason
         - CashMovement.recordedAt
-        - CashMovement.shiftId
-        - CashMovement.authorisedByPrincipalId
-        - CashMovement.sequence
         - CashMovement.syncedAt
         operation: listCashMovements
         provenance: contract shift.yaml GET /shifts/{shiftId}/cash-movements
@@ -6441,17 +6255,9 @@ screens:
         label: Every deposit box
         bindsTo: DepositBox
         columns:
-        - DepositBox.id
-        - DepositBox.cashierPrincipalId
         - DepositBox.cashierName
-        - DepositBox.venueId
-        - DepositBox.workstationId
-        - DepositBox.shiftId
         - DepositBox.status
-        - DepositBox.openingFloat
-        - DepositBox.openingDenominations
         - DepositBox.withdrawnTotal
-        - DepositBox.foreignHoldings
         - DepositBox.expectedTotal
         operation: listDepositBoxes
         provenance: contract shift.yaml GET /deposit-boxes
@@ -6532,9 +6338,9 @@ screens:
       note: 'The prototype has no view for this screen. It was drawn in Claude Design on 29 September
         in the prototype''s style and accepted as its design the same day (the frame on this screen''s
         board): build the layout from that frame.'
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-010): The purpose read "Cash Operations Dashboard
     — from the client design board, 20 August"; the client asked for live cash status per till with expected
     cash and card totals for supervisors (DI-273, DI-308; design-notes correction fnb-retail POS-015).'
@@ -6707,9 +6513,9 @@ screens:
     note: '**Drawn by Claude Design on `POS Frontline Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSetReaderScannerPeripheral
     component: modal
@@ -6879,9 +6685,9 @@ screens:
     note: '**Drawn by Claude Design on `POS Frontline Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: POS-018
   name: Safe Drop & Cash Transfer Management
   module: Sell
@@ -7055,9 +6861,9 @@ screens:
     note: '**Drawn by Claude Design on `POS Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: createRotaAssignment
     removed: true
@@ -7166,19 +6972,11 @@ screens:
         label: The selected shift
         bindsTo: Shift
         columns:
-        - Shift.id
-        - Shift.workstationId
-        - Shift.venueId
-        - Shift.scopePath
-        - Shift.principalId
         - Shift.principalDisplayName
         - Shift.incidents
         - Shift.status
-        - Shift.currency
-        - Shift.currencyScale
         - Shift.depositBoxCode
         - Shift.bagNumber
-        - Shift.openingFloat
         - Shift.salesTotal
         - Shift.refundsTotal
         - Shift.liftsTotal
@@ -7261,9 +7059,9 @@ screens:
     note: '**Drawn by Claude Design on `POS Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: getVenueSettings
     removed: true
@@ -7378,18 +7176,12 @@ screens:
         label: Waiting for a decision
         bindsTo: Alert
         columns:
-        - Alert.id
-        - Alert.ruleId
         - Alert.raisedAt
         - Alert.severity
         - Alert.status
-        - Alert.observedValue
         - Alert.threshold
-        - Alert.scopePath
-        - Alert.acknowledgedByPrincipalId
         - Alert.acknowledgedAt
         - Alert.resolvedAt
-        - Alert.escalatedAt
         operation: listAlerts
         provenance: contract reporting.yaml GET /alerts
       - kind: primaryButton
@@ -7517,9 +7309,9 @@ screens:
     note: '**Drawn by Claude Design on `POS Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRecordNoSale
     component: modal
@@ -7805,9 +7597,9 @@ screens:
         the default send-first outlet audit R261 stands. Design corrections (CHG-SPO-016): no "Open-dated
         · any day" validity chip on food tiles, no "Today" or "Low capacity" REFINE chips and no "Reserve"
         button in a food-only cart; those are ticket concepts.'
-  apisNote: Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formAddCartLine
     component: modal
@@ -7949,18 +7741,12 @@ screens:
         label: Every kitchen ticket
         bindsTo: KitchenTicket
         columns:
-        - KitchenTicket.id
-        - KitchenTicket.orderId
         - KitchenTicket.orderNumber
-        - KitchenTicket.outletId
         - KitchenTicket.tableLabel
         - KitchenTicket.serviceMode
-        - KitchenTicket.coursing
         - KitchenTicket.buzzerCode
         - KitchenTicket.status
         - KitchenTicket.priority
-        - KitchenTicket.prioritisedByPrincipalId
-        - KitchenTicket.prioritiseReason
         operation: listKitchenTickets
         provenance: contract fnb.yaml GET /kitchen/tickets
       - kind: metricTile
@@ -7977,19 +7763,12 @@ screens:
         label: The selected kitchen ticket
         bindsTo: KitchenTicket
         columns:
-        - KitchenTicket.id
-        - KitchenTicket.orderId
         - KitchenTicket.orderNumber
-        - KitchenTicket.outletId
         - KitchenTicket.tableLabel
         - KitchenTicket.serviceMode
-        - KitchenTicket.coursing
         - KitchenTicket.buzzerCode
         - KitchenTicket.status
         - KitchenTicket.priority
-        - KitchenTicket.prioritisedByPrincipalId
-        - KitchenTicket.prioritiseReason
-        - KitchenTicket.lines
         - KitchenTicket.targetReadyAt
         - KitchenTicket.elapsedSeconds
         operation: listKitchenTickets
@@ -8105,9 +7884,9 @@ screens:
         and collection are worked from the queue, not from a screen of their own. Design correction (decided
         1 October, POSV2-4): a counter order is not fired on payment; audit R261 stands: send to kitchen,
         then charge. The guest status board is owned by KIT-007 (POSV2-7).'
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formCreateFnbOrder
     component: modal
@@ -8347,9 +8126,9 @@ screens:
         Chinmay, batch 5: "Lockers tab, refine chips and Scan; no inventory ledger on the till"; POSV2-13,
         DEC-554; CHG-SPO-001). Chip wording: "Low stock", never "Low capacity", and no "Open-dated" validity
         on merchandise (DI-354; design-notes correction fnb-retail POS-023).'
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formAddCartLine
     component: modal
@@ -8561,9 +8340,9 @@ screens:
       note: 'The prototype has no view for this screen. It was drawn in Claude Design on 29 September
         in the prototype''s style and accepted as its design the same day (the frame on this screen''s
         board): build the layout from that frame.'
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSetTableLayout
     component: modal
