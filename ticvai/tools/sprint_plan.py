@@ -296,7 +296,11 @@ def pace_model(team, items):
     A scenario (Chinmay, 1 October: "5 tasks per day ... ramp up towards the next block ... 2x by Block D"):
     tasksPerDevDay x the average points of a non-AI task in the plan, held through Sprint rampFromSprint - 1,
     then rising linearly sprint by sprint to rampTo x that at Sprint rampFullSprint, and held. Per-person pace
-    (Surendra 60%) still applies on top; AI engine tasks are sized in days and are not affected."""
+    (Surendra 60%) still applies on top; AI engine tasks are sized in days and are not affected.
+
+    **Block A at 6 tasks a day** (Chinmay, 3 October, CHG-RONEP-009): `tasksPerDevDayBlockA` replaces tasksPerDevDay in the
+    sprints before the ramp (Sprints 1-4); the ramp after them still starts from tasksPerDevDay, so it is unchanged. A
+    task-a-day is per developer: N average tasks (the average points of a non-AI task) a working day, each."""
     cfg = sprint_settings(team)["pace"]
     tpd = cfg.get("tasksPerDevDay")
     if not tpd:
@@ -306,9 +310,11 @@ def pace_model(team, items):
     base = float(tpd) * avg
     to, a, b = float(cfg.get("rampTo") or 1.0), int(cfg.get("rampFromSprint") or 5), int(cfg.get("rampFullSprint") or 11)
 
+    early = float(cfg.get("tasksPerDevDayBlockA") or tpd) / float(tpd)
+
     def factor(n):
         if n < a:
-            return 1.0
+            return early
         if n >= b:
             return to
         return 1.0 + (to - 1.0) * (n - a + 1) / (b - a + 1)
@@ -317,8 +323,9 @@ def pace_model(team, items):
 
     def at(i):
         return by_sprint.get(sprint_of_index(max(i, 0.0)), base * to)
-    return at, (f"{tpd:g} tasks per developer per day x {avg:.2f} points a task = {base:.1f} points, through Sprint "
-                f"{a - 1}; rising to {to:g}x ({base * to:.1f}) by Sprint {b}, then held"), base
+    return at, (f"{tpd * early:g} tasks per developer per day x {avg:.2f} points a task = {base * early:.1f} points, through "
+                f"Sprint {a - 1}; from Sprint {a} the ramp from {tpd:g} ({base:.1f}) rises to {to:g}x ({base * to:.1f}) by "
+                f"Sprint {b}, then held"), base
 
 
 def release_number(tag):

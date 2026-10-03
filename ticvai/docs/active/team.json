@@ -256,6 +256,8 @@
   ],
   "pace": {
    "tasksPerDevDay": 5,
+   "tasksPerDevDayBlockA": 6,
+   "tasksPerDevDayBlockANote": "Block A (Sprints 1-4) at 6 tasks a day per developer instead of overtime (Chinmay, 3 October, CHG-RONEP-009); the ramp from Sprint 5 still starts from tasksPerDevDay",
    "rampTo": 2.0,
    "rampFromSprint": 5,
    "rampFullSprint": 11
